@@ -100,30 +100,91 @@ window.LP = {
         ['Omar', 'I’ll ask the families. I think a lot of parents will help.']], marks: [["O**K**, ↗ **ev**eryone. ↘", "We’re **meet**ing the **head** teacher on **Mon**day, ↗ so we need‿a **plan** to**day**. ↘"], ["**Right**. ↘ The e**vent**‿is going to be a**bout** **fes**tivals‿of **light**: Di**wa**li, ↗ **Ha**nukkah, ↗ **Lu**nar New **Year** and **Christ**mas. ↘"], ["**Good**. ↘ **When**‿is‿it? ↘"], ["It’s‿on **Fri**day the e**lev**enth of De**cem**ber. ↘", "**School** **fin**ishes‿at **two**, ↗ so the e**vent** **starts**‿at **ten** and **fin**ishes at **one** **thir**ty. ↘"], ["**Where’s**‿it going to take **place**? ↘"], ["In the **school** **hall**. ↘", "There will be **four** **stalls**, ↗ one for‿**each** **fes**tival. ↘"], ["What‿a**bout** **food**? ↘"], ["I’ll‿**ask** the **fam**ilies. ↘", "I **think**‿a **lot**‿of **par**ents will **help**. ↘"]], cues: [[0.03, 1.27, 0.05, 1.5], [1.27, 5.08, 1.5, 5.97], [5.2, 12.75, 6.48, 15.41], [12.88, 14.75, 15.9, 18.01], [14.96, 17.17, 18.68, 21.25], [17.25, 22.13, 21.36, 27.06], [22.23, 24.42, 27.58, 29.99], [24.65, 26.09, 30.79, 32.46], [26.09, 29.27, 32.46, 36.24], [29.41, 30.87, 36.75, 38.47], [31.02, 32.39, 38.98, 40.56], [32.4, 34.22, 40.61, 42.68]] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: '<strong>going to</strong> per a plans que ja tens (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> per a decisions que prens ara i ofertes (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + nom (<em>There will be music and food.</em>).', en: '<strong>going to</strong> for plans you already have (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> for decisions made now and offers (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + noun (<em>There will be music and food.</em>).' },
-        { r: 'safe', en: '<strong>Present Continuous</strong> for arrangements (<em>We’re meeting the head teacher on Monday.</em>) · <strong>Present Simple</strong> for timetables (<em>The event starts at 10.00.</em>) · <strong>will</strong> for predictions (<em>I think everyone will love it.</em>).' },
-        { r: 'daring', en: '<strong>One plan, five futures:</strong> choose the form by the reason. Decided before → <em>going to</em> · arranged with someone → Present Continuous · on the programme → Present Simple · decided now or offered → <em>will</em> · predicted: <em>will</em> for an opinion (<em>I think…</em>), <em>going to</em> when you can see it coming (<em>Look at those clouds! It’s going to rain.</em>).' }
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
+        return [
+          { p: 'fut', ca: head('🔮', 'Parlar del futur: <em>going to</em>, <em>will</em>, <em>There will be</em>', 'Depèn de <b>quan</b> has pres la decisió.') +
+              row(card('blue', '🗓 going to = un PLA que ja tens', ex('We’re <b>going to decorate</b> the hall.', 'ja ho hem decidit') + ex('Ana is <b>going to make</b> the posters.', 'ja té el paper') + small('am / is / are + going to + verb')),
+                card('orange', '⚡ will = ho decideixes ARA / t’ofereixes', ex('“We need music!” “I’<b>ll bring</b> my speaker!”') + ex('“It’s cold.” “I’<b>ll close</b> the window.”') + small('will (’ll) + verb, igual per a tothom')),
+                card('green', '🎪 There will be + nom', ex('<b>There will be</b> music and food.') + ex('<b>There will be</b> four stalls.') + small('= hi haurà'))) +
+              table([['', 'going to', 'will'], ['➕', 'We’re <b>going to</b> invite families.', 'I’<b>ll</b> help you.'], ['➖', 'We <b>aren’t going to</b> invite other schools.', 'I <b>won’t</b> be late.'], ['❓', '<b>Are</b> you <b>going to</b> come?', '<b>Will</b> you help me?']]) +
+              mistakes('Compte!', bad('We going to decorate.', 'We<b>’re</b> going to decorate.', '(falta are)'), bad('I will to bring the music.', 'I’ll <b>bring</b> the music.', '(sense to)'), bad('There will have music.', 'There will <b>be</b> music.')) +
+              together(true, ['“The bin is full!” “I ___ take it out!”', '’ll (will)'], ['We decided last week: we ___ ___ ___ have a party on Friday.', '’re going to'], ['___ ___ ___ a DJ and a cake. (hi haurà)', 'There will be']) +
+              turn('Ara tu:', 'un pla per al cap de setmana (<em>going to</em>) i una oferta per ajudar un company (<em>I’ll…</em>).'),
+            en: head('🔮', 'Talking about the future: <em>going to</em>, <em>will</em>, <em>There will be</em>', 'It depends on <b>when</b> you made the decision.') +
+              row(card('blue', '🗓 going to = a PLAN you already have', ex('We’re <b>going to decorate</b> the hall.', 'we decided before') + ex('Ana is <b>going to make</b> the posters.', 'she bought the paper') + small('am / is / are + going to + verb')),
+                card('orange', '⚡ will = you decide NOW / you offer', ex('“We need music!” “I’<b>ll bring</b> my speaker!”') + ex('“It’s cold.” “I’<b>ll close</b> the window.”') + small('will (’ll) + verb, the same for everybody')),
+                card('green', '🎪 There will be + noun', ex('<b>There will be</b> music and food.') + ex('<b>There will be</b> four stalls.'))) +
+              table([['', 'going to', 'will'], ['➕', 'We’re <b>going to</b> invite families.', 'I’<b>ll</b> help you.'], ['➖', 'We <b>aren’t going to</b> invite other schools.', 'I <b>won’t</b> be late.'], ['❓', '<b>Are</b> you <b>going to</b> come?', '<b>Will</b> you help me?']]) +
+              mistakes('Watch out', bad('We going to decorate.', 'We<b>’re</b> going to decorate.', '(are is missing)'), bad('I will to bring the music.', 'I’ll <b>bring</b> the music.', '(no to)'), bad('There will have music.', 'There will <b>be</b> music.')) +
+              together(false, ['“The bin is full!” “I ___ take it out!”', '’ll (will)'], ['We decided last week: we ___ ___ ___ have a party on Friday.', '’re going to'], ['___ ___ ___ a DJ and a cake. (hi haurà)', 'There will be']) +
+              turn('Your turn:', 'one plan for the weekend (<em>going to</em>) and one offer to help a classmate (<em>I’ll…</em>).') },
+          { p: 'three', r: 'safe', en: head('📅', 'Three more futures', 'For a real event you need more than <em>going to</em> and <em>will</em>.') +
+              row(card('purple', '🤝 Present Continuous = ARRANGED with someone', ex('We’<b>re meeting</b> the head teacher on Monday at 9.') + ex('We’<b>re performing</b> a dance at 12.') + small('It’s in the diary: a day, a time, other people.')),
+                card('teal', '🕙 Present Simple = the TIMETABLE', ex('The event <b>starts</b> at 10.00.') + ex('The bus <b>leaves</b> at 8.15 tomorrow.') + small('Programmes, timetables, opening hours.')),
+                card('orange', '🔮 will = a PREDICTION (your opinion)', ex('I think everyone <b>will love</b> it.') + ex('It <b>will be</b> a great day.') + small('Often with <em>I think, I’m sure, probably</em>.'))) +
+              mistakes('Watch out', bad('We will meet the head teacher on Monday at 9.', 'We’<b>re meeting</b> the head teacher on Monday at 9.', '(it’s arranged)'), bad('The event is starting at 10.00.', 'The event <b>starts</b> at 10.00.', '(timetable)')) +
+              together(false, ['The film ___ (start) at 8.00. (cinema timetable)', 'starts'], ['We ___ ___ (meet) Ms Puig tomorrow at 9. (it’s in her diary)', '’re meeting']) +
+              turn('Your turn:', 'one arrangement you have this week, one timetable (school, bus, match) and one prediction about the celebration day.') },
+          { p: 'five', r: 'daring', en: head('🧭', 'One plan, five futures', 'Choose the form by the <b>reason</b>, not by the time.') +
+              table([['Why?', 'Form', 'Example'], ['🗓 decided before', 'going to', 'We’re <b>going to set up</b> four stalls.'], ['🤝 arranged with someone', 'Present Continuous', 'We’<b>re meeting</b> the head teacher on Monday.'], ['🕙 on the programme', 'Present Simple', 'The doors <b>open</b> at 9.30.'], ['⚡ decided now / offered', 'will', '“Nobody has a speaker.” “I’<b>ll bring</b> mine.”'], ['🔮 an opinion', 'will', 'I think it <b>will be</b> a success.'], ['👀 you can SEE it coming', 'going to', 'Look at those clouds! It’s <b>going to rain</b>.']]) +
+              mistakes('Watch out', bad('Look at those clouds! It will rain.', 'It’s <b>going to</b> rain.', '(you can see it)'), bad('We will use the hall on Friday. (she has said yes)', 'We’<b>re using</b> the hall on Friday.')) +
+              together(false, ['Look at those clouds! It ___ ___ ___ (snow).', '’s going to snow'], ['I think the party ___ ___ (be) great.', 'will be']) +
+              turn('Your turn:', 'write your plan for the day with at least four of the five futures and say why you chose each one.') }
+        ];
+      })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'fut', title: { en: 'going to, will, There will be' }, note: { ca: 'Pla → <b>going to</b> · decisió ara / oferta → <b>will</b> · hi haurà → <b>There will be</b>', en: 'Plan → <b>going to</b> · decision now / offer → <b>will</b> · <b>There will be</b> + noun' } },
+        { id: 'three', title: { en: 'Arrangements, timetables, predictions' }, note: { en: 'Arranged → Present Continuous · timetable → Present Simple · opinion → will' } },
+        { id: 'five', title: { en: 'One plan, five futures' }, note: { en: 'Choose the form by the reason.' } }
       ],
       items: [
-        { q: 'We ___ ___ ___ (decorate) the hall. It’s our plan.', a: ['are going to decorate', "'re going to decorate"], ca: 'Pla → going to.', en: 'A plan → going to.' },
-        { q: '“We need music!” “I ___ bring my speaker!”', a: ['will', "'ll"], ca: 'Oferta → will.', en: 'Offer → will.' },
-        { q: '___ ___ ___ music and food.', a: ['there will be'], ca: 'There will be + nom.', en: 'There will be + noun.' },
-        { q: 'Ana ___ ___ ___ (make) the posters. She bought the paper yesterday.', a: ['is going to make', "'s going to make"], ca: 'Ja ho té planejat → going to.', en: 'Already planned → going to.' },
-        { q: '“It’s cold in here.” “I ___ close the window.”', a: ['will', "'ll"], ca: 'Decisió ara → will.', en: 'Decision now → will.' },
-        { r: 'insecure', q: 'We ___ ___ ___ (not / invite) other schools.', a: ["aren't going to invite", 'are not going to invite'], ca: 'Negativa: aren’t going to.', en: 'Negative: aren’t going to.' },
-        { r: 'insecure', q: '___ you going to come?', a: ['are'], ca: 'Pregunta: Are you going to…?', en: 'Question: Are you going to…?' },
-        { q: 'There ___ ___ four stalls.', a: ['will be'], ca: 'There will be.', en: 'There will be.' },
-        { r: 'safe', q: 'We ___ ___ (meet) the head teacher on Monday at 9. It’s in her diary.', a: ['are meeting', "'re meeting"], en: 'Arrangement → Present Continuous.' },
-        { r: 'safe', q: 'The event ___ (start) at 10.00.', a: ['starts'], en: 'Timetable → Present Simple.' },
-        { r: 'safe', q: 'I think everyone ___ ___ (love) it.', a: ['will love', "'ll love"], en: 'Prediction → will.' },
-        { r: 'safe', q: 'The bus ___ (leave) at 8.15 tomorrow.', a: ['leaves'], en: 'Timetable → Present Simple.' },
-        { r: 'safe', q: 'We ___ ___ (perform) a dance at 12. We booked the hall yesterday.', a: ['are performing', "'re performing"], en: 'Arrangement → Present Continuous.' },
-        { r: 'daring', q: 'Look at those dark clouds! It ___ ___ ___ (rain) before the parade.', a: ['is going to rain', "'s going to rain"], en: 'A prediction you can see coming → going to.' },
-        { r: 'daring', q: 'The head teacher has said yes: we ___ ___ (use) the hall on Friday.', a: ['are using', "'re using"], en: 'Arranged with another person → Present Continuous.' },
-        { r: 'daring', q: 'The doors ___ (open) at 9.30, and the event finishes at 13.00.', a: ['open'], en: 'On the programme → Present Simple.' },
-        { r: 'daring', q: '“Nobody has a speaker.” “Don’t worry, I ___ ___ (bring) mine.”', a: ['will bring', "'ll bring"], en: 'Offered now → will.' },
-        { r: 'daring', q: 'Correct it: “We will meet the head teacher on Monday at 9. It’s in her diary.” → We ___ ___ the head teacher on Monday at 9.', a: ['are meeting', "'re meeting"], en: 'It is already arranged, so Present Continuous, not will.' }
+        { p: 'fut', q: 'We ___ ___ ___ (decorate) the hall. It’s our plan.', a: ['are going to decorate', "'re going to decorate"], ca: 'Pla → going to.', en: 'A plan → going to.' },
+        { p: 'fut', q: '“We need music!” “I ___ bring my speaker!”', a: ['will', "'ll"], ca: 'Oferta → will.', en: 'Offer → will.' },
+        { p: 'fut', q: '___ ___ ___ music and food.', a: ['there will be'], ca: 'There will be + nom.', en: 'There will be + noun.' },
+        { p: 'fut', q: 'Ana ___ ___ ___ (make) the posters. She bought the paper yesterday.', a: ['is going to make', "'s going to make"], ca: 'Ja ho té planejat → going to.', en: 'Already planned → going to.' },
+        { p: 'fut', q: '“It’s cold in here.” “I ___ close the window.”', a: ['will', "'ll"], ca: 'Decisió ara → will.', en: 'Decision now → will.' },
+        { p: 'fut', r: 'insecure', q: 'We ___ ___ ___ (not / invite) other schools.', a: ["aren't going to invite", 'are not going to invite'], ca: 'Negativa: aren’t going to.', en: 'Negative: aren’t going to.' },
+        { p: 'fut', r: 'insecure', q: '___ you going to come?', a: ['are'], ca: 'Pregunta: Are you going to…?', en: 'Question: Are you going to…?' },
+        { p: 'fut', q: 'There ___ ___ four stalls.', a: ['will be'], ca: 'There will be.', en: 'There will be.' },
+        { p: 'three', r: 'safe', q: 'We ___ ___ (meet) the head teacher on Monday at 9. It’s in her diary.', a: ['are meeting', "'re meeting"], en: 'Arrangement → Present Continuous.' },
+        { p: 'three', r: 'safe', q: 'The event ___ (start) at 10.00.', a: ['starts'], en: 'Timetable → Present Simple.' },
+        { p: 'three', r: 'safe', q: 'I think everyone ___ ___ (love) it.', a: ['will love', "'ll love"], en: 'Prediction → will.' },
+        { p: 'three', r: 'safe', q: 'The bus ___ (leave) at 8.15 tomorrow.', a: ['leaves'], en: 'Timetable → Present Simple.' },
+        { p: 'three', r: 'safe', q: 'We ___ ___ (perform) a dance at 12. We booked the hall yesterday.', a: ['are performing', "'re performing"], en: 'Arrangement → Present Continuous.' },
+        { p: 'five', r: 'daring', q: 'Look at those dark clouds! It ___ ___ ___ (rain) before the parade.', a: ['is going to rain', "'s going to rain"], en: 'A prediction you can see coming → going to.' },
+        { p: 'five', r: 'daring', q: 'The head teacher has said yes: we ___ ___ (use) the hall on Friday.', a: ['are using', "'re using"], en: 'Arranged with another person → Present Continuous.' },
+        { p: 'five', r: 'daring', q: 'The doors ___ (open) at 9.30, and the event finishes at 13.00.', a: ['open'], en: 'On the programme → Present Simple.' },
+        { p: 'five', r: 'daring', q: '“Nobody has a speaker.” “Don’t worry, I ___ ___ (bring) mine.”', a: ['will bring', "'ll bring"], en: 'Offered now → will.' },
+        { p: 'five', r: 'daring', q: 'Correct it: “We will meet the head teacher on Monday at 9. It’s in her diary.” → We ___ ___ the head teacher on Monday at 9.', a: ['are meeting', "'re meeting"], en: 'It is already arranged, so Present Continuous, not will.' }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Quin futur?', en: 'Which future?' }, title: { ca: 'Quin futur? (barrejat)', en: 'Which future? (mixed)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Pensa per què: decisió ara, pla, oferta…', en: 'Think why: decision now, plan, arrangement, timetable or prediction.' },

@@ -217,20 +217,24 @@ var LS2 = (function () {
      min words and every pattern (the teacher reads it in the activity) · otherwise ✏️ complete. show: the answer as the student sees it.
      Without parts, nothing changes: the panel's mode is for every item, as before. */
   const picking = it => !it.own && (starter() || !!it.opts);
-  const itemMode = (it, mode, parts) => parts ? (it.hear ? 'listen' : it.say ? 'say' : null) : mode;
+  // a step in parts keeps the panel's mode for its plain gaps (4 ESO LP3 has none: no listening there; the other LPs keep theirs)
+  const itemMode = (it, mode, parts) => parts ? (it.hear ? 'listen' : it.say ? 'say' : it.opts || it.k || it.own ? null : mode || null) : mode;
   /* 7 compulsory questions per block, the rest is extra practice (Roger, 13 Nov 2026: "they are too many activities, make 7 of each section
      compulsory and the rest to practice … when they have done 7, a message appears saying you can turn in this activity"). Per block, in the
      route's own list: the first 6 questions plus the ✏️ own example (or the first 7 when there is none) are compulsory, shown first; the rest
      follow under "➕ Extra practice". Only the compulsory ones count: the step is done when they are all answered and checked, and the mark
      (first try) is over them; the extras get feedback but never count, and an empty extra is no error. */
+  /* How many are compulsory per block is the panel's `req` (Roger, 13 Nov 2026, new flow: explanation → 🙌 all together → notebook / pairs →
+     "a short individual set … it's not about volume but quality"): `req: 4` = 3 questions + the own example. Without `req`, 7. */
   const REQ = 7, EXTRA = new WeakSet();
-  function arrange(items) {
+  function arrange(items, n) {
+    n = n || REQ;
     const order = [], by = {};
     items.forEach(it => { if (!by[it.p]) { by[it.p] = []; order.push(it.p); } by[it.p].push(it); });
     const out = [], need = [], per = {};
     order.forEach(k => {
       const list = by[k], own = list.filter(x => x.own), plain = list.filter(x => !x.own);
-      const req = own.length ? plain.slice(0, REQ - 1).concat(own.slice(0, 1)) : plain.slice(0, REQ);
+      const req = own.length ? plain.slice(0, n - 1).concat(own.slice(0, 1)) : plain.slice(0, n);
       const ext = list.filter(x => !req.includes(x));
       per[k] = [];
       req.forEach(it => { per[k].push(out.length); need.push(out.length); out.push(it); });
@@ -394,7 +398,9 @@ var LS2 = (function () {
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
-    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null), added: L === level };
+    Object.assign(tries, m.tries);
+    // the same questions in a new order (a step rebuilt in blocks, 13 Nov 2026) is no news for the student: no note
+    const nu = m.v.some(x => x == null); return { v: m.v, moved: !m.same && (nu || L !== level), fresh: nu, added: L === level };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -473,6 +479,8 @@ var LS2 = (function () {
   R.vocab = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
+      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar
+      (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group"' + (level === 'native' ? ' hidden' : '') + ' aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +
@@ -869,7 +877,7 @@ var LS2 = (function () {
 
   // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
   function partsBind(p) {
-    const A = arrange(forLevel(p.items)), items = A.items, list = $('#' + p.id + 'List');
+    const A = arrange(forLevel(p.items), p.req), items = A.items, list = $('#' + p.id + 'List');
     list.innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
     const filled = i => { const t = $('#' + p.id + i); return !!(t && String(t.value).trim()); };
     const ready = () => { let b = $('#el-gready'); const panel = $('#' + p.id), show = !state.done[p.id] && A.need.every(filled) && panel && panel.offsetParent !== null;

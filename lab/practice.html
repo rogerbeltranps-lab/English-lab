@@ -492,7 +492,7 @@ function grammar() {
   }
   const st = starterLv();
   $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${t('Tots els temes', 'All topics')}</button></div>
-    <div class="card"><h3>${g.mixed ? '🔀' : '📘'} ${esc(gTitle(g))}</h3>${g.explain.length ? `<div class="explain">${g.explain.map(e => `<p>${e}</p>`).join('')}</div>` : ''}
+    <div class="card"><h3>${g.mixed ? '🔀' : '📘'} ${esc(gTitle(g))}</h3>${g.explain.length ? `<div class="explain">${g.explain.map(e => `<div style="margin:.35em 0">${e}</div>`).join('')}</div>` : ''}
     <div class="how">${st ? 'Tria la resposta correcta. Si falles, torna-ho a provar: a la segona vegada veuràs la resposta.' : t('Escriu la forma correcta a cada frase. Si falles dues vegades, veuràs la resposta.', 'Type the right form in each sentence. After two wrong tries you will see the answer.')}</div>
     ${g.items.map((it, i) => `<div class="q"><p>${i + 1}. ${it.q}</p><input class="typed" id="gq${i}" autocomplete="off" autocapitalize="off" spellcheck="false"${st ? ` readonly placeholder="Tria una opció"` : ''}>
       ${st ? `<div class="picks">${gChoices(it, g.items, i).map(o => `<button class="w" data-do="gpick" data-i="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}<div class="fb" id="gf${i}"></div></div>`).join('')}

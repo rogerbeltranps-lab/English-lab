@@ -191,7 +191,8 @@ var LS2 = (function () {
     return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
   }
   function picksHtml(it, items, prefix, i, mode) {
-    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + choices(it, items, LP.key + prefix + i).map(o =>
+    const salt = LP.key + prefix + i, opts = it.opts ? it.opts.slice().sort((x, y) => hash(salt + x) - hash(salt + y)) : choices(it, items, salt);
+    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + opts.map(o =>
       '<button class="btn secondary" type="button" data-pick="' + prefix + i + '"' + (mode === 'say' ? ' data-say="1"' : '') + ' data-v="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>';
   }
   // highlights the option that is in the box (after a pick or when saved answers come back)
@@ -208,16 +209,78 @@ var LS2 = (function () {
       box.value = b.dataset.v; box.dispatchEvent(new Event('input', { bubbles: true })); syncPicks();
     });
   }
-  function typedHtml(items, prefix, mode) {
-    if (starter()) bindPicks();
+  /* Grammar in parts (Roger, 13 Nov 2026: "students don't have good activities to practise this theory"): a typed panel with `parts`
+     ([{id, r, title, note}]) shows its items in blocks, one per grammar point (item.p = the part's id), each item with its own kind:
+     hear: 1 = 🎧 listen and complete · opts: [...] = 👆 choose (buttons for every route; the first right answer is in a) ·
+     k: 'join' | 'change' | 'fix' = 🔗 / 🔄 / 🔧 · own: {must: [regex], min} = ✏️ a sentence of their own, right when it has at least
+     min words and every pattern (the teacher reads it in the activity) · otherwise ✏️ complete. show: the answer as the student sees it.
+     Without parts, nothing changes: the panel's mode is for every item, as before. */
+  const picking = it => !it.own && (starter() || !!it.opts);
+  // a step in parts keeps the panel's mode for its plain gaps (4 ESO LP3 has none: no listening there; the other LPs keep theirs)
+  const itemMode = (it, mode, parts) => parts ? (it.hear ? 'listen' : it.say ? 'say' : it.opts || it.k || it.own ? null : mode || null) : mode;
+  /* 7 compulsory questions per block, the rest is extra practice (Roger, 13 Nov 2026: "they are too many activities, make 7 of each section
+     compulsory and the rest to practice … when they have done 7, a message appears saying you can turn in this activity"). Per block, in the
+     route's own list: the first 6 questions plus the ✏️ own example (or the first 7 when there is none) are compulsory, shown first; the rest
+     follow under "➕ Extra practice". Only the compulsory ones count: the step is done when they are all answered and checked, and the mark
+     (first try) is over them; the extras get feedback but never count, and an empty extra is no error. */
+  /* How many are compulsory per block is the panel's `req` (Roger, 13 Nov 2026, new flow: explanation → 🙌 all together → notebook / pairs →
+     "a short individual set … it's not about volume but quality"): `req: 4` = 3 questions + the own example. Without `req`, 7. */
+  const REQ = 7, EXTRA = new WeakSet();
+  function arrange(items, n) {
+    n = n || REQ;
+    const order = [], by = {};
+    items.forEach(it => { if (!by[it.p]) { by[it.p] = []; order.push(it.p); } by[it.p].push(it); });
+    const out = [], need = [], per = {};
+    order.forEach(k => {
+      const list = by[k], own = list.filter(x => x.own), plain = list.filter(x => !x.own);
+      const req = own.length ? plain.slice(0, n - 1).concat(own.slice(0, 1)) : plain.slice(0, n);
+      const ext = list.filter(x => !req.includes(x));
+      per[k] = [];
+      req.forEach(it => { per[k].push(out.length); need.push(out.length); out.push(it); });
+      ext.forEach(it => { EXTRA.add(it); out.push(it); });
+    });
+    return { items: out, need, per };
+  }
+  const ownOk = (it, v) => { const t = String(v || '').trim(); return words(t) >= (it.own.min || 5) && (it.own.must || []).every(re => new RegExp(re, 'i').test(t)); };
+  function kindChip(it, m) {
+    const K = { listen: ['🎧', 'Escolta i completa', 'Listen and complete'], pick: ['👆', 'Tria', 'Choose'], join: ['🔗', 'Uneix les dues frases', 'Join the two sentences'],
+      change: ['🔄', 'Canvia la frase', 'Change the sentence'], fix: ['🔧', 'Troba l’error i corregeix-lo', 'Find the mistake and correct it'],
+      own: ['✏️', 'El teu exemple', 'Your own example'], fill: ['✏️', 'Completa', 'Complete'] };
+    const k = K[m === 'listen' ? 'listen' : it.own ? 'own' : it.k && K[it.k] ? it.k : it.opts ? 'pick' : 'fill'];
+    return '<span class="gkind gk-' + (it.own ? 'own' : m === 'listen' ? 'listen' : it.k || (it.opts ? 'pick' : 'fill')) + '">' + k[0] + ' ' + (ca() ? k[1] : k[2]) + '</span>';
+  }
+  function partsCss() {
+    if (document.getElementById('el-gparts-css')) return;
+    const st = document.createElement('style'); st.id = 'el-gparts-css';
+    st.textContent = '.gpart{margin:26px 0 6px;padding-top:14px;border-top:2px dashed var(--line,#d8e0ea)}.gpart:first-child{margin-top:0;padding-top:0;border-top:0}.gpart h3{margin:0 0 6px}' +
+      '.gnote{padding:10px 14px;border-radius:12px;background:#f3f7fc;border:1px solid #c5d8ef;line-height:1.55;margin-bottom:6px}' +
+      '.gkind{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:800;background:#eef2f7;color:#334155}' +
+      '.gk-pick{background:#e0f2fe;color:#075985}.gk-join{background:#ede9fe;color:#5b21b6}.gk-change{background:#fef3c7;color:#92400e}.gk-fix{background:#fee2e2;color:#991b1b}.gk-own{background:#dcfce7;color:#166534}.gk-listen{background:#f1f5f9;color:#334155}' +
+      '.question input.typed.own{width:100%;max-width:none}' +
+      '.gcount{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;font-size:.62em;font-weight:800;vertical-align:middle;background:#eef2f7;color:#334155}.gcount.ok{background:#dcfce7;color:#166534}' +
+      '.gbd{margin:14px 0 0;padding:10px 14px;border-radius:12px;background:#dcfce7;border:1px solid #86efac;color:#14532d;font-weight:700}' +
+      '#el-gready{font:700 15px system-ui,-apple-system,Segoe UI,sans-serif;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147481000;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#14532d;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}' +
+      '#el-gready button{border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#14532d;font-weight:800;cursor:pointer}' +
+      '.gextra{margin:22px 0 4px;padding:10px 14px;border-radius:12px;background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}';
+    document.head.appendChild(st);
+  }
+  function typedHtml(items, prefix, mode, parts) {
+    if (starter() || items.some(it => it.opts)) bindPicks();
+    if (parts) partsCss();
+    let sec = null, np = 0, inX = false;   // blocks are numbered in the order this route sees them
+    const head = it => {
+      if (!parts) return '';
+      if (it.p === sec) { if (EXTRA.has(it) && !inX) { inX = true; return '<div class="gextra">➕ <b>' + (ca() ? 'Pràctica extra (opcional)' : 'Extra practice (optional)') + '</b>: ' + (ca() ? 'no compta per a la nota. Fes-la si vols practicar més.' : 'it doesn’t count for your mark. Do it if you want more practice.') + '</div>'; } return ''; }
+      sec = it.p; inX = false; const pt = parts.find(x => x.id === it.p);
+      return pt ? '<div class="gpart"><h3>' + (++np) + ' · ' + tx(pt.title) + ' <span class="gcount" data-part="' + esc(it.p) + '"></span></h3>' + (pt.note ? '<div class="gnote">' + tx(pt.note) + '</div>' : '') + '</div>' : ''; };
     return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
-      items.map((it, i) => '<div class="question">' + (mode === 'listen'
+      items.map((it, i) => { const m = itemMode(it, mode, parts), pk = picking(it); return head(it) + '<div class="question' + (EXTRA.has(it) ? ' gx' : '') + '">' + (parts ? kindChip(it, m) : '') + (m === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
-        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : starter() ? ' readonly placeholder="Tria una opció"' : '') + '>' +
-      (starter() ? picksHtml(it, items, prefix, i, mode) : '') +
-      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
+        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
+      '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' +
+      (pk ? picksHtml(it, items, prefix, i, m) : '') +
+      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
   /* More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
@@ -243,13 +306,15 @@ var LS2 = (function () {
   }
   // the accepted answer the student said (in any recognition alternative), or null
   const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
-  function bindModes(items, prefix, mode) {
-    if (mode === 'listen') items.forEach((it, i) => {
+  function bindModes(items, prefix, mode, parts) {
+    items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'listen') return;
       $('[data-hear="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.9);
       $('[data-hear-slow="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.65);
     });
-    const SR = SRC(); if (mode !== 'say' || !SR) return;
+    const SR = SRC(); if (!SR) return;
     items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'say') return;
       const b = $('[data-mic="' + prefix + i + '"]'), box = $('#' + prefix + i), h = $('#' + prefix + 'h' + i), k = prefix + i + 'say';
       b.onclick = () => {
         let r; try { r = new SR(); } catch (e) { box.readOnly = false; return; }
@@ -273,17 +338,18 @@ var LS2 = (function () {
   function checkTyped(items, prefix, reveal, count) {
     let score = 0; got = [];
     items.forEach((it, i) => {
-      const v = norm($('#' + prefix + i).value), ok = fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
+      const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
-      if (starter() && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
+      if (picking(it) && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
-      f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!')
-        : !v ? (starter() ? 'Tria una resposta.' : ca() ? 'Escriu una resposta.' : 'Type an answer.')
+      if (!v && EXTRA.has(it)) { f.innerHTML = ''; f.className = 'feedback'; return; }
+      f.innerHTML = ok ? (it.own ? (ca() ? 'Molt bé! El professor pot llegir la teva frase.' : 'Well done! Your teacher can read your sentence.') : (ca() ? 'Correcte!' : 'Correct!'))
+        : !v ? (picking(it) ? (ca() ? 'Tria una resposta.' : 'Choose an answer.') : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
-          (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.a[0]) + '</strong>'
+          (show ? (it.own ? (ca() ? 'Un exemple: ' : 'An example: ') : (ca() ? 'Resposta: ' : 'Answer: ')) + '<strong>' + esc(it.show || (it.a || [])[0] || '') + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
       f.className = 'feedback ' + (ok ? 'ok' : 'no');
     });
@@ -331,7 +397,9 @@ var LS2 = (function () {
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
-    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null), added: L === level };
+    Object.assign(tries, m.tries);
+    // the same questions in a new order (a step rebuilt in blocks, 13 Nov 2026) is no news for the student: no note
+    const nu = m.v.some(x => x == null); return { v: m.v, moved: !m.same && (nu || L !== level), fresh: nu, added: L === level };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -410,6 +478,8 @@ var LS2 = (function () {
   R.vocab = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
+      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar
+      (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group" aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +
@@ -786,15 +856,60 @@ var LS2 = (function () {
     el.innerHTML = h; el.hidden = false;
   }
 
+  // a box of How it works tied to a block (e.p) gets the block's number, so "2" in the theory is "2" in the practice
+  function boxNum(p, e) {
+    if (!p.parts || !e || !e.p) return '';
+    const order = []; forLevel(p.items).forEach(it => { if (!order.includes(it.p)) order.push(it.p); });
+    const n = order.indexOf(e.p) + 1;
+    return n ? '<span style="display:inline-block;min-width:1.6em;margin-right:6px;padding:0 6px;border-radius:999px;background:var(--accent,#2d5b9a);color:#fff;font-weight:800;text-align:center">' + n + '</span>' : '';
+  }
   R.typed = p => ({
-    html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
-      '<div class="section-card">' + (p.mode ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+    html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + boxNum(p, e) + tx(e) + '</div>').join('') + '</div>' : '') +
+      '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
+      if (p.parts) return partsBind(p);
       const items = forLevel(p.items);
-      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
+      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
       stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = answered(items, p.id); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items);
     }
   });
+
+  // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
+  function partsBind(p) {
+    const A = arrange(forLevel(p.items), p.req), items = A.items, list = $('#' + p.id + 'List');
+    list.innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
+    const filled = i => { const t = $('#' + p.id + i); return !!(t && String(t.value).trim()); };
+    const ready = () => { let b = $('#el-gready'); const panel = $('#' + p.id), show = !state.done[p.id] && A.need.every(filled) && panel && panel.offsetParent !== null;
+      if (!show) { if (b) b.remove(); return; }
+      if (b) return;
+      b = document.createElement('div'); b.id = 'el-gready';
+      b.innerHTML = '<span>✅ ' + (ca() ? 'Ja has respost totes les preguntes obligatòries. Ja pots entregar l’activitat.' : 'You’ve answered all the compulsory questions. You can hand in this activity now.') + '</span>';
+      const go = document.createElement('button'); go.type = 'button'; go.textContent = (ca() ? 'Comprova i entrega' : 'Check and hand it in') + ' ✓';
+      go.onclick = () => { b.remove(); const c = $('#' + p.id + 'Check'); if (c) { c.click(); const r = $('#' + p.id + 'Result'); if (r) r.scrollIntoView({ block: 'center', behavior: 'smooth' }); } };
+      b.appendChild(go); document.documentElement.appendChild(b); };
+    const counts = () => {
+      $$('#' + p.id + 'List .gcount').forEach(c => { const ix = A.per[c.dataset.part] || [], n = ix.filter(filled).length, all = n === ix.length;
+        c.textContent = (all ? '✅ ' : '') + n + ' / ' + ix.length + (ca() ? ' obligatòries' : ' compulsory'); c.classList.toggle('ok', all); });
+      $$('#' + p.id + 'List .gbd').forEach(d => { const ix = A.per[d.dataset.part] || [], all = ix.length && ix.every(filled), more = !!(d.nextElementSibling && d.nextElementSibling.classList.contains('gextra'));
+        d.hidden = !all; if (all) d.textContent = '✅ ' + (ca() ? 'Has fet les ' + ix.length + ' preguntes obligatòries d’aquest bloc.' + (more ? ' Les de sota són pràctica extra, opcional.' : '') : 'You’ve done the ' + ix.length + ' compulsory questions of this block.' + (more ? ' The ones below are optional extra practice.' : '')); });
+      ready();
+    };
+    document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.tab')) setTimeout(ready, 150); });
+    list.addEventListener('input', counts);
+    stays(p.id, p.id, p.id + 'List', items, count => {
+      checkTyped(items, p.id, false, count);
+      const s = A.need.filter(i => got[i] && got[i][0]).length, n = A.need.length;
+      if (count) { firstTry(p.id, s, n); firstItems(p.id, p.items, A.need.map(i => items[i]), A.need.map(i => got[i])); }
+      const left = A.need.filter(i => !filled(i)).length, ok = !left, el = $('#' + p.id + 'Result');
+      el.innerHTML = '<b>' + s + ' / ' + n + '</b> ' + (ca() ? 'correctes (preguntes obligatòries)' : 'correct (compulsory questions)') + ' · ' + (ok
+        ? (ca() ? '✅ Ja has fet les preguntes obligatòries de tots els blocs: aquesta activitat està feta i entregada. La ➕ pràctica extra és opcional i no compta.' : '✅ You’ve done the compulsory questions of every block: this activity is done and handed in. The ➕ extra practice is optional and doesn’t count.')
+        : (ca() ? 'Et falten ' + left + ' preguntes obligatòries (mira el comptador de cada bloc).' : left + ' compulsory question' + (left > 1 ? 's' : '') + ' left (see the counter in each block).'));
+      el.classList.add('show');
+      if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }
+      counts();
+    }, p.items);
+    counts();
+  }
 
   /* Revision counts (research audit, Roger 26 Oct 2026): the first version sent for feedback is kept as the draft (state.drafts[key]);
      the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
