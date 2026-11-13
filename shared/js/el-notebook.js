@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113i', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113j', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -399,6 +399,23 @@ window.ELNotebook = (function () {
   const chapName = l => `${window.elLsNum ? elLsNum(l) : ''} (${String(l.title || '').replace(/^[^·]*·\s*/, '')})`;
   const chapters = () => { const me0 = (window.EL_LS || []).find(l => l.id === H.LS); return me0 ? (window.EL_LS || []).filter(l => l.course === me0.course) : []; };
 
+  // 🎬 Final products (Roger, 13 Nov 2026: "Final products missing here"): a tab of its own beside ✨ Summary, one part per LS with
+  // its mark, the teacher's feedback and the rubric with the student's level underlined (the part examBlocks makes), a side post-it per LS
+  // list: [{ex, ci}]
+  function fpSection(list) {
+    const multi = list.length > 1, blocks = [], back = CI;
+    list.forEach(({ ex, ci }) => {
+      if (ci !== CI) use(ci);
+      const b = examBlocks(ex).find(x => x.kind === 'fp'); if (!b) return;
+      const L = (window.EL_LS || []).find(l => l.id === H.LS) || {};
+      blocks.push({ id: 'fp-' + fk(H.LS), side: multi ? plainOf(window.elLsNum ? elLsNum(L) : H.LS) : b.side, kind: 'fp',
+        html: b.html.replace(/^<div class="nb-postit k-fp">[^<]*<\/div>/, `<div class="nb-postit k-fp">🎬 ${esc(chapName(L))}</div>`) });
+    });
+    if (back !== CI) use(back);
+    return { key: 'fps', fixed: true, tab: '🎬 ' + t('Productes finals', 'Final products'), l: '🎬 ' + t('Productes finals', 'Final products'), blocks,
+      head: `<p class="nb-h1"><u>🎬 ${t('Productes finals', 'Final products')}</u></p>`
+        + (blocks.length ? '' : `<p class="nb-pencil">${t('Quan el professor hagi corregit un producte final, aquí hi tindràs la nota i el seu feedback.', 'Once your teacher has marked a final product, you\'ll find your mark and the feedback here.')}</p>`) };
+  }
   // list: [{ex, games, ci}], the chapters to sum up
   function summary(list) {
     // ✨ the last page: a summary of the LS (Roger, 13 Nov 2026: "on the last page, there should be a summary of the grammar indicating the
@@ -432,8 +449,8 @@ window.ELNotebook = (function () {
     });
     });
     const sumUl = (ic, ca, en, items) => items.length ? `<div class="nb-h2">${ic} <span class="u">${t(ca, en)}</span></div><ul class="nb-idx nb-sum">${items.map(x => `<li>${x}</li>`).join('')}</ul>` : '';
-    return { key: 'sum', fixed: true, tab: t('Resum', 'Summary'), l: '✨ ' + t('Resum', 'Summary'), blocks: [],
-      head: `<p class="nb-h1"><u>✨ ${t('Resum', 'Summary')}</u> ${multi ? '' : `<small class="nb-chap">· ${esc(chapName((window.EL_LS || []).find(l => l.id === H.LS) || {}))}</small>`}</p>`
+    return { key: 'sum', fixed: true, tab: '✨ ' + t('Resum de gram. i vocab.', 'Gram & Vocab summary'), l: '✨ ' + t('Resum de gramàtica i vocabulari', 'Grammar & Vocabulary summary'), blocks: [],
+      head: `<p class="nb-h1"><u>✨ ${t('Resum de gramàtica i vocabulari', 'Grammar & Vocabulary summary')}</u> ${multi ? '' : `<small class="nb-chap">· ${esc(chapName((window.EL_LS || []).find(l => l.id === H.LS) || {}))}</small>`}</p>`
         + sumUl('🧩', 'Gramàtica', 'Grammar', sg) + sumUl('📚', 'Vocabulari: temes', 'Vocabulary topics', sv)
         + (sx.length ? `<div class="nb-h2">💬 <span class="u">${t('Expressions', 'Expressions')}</span></div><ul class="nb-voc">${sx.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>` : '')
         + (!sg.length && !sv.length && !sx.length ? `<p class="nb-pencil">${t('Quan feu gramàtica i vocabulari a classe, el resum apareixerà aquí.', 'When you do grammar and vocabulary in class, the summary will appear here.')}</p>` : '')
@@ -510,7 +527,8 @@ window.ELNotebook = (function () {
     // 📝 Exams (Roger, 13 Nov 2026: "Add a section (post-it) Exams, with the feedback and Final Product Feedback"): the exam, corrected as
     // on paper (the questions to review, the writing's mistakes, what to review) and the final product's mark and feedback. From the
     // student's results (results/{ls}/assessment and the final product's activity), which el-cloud.js already keeps on the device.
-    const xb = examBlocks(ex);
+    // (the final product has its own 🎬 Final products tab, fpSection)
+    const xb = examBlocks(ex).filter(b => b.kind !== 'fp');
     out.push({ key: 'exams', tab: t('Exàmens', 'Exams'), l: '📝 ' + t('Exàmens', 'Exams'), head: `<p class="nb-h1"><u>📝 ${t('Exàmens', 'Exams')}</u></p>`, blocks: ordered('exams', xb.concat(notesOf('exams'))), foot: addBtn('exams') });
     // ✍ the student's own sections (Roger, 13 Nov 2026: "in the index, I want them to be able to organize their notes, like moving up and
     // down the sections, and I want them to add some sections"); every section after the index can go ▲ up and ▼ down
@@ -533,7 +551,7 @@ window.ELNotebook = (function () {
     const all = fixed.concat(list.map(k => mov.find(p => p.key === k)));
     // the index: the page numbers are written in once the pages are laid out (data-nbto)
     const li = (l, to) => liTo(l, to, CI);
-    if (mode === 'one') all.push(summary([{ ex, games, ci: CI }]));
+    if (mode === 'one') all.push(fpSection([{ ex, ci: CI }]), summary([{ ex, games, ci: CI }]));
     const ix = all.slice(2).map(s => {
       const at = list.indexOf(s.key), sub = s.blocks.filter(b => b.l);
       const mv = H.own && at >= 0 ? `<span class="nb-mv nb-ui"><button type="button" data-nbmv="-1" data-k="${s.key}" aria-label="${t('Puja', 'Move up')}" ${at === 0 ? 'disabled' : ''}>▲</button><button type="button" data-nbmv="1" data-k="${s.key}" aria-label="${t('Baixa', 'Move down')}" ${at === list.length - 1 ? 'disabled' : ''}>▼</button></span>` : '';
@@ -706,7 +724,7 @@ window.ELNotebook = (function () {
     const seen = {};
     sp.querySelectorAll('.nb-blk[data-b]').forEach(pc => {
       const ci = ciOf(pc), id = pc.dataset.b, k = ci + ':' + id; pc.dataset.off = seen[k] || 0; seen[k] = (seen[k] || 0) + tnodes(pc).map(n => n.nodeValue).join('').length;
-      if (pc.dataset.off === '0' && H.own) { use(ci); pc.insertAdjacentHTML('afterbegin', tools(pc)); }
+      if (pc.dataset.off === '0' && H.own && !(secs[+pc.closest('.nb-page').dataset.s] || {}).fixed) { use(ci); pc.insertAdjacentHTML('afterbegin', tools(pc)); }
     });
     use(keepCi);
     // page numbers in the index and the tabs
@@ -756,7 +774,7 @@ window.ELNotebook = (function () {
     const cz = pages[z] ? +(pages[z].el.dataset.ci || 0) : 0; if (CH.length > 1 && pages[a]) use(+(pages[a].el.dataset.ci || 0));
     root.querySelectorAll('.nb-tab[data-ci]').forEach(b => { b.hidden = CH.length > 1 && +b.dataset.ci !== cz; });
     let cur = null; root.querySelectorAll('.nb-tab:not(.nb-ctab)').forEach(b => { if (!b.hidden && b.dataset.nbgo != null && +b.dataset.nbgo <= z) cur = b; });
-    const onSum = cur && cur.classList.contains('nb-sumtab');
+    const onSum = cur && (cur.classList.contains('nb-sumtab') || cur.classList.contains('nb-fptab'));
     root.querySelectorAll('.nb-tab').forEach(b => b.setAttribute('aria-current', String(b === cur || (b.classList.contains('nb-ctab') && !onSum && +b.dataset.chap === cz && +b.dataset.nbgo <= z))));
     store.set('el-nb-pg|' + LSKEY, String(pg)); hideSel(); side(a, z);
   }
@@ -818,6 +836,7 @@ window.ELNotebook = (function () {
       // the cover (this LS's helpers: its name, results and colours), then every LS's chapter in the course's order, then the summary of all
       use(rootCi); build(ex, games, 'cover').forEach(x => { x.ci = 0; secs.push(x); });
       CH.forEach((c, i) => { use(i); const ss = build(c.ex, c.games, 'chap'); ss.forEach(x => { x.ci = i; }); c.order = order; secs.push(...ss); });
+      const fs = fpSection(CH.map((c, i) => ({ ex: c.ex, ci: i }))); fs.ci = CH.length - 1; fs.all = true; secs.push(fs);
       use(CH.length - 1); const sm = summary(CH.map((c, i) => ({ ex: c.ex, games: c.games, ci: i }))); sm.ci = CH.length - 1; sm.all = true; secs.push(sm);
       use(rootCi);
     }
@@ -826,7 +845,7 @@ window.ELNotebook = (function () {
       .concat(secs.filter(x => x.ci === i && x.tab && !x.all).map(x => `<button type="button" class="nb-tab" data-ci="${i}" data-nbto="s:${x.key}|${i}">${esc(x.tab)}</button>`));
     const tabs = (chs
       ? CH.map((c, i) => `<button type="button" class="nb-tab nb-ctab nb-ctop" data-chap="${i}" data-nbto="s:chap|${i}" title="${esc(chapName((window.EL_LS || []).find(l => l.id === c.LS) || {}))}">📚 ${lsNum(c)}</button>`)
-        .concat(CH.flatMap((c, i) => subTabs(i)), [`<button type="button" class="nb-tab nb-sumtab" data-nbto="s:sum|${CH.length - 1}">✨ ${t('Resum', 'Summary')}</button>`])
+        .concat(CH.flatMap((c, i) => subTabs(i)), [`<button type="button" class="nb-tab nb-fptab" data-nbto="s:fps|${CH.length - 1}">🎬 ${t('Productes finals', 'Final products')}</button>`, `<button type="button" class="nb-tab nb-sumtab" data-nbto="s:sum|${CH.length - 1}">✨ ${t('Resum de gram. i vocab.', 'Gram & Vocab summary')}</button>`])
       : subTabs(0)).join('');
     const plain = document.documentElement.classList.contains(PLAIN);
     let rings = ''; for (let i = 0; i < 14; i++) rings += '<span class="nb-ring"></span>';
