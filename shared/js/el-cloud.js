@@ -507,6 +507,10 @@ function lockSections(ids,ca,a,done,soon,gid){
         if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true});
       p.querySelectorAll("[data-elro]").forEach(e=>{delete e.dataset.elro;e.removeAttribute("tabindex");e.disabled=false})});
     window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];apply();if(window.elProgress)window.elProgress()};
+  // a page left open from an earlier day (problem report, 2ESOA, 13 Nov 2026: a Chromebook closed after Thursday's class and opened again
+  // in Friday's class kept Friday's tabs 🏫 frozen): every minute, the tabs whose class day has come open in place, like the timer above
+  if(cls.length){const reday=setInterval(()=>{if(!cls.length)return clearInterval(reday);const t=elAgToday(),op=gid?elClassOpenAt(gid,t):null;
+    const f=cls.filter(id=>soon[id]&&(soon[id]<t||soon[id]===t&&(!op||Date.now()>=op)));if(f.length)window.elSecFree(f)},60e3)}
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
@@ -1087,7 +1091,7 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();cmStudentTabs();fsRefresh();fsCheck();hereTick()},1000);
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();cmTopSpace();cmStudentTabs();fsRefresh();fsCheck();hereTick()},1000);
 // the student's tabs in class mode (only today's steps); after class mode every tab is back
 function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){cmTabs(null);return}
   if(!cmTabs(g.vis,cmHere(g).map(x=>x.p)))return;
@@ -1210,7 +1214,15 @@ function cmGo(g){
 // "Hi Pau, …" line as their board (ELCheer.student in el-cheer.js, Catalan for Starter/Base), in a bar at the top of whatever page class
 // mode takes them to, for the first 4 minutes after the teacher started it (go.s), then it goes away. No extra reads or writes.
 const CHEER_MS=4*60e3;let cheerT=0,cheerPad=null;
-function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();if(cheerPad!==null){document.body.style.paddingTop=cheerPad;cheerPad=null}}
+function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
+// The 🎓 class mode bar (el-lock) and the 🌟 line are fixed on top of the screen: the page moves down by their height, and its sticky top bar
+// (with 🔍 Dictionary) and steps column stop under them, not behind them (problem report, 2ESOA, 13 Nov 2026: "the top green line is
+// covering the dictionary"). ⛶ one step full screen places its own bar (el-app.js slpPlace).
+function cmTopSpace(){const l=document.getElementById("el-lock"),c=document.getElementById("el-cmcheer"),h=(l?l.offsetHeight:0)+(c?c.offsetHeight:0),R=document.documentElement,B=document.body;
+  if(h&&!document.getElementById("el-cm-top-css")){const st=document.createElement("style");st.id="el-cm-top-css";
+    st.textContent="html.elcmtop .topbar{top:var(--el-cm-top,0px)!important}html.elcmtop .ellpside{top:calc(70px + var(--el-cm-top,0px))!important}";document.head.append(st)}
+  if(h){R.style.setProperty("--el-cm-top",h+"px");R.classList.add("elcmtop");if(cheerPad===null)cheerPad=B.style.paddingTop||"";if(!B.classList.contains("elslpfs"))B.style.paddingTop=h+"px"}
+  else if(cheerPad!==null){R.style.removeProperty("--el-cm-top");R.classList.remove("elcmtop");if(!B.classList.contains("elslpfs"))B.style.paddingTop=cheerPad;cheerPad=null}}
 function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&&g.s?g.s+CHEER_MS:0;
   if(!end||Date.now()>=end||!user||!isStudent(user)||AS){if(was)cheerOff();return}
   if(was&&was.dataset.s===String(g.s))return;
@@ -1223,9 +1235,7 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
       b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:2147481990;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;font:800 clamp(18px,2.3vw,28px)/1.25 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(67,56,202,.3)";
       document.body.append(b)}
     b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
-    if(cheerPad===null)cheerPad=document.body.style.paddingTop||"";
-    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";
-      if(!document.body.classList.contains("elslpfs"))document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
+    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";cmTopSpace()};
     clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
