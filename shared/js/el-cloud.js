@@ -350,7 +350,7 @@ async function gate(u){
     try{const s=await getDoc(doc(db,"students",u.uid,"checkpoints",a.keys[0]));if(s.exists()&&s.data().redo)open=true}catch(e){console.warn("checkpoint",e)}}
   if(a&&!tester&&!open&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
   if(a&&!tester&&!open){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
-  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn),myGroup);trimJump(a,info,myGroup)}
+  if(a&&!tester){dayWatch();const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn),myGroup);trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
@@ -512,6 +512,15 @@ function lockSections(ids,ca,a,done,soon,gid){
   if(cls.length){const reday=setInterval(()=>{if(!cls.length)return clearInterval(reday);const t=elAgToday(),op=gid?elClassOpenAt(gid,t):null;
     const f=cls.filter(id=>soon[id]&&(soon[id]<t||soon[id]===t&&(!op||Date.now()>=op)));if(f.length)window.elSecFree(f)},60e3)}
 }
+// A learning path page left open overnight (Roger, 13 Nov 2026: "students in class can't edit their pages"; 2ESO A's Chromebooks still had
+// LP2 open from Thursday's class, with Thursday's code and Time plan): when the day changes the page reloads, so the Time plan, the 🏫 tabs
+// and the site's latest code are those of the new day (lockSections' minute check only opens the tabs). Checked every minute and when the
+// page comes back into view (a Chromebook opened again); only while it is shown. Answers are kept: they are saved in this browser as they
+// are typed and the reload pulls them first (pull). Previews (EL_TODAY) never change day.
+let dayW=false;
+function dayWatch(){if(dayW)return;dayW=true;const d0=elAgToday(),chk=()=>{if(document.visibilityState!=="visible"||reloading||elAgToday()===d0)return;
+    reloading=true;location.reload()};
+  setInterval(chk,60e3);document.addEventListener("visibilitychange",chk);window.addEventListener("focus",chk);window.addEventListener("pageshow",chk)}
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
 function trimJump(a,info,g){const sel=document.getElementById("sessionJump");if(!sel)return;const dn=x=>elDoneSet(localStorage.getItem(x.keys[0])),op=x=>elLpOpen(x,info,g);
