@@ -134,7 +134,7 @@ window.LP = {
         const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
           qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
-          { ca: head('🎥', 'El guió del vlog en quatre formes', 'Cada part del vlog té la seva forma. Repàs del que ja saps.') +
+          { p: 'forms', ca: head('🎥', 'El guió del vlog en quatre formes', 'Cada part del vlog té la seva forma. Repàs del que ja saps.') +
               row(card('orange', '👀 Ara: am / is / are + -ing', ex('Today I<b>’m</b> at the skate park.') + ex('Right now my friends <b>are skating</b>.'), 200),
                 card('blue', '🔁 Normalment: Present Simple', ex('I usually <b>come</b> here on Saturdays.') + ex('My sister <b>trains</b> twice a week.'), 200),
                 card('pink', '❤️ Gustos: love / like / hate + -ing', ex('I <b>love skating</b> because it’s fast.') + ex('Do you <b>like watching</b> basketball?'), 200),
@@ -152,42 +152,49 @@ window.LP = {
               mistakes('Watch out', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) +
               together(false, ['Right now we ___ (eat) pizza.', '’re eating'], ['I hate ___ (lose).', 'losing'], ['___ your helmet! (portar posat)', 'Wear']) +
               turn('Your turn:', 'one sentence of each colour for your vlog.') },
-          { r: 'safe', en: head('🔗', 'Linking sentences', 'Four little words make your vlog sound natural.') +
+          { p: 'link', r: 'safe', en: head('🔗', 'Linking sentences', 'Four little words make your vlog sound natural.') +
               scale([['green', '➕ and', 'adds'], ['orange', '↔️ but', 'contrast'], ['purple', '❓ because', 'reason'], ['blue', '➡️ so', 'result']]) +
               row(card('slate', 'Example', ex('I love climbing <b>because</b> it’s like a puzzle, <b>so</b> I train twice a week.') + ex('I hate falling, <b>but</b> you learn from it.') + ex('It’s cold, <b>so</b> I’m wearing a jacket.'))) +
               mistakes('Watch out', bad('I want to get better, because I practise every day.', 'I want to get better, <b>so</b> I practise every day.', '(result → so)')) +
               together(false, ['I was tired, ___ I went to bed early.', 'so'], ['I like it ___ it’s fun.', 'because']) +
               turn('Your turn:', 'one sentence for your vlog with <em>because</em> and <em>so</em>.') },
-          { r: 'daring', en: head('📝', 'Longer descriptions', 'Mix the forms in one paragraph.') +
+          { p: 'longer', r: 'daring', en: head('📝', 'Longer descriptions', 'Mix the forms in one paragraph.') +
               card('slate', 'Model', '<div style="line-height:1.7">I usually <b>skate</b> on Saturdays, <span style="background:#ffedd5">but this month I<b>’m training</b> for a competition</span>, <b>so</b> I come every day. <span style="background:#ede9fe">I <b>think</b> bouldering is the most fun</span>, and <span style="background:#ede9fe">I <b>prefer</b> the park <b>to</b> the sports hall</span>. For me, climbing <b>means</b> freedom.</div>' + small('🟧 temporary situation · 🟪 opinion with a state verb'), 600) +
               mistakes('Watch out', bad('I’m thinking bouldering is fun.', 'I <b>think</b> bouldering is fun.'), bad('I prefer the park than the hall.', 'I prefer the park <b>to</b> the hall.')) +
               together(false, ['I prefer football ___ basketball.', 'to'], ['This month I ___ (learn) to skate.', '’m learning']) +
               turn('Your turn:', 'write three linked sentences: a temporary situation, an opinion and a reason.') }
         ];
       })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'forms', title: { ca: 'Les quatre formes del vlog', en: 'The four forms of the vlog' }, note: { ca: 'ara → <em>I’m + -ing</em> · normalment → Present Simple · gustos → <em>love + -ing</em> · consells → imperatiu', en: 'now → <em>I’m + -ing</em> · usually → Present Simple · likes → <em>love + -ing</em> · tips → imperative' } },
+        { id: 'link', title: { en: 'Linking sentences' }, note: { en: '<em>and, but, because, so</em>' } },
+        { id: 'longer', title: { en: 'Longer descriptions' }, note: { en: '<em>This month I’m…</em> · <em>I think… · I prefer… to…</em>' } }
+      ],
       items: [
-        { q: 'Today I ___ (be) at the skate park.', a: ['am', "'m"], ca: 'Today I am at…', en: 'Today I am at…' },
-        { q: 'Right now my friends ___ (skate).', a: ['are skating', "'re skating"], ca: 'right now → ara.', en: 'right now → now.' },
-        { q: 'I usually ___ (come) here on Saturdays.', a: ['come'], ca: 'usually → hàbit.', en: 'usually → habit.' },
-        { r: 'insecure', q: 'My sister ___ (not / come) with me: she hates skating.', a: ["doesn't come", 'does not come'], ca: 'Hàbit negatiu 3a persona.', en: 'Habit, third person negative.' },
-        { q: 'I love ___ (skate) because it’s fast.', a: ['skating'], ca: 'love + -ing.', en: 'love + -ing.' },
-        { q: 'In this photo, we ___ (wear) helmets.', a: ['are wearing', "'re wearing"], ca: 'A la foto → ara.', en: 'In the photo → now.' },
-        { q: 'Tip: ___ a break every thirty minutes.', a: ['take'], ca: 'Imperatiu.', en: 'Imperative.' },
-        { q: 'Tip: ___ use your phone in bed.', a: ["don't", 'do not'], ca: 'Imperatiu negatiu.', en: 'Negative imperative.' },
-        { q: 'It’s cold ___ (avui), so I’m wearing a jacket.', a: ['today'], ca: 'Expressió de temps.', en: 'Time expression.' },
-        { r: 'insecure', q: 'I train ___ a week: on Tuesdays and Thursdays. (dos cops)', a: ['twice'], ca: 'Freqüència.', en: 'Frequency.' },
-        { q: 'Write the -ing form: run → ___', a: ['running'] },
-        { q: 'Do you like ___ (watch) basketball?', a: ['watching'] },
-        { r: 'safe', q: 'I love climbing ___ it’s like a puzzle.', a: ['because'], en: 'Reason.' },
-        { r: 'safe', q: 'I want to get better, ___ I practise twice a week.', a: ['so'], en: 'Result.' },
-        { r: 'safe', q: 'I hate falling, ___ you learn from it.', a: ['but'], en: 'Contrast.' },
-        { r: 'safe', q: 'I ___ (want) to join a climbing club. (state verb)', a: ['want'], en: 'State verb: Present Simple.' },
-        { r: 'safe', q: 'I’m getting ___ at skating. (millor)', a: ['better'], en: 'get better at.' },
-        { r: 'daring', q: 'This month I ___ (train) three times a week for the competition.', a: ['am training', "'m training"], en: 'Temporary situation.' },
-        { r: 'daring', q: 'I ___ (think) bouldering is the most fun. (opinion)', a: ['think'], en: 'Opinion: no continuous.' },
-        { r: 'daring', q: 'I prefer the park ___ the sports hall.', a: ['to'], en: 'prefer A to B.' },
-        { r: 'daring', q: 'Join: “It’s cold. I’m wearing a jacket.” (result) → It’s cold, ___ I’m wearing a jacket.', a: ['so'], en: 'so = result.' },
-        { r: 'daring', q: 'For me, climbing ___ (mean) freedom.', a: ['means'], en: 'State verb, third person.' }
+        { p: 'forms', q: 'Today I ___ (be) at the skate park.', a: ['am', "'m"], ca: 'Today I am at…', en: 'Today I am at…' },
+        { p: 'forms', q: 'Right now my friends ___ (skate).', a: ['are skating', "'re skating"], ca: 'right now → ara.', en: 'right now → now.' },
+        { p: 'forms', q: 'I usually ___ (come) here on Saturdays.', a: ['come'], ca: 'usually → hàbit.', en: 'usually → habit.' },
+        { p: 'forms', q: 'I love ___ (skate) because it’s fast.', a: ['skating'], ca: 'love + -ing.', en: 'love + -ing.' },
+        { p: 'forms', q: 'In this photo, we ___ (wear) helmets.', a: ['are wearing', "'re wearing"], ca: 'A la foto → ara.', en: 'In the photo → now.' },
+        { p: 'forms', q: 'Tip: ___ a break every thirty minutes.', a: ['take'], ca: 'Imperatiu.', en: 'Imperative.' },
+        { p: 'forms', q: 'Tip: ___ use your phone in bed.', a: ["don't", 'do not'], ca: 'Imperatiu negatiu.', en: 'Negative imperative.' },
+        { p: 'forms', q: 'It’s cold ___ (avui), so I’m wearing a jacket.', a: ['today'], ca: 'Expressió de temps.', en: 'Time expression.' },
+        { p: 'forms', q: 'Write the -ing form: run → ___', a: ['running'] },
+        { p: 'forms', q: 'Do you like ___ (watch) basketball?', a: ['watching'] },
+        { p: 'forms', r: 'insecure', q: 'My sister ___ (not / come) with me: she hates skating.', a: ["doesn't come", 'does not come'], ca: 'Hàbit negatiu 3a persona.', en: 'Habit, third person negative.' },
+        { p: 'forms', r: 'insecure', q: 'I train ___ a week: on Tuesdays and Thursdays. (dos cops)', a: ['twice'], ca: 'Freqüència.', en: 'Frequency.' },
+        { p: 'forms', r: 'safe', q: 'I ___ (want) to join a climbing club. (state verb)', a: ['want'], en: 'State verb: Present Simple.' },
+        { p: 'forms', r: 'safe', q: 'I’m getting ___ at skating. (millor)', a: ['better'], en: 'get better at.' },
+        { p: 'link', r: 'safe', q: 'I love climbing ___ it’s like a puzzle.', a: ['because'], en: 'Reason.' },
+        { p: 'link', r: 'safe', q: 'I want to get better, ___ I practise twice a week.', a: ['so'], en: 'Result.' },
+        { p: 'link', r: 'safe', q: 'I hate falling, ___ you learn from it.', a: ['but'], en: 'Contrast.' },
+        { p: 'link', r: 'daring', q: 'Join: “It’s cold. I’m wearing a jacket.” (result) → It’s cold, ___ I’m wearing a jacket.', a: ['so'], en: 'so = result.' },
+        { p: 'longer', r: 'daring', q: 'This month I ___ (train) three times a week for the competition.', a: ['am training', "'m training"], en: 'Temporary situation.' },
+        { p: 'longer', r: 'daring', q: 'I ___ (think) bouldering is the most fun. (opinion)', a: ['think'], en: 'Opinion: no continuous.' },
+        { p: 'longer', r: 'daring', q: 'I prefer the park ___ the sports hall.', a: ['to'], en: 'prefer A to B.' },
+        { p: 'longer', r: 'daring', q: 'For me, climbing ___ (mean) freedom.', a: ['means'], en: 'State verb, third person.' }
       ] },
     { id: 'write', type: 'writing', product: 5, tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: 'Peça 5: el guió del meu vlog', en: 'Piece 5: my vlog script' },
       intro: { ca: 'Ajunta les peces 1, 2 i 4 i escriu el guió complet del teu vlog, diapositiva per diapositiva, seguint el model de la Noa. És el text que diràs al vídeo.', en: 'Put pieces 1, 2 and 4 together and write the full script of your vlog, slide by slide, following Noa’s model. This is the text you will say in the video.' },

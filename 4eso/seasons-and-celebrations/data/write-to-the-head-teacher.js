@@ -147,7 +147,7 @@ window.LP = {
         const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
           qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
-          { ca: head('🙏', '<em>would like to</em> + verb: demanar amb educació', 'En un correu formal no diem <em>we want</em>: diem <b>we would like to</b>.') +
+          { p: 'like', ca: head('🙏', '<em>would like to</em> + verb: demanar amb educació', 'En un correu formal no diem <em>we want</em>: diem <b>we would like to</b>.') +
               scale([['slate', '👥', 'We / I'], ['blue', 'would like', '(’d like)'], ['green', 'to + verb', 'to organise · to invite']]) +
               row(card('red', '😐 Massa directe', ex('We <b>want</b> to use the hall.')), card('green', '🙂 Educat', ex('We <b>would like to</b> use the hall.') + ex('I <b>would like to</b> explain our idea.') + ex('We <b>would like to</b> invite families.'))) +
               mistakes('Compte!', bad('We would like organise…', 'We would like <b>to</b> organise…'), bad('We would like to organising…', 'We would like to <b>organise</b>…')) +
@@ -159,20 +159,20 @@ window.LP = {
               mistakes('Watch out', bad('We would like organise…', 'We would like <b>to</b> organise…'), bad('We would like to organising…', 'We would like to <b>organise</b>…')) +
               together(false, ['We would like ___ ___ (organise) a party.', 'to organise'], ['I ___ ___ ___ explain our idea. (m’agradaria)', 'would like to']) +
               turn('Your turn:', 'two things your class would like to do on the celebration day, with <em>We would like to…</em>') },
-          { r: 'insecure', only: ['insecure'], ca: head('✉️', '<em>I am writing to</em> + verb: per què escrius', 'És la primera frase del correu, després de <em>Dear…</em>') +
+          { p: 'writing', r: 'insecure', only: ['insecure'], ca: head('✉️', '<em>I am writing to</em> + verb: per què escrius', 'És la primera frase del correu, després de <em>Dear…</em>') +
               row(card('blue', 'I am writing to + verb', ex('I am writing to <b>propose</b> a celebration day.', 'proposar') + ex('I am writing to <b>ask</b> about the school hall.', 'preguntar') + ex('I am writing to <b>invite</b> you to our event.', 'convidar'))) +
               mistakes('Compte!', bad('I am writing for propose…', 'I am writing <b>to</b> propose…')) + together(true, ['I am writing ___ ___ (ask) about the hall.', 'to ask']) +
               turn('Ara tu:', 'escriu la primera frase del teu correu a la directora.'),
             en: head('✉️', '<em>I am writing to</em> + verb: why you are writing') + ex('I am writing to <b>propose</b> a celebration day.') + ex('I am writing to <b>ask</b> about the school hall.') + together(false, ['I am writing ___ ___ (ask) about the hall.', 'to ask']) +
               turn('Your turn:', 'write the first sentence of your email.') },
-          { r: 'safe', en: head('🪜', 'Polite requests: the politeness ladder', 'The more formal the person, the higher you go.') +
+          { p: 'polite', r: 'safe', en: head('🪜', 'Polite requests: the politeness ladder', 'The more formal the person, the higher you go.') +
               scale([['slate', '🙂', 'Can we…? (friends)'], ['blue', '😊', 'Could we…? (polite)'], ['purple', '🎩', 'Would it be possible to…? (very formal)']]) +
               row(card('blue', 'Could we + verb?', ex('<b>Could we use</b> the school hall?') + ex('<b>Could we put up</b> posters in the corridor?')),
                 card('purple', 'Would it be possible + to + verb?', ex('<b>Would it be possible to start</b> at 10.00?') + ex('<b>Would it be possible to use</b> the school’s speakers?'))) +
               mistakes('Watch out', bad('Could we to use the hall?', 'Could we <b>use</b> the hall?'), bad('Would it be possible use…?', 'Would it be possible <b>to</b> use…?'), bad('We want the hall.', 'Could we use the hall?', '(too direct for a head teacher)')) +
               together(false, ['___ we use the gym? (polite)', 'Could'], ['Would it be possible ___ ___ (start) at 10?', 'to start']) +
               turn('Your turn:', 'two requests for your email: one with <em>Could we…?</em> and one with <em>Would it be possible to…?</em>') },
-          { r: 'daring', en: head('🎩', 'Formal endings and answering a concern') +
+          { p: 'formal', r: 'daring', en: head('🎩', 'Formal endings and answering a concern') +
               row(card('blue', '<em>look forward to</em> + -ing', ex('I look forward to <b>hearing</b> from you.') + ex('We look forward to <b>welcoming</b> families.') + small('Here <b>to</b> is a preposition, so the verb takes <b>-ing</b>.')),
                 card('orange', '🤔 Although: answer a worry before they ask', ex('<b>Although</b> the hall is small, we can also use the gym.') + ex('<b>Although</b> some families do not celebrate Diwali, the event will be about learning, not belief.'))) +
               mistakes('Watch out', bad('I look forward to hear from you.', 'I look forward to <b>hearing</b> from you.'), bad('Although the hall is small, but…', 'Although the hall is small, we…', '(no but)')) +
@@ -180,17 +180,25 @@ window.LP = {
               turn('Your turn:', 'think of one worry the head teacher could have and answer it with <em>Although…</em>') }
         ];
       })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'like', title: { en: 'would like to + verb' }, note: { en: '<em>We would like <b>to</b> organise…</em>' } },
+        { id: 'writing', title: { en: 'I am writing to + verb' }, note: { en: '<em>I am writing <b>to</b> propose…</em>' } },
+        { id: 'polite', title: { en: 'Polite requests' }, note: { en: '<em>Could we + verb? · Would it be possible <b>to</b> + verb?</em>' } },
+        { id: 'formal', title: { en: 'Formal endings and although' }, note: { en: '<em>look forward to + <b>-ing</b></em> · <em>Although</em> + a sentence (no <em>but</em>)' } }
+      ],
       items: [
-        { q: 'We would like ___ ___ (invite) families.', a: ['to invite'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
-        { q: 'I would like ___ ___ (explain) our idea.', a: ['to explain'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
-        { q: 'We would ___ to use the hall.', a: ['like'], ca: 'would like to.', en: 'would like to.' },
-        { r: 'insecure', only: ['insecure'], q: 'I am writing ___ ___ (propose) a celebration day.', a: ['to propose'], ca: 'I am writing + to + verb.', en: 'I am writing + to + verb.' },
-        { r: 'insecure', only: ['insecure'], q: 'We ___ ___ to use the school hall on 18 December. (ens agradaria)', a: ['would like'], ca: 'would like to per demanar.', en: 'would like to.' },
-        { r: 'safe', q: '___ it be possible to start at 10.00?', a: ['would'], en: 'Would it be possible to…?' },
-        { r: 'safe', q: '___ we put up posters in the corridor?', a: ['could'], en: 'Could we…?' },
-        { r: 'daring', q: 'We look forward to ___ (welcome) families.', a: ['welcoming'], en: 'look forward to + -ing.' },
-        { r: 'daring', q: 'Correct the word: “I look forward to hear from you.” → ___', a: ['hearing'], en: 'look forward to + -ing.' },
-        { r: 'daring', q: '___ the hall is small, we can also use the gym.', a: ['although', 'even though'], en: 'Concession.' }
+        { p: 'like', q: 'We would like ___ ___ (invite) families.', a: ['to invite'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
+        { p: 'like', q: 'I would like ___ ___ (explain) our idea.', a: ['to explain'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
+        { p: 'like', q: 'We would ___ to use the hall.', a: ['like'], ca: 'would like to.', en: 'would like to.' },
+        { p: 'like', r: 'insecure', only: ['insecure'], q: 'We ___ ___ to use the school hall on 18 December. (ens agradaria)', a: ['would like'], ca: 'would like to per demanar.', en: 'would like to.' },
+        { p: 'writing', r: 'insecure', only: ['insecure'], q: 'I am writing ___ ___ (propose) a celebration day.', a: ['to propose'], ca: 'I am writing + to + verb.', en: 'I am writing + to + verb.' },
+        { p: 'polite', r: 'safe', q: '___ it be possible to start at 10.00?', a: ['would'], en: 'Would it be possible to…?' },
+        { p: 'polite', r: 'safe', q: '___ we put up posters in the corridor?', a: ['could'], en: 'Could we…?' },
+        { p: 'formal', r: 'daring', q: 'We look forward to ___ (welcome) families.', a: ['welcoming'], en: 'look forward to + -ing.' },
+        { p: 'formal', r: 'daring', q: 'Correct the word: “I look forward to hear from you.” → ___', a: ['hearing'], en: 'look forward to + -ing.' },
+        { p: 'formal', r: 'daring', q: '___ the hall is small, we can also use the gym.', a: ['although', 'even though'], en: 'Concession.' }
       ] },
     { id: 'write', type: 'writing', product: 5, tab: { ca: 'El correu', en: 'The email' }, title: { ca: 'Peça 5: el correu a la direcció', en: 'Piece 5: the email to the head teacher' },
       intro: { ca: 'Escriu l’esborrany, demana feedback amb IA, millora’l aquí i torna’l a desar: aquesta és la versió que entregaràs amb el producte final.', en: 'Write a draft, get AI feedback, improve it here and save it again: this is the version you will submit with the final product.' },

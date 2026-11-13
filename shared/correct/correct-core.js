@@ -103,7 +103,7 @@
         const by = {}, order = [], list = [], req = new Set();
         forLevel(panel.items, r).forEach(it => { if (!by[it.p]) { by[it.p] = []; order.push(it.p); } by[it.p].push(it); });
         order.forEach(k => { const L = by[k], own = L.filter(x => x.own), plain = L.filter(x => !x.own);
-          const rq = own.length ? plain.slice(0, 6).concat(own.slice(0, 1)) : plain.slice(0, 7);
+          const n = panel.req || 7, rq = own.length ? plain.slice(0, n - 1).concat(own.slice(0, 1)) : plain.slice(0, n);
           rq.forEach(x => { req.add(x); list.push(x); }); L.filter(x => !rq.includes(x)).forEach(x => list.push(x)); });
         seen[r] = { list, req };
       });

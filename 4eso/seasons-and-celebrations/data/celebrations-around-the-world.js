@@ -174,7 +174,7 @@ window.LP = {
         const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
           qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
-          { ca: head('📅', 'Present Simple per als costums', 'Per a coses que passen <b>cada any</b>, sempre igual: el que la gent fa en una festa.') +
+          { p: 'ps', ca: head('📅', 'Present Simple per als costums', 'Per a coses que passen <b>cada any</b>, sempre igual: el que la gent fa en una festa.') +
               row(card('blue', '➕ Què fem', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
                 card('orange', '➖ Què no fem', ex('We <b>don’t work</b> on 25 December.') + ex('My dad <b>doesn’t eat</b> turkey.', 'he / she / it → doesn’t') + small('Després de <b>don’t / doesn’t</b>: verb sense -s.')),
                 card('purple', '❓ Preguntes', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.'))) +
@@ -190,7 +190,7 @@ window.LP = {
               mistakes('Watch out', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?')) +
               together(false, ['My grandma ___ (make) panellets every year.', 'makes'], ['We ___ (not / go) to school on 25 December.', 'don’t go'], ['___ your family ___ (celebrate) Halloween?', 'Does … celebrate']) +
               turn('Your turn:', 'two things your family does at Christmas and one thing it <b>doesn’t</b> do.') },
-          { ca: head('🧩', 'Frases fetes per dir QUAN és una festa', 'Aprèn-les senceres: només canvies la data.') +
+          { p: 'chunk', ca: head('🧩', 'Frases fetes per dir QUAN és una festa', 'Aprèn-les senceres: només canvies la data.') +
               row(card('teal', 'It <b>is celebrated</b> … · se celebra', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
                 card('teal', 'It <b>takes place</b> … · té lloc', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
                 card('teal', 'It <b>is held</b> … · es fa', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
@@ -204,7 +204,7 @@ window.LP = {
               mistakes('Watch out', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(the festival doesn’t celebrate: people celebrate it)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
               together(false, ['Diwali ___ ___ in autumn. (se celebra)', 'is celebrated'], ['The parade ___ ___ at night. (té lloc)', 'takes place']) +
               turn('Your turn:', 'say when and where your town’s festa is with <em>It takes place…</em> and <em>It is held…</em>') },
-          { ca: head('🔍', '<em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
+          { p: 'prep', ca: head('🔍', '<em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'hora · nit · període de festa']]) +
               row(card('blue', 'IN', ex('<b>in</b> November') + ex('<b>in</b> winter') + ex('<b>in</b> 2025') + ex('<b>in</b> the morning'), 180),
                 card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
@@ -220,7 +220,7 @@ window.LP = {
               mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October', '(a date → on)'), bad('on Christmas', '<b>at</b> Christmas', '(but <b>on</b> Christmas Day: one day)'), bad('in night', '<b>at</b> night')) +
               together(false, ['___ 31 October · ___ winter · ___ Christmas · ___ night', 'on · in · at · at'], ['My birthday is ___ May, ___ 12 May.', 'in · on']) +
               turn('Your turn:', 'when is your birthday? Say the month (<em>in</em>), the day (<em>on</em>) and the time of your party (<em>at</em>).') },
-          { r: 'daring', en: head('🔄', 'Present Simple passive', 'Use it when the <b>custom</b> matters, not who does it.') +
+          { p: 'pass', r: 'daring', en: head('🔄', 'Present Simple passive', 'Use it when the <b>custom</b> matters, not who does it.') +
               scale([['slate', '📦', 'thing'], ['blue', 'am / is / are', ''], ['purple', 'past participle', 'carved · given · sold']]) +
               table([['Active (who does it)', '→ Passive (the custom)'], ['People <b>carve</b> pumpkins.', 'Pumpkins <b>are carved</b>.'], ['People <b>exchange</b> gifts at midnight.', 'Gifts <b>are exchanged</b> at midnight.'], ['They <b>don’t sell</b> chestnuts in summer.', 'Chestnuts <b>aren’t sold</b> in summer.'], ['People <b>light</b> a candle every night.', 'A candle <b>is lit</b> every night.']]) +
               mistakes('Watch out', bad('Pumpkins are carve.', 'Pumpkins are <b>carved</b>.'), bad('Gifts is exchanged.', 'Gifts <b>are</b> exchanged.', '(plural → are)')) +
@@ -228,22 +228,30 @@ window.LP = {
               turn('Your turn:', 'two customs of your favourite celebration in the passive: <em>… is eaten, … are decorated</em>.') }
         ];
       })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'ps', title: { ca: 'Present Simple: costums', en: 'Present Simple: customs' }, note: { ca: 'he / she / it → <b>-s</b> · <b>don’t / doesn’t</b> + verb sense -s · <b>Do / Does</b> …?', en: 'he / she / it → <b>-s</b> · <b>don’t / doesn’t</b> + verb with no -s · <b>Do / Does</b> …?' } },
+        { id: 'chunk', title: { ca: 'Frases fetes', en: 'Ready-made chunks' }, note: { ca: '<em>It is celebrated… · It takes place… · It is held…</em>', en: '<em>It is celebrated… · It takes place… · It is held…</em>' } },
+        { id: 'prep', title: { ca: 'in, on o at?', en: 'in, on or at?' }, note: { ca: '<b>in</b> mes / estació · <b>on</b> dia / data · <b>at</b> nit / festa', en: '<b>in</b> month / season · <b>on</b> day / date · <b>at</b> night / holiday' } },
+        { id: 'pass', title: { en: 'Present Simple passive' }, note: { en: 'am / is / are + past participle: <em>Pumpkins <b>are carved</b>.</em>' } }
+      ],
       items: [
-        { q: 'Children ___ (dress) up at Halloween.', a: ['dress'], ca: 'Children és plural: sense -s.', en: 'Children is plural: no -s.' },
-        { q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'], ca: 'She → verb + -s.', en: 'She → verb + -s.' },
-        { r: 'insecure', q: 'We ___ (not / go) to school on 25 December.', a: ["don't go", 'do not go'], ca: 'Negativa amb we: don’t + verb.', en: 'Negative with we: don’t + verb.' },
-        { q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data concreta → on.', en: 'A date → on.' },
-        { q: 'Diwali takes place ___ autumn.', a: ['in'], ca: 'Estació → in.', en: 'A season → in.' },
-        { q: 'We visit our relatives ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'A festival period → at.' },
-        { q: 'People light candles ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
-        { q: 'Lunar New Year ___ celebrated in late January or February.', a: ['is'], ca: 'It is celebrated…', en: 'It is celebrated…' },
-        { r: 'insecure', q: '___ your family decorate the house? — Yes, it does.', a: ['does'], ca: 'Pregunta amb your family (it): Does…?', en: 'Question with your family (it): Does…?' },
-        { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'], ca: 'It → verb + -s.', en: 'It → verb + -s.' },
-        { r: 'safe', q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'], en: 'Families is plural: no -s.' },
-        { r: 'safe', q: 'Lunar New Year ___ place in late January or February.', a: ['takes'], en: 'It takes place…' },
-        { r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'], en: 'are + past participle.' },
-        { r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
-        { r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
+        { p: 'ps', q: 'Children ___ (dress) up at Halloween.', a: ['dress'], ca: 'Children és plural: sense -s.', en: 'Children is plural: no -s.' },
+        { p: 'ps', q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'], ca: 'She → verb + -s.', en: 'She → verb + -s.' },
+        { p: 'ps', r: 'insecure', q: 'We ___ (not / go) to school on 25 December.', a: ["don't go", 'do not go'], ca: 'Negativa amb we: don’t + verb.', en: 'Negative with we: don’t + verb.' },
+        { p: 'ps', q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'], ca: 'It → verb + -s.', en: 'It → verb + -s.' },
+        { p: 'ps', r: 'insecure', q: '___ your family decorate the house? — Yes, it does.', a: ['does'], ca: 'Pregunta amb your family (it): Does…?', en: 'Question with your family (it): Does…?' },
+        { p: 'ps', r: 'safe', q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'], en: 'Families is plural: no -s.' },
+        { p: 'chunk', q: 'Lunar New Year ___ celebrated in late January or February.', a: ['is'], ca: 'It is celebrated…', en: 'It is celebrated…' },
+        { p: 'chunk', r: 'safe', q: 'Lunar New Year ___ place in late January or February.', a: ['takes'], en: 'It takes place…' },
+        { p: 'prep', q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data concreta → on.', en: 'A date → on.' },
+        { p: 'prep', q: 'Diwali takes place ___ autumn.', a: ['in'], ca: 'Estació → in.', en: 'A season → in.' },
+        { p: 'prep', q: 'We visit our relatives ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'A festival period → at.' },
+        { p: 'prep', q: 'People light candles ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
+        { p: 'pass', r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'], en: 'are + past participle.' },
+        { p: 'pass', r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
+        { p: 'pass', r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
       ] },
     { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquí es barregen coses noves i de la LS1: primer pensa quina forma necessites.', en: 'New and LS1 language mixed: first decide which form you need.' },

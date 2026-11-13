@@ -238,7 +238,7 @@ window.LP = {
         const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
           qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
-          { ca: head('👀', 'Present Continuous: el que passa ARA', 'Mira la foto: què està fent cadascú en aquest moment?') +
+          { p: 'form', ca: head('👀', 'Present Continuous: el que passa ARA', 'Mira la foto: què està fent cadascú en aquest moment?') +
               scale([['slate', '🙋', 'I / she / they'], ['blue', 'am / is / are', '’m · ’s · ’re'], ['green', 'verb + ing', 'playing · skating']]) +
               table([['', '➕', '➖', '❓', 'Resposta curta'], ['I', 'I<b>’m playing</b>', 'I<b>’m not playing</b>', '<b>Am</b> I <b>playing</b>?', 'Yes, I am. / No, I’m not.'], ['he / she / it', 'She<b>’s skating</b>', 'She <b>isn’t skating</b>', '<b>Is</b> she <b>skating</b>?', 'Yes, she is. / No, she isn’t.'], ['you / we / they', 'They<b>’re watching</b>', 'They <b>aren’t watching</b>', '<b>Are</b> they <b>watching</b>?', 'Yes, they are. / No, they aren’t.']]) +
               row(card('blue', '📸 Exemples', ex('Look! Pol <b>is skating</b> on the big ramp.') + ex('I<b>’m watching</b> a match right now.') + ex('What <b>are</b> they <b>doing</b>? — They<b>’re taking</b> photos.'))) +
@@ -252,7 +252,7 @@ window.LP = {
               mistakes('Watch out', bad('She skating.', 'She<b>’s</b> skating.', '(is is missing)'), bad('Are you play?', 'Are you <b>playing</b>?'), bad('Yes, I’m.', 'Yes, I <b>am</b>.', '(no contraction at the end)')) +
               together(false, ['Look! The dog ___ (run).', '’s running'], ['___ they ___ (play)? — Yes, they are.', 'Are … playing'], ['I ___ (not / watch) TV now.', '’m not watching']) +
               turn('Your turn:', 'look around the class: write what three classmates are doing right now.') },
-          { ca: head('✍️', 'Com s’escriu la -ing?', 'Tres regles, i ja les saps totes.') +
+          { p: 'spell', ca: head('✍️', 'Com s’escriu la -ing?', 'Tres regles, i ja les saps totes.') +
               row(card('green', '1️⃣ Normalment: + ing', ex('play → play<b>ing</b>') + ex('watch → watch<b>ing</b>') + ex('read → read<b>ing</b>'), 180),
                 card('orange', '2️⃣ Acaba en -e: treu la -e', ex('danc<del>e</del> → danc<b>ing</b>') + ex('mak<del>e</del> → mak<b>ing</b>') + ex('writ<del>e</del> → writ<b>ing</b>'), 180),
                 card('purple', '3️⃣ Vocal + consonant: dobla-la', ex('swi<b>m</b> → swi<b>mm</b>ing') + ex('ru<b>n</b> → ru<b>nn</b>ing') + ex('si<b>t</b> → si<b>tt</b>ing · ge<b>t</b> → ge<b>tt</b>ing'), 180)) +
@@ -266,13 +266,13 @@ window.LP = {
               mistakes('Watch out', bad('danceing', 'danc<b>ing</b>'), bad('runing', 'ru<b>nn</b>ing'), bad('studing', 'stud<b>y</b>ing', '(keep the -y)')) +
               together(false, ['swim → ___ · write → ___ · play → ___', 'swimming · writing · playing']) +
               turn('Your turn:', 'write the -ing form of: <em>swim, ride, shop, cook, have</em>.') },
-          { r: 'safe', en: head('⏱', 'Words that say NOW', 'When you see them, think Present Continuous.') +
+          { p: 'now', r: 'safe', en: head('⏱', 'Words that say NOW', 'When you see them, think Present Continuous.') +
               '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'this week', 'Look!', 'Listen!'].map(w => pill('blue', w)).join('') + '</div>' +
               row(card('blue', 'Examples', ex('The crowd <b>is cheering</b> at the moment.') + ex('<b>Listen!</b> Somebody <b>is playing</b> the guitar.') + ex('<b>This weekend</b> we<b>’re playing</b> in a tournament.'))) +
               tip('Short answers:', 'never contract at the end. <em>Is she playing well? — Yes, she <b>is</b>.</em>') +
               mistakes('Watch out', bad('Yes, she’s.', 'Yes, she <b>is</b>.')) + together(false, ['Listen! Somebody ___ (sing).', 'is singing'], ['Is he running? — Yes, he ___.', 'is']) +
               turn('Your turn:', 'two sentences about this weekend with <em>this weekend</em> and <em>at the moment</em>.') },
-          { r: 'daring', en: head('❓', 'Word order in questions', 'Question word → am / is / are → who → verb-ing.') +
+          { p: 'order', r: 'daring', en: head('❓', 'Word order in questions', 'Question word → am / is / are → who → verb-ing.') +
               table([['Question word', 'am / is / are', 'subject', 'verb-ing', '?'], ['Why', 'are', 'the fans', 'cheering', '?'], ['What', 'is', 'Marta', 'doing', '?'], ['Where', 'are', 'you', 'going', '?']]) +
               tip('Who as the subject:', 'no extra person after it: <em><b>Who is scoring</b>? — Marc!</em>') +
               mistakes('Watch out', bad('Why the fans are cheering?', 'Why <b>are</b> the fans cheering?'), bad('Who is he scoring?', 'Who is scoring?')) +
@@ -280,31 +280,39 @@ window.LP = {
               turn('Your turn:', 'ask your partner three questions about a photo with <em>What, Why, Who</em>.') }
         ];
       })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'form', title: { ca: 'am / is / are + -ing', en: 'am / is / are + -ing' }, note: { ca: '➕ <em>She’s skating</em> · ➖ <em>She isn’t skating</em> · ❓ <em>Is she skating?</em>', en: '➕ <em>She’s skating</em> · ➖ <em>She isn’t skating</em> · ❓ <em>Is she skating?</em>' } },
+        { id: 'spell', title: { ca: 'Com s’escriu la -ing', en: 'How to spell -ing' }, note: { ca: '+ing · treu la -e · dobla la consonant', en: '+ing · drop the -e · double the consonant' } },
+        { id: 'now', title: { en: 'Words that say now' }, note: { en: '<em>now, at the moment, today, this weekend, Look!</em> · short answers: <em>Yes, she <b>is</b>.</em>' } },
+        { id: 'order', title: { en: 'Word order in questions' }, note: { en: 'Question word + am / is / are + subject + -ing' } }
+      ],
       items: [
-        { q: 'Look! Pol ___ (skate) on the big ramp.', a: ['is skating', "'s skating"], ca: 'he → is + skating.', en: 'he → is + skating.' },
-        { q: 'I ___ (watch) a basketball match right now.', a: ['am watching', "'m watching"], ca: 'I → am + watching.', en: 'I → am + watching.' },
-        { q: 'They ___ (wear) green T-shirts today.', a: ['are wearing', "'re wearing"], ca: 'they → are + wearing.', en: 'they → are + wearing.' },
-        { q: 'We ___ (swim) in the sea. (atenció a l’ortografia)', a: ['are swimming', "'re swimming"], ca: 'swim → swimming (dobla la m).', en: 'swim → swimming (double m).' },
-        { q: 'She ___ (dance) in the show.', a: ['is dancing', "'s dancing"], ca: 'dance → dancing (sense -e).', en: 'dance → dancing (drop the -e).' },
-        { r: 'insecure', q: 'It ___ (not / rain) now. It’s sunny!', a: ["isn't raining", 'is not raining', "'s not raining"], ca: 'Negativa: isn’t + raining.', en: 'Negative: isn’t + raining.' },
-        { r: 'insecure', q: '___ you ___ (listen) to music? — Yes, I am.', a: ['are listening'], ca: 'Pregunta: Are you listening?', en: 'Question: Are you listening?' },
-        { r: 'insecure', q: 'What ___ Marta ___ (do)? — She’s taking photos.', a: ['is doing'], ca: 'What + is + Marta + doing?', en: 'What + is + Marta + doing?' },
-        { r: 'insecure', q: 'Is Hugo playing football? — No, he ___.', a: ["isn't"], ca: 'Resposta curta negativa: No, he isn’t.', en: 'Short answer: No, he isn’t.' },
-        { q: 'The children ___ (run) in the park.', a: ['are running', "'re running"], ca: 'run → running.', en: 'run → running.' },
-        { r: 'insecure', q: 'I ___ (not / play) video games. I’m doing my homework.', a: ["'m not playing", 'am not playing'], ca: 'I’m not + playing.', en: 'I’m not + playing.' },
-        { q: 'Write the -ing form: sit → ___', a: ['sitting'], ca: 'Dobla la t.', en: 'Double the t.' },
-        { q: 'Write the -ing form: make → ___', a: ['making'], ca: 'Treu la -e.', en: 'Drop the -e.' },
-        { q: 'Write the -ing form: read → ___', a: ['reading'], ca: 'Dues vocals: no es dobla.', en: 'Two vowels: no double consonant.' },
-        { r: 'safe', q: 'The crowd ___ (cheer) at the moment: the match is exciting.', a: ['is cheering', "'s cheering"], en: 'Crowd is singular: is.' },
-        { r: 'safe', q: 'Why ___ you ___ (wear) a helmet? — Because I’m going cycling.', a: ['are wearing'], en: 'Why + are + you + wearing?' },
-        { r: 'safe', q: 'Is she playing well? — Yes, she ___. (no contraction)', a: ['is'], en: 'Short answers have no contraction.' },
-        { r: 'safe', q: 'Write the -ing form: get → ___', a: ['getting'], en: 'Vowel + consonant: double it.' },
-        { r: 'safe', q: 'Write the -ing form: write → ___', a: ['writing'], en: 'Drop the -e.' },
-        { r: 'safe', q: 'Who ___ (score)? — Marc!', a: ['is scoring', "'s scoring"], en: 'Who is the subject: Who is scoring?' },
-        { r: 'daring', q: 'Order the words: are / why / the fans / cheering → ___?', a: ['why are the fans cheering'], en: 'Question word + are + subject + -ing.' },
-        { r: 'daring', q: 'Correct the mistake: “She’s studing for the exam.” → ___', a: ['studying'], en: 'Verbs ending in -y keep the y: studying.' },
-        { r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', a: ['running'], en: 'Double the n.' },
-        { r: 'daring', q: 'Twenty teams ___ (take) part in the tournament this weekend.', a: ['are taking', "'re taking"], en: 'Plural subject: are taking.' }
+        { p: 'form', q: 'Look! Pol ___ (skate) on the big ramp.', a: ['is skating', "'s skating"], ca: 'he → is + skating.', en: 'he → is + skating.' },
+        { p: 'form', q: 'I ___ (watch) a basketball match right now.', a: ['am watching', "'m watching"], ca: 'I → am + watching.', en: 'I → am + watching.' },
+        { p: 'form', q: 'They ___ (wear) green T-shirts today.', a: ['are wearing', "'re wearing"], ca: 'they → are + wearing.', en: 'they → are + wearing.' },
+        { p: 'form', q: 'She ___ (dance) in the show.', a: ['is dancing', "'s dancing"], ca: 'dance → dancing (sense -e).', en: 'dance → dancing (drop the -e).' },
+        { p: 'form', q: 'The children ___ (run) in the park.', a: ['are running', "'re running"], ca: 'run → running.', en: 'run → running.' },
+        { p: 'form', r: 'insecure', q: 'It ___ (not / rain) now. It’s sunny!', a: ["isn't raining", 'is not raining', "'s not raining"], ca: 'Negativa: isn’t + raining.', en: 'Negative: isn’t + raining.' },
+        { p: 'form', r: 'insecure', q: '___ you ___ (listen) to music? — Yes, I am.', a: ['are listening'], ca: 'Pregunta: Are you listening?', en: 'Question: Are you listening?' },
+        { p: 'form', r: 'insecure', q: 'What ___ Marta ___ (do)? — She’s taking photos.', a: ['is doing'], ca: 'What + is + Marta + doing?', en: 'What + is + Marta + doing?' },
+        { p: 'form', r: 'insecure', q: 'Is Hugo playing football? — No, he ___.', a: ["isn't"], ca: 'Resposta curta negativa: No, he isn’t.', en: 'Short answer: No, he isn’t.' },
+        { p: 'form', r: 'insecure', q: 'I ___ (not / play) video games. I’m doing my homework.', a: ["'m not playing", 'am not playing'], ca: 'I’m not + playing.', en: 'I’m not + playing.' },
+        { p: 'spell', q: 'We ___ (swim) in the sea. (atenció a l’ortografia)', a: ['are swimming', "'re swimming"], ca: 'swim → swimming (dobla la m).', en: 'swim → swimming (double m).' },
+        { p: 'spell', q: 'Write the -ing form: sit → ___', a: ['sitting'], ca: 'Dobla la t.', en: 'Double the t.' },
+        { p: 'spell', q: 'Write the -ing form: make → ___', a: ['making'], ca: 'Treu la -e.', en: 'Drop the -e.' },
+        { p: 'spell', q: 'Write the -ing form: read → ___', a: ['reading'], ca: 'Dues vocals: no es dobla.', en: 'Two vowels: no double consonant.' },
+        { p: 'spell', r: 'safe', q: 'Write the -ing form: get → ___', a: ['getting'], en: 'Vowel + consonant: double it.' },
+        { p: 'spell', r: 'safe', q: 'Write the -ing form: write → ___', a: ['writing'], en: 'Drop the -e.' },
+        { p: 'spell', r: 'daring', q: 'Correct the mistake: “She’s studing for the exam.” → ___', a: ['studying'], en: 'Verbs ending in -y keep the y: studying.' },
+        { p: 'spell', r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', a: ['running'], en: 'Double the n.' },
+        { p: 'now', r: 'safe', q: 'The crowd ___ (cheer) at the moment: the match is exciting.', a: ['is cheering', "'s cheering"], en: 'Crowd is singular: is.' },
+        { p: 'now', r: 'safe', q: 'Is she playing well? — Yes, she ___. (no contraction)', a: ['is'], en: 'Short answers have no contraction.' },
+        { p: 'now', r: 'safe', q: 'Why ___ you ___ (wear) a helmet? — Because I’m going cycling.', a: ['are wearing'], en: 'Why + are + you + wearing?' },
+        { p: 'now', r: 'safe', q: 'Who ___ (score)? — Marc!', a: ['is scoring', "'s scoring"], en: 'Who is the subject: Who is scoring?' },
+        { p: 'now', r: 'daring', q: 'Twenty teams ___ (take) part in the tournament this weekend.', a: ['are taking', "'re taking"], en: 'Plural subject: are taking.' },
+        { p: 'order', r: 'daring', q: 'Order the words: are / why / the fans / cheering → ___?', a: ['why are the fans cheering'], en: 'Question word + are + subject + -ing.' }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: decideix si la frase parla d’ara (Present Continuous) o d’un hàbit (Present Simple).', en: 'Mixed forms: decide if the sentence is about now (Present Continuous) or a habit (Present Simple).' },

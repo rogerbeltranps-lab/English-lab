@@ -184,7 +184,7 @@ window.LP = {
         const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
           qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
-          { ca: head('🔁👀', 'Present Simple o Present Continuous?', 'Normalment (un hàbit) o ara mateix?') +
+          { p: 'which', ca: head('🔁👀', 'Present Simple o Present Continuous?', 'Normalment (un hàbit) o ara mateix?') +
               row(card('blue', '🔁 Present Simple = HÀBITS', timeline([[10], [30], [50], [70], [90]], false, 'Passa una vegada i una altra.') +
                   ex('I usually <b>play</b> on Saturdays.') + ex('She <b>goes</b> skating every Sunday.', 'he / she → -s') + ex('We never <b>play</b> football in winter.') +
                   '<div>' + ['usually', 'always', 'never', 'every day', 'on Saturdays', 'in winter'].map(w => pill('blue', w)).join('') + '</div>', 280),
@@ -206,7 +206,7 @@ window.LP = {
               mistakes('Watch out', bad('I’m usually playing on Saturdays.', 'I usually <b>play</b> on Saturdays.'), bad('Look! She skates.', 'Look! She<b>’s skating</b>.'), bad('Mei come every Sunday.', 'Mei <b>comes</b> every Sunday.')) +
               together(false, ['Look! Ana ___ (skate).', '’s skating'], ['Ana ___ (skate) every Sunday.', 'skates']) +
               turn('Your turn:', 'one thing you usually do on Saturdays and one thing you are doing now.') },
-          { ca: head('↔️', 'Hàbit + ara en una sola frase', 'Uneix-les amb <b>but</b>: el que fas normalment, però avui és diferent.') +
+          { p: 'both', ca: head('↔️', 'Hàbit + ara en una sola frase', 'Uneix-les amb <b>but</b>: el que fas normalment, però avui és diferent.') +
               table([['🔁 Normalment (Present Simple)', 'but', '👀 Avui / ara (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
               together(true, ['I usually ___ (walk) to school, but today I ___ (go) by bus.', 'walk · ’m going']) +
               turn('Ara tu:', 'escriu una frase com aquestes sobre tu: <em>I usually…, but today I’m…</em>'),
@@ -214,13 +214,13 @@ window.LP = {
               table([['🔁 Usually (Present Simple)', 'but', '👀 Today / now (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
               together(false, ['I usually ___ (walk) to school, but today I ___ (go) by bus.', 'walk · ’m going']) +
               turn('Your turn:', 'write a sentence like these about you: <em>I usually…, but today I’m…</em>') },
-          { r: 'safe', en: head('🧠', 'State verbs: no -ing, even now', 'They are about what you think, feel, want or know, not actions you can see.') +
+          { p: 'state', r: 'safe', en: head('🧠', 'State verbs: no -ing, even now', 'They are about what you think, feel, want or know, not actions you can see.') +
               '<div>' + ['like', 'love', 'hate', 'want', 'need', 'know', 'prefer', 'understand', 'believe', 'mean'].map(w => pill('purple', w)).join('') + '</div>' +
               row(card('red', '✗ Not with -ing', ex('<del>I’m wanting a new helmet.</del>') + ex('<del>Are you knowing the rules?</del>')), card('green', '✓ Present Simple', ex('I <b>want</b> a new helmet now.') + ex('<b>Do</b> you <b>know</b> the rules?') + ex('I <b>don’t understand</b> this exercise.'))) +
               mistakes('Watch out', bad('I’m needing new gloves.', 'I <b>need</b> new gloves.')) +
               together(false, ['I ___ (need) a new pen right now.', 'need'], ['She ___ (know) the answer.', 'knows']) +
               turn('Your turn:', 'three sentences about you right now with <em>want, need</em> and <em>know</em>.') },
-          { r: 'daring', en: head('⏳', 'For a while, and the two meanings of <em>think</em>') +
+          { p: 'temp', r: 'daring', en: head('⏳', 'For a while, and the two meanings of <em>think</em>') +
               row(card('blue', '⏳ Present Continuous for TEMPORARY things', ex('This month I<b>’m training</b> for a race.') + ex('My cousin <b>is living</b> with us this year.') + small('True for a limited time, not only this second.')),
                 card('purple', '🤔 think: opinion or activity?', ex('I <b>think</b> skating is great.', 'opinion → Present Simple') + ex('I<b>’m thinking</b> about my next video.', 'an activity now → continuous'))) +
               mistakes('Watch out', bad('I’m thinking skating is great.', 'I <b>think</b> skating is great.'), bad('Leo is knowing all the routes.', 'Leo <b>knows</b> all the routes.')) +
@@ -228,30 +228,38 @@ window.LP = {
               turn('Your turn:', 'something you are doing this month (not now) and your opinion about it with <em>I think…</em>') }
         ];
       })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'which', title: { ca: 'Present Simple o Continuous?', en: 'Present Simple or Continuous?' }, note: { ca: 'Hàbit (<em>usually, every…</em>) → Present Simple · ara (<em>now, today, Look!</em>) → Present Continuous', en: 'Habit (<em>usually, every…</em>) → Present Simple · now (<em>now, today, Look!</em>) → Present Continuous' } },
+        { id: 'both', title: { ca: 'Hàbit + ara', en: 'Habit + now' }, note: { ca: '<em>I usually…, but today I’m…</em>', en: '<em>I usually…, but today I’m…</em>' } },
+        { id: 'state', title: { en: 'State verbs' }, note: { en: '<em>want, need, know, like, prefer, understand…</em> → no -ing' } },
+        { id: 'temp', title: { en: 'For a while · think' }, note: { en: '<em>This month I’m training</em> · <em>I think…</em> (opinion) / <em>I’m thinking about…</em> (activity)' } }
+      ],
       items: [
-        { q: 'I usually ___ (go) swimming on Saturdays.', a: ['go'], ca: 'usually → hàbit.', en: 'usually → habit.' },
-        { q: 'Today I ___ (watch) my sister’s match.', a: ['am watching', "'m watching"], ca: 'today → ara.', en: 'today → now.' },
-        { q: 'Mei ___ (come) to the rink every Sunday.', a: ['comes'], ca: 'every Sunday → hàbit, 3a persona.', en: 'every Sunday → habit, third person.' },
-        { q: 'Right now she ___ (practise) her turns.', a: ['is practising', "'s practising", 'is practicing', "'s practicing"], ca: 'right now → ara.', en: 'right now → now.' },
-        { r: 'insecure', q: 'Noah ___ (not / ride) today: he’s filming.', a: ["isn't riding", 'is not riding', "'s not riding"], ca: 'today → Present Continuous negatiu.', en: 'today → Present Continuous negative.' },
-        { q: 'Listen! Somebody ___ (play) the guitar.', a: ['is playing', "'s playing"], ca: 'Listen! → ara.', en: 'Listen! → now.' },
-        { q: 'We never ___ (play) football in winter.', a: ['play'], ca: 'never → hàbit.', en: 'never → habit.' },
-        { r: 'insecure', q: '___ you usually ___ (train) on Tuesdays? — Yes, we do.', a: ['do train'], ca: 'Pregunta d’hàbit: Do you train…?', en: 'Habit question: Do you train…?' },
-        { r: 'insecure', q: 'What ___ Kai ___ (do) at the moment? — He’s falling!', a: ['is doing'], ca: 'at the moment → ara.', en: 'at the moment → now.' },
-        { r: 'insecure', q: 'My dad ___ (not / like) cold weather, so he stays at home in winter.', a: ["doesn't like", 'does not like'], ca: 'Hàbit/general: doesn’t like.', en: 'General: doesn’t like.' },
-        { q: 'I usually wear trainers, but today I ___ (wear) boots.', a: ['am wearing', "'m wearing"], ca: 'today → ara.', en: 'today → now.' },
-        { q: 'In summer we ___ (swim) in the sea every day.', a: ['swim'], ca: 'every day → hàbit.', en: 'every day → habit.' },
-        { r: 'safe', q: 'I ___ (want) a new helmet. Mine is too small. (state verb)', a: ['want'], en: 'State verb: never continuous.' },
-        { r: 'safe', q: '___ you ___ (know) the rules of this game?', a: ['do know'], en: 'know → Present Simple: Do you know…?' },
-        { r: 'safe', q: 'She ___ (prefer) skating to cycling.', a: ['prefers'], en: 'State verb, third person.' },
-        { r: 'safe', q: 'I ___ (not / understand) this exercise. Can you help me?', a: ["don't understand", 'do not understand'], en: 'State verb: don’t understand.' },
-        { r: 'safe', q: 'Leo usually wins, and he ___ (win) again today!', a: ['is winning', "'s winning"], en: 'today → now → is winning.' },
-        { r: 'safe', q: 'Correct the mistake: “I’m needing new gloves.” → I ___ new gloves.', a: ['need'], en: 'need is a state verb.' },
-        { r: 'daring', q: 'This month I ___ (train) for a race, so I ride every day.', a: ['am training', "'m training"], en: 'Temporary situation: this month.' },
-        { r: 'daring', q: 'My cousin ___ (stay) with us this week, so we go skating together every afternoon.', a: ['is staying', "'s staying"], en: 'Temporary: this week.' },
-        { r: 'daring', q: 'I ___ (think) skating is more fun than cycling. (opinion)', a: ['think'], en: 'Opinion: think, no continuous.' },
-        { r: 'daring', q: 'Be quiet, please! I ___ (think) about my next video.', a: ['am thinking', "'m thinking"], en: 'An activity now: I’m thinking about…' },
-        { r: 'daring', q: 'Correct the mistake: “Leo is knowing all the routes in the park.” → Leo ___ all the routes.', a: ['knows'], en: 'know is a state verb.' }
+        { p: 'which', q: 'I usually ___ (go) swimming on Saturdays.', a: ['go'], ca: 'usually → hàbit.', en: 'usually → habit.' },
+        { p: 'which', q: 'Today I ___ (watch) my sister’s match.', a: ['am watching', "'m watching"], ca: 'today → ara.', en: 'today → now.' },
+        { p: 'which', q: 'Mei ___ (come) to the rink every Sunday.', a: ['comes'], ca: 'every Sunday → hàbit, 3a persona.', en: 'every Sunday → habit, third person.' },
+        { p: 'which', q: 'Right now she ___ (practise) her turns.', a: ['is practising', "'s practising", 'is practicing', "'s practicing"], ca: 'right now → ara.', en: 'right now → now.' },
+        { p: 'which', q: 'Listen! Somebody ___ (play) the guitar.', a: ['is playing', "'s playing"], ca: 'Listen! → ara.', en: 'Listen! → now.' },
+        { p: 'which', q: 'We never ___ (play) football in winter.', a: ['play'], ca: 'never → hàbit.', en: 'never → habit.' },
+        { p: 'which', q: 'In summer we ___ (swim) in the sea every day.', a: ['swim'], ca: 'every day → hàbit.', en: 'every day → habit.' },
+        { p: 'which', r: 'insecure', q: 'Noah ___ (not / ride) today: he’s filming.', a: ["isn't riding", 'is not riding', "'s not riding"], ca: 'today → Present Continuous negatiu.', en: 'today → Present Continuous negative.' },
+        { p: 'which', r: 'insecure', q: '___ you usually ___ (train) on Tuesdays? — Yes, we do.', a: ['do train'], ca: 'Pregunta d’hàbit: Do you train…?', en: 'Habit question: Do you train…?' },
+        { p: 'which', r: 'insecure', q: 'What ___ Kai ___ (do) at the moment? — He’s falling!', a: ['is doing'], ca: 'at the moment → ara.', en: 'at the moment → now.' },
+        { p: 'which', r: 'insecure', q: 'My dad ___ (not / like) cold weather, so he stays at home in winter.', a: ["doesn't like", 'does not like'], ca: 'Hàbit/general: doesn’t like.', en: 'General: doesn’t like.' },
+        { p: 'both', q: 'I usually wear trainers, but today I ___ (wear) boots.', a: ['am wearing', "'m wearing"], ca: 'today → ara.', en: 'today → now.' },
+        { p: 'both', r: 'safe', q: 'Leo usually wins, and he ___ (win) again today!', a: ['is winning', "'s winning"], en: 'today → now → is winning.' },
+        { p: 'state', r: 'safe', q: 'I ___ (want) a new helmet. Mine is too small. (state verb)', a: ['want'], en: 'State verb: never continuous.' },
+        { p: 'state', r: 'safe', q: '___ you ___ (know) the rules of this game?', a: ['do know'], en: 'know → Present Simple: Do you know…?' },
+        { p: 'state', r: 'safe', q: 'She ___ (prefer) skating to cycling.', a: ['prefers'], en: 'State verb, third person.' },
+        { p: 'state', r: 'safe', q: 'I ___ (not / understand) this exercise. Can you help me?', a: ["don't understand", 'do not understand'], en: 'State verb: don’t understand.' },
+        { p: 'state', r: 'safe', q: 'Correct the mistake: “I’m needing new gloves.” → I ___ new gloves.', a: ['need'], en: 'need is a state verb.' },
+        { p: 'temp', r: 'daring', q: 'This month I ___ (train) for a race, so I ride every day.', a: ['am training', "'m training"], en: 'Temporary situation: this month.' },
+        { p: 'temp', r: 'daring', q: 'My cousin ___ (stay) with us this week, so we go skating together every afternoon.', a: ['is staying', "'s staying"], en: 'Temporary: this week.' },
+        { p: 'temp', r: 'daring', q: 'I ___ (think) skating is more fun than cycling. (opinion)', a: ['think'], en: 'Opinion: think, no continuous.' },
+        { p: 'temp', r: 'daring', q: 'Be quiet, please! I ___ (think) about my next video.', a: ['am thinking', "'m thinking"], en: 'An activity now: I’m thinking about…' },
+        { p: 'temp', r: 'daring', q: 'Correct the mistake: “Leo is knowing all the routes in the park.” → Leo ___ all the routes.', a: ['knows'], en: 'know is a state verb.' }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes de les LS1 i LS2: decideix primer quina necessites.', en: 'Mixed forms from LS1 and LS2: decide which one you need first.' },
