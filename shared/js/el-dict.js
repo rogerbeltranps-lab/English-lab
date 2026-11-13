@@ -154,7 +154,7 @@
     + '.eldict-tipbox.up::after{bottom:auto;top:-9px;right:10px;border-top:0;border-bottom:9px solid #20312b}'
     + '@media (max-width:640px){.eldict-tipbox{right:10px;bottom:146px}.eldict-tipbox::after{right:28px}}'
     + '@media (max-width:640px){.eldict-fab{right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
-    + '@media print{.eldict-fab,.eldict{display:none!important}}';
+    + '@media print{.eldict-fab,.eldict,.eldict-tipbox{display:none!important}}';
   var fab, box, inp, out, last = '', dragging = false, dragged = false;
   function recent() { try { return JSON.parse(localStorage.getItem('el_dict_recent') || '[]') || []; } catch (e) { return []; } }
   function remember(q) { try { var r = recent().filter(function (x) { return norm(x) !== norm(q); }); r.unshift(q); localStorage.setItem('el_dict_recent', JSON.stringify(r.slice(0, 8))); } catch (e) {} }

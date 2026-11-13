@@ -136,6 +136,8 @@ html.el-nb-plain .nb-idx .lp>a{font-size:17px}
   .nb-page{display:block!important;border-radius:0!important;break-after:page;overflow:visible}
   .nb-paper{position:relative;inset:auto;overflow:visible}
   .nb-pno{position:static;display:block;text-align:right}
+  /* the pages are laid out for the sheet (html.nb-prlay, el-notebook.js beforeprint): 700 x 950 px fits A4 and Letter */
+  html.nb-prlay .nb-page{width:700px;max-width:100%}
   /* the cover fills its sheet, like a real cover */
   .nb-page.nb-cvp .nb-paper{box-sizing:border-box;min-height:98vh}
 }
@@ -377,13 +379,34 @@ html.nb-touring .nb-bt{opacity:1}
 a.nb-ch:hover{background:#e3eafb}
 a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 @media (max-width:899px){.nb .nb-chaps{max-width:none;bottom:auto;top:auto;position:static;justify-content:center;margin-top:4px}.nb-ch span{display:none}}
-@media print{.nb-chaps{display:none}}
+@media print{.nb .nb-chaps{display:none!important}}
 /* 📘 the front cover: page 1 of every chapter and every print (el-notebook.js front) */
 .nb-front{font:15px/1.4 var(--nb-sans,system-ui,sans-serif);color:#26303d}
 /* 📘 the cover's pages: a hard cover of blue cloth board with a darker spine, corner protectors and an elastic band; the ruled lines,
    the margin and the page number are not drawn there. Only colours change here (the pages are measured before), so nothing moves. */
-.nb-page.nb-cvp,.nb-face.nb-cvp{background:#1f3c73}
-.nb-page.nb-cvp .nb-paper,.nb-face.nb-cvp .nb-paper{background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.10),transparent 60%),repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(90deg,#132a55 0 40px,rgba(0,0,0,.25) 40px 43px,#1f3c73 43px);color:#fff}
+.nb-page.nb-cvp,.nb-face.nb-cvp{background:var(--cv)}
+.nb-page.nb-cvp .nb-paper,.nb-face.nb-cvp .nb-paper{background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.10),transparent 60%),var(--cv-pat),linear-gradient(90deg,var(--cv-dk) 0 40px,rgba(0,0,0,.25) 40px 43px,var(--cv) 43px);color:#fff}
+/* 🎨 the student's cover (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"): .nb data-cv (colour) and
+   data-cvd (design), chosen with 🎨 My cover (el-notebook.js cvPick) */
+.nb{--cv:#1f3c73;--cv-dk:#132a55;--cv-pat:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px)}
+.nb[data-cv="red"]{--cv:#8e2430;--cv-dk:#5e1620}.nb[data-cv="green"]{--cv:#1f5c3f;--cv-dk:#123b28}.nb[data-cv="purple"]{--cv:#4a2c6e;--cv-dk:#2f1a48}
+.nb[data-cv="black"]{--cv:#2a2d33;--cv-dk:#15171b}.nb[data-cv="pink"]{--cv:#a3365f;--cv-dk:#6d203e}.nb[data-cv="orange"]{--cv:#a8501c;--cv-dk:#6e3211}.nb[data-cv="teal"]{--cv:#1d5e66;--cv-dk:#103c42}
+.nb[data-cvd="dots"]{--cv-pat:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.6px) 0 0/18px 18px}
+.nb[data-cvd="stripes"]{--cv-pat:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 14px,transparent 14px 28px)}
+.nb[data-cvd="checks"]{--cv-pat:linear-gradient(rgba(255,255,255,.07) 50%,transparent 0) 0 0/32px 32px,linear-gradient(90deg,rgba(255,255,255,.07) 50%,transparent 0) 0 0/32px 32px}
+.nb[data-cvd="stars"]{--cv-pat:radial-gradient(circle at 30% 30%,rgba(255,226,138,.5) 1.4px,transparent 2px) 0 0/34px 34px,radial-gradient(circle,rgba(255,255,255,.35) 1px,transparent 1.6px) 17px 17px/34px 34px}
+.nb[data-cvd="plain"]{--cv-pat:linear-gradient(transparent,transparent)}
+.nb-cvbtn{position:absolute;right:-12px;top:-14px;z-index:3;white-space:nowrap;font:700 14px var(--nb-sans,system-ui,sans-serif);background:rgba(255,255,255,.92);color:#1f2733;border:0;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.nb-cvbtn:hover{background:#fff}
+.nb-cvpick{position:fixed;z-index:2147482700;background:#fff;color:#1f2733;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);padding:12px 14px;width:min(320px,calc(100vw - 24px));font:14px/1.3 var(--nb-sans,system-ui,sans-serif)}
+.nb-cvpick b{display:block;font-weight:700;margin:2px 0 6px}
+.nb-cvpick .row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.nb-cvpick .sw{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #d5dce5;cursor:pointer;padding:0}
+.nb-cvpick .sw.on,.nb-cvpick .pt.on{box-shadow:0 0 0 3px #2f5bd3}
+.nb-cvpick .pt{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;cursor:pointer;font:600 12px var(--nb-sans,system-ui,sans-serif);color:#1f2733;padding:2px;border-radius:10px}
+.nb-cvpick .pt i{width:46px;height:46px;border-radius:8px;background:var(--cv-pat),var(--cv);display:block}
+.nb-cvpick .ok{width:100%;font:700 14px var(--nb-sans,system-ui,sans-serif);border:0;border-radius:10px;padding:8px;background:#1f3c73;color:#fff;cursor:pointer}
+@media print{.nb-cvbtn,.nb-cvpick{display:none!important}}
 .nb-cvp .nb-pno,.nb-cvp .nb-corner{display:none}
 .nb-cv1::before,.nb-cv1::after{content:"";position:absolute;z-index:2;pointer-events:none}
 .nb-cv1::before{right:0;top:0;width:34px;height:34px;background:linear-gradient(225deg,#c9a24a 0 50%,transparent 50%);opacity:.9}
@@ -457,3 +480,49 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-more .nb-fr-res small{font:600 22px var(--nb-hand);color:var(--nb-ink)}
 .nb-fr-more .nb-fr-ls{background:#fff;border:1px solid #d7dde6;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .nb-fr-more .nb-fr-key{color:#6b7280}
+.nb-fr-rings .nb-fr-rh~.nb-fr-rh{margin-top:4px;padding-top:10px;border-top:1px dashed #d7dde6}
+.nb-fr-nums{background:#fff;color:#26303d;border-radius:12px;padding:10px 14px 12px;margin:14px 3% 0;box-shadow:0 3px 10px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.nb-fr-num{display:flex;flex-direction:column;align-items:center;text-align:center;background:#f4f6fa;border-radius:10px;padding:8px 6px;min-width:0}
+.nb-fr-num b{font:800 22px/1.1 var(--nb-sans,system-ui,sans-serif);color:#1f3c73}
+.nb-fr-num span{font:600 13px/1.25 var(--nb-sans,system-ui,sans-serif);color:#26303d}
+.nb-fr-num small{font:12px/1.25 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
+@media print{.nb-fr-rings,.nb-fr-nums,.nb-fr-num,.nb-fr-ring{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media (max-width:640px){.nb-fr-nums{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}.nb-fr-num b{font-size:19px}.nb-fr-num span{font-size:12px}}
+/* 🖨 while printing, the pages are measured on a sheet: one page, 700 x 950 px, fits A4 and Letter with the copyright line */
+html.nb-prlay .nb-spread{flex:none;width:700px;height:950px;grid-template-columns:minmax(0,1fr);margin:0}
+html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px}
+@media print{html.nb-prlay .nb-spread{display:block;width:auto;height:auto}}
+/* 🖨 the full-screen notebook prints alone: nothing of the page around it (no last sheet with the page's header only) */
+@media print{html.el-nb-full body *:not(:has(.nb)):not(.nb):not(.nb *):not(.el-copyright){display:none!important}}
+/* the cover's statistics in rows (Roger: "Add more statistics here"): the first tries and the class games in one row of rings, my work in
+   one row of numbers, so everything fits on the cover */
+.nb-fr-rings{grid-template-columns:repeat(4,1fr) 10px repeat(2,1fr);gap:4px 6px;padding:8px 10px 10px}
+.nb-fr-rings .nb-fr-rh{grid-column:auto/span 4;grid-row:1}
+.nb-fr-rings .nb-fr-rh~.nb-fr-rh{grid-column:6/span 2;margin:0;padding:0;border:0}
+.nb-fr-rings .nb-fr-rg{grid-row:2;flex-direction:column;text-align:center;gap:3px}
+.nb-fr-rings .nb-fr-rg:nth-of-type(7){grid-column:6}.nb-fr-rings .nb-fr-rg:nth-of-type(8){grid-column:7}
+.nb-fr-rings .nb-fr-rg>span:last-child{align-items:center}
+.nb-fr-rings .nb-fr-rg b{font-size:13.5px}
+.nb-fr-rings .nb-fr-rg small{font-size:11.5px}
+.nb-fr-rings .nb-fr-ring{width:48px;height:48px}
+.nb-fr-rings .nb-fr-ring b{width:36px;height:36px;font-size:15px!important}
+.nb-fr-nums{grid-template-columns:repeat(6,1fr);gap:6px;padding:8px 10px 10px;margin-top:10px}
+.nb-fr-nums .nb-fr-rh{grid-column:1/-1}
+.nb-fr-num{padding:6px 4px}
+.nb-fr-num b{font-size:19px}
+.nb-fr-num span{font-size:11.5px}
+.nb-fr-num small{font-size:10.5px}
+@media (max-width:640px){
+  .nb-fr-rings{grid-template-columns:repeat(4,1fr)}
+  .nb-fr-rings .nb-fr-rh,.nb-fr-rings .nb-fr-rh~.nb-fr-rh{grid-column:1/-1;grid-row:auto}
+  .nb-fr-rings .nb-fr-rg,.nb-fr-rings .nb-fr-rg:nth-of-type(n){grid-row:auto;grid-column:auto}
+  .nb-fr-rings .nb-fr-ring{width:40px;height:40px}.nb-fr-rings .nb-fr-ring b{width:30px;height:30px;font-size:13px!important}
+  .nb-fr-rings .nb-fr-rg b{font-size:12px}.nb-fr-rings .nb-fr-rg small{font-size:10.5px}
+  .nb-fr-nums{grid-template-columns:repeat(3,1fr)}.nb-fr-num b{font-size:16px}.nb-fr-num small{display:none}
+  .nb-fr-rings .nb-fr-rg small{line-height:1.2}.nb-fr-rings{gap:2px 4px;padding:6px 8px 8px}.nb-fr-label{margin-bottom:10px}
+  .nb-cvbtn span{display:none}.nb-cvbtn{padding:6px 9px;right:-8px}
+}
+.nb-fr-rings .nb-fr-rg b i{display:block;font-style:normal}
+.nb-fr-rings .nb-fr-rg>span:last-child{max-width:100%;min-width:0}
+/* the printed cover: its label and statistics spread over the whole sheet, no empty half */
+@media print{.nb-page.nb-cv1 .nb-paper{display:flex;flex-direction:column}.nb-page.nb-cv1 .nb-front{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}.nb-page.nb-cv1 .nb-fr-top{margin:0}}

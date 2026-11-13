@@ -30,7 +30,12 @@ window.ELNotebook = (function () {
   // what the student wrote on a handwriting page: only the notebook's own marks are kept (a doc is the student's own, so it is cleaned
   // again here before the teacher's 👁 Student view shows it)
   const KEEP = new Set(['nb-pen-b', 'nb-pen-k', 'nb-pen-r', 'nb-pen-g', 'nb-hl-y', 'nb-hl-g', 'nb-hl-p', 'nb-ul', 'nb-ulw', 'nb-circ', 'nb-boxd', 'nb-cp']);
-  function clean(h) {
+  // empty lines at the end of a note (Enter pressed many times) are left out, and more than one empty line in a row is one: they made empty
+  // pages (Miquel's grammar notes: 7 empty pages). Not in a note with a drawing: the drawing lies over the lines and needs them.
+  function clean(h, keep) {
+    const s = cleanAll(h); return keep ? s : s.replace(/(?:<br>\s*){3,}/g, '<br><br>').replace(/(?:<br>|<div>(?:<br>|\s|&nbsp;)*<\/div>|\s|&nbsp;)+$/, '');
+  }
+  function cleanAll(h) {
     let n = 0;
     const box = new DOMParser().parseFromString('<div>' + String(h || '') + '</div>', 'text/html').body.firstChild;
     const out = node => {
@@ -59,7 +64,7 @@ window.ELNotebook = (function () {
   let H = null, secs = [], pages = [], pg = 0, LSKEY = '', order = [], last = null, saveT = 0, laid = '', gamesById = {};
   const t = (c, e) => H.t(c, e);
   const mday = d => { if (!d || d === true) return ''; const s = String(H.exDay(d)).replace(/\.$/, '').replace(/,/g, ''); const i = s.indexOf(' '); return i > 0 ? esc(s.slice(0, i)) + '<br>' + esc(s.slice(i + 1)) : esc(s); };
-  const lines = s => esc(String(s || '').trim()).replace(/\n/g, '<br>');
+  const lines = s => esc(String(s || '').trim()).replace(/\n\s*\n(\s*\n)+/g, '\n\n').replace(/\n/g, '<br>');
   const kindIcon = k => k === 'grammar' ? '🧩' : k === 'vocab' ? '📚' : '🎮';
   const gname = g => String(g.title || '').replace(/^(Grammar|Vocabulary) · /, '').replace(/^📘\s*/, '');
   const fk = s => String(s).replace(/[^A-Za-z0-9_~-]/g, '_').slice(0, 80);   // a safe key for Firestore maps and data-b
@@ -83,7 +88,7 @@ window.ELNotebook = (function () {
     const parts = (g.parts || []).map(p => {
       const n = (g.notes || {})[p.k], txt = n && String(n.text || '').trim();
       return `<div class="nb-slip">${p.slides && p.slides.length ? p.slides.map(H.slide).join('') : `<h4>${H.md(p.topic)}</h4>`}</div>`
-        + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}</span>${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
+        + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}</span>${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html, (n.dr || []).length)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
     }).join('');
     let study = '';
     if (absent) study = `<div class="nb-sticky pink">${t('No vas fer aquest joc', 'You missed this game')}<small>${t('Llegeix la teoria i copia-la a la teva llibreta. Si tens dubtes, pregunta al professor.', 'Read the theory and copy it into your notebook. If anything is not clear, ask your teacher.')}</small></div>`;
@@ -100,7 +105,7 @@ window.ELNotebook = (function () {
   function together(g) {
     const p = g.gt || {}, rd = /-rd$/.test(g.id), txt = String(p.text || '').trim();
     const sum = (p.sum || []).length ? `<div class="nb-slip">${p.sum.map(b => `<div class="ex-rule">${H.safe(b)}</div>`).join('')}<span class="nb-clip">📎 ${t('de la pissarra', 'from the whiteboard')}</span></div>` : '';
-    const mine = p.html || (p.dr && p.dr.length) ? `<div class="nb-notes">${clean(p.html)}${svg(p.dr)}</div>` : txt ? `<div class="nb-mine">${lines(txt)}</div>` : `<p class="nb-pencil">${t('No vas prendre apunts aquí.', 'You didn\'t take notes here.')}</p>`;
+    const mine = p.html || (p.dr && p.dr.length) ? `<div class="nb-notes">${clean(p.html, (p.dr || []).length)}${svg(p.dr)}</div>` : txt ? `<div class="nb-mine">${lines(txt)}</div>` : `<p class="nb-pencil">${t('No vas prendre apunts aquí.', 'You didn\'t take notes here.')}</p>`;
     return `<div class="nb-game"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
@@ -133,7 +138,7 @@ window.ELNotebook = (function () {
       + (w.task ? `<p class="nb-pencil">${esc(plainOf(w.task)).slice(0, 400)}</p>` : '')
       + (w.qs.length ? `<ol class="nb-ans nb-tdq">${w.qs.map(li).join('')}</ol>` : `<p class="nb-pencil">${t('Encara no ho has fet: obre el learning path per fer-ho.', 'You haven\'t done it yet: open the learning path to do it.')}</p>`) + `</div>`;
   }
-  const noteHtml = v => `${v.w ? `<span class="nb-when nb-qw">📍 ${esc(v.w)}${v.day ? ' · ' + esc(H.exDay(v.day)) : ''}</span>` : ''}<div class="nb-notes${/^[ygpb]$/.test(v.pi || '') ? ' nb-pi pi-' + v.pi : ''}">${v.html ? clean(v.html) : lines(v.text)}${svg(v.dr)}</div>`;
+  const noteHtml = v => `${v.w ? `<span class="nb-when nb-qw">📍 ${esc(v.w)}${v.day ? ' · ' + esc(H.exDay(v.day)) : ''}</span>` : ''}<div class="nb-notes${/^[ygpb]$/.test(v.pi || '') ? ' nb-pi pi-' + v.pi : ''}">${v.html ? clean(v.html, (v.dr || []).length) : lines(v.text)}${svg(v.dr)}</div>`;
 
   // the parts of a section in the student's order (new parts go after the one they follow by default)
   function ordered(key, blocks) {
@@ -262,7 +267,7 @@ window.ELNotebook = (function () {
   // which skill an activity practises, by its tab: the first tries of the cover's rings (recall and checkpoints mix them: left out)
   const SKILL = id => /^(grammar|mixed)$/.test(id) ? 'grammar' : /^(vocab|words|cards)$/.test(id) ? 'vocab' : /^(read|log|sources|ch\d+)$/.test(id) ? 'read' : /^(listen|again|chart)$/.test(id) ? 'listen' : null;
   const lsSum = L => {
-    const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {}, skill = {};
+    const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {}, skill = {}, act = { n: 0, ok: 0 };
     (window.EL_CATALOG || []).filter(a => a.ls === L.id && a.keys && a.keys[0]).forEach(a => {
       let st = null; try { st = JSON.parse(localStorage.getItem(a.keys[0]) || 'null'); } catch (e) {}
       const items = (st && st.items) || {}, first = {};
@@ -270,6 +275,7 @@ window.ELNotebook = (function () {
       Object.entries(first).forEach(([id, r]) => {
         const right = r.ok.filter(Boolean).length, of = r.ok.length, sk = SKILL(id);
         if (sk) { const z = skill[sk] || (skill[sk] = { r: 0, of: 0 }); z.r += right; z.of += of; }
+        act.n++; if (right / of >= .5) act.ok++;
         const cs = ((SC[a.id] || {})[id] || []).filter(c => /^\d+\.\d+$/.test(c)); if (!cs.length) return;
         cs.forEach(c => { const x = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); x.r += right; x.of += of; x.n++; });
         [...new Set(cs.map(c => c.split('.')[0]))].forEach(k => { const y = comp[k] || (comp[k] = { ok: 0, of: 0 }); y.of++; if (right / of >= .5) y.ok++; });
@@ -297,11 +303,12 @@ window.ELNotebook = (function () {
     const e = G.exam, sc = x.sections || {}, got = e ? e.sections.filter(([k]) => sc[k] && sc[k].score != null) : [];
     const mx = got.reduce((n, [k, , m]) => n + (+(sc[k].max || m || e.max)), 0), exam = mx ? got.reduce((n, [k]) => n + (+sc[k].score), 0) / mx * 10 : null;
     const f = G.fp && (H.rs || {})[G.fp.a] || {}, fp = f.max ? (+f.score || 0) / f.max * 10 : null;
-    return { L, rows, comp, skill, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
+    return { L, rows, comp, skill, act, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
   };
   // the competences' names in English on the cover (Roger: "the criteria … should be in English")
   const CEN = { 1: 'Interculturality', 2: 'Listening', 3: 'Speaking', 4: 'Reading', 5: 'Writing', 6: 'Research', 7: 'Personal reading', 8: 'Mediation', 9: 'Self-regulation', 10: 'Ethical communication' };
-  function front() {
+  function front(st) {
+    st = st || {};
     const me0 = (window.EL_LS || []).find(l => l.id === H.LS) || {}, grp = String(H.group || '').replace(/^(\d)ESO\s*([A-Z])?$/i, (m, n, l) => `${n} ESO${l ? ' ' + l : ''}`) || String(me0.course || '').replace(/^(\d)eso$/, '$1 ESO');
     const n1 = v => v == null ? '–' : String(Math.round(v * 10) / 10).replace('.', ',');
     const DG = { NA: t('No assolit', 'Not achieved'), AS: t('Assoliment satisfactori', 'Satisfactory'), AN: t('Assoliment notable', 'Good'), AE: t('Assoliment excel·lent', 'Excellent') };
@@ -309,23 +316,37 @@ window.ELNotebook = (function () {
     const LVN = { beginners: 'Starter', insecure: 'Base', safe: 'Core', daring: 'Plus', native: 'Pro' }, lv = String(H.level || '').toLowerCase();
     const lvl = lv && LVN[lv] ? [window.elCefr ? elCefr(me0.course, lv) : '', LVN[lv]].filter(Boolean).join(' · ') : '';
     const sums = chapters().map(lsSum).filter(y => y.any || y.L.id === H.LS);
+    // one ring: the degree, not the % (Roger: "Instead of %, the AS, AN…"): NA under 5 · AS · AN · AE from 9, the ring filled as far as they got
+    const ring = (z, ic, nm, unit) => { const pc = z.of ? Math.round(z.r / z.of * 100) : null, dg = pc == null ? null : window.elDegree ? elDegree(pc / 10) : null;
+      return `<div class="nb-fr-rg"><span class="nb-fr-ring${pc == null ? ' none' : ' d-' + dg}" style="--p:${pc || 0}"><b>${dg || '–'}</b></span><span><b><i>${ic}</i> ${esc(nm)}</b><small>${pc == null ? t('encara res', 'nothing yet') : `${esc(DG[dg] || '')} · ${unit ? `${z.n} ${z.n === 1 ? unit[0] : unit[1]} · ${pc} %` : `${z.r}/${z.of} ${t('bé', 'right')}`}`}</small></span></div>`; };
+    // the class games of every LS of the course: only the latest play of each game counts (as the board and the mark)
+    const ids = new Set(sums.map(y => y.L.id)), gl = Object.values(H.mg || {}).filter(y => y && ids.has(y.ls)), gm = { grammar: { r: 0, of: 0, n: 0 }, vocab: { r: 0, of: 0, n: 0 } };
+    (window.elLatestGames ? elLatestGames(gl) : gl).forEach(y => { const z = gm[y.kind === 'vocab' ? 'vocab' : y.kind === 'grammar' ? 'grammar' : '']; if (z && y.of) { z.r += +y.r || 0; z.of += +y.of; z.n++; } });
+    const act = sums.reduce((a, y) => { a.n += y.act.n; a.ok += y.act.ok; return a; }, { n: 0, ok: 0 }), here = sums.length > 1 ? `${window.elLsNum ? elLsNum(me0) : 'LS'}` : '';
+    const tiles = [['✏️', act.n, t('activitats fetes', 'activities done'), act.n ? t(`${act.ok} bé al primer intent`, `${act.ok} right on the first try`) : ''],
+      ['🎮', gm.grammar.n + gm.vocab.n, t('jocs de classe', 'class games played'), ''],
+      ['🧭', st.lps || 0, t('learning paths començats', 'learning paths started'), here],
+      ['🔤', st.words || 0, t('paraules a la llibreta', 'words in my notebook'), here],
+      ['✍', st.notes || 0, t('apunts meus', 'notes I took'), here],
+      ['📌', st.todo || 0, t('activitats per fer', 'activities to do'), st.todo ? t('fes-les per completar la llibreta', 'do them to complete your notebook') : t('tot fet!', 'all done!')]];
     const box = y => `<div class="nb-fr-ls"><div class="nb-fr-lh">📚 ${esc(chapName(y.L))}${y.exam != null ? ` <span class="nb-fr-k">📝 ${t('Examen', 'Exam')} <b>${n1(y.exam)}</b></span>` : ''}${y.fp != null ? ` <span class="nb-fr-k">🎬 ${t('Producte final', 'Final product')} <b>${n1(y.fp)}</b></span>` : ''}</div>`
       + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(CEN[String(r.c).split('.')[0]] || String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
       + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
       + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
     // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
     return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
-      + `<div class="nb-fr-label"><div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+      + `<div class="nb-fr-label">${H.own ? `<button type="button" class="nb-ui nb-cvbtn" title="${t('Canvia el color i el disseny de la portada', 'Change the colour and design of the cover')}">🎨 <span>${t('La meva portada', 'My cover')}</span></button>` : ''}<div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
       + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
       + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
       // (Roger, 13 Nov 2026: "On the cover only this and add sth like this bit about grammar, vocabulary, reading, listening activities.
       // Then the following pages my results but in a cover style", then "This should be notebook like not like a cover"): the first tries
       // of each skill as rings, the results on the next pages, on notebook paper
       + `<div class="nb-fr-rings"><div class="nb-fr-rh">${t('Primers intents', 'First tries')}</div>${[['grammar', '🧩', t('Gramàtica', 'Grammar')], ['vocab', '📚', t('Vocabulari', 'Vocabulary')], ['read', '📖', 'Reading'], ['listen', '🎧', 'Listening']].map(([k, ic, nm]) => {
-        const z = sums.reduce((a, y) => { const v = y.skill[k]; if (v) { a.r += v.r; a.of += v.of; } return a; }, { r: 0, of: 0 }), pc = z.of ? Math.round(z.r / z.of * 100) : null;
-        // the degree, not the % (Roger: "Instead of %, the AS, AN…"): NA under 5 · AS · AN · AE from 9, the ring filled as far as they got
-        const dg = pc == null ? null : window.elDegree ? elDegree(pc / 10) : null;
-        return `<div class="nb-fr-rg"><span class="nb-fr-ring${pc == null ? ' none' : ' d-' + dg}" style="--p:${pc || 0}"><b>${dg || '–'}</b></span><span><b>${ic} ${esc(nm)}</b><small>${pc == null ? t('encara res', 'nothing yet') : `${esc(DG[dg] || '')} · ${z.r}/${z.of} ${t('bé', 'right')}`}</small></span></div>`; }).join('')}</div>`
+        const z = sums.reduce((a, y) => { const v = y.skill[k]; if (v) { a.r += v.r; a.of += v.of; } return a; }, { r: 0, of: 0 });
+        return ring(z, ic, nm); }).join('')}`
+      // 🎮 the class games and 📊 the numbers of the notebook (Roger, 13 Nov 2026: "Add more statistics here", the empty part of the cover)
+      + `<div class="nb-fr-rh">${t('Jocs de classe', 'Class games')}</div>${ring(gm.grammar, '🧩', t('Jocs de gramàtica', 'Grammar games'), [t('joc', 'game'), t('jocs', 'games')])}${ring(gm.vocab, '📚', t('Jocs de vocabulari', 'Vocabulary games'), [t('joc', 'game'), t('jocs', 'games')])}</div>`
+      + `<div class="nb-fr-nums"><div class="nb-fr-rh">${t('La meva feina', 'My work')}</div>${tiles.map(([ic, v, nm, sub]) => `<div class="nb-fr-num"><b>${ic} ${v}</b><span>${esc(nm)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`).join('')}</div>`
       + `</div><div class="nb-break"></div><div class="nb-front nb-fr-more">`
       + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')} <small>· ${esc(H.name || '')}</small></div>`
       + sums.map(box).join('')
@@ -345,7 +366,10 @@ window.ELNotebook = (function () {
     // the cover
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
     const when = n == null || n < 0 ? '' : n === 0 ? t('avui!', 'today!') : n === 1 ? t('demà!', 'tomorrow!') : t(`d'aquí a ${n} dies`, `in ${n} days`);
-    out.push({ key: 'cover', fixed: true, blocks: [], head: front() + `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p><div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>
+    const st = { lps: ex.lps.filter(lp => lp.tabs.length).length, words: ex.lps.reduce((n, lp) => n + (lp.parts || []).reduce((m, pt) => m + pt.terms.reduce((k, g) => k + g.items.length, 0), 0), 0),
+      todo: ex.lps.reduce((n, lp) => n + (lp.parts || []).filter(pt => pt.todo).length, 0),
+      notes: Object.values(NT()).filter(v => v && (String(v.text || '').trim() || String(v.html || '').trim() || (v.dr || []).length)).length + games.filter(g => g.gt && (String(g.gt.text || '').trim() || String(g.gt.html || '').replace(/<[^>]*>/g, '').trim() || (g.gt.dr || []).length)).length };
+    out.push({ key: 'cover', fixed: true, blocks: [], head: front(st) + `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p><div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>
       <div class="nb-links">${ex.sample ? `<a href="${esc(ex.sample)}">📝 ${t('Examen de mostra', 'Sample exam')}</a>` : ''}<button type="button" class="nb-printbtn">🖨 ${t('Imprimeix la llibreta', 'Print my notebook')}</button></div>
       <div class="nb-sticky">${ex.exam ? `🎯 ${t('EXAMEN', 'EXAM')}: ${esc(H.exDay(ex.exam))}${when ? ' · ' + when : ''}` : '🎯 ' + t('Què entra a l\'examen', 'What\'s in the exam')}<small>${t('Tot el que hi ha en aquesta llibreta és el que hem fet a classe: és el que entra a l\'examen. Cada vegada que fem alguna cosa nova, apareix aquí.', 'Everything in this notebook is what we did in class: it\'s what goes in the exam. Each time we do something new, it appears here.')}</small></div>
       ${ex.dropped.length ? `<p class="nb-pencil">✂️ ${t('No entra a l\'examen', 'Not in your exam')}: ${ex.dropped.map(a => `LP${esc(a.n)} ${esc(a.title)}`).join(' · ')}</p>` : ''}
@@ -565,11 +589,13 @@ window.ELNotebook = (function () {
     // only the cover itself is the blue board; ⭐ My results after it are ordinary notebook paper (Roger: "This should be notebook like not like a cover")
     pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front:not(.nb-fr-more)')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont):not(.nb-fr-more)') ? ['nb-cv1'] : [])); });
   }
-  function layout(keep) {
-    const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || printing()) return false;
+  // where the student is: the first part on the page shown, to open there again
+  const here = () => { if (!pages.length) return null; const p = pages[Math.max(0, Math.min(pages.length - 1, pg))]; const b = p && p.el.querySelector('.nb-blk[data-b]'); const f = pages.findIndex(x => x.s === p.s); return b ? 'b:' + b.dataset.b + '@' + (b.dataset.off || 0) : 's:' + ((secs[p.s] || {}).key || '') + '@' + (pg - f); };
+  function layout(keep, force) {
+    const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || (printing() && !force)) return false;
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
-    // where the student is: the first part on the page shown, to open there again
-    if (keep == null && pages.length) { const p = pages[Math.max(0, Math.min(pages.length - 1, pg))]; const b = p && p.el.querySelector('.nb-blk[data-b]'); const f = pages.findIndex(x => x.s === p.s); keep = b ? 'b:' + b.dataset.b + '@' + (b.dataset.off || 0) : 's:' + ((secs[p.s] || {}).key || '') + '@' + (pg - f); }
+    if (keep == null) keep = here();
+    cvSet(root);
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), M = MK();
     secs.forEach((s, si) => {
@@ -679,8 +705,24 @@ window.ELNotebook = (function () {
     if (!layout(keep)) { /* hidden for now: laid out when it shows (watch) */ }
   }
 
-  // never while printing: the printed sheets are the pages on the screen
-  let PRN = false; addEventListener('beforeprint', () => { PRN = true; }); addEventListener('afterprint', () => { PRN = false; });
+  // 🖨 printing: the pages are laid out again for a sheet of paper (Roger, 13 Nov 2026: "Here there's space between the info and it doesn't
+  // make sense": the screen's pages are wider than tall, so each printed sheet had half of it empty), one page per sheet, then back to the
+  // screen's pages where the student was. PSEL = the parts and sections of the pages picked in 🖨 (printPages), which are found again in
+  // the sheets' pages. Never laid out while printing otherwise.
+  let PRN = false, PSEL = null, PKEEP = null;
+  addEventListener('beforeprint', () => {
+    PRN = true; const sp = document.querySelector('.nb .nb-spread'), h = document.documentElement;
+    if (!sp || !H || !sp.getClientRects().length) return;
+    PKEEP = here(); h.classList.add('nb-prlay');
+    if (!layout(PKEEP, true)) { h.classList.remove('nb-prlay'); return; }
+    if (PSEL) { h.classList.add('nb-printsel'); pages.forEach(p => { const bs = [...p.el.querySelectorAll('.nb-blk[data-b]')].map(b => b.dataset.b);
+      p.el.classList.toggle('nb-pr', bs.length ? bs.some(b => PSEL.b.has(b)) : PSEL.s.has(p.s)); }); }
+  });
+  addEventListener('afterprint', () => {
+    PRN = false; const h = document.documentElement, was = h.classList.contains('nb-prlay');
+    h.classList.remove('nb-prlay', 'nb-printsel'); document.querySelectorAll('.nb .nb-pr').forEach(p => p.classList.remove('nb-pr')); PSEL = null;
+    if (was) relayout(PKEEP);
+  });
   const printing = () => PRN || matchMedia('print').matches;
   // laid out again when the book's size changes (window, Chromebook rotated, fonts loaded), not while the student types in it
   let RO = null;
@@ -972,15 +1014,43 @@ window.ELNotebook = (function () {
 
   // 🖨 Print (Roger, 13 Nov 2026: "print current, selected or all the pages"): the pages on the screen now, the pages ticked in the list,
   // or the whole notebook. One page per sheet; el-copyright.js adds the copyright line and the page numbers to every printed sheet.
+  // 🎨 the cover's colour and design (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"): saved in the
+  // notebook (parts.cv = {c, d}) and on this device for the other chapters; only colours change, so nothing is laid out again
+  const CVC = { blue: ['#1f3c73', 'Blau', 'Blue'], red: ['#8e2430', 'Vermell', 'Red'], green: ['#1f5c3f', 'Verd', 'Green'], purple: ['#4a2c6e', 'Lila', 'Purple'],
+    black: ['#2a2d33', 'Negre', 'Black'], pink: ['#a3365f', 'Rosa', 'Pink'], orange: ['#a8501c', 'Taronja', 'Orange'], teal: ['#1d5e66', 'Turquesa', 'Teal'] };
+  const CVD = { cloth: ['Tela', 'Cloth'], dots: ['Punts', 'Dots'], stripes: ['Ratlles', 'Stripes'], checks: ['Quadres', 'Checks'], stars: ['Estrelles', 'Stars'], plain: ['Llisa', 'Plain'] };
+  const cvGet = () => { let c = H && PT().cv; if (!c || !c.c) try { c = JSON.parse(localStorage.getItem('el_nb_cv') || 'null'); } catch (e) {} return c && CVC[c.c] ? { c: c.c, d: CVD[c.d] ? c.d : 'cloth' } : { c: 'blue', d: 'cloth' }; };
+  const cvSet = root => { const c = cvGet(); if (root) { root.dataset.cv = c.c; root.dataset.cvd = c.d; } };
+  function cvPick(btn) {
+    document.querySelectorAll('.nb-cvpick').forEach(x => x.remove());
+    const root = document.querySelector('.nb'); if (!root || !H || !H.own) return;
+    const box = document.createElement('div'); box.className = 'nb-cvpick nb-ui'; box.setAttribute('role', 'dialog');
+    const paint = () => { const c = cvGet();
+      box.innerHTML = `<b>🎨 ${t('Color', 'Colour')}</b><div class="row">${Object.entries(CVC).map(([k, v]) => `<button type="button" class="sw${c.c === k ? ' on' : ''}" data-cvc="${k}" style="background:${v[0]}" title="${t(v[1], v[2])}" aria-label="${t(v[1], v[2])}"></button>`).join('')}</div>`
+        + `<b>✨ ${t('Disseny', 'Design')}</b><div class="row">${Object.entries(CVD).map(([k, v]) => `<button type="button" class="pt${c.d === k ? ' on' : ''}" data-cvd="${k}"><i class="nb-cvsw" data-k="${k}"></i>${t(v[0], v[1])}</button>`).join('')}</div>`
+        + `<button type="button" class="ok">✓ ${t('Fet', 'Done')}</button>`;
+      box.querySelectorAll('.nb-cvsw').forEach(i => { const r = document.createElement('div'); r.className = 'nb'; r.dataset.cv = c.c; r.dataset.cvd = i.dataset.k; r.style.cssText = 'display:none'; document.body.append(r); const cs = getComputedStyle(r); i.style.background = cs.getPropertyValue('--cv-pat') + ',' + cs.getPropertyValue('--cv'); r.remove(); }); };
+    paint(); root.append(box);
+    const rc = btn.getBoundingClientRect(), h = box.offsetHeight, w = box.offsetWidth;
+    box.style.left = Math.max(12, Math.min(innerWidth - w - 12, rc.left)) + 'px'; box.style.top = Math.max(12, rc.top - h - 8 > 12 ? rc.top - h - 8 : Math.min(innerHeight - h - 12, rc.bottom + 8)) + 'px';
+    box.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.classList.contains('ok')) { box.remove(); return; }
+      const c = cvGet(); if (b.dataset.cvc) c.c = b.dataset.cvc; if (b.dataset.cvd) c.d = b.dataset.cvd;
+      PT().cv = c; try { localStorage.setItem('el_nb_cv', JSON.stringify(c)); } catch (x) {} cvSet(root); paint(); save();
+    });
+  }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('.nb .nb-cvbtn'); if (b) { e.preventDefault(); e.stopPropagation(); cvPick(b); return; }
+    const p = document.querySelector('.nb-cvpick'); if (p && !(e.target.closest && e.target.closest('.nb-cvpick'))) p.remove(); }, true);
   function printPages(set) {
     const h = document.documentElement, root = document.querySelector('.nb'); if (!root) return;
     // the cover always goes first unless the student unticks it (Roger: "Per defecte la portada surt sempre")
     const cov = root.querySelector('.nb-pcov input');
     if (set && (!cov || cov.checked)) set = [...new Set(pages.map((p, i) => p.el.querySelector('.nb-front') ? i : -1).filter(i => i >= 0).concat(set))].sort((a, b) => a - b);
-    if (set) { h.classList.add('nb-printsel'); pages.forEach((p, i) => p.el.classList.toggle('nb-pr', set.includes(i))); }
+    // the pages picked, by what is on them: the sheets' pages are not the screen's (laid out again for paper when printing)
+    PSEL = set ? { b: new Set(set.flatMap(i => pages[i] ? [...pages[i].el.querySelectorAll('.nb-blk[data-b]')].map(b => b.dataset.b) : [])), s: new Set(set.map(i => pages[i] && pages[i].s)) } : null;
     const menu = root.querySelector('.nb-pmenu'); if (menu) menu.hidden = true;
-    const off = () => { h.classList.remove('nb-printsel'); root.querySelectorAll('.nb-pr').forEach(p => p.classList.remove('nb-pr')); removeEventListener('afterprint', off); };
-    addEventListener('afterprint', off); setTimeout(() => window.print(), 50);
+    setTimeout(() => window.print(), 50);
   }
   const menuOff = () => { const m = document.querySelector('.nb .nb-pmenu'); if (m) m.hidden = true; const pb = document.querySelector('.nb-bar .nb-printbtn'); if (pb) pb.setAttribute('aria-expanded', 'false'); };
   document.addEventListener('click', e => {
