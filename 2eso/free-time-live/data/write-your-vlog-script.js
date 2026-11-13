@@ -187,14 +187,17 @@ window.LP = {
         { p: 'forms', r: 'insecure', q: 'I train ___ a week: on Tuesdays and Thursdays. (dos cops)', a: ['twice'], ca: 'Freqüència.', en: 'Frequency.' },
         { p: 'forms', r: 'safe', q: 'I ___ (want) to join a climbing club. (state verb)', a: ['want'], en: 'State verb: Present Simple.' },
         { p: 'forms', r: 'safe', q: 'I’m getting ___ at skating. (millor)', a: ['better'], en: 'get better at.' },
+        { p: 'forms', a: [], own: { must: ["\\b(am|is|are|['’]m|['’]s|['’]re)\\s+\\w+ing\\b", "\\b(love|like|hate)s?\\s+\\w+ing\\b"], min: 15 }, q: "Your turn: one sentence of each colour for your vlog: now (-ing), usually, likes (-ing) and a tip. <span class=\"tiny\">(Una frase de cada color per al teu vlog: ara (-ing), normalment, el que t’agrada (-ing) i un consell.)</span>", show: "Today I’m skating at the park. I usually come here on Saturdays. I love skating. Wear a helmet!", ca: "Una frase de cada forma.", en: "One sentence of each form." },
         { p: 'link', r: 'safe', q: 'I love climbing ___ it’s like a puzzle.', a: ['because'], en: 'Reason.' },
         { p: 'link', r: 'safe', q: 'I want to get better, ___ I practise twice a week.', a: ['so'], en: 'Result.' },
         { p: 'link', r: 'safe', q: 'I hate falling, ___ you learn from it.', a: ['but'], en: 'Contrast.' },
         { p: 'link', r: 'daring', q: 'Join: “It’s cold. I’m wearing a jacket.” (result) → It’s cold, ___ I’m wearing a jacket.', a: ['so'], en: 'so = result.' },
+        { p: 'link', r: 'safe', a: [], own: { must: ["\\bbecause\\b", "\\bso\\b"], min: 10 }, q: "Your turn: one sentence for your vlog with <b>because</b> and <b>so</b>.", show: "I love skating because it’s fast, so I come here every Saturday.", en: "because = the reason · so = the result." },
         { p: 'longer', r: 'daring', q: 'This month I ___ (train) three times a week for the competition.', a: ['am training', "'m training"], en: 'Temporary situation.' },
         { p: 'longer', r: 'daring', q: 'I ___ (think) bouldering is the most fun. (opinion)', a: ['think'], en: 'Opinion: no continuous.' },
         { p: 'longer', r: 'daring', q: 'I prefer the park ___ the sports hall.', a: ['to'], en: 'prefer A to B.' },
-        { p: 'longer', r: 'daring', q: 'For me, climbing ___ (mean) freedom.', a: ['means'], en: 'State verb, third person.' }
+        { p: 'longer', r: 'daring', q: 'For me, climbing ___ (mean) freedom.', a: ['means'], en: 'State verb, third person.' },
+        { p: 'longer', r: 'daring', a: [], own: { must: ["\\b(am|is|are|['’]m|['’]s|['’]re)\\s+\\w+ing\\b", "\\b(think|for me|in my opinion)\\b", "\\bbecause\\b"], min: 15 }, q: "Your turn: three linked sentences for your vlog: a temporary situation, an opinion and a reason.", show: "I’m training a lot this month. For me, climbing means freedom because I forget everything up there.", en: "-ing for now · For me / I think · because." }
       ] },
     { id: 'write', type: 'writing', product: 5, tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: 'Peça 5: el guió del meu vlog', en: 'Piece 5: my vlog script' },
       intro: { ca: 'Ajunta les peces 1, 2 i 4 i escriu el guió complet del teu vlog, diapositiva per diapositiva, seguint el model de la Noa. És el text que diràs al vídeo.', en: 'Put pieces 1, 2 and 4 together and write the full script of your vlog, slide by slide, following Noa’s model. This is the text you will say in the video.' },

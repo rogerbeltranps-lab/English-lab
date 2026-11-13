@@ -179,6 +179,7 @@ window.LP = {
         { p: 'like', r: 'insecure', q: 'My brother ___ (not / like) swimming.', a: ["doesn't like", 'does not like'], ca: 'Negativa 3a persona: doesn’t like.', en: 'Third person negative: doesn’t like.' },
         { p: 'like', r: 'insecure', q: 'I don’t ___ training in the rain. (no m’importa)', a: ['mind'], ca: 'don’t mind + -ing.', en: 'don’t mind + -ing.' },
         { p: 'like', r: 'safe', q: 'They love ___ (watch) highlights after the match.', a: ['watching'], en: 'love + -ing.' },
+        { p: 'like', a: [], own: { must: ["\\b(love|like|enjoy)s?\\s+\\w+ing\\b", "\\bmind\\s+\\w+ing\\b", "\\bhate\\s+\\w+ing\\b"], min: 10 }, q: "Your turn: one thing you <b>love</b> doing, one you <b>don’t mind</b> and one you <b>hate</b>, with -ing. <span class=\"tiny\">(Una cosa que t’encanta fer, una que no t’importa i una que odies, amb -ing.)</span>", show: "I love skating, I don’t mind cooking and I hate getting up early.", ca: "love / don’t mind / hate + verb-ing.", en: "love / don’t mind / hate + verb-ing." },
         { p: 'imp', q: 'Tip: ___ a break every 30 minutes. (fer)', a: ['take'], ca: 'Imperatiu: Take…', en: 'Imperative: Take…' },
         { p: 'imp', q: 'Tip: ___ off your phone at night. (apagar)', a: ['switch', 'turn'], ca: 'Imperatiu: Switch off…', en: 'Imperative: Switch off…' },
         { p: 'imp', q: 'Tip: ___ use your phone in bed. (negatiu)', a: ["don't", 'do not'], ca: 'Imperatiu negatiu: Don’t + verb.', en: 'Negative imperative: Don’t + verb.' },
@@ -187,11 +188,14 @@ window.LP = {
         { p: 'imp', r: 'safe', q: '___ your phone out of your bedroom. (mantenir)', a: ['keep'], en: 'Imperative: Keep…' },
         { p: 'imp', r: 'safe', q: 'Tip: ___ check your phone every five minutes. (negatiu)', a: ["don't", 'do not'], en: 'Don’t + verb.' },
         { p: 'imp', r: 'daring', q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'], en: 'Don’t + base verb, no “to”.' },
+        { p: 'imp', a: [], own: { must: ["\\b(don['’]t|do not)\\s+\\w+"], min: 8 }, q: "Your turn: three tips for a friend who uses the phone too much: two do’s and one <b>don’t</b>. <span class=\"tiny\">(Tres consells per a un amic que fa servir massa el mòbil: dos de fer i un de no fer.)</span>", show: "Turn off your phone at night. Go for a walk. Don’t use your phone in bed.", ca: "Verb sol, sense you · Don’t + verb.", en: "The verb alone, no you · Don’t + verb." },
         { p: 'why', r: 'safe', q: 'Switch off your phone at night, ___ the light keeps you awake. (raó)', a: ['because'], en: 'because gives the reason.' },
         { p: 'why', r: 'safe', q: 'Set a time limit, ___ you have time for other things. (resultat)', a: ['so'], en: 'so gives the result.' },
         { p: 'why', r: 'daring', q: 'Turn off notifications when you study, ___ you can concentrate.', a: ['so', 'so that'], en: 'so (that) = result / purpose.' },
+        { p: 'why', r: 'safe', a: [], own: { must: ["\\bbecause\\b", "\\bso\\b"], min: 10 }, q: "Your turn: two tips, one with <b>because</b> and one with <b>so</b>.", show: "Don’t play at night because you need to sleep. Turn off notifications, so you can concentrate.", en: "because = the reason · so = the result." },
         { p: 'instead', r: 'daring', q: 'Go outside ___ ___ watching videos all afternoon. (en lloc de)', a: ['instead of'], en: 'instead of + -ing.' },
-        { p: 'instead', r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' }
+        { p: 'instead', r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' },
+        { p: 'instead', r: 'daring', a: [], own: { must: ["\\binstead of\\b", "\\benough\\b"], min: 10 }, q: "Your turn: one tip with <b>instead of</b> and one sentence with <b>enough</b>.", show: "Read a book instead of watching videos. One hour a day is enough.", en: "instead of + -ing · enough." }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: -ing després de like, Present Continuous, Present Simple o imperatiu?', en: 'Mixed forms: -ing after like, Present Continuous, Present Simple or imperative?' },
