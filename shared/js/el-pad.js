@@ -13,7 +13,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 
 export function css() {
   if (document.getElementById('el-nb-css')) return;
-  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113g', import.meta.url).href; document.head.append(l);
+  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113i', import.meta.url).href; document.head.append(l);
 }
 export function clean(h) {
   let n = 0;

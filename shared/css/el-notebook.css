@@ -587,3 +587,19 @@ a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) sc
 .nb-wtext .nb-wp{margin:0;font:500 21px/32px var(--nb-hand)}
 .nb-wtext .nb-wp .nb-giv{font-size:21px;font-weight:500}.nb-wtext .nb-wp .nb-fix{font-size:20px}
 .nb-wfix .nb-wp{margin:0 0 6px;font-size:16px;line-height:1.45}.nb-wfix .nb-wp b{color:#1b7a3a}
+
+/* 📚 the LSs as post-its sticking out of the book's LEFT edge (Roger, 13 Nov 2026: "I wanted the LS on the left hand side like this"),
+   as the sections on the right; on a narrow screen there is no room on the sides: they stay in the top row */
+.nb-lside{position:absolute;left:-36px;top:26px;bottom:26px;width:36px;display:flex;flex-direction:column;gap:8px;z-index:1;pointer-events:none}
+.nb-lside .nb-tab.nb-lt{pointer-events:auto;writing-mode:vertical-rl;transform:rotate(180deg) translateX(-6px);border-radius:0 8px 8px 0;padding:12px 5px 12px 7px;font:600 18px/1 var(--nb-hand);color:#2b2b2b;
+  background:var(--lt,#ffe082);box-shadow:-2px 1px 3px rgba(0,0,0,.12);max-height:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:transform .15s}
+.nb-lside .nb-tab.nb-lt b{font-weight:800;font-size:20px}
+.nb-lside .nb-tab.nb-lt:nth-child(5n+1){--lt:#ffe082}.nb-lside .nb-tab.nb-lt:nth-child(5n+2){--lt:#b3e5fc}.nb-lside .nb-tab.nb-lt:nth-child(5n+3){--lt:#c5e1a5}.nb-lside .nb-tab.nb-lt:nth-child(5n+4){--lt:#ffccbc}.nb-lside .nb-tab.nb-lt:nth-child(5n){--lt:#e1bee7}
+.nb-lside .nb-tab.nb-lt[aria-current="true"],.nb-lside .nb-tab.nb-lt:hover{transform:rotate(180deg);padding-bottom:12px}
+.nb-lside .nb-tab.nb-lt[aria-current="true"]{font-weight:800;box-shadow:-2px 1px 3px rgba(0,0,0,.12),inset -4px 0 0 #1f3c73}
+@media (min-width:900px){.nb-spread:has(.nb-lside){margin-left:32px}.nb-tab.nb-ctop{display:none}}
+@media (max-width:899px){.nb-lside{display:none}}
+@media print{.nb-lside{display:none!important}}
+/* a whole year of LSs: the tabs share the edge (never cut off); from 5 LSs on only "LS5" shows, the name is in the tooltip */
+.nb-lside .nb-tab.nb-lt{flex:0 1 auto;min-height:0}
+.nb-lside.nb-many{gap:5px}.nb-lside.nb-many .nb-tab.nb-lt span{display:none}.nb-lside.nb-many .nb-tab.nb-lt{padding:8px 5px 8px 7px;text-overflow:clip}
