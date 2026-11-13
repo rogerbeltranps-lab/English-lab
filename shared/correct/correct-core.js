@@ -96,12 +96,25 @@
       return out;
     }
     if (kind === 'shared') {
-      const items = panel.items.map((it, n) => ({ it, n, on: routes.filter(r => forLevel([it], r).length) })).filter(x => x.on.length && !x.it.own);   // ✏️ own examples: no answer to show
+      /* a grammar step in parts (ls2-engine.js arrange): each route sees per block its 6 first questions + the ✏️ own example (compulsory),
+         then the ➕ extras. Together we correct only the compulsory ones, with the numbers the students see. */
+      const seen = {};
+      if (panel.parts) routes.forEach(r => {
+        const by = {}, order = [], list = [], req = new Set();
+        forLevel(panel.items, r).forEach(it => { if (!by[it.p]) { by[it.p] = []; order.push(it.p); } by[it.p].push(it); });
+        order.forEach(k => { const L = by[k], own = L.filter(x => x.own), plain = L.filter(x => !x.own);
+          const rq = own.length ? plain.slice(0, 6).concat(own.slice(0, 1)) : plain.slice(0, 7);
+          rq.forEach(x => { req.add(x); list.push(x); }); L.filter(x => !rq.includes(x)).forEach(x => list.push(x)); });
+        seen[r] = { list, req };
+      });
+      const onR = (it, r) => panel.parts ? seen[r].req.has(it) : forLevel([it], r).length > 0;
+      const numR = (it, r) => (panel.parts ? seen[r].list : forLevel(panel.items, r)).indexOf(it) + 1;
+      const items = panel.items.map((it, n) => ({ it, n, on: routes.filter(r => onR(it, r)) })).filter(x => x.on.length && !x.it.own);   // ✏️ own examples: no answer to show
       // Everyone first, then Base+, Core+, Plus (stable: the data's order inside each group)
       items.sort((a, b) => (a.on.length === routes.length ? -1 : ri(a.on[0])) - (b.on.length === routes.length ? -1 : ri(b.on[0])) || a.n - b.n);
       items.forEach(({ it, on }) => out.push({
         kind: 'shared', panel: panel.id, pro, q: tx(it.q), ans: answerOf(it), alt: it.a ? [].concat(it.a).slice(1) : [], mc: !!it.o, qid: qid(it), routes, on, all: on.length === routes.length,
-        per: on.map(r => ({ r, num: forLevel(panel.items, r).indexOf(it) + 1, ev: ev(r, it), units: texts[r].units, chat: !!texts[r].chat }))
+        per: on.map(r => ({ r, num: numR(it, r), ev: ev(r, it), units: texts[r].units, chat: !!texts[r].chat }))
       }));
       return out;
     }
