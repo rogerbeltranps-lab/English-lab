@@ -98,6 +98,7 @@ a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:1
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;color:#0f172a;text-decoration:none;min-height:112px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:28px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:17px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .cov .cvt{width:100%}.cov .cvt td,.cov .cvt th{text-align:left;vertical-align:top}.cov .cvt th.cvc,.cov .cvt td.cvc{text-align:center;min-width:58px}.cov td.cvc small{display:block;font-size:11px;color:#475569;line-height:1.2}.cov td.cvk small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#64748b;font-size:12px;max-width:380px;white-space:normal;line-height:1.3}.cov .cvw{overflow-x:auto}.cve .t1{color:#166534;font-weight:600}.cve .t0{color:#64748b}.cov td.cvk{white-space:normal;min-width:220px}.cov tr.cvsec td{background:#f1f5f9;font-weight:700}.cov .cdot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:0}.cvb{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600;white-space:nowrap}.cvsum{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.cve{display:inline-block;font-size:13px;line-height:1.35;border:1px solid #cbd5e1;border-radius:8px;padding:1px 7px;margin:1px;background:#fff}.cve.ok{background:#dcfce7;border-color:#86efac}.cve.dr{background:#fff7ed;border-color:#fdba74;text-decoration:line-through}.cve a{color:inherit;text-decoration:none}.cve a:hover{text-decoration:underline}.cov td.cvy{white-space:nowrap;font-size:13px}.cvn{display:inline-block;margin-left:6px;background:#dc2626;color:#fff;border-radius:999px;padding:0 7px;font-size:12px;font-weight:700}.chip.on .cvn{background:#fff;color:#b91c1c}.cvalert{border:2px solid #fca5a5;background:#fef2f2;border-radius:12px;padding:10px 14px;margin:6px 0 12px}.cvalert h3{margin:0 0 2px;color:#991b1b;font-size:16px}.cvalert p{margin:2px 0 6px}.cvalert ul{list-style:none;margin:0;padding:0}.cvalert li{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0}.cvalert li .cvt2{font-size:12px;font-weight:700;color:#991b1b;background:#fee2e2;border-radius:6px;padding:1px 7px}.cvalert button{font-size:13px;padding:2px 10px}.cov tr.cvbad td{background:#fef2f2}.cov tr.cvbad td:first-child{box-shadow:inset 4px 0 0 #dc2626}.cov tr.cvflash td{animation:cvfl 2.4s ease-out}@keyframes cvfl{0%,40%{background:#fecaca}100%{background:#fef2f2}}
+.lsn{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:40px;padding:0 8px;box-sizing:border-box;border-radius:12px;background:#eef2ff;color:#3157d5;font-weight:800;font-size:18px;vertical-align:middle}a.tile b.lsc{font-size:24px}a.tile .ti .badge{font-size:13px}table.lsps td,table.lsps th{text-align:left}table.lsps .lsop{text-align:center;white-space:nowrap}table.lsps .lsyes{color:#15803d}
 .tiles.wide{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:1180px){.tiles.wide{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.tiles.wide{grid-template-columns:repeat(2,minmax(0,1fr))}}.gal{display:flex;flex-direction:column;gap:12px;margin:0 0 16px}.gal:empty{display:none}
 table.fpt td,table.fpt th{text-align:left;vertical-align:middle}table.fpt td.n{white-space:nowrap}
 a.tile.c2eso{border-left:6px solid #16a34a}a.tile.c4eso{border-left:6px solid #2563eb}a.tile.c2eso .ti b,a.tile.c4eso .ti b{font-size:20px}
@@ -265,7 +266,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","mat","ref","none"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -1115,7 +1116,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}</div>`
-    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
+    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
@@ -1398,6 +1399,8 @@ function render0(){
     +nv("plan","🏠 Home",S.g==="plan"&&(S.place||"home")!=="home"?"off":"","How each class is doing: work done in each learning path, first tries, games and marks")
     +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,`<span class="gn">${esc(g.name)}</span>`,"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0),g.id))).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
+    // 🧭 Learning situations (Roger, 12 Nov 2026: "here I should have LSs sections; when i get in I should see the courses and choose one")
+    +nv("lss","🧭 Learning situations","","Every LS by course: its learning paths, groups, status and materials")
     +`<div class="sep"></div>`
     +nv("corr","✏️ Corrections","","What Claude corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
     // the Home tiles moved here (Roger, 9 Nov 2026: "all this info can only be on the left menu")
@@ -1412,6 +1415,7 @@ function render0(){
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
+  if(S.g==="lss"){$("#main").innerHTML=lssPage();return}
   if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
   if(S.g==="none"){$("#main").innerHTML=`<div class="ph"><h1>${listed()?"Not on the list":"No group"}</h1></div>`+noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+sgBox()+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
@@ -1805,28 +1809,63 @@ const HOW_VIDEOS=[["For teachers",[["👩‍🏫 How the dashboard works","video
   ["For students · how the website works",[["🎓 In English (Amelia)","video/how-english-lab-works.mp4?v=20261102c",true],["🎓 In Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261102c",true]]]];
 function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
   +HOW_VIDEOS.map(([g,vs])=>vs.some(v=>v[2])?`<h3 style="margin:10px 0 4px">${esc(g)}</h3>`+vs.filter(v=>v[2]).map(([t,href])=>`<p style="margin:4px 0">${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join(""):"").join("")+`</div>`}
+const matA=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
+const MAT_R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],matRP=l=>MAT_R0.concat(l.pro?[["native","Pro"]]:[]);
+const courseGames=c=>(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true}));
+// the class games table (Materials, and one LS's page with only its games)
+function gamesTable(games){const a=matA;
+  return `<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
+    +games.map((g,i)=>{const k=g.id.replace(/-(vocab|grammar)$/,""),last=g.lp&&/-lp[1-3]$/.test(k)&&!(games[i+1]&&games[i+1].ls===g.ls&&games[i+1].lp===g.lp);   // + 🕵️ Code Breakers after each LP1–3 pair
+      return `<tr><td>${esc(g.emoji||"")} ${esc(elGameName(g))}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`
+        +(last?`<tr><td>🕵️ ${esc(String(g.lp).split(" · ")[0])} · Code Breakers <small class="muted">(vocabulary + grammar, each at their own pace)</small></td><td>${esc(g.ls||"")} · ${esc(g.lp)}</td><td>${a("lab/game/codebreakers.html?lp="+encodeURIComponent(k),"Open the board →","btn")}</td></tr>`:"")}).join("")+`</table></div>`}
+// one LS's study PDFs, reading story, shadowing and paper worksheets (Materials, and the LS's page)
+function lsMat(l,noHead){const a=matA,R0=MAT_R0,RP=matRP,k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k],R=RP(l);
+  // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
+  return (noHead?"":`<h3>📄 ${esc(l.title)}</h3>`)
+    +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(l.starter?0:1).map(([r,n])=>a(l.study+r+".pdf",n,"chip")).join(" ")}${l.starter?"":` <span class="muted">(Starter uses Base)</span>`}</p>`:"")
+    +(l.story?`<p>📖 Reading story “${esc(l.story.title)}” (one chapter a week at home; students see only their level's book on the LS home page): ${(l.story.pro?RP(l):R0).map(([r,n])=>a(l.story.pdf+r+".pdf",n,"chip")).join(" ")}${l.pro&&!l.story.pro?` <span class="muted">(Pro reads Plus)</span>`:""}${l.story.key?` ${a(l.story.key,"Answer key and teacher notes (Drive)","chip")}`:""}</p>`:"")
+    +(l.shadowing?`<p>🎬 Shadowing video for the whole unit (Core, about 6 min; also on the student board and before the sample exam): <a href="${l.shadowing}" target="_blank" rel="noopener" class="btn" data-elvid="1" title="Plays here, over the dashboard: the list of who left stays on top">Play on the projector →</a></p>`:"")
+    +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
+    +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${n}</th>`).join("")}<th>Answer key</th></tr>`
+      +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
+        return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
+      :`<p class="muted">No paper worksheets for this LS.</p>`)}
 function matTab(){
-  const R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],RP=l=>R0.concat(l.pro?[["native","Pro"]]:[]);
-  const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
-  return howTo(a)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
-    const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
+  return howTo(matA)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
+    const games=courseGames(c),a=matA,lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
-      +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
-        +games.map((g,i)=>{const k=g.id.replace(/-(vocab|grammar)$/,""),last=g.lp&&/-lp[1-3]$/.test(k)&&!(games[i+1]&&games[i+1].ls===g.ls&&games[i+1].lp===g.lp);   // + 🕵️ Code Breakers after each LP1–3 pair
-          return `<tr><td>${esc(g.emoji||"")} ${esc(elGameName(g))}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`
-            +(last?`<tr><td>🕵️ ${esc(String(g.lp).split(" · ")[0])} · Code Breakers <small class="muted">(vocabulary + grammar, each at their own pace)</small></td><td>${esc(g.ls||"")} · ${esc(g.lp)}</td><td>${a("lab/game/codebreakers.html?lp="+encodeURIComponent(k),"Open the board →","btn")}</td></tr>`:"")}).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
-      +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k],R=RP(l);
-        // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
-        return `<h3>📄 ${esc(l.title)}</h3>`
-          +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(l.starter?0:1).map(([r,n])=>a(l.study+r+".pdf",n,"chip")).join(" ")}${l.starter?"":` <span class="muted">(Starter uses Base)</span>`}</p>`:"")
-          +(l.story?`<p>📖 Reading story “${esc(l.story.title)}” (one chapter a week at home; students see only their level's book on the LS home page): ${(l.story.pro?RP(l):R0).map(([r,n])=>a(l.story.pdf+r+".pdf",n,"chip")).join(" ")}${l.pro&&!l.story.pro?` <span class="muted">(Pro reads Plus)</span>`:""}${l.story.key?` ${a(l.story.key,"Answer key and teacher notes (Drive)","chip")}`:""}</p>`:"")
-          +(l.shadowing?`<p>🎬 Shadowing video for the whole unit (Core, about 6 min; also on the student board and before the sample exam): <a href="${l.shadowing}" target="_blank" rel="noopener" class="btn" data-elvid="1" title="Plays here, over the dashboard: the list of who left stays on top">Play on the projector →</a></p>`:"")
-          +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
-          +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${n}</th>`).join("")}<th>Answer key</th></tr>`
-            +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
-              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
-            :`<p class="muted">No paper worksheets for this LS.</p>`)}).join("")
+      +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?gamesTable(games):`<p class="muted">No games yet.</p>`)
+      +lss.map(l=>lsMat(l)).join("")
       +`</div>`}).join("");
+}
+// ---- 🧭 Learning situations (Roger, 12 Nov 2026: "here I should have LSs sections; when i get in I should see the courses and choose one"):
+// a side-menu place for every LS, not tied to a group. S.g="lss" and S.place: "home" = the courses, "c:<course>" = that course's LSs
+// (one card each), "one" = the LS in S.ls: its groups (each opens that group's page on this LS), learning paths (open ↗, and which
+// groups have each one open), status and groups (the same buttons as in 📈 Learning paths) and materials. Back works as everywhere else.
+const LSC=[["2eso","2 ESO"],["4eso","4 ESO"]];
+function lssPage(){
+  const st=id=>(S.D.ls[id]||{}).status||"hidden",badge=id=>`<span class="badge" style="background:${STCOL[st(id)]}">${LS_INFO[st(id)][0]}</span>`;
+  const nowIn=l=>GR.filter(g=>g.course===l.course&&(ELWeek.now(g.id)||{}).ls===l.id),short=l=>elLsName(l).replace(/^LS\d+ · /,"");
+  const head=(back,bp,h,sub)=>`<div class="ph">${back?`<p class="crumb"><a class="back" href="#" data-do="place" data-p="${bp}">‹ ${esc(back)}</a></p>`:""}<h1 class="pt">${h}</h1>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
+  const cm=/^c:(.+)$/.exec(S.place||""),l=S.place==="one"&&EL_LS.find(x=>x.id===S.ls);
+  if(l){const c=LSC.find(x=>x[0]===l.course)||[l.course,l.course],info=S.D.ls[l.id]||{},list=acts(l.id),gs=GR.filter(g=>g.course===l.course),P=(window.EL_PLAN||{})[l.id];
+    const ls1=/-my-real-routine$/.test(l.id),games=courseGames(l.course).filter(g=>g.ls===elLsName(l)),now=nowIn(l);
+    const gTile=g=>{const on=elLsForGroup(l,info,g.id),gi=P?ELWeek.col(P,g.id):-1,ex=gi>=0?ELWeek.exam(P,gi):null,nOpen=list.filter(a=>elLpOpen(a,info,g.id)).length;
+      return `<a class="tile" href="#" data-do="tab" data-g="${g.id}" data-ls="${l.id}" title="${esc(g.name)}'s page on this LS: time plan, to do, learning paths, marks…"><span class="ti"><b>${esc(g.name)}</b>${now.includes(g)?`<span class="tb">now</span>`:""}</span><span><small>${on?ls1?"assigned":`${nOpen} of ${list.length} learning paths open`:"not assigned to this group"}</small>${ex?`<small>${examTag(ex)}</small>`:""}</span></a>`};
+    const lpRows=list.map((a,i)=>`<tr><td class="muted">${i+1}</td><td><a href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it in a new tab">${esc(elLpLabel(a))} ↗</a>${a.checkpoint?` <small class="muted">checkpoint</small>`:a.optional?` <small class="muted">optional</small>`:!a.graded?` <small class="muted">not graded</small>`:""}</td>`
+      +(ls1?"":gs.map(g=>`<td class="lsop">${elLsForGroup(l,info,g.id)?elLpOpen(a,info,g.id)?`<b class="lsyes">✔ open</b>`:`<span class="muted">🔒</span>`:`<span class="muted">–</span>`}</td>`).join(""))+`</tr>`).join("");
+    return head(c[1],"c:"+l.course,`<span class="lsn">${esc(elLsNum(l))}</span> ${esc(short(l))}`,`${badge(l.id)} <span>Term ${lsTerm(l)}</span> <a class="lsgo" href="${lsHref(l)}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a>`)
+      +`<div class="box"><h2>Groups</h2><div class="tiles wide">${gs.map(gTile).join("")}</div></div>`
+      +`<div class="box"><h2>Learning paths <small class="muted">· ${list.length}</small></h2>${list.length?`<div class="qwrap"><table class="mat lsps"><tr><th></th><th>Learning path</th>${ls1?"":gs.map(g=>`<th class="lsop">${esc(g.name)}</th>`).join("")}</tr>${lpRows}</table></div>${ls1?"":`<p class="muted">✔ open for the group · 🔒 not open yet. To open or lock them, go to the group (above) › 📈 Learning paths.</p>`}`:`<p class="muted">No learning paths on the site yet.</p>`}</div>`
+      +`<div class="box"><h2>Status and groups</h2>${lsSettings(l.id)}</div>`
+      +`<div class="box"><h2>📚 Materials</h2>${games.length?`<h3>🎮 Class games</h3>`+gamesTable(games):""}${lsMat(l,true)}</div>`}
+  if(cm&&LSC.some(x=>x[0]===cm[1])){const [c,name]=LSC.find(x=>x[0]===cm[1]),lss=EL_LS.filter(x=>x.course===c);
+    return head("Learning situations","home",esc(name),LSC.map(([k,n])=>`<button class="chip ${k===c?"on":""}" data-do="place" data-p="c:${k}">${n}</button>`).join(" "))
+      +`<div class="tiles lsts">${lss.map(x=>{const now=nowIn(x),n=acts(x.id).length;
+        return `<a class="tile" href="#" data-do="lsone" data-ls="${x.id}"><span class="ti"><span class="lsn">${esc(elLsNum(x))}</span>${badge(x.id)}</span><span><b>${esc(short(x))}</b><small>Term ${lsTerm(x)} · ${plural(n,"learning path")}${now.length?` · now in ${esc(now.map(g=>g.name).join(", "))}`:""}</small></span></a>`}).join("")||`<p class="muted">No LSs yet.</p>`}</div>`}
+  return head("","",`🧭 Learning situations`,"Choose a course")
+    +`<div class="tiles lsts">${LSC.map(([c,name])=>{const lss=EL_LS.filter(x=>x.course===c),cur=lss.filter(x=>nowIn(x).length);
+      return `<a class="tile" href="#" data-do="place" data-p="c:${c}"><span class="ti"><b class="lsc">${name}</b><span class="tb">${plural(lss.length,"LS")}</span></span><span><small>${esc(GR.filter(g=>g.course===c).map(g=>g.name).join(" · "))}</small>${cur.length?`<small>Now: ${cur.map(x=>esc(elLsNum(x)+" · "+short(x))).join(", ")}</small>`:""}</span></a>`}).join("")}</div>`;
 }
 function qaTab(){
   const lss=EL_LS.filter(l=>!((window.EL_GRADING||{})[l.id]||{}).only);
@@ -4234,7 +4273,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
       if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
-        if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;S.tp2prog=false;S.tp2one="";tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
+        if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;S.tp2prog=false;S.tp2one="";tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
       if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
