@@ -259,15 +259,18 @@ window.ELNotebook = (function () {
     });
     return out;
   }
+  // which skill an activity practises, by its tab: the first tries of the cover's rings (recall and checkpoints mix them: left out)
+  const SKILL = id => /^(grammar|mixed)$/.test(id) ? 'grammar' : /^(vocab|words|cards)$/.test(id) ? 'vocab' : /^(read|log|sources|ch\d+)$/.test(id) ? 'read' : /^(listen|again|chart)$/.test(id) ? 'listen' : null;
   const lsSum = L => {
-    const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {};
+    const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {}, skill = {};
     (window.EL_CATALOG || []).filter(a => a.ls === L.id && a.keys && a.keys[0]).forEach(a => {
       let st = null; try { st = JSON.parse(localStorage.getItem(a.keys[0]) || 'null'); } catch (e) {}
       const items = (st && st.items) || {}, first = {};
       Object.entries(items).forEach(([k, r]) => { const id = k.replace(/_[^_]+$/, ''); if (!r || !Array.isArray(r.ok) || !r.ok.length) return; if (!first[id] || String(r.date || '') < String(first[id].date || '')) first[id] = r; });
       Object.entries(first).forEach(([id, r]) => {
+        const right = r.ok.filter(Boolean).length, of = r.ok.length, sk = SKILL(id);
+        if (sk) { const z = skill[sk] || (skill[sk] = { r: 0, of: 0 }); z.r += right; z.of += of; }
         const cs = ((SC[a.id] || {})[id] || []).filter(c => /^\d+\.\d+$/.test(c)); if (!cs.length) return;
-        const right = r.ok.filter(Boolean).length, of = r.ok.length;
         cs.forEach(c => { const x = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); x.r += right; x.of += of; x.n++; });
         [...new Set(cs.map(c => c.split('.')[0]))].forEach(k => { const y = comp[k] || (comp[k] = { ok: 0, of: 0 }); y.of++; if (right / of >= .5) y.ok++; });
       });
@@ -294,7 +297,7 @@ window.ELNotebook = (function () {
     const e = G.exam, sc = x.sections || {}, got = e ? e.sections.filter(([k]) => sc[k] && sc[k].score != null) : [];
     const mx = got.reduce((n, [k, , m]) => n + (+(sc[k].max || m || e.max)), 0), exam = mx ? got.reduce((n, [k]) => n + (+sc[k].score), 0) / mx * 10 : null;
     const f = G.fp && (H.rs || {})[G.fp.a] || {}, fp = f.max ? (+f.score || 0) / f.max * 10 : null;
-    return { L, rows, comp, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
+    return { L, rows, comp, skill, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
   };
   // the competences' names in English on the cover (Roger: "the criteria … should be in English")
   const CEN = { 1: 'Interculturality', 2: 'Listening', 3: 'Speaking', 4: 'Reading', 5: 'Writing', 6: 'Research', 7: 'Personal reading', 8: 'Mediation', 9: 'Self-regulation', 10: 'Ethical communication' };
@@ -315,7 +318,15 @@ window.ELNotebook = (function () {
       + `<div class="nb-fr-label"><div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
       + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
       + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
-      + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')}</div>`
+      // (Roger, 13 Nov 2026: "On the cover only this and add sth like this bit about grammar, vocabulary, reading, listening activities.
+      // Then the following pages my results but in a cover style"): the first tries of each skill as rings, the results on the next pages
+      + `<div class="nb-fr-rings"><div class="nb-fr-rh">${t('Primers intents', 'First tries')}</div>${[['grammar', '🧩', t('Gramàtica', 'Grammar')], ['vocab', '📚', t('Vocabulari', 'Vocabulary')], ['read', '📖', 'Reading'], ['listen', '🎧', 'Listening']].map(([k, ic, nm]) => {
+        const z = sums.reduce((a, y) => { const v = y.skill[k]; if (v) { a.r += v.r; a.of += v.of; } return a; }, { r: 0, of: 0 }), pc = z.of ? Math.round(z.r / z.of * 100) : null;
+        // the degree, not the % (Roger: "Instead of %, the AS, AN…"): NA under 5 · AS · AN · AE from 9, the ring filled as far as they got
+        const dg = pc == null ? null : window.elDegree ? elDegree(pc / 10) : null;
+        return `<div class="nb-fr-rg"><span class="nb-fr-ring${pc == null ? ' none' : ' d-' + dg}" style="--p:${pc || 0}"><b>${dg || '–'}</b></span><span><b>${ic} ${esc(nm)}</b><small>${pc == null ? t('encara res', 'nothing yet') : `${esc(DG[dg] || '')} · ${z.r}/${z.of} ${t('bé', 'right')}`}</small></span></div>`; }).join('')}</div>`
+      + `</div><div class="nb-break"></div><div class="nb-front nb-fr-more">`
+      + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')} <small>· ${esc(H.name || '')}</small></div>`
       + sums.map(box).join('')
       + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} · ${t('ben feta = la meitat o més bé al primer intent', 'done well = half or more right on the first try')}</p></div><div class="nb-break"></div>`;
   }
@@ -550,7 +561,7 @@ window.ELNotebook = (function () {
     };
     newPage(); [...frag.childNodes].forEach(place); page.classList.remove('nb-meas');
     // the cover's pages look like a notebook's hard cover (Roger, 13 Nov 2026: "The cover should look like a real notebook cover")
-    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont)') ? ['nb-cv1'] : [])); });
+    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont):not(.nb-fr-more)') ? ['nb-cv1'] : [])); });
   }
   function layout(keep) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || printing()) return false;

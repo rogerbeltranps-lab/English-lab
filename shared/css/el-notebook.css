@@ -436,3 +436,19 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb .nb-home{text-decoration:none;font-weight:600;white-space:nowrap}
 @media (max-width:640px){.nb .nb-home .nb-hlab{display:none}}
 @media (max-width:640px){.nb-cv1::after{display:none}}
+
+/* the cover's first-try rings (as on the board's My progress) */
+.nb-fr-rings{background:#fff;color:#26303d;border-radius:12px;padding:10px 14px 12px;margin:4px 3% 0;box-shadow:0 3px 10px rgba(0,0,0,.35);display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.nb-fr-rh{grid-column:1/-1;font:700 12px/1 var(--nb-sans,system-ui,sans-serif);text-transform:uppercase;letter-spacing:1px;color:#6b7a90}
+.nb-fr-rg{display:flex;align-items:center;gap:10px;min-width:0}
+.nb-fr-rg>span:last-child{display:flex;flex-direction:column;min-width:0}
+.nb-fr-rg b{font:700 16px/1.2 var(--nb-sans,system-ui,sans-serif)}
+.nb-fr-rg small{font:13px/1.3 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
+.nb-fr-ring{--p:0;flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#d4802f calc(var(--p) * 1%),#e5e7eb 0);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.nb-fr-ring.none{background:#e5e7eb}
+.nb-fr-ring.d-AE{--c:#1b7a2b}.nb-fr-ring.d-AN{--c:#5a9e2f}.nb-fr-ring.d-AS{--c:#d4a017}.nb-fr-ring.d-NA{--c:#c62828}
+.nb-fr-ring[class*=" d-"]{background:conic-gradient(var(--c) calc(var(--p) * 1%),#e5e7eb 0)}
+.nb-fr-ring.d-AE b{color:#1b5e20}.nb-fr-ring.d-AN b{color:#33691e}.nb-fr-ring.d-AS b{color:#8a6d00}.nb-fr-ring.d-NA b{color:#b71c1c}
+.nb-fr-ring b{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 17px/1 var(--nb-sans,system-ui,sans-serif)!important;color:#26303d}
+.nb-fr-res small{font-weight:500;color:#c7d3ea;font-size:15px}
+@media (max-width:640px){.nb-fr-rings{gap:10px 8px;padding:10px 10px 12px}.nb-fr-rg{flex-direction:column;text-align:center;gap:4px}.nb-fr-rg>span:last-child{align-items:center}.nb-fr-rg b{font-size:14px}.nb-fr-rg small{font-size:12px}.nb-fr-ring{width:50px;height:50px}.nb-fr-ring b{width:38px;height:38px;font-size:15px!important}}
