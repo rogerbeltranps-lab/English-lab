@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113f', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113g', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -197,6 +197,24 @@ window.ELNotebook = (function () {
   function examBlocks(ex) {
     const G = (window.EL_GRADING || {})[H.LS] || {}, rs = H.rs || {}, out = [];
     const stamp = v => v == null ? '' : `<span class="nb-stamp${v >= 8 ? ' ok' : ''}">${String(Math.round(v * 10) / 10).replace('.', ',')} / 10</span>`;
+    const paras = html => html.split(/\n\s*\n|\n/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
+    // a word-by-word diff of the student's text and the corrected one: kept words in pen, removed ones crossed out, new ones in green
+    const wdiff = (a, b) => {
+      const tok = x => x.replace(/\r/g, '').replace(/\n+/g, ' \u00b6 ').split(/[ \t]+/).filter(Boolean), A = tok(a), B = tok(b), n = A.length, m = B.length;
+      if (n * m > 400000) return paras(esc(a));
+      const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+      for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+      const out = []; let i = 0, j = 0, del = [], ins = [];
+      const flush = () => { const d = del.filter(x => x !== '\u00b6'), s = ins.filter(x => x !== '\u00b6');
+        if (d.length) out.push(`<s class="nb-giv nb-x">${esc(d.join(' '))}</s>`); if (s.length) out.push(`<span class="nb-fix in">${esc(s.join(' '))}</span>`);
+        if (ins.includes('\u00b6')) out.push('\n'); del = []; ins = []; };
+      while (i < n || j < m) {
+        if (i < n && j < m && A[i] === B[j]) { flush(); out.push(A[i] === '\u00b6' ? '\n' : `<span class="nb-giv">${esc(A[i])}</span>`); i++; j++; }
+        else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) ins.push(B[j++]); else del.push(A[i++]);
+      }
+      flush();
+      return out.join(' ').split(/ ?\n ?/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
+    };
     const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
     // 🎯 the exam
     if (G.exam) {
@@ -223,6 +241,11 @@ window.ELNotebook = (function () {
           h += `<div class="nb-wh">✍️ ${t('El meu writing', 'My writing')}${tot[1] ? ` <span class="nb-stamp${tot[0] / tot[1] >= .8 ? ' ok' : ''}">${String(Math.round(tot[0] * 10) / 10).replace('.', ',')} / ${tot[1]}</span>` : ''}</div>`;
           if (rub.length) h += `<ul class="nb-xparts">${rub.map(y => `<li><b>${esc(y[0])}</b> <span class="${(+y[1] || 0) / (+y[2] || 1) >= .5 ? 'ok' : 'ko'}">${String(Math.round((+y[1] || 0) * 10) / 10).replace('.', ',')} / ${esc(y[2])}</span></li>`).join('')}</ul>`;
           if (w.feedback) h += `<div class="nb-slip"><h4>💬 ${t('Comentari del professor', 'Your teacher\'s comment')}</h4><div class="ex-rule">${lines(w.feedback)}</div></div>`;
+          // (Roger, 13 Nov 2026: "I want their real writing of the exam here, with the … corrected"): the student's own text with the
+          // changes marked (crossed out in red, the right words in green), then the whole corrected text
+          const orig = String(w.original || '').trim(), corr = String(w.corrected || '').trim();
+          if (orig) h += `<div class="nb-work nb-wtext"><div class="nb-wh">📝 ${t('El meu text, corregit', 'My text, corrected')}</div>${corr ? wdiff(orig, corr.replace(/\*/g, '')) : paras(esc(orig))}</div>`;
+          if (corr) h += `<div class="nb-slip nb-wfix"><h4>✅ ${t('El text corregit', 'The corrected text')}</h4>${paras(esc(corr).replace(/\*([^*\n]+)\*/g, '<b>$1</b>'))}</div>`;
           if ((w.errors || []).length) h += `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves errades, corregides', 'My mistakes, corrected')}</div><ol class="nb-ans">${w.errors.map(y => `<li>${fix(y.orig, y.fix)}${y.why ? `<small class="nb-why">${esc(y.why)}</small>` : ''}</li>`).join('')}</ol></div>`;
         }
         if ((r.review || []).length) h += `<div class="nb-sticky pink">${t('Què has de repassar', 'What to review')}<ul>${r.review.map(y => `<li>${esc(y.text || '')}</li>`).join('')}</ul></div>`;
@@ -319,6 +342,7 @@ window.ELNotebook = (function () {
     return { L, rows, comp, skill, act, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
   };
   // the competences' names in English on the cover (Roger: "the criteria … should be in English")
+  const SKI = { 1: '🌍', 2: '🎧', 3: '🗣️', 4: '📖', 5: '✍️', 6: '🔎', 7: '📚', 8: '🔁', 9: '🧭', 10: '🤝' };
   const CEN = { 1: 'Interculturality', 2: 'Listening', 3: 'Speaking', 4: 'Reading', 5: 'Writing', 6: 'Research', 7: 'Personal reading', 8: 'Mediation', 9: 'Self-regulation', 10: 'Ethical communication' };
   function front(st) {
     st = st || {};
@@ -343,9 +367,14 @@ window.ELNotebook = (function () {
       ['✍', st.notes || 0, t('apunts meus', 'notes I took'), here],
       ['📌', st.todo || 0, t('activitats per fer', 'activities to do'), st.todo ? t('fes-les per completar la llibreta', 'do them to complete your notebook') : t('tot fet!', 'all done!')]];
     const box = y => `<div class="nb-fr-ls"><div class="nb-fr-lh">📚 ${esc(chapName(y.L))}${y.exam != null ? ` <span class="nb-fr-k">📝 ${t('Examen', 'Exam')} <b>${n1(y.exam)}</b></span>` : ''}${y.fp != null ? ` <span class="nb-fr-k">🎬 ${t('Producte final', 'Final product')} <b>${n1(y.fp)}</b></span>` : ''}</div>`
-      + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(CEN[String(r.c).split('.')[0]] || String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
-      + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
-      + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
+      // (Roger, 13 Nov 2026: "The criteria should be more understandable maybe we can highlight sth, or add boxes"): one box per
+      // criterion, the skill highlighted, the degree in words; the activities done well as a row of squares per skill
+      + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => { const k = String(r.c).split('.')[0];
+        return `<div class="nb-fr-row d-${r.deg || 'x'}"><div class="nb-fr-rt"><span class="nb-fr-sk">${SKI[k] || '⭐'} <b>${esc(CEN[k] || String(r.comp).replace(/^\S+ · /, ''))}</b></span><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}">${esc(r.deg || '–')}</span><span class="nb-fr-dw">${esc(DG[r.deg] || t('encara sense nota', 'not assessed yet'))}</span></div>`
+          + `${r.ind ? `<div class="nb-fr-t">${esc(r.ind)}</div>` : ''}</div>`; }).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
+      + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}</div>`
+      + `${Object.keys(y.comp).length ? `<div class="nb-fr-ab"><div class="nb-fr-abh">✅ ${t('Activitats ben fetes', 'Activities done well')} <small>${t('(la meitat o més bé al primer intent)', '(half or more right on the first try)')}</small></div><div class="nb-fr-abl">${Object.keys(y.comp).sort((a, b) => a - b).map(k => { const z = y.comp[k], n = Math.min(z.of, 12);
+        return `<div class="nb-fr-abc"><b>${SKI[k] || '⭐'} ${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))}</b><span class="nb-fr-sqs" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i < Math.round(z.ok / z.of * n) ? 'ok' : ''}"></i>`).join('')}</span><small>${t(`${z.ok} de ${z.of} ben fetes`, `${z.ok} of ${z.of} done well`)}</small></div>`; }).join('')}</div></div>` : ''}</div>`;
     // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
     return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40" decoding="sync"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
       + `<div class="nb-fr-label">${H.own ? `<button type="button" class="nb-ui nb-cvbtn" title="${t('Canvia el color i el disseny de la portada', 'Change the colour and design of the cover')}">🎨 <span>${t('La meva portada', 'My cover')}</span></button>` : ''}<div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
@@ -363,7 +392,7 @@ window.ELNotebook = (function () {
       + `</div><div class="nb-break"></div><div class="nb-front nb-fr-more">`
       + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')} <small>· ${esc(H.name || '')}</small></div>`
       + sums.map(box).join('')
-      + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} · ${t('ben feta = la meitat o més bé al primer intent', 'done well = half or more right on the first try')}</p></div><div class="nb-break"></div>`;
+      + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} </p></div><div class="nb-break"></div>`;
   }
   // 📚 the chapters (Roger, 13 Nov 2026: "Notebooks should have chapters call LS1 (Name) LS2 (Name)"): one chapter per LS of the course,
   // each on its LS page (#notes); the chapter name is "LS2 (Seasons & Celebrations)"

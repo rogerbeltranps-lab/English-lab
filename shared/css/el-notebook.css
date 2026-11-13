@@ -563,3 +563,27 @@ html.el-nb-plain .nb-final{font-size:28px}
 a.nb-tdo.nb-tdgo{text-decoration:none;cursor:pointer;background:#fff;box-shadow:2px 2px 0 rgba(200,40,40,.25);transition:transform .12s}
 a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) scale(1.08);background:#fdecec}
 @media print{a.nb-tdo.nb-tdgo{box-shadow:none}}
+
+/* ⭐ My results: one box per criterion, the skill highlighted and the degree in words; activities done well as squares (Roger, 13 Nov 2026) */
+.nb-fr-more .nb-fr-crit{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px 10px;margin:4px 0 8px}
+.nb-fr-more .nb-fr-row{display:block;background:#fff;border:1.5px solid #d4dae4;border-left:7px solid #b8c0cc;border-radius:8px;padding:5px 10px 6px;font:500 17px/1.3 var(--nb-hand);box-shadow:1px 2px 0 rgba(0,0,0,.06)}
+.nb-fr-more .nb-fr-row.d-AE{border-left-color:#2e7d32}.nb-fr-more .nb-fr-row.d-AN{border-left-color:#7cb342}.nb-fr-more .nb-fr-row.d-AS{border-left-color:#e0a800}.nb-fr-more .nb-fr-row.d-NA{border-left-color:#d32f2f}
+.nb-fr-rt{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-bottom:2px}
+.nb-fr-sk b{font:700 20px/1.2 var(--nb-hand);background:linear-gradient(transparent 55%,#fff176 55%);padding:0 3px}
+.nb-fr-more .nb-fr-rt .nb-fr-c{font:600 14px/1 var(--nb-sans,system-ui,sans-serif);color:#8792a2}
+.nb-fr-more .nb-fr-rt .nb-fr-d{margin:0 0 0 auto;font:700 16px/20px var(--nb-hand);padding:0 5px}
+.nb-fr-dw{font:700 15px/1 var(--nb-sans,system-ui,sans-serif);color:#5b6878}
+.nb-fr-row.d-AE .nb-fr-dw{color:#1b5e20}.nb-fr-row.d-AN .nb-fr-dw{color:#33691e}.nb-fr-row.d-AS .nb-fr-dw{color:#8a6d00}.nb-fr-row.d-NA .nb-fr-dw{color:#b71c1c}
+.nb-fr-more .nb-fr-t{display:block;color:#3a4350}
+.nb-fr-more .nb-fr-t small{display:block;margin-top:2px;font:500 15px/1.3 var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-ab{margin:2px 0 0}
+.nb-fr-abh{font:700 21px/32px var(--nb-hand)}.nb-fr-abh small{font:500 16px var(--nb-hand);color:var(--nb-pencil)}
+.nb-fr-abl{display:flex;flex-wrap:wrap;gap:8px}
+.nb-fr-abc{display:flex;flex-direction:column;gap:3px;background:#fff;border:1.5px solid #d4dae4;border-radius:8px;padding:5px 10px;min-width:150px}
+.nb-fr-abc b{font:700 18px/1.2 var(--nb-hand)}.nb-fr-abc small{font:500 15px/1.2 var(--nb-hand);color:var(--nb-pencil)}
+.nb-fr-sqs{display:flex;gap:3px}.nb-fr-sqs i{width:16px;height:16px;border:2px solid #2e7d32;border-radius:3px;background:#fff}.nb-fr-sqs i.ok{background:#43a047}
+@media print{.nb-fr-row,.nb-fr-abc,.nb-fr-sqs i,.nb-fr-sk b{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+/* ✍️ the exam writing: the student's text with the corrections, then the corrected text */
+.nb-wtext .nb-wp{margin:0;font:500 21px/32px var(--nb-hand)}
+.nb-wtext .nb-wp .nb-giv{font-size:21px;font-weight:500}.nb-wtext .nb-wp .nb-fix{font-size:20px}
+.nb-wfix .nb-wp{margin:0 0 6px;font-size:16px;line-height:1.45}.nb-wfix .nb-wp b{color:#1b7a3a}
