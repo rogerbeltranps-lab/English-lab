@@ -534,7 +534,7 @@ window.ELNotebook = (function () {
     root.append(w); ED = { o, w, v, gtT: 0 };
     import(new URL('./el-pad.js', me).href).then(P => {
       if (ED == null || ED.w !== w) return;
-      ED.p = P.pad(w.querySelector('.nb-ed-host'), { html: v.html, text: v.text, dr: v.dr, ca: H.ca, ph: t('Escriu aquí. Pots canviar de boli, subratllar i dibuixar.', 'Write here. You can change pens, highlight and draw.'), onChange: x => {
+      ED.p = P.pad(w.querySelector('.nb-ed-host'), { html: v.html, text: v.text, dr: v.dr, ca: H.ca, ph: t('Escriu aquí. Pots canviar de boli, subratllar i marcar.', 'Write here. You can change pens, highlight and underline.'), onChange: x => {
         Object.assign(v, x);
         if (o.kind === 'gt') { status(t('Desant…', 'Saving…')); clearTimeout(ED.gtT); ED.gtT = setTimeout(() => gtSave(o.g), 1500); } else save();
       } });
