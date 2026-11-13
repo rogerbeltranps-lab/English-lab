@@ -1461,4 +1461,14 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
+// A page left open from an earlier day (a Chromebook closed at the end of a class and opened the next morning) reloads when it is shown
+// again, so it runs the site's latest version and today's plan (problem report, 2ESOA, 13 Nov 2026: yesterday's page had no ⛶ Full screen
+// and could not take the class mode changes made since). Work not sent yet is sent first; the reload keeps what this browser has not sent
+// (DIRTY). Not on the dashboard, recall checkpoints, the sample exam or a followed presentation.
+const elDayNow=()=>{try{return new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"})}catch(e){return new Date().toDateString()}},elLoadDay=elDayNow();
+async function newDayReload(){if(document.hidden||reloading||elDayNow()===elLoadDay||/\/teacher\.html$/.test(location.pathname)||/[?&]live=/.test(location.search)
+    ||/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname))return;
+  reloading=true;try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("new day",e)}location.reload()}
+document.addEventListener("visibilitychange",newDayReload);window.addEventListener("focus",newDayReload);setInterval(newDayReload,5*60e3);
+
 window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),annReply:(id,text)=>annReply(user,id,text),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null&&userDone)f(user)},get user(){return user}};
