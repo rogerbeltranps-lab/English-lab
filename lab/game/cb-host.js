@@ -10,12 +10,15 @@
 // 🎓 My progress and the LS mark read them like any other game: gameResults/{group}_{sid} (vocabulary) and {group}_{sid+1} (grammar) with
 // mode "cb" and cb:true (each student's % is over the questions THEY answered: stu[].a), and myGames/{email}.games[same key] with of = a.
 // Right answers are +1 term point each, as in the class game.
+// 🧑‍💻 Hacker avatars (cb-av.js, Roger 13 Nov 2026): the board reads the group's cbAv docs when the round starts (one query), shows each
+// player's hacker (pl[pid].hv) and, at the end, gives each student their XP, crate and badges (cbAv/{email}, same batch as the results) and
+// tells their Chromebook what they won (cb.rw[pid]).
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,TEACHERS} from "../../shared/js/el-firebase.js";
 
-const G=window.ELGame,CB=window.ELCB,{esc,md}=G,$=s=>document.querySelector(s);
+const G=window.ELGame,CB=window.ELCB,AV=window.ELCBAV,{esc,md}=G,$=s=>document.querySelector(s);
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=$("#app");G.bg();
 const URLP=new URLSearchParams(location.search);
@@ -32,7 +35,7 @@ function lpGames(key,deck){const L=window.EL_GAMES||[];let d=deck&&L.find(x=>x.i
 const lpKeyOf=d=>d.id.replace(/-(vocab|grammar)$/,"");
 
 const H={user:null,teacher:false,games:lpGames(URLP.get("lp"),URLP.get("deck")),L:null,g:"",sid:0,phase:"pick",end:0,mins:8,hr:{},names:{},pts:{},players:{},
-  feed:[],lx:{},err:"",term:elTerm()};
+  feed:[],lx:{},err:"",term:elTerm(),av:{},rw:{},ups:[]};
 const saved=ss.get();
 if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.games.length||lpKeyOf(H.games[0])===saved.lp)){H.games=lpGames(saved.lp);Object.assign(H,{g:saved.g,sid:saved.sid,phase:saved.phase,end:saved.end,mins:saved.mins||8,hr:saved.hr||{}})}
 const keep=()=>ss.set(H.sid?{lp:H.games.length?lpKeyOf(H.games[0]):"",g:H.g,sid:H.sid,phase:H.phase,end:H.end,mins:H.mins,hr:H.hr}:null);
@@ -49,7 +52,8 @@ const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%6
 /* ---------- players, bits and hacks ---------- */
 const byPid=()=>{const m={};Object.keys(H.players).forEach(em=>m[CB.pid(em)]=em);return m};
 function pl(){const out={};Object.entries(H.players).forEach(([em,p])=>{const c=p.cb||{},w=(H.L&&H.L.words||[]).find(z=>z.w===c.pw);
-  out[CB.pid(em)]={nm:nameOf(em),av:CB.avatar(em),e:+c.e||0,ws:Array.isArray(c.ws)?c.ws.slice(0,3):[],c:w?w.c:"",sh:+c.sh||0,n:+c.n||0,r:+c.r||0,pw:!!c.pw}});
+  const lk=AV.look(H.av[em],c.wear),hv={r:lk.r};["v","p","pt","fx"].forEach(k=>{if(lk[k])hv[k]=lk[k]});
+  out[CB.pid(em)]={nm:nameOf(em),av:CB.avatar(em),hv,e:+c.e||0,ws:Array.isArray(c.ws)?c.ws.slice(0,3):[],c:w?w.c:"",sh:+c.sh||0,n:+c.n||0,r:+c.r||0,pw:!!c.pw}});
   Object.keys(out).forEach(id=>out[id].s=CB.score(id,out,H.hr));return out}
 // every new hack attempt (cb.h in the players' docs), oldest first: right password and no firewall → steals ELCB.HACK of the target's bits
 function judge(){const P=byPid(),todo=[];
@@ -78,7 +82,7 @@ function publish(soon){
   if(!H.g||!H.sid)return;clearTimeout(pubT);const wait=soon?250:Math.max(0,4000-(Date.now()-pubAt));
   pubT=setTimeout(()=>{pubAt=Date.now();const P=pl();Object.values(P).forEach(p=>delete p.pw);
     const D=S.deleteField(),data={on:true,game:true,mode:"cb",deck:location.pathname,title:title(),sid:H.sid,phase:H.phase,i:0,qn:0,qt:0,keys:{},at:S.serverTimestamp(),
-      cb:{decks:H.games.map(d=>d.id),lp:lpName(),end:H.end,pl:P,hr:H.hr},q:D,th:D,ok:D,nt:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
+      cb:{decks:H.games.map(d=>d.id),lp:lpName(),end:H.end,pl:P,hr:H.hr,rw:H.phase==="end"?H.rw:{}},q:D,th:D,ok:D,nt:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
     S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()})},wait)}
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g)});
@@ -88,6 +92,8 @@ async function startGroup(){
     const names={},keys=new Set();ro.forEach(d=>{const x=d.data();keys.add(d.id);names[d.id]=(x.first||d.id.split("@")[0])+(x.surname1?" "+x.surname1[0]+".":"")});
     const pts={};pt.forEach(d=>{if(keys.has(d.id))pts[d.id]=+d.data()[H.term]||0});Object.assign(H,{names,pts})}
   catch(e){console.warn("game",e);H.err="⚠ Could not read the group: "+e.message}
+  // the group's hackers (one query: a read per student who has played before)
+  try{const av={};(await S.getDocs(S.query(S.collection(db,"cbAv"),S.where("group","==",g)))).forEach(d=>av[d.id]=d.data());H.av=av}catch(e){console.warn("hackers",e);H.av={}}
   if(ansStop)ansStop();
   ansStop=S.onSnapshot(S.collection(db,"live",g,"answers"),qs=>{const before=Object.keys(H.players).length,P={};
     qs.forEach(d=>{const x=d.data();if(x.sid===H.sid)P[d.id]={a:x.a||{},cb:x.cb||{}}});H.players=P;
@@ -96,7 +102,7 @@ async function startGroup(){
   clearInterval(beat);beat=setInterval(()=>publish(),30e3);publish(true);draw()}
 
 /* ---------- the round ---------- */
-async function startGame(g){H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.hr={};H.feed=[];H.lx={};H.cp=null;savedSid=0;keep();G.music("lobby");await startGroup()}
+async function startGame(g){H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.hr={};H.feed=[];H.lx={};H.cp=null;H.rw={};H.ups=[];savedSid=0;keep();G.music("lobby");await startGroup()}
 function go(){H.phase="play";H.end=Date.now()+H.mins*60e3;keep();G.music("think");G.fx("next");publish(true);draw()}
 function more(){H.end=Math.max(H.end,Date.now())+2*60e3;keep();publish(true);draw()}
 function finish(){if(H.phase!=="play")return;H.phase="end";H.end=Math.min(H.end,Date.now());const t=totals();H.cp=t.n?Math.round(t.r/t.n*100):null;
@@ -130,9 +136,22 @@ async function saveResults(){
   // +1 term point per right answer (the same points as the class game); the group's best over the student list only
   const right={};Object.entries(M).forEach(([e,x])=>{const r=Object.values(x).filter(z=>z.ok).length;if(r)right[e]=r});
   Object.entries(right).forEach(([e,r])=>{H.pts[e]=(H.pts[e]||0)+r;w.set(S.doc(db,"points",e),{[H.term]:S.increment(r),updated:now},{merge:true})});
+  hackers(w,M,now);
   if(Object.keys(right).length)w.set(S.doc(db,"teams",H.g),{best:{[H.term]:Math.max(0,...Object.keys(H.names).map(e=>H.pts[e]||0))},updated:now},{merge:true});
   try{await w.commit()}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
 }
+
+// 🧑‍💻 each student's XP, crate and badges (cb-av.js award), saved in the same batch; their Chromebook shows what they won (cb.rw)
+function hackers(w,M,now){const R=rankList(),rw={},ups=[];
+  Object.entries(H.players).forEach(([em,p])=>{const c=p.cb||{},id=CB.pid(em),m=M[em]||{},n=Object.keys(m).length,r=Object.values(m).filter(z=>z.ok).length;
+    const hr=Object.values(H.hr),place=R.findIndex(z=>z.id===id)+1;
+    const A=AV.award(H.av[em],{n,r,place,players:R.length,bs:+c.bs||0,hk:hr.filter(h=>h.f===id&&h.ok).length,bl:hr.filter(h=>h.t===id&&h.blk&&!h.pr).length,group:H.g});
+    const wear=c.wear&&typeof c.wear==="object"?AV.look(H.av[em],c.wear):null;
+    if(A){if(wear&&!A.rw.g)["v","p","pt","fx"].forEach(k=>A.doc.on[k]=wear[k]||"");
+      A.doc.at=now;w.set(S.doc(db,"cbAv",em),A.doc,{merge:true});H.av[em]=Object.assign({},H.av[em],A.doc);rw[id]=A.rw;
+      if(A.rw.r1>A.rw.r0){const P=pl()[id]||{};ups.push({nm:nameOf(em),r:A.rw.r1,lk:Object.assign({a:P.av},P.hv)})}}
+    else if(wear){const on={};["v","p","pt","fx"].forEach(k=>on[k]=wear[k]||"");w.set(S.doc(db,"cbAv",em),{on,group:H.g,at:now},{merge:true});H.av[em]=Object.assign({},H.av[em],{on})}});
+  H.rw=rw;H.ups=ups;ups.forEach(u=>say(`⭐ <b>${esc(u.nm)}</b> is now a <b>${esc(AV.RANKS[u.r-1].n)}</b>!`,"hack"));publish(true)}
 
 /* ---------- 🎓 back to class mode (as the class game board) ---------- */
 async function backToClass(){const g=CMT&&CMT.g;if(!g)return;if(H.phase==="play")finish();await saveResults();
@@ -167,15 +186,16 @@ function draw(){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%"><h1 class="logo pop">🕵️ Code Breakers</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook and <b>choose your secret password</b>.</div><div class="count">🕵️ ${R.length} player${R.length===1?"":"s"}</div></div>
       <div class="cbmins"><span>⏱ Time:</span>${MINS.map(m=>`<button class="btn${m===H.mins?" go":" ghost"}" data-do="mins" data-m="${m}">${m} min</button>`).join("")}<button class="btn go" data-do="go" style="font-size:1.2em">Start ▶</button></div>
-      <div class="names">${R.map(p=>`<span>${esc(p.av)} ${esc(p.nm)} ${p.pw?"🔒":"<small>…</small>"}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div></div></div></div>`;return}
+      <div class="names">${R.map(p=>`<span class="cbnm">${AV.svg(Object.assign({a:p.av},p.hv),{mini:true,size:34})} ${esc(p.nm)} ${p.pw?"🔒":"<small>…</small>"}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div></div></div></div>`;return}
   const t=totals(),mx=Math.max(1,...R.map(p=>p.s));
-  const rows=R.slice(0,12).map((p,k)=>`<div class="cbrow"><span class="rk">${k+1}</span><span class="av">${esc(p.av)}</span><span class="nm">${esc(p.nm)}${p.sh>Date.now()?" 🛡️":""}</span><span class="trk"><i style="width:${Math.round(p.s/mx*100)}%"></i></span><span class="bt">${p.s}</span></div>`).join("");
+  const rows=R.slice(0,12).map((p,k)=>`<div class="cbrow"><span class="rk">${k+1}</span><span class="av">${AV.svg(Object.assign({a:p.av},p.hv),{mini:true,size:44})}</span><span class="nm">${esc(p.nm)}${p.sh>Date.now()?" 🛡️":""}</span><span class="trk"><i style="width:${Math.round(p.s/mx*100)}%"></i></span><span class="bt">${p.s}</span></div>`).join("");
   // the end screen is drawn once (late saves from the Chromebooks would restart the podium's animation); again only if the numbers change
-  if(H.phase==="end"){const ek=H.sid+":"+R.map(p=>p.id+":"+p.s).join(",")+":"+t.n+":"+H.err+":"+endArm;if(ek===lastEnd&&app$.querySelector(".cbpod"))return;lastEnd=ek;
+  if(H.phase==="end"){const ek=H.sid+":"+R.map(p=>p.id+":"+p.s+":"+(p.hv&&p.hv.r)).join(",")+":"+t.n+":"+H.err+":"+endArm+":"+H.ups.length;if(ek===lastEnd&&app$.querySelector(".cbpod"))return;lastEnd=ek;
     const pod=[R[1],R[0],R[2]],cls=["p2","p1","p3"],medal=["🥈","🥇","🥉"];
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${t.n?G.ring(t.r/t.n*100,"the class got right","150px"):""}<div><h1 class="logo pop" style="margin:0">⏱ Time's up!</h1><p class="sub">${t.n} answers · ${t.r} right · every right answer is +1 point</p></div></div>
-      <div class="podium cbpod"${R.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(x.av)} ${esc(x.nm)}<br><span class="sc">💾 ${x.s} bits</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
+      <div class="podium cbpod"${R.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm"><span class="cbpav">${AV.svg(Object.assign({a:x.av},x.hv),{mini:true,size:k===1?72:60})}</span>${esc(x.nm)}<br><span class="sc">💾 ${x.s} bits</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
+      ${H.ups.length?`<div class="cbups">${H.ups.map(u=>`<span class="cbup pop">${AV.svg(u.lk,{mini:true,size:40})} ⭐ <b>${esc(u.nm)}</b> → ${esc(AV.RANKS[u.r-1].n)}</span>`).join("")}</div>`:""}
       <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${back()}</p></div></div></div>`;return}
   app$.innerHTML=top()+`<div class="main cbplay"><div class="cbhead"><div class="cbtime${left()<30e3?" low":""}" id="cbtime">⏱ ${fmt(left())}</div>
       <div class="cbstat"><b>${t.n}</b> answers · <b>${t.n?Math.round(t.r/t.n*100):0} %</b> right</div></div>

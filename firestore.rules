@@ -185,6 +185,12 @@ service cloud.firestore {
       allow get: if school() && email == myEmail();
       allow read, write: if isTeacher();
     }
+    // 🧑‍💻 Code Breakers hackers (Roger, 13 Nov 2026; lab/game/cb-av.js): cbAv/{email} = {group, xp, n, best, it, on, b, hk, bl, at}. Only the board
+    // (the teacher) gives XP, crates and badges; each student reads only their own (once per round, for the 👕 locker and the end screen).
+    match /cbAv/{email} {
+      allow get: if school() && email == myEmail();
+      allow read, write: if isTeacher();
+    }
     // ⛶ class full screen (shared/js/el-cloud.js fsLeft): live/{group}/fsLeft/{email} = {name, at, pull, n}, written by a student of the group
     // when they leave the full screen of a pull-up; only the teacher reads them (the dashboard and the learning path page list who left)
     match /live/{group}/fsLeft/{email} {
