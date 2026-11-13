@@ -47,7 +47,9 @@
   /* 📘 Grammar together (Roger, 13 Nov 2026: "It should appear in their notes with the day, the grammar summary and their notes"): the day,
      the explanation boxes seen together on the projector (as the student saw them) and what the student wrote, read only. The boxes are the
      site's own text, saved by the student's page: only <b> <strong> <em> <i> <br> <del> <s> <u> are kept as tags. */
-  const safe=h=>String(h||"").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/&lt;(\/?)(strong|em|b|i|br|del|s|u)\s*\/?&gt;/gi,"<$1$2>");
+  // visual explain boxes (cards, tables, timelines) come in with styled divs: keep their words, one line per box row
+  const flat=h=>String(h||"").replace(/<\/(div|p|tr|table|h\d|li|ul|ol)>|<(br|hr)\b[^>]*>/gi,"<br>").replace(/<\/t[dh]>/gi," · ").replace(/<\/span>/gi," ").replace(/<(?!\/?(strong|em|b|i|br|del|s|u)\b)[^>]*>/gi,"").replace(/<(\/?)(strong|em|b|i|br|del|s|u)\b[^>]*>/gi,"<$1$2>").replace(/(\s*·\s*)+<br>/g,"<br>").replace(/(\s*<br>\s*){2,}/g,"<br>").replace(/^(\s*<br>)+|(<br>\s*)+$/g,"").trim();
+  const safe=h=>flat(h).replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/&lt;(\/?)(strong|em|b|i|br|del|s|u)\s*\/?&gt;/gi,"<$1$2>");
   const gtDay=d=>{const x=new Date(String(d||"")+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString(ca()?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})};
   function gtCard(g,inLp){
     const p=g.gt,txt=String(p.text||"").trim(),when=`<span class="muted nt-day">${t("Gramàtica junts","Grammar together")}${p.day?" · "+esc(gtDay(p.day)):""}</span>`,name=esc(String(g.title).replace(/^📘\s*/,""));

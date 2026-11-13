@@ -1058,6 +1058,8 @@ const rtNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[
    students/{uid}/notes/gt-<course>-<ls>-<page> (the class games' notes collection, firestore.rules: their own) = {ls, course, deck, title, lp,
    parts:{gt:{topic, day, sum: the boxes seen together, text, at}}, updated}. 🎯 What's in the exam on the LS page shows it in its learning
    path's card (shared/js/el-notes.js gtCard). Nothing is saved until they write. */
+// the boxes as plain words + <b>/<br> (the visual ones are styled divs that would eat the 1500 characters)
+const gtFlat=h=>String(h||"").replace(/<\/(div|p|tr|table|h\d|li|ul|ol)>|<(br|hr)\b[^>]*>/gi,"<br>").replace(/<\/t[dh]>/gi," · ").replace(/<\/span>/gi," ").replace(/<(?!\/?(strong|em|b|i|br|del|s|u)\b)[^>]*>/gi,"").replace(/<(\/?)(strong|em|b|i|br|del|s|u)\b[^>]*>/gi,"<$1$2>").replace(/(\s*·\s*)+<br>/g,"<br>").replace(/(\s*<br>\s*){2,}/g,"<br>").replace(/^(\s*<br>)+|(<br>\s*)+$/g,"").trim();
 const GTN={el:null,v:"",dirty:false,t:0,st:"",rt:null,loaded:"",ca:false};
 const gtDeck=()=>"gt-"+relPath.replace(/\.html$/,"").replace(/\//g,"-");   // gt-2eso-free-time-live-what-are-they-doing
 const gtT=(c,e)=>GTN.ca?c:e;
@@ -1067,7 +1069,7 @@ function gtState(st){if(st!=null)GTN.st=st;const e=document.getElementById("el-g
 async function gtSave(){
   clearTimeout(GTN.t);if(!GTN.dirty||!user||!isStudent(user)||AS||!GTN.rt)return;GTN.dirty=false;
   const rt=GTN.rt,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath),d=document.createElement("div");d.innerHTML=(GTN.ca&&rt.hc)||rt.h||"";
-  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return c.innerHTML.trim().slice(0,1500)}).slice(0,12);
+  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12);
   const title=(document.querySelector('#'+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .panel-head h2")||{}).textContent||"";
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});gtState("saving");
   try{await setDoc(doc(db,"students",user.uid,"notes",gtDeck()),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck:gtDeck(),
@@ -1122,7 +1124,7 @@ async function wbSave(){
   clearTimeout(WB.t);if(!WB.dirty||!WB.v||!user||!isStudent(user)||AS||!WB.srt)return;WB.dirty=false;
   const rt=WB.srt,kind=WB.kind,deck=WB.deck,v=WB.v,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath);
   let sum=[];if(kind==="grammar"){const d=document.createElement("div");d.innerHTML=(WB.ca&&rt.hc)||rt.h||"";
-    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return c.innerHTML.trim().slice(0,1500)}).slice(0,12)}
+    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12)}
   const html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
   if(WB.m)WB.m.status(wbT("Desant…","Saving…"));
