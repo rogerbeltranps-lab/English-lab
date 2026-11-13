@@ -2,7 +2,7 @@
    feeling that they are reading a book, with the images they had"; "and if you could make the feeling of turning pages, that'd be
    amazing"). ELBook.mount(el, pages, opts) draws the chapter's page pictures (<LS>/book/<route>-NN.webp, made by
    tools/reading-story/build.py --web) as an open book: two pages side by side on a computer, one on a phone, and the page turns like
-   paper (a 3D leaf) with the arrows, a tap on the left or right page, a swipe or the keyboard. ⤢ opens it full screen to read;
+   paper (a 3D leaf) with the arrows, a tap on the left or right page, dragging the page with a finger or the mouse, or the keyboard. ⤢ opens it full screen to read;
    🔍 shows one page as wide as the screen.
    The questions are the book's last page (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they
    press the options there?"): opts.end is a live element (the engine's form) shown as a page after the pictures. While it is on screen
@@ -10,7 +10,9 @@
    Full screen is the browser's (on <html>, so going from one chapter to the next keeps it) plus a cover over the page; it leaves the
    browser's full screen only if it entered it (class mode keeps its own).
    opts: {ca: Catalan labels, title: the chapter's name (alt text), end: element, atEnd(): the end page is on screen}.
-   Returns {open(), close(keepBrowserFullScreen), isFull()}. Used by ls2-engine.js on book.html. */
+   opts.start: the page to open at ('end': the last); opts.pre: words before "Page n of m"; opts.onTurn(i): the page on screen changed.
+   opts.after/before/canNext()/more(d)/nextLabel: going on to the chapter after or before (see setup).
+   Returns {open(), close(keepBrowserFullScreen), isFull(), refresh(), toEnd(), destroy(keepBrowserFullScreen)}. Used by ls2-engine.js on book.html. */
 (function () {
   const R = 210 / 148;   // A5
   const css = `
@@ -19,6 +21,8 @@
 .elb-stage{display:flex;justify-content:center;padding:18px 8px 10px;background:var(--desk);border-radius:16px;perspective:2600px}
 .elb-book{position:relative;width:calc(var(--pw)*2);height:var(--ph);box-shadow:0 18px 40px rgba(0,0,0,.28);border-radius:3px;background:var(--paper)}
 .elb.single .elb-book{width:var(--pw)}
+.elb-book{touch-action:pan-y;user-select:none;-webkit-user-select:none}.elb.zoom .elb-book{touch-action:auto}
+.elb-hit.prev,.elb-hit.next{cursor:grab}.elb-hit:active{cursor:grabbing}
 .elb-page,.elb-leaf{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--paper)}
 .elb-page img,.elb-face img{display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .elb-l{left:0}.elb-r{left:var(--pw)}.elb.single .elb-l{display:none}.elb.single .elb-r{left:0}
@@ -38,7 +42,7 @@
 .elb-back::after{background:linear-gradient(to right,rgba(0,0,0,.28),rgba(0,0,0,0) 45%)}
 .elb-leaf.turn .elb-face::after{opacity:1}
 .elb-hit{position:absolute;top:0;bottom:0;width:50%;border:0;background:transparent;cursor:pointer;z-index:4;padding:0}
-.elb-hit.prev{left:0;cursor:w-resize}.elb-hit.next{right:0;cursor:e-resize}.elb-hit:disabled{cursor:default}
+.elb-hit.prev{left:0}.elb-hit.next{right:0}.elb-hit:disabled{cursor:default}
 .elb-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-top:10px}
 .elb-bar button{border:1px solid var(--line,#d8e6df);background:#fff;color:var(--dark,#174d3d);border-radius:12px;padding:9px 14px;font:inherit;font-weight:800;cursor:pointer;min-height:42px}
 .elb-bar button:disabled{opacity:.4;cursor:default}
@@ -91,7 +95,7 @@ html.elb-lock{overflow:hidden}
   function mount(el, pages, o) {
     o = o || {};
     if (!el || !pages || !pages.length) return null;
-    const endEl = o.end || null;
+    const endEl = o.end || null, home = endEl && endEl.parentNode;   // destroy() gives the end page back to where it was
     if (endEl && endEl.parentNode) endEl.parentNode.removeChild(endEl);
     if (!document.getElementById('elBookCss')) document.head.insertAdjacentHTML('beforeend', '<style id="elBookCss">' + css + '</style>');
     const all = endEl ? pages.concat([endEl]) : pages.slice();
@@ -111,33 +115,40 @@ html.elb-lock{overflow:hidden}
     const q = s => el.querySelector(s), L = q('.elb-l'), Rp = q('.elb-r'), leaf = q('.elb-leaf'), book = q('.elb-book'), stage = q('.elb-stage');
     const nb = q('.elb-n'), bp = q('.elb-p'), bx = q('.elb-x'), bz = q('.elb-z'), bf = q('.elb-f'), tip = q('.elb-tip'), hold = q('.elb-hold');
     if (endEl) hold.appendChild(endEl);
-    let i = 0, busy = false, full = false, zoom = false, single = false, seen = false;
+    let i = o.start === 'end' ? n - 1 : Math.max(0, Math.min(n - 1, o.start | 0)), busy = false, full = false, zoom = false, single = false, seen = false, dead = false, atI = -1;
     // the end page on the moving paper: a copy without ids or names (the live form stays where the engine finds it)
     const copyOf = x => { const c = x.cloneNode(true); c.classList.add('elb-copy'); c.removeAttribute('id'); c.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); }); c.querySelectorAll('input,button,a').forEach(e => { e.tabIndex = -1; if ('disabled' in e) e.disabled = true; }); return c; };
-    const set = (box, k) => {
-      const im = box.querySelector('img'), pg = k != null && k >= 0 && k < n ? all[k] : null, live = pg && typeof pg !== 'string' ? pg : null;
+    // set(box, k): page k of this chapter; set(box, null, x): x, a page of the chapter before or after (a picture, or a copy of its live page)
+    const set = (box, k, x) => {
+      const ext = x !== undefined, im = box.querySelector('img'), pg = ext ? x || null : k != null && k >= 0 && k < n ? all[k] : null, live = pg && typeof pg !== 'string' ? pg : null;
       Array.from(box.children).forEach(c => { if (c === endEl) hold.appendChild(c); else if (c.classList.contains('elb-copy')) c.remove(); });
       box.classList.toggle('blank', !pg); box.classList.toggle('html', !!live);
       if (!pg || live) im.removeAttribute('src');
-      if (live) box.appendChild(box.classList.contains('elb-face') ? copyOf(live) : live);
-      else if (pg) { im.src = pg; im.alt = alt(k); }
+      if (live) box.appendChild(ext || box.classList.contains('elb-face') ? copyOf(live) : live);
+      else if (pg) { im.src = pg; im.alt = ext ? (o.title || '') : alt(k); }
     };
     pages.forEach(src => { const im = new Image(); im.decoding = 'async'; im.src = src; });   // a chapter is 2–5 pages: load them all, so a turn never waits
     const step = () => single ? 1 : 2;
     function draw() {
+      if (dead) return;
       if (single) { set(Rp, i); set(L, null); } else { set(L, i); set(Rp, i + 1); }
       const last = Math.min(n, i + step()), qs = endEl && last === n && (single || last - i === 1);
       const lt = endEl ? Math.min(last, n - 1) : last;   // the last picture on screen (the questions page is not counted as a page)
-      nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : '');
-      bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
+      nb.textContent = (o.pre || '') + (qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : ''));
+      const pre = i === 0 && !!(o.before && o.before.length && o.more);
+      bp.disabled = i === 0 && !pre; q('.elb-hit.prev').disabled = i === 0 && !pre;
       const end = i + step() >= n, onEnd = endEl && last === n;
-      // the end page takes the taps (its options); the arrows, the keys and a swipe still turn
+      // the end page takes the taps (its options); the arrows, the keys and dragging the page still turn
       q('.elb-hit.prev').classList.toggle('off', !!onEnd); q('.elb-hit.next').classList.toggle('off', !!onEnd);
       bx.textContent = end ? T(ca, 'Fi', 'The end') : (endEl && i + 2 * step() >= n ? T(ca, 'Preguntes', 'Questions') + ' ▶' : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶');
-      bx.disabled = end; bx.hidden = end && !!endEl;
+      const nxt = end && !!(o.after && o.after.length && o.more) && (!o.canNext || o.canNext());
+      bx.disabled = end && !nxt; bx.hidden = end && !!endEl && !nxt;
+      if (nxt) bx.textContent = (o.nextLabel || T(ca, 'Capítol següent', 'Next chapter')) + ' ▶';
       if (onEnd && o.atEnd) o.atEnd();
+      if (i !== atI) { atI = i; if (o.onTurn) o.onTurn(i); }   // where the student is (the one-book page keeps it to come back there)
     }
     function fit() {
+      if (dead) return;
       const W = full ? innerWidth - 20 : el.clientWidth - 16, H = full ? innerHeight - (q('.elb-bar').offsetHeight + 30) : Math.min(innerHeight * 0.82, 760);
       if (W <= 0) return;
       const was = single;
@@ -153,36 +164,96 @@ html.elb-lock{overflow:hidden}
     }
     const motion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Turning: the leaf is the page that moves; under it the pages that the turn uncovers are already in place.
-    function turn(dir) {
-      if (busy) return;
-      const s = step(), to = i + dir * s;
-      if (dir > 0 && i + s >= n) return;
-      if (dir < 0 && i === 0) return;
+    // setup(dir) puts the leaf at its start (a0) and returns where it ends (a1); go() moves it to the end or back to the start.
+    // Past the end or before the start (Roger, 13 Nov 2026: "they should be able to drag on to the next chapter"): opts.after = the next
+    // chapter's pages, only once opts.canNext() (its questions answered); opts.before = the chapter before's pages and questions page. The
+    // paper turns onto them and opts.more(+1 / -1) then puts that chapter on the book (at its start / at its end).
+    const A = () => o.after || [], B = () => o.before || [];
+    function setup(dir) {
+      const s = step(); let to = i + dir * s, ch = 0;
+      if (dir > 0 && i + s >= n) { if (!A().length || !o.more || (o.canNext && !o.canNext())) return null; ch = 1; }
+      if (dir < 0 && i === 0) { if (!B().length || !o.more) return null; ch = -1; }
+      const bm = B().length, bs = single ? bm - 1 : (bm - 1) - ((bm - 1) % 2);   // where the chapter before opens: its last page / spread
       seen = true; tip.hidden = true;
-      if (!motion()) { i = Math.max(0, to); draw(); return; }
-      busy = true;
       const front = leaf.querySelector('.elb-front'), back = leaf.querySelector('.elb-back');
       leaf.style.transition = 'none'; leaf.classList.remove('turn');
+      let a0 = 0, a1;
       if (single) {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'left center';
         // one page: the page lifts away to the left until it is edge-on (no back to show), or comes back over the page
-        if (dir > 0) { set(front, i); set(back, null); set(Rp, to); leaf.style.transform = 'rotateY(0deg)'; }
-        else { set(front, to); set(back, null); leaf.style.transform = 'rotateY(-90deg)'; }
+        if (dir > 0) { set(front, i); set(back, null); if (ch) set(Rp, null, A()[0]); else set(Rp, to); a1 = -90; }
+        else { if (ch) set(front, null, B()[bm - 1]); else set(front, to); set(back, null); a0 = -90; a1 = 0; }
       } else if (dir > 0) {
         leaf.style.left = 'var(--pw)'; leaf.style.transformOrigin = 'left center';
-        set(front, i + 1); set(back, i + 2); set(Rp, i + 3); leaf.style.transform = 'rotateY(0deg)';
+        set(front, i + 1); if (ch) { set(back, null, A()[0]); set(Rp, null, A()[1]); } else { set(back, i + 2); set(Rp, i + 3); } a1 = -180;
       } else {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'right center';
-        set(front, i); set(back, i - 1); set(L, i - 2); leaf.style.transform = 'rotateY(0deg)';
+        set(front, i); if (ch) { set(back, null, B()[bs + 1]); set(L, null, B()[bs]); } else { set(back, i - 1); set(L, i - 2); } a1 = 180;
       }
+      leaf.style.transform = 'rotateY(' + a0 + 'deg)';
       leaf.classList.add('on'); void leaf.offsetWidth;
-      leaf.style.transition = ''; leaf.classList.add('turn');
-      leaf.style.transform = single ? (dir > 0 ? 'rotateY(-90deg)' : 'rotateY(0deg)') : (dir > 0 ? 'rotateY(-180deg)' : 'rotateY(180deg)');
-      let done = false;
-      const end = () => { if (done) return; done = true; i = to; draw(); leaf.classList.remove('on', 'turn'); busy = false; };
-      leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
-      setTimeout(end, 1000);
+      return { to, a0, a1, ch };
     }
+    function go(t, all, sec) {
+      busy = true;
+      leaf.style.transition = 'transform ' + sec + 's cubic-bezier(.3,.1,.3,1)'; leaf.classList.add('turn');
+      leaf.style.transform = 'rotateY(' + (all ? t.a1 : t.a0) + 'deg)';
+      let done = false;
+      const end = () => { if (done) return; done = true; if (all && t.ch) { busy = false; o.more(t.ch); return; }   // the other chapter takes the book
+        if (all) i = t.to; draw(); leaf.classList.remove('on', 'turn'); leaf.style.transition = ''; busy = false; };
+      leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
+      setTimeout(end, sec * 1000 + 300);
+    }
+    function turn(dir) {
+      if (dead || busy || drag) return;
+      if (!motion()) { const s = step(); if ((dir > 0 && i + s >= n) || (dir < 0 && i === 0)) { const t = setup(dir); if (t) o.more(t.ch); return; } seen = true; tip.hidden = true; i = Math.max(0, i + dir * s); draw(); return; }
+      const t = setup(dir); if (t) { leaf.style.transition = ''; go(t, true, .75); }
+    }
+    // Dragging the page (Roger, 13 Nov 2026: "I want them to pass pages by dragging them"): with a finger or the mouse the paper follows
+    // the hand, its edge where the hand is; let go past a third of the way (or with a quick flick) and it turns, before that it falls back.
+    // A tap still turns (or opens full screen the first time); the end page's options and buttons keep their taps.
+    let drag = null, noClick = 0;
+    const angle = (d, p) => single ? (d > 0 ? -Math.acos(1 - p) : -Math.acos(p)) : (d > 0 ? -1 : 1) * Math.acos(1 - 2 * p);
+    book.addEventListener('pointerdown', e => {
+      if (busy || drag || zoom || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (e.target.closest && e.target.closest('.elb-q :is(label,input,button,a,select,textarea)')) return;
+      const r = book.getBoundingClientRect();
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, rx: e.clientX - r.left, w: r.width, t: null, p: 0, hist: [[e.timeStamp, e.clientX]] };
+    });
+    book.addEventListener('pointermove', e => {
+      const d = drag; if (!d || e.pointerId !== d.id) return;
+      if (e.pointerType === 'mouse' && !(e.buttons & 1)) return drop(e);   // the button is up but its pointerup never came (Roger, 13 Nov 2026: "when I drag I can't release")
+      const dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (!d.t) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        if (Math.abs(dx) < Math.abs(dy) * 1.2) { drag = null; return; }   // up and down: the page scrolls (the questions page)
+        d.dir = dx < 0 ? 1 : -1; d.t = setup(d.dir);
+        if (!d.t) { drag = null; return; }   // nothing to turn that way
+        busy = true;
+        try { book.setPointerCapture(e.pointerId); } catch (x) { }
+        if (motion()) leaf.classList.add('turn');
+      }
+      e.preventDefault();
+      const room = d.dir > 0 ? d.rx : d.w - d.rx, pw = d.w / (single ? 1 : 2);
+      d.p = Math.max(0, Math.min(1, (d.dir > 0 ? -dx : dx) / Math.max(room, pw * .5)));
+      leaf.style.transform = 'rotateY(' + angle(d.dir, d.p) * 180 / Math.PI + 'deg)';
+      d.hist.push([e.timeStamp, e.clientX]); if (d.hist.length > 6) d.hist.shift();
+    });
+    const drop = e => {
+      const d = drag; if (!d || e.pointerId !== d.id) return;
+      drag = null; if (!d.t) return;
+      noClick = Date.now() + 400;   // the tap that ends a drag is not a tap on the page
+      const h = d.hist, a = h[0], b = h[h.length - 1], v = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0;   // px per ms, + to the right
+      const flick = (d.dir > 0 ? -v : v) > .45 && d.p > .04, back = (d.dir > 0 ? v : -v) > .45;
+      const all = e.type !== 'pointercancel' && !back && (d.p > .25 || flick);
+      busy = false; go(d.t, all, all ? .22 + .45 * (1 - d.p) : .18 + .35 * d.p);
+    };
+    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop); book.addEventListener('lostpointercapture', drop);
+    // let go anywhere: outside the book, outside the page's frame (the preview), or the window losing the mouse
+    const dropAny = e => { if (drag && (!e || e.pointerId == null || e.pointerId === drag.id)) drop({ type: 'pointerup', pointerId: drag.id, timeStamp: e && e.timeStamp || performance.now() }); };
+    const mUp = e => dropAny({ timeStamp: e.timeStamp }), wBlur = () => dropAny();
+    addEventListener('pointerup', dropAny, true); addEventListener('mouseup', mUp, true); addEventListener('blur', wBlur);
+    book.addEventListener('click', e => { if (Date.now() < noClick) { e.preventDefault(); e.stopPropagation(); } }, true);
     function toggleFull(on, stay, keepFs) {
       full = on == null ? !full : on;
       if (!full) zoom = false;
@@ -203,22 +274,31 @@ html.elb-lock{overflow:hidden}
     q('.elb-hit.prev').onclick = () => turn(-1);
     q('.elb-hit.next').onclick = () => { if (!full && !seen && innerWidth >= 700) { seen = true; toggleFull(true); return; } turn(1); };
     el.addEventListener('keydown', e => {
+      if (dead) return;
       if (e.key !== 'Escape' && e.target.closest && e.target.closest('input,button,a,textarea,select') && e.target !== el) return;   // the end page's options and buttons keep their keys
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && full)) { e.preventDefault(); turn(1); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
       else if (e.key === 'Escape' && full) { e.preventDefault(); toggleFull(false); }
     });
-    let sx = null, sy = null;
-    book.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
-    book.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5 && !zoom) { e.preventDefault(); turn(dx < 0 ? 1 : -1); } });
-    if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(el); else addEventListener('resize', fit);
-    addEventListener('resize', () => { if (full) fit(); });
+    const ro = window.ResizeObserver ? new ResizeObserver(() => fit()) : null, rz = () => { if (full || !ro) fit(); };
+    if (ro) ro.observe(el); addEventListener('resize', rz);
     fit();
+    if (!single && i % 2) { i--; draw(); }   // a spread starts on an even page
     return {
       open() { if (!full) { seen = true; toggleFull(true); } },
       close(keepFs) { if (full) toggleFull(false, true, keepFs); },
       isFull: () => full,
-      toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); }
+      refresh() { if (!busy) draw(); },
+      toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); },
+      // another chapter in the same place (one-book page): listeners off, the end page back home, the browser's full screen kept if asked
+      destroy(keepFs) {
+        if (dead) return; if (full) toggleFull(false, true, keepFs); dead = true;
+        document.removeEventListener('fullscreenchange', fc); document.removeEventListener('webkitfullscreenchange', fc);
+        removeEventListener('resize', rz); if (ro) ro.disconnect();
+        removeEventListener('pointerup', dropAny, true); removeEventListener('mouseup', mUp, true); removeEventListener('blur', wBlur);
+        if (endEl && home) home.appendChild(endEl);
+        el.innerHTML = '';
+      }
     };
   }
   window.ELBook = { mount };

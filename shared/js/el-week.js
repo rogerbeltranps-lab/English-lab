@@ -130,7 +130,12 @@
           // 📖 Book (Roger, 12 Nov 2026: "a Book LP with a section per chapter, and we allocate time on the agenda"): a path with agendaDue in
           // EL_CATALOG has no dates in the plan, so each of its tabs is due on the day it sits on this group's agenda (stepDue) and the path on
           // its last day (due); a tab not on the agenda has no deadline and never counts as missing.
-          const tday={};ds.forEach(d=>(ag.days[d]||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.+)$/.exec(it||"");if(m)(tday[m[1]]=tday[m[1]]||{})[m[2]]=d}));
+          // One Book tab (Roger, 13 Nov 2026: "only one SLP for the book"; then, asked when a chapter is on time: "One chapter per Book day"):
+          // the n-th day "📖 The book" (path#book) is on this group's agenda, chapter n is due; chapters past the last Book day have no
+          // deadline. A chapter planned on its own before then (path#ch2) keeps its own day.
+          const tday={},bday={};ds.forEach(d=>(ag.days[d]||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.+)$/.exec(it||"");if(!m)return;
+            if(m[2]==="book"){const l=bday[m[1]]=bday[m[1]]||[];if(!l.includes(d))l.push(d);return}(tday[m[1]]=tday[m[1]]||{})[m[2]]=d}));
+          Object.entries(bday).forEach(([id,l])=>{const o=tday[id]=tday[id]||{};(((typeof window!=="undefined"&&window.EL_ACTIONS)||{})[id]||[]).forEach((k,j)=>{if(j<l.length&&!o[k])o[k]=l[j]})});
           ((typeof window!=="undefined"&&window.EL_CATALOG)||[]).filter(a=>a.agendaDue&&a.ls===ls&&!dr.includes(a.id)&&tday[a.id]).forEach(a=>{const o=tday[a.id];
             if(!p.due)p.due={};if(!p.due[a.id])p.due[a.id]=p.groups.map(()=>null);p.due[a.id][gi]=Object.values(o).sort().pop();
             if(!p.stepDue)p.stepDue={};const sd=p.stepDue[a.id]=p.stepDue[a.id]||{};Object.entries(o).forEach(([k,d])=>{if(!sd[k])sd[k]=p.groups.map(()=>null);sd[k][gi]=d})});
