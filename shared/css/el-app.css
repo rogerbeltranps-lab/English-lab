@@ -149,7 +149,11 @@ body.ellp2 main#lp{max-width:none!important;width:auto!important;margin:0!import
 body.ellp2 #el-cloud-bar-space{display:none}
 body.ellp2 main#lp{padding-bottom:var(--el-bar-space,0px)!important}
 body.ellp2 .lp-body{display:block!important}
-.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
+.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin;scrollbar-gutter:stable}
+/* the class tab on the projector: no scrollbar on the steps column (the wheel still scrolls it), so nothing moves beside the lesson
+   (teacher's report, 4ESOA, 13 Nov 2026: "the bar is moving … like flickering" = this scrollbar). Everywhere else its place is kept
+   (scrollbar-gutter:stable), so the column no longer flickers when its height is right at the edge: scrollbar on, text wraps, scrollbar off… */
+html.elcmtab .ellpside{scrollbar-width:none;overflow-anchor:none}html.elcmtab .ellpside::-webkit-scrollbar{display:none}
 .ellp-head{display:flex;flex-direction:column;gap:6px}
 .ellp-head .eyebrow{align-self:flex-start;font-size:11px!important;padding:4px 10px!important;margin:0!important}
 .ellp-head h1{font-size:1.6rem!important;line-height:1.15!important;margin:0!important;letter-spacing:-.01em;text-wrap:balance}
