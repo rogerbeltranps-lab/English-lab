@@ -414,3 +414,7 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-hl{background:linear-gradient(transparent 52%,rgba(255,230,0,.55) 52%);text-decoration:underline;text-decoration-color:var(--nb-red);text-decoration-thickness:2px;text-underline-offset:3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .nb-you{font:700 17px/24px var(--nb-hand);color:var(--nb-red);white-space:nowrap}
 .nb-pts{font:15px/24px var(--nb-hand);color:var(--nb-pencil);margin-left:4px}
+
+/* 🏠 My board */
+.nb .nb-home{text-decoration:none;font-weight:600;white-space:nowrap}
+@media (max-width:640px){.nb .nb-home .nb-hlab{display:none}}

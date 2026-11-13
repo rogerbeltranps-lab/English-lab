@@ -256,10 +256,14 @@ window.ELNotebook = (function () {
       });
     });
     const x = (H.rs || {})[L.id + '/assessment'] || {}, fin = x.final || {};
+    // the exam is evidence too: each marked section counts for its criteria (points right out of its points), so an LS where only the
+    // exam and the final product count (LS1) also shows its criteria
+    ((G.exam || {}).sections || []).forEach(([k, , m, cs]) => { const v = (x.sections || {})[k]; if (!v || v.score == null) return;
+      (cs || []).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { const y = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); y.r += +v.score || 0; y.of += +(v.max || m) || 0; }); });
     Object.keys(fin).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { if (!crit[c]) crit[c] = { r: 0, of: 0, n: 0 }; });
     const rows = Object.keys(crit).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map(c => {
       const v = crit[c], deg = fin[c] || (v.of ? window.elDegree && elDegree(v.r / v.of * 10) : null), i = (window.EL_DEGREES || []).indexOf(deg);
-      const ind = i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '';
+      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');
       return { c, deg, ind, comp: window.elCompetence ? elCompetence(c) : '' };
     });
     const g = window.elGameStats ? elGameStats(Object.values(H.mg || {}).filter(y => y && y.ls === L.id)) : {};
@@ -477,7 +481,7 @@ window.ELNotebook = (function () {
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
     // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
     // part whose first line didn't fit (it goes up through the part's boxes)
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh';
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh';
     const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
     const breakBefore = force => {
       const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
@@ -614,6 +618,8 @@ window.ELNotebook = (function () {
       + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
+      // 🏠 to the student's board (Roger, 13 Nov 2026: "add a button to go to the students dashboard")
+      + (H.own ? `<a class="nb-tool nb-home" href="${rel('today.html')}" title="${t('El meu tauler', 'My board')}">🏠<span class="nb-hlab"> ${t('El meu tauler', 'My board')}</span></a>` : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav></div>`
@@ -671,7 +677,7 @@ window.ELNotebook = (function () {
       { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota, 🟨 hi enganxa un post-it (tria el color) i ▲ ▼ la mouen. Les notes també poden passar a una altra secció.', 'In the margin of each part: ✍ adds a note below it, 🟨 sticks a post-it (choose its colour) and ▲ ▼ move it. Notes can also move on to another section.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
       { el: '.nb-printbtn', ic: '🖨', h: t('Imprimeix', 'Print'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta.', '🖨 prints these pages, the ones you choose or the whole notebook.') },
-      { el: '.nb-close', all: '.nb-close,.nb-help', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
+      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i 🏠 et porta al teu tauler. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and 🏠 takes you to your board. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
     ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
   }
   function tour() {
