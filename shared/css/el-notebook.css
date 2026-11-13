@@ -600,3 +600,6 @@ a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) sc
 @media (min-width:900px){.nb-spread:has(.nb-lside){margin-left:32px}.nb-tab.nb-ctop{display:none}}
 @media (max-width:899px){.nb-lside{display:none}}
 @media print{.nb-lside{display:none!important}}
+/* a whole year of LSs: the tabs share the edge (never cut off); from 5 LSs on only "LS5" shows, the name is in the tooltip */
+.nb-lside .nb-tab.nb-lt{flex:0 1 auto;min-height:0}
+.nb-lside.nb-many{gap:5px}.nb-lside.nb-many .nb-tab.nb-lt span{display:none}.nb-lside.nb-many .nb-tab.nb-lt{padding:8px 5px 8px 7px;text-overflow:clip}

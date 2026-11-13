@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113h', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113i', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -842,7 +842,7 @@ window.ELNotebook = (function () {
       + (H.own ? `<a class="nb-tool nb-home" href="${rel('today.html')}" title="${t('El meu tauler', 'My board')}">🏠<span class="nb-hlab"> ${t('El meu tauler', 'My board')}</span></a>` : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
-      + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav>${chs ? `<nav class="nb-lside" aria-label="${t('Situacions d\'aprenentatge', 'Learning situations')}">${CH.map((c, i) => { const L = (window.EL_LS || []).find(l => l.id === c.LS) || {}; return `<button type="button" class="nb-tab nb-ctab nb-lt" data-chap="${i}" data-nbto="s:chap|${i}" style="--i:${i}" title="${esc(chapName(L))}"><b>${lsNum(c)}</b> ${esc(chapName(L).replace(/^\S+\s*/, '').replace(/^\((.*)\)$/, '$1'))}</button>`; }).join('')}</nav>` : ''}</div>`
+      + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav>${chs ? `<nav class="nb-lside${CH.length > 4 ? ' nb-many' : ''}" aria-label="${t('Situacions d\'aprenentatge', 'Learning situations')}">${CH.map((c, i) => { const L = (window.EL_LS || []).find(l => l.id === c.LS) || {}; return `<button type="button" class="nb-tab nb-ctab nb-lt" data-chap="${i}" data-nbto="s:chap|${i}" style="--i:${i}" title="${esc(chapName(L))}"><b>${lsNum(c)}</b><span> ${esc(chapName(L).replace(/^\S+\s*/, '').replace(/^\((.*)\)$/, '$1'))}</span></button>`; }).join('')}</nav>` : ''}</div>`
       + (!chs && chapters().length > 1 ? `<nav class="nb-chaps" aria-label="${t('Capítols', 'Chapters')}"><span class="nb-chl">📚</span>${chapters().map(l => l.id === H.LS
         ? `<span class="nb-ch on" aria-current="page" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></span>`
         : `<a class="nb-ch" href="${rel(l.id.replace(/^(\d+eso)-/, '$1/') + '/index.html#notes')}" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></a>`).join('')}</nav>` : '')
