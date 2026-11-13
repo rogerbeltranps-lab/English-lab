@@ -104,7 +104,10 @@ const asSave=o=>{try{sessionStorage.setItem(AS_K,JSON.stringify(o))}catch(e){}};
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 // Student list (roster/{email}, imported by the teacher in the dashboard): only listed school accounts (and testers) can use the site, and the list sets their group.
 // null = not on the list; undefined = the list could not be read (then the site behaves as before the list existed).
-const onRoster=async u=>{try{const s=await getDoc(doc(db,"roster",(u.email||"").toLowerCase()));return s.exists()?s.data():null}catch(e){console.warn("roster",e);return undefined}};
+// A refused read can come from an old sign-in pass (e.g. the account's email was changed or verified after this browser signed in,
+// Josue 2ESOB, 13 Nov 2026: stuck on "Tria el teu grup"): get a fresh pass once and try again, so a reload is enough.
+const onRoster=async(u,again)=>{try{const s=await getDoc(doc(db,"roster",(u.email||"").toLowerCase()));return s.exists()?s.data():null}
+  catch(e){if(!again&&e&&e.code==="permission-denied"){try{await u.getIdToken(true);return await onRoster(u,true)}catch(x){}}console.warn("roster",e);return undefined}};
 let myRoster;
 
 // Which activity / LS is this page?
