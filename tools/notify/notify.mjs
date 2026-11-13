@@ -46,7 +46,7 @@ if(INSTANT){
   let last;try{last=JSON.parse(fs.readFileSync(STATE,"utf8")).lastAt}catch(e){}
   if(!last){last=new Date(Date.now()-20*60000).toISOString();console.log("No saved last check: looking back 20 minutes.")}
   const t=d=>new Date(d).getTime(),inWin=x=>t(x.created)>t(last)&&t(x.created)<=t(now);
-  const [probs,ideas]=(await Promise.all([since("problems",last),since("suggestions",last)])).map(l=>l.filter(inWin));
+  const [probs,ideas]=(await Promise.all([since("problems",last),since("suggestions",last)])).map(l=>l.filter(inWin).filter(x=>!x.teacher));   // not Roger's own reports: he wrote them
   // answers to private messages: sAt (server time) is the student's last reply; the email quotes their answers since your last one (at most 3)
   const tail=th=>{const i=th.map(x=>x.by).lastIndexOf("t");return th.slice(i+1).filter(x=>x.by==="s").slice(-3)};
   const answers=(await since("announcements",last,"sAt")).filter(a=>t(a.sAt)>t(last)&&t(a.sAt)<=t(now)).map(a=>Object.assign(a,{newOnes:tail(a.thread||[])})).filter(a=>a.newOnes.length);
@@ -54,9 +54,9 @@ if(INSTANT){
   // written by tools/problems/auto.mjs (verdict "fixed", at = when). Their own email, an ⚠️ IMPORTANT subject, sent first.
   const autoFixed=(await since("problems",last,"auto.at")).filter(x=>x.auto&&x.auto.verdict==="fixed"&&t(x.auto.at)>t(last)&&t(x.auto.at)<=t(now));
   if(autoFixed.length){
-    const out=["Claude fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself and answered the student"+(autoFixed.length>1?"s":"")+" for you:",""];
+    const ns=autoFixed.filter(x=>!x.teacher).length,out=["Claude fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself"+(ns?" and answered the student"+(ns>1?"s":"")+" for you":"")+":",""];
     autoFixed.forEach(x=>{out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🔧 "+String(x.auto.note||"").trim());
-      const m=(x.msgs||[]).filter(y=>y.fix).pop();out.push("   💬 The student got: ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
+      const m=(x.msgs||[]).filter(y=>y.fix).pop();out.push(x.teacher?"   👨‍🏫 Your own report: hard reload the page (Ctrl+Shift+R) to see it fixed.":"   💬 The student got: ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
     out.push("Check them or reopen one: "+SITE+"teacher.html#probs","","—","Only technical problems are fixed automatically; everything else stays in ⚠️ Problem reports for you. Students do not see this email.");
     await sendMail("⚠️ IMPORTANT · English Lab: "+n(autoFixed.length,"problem report","problem reports")+" fixed automatically",out.join("\n"))}
   console.log("New since the last check: "+probs.length+" problem report(s), "+ideas.length+" idea(s), "+answers.length+" answer(s), "+autoFixed.length+" fixed automatically.");   // counts only: the log is public

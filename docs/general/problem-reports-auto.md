@@ -64,6 +64,24 @@ In ⚠️ Problem reports the reply has **📨 Send…** (fixed → the ✅ fixe
 you → the message card, the report stays open) and **✏️ Edit first** (opens 💬 Answer with the text). Run `leave` again on the same
 report to change it (`open --all` shows the current one).
 
+## The teacher's own reports (Roger, 13 Nov 2026)
+
+"I need a problem button available for the teacher." Roger has the same ⚠️ Problem button in the bottom bar of the dashboard, the class
+tab and every page he opens signed in (and in the ⋯ menu of a learning path on a phone). His reports are `problems/{id}` with
+`teacher: true` (firestore.rules lets only his account set it), in English, with `group` = the class mode's group when he sends it from the
+class tab. They start this same task. `auto.mjs open` prints them as "FROM ROGER, THE TEACHER". They are Roger's own requests, so:
+
+- **Technical bug** (on any page, LS1 included: Roger asked) → fix it and squash-merge exactly as in "Each run" step 3, then
+  `node tools/problems/auto.mjs fixed <id> --note "what was wrong, PR #n" --apply` (no `--msg`: there is no student card) and start the
+  email Action (step 5): the ⚠️ IMPORTANT email tells him, with "hard reload the page".
+- **A change he wants** (design, wording, content, a new button…) → make it on a branch `claude/problem-<short id>`, open the PR with a
+  clickable preview (screenshots in the PR) and **do not merge** (Roger: preview before merge). Then
+  `auto.mjs leave <id> --status you --note "what I changed, PR #n" --todo "Say \"merge PR #n\" in the English Lab project" --apply` (no `--reply`).
+- **Unclear** → `leave <id> --status you --note "what I checked and the one question I need answered" --apply`.
+
+Roger gets no 15-minute "new report" email for his own reports (notify.mjs skips `teacher`); the dashboard shows them as 👨‍🏫 You, with no
+💬 Answer and no suggested reply.
+
 ## Students' comments, answered at once (Roger, 9 Nov 2026)
 
 "I want you to answer straight away but I want to see what you said and be able to edit … or remove it if I want to." The same task

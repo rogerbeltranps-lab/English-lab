@@ -70,9 +70,11 @@ service cloud.firestore {
         && request.resource.data.created == request.time;
       allow read, update, delete: if isTeacher();
     }
+    // the teacher reports too (Roger, 13 Nov 2026: "I need a problem button available for the teacher"): teacher:true, only from the teacher's account
     match /problems/{id} {
-      allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['uid','email','name','group','ls','activity','route','page','title','section','kind','text','errors','device','shot','created'])
+      allow create: if (signedIn() || isTeacher())
+        && request.resource.data.keys().hasOnly(['uid','email','name','group','ls','activity','route','page','title','section','kind','text','errors','device','shot','created','teacher'])
+        && request.resource.data.get('teacher', false) == isTeacher()
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.email == myEmail()
         && request.resource.data.kind in ['media','stuck','marking','display','other']
@@ -126,7 +128,7 @@ service cloud.firestore {
         && request.resource.data.sAt == request.time;
     }
     match /problemShots/{id} {
-      allow create: if signedIn()
+      allow create: if (signedIn() || isTeacher())
         && request.resource.data.keys().hasOnly(['uid','img','created'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.img is string && request.resource.data.img.size() <= 900000

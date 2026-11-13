@@ -74,7 +74,10 @@ async function pageShot(skip){
 }
 
 // Opens the report window. en: English (Safe, Daring) or Catalan (Insecure, no route). save(o) stores {kind, text, ...context()}.
-export function report({en,save}){
+// teacher: the teacher's own ⚠️ Problem (Roger, 13 Nov 2026: "I need a problem button available for the teacher"), always in English,
+// with words that say what happens next (the same instant task reads it; no student to answer).
+export function report({en,save,teacher}){
+  if(teacher)en=true;
   const t=(ca,e)=>en?e:ca,ctx=context(),d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
   d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
   d.innerHTML='<h3 style="margin:0 0 6px"></h3><p data-i style="margin:0 0 8px;color:#475569"></p><div data-k></div>'
@@ -88,10 +91,11 @@ export function report({en,save}){
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
   const $=s=>d.querySelector(s),ta=$("textarea"),ok=$("[data-ok]"),x=$("[data-x]");
   $("h3").textContent="⚠️ "+t("Avisa d'un problema","Report a problem");
-  $("[data-i]").textContent=t("Què no funciona? El professor ho veurà i ho intentarà arreglar.","What is not working? Your teacher will see it and try to fix it.");
+  $("[data-i]").textContent=teacher?"What is not working? Claude looks at it straight away: a technical problem is fixed and merged, and you get an ⚠️ IMPORTANT email. A change you would like gets a pull request with a preview for your \"merge\". You find it in ⚠️ Problem reports on the dashboard."
+    :t("Què no funciona? El professor ho veurà i ho intentarà arreglar.","What is not working? Your teacher will see it and try to fix it.");
   KINDS.forEach(k=>{const l=document.createElement("label");l.style.cssText="display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer";
     l.innerHTML='<input type="radio" name="el-rep" value="'+k.id+'"><span></span>';l.querySelector("span").textContent=t(k.ca,k.en);$("[data-k]").append(l)});
-  ta.placeholder=t("Explica què ha passat: què feies, en quin exercici o pas, què esperaves que passés…","Explain what happened: what you were doing, which exercise or step, what you expected…");
+  ta.placeholder=teacher?"What happened or what should change: which group, step or button, what you expected…":t("Explica què ha passat: què feies, en quin exercici o pas, què esperaves que passés…","Explain what happened: what you were doing, which exercise or step, what you expected…");
   const where=[ctx.title||ctx.page,ctx.section].filter(Boolean).join(" › ");
   $("[data-w]").textContent=t("S'enviarà també on ets: ","Where you are is sent too: ")+where+".";
   const n=$("[data-n]"),count=()=>n.textContent=ta.value.length+" / 1000";ta.oninput=count;count();
@@ -124,9 +128,9 @@ export function report({en,save}){
     if(kind==="other"&&!text){err(t("Explica breument què passa.","Explain briefly what is happening."));ta.focus();return}
     if(busy)return;ok.disabled=true;
     try{await save(Object.assign({kind,text},ctx,shot?{shot,shotFrom:src}:{}));
-      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=teacher?"Sent. Claude is looking at it now; you get an email if it is fixed, and it waits for you in ⚠️ Problem reports otherwise.":t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
       const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c);c.focus()}
-    catch(e){console.warn("problem report",e);ok.disabled=false;err(t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
+    catch(e){console.warn("problem report",e);ok.disabled=false;err(teacher?"It could not be sent. Try again in a minute (a page open since yesterday: reload it first).":t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
   d.addEventListener("close",()=>d.remove());
   document.body.append(d);d.showModal();
 }
