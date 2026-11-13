@@ -166,7 +166,7 @@ window.ELNotebook = (function () {
   // underlining their result in each indicator"), with the teacher's ✔ / ➜ notes of that row under it. LS2: the rows of EL_GRADING fp.rows,
   // their indicators (NA … AE) and the level the teacher gave (results levels[step][c], one lower for a group row when x.down);
   // LS1: the rubric the teacher marked with (EL_FP_RUBRICS), level = the part's mark ÷ 2.5, as on the board (today.html fbRubric).
-  const DEG = { AE: ['Excel·lent', 'Excellent'], AN: ['Notable', 'Good'], AS: ['Satisfactori', 'Satisfactory'], NA: ['No satisfactori', 'Not achieved'] };
+  const DEG = { AE: ['Excel·lent', 'Excellent'], AN: ['Notable', 'Very good'], AS: ['Satisfactori', 'Satisfactory'], NA: ['No satisfactori', 'Not achieved'] };
   function fpRubric(G, x, parts) {
     const lvOfM = m => { const v = parseFloat(String(m).replace(',', '.')); return isNaN(v) ? null : Math.max(0, Math.min(4, Math.round(v / 2.5))); };
     const fb = p => p && (p.ok.length || p.todo.length) ? `<ul class="nb-fbl">${p.ok.map(y => `<li class="ok">✔ ${esc(y)}</li>`).join('')}${p.todo.map(y => `<li class="todo">➜ ${esc(y)}</li>`).join('')}</ul>` : '';
@@ -348,7 +348,7 @@ window.ELNotebook = (function () {
     st = st || {};
     const me0 = (window.EL_LS || []).find(l => l.id === H.LS) || {}, grp = String(H.group || '').replace(/^(\d)ESO\s*([A-Z])?$/i, (m, n, l) => `${n} ESO${l ? ' ' + l : ''}`) || String(me0.course || '').replace(/^(\d)eso$/, '$1 ESO');
     const n1 = v => v == null ? '–' : String(Math.round(v * 10) / 10).replace('.', ',');
-    const DG = { NA: t('No assolit', 'Not achieved'), AS: t('Assoliment satisfactori', 'Satisfactory'), AN: t('Assoliment notable', 'Good'), AE: t('Assoliment excel·lent', 'Excellent') };
+    const DG = { NA: t('No assolit', 'Not achieved'), AS: t('Assoliment satisfactori', 'Satisfactory'), AN: t('Assoliment notable', 'Very good'), AE: t('Assoliment excel·lent', 'Excellent') };
     // the student's level (Roger: "a la portada tb surt el nivell i nom (core...)"): "A2 · Core"
     const LVN = { beginners: 'Starter', insecure: 'Base', safe: 'Core', daring: 'Plus', native: 'Pro' }, lv = String(H.level || '').toLowerCase();
     const lvl = lv && LVN[lv] ? [window.elCefr ? elCefr(me0.course, lv) : '', LVN[lv]].filter(Boolean).join(' · ') : '';
@@ -392,7 +392,7 @@ window.ELNotebook = (function () {
       + `</div><div class="nb-break"></div><div class="nb-front nb-fr-more">`
       + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')} <small>· ${esc(H.name || '')}</small></div>`
       + sums.map(box).join('')
-      + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} </p></div><div class="nb-break"></div>`;
+      + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'very good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} </p></div><div class="nb-break"></div>`;
   }
   // 📚 the chapters (Roger, 13 Nov 2026: "Notebooks should have chapters call LS1 (Name) LS2 (Name)"): one chapter per LS of the course,
   // each on its LS page (#notes); the chapter name is "LS2 (Seasons & Celebrations)"
@@ -688,7 +688,7 @@ window.ELNotebook = (function () {
   function layout(keep, force) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || (printing() && !force)) return false;
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
-    if (keep == null) keep = here();
+    if (keep == null) keep = atLP() || here();
     cvSet(root);
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
@@ -789,6 +789,20 @@ window.ELNotebook = (function () {
   ['pointerdown', 'mousedown', 'touchstart', 'click', 'change', 'input', 'submit', 'keydown', 'focusin'].forEach(ev => document.addEventListener(ev, pick, true));
   // 🔍 the dictionary floats over the notebook too (Roger, 13 Nov 2026: "only the magnifier, always floating")
   function dict() { if (window.ELDict || document.getElementById('el-dict-js') || !me) return; const sc = document.createElement('script'); sc.id = 'el-dict-js'; sc.src = new URL('./el-dict.js', me).href; document.head.append(sc); }
+  // 📓 opened from a learning path (el-cloud.js el_nb_at, set by the click): that LP's step in the notebook, else that LP, else its LS
+  // chapter. Kept (PEND) until a layout finds that LS: the first draws can come before the other LSs' chapters are loaded.
+  let PEND;
+  function atLP() {
+    if (PEND === undefined) { PEND = null; try { const x = JSON.parse(store.get('el_nb_at') || 'null'); localStorage.removeItem('el_nb_at'); if (x && Date.now() - x.t < 120000) PEND = x; } catch (e) {} }
+    const at = PEND; if (!at || !(Date.now() - at.t < 120000)) { PEND = null; return null; }
+    const ci = CH.findIndex(c => c.LS === at.ls); if (ci < 0) return null;
+    const lp = ((CH[ci].ex || {}).lps || []).find(l => String(l.href || '').split('#')[0].split('/').pop() === at.page);
+    if (!lp && !CH[ci].ex) return null;
+    PEND = null;
+    if (!lp) return CH.length > 1 ? 's:chap|' + ci : null;
+    const pt = (lp.parts || []).find(x => x.id === at.panel);
+    return (pt ? 'b:lp' + lp.n + '-p-' + fk(pt.id) : 's:lp' + lp.n) + '|' + ci;
+  }
   function draw(box, ex, games, helpers, keep) {
     css(); dict(); H = helpers; ROOT = helpers; last = [box, ex, games]; H.nb = H.nb || { parts: {} };
     const chs = Array.isArray(helpers.chapters) && helpers.chapters.length > 1 ? helpers.chapters : null;

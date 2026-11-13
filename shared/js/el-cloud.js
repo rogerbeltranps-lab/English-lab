@@ -1163,6 +1163,10 @@ function nbFab(){
   // the board knows the student's LS now: its notebook (an LS1 or no LS: no button)
   window.elNbFab=h=>{try{if(h)localStorage.setItem("el_nb",h);else localStorage.removeItem("el_nb")}catch(e){}a.hidden=!h;if(h)a.href=h;else a.removeAttribute("href")};
 }
+// 📓 opened from a learning path: the notebook opens on that learning path, at the step on screen (Roger, 13 Nov 2026: "When I open my
+// notebook from an SLP, I want the notebook to open there too"). el-notebook.js reads el_nb_at once, if it is less than 2 minutes old.
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href*="#notes"]');if(!a||!lsId||!m||/\/(index\.html)?$/.test(location.pathname))return;
+  const tab=document.querySelector(".tab.active[data-panel]");try{localStorage.setItem("el_nb_at",JSON.stringify({ls:lsId,page:location.pathname.split("/").pop(),panel:tab?tab.dataset.panel:"",t:Date.now()}))}catch(x){}},true);
 setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
 /* ✍ A quick note from any page (Roger, 13 Nov 2026: "is the floating icon of the notebook always available, so that students can note
    what they need when they need it?"): for a signed-in student the 📓 button opens a small handwriting page (el-pad.js: pens, highlighters,
