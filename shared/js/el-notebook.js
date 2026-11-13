@@ -263,7 +263,7 @@ window.ELNotebook = (function () {
     Object.keys(fin).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { if (!crit[c]) crit[c] = { r: 0, of: 0, n: 0 }; });
     const rows = Object.keys(crit).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map(c => {
       const v = crit[c], deg = fin[c] || (v.of ? window.elDegree && elDegree(v.r / v.of * 10) : null), i = (window.EL_DEGREES || []).indexOf(deg);
-      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');
+      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterionEasy && elCriterionEasy(L.course, c, true)) || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');   // no indicators (LS1): the criterion in plain English (Roger: "the criteria of the exam should be in English")
       return { c, deg, ind, comp: window.elCompetence ? elCompetence(c) : '' };
     });
     const g = window.elGameStats ? elGameStats(Object.values(H.mg || {}).filter(y => y && y.ls === L.id)) : {};
