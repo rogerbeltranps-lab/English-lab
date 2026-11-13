@@ -614,6 +614,8 @@ window.ELNotebook = (function () {
       + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
+      // 🏠 to the student's board (Roger, 13 Nov 2026: "add a button to go to the students dashboard")
+      + (H.own ? `<a class="nb-tool nb-home" href="${rel('today.html')}" title="${t('El meu tauler', 'My board')}">🏠<span class="nb-hlab"> ${t('El meu tauler', 'My board')}</span></a>` : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav></div>`
@@ -671,7 +673,7 @@ window.ELNotebook = (function () {
       { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota, 🟨 hi enganxa un post-it (tria el color) i ▲ ▼ la mouen. Les notes també poden passar a una altra secció.', 'In the margin of each part: ✍ adds a note below it, 🟨 sticks a post-it (choose its colour) and ▲ ▼ move it. Notes can also move on to another section.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
       { el: '.nb-printbtn', ic: '🖨', h: t('Imprimeix', 'Print'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta.', '🖨 prints these pages, the ones you choose or the whole notebook.') },
-      { el: '.nb-close', all: '.nb-close,.nb-help', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
+      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i 🏠 et porta al teu tauler. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and 🏠 takes you to your board. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
     ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
   }
   function tour() {
