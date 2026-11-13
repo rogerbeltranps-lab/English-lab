@@ -30,7 +30,10 @@ html.el-nb-plain{--nb-hand:var(--nb-sans);--nb-teacher:var(--nb-sans)}
 html.el-nb-plain .nb-notes{font-size:17px}
 
 /* ---------- 📓 the notebook ---------- */
-.nb{margin:0 0 16px}
+.nb{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;padding:10px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));background:radial-gradient(ellipse at 50% 40%,#eef1f5,#d9dee6);box-sizing:border-box}
+.nb *,.nb *::before,.nb *::after{box-sizing:border-box}
+html.el-nb-full,html.el-nb-full body{overflow:hidden}
+html.el-nb-full #el-nbfab{display:none}
 .nb-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px;padding:0 6px}
 .nb-tab{border:0;cursor:pointer;padding:8px 14px 10px;border-radius:10px 10px 0 0;font:700 19px/1 var(--nb-hand);color:#2b2b2b;box-shadow:0 -1px 3px rgba(0,0,0,.08);transform:translateY(4px);transition:transform .15s}
 .nb-tab[aria-current="true"]{transform:none;padding-bottom:14px}
@@ -38,20 +41,22 @@ html.el-nb-plain .nb-notes{font-size:17px}
 .nb-bar .nb-sp{flex:1}
 .nb-tool{border:1px solid #d5dce5;background:#fff;border-radius:10px;padding:6px 10px;font:600 14px var(--nb-sans);cursor:pointer;margin-bottom:6px;color:#16202c;text-decoration:none}
 .nb-tool[aria-pressed="true"]{border-color:#2f5bd3;background:#e8eefc}
-.nb-spread{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);height:clamp(470px,calc(100vh - 190px),780px);filter:drop-shadow(0 10px 16px rgba(30,40,60,.2))}
+.nb-spread{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);grid-template-rows:minmax(0,1fr);filter:drop-shadow(0 10px 16px rgba(30,40,60,.2))}
 .nb-page{position:relative;background:var(--nb-paper);overflow:hidden;min-width:0;display:none}
-.nb-page.l,.nb-page.r{display:block}
+.nb-page.l,.nb-page.r,.nb-page.nb-meas{display:block}
+.nb-page.nb-meas{grid-column:1;visibility:hidden}
 .nb-page.l{border-radius:10px 0 0 10px;grid-column:1}
 .nb-page.r{border-radius:0 10px 10px 0;grid-column:3}
 .nb-spine{grid-column:2;grid-row:1;background:linear-gradient(90deg,#e9e6dc,#f6f3ea 40%,#f6f3ea 60%,#e9e6dc);display:flex;flex-direction:column;justify-content:space-evenly;align-items:center}
 .nb-ring{width:42px;height:9px;border-radius:9px;background:linear-gradient(#f2f4f7,#9aa3ad 55%,#6b737c);box-shadow:0 1px 1px rgba(0,0,0,.25)}
 .nb-page,.nb-spine{grid-row:1}
-.nb-paper{position:absolute;inset:0;overflow:auto;padding:32px 22px 44px 72px;color:var(--nb-black);font:500 23px/32px var(--nb-hand);
+.nb-paper{position:absolute;inset:0;overflow:hidden;padding:32px 22px 44px 72px;color:var(--nb-black);font:500 23px/32px var(--nb-hand);
   background:linear-gradient(90deg,transparent 58px,var(--nb-margin) 58px,var(--nb-margin) 60px,transparent 60px),repeating-linear-gradient(transparent 0 31px,var(--nb-line) 31px 32px);background-attachment:local}
 html.el-nb-plain .nb-paper{font-size:16px}
 .nb-pno{position:absolute;bottom:8px;font:600 16px var(--nb-hand);color:var(--nb-pencil)}
-.nb-page.l .nb-pno{left:22px}.nb-page.r .nb-pno{right:22px}
-.nb-nav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px;font:600 14px var(--nb-sans);color:#5b6878}
+.nb-page.l .nb-pno{left:44px}.nb-page.r .nb-pno{right:46px}
+@media (max-width:899px){.nb-page.l .nb-pno{left:22px}}
+.nb-nav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:8px;font:600 14px var(--nb-sans);color:#5b6878}
 .nb-nav button{border:1px solid #d5dce5;background:#fff;border-radius:999px;width:40px;height:40px;font-size:17px;cursor:pointer}
 .nb-nav button:disabled{opacity:.35;cursor:default}
 .nb h3,.nb h4{font-family:inherit}
@@ -114,14 +119,20 @@ html.el-nb-plain .nb-idx .lp>a{font-size:17px}
 .nb-links{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
 .nb-links a,.nb-links button{font:600 14px var(--nb-sans);border:1px solid #d5dce5;background:#fff;border-radius:10px;padding:7px 12px;color:#16202c;text-decoration:none;cursor:pointer}
 @media (max-width:899px){
-  .nb-spread{grid-template-columns:minmax(0,1fr);height:auto}
+  .nb{padding:6px 8px 6px}
+  .nb-spread{grid-template-columns:minmax(0,1fr)}
   .nb-spine,.nb-page.r{display:none}
   .nb-page.l{border-radius:0 10px 10px 10px;grid-column:1}
-  .nb-paper{position:relative;min-height:65vh;padding-left:66px;padding-right:14px}
+  .nb-paper{padding-left:62px;padding-right:12px}
+  .nb-tab{padding:6px 10px 8px;font-size:17px}
+  .nb-tool{padding:5px 8px}
 }
 @media print{
-  .nb-bar,.nb-nav,.nb-spine,.nb-links{display:none!important}
+  html.el-nb-full,html.el-nb-full body{overflow:visible}
+  .nb{position:static;display:block;padding:0;background:none}
+  .nb-bar,.nb-nav,.nb-spine,.nb-links,.nb-ui,.nb-selbar,.nb-ed,.nb-leaf,.nb-corner{display:none!important}
   .nb-spread{display:block;height:auto;filter:none}
+  html.nb-printsel .nb-page:not(.nb-pr){display:none!important}
   .nb-page{display:block!important;border-radius:0!important;break-after:page;overflow:visible}
   .nb-paper{position:relative;inset:auto;overflow:visible}
   .nb-pno{position:static;display:block;text-align:right}
@@ -206,3 +217,119 @@ html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-
 .nb-saved{align-self:center;margin:0 6px 6px 0;font-size:17px}
 .nb-page .pad-tools{margin:6px 0 30px -14px}
 @media (max-width:899px){.nb-page .pad-tools{margin-left:-8px}}
+
+/* the parts of a page: ▲ ▼ ✍ ✏️ in the margin, beside the part (the student's own notebook only) */
+.nb-blk{position:relative}
+.nb-bt{position:absolute;left:-70px;top:2px;width:56px;display:flex;flex-wrap:wrap;gap:2px;z-index:2;opacity:.3;transition:opacity .15s}
+.nb-blk:hover>.nb-bt,.nb-bt:focus-within{opacity:1;z-index:3}
+.nb-bt button{width:27px;height:25px;padding:0;border:1px solid #d5dce5;background:#fff;border-radius:6px;font:12px/1 var(--nb-sans);color:#5b6878;cursor:pointer}
+.nb-bt button:hover{background:#e8eefc;color:#2f5bd3}
+.nb-bt button:disabled{opacity:.3;cursor:default}
+.nb-bt button:focus-visible,.nb-selbar button:focus-visible,.nb-tool:focus-visible,.nb-tab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (max-width:899px){.nb-bt{left:-60px;width:28px;opacity:.55}}
+.nb-note{cursor:text;border-radius:8px;margin:8px 0}
+.nb-note:hover{background:rgba(31,79,181,.05)}
+.nb-mk{border-radius:.3em}
+.nb-cont.nb-slip::before,.nb-cont.nb-slip::after{display:none}
+.nb-cont.nb-slip{margin-top:4px}
+.nb-addnote{color:var(--nb-ink)!important}
+/* the folded corner: drag it (or a margin) to turn the page */
+.nb-corner{position:absolute;bottom:0;width:38px;height:38px;z-index:2;cursor:grab;background:linear-gradient(135deg,transparent 50%,#e6e1d2 50%,#f7f3e6 70%,#ddd6c3);box-shadow:-2px -2px 4px rgba(0,0,0,.06);border-radius:0 0 10px 0}
+.nb-page.r .nb-corner{right:0}
+.nb-page.l .nb-corner{left:0;transform:scaleX(-1)}
+@media (max-width:899px){.nb-page.l .nb-corner{left:auto;right:0;transform:none}}
+.nb-page .nb-pno{z-index:1}
+/* the leaf that turns */
+.nb-leaf{grid-row:1;z-index:5;position:relative;transform-style:preserve-3d;pointer-events:none;will-change:transform}
+.nb-leaf.r{grid-column:3;transform-origin:left center}
+.nb-leaf.l{grid-column:1;transform-origin:right center}
+.nb-leaf.one{grid-column:1;transform-origin:left center}
+.nb-face{position:absolute;inset:0;background:var(--nb-paper);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 0 calc(30px * var(--nb-sh,0)) rgba(0,0,0,calc(var(--nb-sh,0) * 1.2))}
+.nb-face.back{transform:rotateY(180deg)}
+.nb-leaf.r .nb-face.front,.nb-leaf.l .nb-face.back{border-radius:0 10px 10px 0}
+.nb-leaf.l .nb-face.front,.nb-leaf.r .nb-face.back{border-radius:10px 0 0 10px}
+.nb-leaf.one .nb-face{border-radius:0 10px 10px 10px}
+.nb-face::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,calc(var(--nb-sh,0) * .5)),transparent 40%)}
+.nb-spread .nb-paper{touch-action:pan-y pinch-zoom}
+/* 🖍 the marks for words a student selects on a page */
+.nb-selbar{position:fixed;z-index:6;display:flex;gap:2px;padding:4px;background:#fff;border:1px solid #d5dce5;border-radius:12px;box-shadow:0 8px 20px rgba(20,30,50,.22)}
+.nb-selbar[hidden]{display:none}
+.nb-selbar button{min-width:34px;height:34px;border:1px solid transparent;background:transparent;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font:700 15px var(--nb-sans)}
+.nb-selbar button:hover{background:#eef2f6}
+/* ✍ the handwriting page for a note, on top of the book */
+.nb-ed{position:absolute;inset:0;z-index:20;background:rgba(30,40,60,.45);display:flex;align-items:center;justify-content:center;padding:14px}
+.nb-ed-in{width:min(820px,100%);height:100%;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.nb-ed-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 12px;border-bottom:1px solid #e3e8ef;font:15px var(--nb-sans)}
+.nb-ed-top b{font:700 22px/1.1 var(--nb-hand)}
+.nb-ed-where{color:#5b6878;font-size:13px}
+.nb-ed-top .nb-sp{flex:1}
+.nb-ed-top .nb-tool{margin:0}
+.nb-ed-ok{background:#1f4fb5!important;border-color:#1f4fb5!important;color:#fff!important}
+.nb-ed-del[data-sure]{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.nb-ed-sheet{position:relative;flex:1;min-height:0;background:var(--nb-paper)}
+.nb-ed-sheet .nb-paper{overflow:auto;padding-top:0}
+.nb-ed .pad-tools{margin:0 -22px 32px -72px}
+@media (max-width:899px){.nb-ed{padding:0}.nb-ed-in{border-radius:0}.nb-ed .pad-tools{margin-left:-62px;margin-right:-12px}}
+/* 🖨 what to print */
+.nb-pwrap{position:relative}
+.nb-pmenu{position:absolute;right:0;top:calc(100% - 2px);z-index:8;width:min(320px,90vw);display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:1px solid #d5dce5;border-radius:12px;box-shadow:0 12px 28px rgba(20,30,50,.22);font:14px var(--nb-sans)}
+.nb-pmenu[hidden]{display:none}
+.nb-pmenu>button,.nb-pmenu details>button{text-align:left;border:1px solid #d5dce5;background:#f8fafc;border-radius:8px;padding:8px 10px;font:600 14px var(--nb-sans);cursor:pointer;color:#16202c}
+.nb-pmenu>button:hover,.nb-pmenu details>button:hover{background:#e8eefc}
+.nb-pmenu summary{cursor:pointer;padding:6px 2px;font-weight:600}
+.nb-plist{max-height:min(300px,45vh);overflow:auto;display:flex;flex-direction:column;gap:2px;margin:4px 0 8px;padding:4px;border:1px solid #e3e8ef;border-radius:8px}
+.nb-plist label{display:flex;gap:6px;align-items:baseline;padding:3px 4px;border-radius:6px;cursor:pointer}
+.nb-plist label:hover{background:#f1f5f9}
+.nb-plist b{min-width:20px;color:var(--nb-red)}
+.nb-shake{animation:nbShake .35s}
+@keyframes nbShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.nb-close{font-weight:700}
+@media (prefers-reduced-motion:reduce){.nb-shake{animation:none}}
+/* words on the pages can be selected to mark them (el-nocopy.js turns selection off on student pages; copying stays blocked) */
+.nb .nb-paper .nb-blk:not(.nb-note){-webkit-user-select:text;user-select:text}
+.nb .nb-ui,.nb .nb-stamp,.nb .nb-postit{-webkit-user-select:none;user-select:none}
+/* 📌 a post-it on top of each section of a learning path */
+.nb-postit{display:inline-block;margin:26px 0 6px -6px;padding:4px 16px 5px 12px;font:700 25px/30px var(--nb-hand);color:#2b2b2b;background:#ffe082;box-shadow:2px 3px 6px rgba(0,0,0,.14);transform:rotate(-1.6deg);border-radius:2px 2px 12px 2px}
+.nb-postit small{font:600 17px var(--nb-hand);color:#6b5d3a;margin-left:10px}
+.nb-blk:first-of-type>.nb-postit,.nb-cont .nb-postit{margin-top:12px}
+.nb-postit.k-vocab,.nb-stab.k-vocab{background:#c5e1a5}.nb-postit.k-grammar,.nb-stab.k-grammar{background:#b3e5fc}.nb-postit.k-read,.nb-stab.k-read{background:#ffccbc}
+.nb-postit.k-listen,.nb-stab.k-listen{background:#e1bee7}.nb-postit.k-other,.nb-stab.k-other{background:#ffe082}
+html.el-nb-plain .nb-postit{font-size:18px}
+/* ✏️ the student's answers, corrected in red pen */
+.nb-work{margin:14px 0 8px}
+.nb-wh{font:700 23px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-wh small{font-weight:500;font-size:18px;color:var(--nb-pencil)}
+.nb-ans{margin:0;padding-left:30px;font:500 21px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-ans li{margin:0;padding:0}
+.nb-ans li::marker{color:var(--nb-pencil)}
+.nb-giv{color:var(--nb-ink);font:600 23px/1 var(--nb-hand)}
+.nb-corr{position:relative;display:inline-block;padding-top:14px;line-height:18px}
+.nb-corr s.nb-giv{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-fix{position:absolute;left:4px;top:-6px;white-space:nowrap;font:700 19px/1 "Kalam",var(--nb-teacher);color:var(--nb-red);transform:rotate(-4deg)}
+.nb-fix.in{position:static;display:inline;white-space:normal;transform:none;margin-left:2px}
+.nb-x{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-tick,.nb-cross{font-style:normal;font:700 24px/1 var(--nb-teacher);color:var(--nb-red);margin-left:4px}
+.nb-tick{color:var(--nb-green)}
+.nb-arrow{color:var(--nb-pencil)}
+html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plain .nb-fix{font-size:14px}
+/* 📌 the sections of the learning path on the screen, sticking out of the book's right edge */
+.nb-side{position:absolute;right:-34px;top:26px;bottom:26px;width:34px;display:flex;flex-direction:column;gap:6px;z-index:1;pointer-events:none}
+.nb-stab{pointer-events:auto;writing-mode:vertical-rl;border:0;border-radius:0 8px 8px 0;padding:10px 4px 10px 6px;font:700 17px/1 var(--nb-hand);color:#2b2b2b;cursor:pointer;box-shadow:2px 1px 3px rgba(0,0,0,.12);max-height:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transform:translateX(-6px);transition:transform .15s}
+.nb-stab.on,.nb-stab:hover{transform:none}
+.nb-stab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (min-width:900px){.nb-spread{margin-right:30px}}
+@media (max-width:899px){.nb-side{display:none}}
+@media print{.nb-side{display:none!important}}
+/* 🟨 notes as post-its */
+.nb-notes.nb-pi{width:auto;max-width:430px;padding:10px 16px 12px;margin:8px 0 8px 6px;box-shadow:2px 4px 8px rgba(0,0,0,.15);transform:rotate(-1deg);border-radius:2px 2px 14px 2px}
+.nb-notes.pi-y{background:#fff59d}.nb-notes.pi-p{background:#f8bbd0}.nb-notes.pi-g{background:#c8e6c9}.nb-notes.pi-b{background:#bbdefb}
+.nb-note:nth-of-type(even) .nb-notes.nb-pi{transform:rotate(1.2deg)}
+.nb-pis{display:inline-flex;gap:4px;margin-left:6px}
+.nb-pib{width:26px;height:26px;border-radius:5px;border:2px solid #d5dce5;cursor:pointer;padding:0}
+.nb-pib[aria-pressed="true"]{border-color:#1f4fb5;box-shadow:0 0 0 2px #fff inset}
+.nb-pib.pi-n{background:repeating-linear-gradient(#fffef8 0 6px,#c7d9ee 6px 7px)}.nb-pib.pi-y{background:#fff59d}.nb-pib.pi-p{background:#f8bbd0}.nb-pib.pi-g{background:#c8e6c9}.nb-pib.pi-b{background:#bbdefb}
+.nb-ed-sheet[data-pi="y"] .nb-paper{background-color:#fff9c4}.nb-ed-sheet[data-pi="p"] .nb-paper{background-color:#fce4ec}.nb-ed-sheet[data-pi="g"] .nb-paper{background-color:#e8f5e9}.nb-ed-sheet[data-pi="b"] .nb-paper{background-color:#e3f2fd}
+/* 🔍 the dictionary floats over the notebook, in the free corner under the book */
+html.el-nb-full .eldict-fab{z-index:2147482500!important;position:fixed!important;left:auto!important;top:auto!important;right:18px!important;bottom:4px!important}
+html.el-nb-full .eldict,html.el-nb-full .eldict-tipbox{z-index:2147482600!important}
+@media (max-width:899px){.nb-bt.nb-bt-n{width:56px}}

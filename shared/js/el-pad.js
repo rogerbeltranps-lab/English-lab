@@ -1,6 +1,6 @@
 // ✍ The handwriting page (Roger, 13 Nov 2026: "when they take notes it looks like hand writing and they can underline, highlight, etc."):
 // a lined page where the student types in handwriting (Caveat, blue pen), with pens (blue, black, red, green), highlighters (yellow, green,
-// pink), underline, wavy underline, circle, box, ✏️ draw (finger or touchpad), 🧽 take the marks off and ↶ undo. Used by the whiteboard
+// pink), underline, wavy underline, circle, box, 🧽 take the marks off and ↶ undo. Used by the whiteboard
 // students see while the teacher explains (el-whiteboard.js) and by the sections students add to 📓 My notebook (el-notebook.js).
 // What it gives back: html (only the notebook's own marks, as nb-* classes; nothing else survives clean()), text (plain, for older views)
 // and dr (drawings: ["b|x,y x,y …"] in a 460-wide box). Styles: shared/css/el-notebook.css.
@@ -51,7 +51,7 @@ export function pad(host, o) {
       <div class="pad-g">${PENS.map(([k, h, en, ca], i) => `<button type="button" class="pad-tb pad-pen" data-pen="${k}" aria-pressed="${i === 0}" title="${T(ca, en)}"><span class="pad-dot" style="background:${h}"></span></button>`).join('')}</div>
       <div class="pad-g"><button type="button" class="pad-tb pad-mk" data-k="nb-hl-y" title="${T('Subratllador groc', 'Yellow highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-y)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-g" title="${T('Subratllador verd', 'Green highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-g)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-p" title="${T('Subratllador rosa', 'Pink highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-p)"></span></button></div>
       <div class="pad-g"><button type="button" class="pad-tb pad-mk" data-k="nb-ul" title="${T('Subratlla', 'Underline')}"><span class="nb-ul pad-l">U</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-ulw" title="${T('Subratlla ondulat', 'Wavy underline')}"><span class="nb-ulw pad-l">W</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-circ" title="${T('Encercla', 'Circle')}"><span class="nb-circ pad-l" style="font-size:16px">o</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-boxd" title="${T('Requadre', 'Box')}"><span class="nb-boxd pad-l" style="font-size:16px">b</span></button></div>
-      <div class="pad-g"><button type="button" class="pad-tb pad-draw" aria-pressed="false" title="${T('Dibuixa fletxes i dibuixos amb el dit o el ratolí', 'Draw arrows and pictures with your finger or the touchpad')}">✏️ ${T('Dibuixa', 'Draw')}</button><button type="button" class="pad-tb pad-clean" title="${T('Treu les marques de les paraules triades', 'Take the marks off the selected words')}">🧽</button><button type="button" class="pad-tb pad-undo" title="${T('Desfés', 'Undo')}">↶</button></div>
+      <div class="pad-g"><button type="button" class="pad-tb pad-clean" title="${T('Treu les marques de les paraules triades', 'Take the marks off the selected words')}">🧽</button><button type="button" class="pad-tb pad-undo" title="${T('Desfés', 'Undo')}">↶</button></div>
     </div>`) + `<div class="nb-notes pad-notes"><div class="pad-ed" ${o.readOnly ? '' : 'contenteditable="true"'} spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" translate="no" data-ph="${esc(o.ph || T('Escriu aquí els teus apunts…', 'Write your notes here…'))}" aria-label="${T('Els teus apunts', 'Your notes')}"></div><canvas class="pad-cv"></canvas></div>`;
   const ed = host.querySelector('.pad-ed'), box = host.querySelector('.pad-notes'), cv = host.querySelector('.pad-cv'), ctx = cv.getContext('2d');
   ed.innerHTML = o.html ? clean(o.html) : o.text ? txt2html(o.text) : '';
@@ -102,7 +102,8 @@ export function pad(host, o) {
   // ✏️ draw
   const size = () => { const w = box.clientWidth || 460, h = Math.max(box.scrollHeight, ed.scrollHeight) + 240, k = devicePixelRatio || 1; cv.width = w * k; cv.height = h * k; cv.style.width = w + 'px'; cv.style.height = h + 'px'; ctx.setTransform(k * w / 460, 0, 0, k * w / 460, 0, 0); };
   const dbtn = host.querySelector('.pad-draw');
-  dbtn.addEventListener('click', () => { const on = host.classList.toggle('pad-drawing'); dbtn.setAttribute('aria-pressed', String(on)); if (on) { size(); hint(T('Dibuixa fletxes o un dibuix. Torna a tocar ✏️ per escriure.', 'Draw arrows or a picture. Tap ✏️ again to write.')); } });
+  // Roger, 13 Nov 2026: "don't add the draw feature since it doesn't draw well": no ✏️ button; old drawings still show
+  if (dbtn) dbtn.addEventListener('click', () => { const on = host.classList.toggle('pad-drawing'); dbtn.setAttribute('aria-pressed', String(on)); if (on) { size(); hint(T('Dibuixa fletxes o un dibuix. Torna a tocar ✏️ per escriure.', 'Draw arrows or a picture. Tap ✏️ again to write.')); } });
   let st = null;
   const pt = e => { const r = cv.getBoundingClientRect(), s = 460 / r.width; return [Math.round((e.clientX - r.left) * s), Math.round((e.clientY - r.top) * s)]; };
   cv.addEventListener('pointerdown', e => { if (dr.length >= 300) return hint(T('La pàgina ja té molts dibuixos.', 'This page already has a lot of drawings.')); cv.setPointerCapture(e.pointerId); snap(); st = [pt(e)]; });

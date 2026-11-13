@@ -1133,22 +1133,28 @@ async function wbSave(){
 function wbClose(){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.rt=null}
 addEventListener("pagehide",()=>{if(WB.dirty)wbSave()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&WB.dirty)wbSave()});
-/* 📓 My notebook, always at hand (Roger, 13 Nov 2026: "a floating icon like a notebook always present"): on every page of an LS from LS2 on
-   (LS1 has no notebook), a round 📓 button bottom left opens the LS page's notebook (#notes). Hidden on the notebook itself and under the
-   whiteboard. No reads. */
+/* 📓 My notebook, always at hand (Roger, 13 Nov 2026: "a floating icon like a notebook always present", "didn't I say that they should see
+   the notebook here?" on the board): a round 📓 button bottom left on every student page, the board, the learning paths, English Lab and
+   the course pages. It opens the notebook (the LS page's #notes) of the LS the student is in: this LS on an LS page from LS2 on (LS1 has no
+   notebook), elsewhere the last one the board or an LS page showed (el_nb on this device; window.elNbFab(href) from the board). Hidden on
+   the notebook itself, under the whiteboard and on the teacher's dashboard. No reads. */
 function nbFab(){
-  if(!lsId||!m||document.getElementById("el-nbfab"))return;
-  const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum||elLsNum(L)==="LS1")return;
-  const home=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html";
+  if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname))return;
+  let href=null;
+  if(lsId&&m){const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum)return;
+    if(elLsNum(L)!=="LS1"){href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}}
+  else{try{href=localStorage.getItem("el_nb")}catch(e){}}
   const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
-    "#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
-    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab{display:none}@media print{#el-nbfab{display:none}}";
+    "#el-nbfab[hidden]{display:none}#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
+    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none}@media print{#el-nbfab{display:none}}";
   document.head.append(st);
-  const a=document.createElement("a");a.id="el-nbfab";a.href=home+"#notes";
+  const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
   const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
   lab();document.body.append(a);
-  const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&/\/(index\.html)?$/.test(location.pathname));
+  const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&!!lsId&&/\/(index\.html)?$/.test(location.pathname));
   here();addEventListener("hashchange",here);setTimeout(lab,4000);
+  // the board knows the student's LS now: its notebook (an LS1 or no LS: no button)
+  window.elNbFab=h=>{try{if(h)localStorage.setItem("el_nb",h);else localStorage.removeItem("el_nb")}catch(e){}a.hidden=!h;if(h)a.href=h;else a.removeAttribute("href")};
 }
 setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
 function rtGram(rt){
