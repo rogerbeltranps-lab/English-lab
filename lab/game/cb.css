@@ -8,6 +8,8 @@ body.cb::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .cbmono,.cbbits b,.cbtime,.cbrow .bt,.cbkey{font-family:ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,monospace;letter-spacing:.02em}
 body.cb .btn.go{background:var(--hk);color:#04210f}
 body.cb b.k{color:#0f766e}
+/* key words on the red "Not this time" screen: white and underlined in yellow (the teal was hard to read on red, 13 Nov 2026) */
+body.cb .res b.k{color:#fff;text-decoration:underline 3px #fde047;text-underline-offset:.18em}
 
 /* player */
 .cbtop .pill{background:rgba(56,242,138,.12);border:1px solid rgba(56,242,138,.35)}
@@ -40,9 +42,11 @@ button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
 .cbspin{animation:cbspin 1s ease-in-out infinite}@keyframes cbspin{50%{transform:scale(1.15) rotate(-6deg)}}
 .cbprog{width:min(420px,80vw);height:16px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:16px auto}
 .cbprog i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--hk),var(--hk2));transform-origin:left;animation:cbprog 1.8s ease-out both}@keyframes cbprog{from{transform:scaleX(0)}}
-.cbtoast{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:40;max-width:min(92vw,720px);padding:14px 22px;border-radius:16px;background:#0b2530;border:2px solid var(--hk2);
-  color:#fff;font-size:clamp(18px,2vw,24px);font-weight:600;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.45)}
-.cbtoast.bad{border-color:#f87171;background:#3b0d0d}
+/* hack news in the top bar (between the pills), never over the question: one line, cut with … if the screen is narrow */
+.cbtop .cbnewsw{min-width:0;display:flex;justify-content:center}
+.cbnews{min-width:0;max-width:100%;padding:.2em .9em;border-radius:999px;background:#0b2530;border:2px solid var(--hk2);color:#fff;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.cbnews.bad{border-color:#f87171;background:#3b0d0d}
 @media (prefers-reduced-motion: reduce){.cbspin,.cbprog i,.cbbits.bump{animation:none}}
 
 /* board */
