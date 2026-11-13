@@ -31,12 +31,16 @@ async function start(){
   got.byKey={};got.pool.forEach(q=>got.byKey[q.key]=q);L=got;
   const sv=ctx.saved()||{},c=sv.cb||{},seed=CB.hash(em()+":"+sid);
   st={seed,order:CB.order(L.pool,seed),a:Object.assign({},sv.a||{}),e:+c.e||0,n:+c.n||0,r:+c.r||0,i:+c.i||0,lp:+c.lp||0,pw:c.pw||"",ws:Array.isArray(c.ws)&&c.ws.length?c.ws:CB.pwFor(em(),L.words).map(w=>w.w),
-    sh:+c.sh||0,hk:Object.keys(c.h||{}).length,cur:null,last:null};
+    sh:+c.sh||0,hk:Object.keys(c.h||{}).length,cur:null,last:null,sim:null,skip:new Set(),lockUntil:0};
   if(st.lp)st.order=CB.order(L.pool,seed+st.lp*101);
   if(!c.ws)pend.cb.ws=st.ws;
   scr=st.pw?"q":"pw";draw();
 }
-function nextQ(){if(!st.order.length)return null;if(st.i>=st.order.length){st.lp++;st.i=0;st.order=CB.order(L.pool,st.seed+st.lp*101)}return st.order[st.i]}
+// the next question in my list, past the ones I already got as a 🔁 similar question in this round of the list
+function nextQ(){if(!st.order.length)return null;
+  for(let g=0;g<=st.order.length;g++){if(st.i>=st.order.length){st.lp++;st.i=0;st.skip.clear();st.order=CB.order(L.pool,st.seed+st.lp*101)}
+    if(!st.skip.has(st.order[st.i]))break;st.i++}
+  return st.order[st.i]}
 
 /* ---------- screens ---------- */
 const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
@@ -49,7 +53,13 @@ function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.q
   const tm=t.querySelector("#cbt");if(tm){tm.textContent="⏱ "+fmt(left());tm.classList.toggle("low",left()<30e3)}
   const rk=t.querySelector("#cbrk");if(rk&&st){const [a,b2]=rank();rk.textContent=`#${a} / ${b2}`}
   const sh=t.querySelector("#cbsh");if(sh){if(st.sh>now())sh.textContent="🛡️ "+fmt(st.sh-now());else sh.remove()}}
-function put(key,h){scrKey=key;app$.innerHTML=top()+`<div class="main cbmain">${h}</div>`}
+function put(key,h){scrKey=key;app$.innerHTML=top()+`<div class="main cbmain">${h}</div>`;waitCheck()}
+// buttons that wait (data-until = ms): disabled until then, the seconds left on them; checked every second and exactly at the end
+function waitCheck(){const t=now();let next=0;
+  app$.querySelectorAll("[data-until]").forEach(b=>{const u=+b.dataset.until;
+    if(t>=u){b.disabled=false;b.removeAttribute("data-until");b.classList.remove("wait");const l=b.querySelector(".wl");if(l)l.remove();const r=b.closest(".main")&&app$.querySelector(".cbread");if(r&&b.matches(".tile,.cbw .btn"))r.classList.add("done")}
+    else{b.disabled=true;const l=b.querySelector(".wl");if(l)l.textContent=" ⏳ "+Math.ceil((u-t)/1000);next=next?Math.min(next,u):u}});
+  if(next)setTimeout(waitCheck,Math.min(1000,next-t+20))}
 function center(h){return `<div class="center"><div>${h}</div></div>`}
 
 function draw(){
@@ -59,8 +69,8 @@ function draw(){
   if(x().phase==="lobby"&&scr!=="pw"&&!st.pw)scr="pw";
   if(over()){flush();return endView()}
   if(x().phase==="lobby"&&st.pw)return lobbyWait();
-  const key=scr+":"+(scr==="q"?st.i+":"+st.lp:"")+(scr==="files"||scr==="hackPick"||scr==="hackPw"||scr==="hackWait"||scr==="hackRes"||scr==="fb"?":"+(st.cur||"")+":"+(st.last?st.last.at:"")+(st.file?":o":""):"");
-  if(key===scrKey&&scr!=="hackPick"){liveTop();if(scr==="hackWait")hackWaitCheck();return}
+  const key=scr+":"+(scr==="q"?st.i+":"+st.lp+":"+(st.sim||""):"")+(scr==="files"||scr==="hackPick"||scr==="hackPw"||scr==="hackWait"||scr==="hackRes"||scr==="fb"?":"+(st.cur||"")+":"+(st.last?st.last.at:"")+(st.file?":o":""):"");
+  if(key===scrKey&&scr!=="hackPick"){liveTop();waitCheck();if(scr==="hackWait")hackWaitCheck();return}
   ({pw:pwView,q:qView,fb:fbView,files:filesView,hackPick:pickView,hackPw:hackPwView,hackWait:hackWaitView,hackRes:hackResView}[scr]||qView)(key);
 }
 
@@ -77,28 +87,46 @@ function lobbyWait(){const key="lobby:"+st.pw;if(key===scrKey)return liveTop();
     <p class="mid">${esc(T("Wait for the start. Answer right to open files: bits, double, firewall, virus or hack!","Espera que comenci. Encerta per obrir fitxers: bits, doble, tallafoc, virus o hack!"))}</p>`))}
 
 function qView(key){
-  const k=nextQ(),qu=qOf(k);if(!qu){put(key,center(`<p class="big">No questions</p>`));return}
-  st.cur=k;
+  const k=st.sim||nextQ(),qu=qOf(k);if(!qu){put(key,center(`<p class="big">No questions</p>`));return}
+  st.cur=k;const ms=CB.readMs(qu),until=now()+ms;st.lockUntil=until;
+  const simTag=st.sim?`<div class="cbsimtag">🔁 ${esc(T("A similar question: try again!","Una pregunta semblant: torna-ho a provar!"))}</div>`:"";
+  const bar=`<div class="cbread" style="--ms:${ms}ms" aria-hidden="true"><i></i></div>`;
   if(qu.write){
-    put(key,`<div class="card qcard slidein">${md(qu.q)}</div>${qu.img?`<div class="cbpic pic">${pic(qu.img)}</div>`:""}
+    put(key,`${simTag}<div class="card qcard slidein">${md(qu.q)}</div>${bar}${qu.img?`<div class="cbpic pic">${pic(qu.img)}</div>`:""}
       <form class="wform cbw slidein"><label for="cbwa">✏️ ${esc(T("Write the missing words","Escriu les paraules que falten"))}</label>
-      <input id="cbwa" type="text" maxlength="60" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="btn go" type="submit">${esc(T("Send ✓","Envia ✓"))}</button></form>`);
+      <input id="cbwa" type="text" maxlength="60" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="btn go wait" type="submit" data-until="${until}" disabled>${esc(T("Send ✓","Envia ✓"))}</button></form>`);
     const i=document.getElementById("cbwa");if(i)i.focus();return}
   const o=CB.shown(qu,st.seed);
-  put(key,`<div class="card qcard slidein">${md(qu.q)}</div><div class="tiles${o.length===2?" two":""}">${o.map((d,j)=>`<button class="tile t${j}" data-cb="tap" data-v="${j}"><span class="shp s${j}"></span><span class="tx">${md(qu.options[d])}</span></button>`).join("")}</div>`);
+  put(key,`${simTag}<div class="card qcard slidein">${md(qu.q)}</div>${bar}<div class="tiles${o.length===2?" two":""}">${o.map((d,j)=>`<button class="tile t${j} wait" data-cb="tap" data-v="${j}" data-until="${until}" disabled><span class="shp s${j}"></span><span class="tx">${md(qu.options[d])}</span></button>`).join("")}</div>`);
 }
 function answer(text,right){
   const qu=qOf(st.cur);if(!qu||scr!=="q")return;
+  if(now()<st.lockUntil)return;
   if(st.a[qu.key]==null){st.a[qu.key]=text;pend.a[qu.key]=text;st.n++;if(right)st.r++}
-  st.i++;st.last={ok:right,text,key:qu.key,at:now()};st.streak=right?(st.streak||0)+1:0;
+  // a 🔁 similar question is not in my list: the list goes on from where it was; a first wrong answer gets one, a second doesn't
+  const second=!!st.sim;if(!second)st.i++;st.sim=null;
+  st.last={ok:right,text,key:qu.key,at:now(),second,sim:!right&&!second?CB.similar(L.pool,qu,st.a,st.seed+st.n,new Set([...st.skip,...st.order.slice(st.i,st.i+1)])):null};
+  st.streak=right?(st.streak||0)+1:0;
   G.fx(right?"right":"wrong");save();
   scr=right?"files":"fb";st.file=null;draw();
 }
-function fbView(key){const qu=qOf(st.last.key);
-  put(key,`<div class="res no cbres"><div class="pop"><div class="mark">✗</div><p class="big">${esc(T("Not this time","Aquesta no"))}</p>
+// ✗ Not this time: the answer, why, and (the first time) the theory of that part of the game, then 🔁 a similar question. The button waits a
+// few seconds so they read it. Starter and Base (?ca=1) get the theory explained in Catalan (Roger, 13 Nov 2026: "if they are base or
+// starter explain the theory in catalan"): the slide's Catalan help first, then its examples; the others get it in English (with the
+// Catalan help smaller below when the level isn't known).
+function thHtml(qu){const d=L.decks[qu.deck],sl=(d&&d.th&&d.th[qu.tp])||[];if(!sl.length)return "";
+  const lang=ctx.lang?ctx.lang():null,bl=l=>l&&l.table?`<table><thead><tr>${l.table[0].map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${l.table.slice(1).map(r=>`<tr>${r.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+    :l&&l.watch?`<p class="w">⚠️ ${md(l.watch)}</p>`:`<p>${md(l)}</p>`;
+  const ca=s0=>(s0.ca||[]).map(c=>`<p>${md(c)}</p>`).join("");
+  return `<div class="card cbth slidein"><small>📖 ${esc(T("Remember the theory","Recorda la teoria"))}</small>${sl.map(s0=>lang==="1"
+    ?`<h4>${esc(s0.img||"")} ${md(s0.pointCa||s0.point||s0.theory)}</h4>${s0.ca&&s0.ca.length?`<div class="cbca">${ca(s0)}</div>`:""}${(s0.lines||[]).map(bl).join("")}`
+    :`<h4>${esc(s0.img||"")} ${md(s0.point||s0.theory)}</h4>${(s0.lines||[]).map(bl).join("")}${lang!=="0"&&s0.ca&&s0.ca.length?`<div class="cbca small">${ca(s0)}</div>`:""}`).join("")}</div>`}
+function fbView(key){const qu=qOf(st.last.key),sim=st.last.sim,wait=now()+(st.last.second?2500:5000);
+  const btn=sim?`<button class="btn go wait" data-cb="sim" data-until="${wait}" disabled>🔁 ${esc(T("Try a similar question","Prova una pregunta semblant"))}<span class="wl"></span></button>`
+    :`<button class="btn go wait" data-cb="next" data-until="${wait}" disabled>${esc(T("Next question ▶","Següent pregunta ▶"))}<span class="wl"></span></button>`;
+  put(key,`<div class="res no cbres"><div class="pop cbfb"><div class="mark">✗</div><p class="big">${esc(st.last.second?T("Not this one either","Aquesta tampoc"):T("Not this time","Aquesta no"))}</p>
     <p class="mid">${qu.write?`${esc(T("You wrote","Has escrit"))}: <s>${esc(st.last.text)}</s><br>`:""}${esc(T("The answer","La resposta"))}: <b>${qu.write?esc(qu.write[0]):md(qu.options[0])}</b></p>
-    ${qu.why?`<p class="mid cbwhy">💡 ${md(qu.why)}</p>`:""}<p><button class="btn go" data-cb="next">${esc(T("Next question ▶","Següent pregunta ▶"))}</button></p></div></div>`);
-  const b=app$.querySelector('[data-cb="next"]');if(b)b.focus()}
+    ${qu.why?`<p class="mid cbwhy">💡 ${md(qu.why)}</p>`:""}${st.last.second?`<p class="mid">💪 ${esc(T("Keep going: you'll see it again later.","Continua: ja hi tornaràs a sortir."))}</p>`:thHtml(qu)}<p>${btn}</p></div></div>`)}
 
 /* ---------- the 3 files ---------- */
 function filesView(key){const f=st.file;
@@ -111,7 +139,7 @@ function filesView(key){const f=st.file;
 function fileMsg(g){const t={bits:`💾 +${g.n} bits!`,double:`⚡ ${T("Double!","Doble!")} +${g.n}`,shield:`🛡️ ${T("Firewall on for 90 s","Tallafoc actiu 90 s")}`,
   virus:`🦠 ${T("Virus!","Virus!")} −${g.n}`,hack:`💻 ${T("Hack!","Hack!")}`};return esc(t[g.k]||"")}
 function openFile(j){if(st.file)return;
-  const canHack=others().some(p=>p.s>0),cur0=myBits(),all=[0,1,2].map(()=>CB.reward(st.r,canHack,null,cur0)),got=Object.assign({},all[j]),cur=myBits();
+  const canHack=others().some(p=>p.s>0&&!guarded(p)),cur0=myBits(),all=[0,1,2].map(()=>CB.reward(st.r,canHack,null,cur0)),got=Object.assign({},all[j]),cur=myBits();
   if(got.k==="double"){got.n=cur;st.e+=got.n}
   else if(got.k==="virus"){got.n=Math.round(cur*CB.VIRUS);st.e-=got.n}
   else if(got.k==="bits")st.e+=got.n;
@@ -121,10 +149,13 @@ function openFile(j){if(st.file)return;
   save(got.k!=="bits");draw()}
 
 /* ---------- hacking ---------- */
+// 🤝 a player hacked a moment ago, or the one I tried last, can't be chosen now (cb.js guard): greyed out with ✋ and the time left
+const guarded=p=>{const hr=C().hr,u=CB.guard(p.id,hr);return u>now()?u:CB.lastTarget(me(),hr)===p.id?-1:0};
 function pickView(key){const l=others();
-  const k2=key+":"+l.map(p=>p.id+p.s+(p.sh>now()?"s":"")).join(",");if(k2===scrKey)return liveTop();
+  const k2=key+":"+l.map(p=>p.id+p.s+(p.sh>now()?"s":"")+":"+Math.ceil(Math.max(0,guarded(p)-now())/1000)).join(",");if(k2===scrKey)return liveTop();
   put(k2,`<p class="big cbh">💻 ${esc(T("Who do you want to hack?","A qui vols hackejar?"))}</p>
-    <div class="cbpick">${l.map(p=>`<button class="cbp" data-cb="target" data-id="${esc(p.id)}"${p.s>0?"":" disabled"}><span class="av">${esc(p.av||"🕵️")}</span><span class="nm">${esc(p.nm||"?")}</span><span class="bt">💾 ${p.s}</span>${p.sh>now()?'<span class="sh">🛡️</span>':""}</button>`).join("")||`<p class="mid">${esc(T("Nobody to hack yet.","Encara no hi ha ningú per hackejar."))}</p>`}</div>
+    <p class="cbrule">🤝 ${esc(T("Fair play: you can't hack the same person twice in a row, and someone who was just hacked is safe for a moment.","Joc net: no pots hackejar la mateixa persona dues vegades seguides, i qui acaba de ser hackejat està protegit una estona."))}</p>
+    <div class="cbpick">${l.map(p=>{const g=guarded(p);return `<button class="cbp${g?" grd":""}" data-cb="target" data-id="${esc(p.id)}"${p.s>0&&!g?"":" disabled"}><span class="av">${esc(p.av||"🕵️")}</span><span class="nm">${esc(p.nm||"?")}</span><span class="bt">${g>0?"✋ "+fmt(g-now()):g?"✋ "+esc(T("Last time","L'última vegada")):"💾 "+p.s}</span>${p.sh>now()?'<span class="sh">🛡️</span>':""}</button>`}).join("")||`<p class="mid">${esc(T("Nobody to hack yet.","Encara no hi ha ningú per hackejar."))}</p>`}</div>
     <p style="text-align:center"><button class="btn ghost" data-cb="next">${esc(T("Skip","Salta"))}</button></p>`)}
 function hackPwView(key){const p=(C().pl||{})[st.target]||{};
   put(key,center(`<p class="big">🔓 ${esc(T("Crack the password of","Esbrina la contrasenya de"))} ${esc(p.av||"")} ${esc(p.nm||"")}</p>
@@ -139,6 +170,7 @@ function hackWaitCheck(){const h=st.hack,r=h&&(C().hr||{})[h.id];
   else if(!r&&now()-h.at>20e3){st.hack.res={late:true};scr="hackRes";draw()}}
 function hackResView(key){const r=st.hack.res,p=(C().pl||{})[st.hack.t]||{};
   const h=r.late?`<div class="emo">📡</div><p class="big">${esc(T("No answer from the board","El tauler no respon"))}</p><p class="mid">${esc(T("Keep playing: you'll see the result on the board.","Continua jugant: el resultat sortirà al tauler."))}</p>`
+    :r.pr?`<div class="emo pop">✋</div><p class="big">${esc(T("Protected!","Protegit!"))}</p><p class="mid">${esc(p.nm||"")} ${esc(T("was just hacked: choose someone else next time.","acaba de ser hackejat: la propera vegada tria algú altre."))}</p>`
     :r.blk?`<div class="emo pop">🛡️</div><p class="big">${esc(T("Blocked!","Bloquejat!"))}</p><p class="mid">${esc(p.nm||"")} ${esc(T("has a firewall on.","té el tallafoc actiu."))}</p>`
     :r.ok?`<div class="emo pop">🔓</div><p class="big">${esc(T("Access granted!","Accés concedit!"))}</p><p class="mid">${esc(T("You stole","Has robat"))} <b>${r.n} bits</b> ${esc(T("from","a"))} ${esc(p.av||"")} ${esc(p.nm||"")}</p>`
     :`<div class="emo pop">🔒</div><p class="big">${esc(T("Wrong password","Contrasenya incorrecta"))}</p><p class="mid">“${esc(st.hack.g)}” ${esc(T("was not it.","no era.")) }</p>`;
@@ -147,7 +179,7 @@ function hackResView(key){const r=st.hack.res,p=(C().pl||{})[st.hack.t]||{};
 function hrCheck(){const hr=C().hr||{};
   if(!seenHr){seenHr=new Set(Object.keys(hr));return}
   Object.entries(hr).forEach(([id,h])=>{if(seenHr.has(id))return;seenHr.add(id);if(h.t!==me())return;
-    const p=(C().pl||{})[h.f]||{};
+    if(h.pr)return;const p=(C().pl||{})[h.f]||{};
     toast(h.ok?`⚠️ ${esc(p.av||"")} <b>${esc(p.nm||"")}</b> ${esc(T("hacked you!","t'ha hackejat!"))} −${h.n} bits`:h.blk?`🛡️ ${esc(T("Your firewall stopped","El teu tallafoc ha aturat"))} ${esc(p.av||"")} <b>${esc(p.nm||"")}</b>`:`🔒 ${esc(p.av||"")} <b>${esc(p.nm||"")}</b> ${esc(T("tried to hack you, but failed","ha intentat hackejar-te, però ha fallat"))}`,h.ok);
     if(h.ok)G.fx("wrong")})}
 // The news sits in the top bar, in the space between the pills (13 Nov 2026, 2 ESO A: "El texto no me deja leer": a floating box
@@ -167,8 +199,9 @@ function endView(){const [rk,of]=rank(),key="end:"+myBits()+":"+rk+":"+(x().cp??
 app$.addEventListener("click",e=>{if(!st||x().mode!=="cb")return;const b=e.target.closest("[data-cb]");if(!b||b.disabled)return;const d=b.dataset.cb;
   if(d==="pw"){st.pw=b.dataset.w;pend.cb.pw=st.pw;pend.cb.ws=st.ws;save(true);G.fx("tap");scr="q";draw()}
   else if(d==="repw"){scr="pw";draw()}
-  else if(d==="tap"&&scr==="q"){const qu=qOf(st.cur),o=CB.shown(qu,st.seed),k=o[+b.dataset.v];answer(CB.plain(qu.options[k]),k===0)}
-  else if(d==="next"){scr="q";st.file=null;draw()}
+  else if(d==="tap"&&scr==="q"&&now()>=st.lockUntil){const qu=qOf(st.cur),o=CB.shown(qu,st.seed),k=o[+b.dataset.v];answer(CB.plain(qu.options[k]),k===0)}
+  else if(d==="next"){scr="q";st.file=null;st.sim=null;draw()}
+  else if(d==="sim"&&st.last&&st.last.sim){st.sim=st.last.sim;st.skip.add(st.sim);scr="q";st.file=null;draw()}
   else if(d==="file")openFile(+b.dataset.j);
   else if(d==="hack"){scr="hackPick";draw()}
   else if(d==="target"){st.target=b.dataset.id;scr="hackPw";draw()}
@@ -176,7 +209,7 @@ app$.addEventListener("click",e=>{if(!st||x().mode!=="cb")return;const b=e.targe
 });
 app$.addEventListener("submit",e=>{if(!st||x().mode!=="cb"||!e.target.closest(".cbw"))return;e.preventDefault();
   const v=String(e.target.querySelector("input").value||"").replace(/\s+/g," ").trim().slice(0,60);if(!v)return;const qu=qOf(st.cur);answer(v,CB.isRight(qu,v))});
-addEventListener("keydown",e=>{if(!st||x().mode!=="cb")return;if(e.key==="Enter"&&scr!=="q"){const b=app$.querySelector('[data-cb="next"].btn.go,[data-cb="hack"]');if(b&&!e.target.closest("input")){e.preventDefault();b.click()}}});
+addEventListener("keydown",e=>{if(!st||x().mode!=="cb")return;if(e.key==="Enter"&&scr!=="q"){const b=app$.querySelector('[data-cb="next"].btn.go,[data-cb="sim"],[data-cb="hack"]');if(b&&!e.target.closest("input")){e.preventDefault();b.click()}}});
 clearInterval(tick);tick=setInterval(()=>{if(st&&x().mode==="cb"&&ctx.active())draw()},1000);
 return {draw,flush};
 }

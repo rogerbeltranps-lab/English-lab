@@ -55,9 +55,13 @@ function pl(){const out={};Object.entries(H.players).forEach(([em,p])=>{const c=
 function judge(){const P=byPid(),todo=[];
   Object.entries(H.players).forEach(([em,p])=>{const h=(p.cb||{}).h||{},f=CB.pid(em);Object.entries(h).forEach(([k,v])=>{const id=f+"_"+k;if(!H.hr[id]&&v&&v.t)todo.push({id,f,...v})})});
   if(!todo.length)return false;todo.sort((a,b)=>(+a.at||0)-(+b.at||0));
-  todo.forEach(t=>{const tem=P[t.t],tc=tem&&(H.players[tem].cb||{}),P0=pl(),ok=!!tc&&!!tc.pw&&t.g===tc.pw,blk=ok&&+tc.sh>(+t.at||0);
+  todo.forEach(t=>{const at=+t.at||Date.now(),fN0=nameOf(P[t.f]||""),tN0=nameOf(P[t.t]||"");
+    // 🤝 no ganging up (cb.js guard): the target was tried less than 1 min ago (2 after a hack that worked), or the same hacker twice in a row
+    if(CB.guard(t.t,H.hr,at)>at||CB.lastTarget(t.f,H.hr)===t.t){H.hr[t.id]={f:t.f,t:t.t,ok:false,blk:true,pr:true,n:0,at};
+      say(`✋ <b>${esc(tN0)}</b> is protected for now: <b>${esc(fN0)}</b> must choose someone else`,"miss");return}
+    const tem=P[t.t],tc=tem&&(H.players[tem].cb||{}),P0=pl(),ok=!!tc&&!!tc.pw&&t.g===tc.pw,blk=ok&&+tc.sh>at;
     const n=ok&&!blk?Math.max(0,Math.round(CB.score(t.t,P0,H.hr)*CB.HACK)):0;
-    H.hr[t.id]={f:t.f,t:t.t,ok:ok&&!blk,blk,n,at:+t.at||Date.now()};
+    H.hr[t.id]={f:t.f,t:t.t,ok:ok&&!blk,blk,n,at};
     const fN=nameOf(P[t.f]||""),tN=nameOf(tem||"");
     say(ok&&!blk?(n?`🔓 <b>${esc(fN)}</b> hacked <b>${esc(tN)}</b>: ${n} bits!`:`🔓 <b>${esc(fN)}</b> cracked <b>${esc(tN)}</b>'s password, but they had no bits`):blk?`🛡️ <b>${esc(tN)}</b>'s firewall stopped <b>${esc(fN)}</b>`:`🔒 <b>${esc(fN)}</b> tried to hack <b>${esc(tN)}</b>: wrong password`,ok&&!blk?"hack":"miss");
     G.fx(ok&&!blk&&n?"reveal":"tap")});
