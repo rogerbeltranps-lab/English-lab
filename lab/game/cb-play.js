@@ -7,7 +7,7 @@
 // (the questions and their answers) because each student goes at their own pace; the board recomputes every result from the raw answers.
 export function cbPlayer(ctx){
 const {S,G,esc,md,pic,T,app$}=ctx,CB=window.ELCB;
-let L=null,loading=null,st=null,sid=0,scr="",scrKey="",pend={a:{},cb:{}},flushT=0,seenHr=null,toastT=0,tick=0,fbTimer=0;
+let L=null,loading=null,st=null,sid=0,scr="",scrKey="",pend={a:{},cb:{}},flushT=0,seenHr=null,toastT=0,news=null,tick=0,fbTimer=0;
 const em=()=>(ctx.user().email||"").toLowerCase(),me=()=>CB.pid(em()),x=()=>ctx.x()||{},C=()=>x().cb||{};
 const now=()=>Date.now(),left=()=>Math.max(0,(+C().end||0)-now());
 const over=()=>x().phase==="end"||x().phase==="play"&&+C().end&&left()<=0;
@@ -42,7 +42,7 @@ function nextQ(){if(!st.order.length)return null;if(st.i>=st.order.length){st.lp
 const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 function top(){const [rk,of]=st?rank():[0,0],sh=st&&st.sh>now(),p=x().phase;
   return `<div class="top cbtop"><span class="pill">${CB.avatar(em())} ${esc(ctx.first())}</span><span class="pill cbbits">💾 <b id="cbb">${st?myBits():0}</b></span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
-    ${sh?`<span class="pill cbsh" id="cbsh">🛡️ ${fmt(st.sh-now())}</span>`:""}<span class="sp"></span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt">⏱ ${fmt(left())}</span>`:""}
+    ${sh?`<span class="pill cbsh" id="cbsh">🛡️ ${fmt(st.sh-now())}</span>`:""}<span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt">⏱ ${fmt(left())}</span>`:""}
     <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`}
 function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.querySelector("#cbb");if(!b)return;
   const v=String(myBits());if(b.textContent!==v){b.textContent=v;b.parentNode.classList.remove("bump");void b.parentNode.offsetWidth;b.parentNode.classList.add("bump")}
@@ -150,8 +150,11 @@ function hrCheck(){const hr=C().hr||{};
     const p=(C().pl||{})[h.f]||{};
     toast(h.ok?`⚠️ ${esc(p.av||"")} <b>${esc(p.nm||"")}</b> ${esc(T("hacked you!","t'ha hackejat!"))} −${h.n} bits`:h.blk?`🛡️ ${esc(T("Your firewall stopped","El teu tallafoc ha aturat"))} ${esc(p.av||"")} <b>${esc(p.nm||"")}</b>`:`🔒 ${esc(p.av||"")} <b>${esc(p.nm||"")}</b> ${esc(T("tried to hack you, but failed","ha intentat hackejar-te, però ha fallat"))}`,h.ok);
     if(h.ok)G.fx("wrong")})}
-function toast(h,bad){let t=document.getElementById("cbtoast");if(!t){t=document.createElement("div");t.id="cbtoast";document.body.append(t)}
-  t.className="cbtoast pop"+(bad?" bad":"");t.innerHTML=h;clearTimeout(toastT);toastT=setTimeout(()=>{t.remove()},4500)}
+// The news sits in the top bar, in the space between the pills (13 Nov 2026, 2 ESO A: "El texto no me deja leer": a floating box
+// at the top of the screen covered the question every time somebody tried to hack them). It never covers the question or the answers.
+function newsH(){return news&&news.until>now()?`<span class="cbnews${news.bad?" bad":""} pop" id="cbnews">${news.h}</span>`:""}
+function toast(h,bad){news={h,bad,until:now()+5000};const w=app$.querySelector(".cbtop .cbnewsw");if(w)w.innerHTML=newsH();
+  clearTimeout(toastT);toastT=setTimeout(()=>{news=null;const n=document.getElementById("cbnews");if(n)n.remove()},5000)}
 
 function endView(){const [rk,of]=rank(),key="end:"+myBits()+":"+rk+":"+(x().cp??"");if(key===scrKey)return;
   if(!scrKey.startsWith("end")){G.fx("fanfare");if(rk&&rk<=3)G.confetti()}
