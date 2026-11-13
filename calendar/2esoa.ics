@@ -42,6 +42,22 @@ URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-17-1mcmp5s@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261113
+DTEND;VALUE=DATE:20261117
+SUMMARY:🏠 English homework for Tue 17 Nov: LP2 What are they doing?: Spe
+ aking
+DESCRIPTION:LP2 What are they doing?: Speaking\nFor the English class on Tu
+ e 17 Nov · Per a la classe d'anglès del dt. 17 nov..\nFree Time\, Live!:
+  https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/inde
+ x.html\nMy board / El meu tauler: https://rogerbeltranps-lab.github.io/Eng
+ lish-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:2esoa-2eso-free-time-live-exam-2026-11-20-1alhb@english-lab
 DTSTAMP:20261031T000000Z
 DTSTART;VALUE=DATE:20261120
