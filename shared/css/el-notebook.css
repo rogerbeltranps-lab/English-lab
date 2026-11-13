@@ -553,3 +553,13 @@ html.el-nb-plain .nb-sum>li>a{font-size:16px}
 .nb-sum .nb-sumlp{font:600 12px var(--nb-sans,system-ui,sans-serif);color:var(--nb-pencil);margin-left:4px}
 .nb-final{margin:26px 0 8px;text-align:center;font:700 38px/1.15 var(--nb-hand);color:var(--nb-ink);transform:rotate(-1.5deg)}
 html.el-nb-plain .nb-final{font-size:28px}
+/* 📚 every LS in one notebook: an LS tab per chapter at the top, then that chapter's tabs (the others hide), then ✨ Summary */
+.nb-tab[hidden]{display:none!important}
+.nb-tab.nb-ctab{background:#26324a;color:#fff;font-weight:700}
+.nb-tab.nb-ctab[aria-current="true"]{background:#1f3c73;box-shadow:0 -3px 0 #f2c94c inset}
+.nb-tab.nb-sumtab{background:#fff2b3}
+.nb-chh{margin-top:6px}
+/* ➜ "To do" takes the student to that activity on the learning path (Roger, 13 Nov 2026: "on to do add a link that takes her there") */
+a.nb-tdo.nb-tdgo{text-decoration:none;cursor:pointer;background:#fff;box-shadow:2px 2px 0 rgba(200,40,40,.25);transition:transform .12s}
+a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) scale(1.08);background:#fdecec}
+@media print{a.nb-tdo.nb-tdgo{box-shadow:none}}
