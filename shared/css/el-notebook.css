@@ -452,3 +452,8 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-ring b{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 17px/1 var(--nb-sans,system-ui,sans-serif)!important;color:#26303d}
 .nb-fr-res small{font-weight:500;color:#c7d3ea;font-size:15px}
 @media (max-width:640px){.nb-fr-rings{gap:10px 8px;padding:10px 10px 12px}.nb-fr-rg{flex-direction:column;text-align:center;gap:4px}.nb-fr-rg>span:last-child{align-items:center}.nb-fr-rg b{font-size:14px}.nb-fr-rg small{font-size:12px}.nb-fr-ring{width:50px;height:50px}.nb-fr-ring b{width:38px;height:38px;font-size:15px!important}}
+/* ⭐ My results after the cover: notebook paper (Roger: "This should be notebook like not like a cover"), heading in pen, cards like glued slips */
+.nb-fr-more .nb-fr-res{font:700 29px/32px var(--nb-hand);color:var(--nb-black,#1f2733);letter-spacing:0;margin:0 0 6px}
+.nb-fr-more .nb-fr-res small{font:600 22px var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-more .nb-fr-ls{background:#fff;border:1px solid #d7dde6;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.nb-fr-more .nb-fr-key{color:#6b7280}

@@ -319,7 +319,8 @@ window.ELNotebook = (function () {
       + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
       + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
       // (Roger, 13 Nov 2026: "On the cover only this and add sth like this bit about grammar, vocabulary, reading, listening activities.
-      // Then the following pages my results but in a cover style"): the first tries of each skill as rings, the results on the next pages
+      // Then the following pages my results but in a cover style", then "This should be notebook like not like a cover"): the first tries
+      // of each skill as rings, the results on the next pages, on notebook paper
       + `<div class="nb-fr-rings"><div class="nb-fr-rh">${t('Primers intents', 'First tries')}</div>${[['grammar', '🧩', t('Gramàtica', 'Grammar')], ['vocab', '📚', t('Vocabulari', 'Vocabulary')], ['read', '📖', 'Reading'], ['listen', '🎧', 'Listening']].map(([k, ic, nm]) => {
         const z = sums.reduce((a, y) => { const v = y.skill[k]; if (v) { a.r += v.r; a.of += v.of; } return a; }, { r: 0, of: 0 }), pc = z.of ? Math.round(z.r / z.of * 100) : null;
         // the degree, not the % (Roger: "Instead of %, the AS, AN…"): NA under 5 · AS · AN · AE from 9, the ring filled as far as they got
@@ -561,7 +562,8 @@ window.ELNotebook = (function () {
     };
     newPage(); [...frag.childNodes].forEach(place); page.classList.remove('nb-meas');
     // the cover's pages look like a notebook's hard cover (Roger, 13 Nov 2026: "The cover should look like a real notebook cover")
-    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont):not(.nb-fr-more)') ? ['nb-cv1'] : [])); });
+    // only the cover itself is the blue board; ⭐ My results after it are ordinary notebook paper (Roger: "This should be notebook like not like a cover")
+    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front:not(.nb-fr-more)')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont):not(.nb-fr-more)') ? ['nb-cv1'] : [])); });
   }
   function layout(keep) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || printing()) return false;
