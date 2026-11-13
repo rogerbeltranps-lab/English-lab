@@ -333,3 +333,22 @@ html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plai
 html.el-nb-full .eldict-fab{z-index:2147482500!important;position:fixed!important;left:auto!important;top:auto!important;right:18px!important;bottom:4px!important}
 html.el-nb-full .eldict,html.el-nb-full .eldict-tipbox{z-index:2147482600!important}
 @media (max-width:899px){.nb-bt.nb-bt-n{width:56px}}
+/* 👋 first-time tour of the notebook (el-notebook.js tour()) */
+.nb-tour{position:fixed;inset:0;z-index:2147483000}
+.nb-tour-ring{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(18,28,48,.62);outline:3px solid #ffd84d;outline-offset:2px;transition:all .3s ease;pointer-events:none}
+.nb-tour-ring.none{outline:0}
+.nb-tour-box{position:fixed;background:#fff6a8;color:#26303d;border-radius:4px 4px 18px 4px;padding:16px 18px 12px;box-shadow:0 14px 30px rgba(0,0,0,.35);transform:rotate(-.6deg);font:16px/1.45 var(--nb-sans,system-ui,sans-serif);transition:left .3s ease,top .3s ease;outline:0}
+.nb-tour-box::before{content:"";position:absolute;top:-10px;left:50%;width:90px;height:20px;margin-left:-45px;background:rgba(230,220,180,.85);transform:rotate(-2deg)}
+.nb-tour-h{display:flex;align-items:center;gap:10px;font:700 24px/1.15 'Kalam','Caveat',cursive;color:#1f3c88;margin-bottom:6px}
+.nb-tour-ic{font-size:28px}
+.nb-tour-box p{margin:0 0 12px}
+.nb-tour-f{display:flex;align-items:center;gap:8px}
+.nb-tour-n{font-size:13px;color:#6b6440;margin-right:auto}
+.nb-tour-f button{font:700 15px system-ui,sans-serif;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid #c9bd6a;background:#fffbe0;color:#4c4520}
+.nb-tour-f .nb-tour-skip{border-color:transparent;background:none;text-decoration:underline;font-weight:600}
+.nb-tour-f .nb-tour-next{background:#1f4fb5;border-color:#1f4fb5;color:#fff}
+.nb-tour-f button:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+html.nb-touring .eldict-tipbox{display:none!important}
+.nb .nb-help{min-width:40px}
+@media print{.nb-tour{display:none}}
+html.nb-touring .nb-bt{opacity:1}

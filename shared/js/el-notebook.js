@@ -359,7 +359,7 @@ window.ELNotebook = (function () {
       if (k === 's') { const [key, n] = rest.split('@'), i = secStart[key]; if (i != null) { let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; pg = j; } }
       else { const [id, off] = rest.split('@'); const hit = [...sp.querySelectorAll(`.nb-blk[data-b="${id}"]`)].filter(b => +b.dataset.off <= +(off || 0)).pop(); if (hit) pg = +hit.closest('.nb-page').dataset.i; else if (blkPage[id] != null) pg = blkPage[id]; }
     }
-    show(); return true;
+    show(); tourSoon(); return true;
   }
   const relayout = keep => { if (!layout(keep)) laid = ''; };
   const nextSec = (s, d) => { const i = order.indexOf(s.key), k = i < 0 ? null : order[i + d]; return k ? secs.find(x => x.key === k) : null; };
@@ -421,6 +421,7 @@ window.ELNotebook = (function () {
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
       + `<button type="button" class="nb-tool nb-plain" aria-pressed="${plain}">${plain ? '✍ ' + t('Lletra de mà', 'Handwriting') : 'Aa ' + t('Lletra d\'impremta', 'Print letters')}</button>`
+      + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav></div>`
       + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button></nav>`
@@ -451,6 +452,90 @@ window.ELNotebook = (function () {
     RO.observe(sp);
   }
   if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => { if (laid && !printing() && !ED && !drag && !T0) relayout(); });
+
+
+  // ---------- 👋 first time: a short guided tour of the notebook (Roger, 13 Nov 2026: "I need messages the first time they open
+  // the notebook to explain how it works"). Once per student (localStorage el-nb-tour|<uid> + o.tour in the notebook doc, so another
+  // Chromebook doesn't show it again); ❓ in the top bar shows it again. Only the student's own notebook, never the teacher's view.
+  const TOUR_K = () => 'el-nb-tour|' + (H && H.uid || '');
+  let TOUR = null, tourT = 0;
+  function tourSoon() {
+    if (TOUR || !H || !H.own || store.get(TOUR_K()) || O().tour) return;
+    clearTimeout(tourT); tourT = setTimeout(() => { const sp = document.querySelector('.nb-spread'); if (sp && sp.getClientRects().length && !ED && !TOUR) tour(); }, 700);
+  }
+  const vis = sel => [...document.querySelectorAll(sel)].find(e => { const r = e.getBoundingClientRect(); return r.width > 4 && r.height > 4 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(e).visibility !== 'hidden'; });
+  function steps() {
+    return [
+      { ic: '📓', h: t('Aquesta és la teva llibreta', 'This is your notebook'), p: t('Tot el que fem a classe hi apareix sol: la teoria, el vocabulari, les teves respostes i els teus apunts. És el que entra a l\'examen.', 'Everything we do in class appears here by itself: the theory, the vocabulary, your answers and your notes. It\'s what goes in the exam.') },
+      { el: '.nb-bar .nb-tab', all: '.nb-bar .nb-tab', ic: '🗂', h: t('Les pestanyes', 'The tabs'), p: t('Toca Index o un LP per anar-hi de seguida. A l\'índex hi ha totes les parts amb el número de pàgina.', 'Tap Index or an LP to go straight there. The index lists every part with its page number.') },
+      { el: '.nb-nav', ic: '👉', h: t('Passa la pàgina', 'Turn the page'), p: t('Amb ◀ ▶, amb les fletxes del teclat, o arrossegant la cantonada de la pàgina com en un llibre de veritat. Aquí no es fa scroll.', 'With ◀ ▶, the arrow keys, or by dragging the corner of the page like a real book. No scrolling here.') },
+      { el: '.nb-side .nb-stab', all: '.nb-side', at: '.nb-work', wide: 1, ic: '🏷', h: t('Els post-its de les seccions', 'The section post-its'), p: t('Cada LP està dividit en seccions: Vocabulary, Reading, Grammar… Toca un post-it del costat per saltar-hi.', 'Each LP is split into sections: Vocabulary, Reading, Grammar… Tap a post-it on the edge to jump there.') },
+      { el: '.nb-work', at: '.nb-work', ic: '✏️', h: t('Les teves respostes, corregides', 'Your answers, corrected'), p: t('Després de cada activitat hi veuràs el teu primer intent, corregit en vermell: el que està malament ratllat i la resposta bona a sobre. Estudia sobretot això!', 'After each activity you\'ll see your first try, corrected in red: the wrong word crossed out and the right answer above it. Study those most!'), pad: 4 },
+      { el: '.nb-spread', at: '.nb-work', ic: '🖍', h: t('Subratlla i encercla', 'Highlight and circle'), p: t('Tria unes paraules amb el ratolí o el dit i apareixeran els subratlladors: groc, verd, rosa, subratllar, ondulat, encerclar. 🧽 ho treu.', 'Select some words with the mouse or your finger and the highlighters appear: yellow, green, pink, underline, wavy, circle. 🧽 takes it off.'), pad: -30 },
+      { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota, 🟨 hi enganxa un post-it (tria el color) i ▲ ▼ la mouen. Les notes també poden passar a una altra secció.', 'In the margin of each part: ✍ adds a note below it, 🟨 sticks a post-it (choose its colour) and ▲ ▼ move it. Notes can also move on to another section.') },
+      { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
+      { el: '.nb-printbtn', all: '.nb-pwrap,.nb-plain', ic: '🖨', h: t('Imprimeix i lletra', 'Print and letters'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta. Si llegeixes millor la lletra d\'impremta, toca Aa.', '🖨 prints these pages, the ones you choose or the whole notebook. If you read print letters better, tap Aa.') },
+      { el: '.nb-close', all: '.nb-close,.nb-help', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
+    ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
+  }
+  function tour() {
+    endTour(true);
+    const S = steps(), pg0 = pg; let i = 0;
+    const goAt = sel => { if (sel && vis('.nb-spread .nb-page ' + sel)) return; const e = sel && document.querySelector('.nb-spread .nb-page ' + sel); const to = e ? +e.closest('.nb-page').dataset.i : pg0; if (to !== pg) { pg = to; show(); } };
+    const w = document.createElement('div'); w.className = 'nb-tour'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true');
+    w.innerHTML = '<div class="nb-tour-ring"></div><div class="nb-tour-box" tabindex="-1"></div>';
+    document.body.append(w); document.documentElement.classList.add('nb-touring');
+    const ring = w.querySelector('.nb-tour-ring'), bx = w.querySelector('.nb-tour-box');
+    const rectOf = st => {
+      if (!st.el) return null;
+      const els = st.all ? [...document.querySelectorAll(st.all)].filter(e => e.getClientRects().length) : [vis(st.el)];
+      if (!els.length || !els[0]) return null;
+      const rs = els.map(e => e.getBoundingClientRect()), pd = st.pad != null ? st.pad : 6;
+      const r = { l: Math.min(...rs.map(x => x.left)) - pd, t: Math.min(...rs.map(x => x.top)) - pd, r: Math.max(...rs.map(x => x.right)) + pd, b: Math.max(...rs.map(x => x.bottom)) + pd };
+      return { l: Math.max(4, r.l), t: Math.max(4, r.t), r: Math.min(innerWidth - 4, r.r), b: Math.min(innerHeight - 4, r.b) };
+    };
+    const go = () => {
+      const st = S[i]; goAt(st.at); const r = rectOf(st);
+      bx.innerHTML = `<div class="nb-tour-h"><span class="nb-tour-ic">${st.ic}</span>${st.h}</div><p>${st.p}</p><div class="nb-tour-f"><span class="nb-tour-n">${i + 1} / ${S.length}</span>`
+        + `<button type="button" class="nb-tour-skip">${i === S.length - 1 ? '' : t('Salta', 'Skip')}</button>`
+        + (i ? `<button type="button" class="nb-tour-back" aria-label="${t('Enrere', 'Back')}">◀</button>` : '')
+        + `<button type="button" class="nb-tour-next">${i === S.length - 1 ? t('Som-hi!', 'Let\'s go!') : t('Següent', 'Next') + ' ▶'}</button></div>`;
+      if (i === S.length - 1) bx.querySelector('.nb-tour-skip').remove();
+      w.setAttribute('aria-label', plainOf(st.h));
+      if (r) { ring.style.cssText = `left:${r.l}px;top:${r.t}px;width:${r.r - r.l}px;height:${r.b - r.t}px`; ring.classList.remove('none'); }
+      else { ring.style.cssText = `left:50%;top:50%;width:0;height:0`; ring.classList.add('none'); }
+      // the message beside the lit part: below it, above it, or in the middle of a big part
+      const bw = Math.min(380, innerWidth - 24); bx.style.width = bw + 'px';
+      const bh = bx.offsetHeight; let x, y;
+      if (!r) { x = (innerWidth - bw) / 2; y = (innerHeight - bh) / 2; }
+      else {
+        const big = r.b - r.t > innerHeight * 0.5;
+        x = Math.min(Math.max(12, (r.l + r.r) / 2 - bw / 2), innerWidth - bw - 12);
+        if (big) y = (r.t + r.b) / 2 - bh / 2;
+        else if (r.b + 14 + bh < innerHeight - 8) y = r.b + 14;
+        else y = Math.max(8, r.t - 14 - bh);
+        if (big && innerWidth > 900) x = (innerWidth - bw) / 2;
+      }
+      bx.style.left = Math.round(x) + 'px'; bx.style.top = Math.round(Math.max(8, Math.min(y, innerHeight - bh - 8))) + 'px';
+      bx.focus({ preventScroll: true });
+    };
+    const done = () => { store.set(TOUR_K(), '1'); if (!O().tour) { O().tour = 1; save(); } if (pg !== pg0) { pg = pg0; show(); } endTour(); };
+    w.addEventListener('click', e => {
+      if (e.target.closest('.nb-tour-next')) { if (i < S.length - 1) { i++; go(); } else done(); }
+      else if (e.target.closest('.nb-tour-back')) { if (i) { i--; go(); } }
+      else if (e.target.closest('.nb-tour-skip')) done();
+    });
+    const key = e => { if (e.key === 'Escape') { e.preventDefault(); done(); } else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (i < S.length - 1) { i++; go(); } else done(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); if (i) { i--; go(); } } };
+    const rs = () => go();
+    addEventListener('keydown', key, true); addEventListener('resize', rs);
+    TOUR = { w, key, rs }; go();
+  }
+  function endTour() {
+    if (!TOUR) return; removeEventListener('keydown', TOUR.key, true); removeEventListener('resize', TOUR.rs);
+    TOUR.w.remove(); TOUR = null; document.documentElement.classList.remove('nb-touring');
+    const c = document.querySelector('.nb .nb-help'); if (c) c.focus({ preventScroll: true });
+  }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.nb .nb-help')) tour(); });
 
   // ---------- one set of listeners for every redraw ----------
   document.addEventListener('click', e => {
