@@ -741,7 +741,9 @@ window.ELNotebook = (function () {
   }
   function go(i) { pg = i; show(); }
   // what the student changes is saved 1.5 s after the last change (el-notes.js writes notes/nb-<LS>)
-  const status = s => { const st = document.querySelector('.nb-saved'); if (st) st.textContent = s; };
+  // 👁 the teacher's student view shows the student's own buttons (Roger, 13 Nov 2026: "I'm on the student's view and I can't see that"),
+  // but nothing is saved to the student's notebook (el-notes.js saves only for the student)
+  const status = s => { if (H && H.preview && /^✓/.test(s)) s = '👁 ' + t('Vista d\'alumne: no es desa', 'Student view: not saved'); const st = document.querySelector('.nb-saved'); if (st) st.textContent = s; };
   function save() {
     clearTimeout(saveT); status(t('Desant…', 'Saving…')); H.order = order; DIRTY.add(H);
     saveT = setTimeout(() => {
