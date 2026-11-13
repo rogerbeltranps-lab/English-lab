@@ -38,12 +38,26 @@
     return [...ids].map(id=>{
       const m=meta(id),th=(window.EL_GAME_THEORY||{})[id],nd=notes.find(n=>(n.deck||n.id)===id),res=Object.values(mine||{}).filter(g=>g.deck===id).sort((a,b)=>b.sid-a.sid);
       const parts=th?th.parts.map(p=>({k:p.k,slides:p.slides,topic:p.slides.map(s=>s.theory).join(" · ")})):Object.keys((nd&&nd.parts)||{}).map(k=>({k,slides:[],topic:nd.parts[k].topic||""}));
-      return {id,title:m.title||(th&&th.title)||(nd&&nd.title)||(res[0]&&res[0].title)||id,kind:m.kind||(res[0]&&res[0].kind)||"",lp:m.lp||(nd&&nd.lp)||(res[0]&&res[0].lp)||"",
+      const gt=/^gt-/.test(id)&&nd&&nd.parts&&nd.parts.gt||null;   // 📘 notes taken while the grammar was explained together (el-cloud.js gtBox)
+      return {id,gt,title:m.title||(th&&th.title)||(nd&&nd.title)||(res[0]&&res[0].title)||id,kind:m.kind||(gt?"grammar":"")||(res[0]&&res[0].kind)||"",lp:m.lp||(nd&&nd.lp)||(res[0]&&res[0].lp)||"",
         when:Math.max(ms((played||{})[id]),res[0]?res[0].sid:0),parts,notes:(nd&&nd.parts)||{},res:res[0]||null,tries:res.length}
     }).sort((a,b)=>lpNum(a.lp)-lpNum(b.lp)||(a.kind==="vocab"?0:1)-(b.kind==="vocab"?0:1)||a.when-b.when);
   }
 
+  /* 📘 Grammar together (Roger, 13 Nov 2026: "It should appear in their notes with the day, the grammar summary and their notes"): the day,
+     the explanation boxes seen together on the projector (as the student saw them) and what the student wrote, read only. The boxes are the
+     site's own text, saved by the student's page: only <b> <strong> <em> <i> <br> <del> <s> <u> are kept as tags. */
+  const safe=h=>String(h||"").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/&lt;(\/?)(strong|em|b|i|br|del|s|u)\s*\/?&gt;/gi,"<$1$2>");
+  const gtDay=d=>{const x=new Date(String(d||"")+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString(ca()?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})};
+  function gtCard(g,inLp){
+    const p=g.gt,txt=String(p.text||"").trim(),when=`<span class="muted nt-day">${t("Gramàtica junts","Grammar together")}${p.day?" · "+esc(gtDay(p.day)):""}</span>`,name=esc(String(g.title).replace(/^📘\s*/,""));
+    const body=`<section class="npart">${(p.sum||[]).length?`<div class="nt-th"><h4>📘 ${t("Com funciona","How it works")}</h4>${p.sum.map(b=>`<div class="ex-rule">${safe(b)}</div>`).join("")}</div>`:""}
+      <div class="nt-my"><span class="nt-lab">📝 ${t("Els teus apunts","Your notes")}</span>${txt?`<div class="nread">${esc(txt).replace(/\n/g,"<br>")}</div>`:`<p class="muted nt-none">${t("No vas prendre apunts aquí.","You didn't take notes here.")}</p>`}</div></section>`;
+    if(inLp)return `<details class="ngame" id="ng-${esc(g.id)}"><summary><span class="ng-t">📘 ${name} ${when}</span></summary>${body}</details>`;
+    return `<article class="bigcard ncard"><div class="nt-head"><div>${g.lp?`<span class="nlp">${esc(g.lp)}</span>`:""}<h2>📘 ${name}</h2>${when}</div></div>${body}</article>`;
+  }
   function card(g,inLp){
+    if(g.gt)return gtCard(g,inLp);
     const r=g.res,hasNotes=Object.values(g.notes).some(p=>String(p.text||"").trim()),absent=!r&&!hasNotes;
     const pc=r&&r.of?Math.round(r.r/r.of*100):null,miss=(r&&r.miss)||[];
     const byPart={};miss.forEach(x=>{(byPart[x.p||""]=byPart[x.p||""]||[]).push(x)});
@@ -88,7 +102,7 @@
     const terms=nTerms?`<details class="ex-sec"><summary>🔑 ${t("Paraules clau","Key terms")} <span class="muted">· ${nTerms}</span></summary>${lp.terms.map(g=>`<h4>${g.g}</h4><ul class="ex-terms">${g.items.map(x=>
       `<li><b>${x.en}</b>${x.ca?` <span class="ex-ca">${x.ca}</span>`:""}${x.ex?`<small>${x.ex}</small>`:""}</li>`).join("")}</ul>`).join("")}</details>`:"";
     const gram=lp.grammar.length?`<details class="ex-sec"><summary>🧩 ${t("Gramàtica","Grammar")} <span class="muted">· ${lp.grammar.reduce((n,g)=>n+g.boxes.length,0)}</span></summary>${lp.grammar.map(g=>`<h4>${g.title}</h4>${g.boxes.map(b=>`<div class="ex-rule">${b}</div>`).join("")}`).join("")}</details>`:"";
-    const gm=games.length?`<div class="ex-games"><span class="nt-lab">🎮 ${t("Jocs de classe: teoria i els teus apunts","Class games: theory and your notes")}</span>${games.map(game).join("")}</div>`:"";
+    const gm=games.length?`<div class="ex-games"><span class="nt-lab">${games.some(g=>g.gt)?(games.every(g=>g.gt)?"📘 ":"🎮 📘 ")+t("Teoria i els teus apunts","Theory and your notes"):"🎮 "+t("Jocs de classe: teoria i els teus apunts","Class games: theory and your notes")}</span>${games.map(game).join("")}</div>`:"";
     const none=!terms&&!gram&&!gm?`<p class="muted">${t("En aquest learning path heu fet pràctica de comprensió i expressió: repassa'l obrint-lo.","In this learning path you practised the skills: open it to look at it again.")}</p>`:"";
     return `<article class="bigcard ncard ex-lp"><div class="nt-head"><div><span class="nlp">LP${esc(lpN)}</span><h2>${esc(lp.title)}</h2></div><a class="nbtn" href="${esc(lp.href)}">${t("Obre","Open")} →</a></div>
       ${tabs?`<div class="ex-tabs"><span class="nt-lab">✅ ${t("Fet a classe","Done in class")}</span>${tabs}</div>`:""}${terms}${gram}${gm}${none}</article>`;

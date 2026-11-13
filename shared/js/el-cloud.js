@@ -917,7 +917,7 @@ function rtFollow(rt){rtNow=rt||null;
   document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
   document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
   if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
-  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){rtRestore();return}
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();rtRestore();return}
   if(rt.p)return rtGram(rt);
   const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();
@@ -940,10 +940,48 @@ function rtFollow(rt){rtNow=rt||null;
    box k. From ⏱ Your turn on, rt = {u, p, k: -1, x: 1, hs: the text of every box seen together}: the student's own boxes are back and
    the ones not seen together go green, to read before the exercise. Only what the card shows changes; nothing is saved. */
 const rtNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-zà-ÿ0-9']+/g," ").trim();
+/* 📝 Notes while explaining together (Roger, 13 Nov 2026: "during the grammar together I want students to have a note place to copy the notes
+   they want. It should appear in their notes with the day, the grammar summary and their notes"): under the shared boxes, a student gets
+   📝 Take your notes. Saved 2.5 s after they stop typing, when the teacher goes on to ⏱ Your turn, and when the page closes, in
+   students/{uid}/notes/gt-<course>-<ls>-<page> (the class games' notes collection, firestore.rules: their own) = {ls, course, deck, title, lp,
+   parts:{gt:{topic, day, sum: the boxes seen together, text, at}}, updated}. 🎯 What's in the exam on the LS page shows it in its learning
+   path's card (shared/js/el-notes.js gtCard). Nothing is saved until they write. */
+const GTN={el:null,v:"",dirty:false,t:0,st:"",rt:null,loaded:"",ca:false};
+const gtDeck=()=>"gt-"+relPath.replace(/\.html$/,"").replace(/\//g,"-");   // gt-2eso-free-time-live-what-are-they-doing
+const gtT=(c,e)=>GTN.ca?c:e;
+function gtState(st){if(st!=null)GTN.st=st;const e=document.getElementById("el-gt-st");if(!e)return;
+  e.textContent=GTN.st==="saving"?gtT("Desant…","Saving…"):GTN.st==="saved"?gtT("✓ Desat a 🎯 Què entra a l'examen, amb la data i l'explicació","✓ Saved in 🎯 What's in the exam, with the day and the explanation")
+    :GTN.st==="err"?gtT("⚠ Encara no s'ha desat: continua escrivint, ho torna a provar","⚠ Not saved yet: keep writing, it tries again"):gtT("Es desa sol mentre escrius.","Saved by itself while you write.")}
+async function gtSave(){
+  clearTimeout(GTN.t);if(!GTN.dirty||!user||!isStudent(user)||AS||!GTN.rt)return;GTN.dirty=false;
+  const rt=GTN.rt,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath),d=document.createElement("div");d.innerHTML=(GTN.ca&&rt.hc)||rt.h||"";
+  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return c.innerHTML.trim().slice(0,1500)}).slice(0,12);
+  const title=(document.querySelector('#'+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .panel-head h2")||{}).textContent||"";
+  const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});gtState("saving");
+  try{await setDoc(doc(db,"students",user.uid,"notes",gtDeck()),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck:gtDeck(),
+      title:"📘 "+(title||"Grammar").trim(),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",parts:{gt:{topic:"How it works · together",day,sum,text:GTN.v.slice(0,3000),at:now}},updated:now},{merge:true});gtState("saved")}
+  catch(e){console.warn("grammar notes",e);GTN.dirty=true;gtState("err");GTN.t=setTimeout(gtSave,8e3)}
+}
+function gtBox(box,rt){
+  if(!user||!isStudent(user)||AS)return;GTN.rt=rt;GTN.ca=lockCa();
+  let f=document.getElementById("el-gt-notes");
+  if(!f||!f.isConnected||f.previousElementSibling!==box){if(f)f.remove();f=document.createElement("div");f.id="el-gt-notes";f.className="section-card";
+    f.innerHTML=`<h3>📝 ${gtT("Pren apunts","Take your notes")}</h3><p class="instruction">${gtT("Copia el que vulguis de l'explicació i escriu 2 frases teves amb aquesta gramàtica. Ho trobaràs a 🎯 Què entra a l'examen, amb la data i l'explicació.","Copy what you want from the explanation and write 2 sentences of your own with this grammar. You'll find it in 🎯 What's in the exam, with the day and the explanation.")}</p>`+
+      `<textarea maxlength="3000" spellcheck="false" style="width:100%;min-height:130px;font:16px/1.5 system-ui,sans-serif;padding:10px;border-radius:10px;border:2px solid #cbd5e1;box-sizing:border-box" placeholder="${GTN.ca?"1. …&#10;2. …&#10;Per recordar: …":"1. …&#10;2. …&#10;To remember: …"}"></textarea><p class="tiny" id="el-gt-st"></p>`;
+    box.after(f);const ta=f.querySelector("textarea");ta.value=GTN.v;
+    ta.addEventListener("input",()=>{GTN.v=ta.value;GTN.dirty=true;gtState("");clearTimeout(GTN.t);GTN.t=setTimeout(gtSave,2500)});
+    // what they wrote before on this learning path (another day, another device) comes back: one read per page
+    if(GTN.loaded!==gtDeck()){GTN.loaded=gtDeck();getDoc(doc(db,"students",user.uid,"notes",gtDeck())).then(s=>{const t=s.exists()?(((s.data().parts||{}).gt||{}).text||""):"";
+      const x=document.querySelector("#el-gt-notes textarea");if(t&&x&&!GTN.v){x.value=GTN.v=t}}).catch(e=>console.warn("grammar notes",e))}}
+  gtState(null);
+}
+function gtClose(){const f=document.getElementById("el-gt-notes");if(GTN.dirty)gtSave();if(f)f.remove()}
+addEventListener("pagehide",()=>{if(GTN.dirty)gtSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&GTN.dirty)gtSave()});
 function rtGram(rt){
   const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();const ca=lockCa();
-  if(rt.x){rtRestore();const hs=new Set(rt.hs||[]);let c=0;
+  if(rt.x){gtClose();rtRestore();const hs=new Set(rt.hs||[]);let c=0;
     box.querySelectorAll(".model").forEach(m=>{if(!hs.has(rtNorm(m.textContent))){m.classList.add("el-rt-newbox");c++}});
     if(c)rtNote(box,"x",ca?"🆕 Els requadres en verd són del teu nivell i no els hem vist junts: llegeix-los ara, abans de començar.":"🆕 The green boxes are for your level and we didn't see them together: read them now, before you start.");
     return}
@@ -952,10 +990,12 @@ function rtGram(rt){
     if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
     const sig="g|"+rt.l+"|"+(ca?1:0)+"|"+h.length+"|"+h.slice(0,80);
     if(sig!==rtSig){box.innerHTML=h;rtSig=sig;
-      rtNote(box,"",ca?"📘 Aprenem junts: ara tothom veu la mateixa explicació que a la pissarra. La del teu nivell torna quan hagis de practicar.":"📘 Learning together: everyone sees the same explanation as on the board now. Your level's comes back when it's time to practise.")}}
+      rtNote(box,"",ca?"📘 Aprenem junts: ara tothom veu la mateixa explicació que a la pissarra. La del teu nivell torna quan hagis de practicar.":"📘 Learning together: everyone sees the same explanation as on the board now. Your level's comes back when it's time to practise.")}
+    gtBox(box,rt)}
   if(!(rt.k>=0))return;
   const bl=[...box.querySelectorAll(".model")];if(!bl.length)return;
-  const el=bl[Math.min(rt.k,bl.length-1)];el.classList.add("el-rt-cur");const k=rt.u+"|g|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
+  const el=bl[Math.min(rt.k,bl.length-1)];el.classList.add("el-rt-cur");const k=rt.u+"|g|"+rt.k;
+  if(k!==rtKey){rtKey=k;const ae=document.activeElement;if(!(ae&&ae.closest&&ae.closest("#el-gt-notes")))el.scrollIntoView({block:"center",behavior:"smooth"})}}   // not while they write their notes
 // the reading tab opened after the teacher moved on still gets the text and the mark (the page may draw the box again)
 document.addEventListener("click",e=>{if(rtNow&&e.target.closest(".tab"))setTimeout(()=>{rtKey="";if(rtBox&&!rtBox.isConnected){rtBox=null;rtOrig=null;rtSig=""}if(rtBox&&rtBox.offsetParent===null)rtSig="";rtFollow(rtNow)},120)});
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
