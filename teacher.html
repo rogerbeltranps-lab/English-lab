@@ -460,6 +460,13 @@ const api={
   annSeen:id=>{const a=S.D.ann.find(x=>x.id===id);if(!a)return;const n=(a.thread||[]).length;if(DEMO){a.tDone=n;return}return F.updateDoc(F.doc(db(),"announcements",id),{tDone:n})},
   annDel:id=>DEMO?S.D.ann=S.D.ann.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"announcements",id)),
   sgRead:(id,v)=>DEMO?S.D.sg.find(x=>x.id===id).read=v:put(["suggestions",id],{read:v}),
+  // "💬 Answer" on a suggestion (Roger, 13 Nov 2026: "I want to be able to answer the students in here"): the same card as an answer to a
+  // problem report (problemReplies/sg_{id}_m{time}, kind "idea", shared/js/el-reply.js), so students get it with the read they already
+  // make on every page (no new reads). Kept on the suggestion too, suggestions/{id}.msgs = [{text, at, rid}], and the suggestion is read.
+  sgMsg:(id,text)=>{const x=(S.D.sg||[]).find(y=>y.id===id);if(!x||!x.uid)return;text=String(text).trim().slice(0,MSG_MAX);
+    const rid="sg_"+id+"_m"+Date.now().toString(36),rp=sgReply(x,text),m={text,at:new Date().toISOString(),rid};
+    if(DEMO){x.msgs=[...(x.msgs||[]),m];x.read=true;S.D.replies[rid]=rp;return}
+    const b=F.writeBatch(db());b.set(F.doc(db(),"suggestions",id),{msgs:F.arrayUnion(m),read:true},{merge:true});b.set(F.doc(db(),"problemReplies",rid),rp);return b.commit()},
   sgDel:id=>DEMO?S.D.sg=S.D.sg.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"suggestions",id)),
   pbLoad:async()=>{if(DEMO)return;const L=[];(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>L.push(Object.assign({id:x.id},x.data())));S.D.pb=L},
   // the screenshot of a report is loaded only when the teacher opens it (problemShots/{same id})
@@ -3488,9 +3495,9 @@ function sgBox(){
   const L=[...(S.D.sg||[])].sort((a,b)=>(!!a.read-!!b.read)||((sgWhen(b)||0)-(sgWhen(a)||0))),nw=L.filter(x=>!x.read).length;
   const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
   const li=x=>{const w=sgWhen(x);return `<li class="${x.read?"read":""}"><div class="hand">${esc(x.text)}</div><small class="muted">${x.read?"":"<b>New</b> · "}${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.page?" · "+pageLink(x,esc(x.page)):""}</small>
-    <button class="g" data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button> <button class="g" data-do="sgdel" data-id="${esc(x.id)}">Delete</button></li>`};
+    ${pbSent(x)}<div>${x.uid?`<button data-do="sgmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> `:""}<button class="g" data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button> <button class="g" data-do="sgdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="sugg">${fold("sugg",`💡 Suggestions from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small>`,
-    `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'))}</div>`;
+    `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'))}</div>`;
 }
 function pbBox(){
   const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
@@ -3524,6 +3531,18 @@ const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return 
   return `<div class="pbauto"><span class="pbst ${st}">${lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}</div>`
     +(a.reply&&!sent&&!x.teacher?`<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(${en?"English":"Catalan"}, like their route; they see it on a card the next time they open a page)</small><p>${esc(a.reply)}</p>
     <button data-do="pbsug" data-id="${esc(x.id)}" data-f="${fixMode}" title="${st==="fixed"?"One card: the ✅ fixed note with this message under it":st==="nobug"?"The student gets this message and the report is closed":"The student gets this message; the report stays open"}">📨 ${btn}</button> <button class="g" data-do="pbsuged" data-id="${esc(x.id)}">✏️ Edit first</button></div>`:"")};
+// the card a student gets for an answer to their suggestion: in the language of their level now (Catalan for Starter, Base or no level yet)
+const sgEn=x=>{const s=S.P[x.uid];return !!s&&msgCa(s)===false};
+const sgReply=(x,msg)=>({uid:x.uid,kind:"idea",what:"idea",text:String(x.text||"").slice(0,300),where:"",en:sgEn(x),msg:String(msg||""),created:DEMO?new Date():F.serverTimestamp()});
+const sgNote=(x,msg)=>{const r=replyText(sgReply(x),sgEn(x));return `<div style="border:2px solid ${replyColor("idea")};border-radius:12px;padding:8px 12px;margin:8px 0"><b>${esc(r.title)}</b><br>${esc(r.body)}<div class="pbmsgv" style="margin-top:6px;padding:6px 10px;border-left:4px solid #2563eb;background:#eff6ff;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere">${esc(msg)||'<span class="muted">Your message…</span>'}</div></div>`};
+function sgAnswer(id){
+  const x=(S.D.sg||[]).find(y=>y.id===id);if(!x)return;const en=sgEn(x),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
+  dlg(`<h3>💬 Answer ${who}</h3><p class="muted">💡 Suggestion${x.page?" · "+esc(x.page):""}</p><div class="hand">${esc(x.text)}</div>
+    <label for="sgt">Your message <small class="muted">(up to ${MSG_MAX} characters; the card around it is in ${en?"English":"Catalan"}, like their level)</small></label>
+    <textarea id="sgt" maxlength="${MSG_MAX}" style="min-height:110px" placeholder="${en?"For example: Great idea! From next week you will see your marks on every activity.":"Per exemple: Bona idea! A partir de la setmana que ve veuràs les notes a cada activitat."}"></textarea>
+    <p class="muted" style="margin:6px 0 0">What ${who} sees, once, at the top of the next page they open:</p><div id="sgprev">${sgNote(x,"")}</div>
+    <div class="row" style="justify-content:flex-start"><button data-do="sgmsgok" data-id="${esc(x.id)}" disabled>💬 Send</button></div>`,true);
+  const t=$("#sgt"),b=$('#dlg [data-do="sgmsgok"]');t.oninput=()=>{$("#sgprev").innerHTML=sgNote(x,t.value.trim());b.disabled=!t.value.trim()};t.focus()}
 // "💬 Answer": write to the student. The card's own words follow the report's language; the message goes as written.
 function pbAnswer(id,pre){
   const x=S.D.pb.find(y=>y.id===id);if(!x)return;const en=!!x.route&&!elCa(x.route),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
@@ -4409,7 +4428,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
     annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>msgSend(u,k.id),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
-    sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
+    sgread:()=>act(api.sgRead(k.id,!!k.v)),sgmsg:()=>sgAnswer(k.id),
+    sgmsgok:()=>{const v=$("#sgt").value.trim();if(!v)return;$("#dlg").close();act(api.sgMsg(k.id,v))},sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},
     pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";
       dlg(`<h3>📷 Screenshot</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p><p id="pbimg">Loading…</p>`,true);

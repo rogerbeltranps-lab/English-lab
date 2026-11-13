@@ -5,15 +5,20 @@
 // kind "message" (Roger, 31 Oct 2026: "I want to be able to answer students when they report a problem"): the teacher's own words in msg,
 // saved as problemReplies/{report id}_m{time} so several answers and the fixed/thanks note never overwrite each other. A "fixed" note can
 // carry msg too ("Send and mark as fixed"). The card shows msg as it was written, in its own box under the standard sentence.
+// kind "idea" (Roger, 13 Nov 2026: "I want to be able to answer the students in here", the 💡 Suggestions in Messages): the teacher's answer
+// to a suggestion sent with 💡 Idea, saved as problemReplies/sg_{suggestion id}_m{time}; text = the suggestion, msg = the answer. Same card.
 import {KINDS} from "./el-report.js";
 
 export const MSG_MAX=1000;
-export const replyColor=k=>k==="fixed"?"#16a34a":k==="message"?"#2563eb":"#7c3aed";
+export const replyColor=k=>k==="fixed"?"#16a34a":k==="message"?"#2563eb":k==="idea"?"#d97706":"#7c3aed";
 const cut=(s,n)=>{s=String(s??"").replace(/\s+/g," ").trim();return s.length>n?s.slice(0,n-1)+"…":s};
 // r = the reply document, en = English or Catalan. Returns {title, body}.
 export function replyText(r,en){
   const k=KINDS.find(x=>x.id===r.what)||{},what=(r.text?cut(r.text,100):(en?k.en:k.ca)||"").replace(/[.!?…\s]+$/,""),q=en?`“${what}”`:`«${what}»`,
     w=r.where?cut(r.where,80):"",at=w?(en?` in “${w}”`:` a «${w}»`):"",about=w?(en?` about “${w}”`:` sobre «${w}»`):"";
+  if(r.kind==="idea")return en
+    ?{title:"💡 Your teacher answered your idea",body:`You sent me an idea: ${q}. Thank you! Here is my answer:`}
+    :{title:"💡 El teu professor ha respost la teva idea",body:`Em vas enviar una idea: ${q}. Gràcies! Aquesta és la meva resposta:`};
   if(r.kind==="message")return en
     ?{title:"💬 Your teacher answered you",body:`You told me about a problem${at}: ${q}. Here is my answer:`}
     :{title:"💬 El teu professor t'ha respost",body:`Em vas avisar d'un problema${at}: ${q}. Aquesta és la meva resposta:`};
