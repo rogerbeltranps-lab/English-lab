@@ -96,7 +96,7 @@
       return out;
     }
     if (kind === 'shared') {
-      const items = panel.items.map((it, n) => ({ it, n, on: routes.filter(r => forLevel([it], r).length) })).filter(x => x.on.length);
+      const items = panel.items.map((it, n) => ({ it, n, on: routes.filter(r => forLevel([it], r).length) })).filter(x => x.on.length && !x.it.own);   // ✏️ own examples: no answer to show
       // Everyone first, then Base+, Core+, Plus (stable: the data's order inside each group)
       items.sort((a, b) => (a.on.length === routes.length ? -1 : ri(a.on[0])) - (b.on.length === routes.length ? -1 : ri(b.on[0])) || a.n - b.n);
       items.forEach(({ it, on }) => out.push({

@@ -46,7 +46,7 @@
       (p.receptive ? '<p class="tiny">' + T('Paraules que sentiràs o llegiràs (no cal aprendre-les): ', 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '');
   }
   function grammar(p) {
-    const ex = forLevel(p.explain), items = forLevel(p.items); if (!ex.length) return '';
+    const ex = forLevel(p.explain), items = forLevel(p.items).filter(it => !it.own); if (!ex.length) return '';   // ✏️ own examples have no answer
     return '<h4>' + tx(p.title) + '</h4><div class="box"><b>' + T('Com funciona', 'How it works') + '</b><ul>' + ex.map(e => '<li>' + tx(e) + '</li>').join('') + '</ul></div>' +
       (items.length ? '<p class="sub">' + T('Pràctica del Learning Path, amb les respostes', 'Practice from the Learning Path, with answers') + '</p>' +
         '<table class="practice"><thead><tr><th>' + T('Frase', 'Sentence') + '</th><th>' + T('Resposta', 'Answer') + '</th><th>' + T('Per què', 'Why') + '</th></tr></thead><tbody>' +

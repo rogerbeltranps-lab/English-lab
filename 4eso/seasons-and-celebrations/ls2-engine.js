@@ -192,7 +192,8 @@ var LS2 = (function () {
     return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
   }
   function picksHtml(it, items, prefix, i, mode) {
-    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + choices(it, items, LP.key + prefix + i).map(o =>
+    const salt = LP.key + prefix + i, opts = it.opts ? it.opts.slice().sort((x, y) => hash(salt + x) - hash(salt + y)) : choices(it, items, salt);
+    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + opts.map(o =>
       '<button class="btn secondary" type="button" data-pick="' + prefix + i + '"' + (mode === 'say' ? ' data-say="1"' : '') + ' data-v="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>';
   }
   // highlights the option that is in the box (after a pick or when saved answers come back)
@@ -209,16 +210,45 @@ var LS2 = (function () {
       box.value = b.dataset.v; box.dispatchEvent(new Event('input', { bubbles: true })); syncPicks();
     });
   }
-  function typedHtml(items, prefix, mode) {
-    if (starter()) bindPicks();
+  /* Grammar in parts (Roger, 13 Nov 2026: "students don't have good activities to practise this theory"): a typed panel with `parts`
+     ([{id, r, title, note}]) shows its items in blocks, one per grammar point (item.p = the part's id), each item with its own kind:
+     hear: 1 = 🎧 listen and complete · opts: [...] = 👆 choose (buttons for every route; the first right answer is in a) ·
+     k: 'join' | 'change' | 'fix' = 🔗 / 🔄 / 🔧 · own: {must: [regex], min} = ✏️ a sentence of their own, right when it has at least
+     min words and every pattern (the teacher reads it in the activity) · otherwise ✏️ complete. show: the answer as the student sees it.
+     Without parts, nothing changes: the panel's mode is for every item, as before. */
+  const picking = it => !it.own && (starter() || !!it.opts);
+  const itemMode = (it, mode, parts) => parts ? (it.hear ? 'listen' : it.say ? 'say' : null) : mode;
+  const ownOk = (it, v) => { const t = String(v || '').trim(); return words(t) >= (it.own.min || 5) && (it.own.must || []).every(re => new RegExp(re, 'i').test(t)); };
+  function kindChip(it, m) {
+    const K = { listen: ['🎧', 'Escolta i completa', 'Listen and complete'], pick: ['👆', 'Tria', 'Choose'], join: ['🔗', 'Uneix les dues frases', 'Join the two sentences'],
+      change: ['🔄', 'Canvia la frase', 'Change the sentence'], fix: ['🔧', 'Troba l’error i corregeix-lo', 'Find the mistake and correct it'],
+      own: ['✏️', 'El teu exemple', 'Your own example'], fill: ['✏️', 'Completa', 'Complete'] };
+    const k = K[m === 'listen' ? 'listen' : it.own ? 'own' : it.k && K[it.k] ? it.k : it.opts ? 'pick' : 'fill'];
+    return '<span class="gkind gk-' + (it.own ? 'own' : m === 'listen' ? 'listen' : it.k || (it.opts ? 'pick' : 'fill')) + '">' + k[0] + ' ' + (ca() ? k[1] : k[2]) + '</span>';
+  }
+  function partsCss() {
+    if (document.getElementById('el-gparts-css')) return;
+    const st = document.createElement('style'); st.id = 'el-gparts-css';
+    st.textContent = '.gpart{margin:26px 0 6px;padding-top:14px;border-top:2px dashed var(--line,#d8e0ea)}.gpart:first-child{margin-top:0;padding-top:0;border-top:0}.gpart h3{margin:0 0 6px}' +
+      '.gnote{padding:10px 14px;border-radius:12px;background:#f3f7fc;border:1px solid #c5d8ef;line-height:1.55;margin-bottom:6px}' +
+      '.gkind{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:800;background:#eef2f7;color:#334155}' +
+      '.gk-pick{background:#e0f2fe;color:#075985}.gk-join{background:#ede9fe;color:#5b21b6}.gk-change{background:#fef3c7;color:#92400e}.gk-fix{background:#fee2e2;color:#991b1b}.gk-own{background:#dcfce7;color:#166534}.gk-listen{background:#f1f5f9;color:#334155}' +
+      '.question input.typed.own{width:100%;max-width:none}';
+    document.head.appendChild(st);
+  }
+  function typedHtml(items, prefix, mode, parts) {
+    if (starter() || items.some(it => it.opts)) bindPicks();
+    if (parts) partsCss();
+    let sec = null, np = 0;   // blocks are numbered in the order this route sees them
+    const head = it => { if (!parts || it.p === sec) return ''; sec = it.p; const pt = parts.find(x => x.id === it.p); return pt ? '<div class="gpart"><h3>' + (++np) + ' · ' + tx(pt.title) + '</h3>' + (pt.note ? '<div class="gnote">' + tx(pt.note) + '</div>' : '') + '</div>' : ''; };
     return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
-      items.map((it, i) => '<div class="question">' + (mode === 'listen'
+      items.map((it, i) => { const m = itemMode(it, mode, parts), pk = picking(it); return head(it) + '<div class="question">' + (parts ? kindChip(it, m) : '') + (m === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
-        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : starter() ? ' readonly placeholder="Tria una opció"' : '') + '>' +
-      (starter() ? picksHtml(it, items, prefix, i, mode) : '') +
-      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
+        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
+      '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' +
+      (pk ? picksHtml(it, items, prefix, i, m) : '') +
+      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>'; }).join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
   /* More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
@@ -244,13 +274,15 @@ var LS2 = (function () {
   }
   // the accepted answer the student said (in any recognition alternative), or null
   const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
-  function bindModes(items, prefix, mode) {
-    if (mode === 'listen') items.forEach((it, i) => {
+  function bindModes(items, prefix, mode, parts) {
+    items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'listen') return;
       $('[data-hear="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.9);
       $('[data-hear-slow="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.65);
     });
-    const SR = SRC(); if (mode !== 'say' || !SR) return;
+    const SR = SRC(); if (!SR) return;
     items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'say') return;
       const b = $('[data-mic="' + prefix + i + '"]'), box = $('#' + prefix + i), h = $('#' + prefix + 'h' + i), k = prefix + i + 'say';
       b.onclick = () => {
         let r; try { r = new SR(); } catch (e) { box.readOnly = false; return; }
@@ -274,17 +306,17 @@ var LS2 = (function () {
   function checkTyped(items, prefix, reveal, count) {
     let score = 0; got = [];
     items.forEach((it, i) => {
-      const v = norm($('#' + prefix + i).value), ok = fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
+      const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
-      if (starter() && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
+      if (picking(it) && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
-      f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!')
-        : !v ? (starter() ? 'Tria una resposta.' : ca() ? 'Escriu una resposta.' : 'Type an answer.')
+      f.innerHTML = ok ? (it.own ? (ca() ? 'Molt bé! El professor pot llegir la teva frase.' : 'Well done! Your teacher can read your sentence.') : (ca() ? 'Correcte!' : 'Correct!'))
+        : !v ? (picking(it) ? (ca() ? 'Tria una resposta.' : 'Choose an answer.') : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
-          (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.a[0]) + '</strong>'
+          (show ? (it.own ? (ca() ? 'Un exemple: ' : 'An example: ') : (ca() ? 'Resposta: ' : 'Answer: ')) + '<strong>' + esc(it.show || (it.a || [])[0] || '') + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
       f.className = 'feedback ' + (ok ? 'ok' : 'no');
     });
@@ -752,10 +784,10 @@ var LS2 = (function () {
 
   R.typed = p => ({
     html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
-      '<div class="section-card">' + (p.mode ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+      '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       const items = forLevel(p.items);
-      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
+      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
       stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = answered(items, p.id); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items);
     }
   });
