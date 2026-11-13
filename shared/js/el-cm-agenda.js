@@ -102,7 +102,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag details{margin:6px 0;border:1.5px solid #e0e7ff;border-radius:12px;padding:4px 8px}#el-cmag summary{cursor:pointer;font-weight:800;padding:4px 0;list-style-position:inside}
 #el-cmag summary small{color:#64748b;font-weight:600}#el-cmag .chips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 0 6px}
 #el-cmag .chip{border:1.5px solid #c7d2fe;border-radius:999px;background:#eef2ff;color:#1e1b4b;font:700 13px system-ui,sans-serif;padding:5px 10px;cursor:pointer}
-#el-cmag .chip:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .chip.done{background:#f1f5f9;border-color:#e2e8f0;color:#64748b;cursor:default}
+#el-cmag .chip:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .chip.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6}#el-cmag .chip.shd:hover{border-color:#7c3aed}#el-cmag .chip.shd span{color:#7c3aed}#el-cmag .chip.done{background:#f1f5f9;border-color:#e2e8f0;color:#64748b;cursor:default}
 #el-cmag .back{border:0;background:none;color:#4338ca;font:800 14px system-ui,sans-serif;cursor:pointer;padding:2px 0;margin:0 0 6px}
 #el-cmag.dock .row .it{flex-wrap:wrap;gap:2px 6px;padding:5px 7px}#el-cmag.dock .row .it>span:not(.m):not(.go){flex:1 1 100%}#el-cmag.dock .row .it .m{order:3}#el-cmag.dock .row .it .go{order:4;margin-left:auto}
 #el-cmag.dock .en,#el-cmag.dock .mo{width:30px;font-size:14px;border-radius:10px}#el-cmag.dock .acts{margin-left:35px}#el-cmag.dock .acts button{font-size:12px;padding:4px 8px}
@@ -244,6 +244,10 @@ async function draw(){if(!box)return;
 function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];let body="";const many=L.length>1;
   [...L].reverse().forEach(x=>{const as=(window.EL_CATALOG||[]).filter(a=>a.ls===x.ls.id&&secs(a).length&&!a.checkpoint&&!a.optional);if(!as.length)return;
     if(many)body+=`<div class="lp">${E(x.ls.title.replace(/^\dESO · /,""))}</div>`;
+    // 🎬 the unit's shadowing video with the whole class (Roger, 13 Nov 2026: "the shadowing of the unit should be on the menu to add steps
+    // during class mode"): goes on today's class like the Time plan's 🎬 Shadowing (the note SHD) and plays at once
+    if(x.ls.shadowing){const tday=((x.ag.days||{})[t]||[]).includes(SHD),n=its.push({x,shd:true})-1;
+      body+=`<div class="chips sh"><button class="chip shd" data-ad="${n}" title="${tday?"Already on today: play it now":"Add it to today's class and play the video now"}">🎬 Shadowing · whole class${tday?" ✓":""} <span>▶</span></button></div>`}
     as.forEach(a=>{const shut=window.elLpOpen&&!elLpOpen(a,x.info,C.g,true),here=hereIs(a,"");
       body+=`<details ${here?"open":""}><summary>${E(lpLab(x,a))}${shut?" <small>· not opened yet</small>":""}</summary><div class="chips">`
         +secs(a).map(([p,nm])=>{const it=a.id+"#"+p;if(on.has(it))return `<span class="chip done" title="Already on today">✓ ${E(nm)}</span>`;
@@ -274,7 +278,11 @@ function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dat
   go(x,b)}
 const busy=async(b,f)=>{b.disabled=true;try{await f()}catch(err){console.warn("class mode",err);say("✗ Not saved: "+(err.code||err.message||err),true)}b.disabled=false;draw()};
 // ➕ on today's agenda (taken off a later day where it was planned), open for the group, 👥 for the students
-function addStep(y,b){if(!y)return;const t=today();return busy(b,async()=>{await ensureOpen(y.x,y.a,y.p);
+function addStep(y,b){if(!y)return;const t=today();
+  if(y.shd){const src=new URL(y.x.ls.shadowing,C.root).href;return busy(b,async()=>{
+    await agWrite(y.x,ag=>{if((ag.days[t]||[]).includes(SHD))return false;addIt(ag,t,SHD)});
+    ADD=false;say("🎬 Shadowing is on today's class");play(src)})}
+  return busy(b,async()=>{await ensureOpen(y.x,y.a,y.p);
   await agWrite(y.x,ag=>{Object.keys(ag.days).forEach(d=>{if(d>t)rmIt(ag,d,y.it)});addIt(ag,t,y.it)});
   EN.add(y.it);enSave();ADD=false;say("➕ "+lpShort(y.x,y.a)+" · "+itName(y.a,y.p)+" is on today: students can do it (👥)")})}
 // 🏠 homework for the next class, or taken off again
