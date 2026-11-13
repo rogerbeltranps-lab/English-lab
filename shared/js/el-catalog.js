@@ -343,7 +343,9 @@ window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.s
 // 📘 Grammar together (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section. Start with the grammar of the
 // LP3, LS2"): the learning paths ("<course>/<ls folder>/<page>") whose Grammar tab gets ✅ Correct (shared/correct/, tab=grammar).
 // Another one: add it here (its grammar step: type typed, explain boxes and items with r: tags, like LP3).
-window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/now-or-usually","4eso/seasons-and-celebrations/where-traditions-come-from"];
+// Every LS2 learning path with a Grammar tab since 13 Nov 2026 (2ESO A used it on LP2 that morning and found no ✅ Correct there).
+window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/what-are-they-doing","2eso/free-time-live/now-or-usually","2eso/free-time-live/likes-and-screen-tips","2eso/free-time-live/write-your-vlog-script",
+  "4eso/seasons-and-celebrations/celebrations-around-the-world","4eso/seasons-and-celebrations/where-traditions-come-from","4eso/seasons-and-celebrations/plan-the-day","4eso/seasons-and-celebrations/write-to-the-head-teacher"];
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
   ((p&&p.rows)||[]).forEach(r=>String(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=acts.find(y=>sh(y.title).startsWith(nm)||nm.startsWith(sh(y.title)));if(a&&!m[n])m[n]=a}));
