@@ -7,7 +7,7 @@
 :root{
   --nb-paper:#fffef8;--nb-line:#c7d9ee;--nb-margin:#ef9a9a;
   --nb-ink:#1f4fb5;--nb-black:#23262b;--nb-red:#d32f2f;--nb-green:#2e7d32;--nb-pencil:#5f6874;
-  --nb-hl-y:#fff176;--nb-hl-g:#b9f6ca;--nb-hl-p:#ffc1e3;
+  --nb-hl-y:#fff176;--nb-hl-g:#b9f6ca;--nb-hl-p:#ffc1e3;--nb-hl-b:#b3e5fc;--nb-hl-o:#ffd59e;
   --nb-hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
   --nb-teacher:"Kalam","Segoe Print","Comic Sans MS",cursive;
   --nb-sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -16,10 +16,12 @@ html.el-nb-plain{--nb-hand:var(--nb-sans);--nb-teacher:var(--nb-sans)}
 
 /* ---------- marks a student makes (notebook and whiteboard page) ---------- */
 .nb-pen-b{color:#1f4fb5}.nb-pen-k{color:#23262b}.nb-pen-r{color:#d32f2f}.nb-pen-g{color:#2e7d32}
-.nb-hl-y,.nb-hl-g,.nb-hl-p{border-radius:.6em .25em .7em .3em;padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.nb-hl-y,.nb-hl-g,.nb-hl-p,.nb-hl-b,.nb-hl-o{border-radius:.6em .25em .7em .3em;padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .nb-hl-y{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-y) 3% 95%,transparent 99%)}
 .nb-hl-g{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-g) 3% 95%,transparent 99%)}
 .nb-hl-p{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-p) 3% 95%,transparent 99%)}
+.nb-hl-b{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-b) 3% 95%,transparent 99%)}
+.nb-hl-o{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-o) 3% 95%,transparent 99%)}
 .nb-ul{text-decoration:underline;text-decoration-thickness:2.5px;text-underline-offset:5px;text-decoration-color:var(--nb-red)}
 .nb-ulw{text-decoration:underline wavy;text-decoration-thickness:1.6px;text-underline-offset:5px;text-decoration-color:var(--nb-red)}
 .nb-circ{border:2.2px solid var(--nb-red);border-radius:50% 45% 55% 48%/60% 50% 55% 45%;padding:0 .25em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -604,3 +606,14 @@ a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) sc
 /* a whole year of LSs: the tabs share the edge (never cut off); from 5 LSs on only "LS5" shows, the name is in the tooltip */
 .nb-lside .nb-tab.nb-lt{flex:0 1 auto;min-height:0}
 .nb-lside.nb-many{gap:5px}.nb-lside.nb-many .nb-tab.nb-lt span{display:none}.nb-lside.nb-many .nb-tab.nb-lt{padding:8px 5px 8px 7px;text-overflow:clip}
+/* 🔒 nothing moves (13 Nov 2026): ➕ beside an index section adds a section of the student's own after it; ↶ Undo in the bar */
+.nb-mv [data-nbins]{opacity:.55;width:28px}
+.nb-mv [data-nbins]:hover,.nb-mv [data-nbins]:focus-visible{opacity:1}
+.nb-ownli>.nb-row>a{color:var(--nb-ink)}
+.nb-after{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--nb-sans);color:#5b6878}
+.nb-after select{font:600 14px var(--nb-sans);max-width:260px;border:1px solid #d5dce5;border-radius:8px;padding:4px 6px;background:#fff;color:#16202c}
+.nb-undo:disabled{opacity:.4;cursor:default}
+.nb-tipb{position:fixed;z-index:60;max-width:340px;background:#fffbe0;border:1px solid #e6d77a;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 14px;font:500 15px/1.4 var(--nb-sans);color:#16202c}
+@media print{.nb-tipb{display:none}}
+.nb-add input{flex:1 1 100%}
+.nb-undo,.nb-hlbar,.nb-pibar{font-size:17px;padding:4px 9px}
