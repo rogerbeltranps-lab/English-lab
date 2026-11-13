@@ -53,7 +53,7 @@ html.el-nb-full #el-nbfab{display:none}
 .nb-ring{width:42px;height:9px;border-radius:9px;background:linear-gradient(#f2f4f7,#9aa3ad 55%,#6b737c);box-shadow:0 1px 1px rgba(0,0,0,.25)}
 .nb-page,.nb-spine{grid-row:1}
 .nb-paper{position:absolute;inset:0;overflow:hidden;padding:32px 22px 44px 72px;color:var(--nb-black);font:500 23px/32px var(--nb-hand);
-  background:linear-gradient(90deg,transparent 58px,var(--nb-margin) 58px,var(--nb-margin) 60px,transparent 60px),repeating-linear-gradient(transparent 0 31px,var(--nb-line) 31px 32px);background-attachment:local}
+  background:linear-gradient(90deg,transparent 58px,var(--nb-margin) 58px,var(--nb-margin) 60px,transparent 60px),repeating-linear-gradient(transparent 0 24px,var(--nb-line) 24px 25px,transparent 25px 32px);background-attachment:local}
 html.el-nb-plain .nb-paper{font-size:16px}
 .nb-pno{position:absolute;bottom:8px;font:600 16px var(--nb-hand);color:var(--nb-pencil)}
 .nb-page.l .nb-pno{left:44px}.nb-page.r .nb-pno{right:46px}
@@ -617,3 +617,27 @@ a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) sc
 @media print{.nb-tipb{display:none}}
 .nb-add input{flex:1 1 100%}
 .nb-undo,.nb-hlbar,.nb-pibar{font-size:17px;padding:4px 9px}
+
+/* ✍ handwriting sits ON the ruled lines (Roger, 13 Nov 2026: "hauria d'escriure damunt de les línies"): in a 32px line the handwriting's
+   baseline is 23px down, so the rule is drawn at 24px. In the pad (notes, whiteboard) the lines belong to the writing itself, so they
+   follow it whatever the toolbar's height. */
+.nb-ed-sheet .nb-paper,#el-wb .wb-sheet .nb-paper{background:linear-gradient(90deg,transparent 58px,var(--nb-margin) 58px,var(--nb-margin) 60px,transparent 60px) var(--nb-paper);background-attachment:local}
+.nb-ed-sheet[data-pi="y"] .nb-paper{background-color:#fff9c4}.nb-ed-sheet[data-pi="p"] .nb-paper{background-color:#fce4ec}.nb-ed-sheet[data-pi="g"] .nb-paper{background-color:#e8f5e9}.nb-ed-sheet[data-pi="b"] .nb-paper{background-color:#e3f2fd}
+.pad-ed{background:repeating-linear-gradient(transparent 0 24px,var(--nb-line) 24px 25px,transparent 25px 32px) local;line-height:32px}
+.nb-ed-sheet .pad-ed{min-height:calc(100vh - 260px)}
+#el-wb .wb-sheet .pad-ed{min-height:60vh}
+/* 🟨 real post-its: small squares on top of the page, dragged by the top strip, stuck to the nearest word (el-notebook.js fpi…) */
+.nb-fpi{position:absolute;z-index:30;width:156px;height:156px;box-sizing:border-box;display:flex;flex-direction:column;background:#fff59d;color:var(--nb-ink);
+  box-shadow:0 1px 1px rgba(0,0,0,.08),0 8px 14px -6px rgba(0,0,0,.35);transform:rotate(var(--rot,0deg));border-radius:2px 2px 14px 2px}
+.nb-fpi.pi-p{background:#f8bbd0}.nb-fpi.pi-g{background:#c8e6c9}.nb-fpi.pi-b{background:#bbdefb}
+.nb-fpi.drag{transform:rotate(0) scale(1.04);box-shadow:0 14px 24px -8px rgba(0,0,0,.45);z-index:31}
+.nb-fpi-top{flex:0 0 22px;display:flex;align-items:center;gap:4px;padding:0 4px 0 8px;background:rgba(0,0,0,.06);cursor:grab;touch-action:none;font:14px/1 var(--nb-sans);color:rgba(0,0,0,.45)}
+.nb-fpi.drag .nb-fpi-top{cursor:grabbing}
+.nb-fpi-top span{flex:1}
+.nb-fpi-top button{border:0;background:transparent;cursor:pointer;padding:0 3px;font:600 13px/1 var(--nb-sans);color:rgba(0,0,0,.5)}
+.nb-fpi-c{width:14px;height:14px;border-radius:50%!important;border:1.5px solid rgba(0,0,0,.35)!important;background:conic-gradient(#fff59d 0 25%,#f8bbd0 0 50%,#c8e6c9 0 75%,#bbdefb 0)!important}
+.nb-fpi textarea,.nb-fpi-t{flex:1;width:100%;box-sizing:border-box;border:0;background:transparent;resize:none;outline:none;padding:0 8px;margin:0;color:var(--nb-ink);
+  font:500 21px/26px var(--nb-hand);overflow:hidden;white-space:pre-wrap}
+.nb-fpi textarea::placeholder{color:rgba(0,0,0,.35)}
+html.el-nb-plain .nb-fpi textarea,html.el-nb-plain .nb-fpi-t{font-size:15px;line-height:20px}
+@media print{.nb-fpi{box-shadow:none;border:1px solid #e6d77a}.nb-fpi-top span,.nb-fpi-top button{display:none}}

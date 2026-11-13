@@ -79,6 +79,7 @@ window.ELNotebook = (function () {
   const kindIcon = k => k === 'grammar' ? '🧩' : k === 'vocab' ? '📚' : '🎮';
   const gname = g => String(g.title || '').replace(/^(Grammar|Vocabulary) · /, '').replace(/^📘\s*/, '');
   const fk = s => String(s).replace(/[^A-Za-z0-9_~-]/g, '_').slice(0, 80);   // a safe key for Firestore maps and data-b
+  const nid = () => 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);   // a new note's id, never the same twice
   const today = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
   const hasInk = v => !!(v && (String(v.text || '').trim() || String(v.html || '').replace(/<[^>]*>/g, '').trim() || (Array.isArray(v.dr) && v.dr.length)));
 
@@ -466,7 +467,7 @@ window.ELNotebook = (function () {
     const out = [], LS = H.LS, ls = (window.EL_LS || []).find(l => l.id === LS) || {};
     const course = String(ls.course || '').replace(/^(\d)eso$/, '$1 ESO'), name = String(ls.title || '').replace(/^[^·]*·\s*/, '');
     games.forEach(g => { gamesById[fk('g-' + g.id)] = g; });
-    const notesOf = key => Object.entries(NT()).filter(([, v]) => v && v.sec === key).sort((a, b) => a[0].localeCompare(b[0])).map(([id, v]) => ({ id, note: true, html: noteHtml(v) }));
+    const notesOf = key => Object.entries(NT()).filter(([, v]) => v && !v.fl && v.sec === key).sort((a, b) => a[0].localeCompare(b[0])).map(([id, v]) => ({ id, note: true, html: noteHtml(v) }));
     const addBtn = key => H.own ? `<div class="nb-links nb-ui"><button type="button" class="nb-addnote" data-sec="${key}">✍ ${t('Afegeix una nota', 'Add a note')}</button><button type="button" class="nb-addnote" data-sec="${key}" data-pi="y">🟨 ${t('Enganxa-hi un post-it', 'Stick a post-it')}</button></div>` : '';
     // the cover
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
@@ -545,7 +546,7 @@ window.ELNotebook = (function () {
     });
     // ✍ Quick notes: the notes taken with the 📓 button on a page that is not a learning path of this notebook (el-cloud.js qnOpen), and
     // any note whose section is not in the notebook (a learning path the class hasn't started yet), so a note never gets lost
-    const keys = new Set(out.map(x => x.key)), lost = Object.entries(NT()).filter(([, v]) => v && v.sec !== 'qn' && !keys.has(v.sec));
+    const keys = new Set(out.map(x => x.key)), lost = Object.entries(NT()).filter(([, v]) => v && !v.fl && v.sec !== 'qn' && !keys.has(v.sec));
     const qn = notesOf('qn').concat(lost.map(([id, v]) => ({ id, note: true, html: noteHtml(v) })));
     if (qn.length) out.push({ key: 'qn', tab: '📍', l: '📍 ' + t('Notes ràpides', 'Quick notes'), head: `<p class="nb-h1"><u>📍 ${t('Notes ràpides', 'Quick notes')}</u></p>`, blocks: ordered('qn', qn), foot: addBtn('qn') });
     // 🔒 the sections from the web always in their own order; the student's own ones go in after the one they chose (a section added
@@ -789,7 +790,7 @@ window.ELNotebook = (function () {
     let cur = null; root.querySelectorAll('.nb-tab:not(.nb-ctab)').forEach(b => { if (!b.hidden && b.dataset.nbgo != null && +b.dataset.nbgo <= z) cur = b; });
     const onSum = cur && (cur.classList.contains('nb-sumtab') || cur.classList.contains('nb-fptab'));
     root.querySelectorAll('.nb-tab').forEach(b => b.setAttribute('aria-current', String(b === cur || (b.classList.contains('nb-ctab') && !onSum && +b.dataset.chap === cz && +b.dataset.nbgo <= z))));
-    store.set('el-nb-pg|' + LSKEY, String(pg)); hideSel(); side(a, z);
+    store.set('el-nb-pg|' + LSKEY, String(pg)); hideSel(); side(a, z); fpiPlace();
   }
   // 📌 the sections of the learning path open on the screen, as post-its sticking out of the book's edge: a tap goes to that section
   function side(a, z) {
@@ -1056,9 +1057,13 @@ window.ELNotebook = (function () {
     const b = e.target.closest && e.target.closest('.nb [data-nbadd],.nb [data-nbed],.nb .nb-addnote,.nb .nb-note'); if (!b || !H || !H.own) return;
     if (b.classList.contains('nb-note') && (e.target.closest('.nb-ui') || getSelection().toString())) return;
     e.preventDefault();
+    if (b.dataset.pi && (b.dataset.nbadd || b.classList.contains('nb-addnote'))) {   // 🟨 a real post-it, stuck beside this part (fpiNew)
+      const pgEl = b.closest('.nb-page'), pr = pgEl.getBoundingClientRect(), br = (b.closest('.nb-blk') || b).getBoundingClientRect();
+      return fpiNew(pgEl, pr.width - FPW - 26, Math.max(8, br.top - pr.top));
+    }
     if (b.dataset.nbadd || b.classList.contains('nb-addnote')) {
       const after = b.dataset.nbadd, s = after ? secOf(after) : secs.find(x => x.key === b.dataset.sec && (x.ci || 0) === (H.ci || 0)); if (!s) return;
-      const id = 'n' + Date.now().toString(36), ids = s.blocks.map(x => x.id), at = after ? ids.indexOf(after) + 1 : ids.length;
+      const id = nid(), ids = s.blocks.map(x => x.id), at = after ? ids.indexOf(after) + 1 : ids.length;
       snap();
       NT()[id] = { sec: s.key, html: '', text: '', dr: [], day: today(), pi: b.dataset.pi || '' }; ids.splice(at, 0, id); O().b[s.key] = ids;
       return editor({ kind: 'note', id, sec: s, fresh: true });
@@ -1089,13 +1094,127 @@ window.ELNotebook = (function () {
   // the page on the screen (the right page first), at its end; on the cover, the index or a summary page, in 📍 Quick notes
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.nb .nb-pibar'); if (!b || !H || !H.own) return; e.preventDefault();
-    const els = [...document.querySelectorAll('.nb-spread .nb-page.r, .nb-spread .nb-page.l')];
-    let s = null; for (const el of els) { const x = secs[+el.dataset.s]; if (x && !x.fixed && x.key !== 'chap') { s = x; use(+el.dataset.ci || 0); break; } }
-    if (!s) { const el = els[els.length - 1]; if (el) use(+el.dataset.ci || 0); s = secs.find(x => x.key === 'qn' && (x.ci || 0) === (H.ci || 0)) || { key: 'qn', l: '📍 ' + t('Notes ràpides', 'Quick notes'), blocks: [] }; }
-    const id = 'n' + Date.now().toString(36), ids = (s.blocks || []).map(x => x.id);
-    snap(); NT()[id] = { sec: s.key, html: '', text: '', dr: [], day: today(), pi: 'y' }; ids.push(id); O().b[s.key] = ids;
-    editor({ kind: 'note', id, sec: s, fresh: true });
+    const el = document.querySelector('.nb-spread .nb-page.r') || document.querySelector('.nb-spread .nb-page.l'); if (!el) return;
+    const r = el.getBoundingClientRect(), n = el.querySelectorAll('.nb-fpi').length;
+    fpiNew(el, Math.max(20, r.width - FPW - 40 - n * 18), 70 + n * 26);
   });
+  // 🟨 Real post-its (Roger, 13 Nov 2026: "el post-it hauria de tenir forma de post-it i poder-lo moure per tota la pàgina i que estigui
+  // sempre per damunt. Si en afegir informació es mouen, que apareguin a prop de la paraula que tenien més a prop"): a small square on top
+  // of the page, written on straight away, dragged anywhere by its top strip. Each one is stuck to the word nearest its corner (a: {b: the
+  // part, o: where the word starts in that part's text, x: its first letters}, dx/dy from that word), so when pages flow differently it
+  // comes back beside the same word. Kept with the other notes in n: {sec, fl: 1, a, dx, dy, text, pi, day}.
+  const FPW = 156;
+  const pageOf = i => pages[i] && pages[i].el;
+  // the word nearest a point of a page (page coordinates): its part, where it starts and its box
+  function nearWord(pgEl, x, y) {
+    const pr = pgEl.getBoundingClientRect(); let best = null;
+    pgEl.querySelectorAll('.nb-blk[data-b]').forEach(pc => {
+      let acc = +pc.dataset.off || 0;
+      tnodes(pc).forEach(tn => {
+        const v = tn.nodeValue, re = /\S+/g; let m;
+        while ((m = re.exec(v))) {
+          const r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length);
+          const q = r.getClientRects()[0]; if (!q || !q.width) continue;
+          const wx = q.left - pr.left, wy = q.top - pr.top, dx = Math.max(wx - x, 0, x - (wx + q.width)), dy = Math.max(wy - y, 0, y - (wy + q.height)), d = dx * dx + dy * dy;
+          if (!best || d < best.d) best = { d, b: pc.dataset.b, o: acc + m.index, x: v.slice(m.index, m.index + 24), wx, wy };
+        }
+        acc += v.length;
+      });
+    });
+    return best;
+  }
+  // where a post-it goes now: beside its word (found again by its letters if the text changed), else at the top of its section
+  function fpiAt(v, ci) {
+    const a = v.a || {};
+    if (a.b) {
+      const ps = blkEls(a.b, ci); if (ps.length) {
+        const full = ps.map(pc => tnodes(pc).map(n => n.nodeValue).join('')).join(''); let o = +a.o || 0;
+        if (a.x && full.slice(o, o + a.x.length) !== a.x) { let bestI = -1, i = full.indexOf(a.x); while (i >= 0) { if (bestI < 0 || Math.abs(i - o) < Math.abs(bestI - o)) bestI = i; i = full.indexOf(a.x, i + 1); } if (bestI >= 0) o = bestI; }
+        const pc = ps.filter(x => (+x.dataset.off || 0) <= o).pop() || ps[0]; let acc = +pc.dataset.off || 0;
+        for (const tn of tnodes(pc)) {
+          const L = tn.nodeValue.length;
+          if (o < acc + L) { const pgEl = pc.closest('.nb-page'); return { pgEl, tn, k: Math.max(0, o - acc) }; }
+          acc += L;
+        }
+        return { pgEl: pc.closest('.nb-page'), el: pc };
+      }
+    }
+    const si = secs.findIndex(x => x.key === v.sec && (x.ci || 0) === ci); const i = pages.findIndex(p => p.s === si);
+    return i >= 0 ? { pgEl: pageOf(i) } : null;
+  }
+  function fpiPlace() { 
+    document.querySelectorAll('.nb-spread .nb-fpi').forEach(x => { if (!x.contains(document.activeElement) && !x.classList.contains('drag')) x.remove(); });
+    if (!H) return; const keep = H.ci || 0;
+    CH.forEach((c, ci) => {
+      use(ci); const N = NT();
+      Object.entries(N).forEach(([id, v]) => {
+        if (!v || !v.fl || document.querySelector(`.nb-spread .nb-fpi[data-n="${id}"][data-ci="${ci}"]`)) return;
+        const at = fpiAt(v, ci); if (!at || !at.pgEl || !at.pgEl.getClientRects().length) return;
+        const pr = at.pgEl.getBoundingClientRect(); let wx = 0, wy = 0;
+        if (at.tn) { const r = document.createRange(); r.setStart(at.tn, at.k); r.setEnd(at.tn, Math.min(at.tn.nodeValue.length, at.k + 1)); const q = r.getClientRects()[0]; if (q) { wx = q.left - pr.left; wy = q.top - pr.top; } }
+        else if (at.el) { const q = at.el.getBoundingClientRect(); wx = q.left - pr.left; wy = q.top - pr.top; }
+        const x = Math.max(4, Math.min(pr.width - FPW - 4, wx + (+v.dx || 0))), y = Math.max(4, Math.min(pr.height - FPW - 4, wy + (+v.dy || 0)));
+        at.pgEl.append(fpiEl(id, v, ci, x, y));
+      });
+    });
+    use(keep);
+  }
+  const PIC = ['y', 'p', 'g', 'b'];
+  function fpiEl(id, v, ci, x, y) {
+    const d = document.createElement('div'); d.className = `nb-fpi nb-ui pi-${PIC.includes(v.pi) ? v.pi : 'y'}`; d.dataset.n = id; d.dataset.ci = ci;
+    d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.setProperty('--rot', ((parseInt(id.slice(-2), 36) || 0) % 5 - 2) * .7 + 'deg');
+    d.innerHTML = H.own ? `<div class="nb-fpi-top" title="${t('Arrossega\'l on vulguis', 'Drag it anywhere')}"><span aria-hidden="true">⠿</span><button type="button" class="nb-fpi-c" title="${t('Canvia el color', 'Change the colour')}" aria-label="${t('Canvia el color', 'Change the colour')}"></button><button type="button" class="nb-fpi-x" title="${t('Treu el post-it', 'Remove the post-it')}" aria-label="${t('Treu el post-it', 'Remove the post-it')}">✕</button></div><textarea maxlength="400" spellcheck="false" autocomplete="off" aria-label="Post-it" placeholder="${t('Escriu aquí…', 'Write here…')}">${esc(v.text || '')}</textarea>`
+      : `<div class="nb-fpi-top"></div><div class="nb-fpi-t">${esc(v.text || '')}</div>`;
+    return d;
+  }
+  const fpiNote = d => { use(+d.dataset.ci); return NT()[d.dataset.n]; };
+  // a new post-it at x, y of a page (page coordinates), stuck to the nearest word, ready to write on
+  function fpiNew(pgEl, x, y) {
+    if (!pgEl || !H || !H.own) return; use(+(pgEl.dataset.ci || 0));
+    const w = nearWord(pgEl, x, y), s = secs[+pgEl.dataset.s] || {}, id = nid();
+    snap();
+    NT()[id] = { sec: s.key || 'qn', fl: 1, a: w ? { b: w.b, o: w.o, x: w.x } : {}, dx: Math.round(w ? x - w.wx : x), dy: Math.round(w ? y - w.wy : y), text: '', html: '', dr: [], day: today(), pi: 'y' };
+    save(); fpiPlace();
+    const el = document.querySelector(`.nb-spread .nb-fpi[data-n="${id}"] textarea`); if (el) el.focus();
+  }
+  document.addEventListener('focusin', e => { const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (ta && !ta.dataset.snap) { ta.dataset.snap = '1'; snap(); } });
+  document.addEventListener('input', e => {
+    const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (!ta || !H || !H.own) return;
+    const v = fpiNote(ta.closest('.nb-fpi')); if (v) { v.text = ta.value.slice(0, 400); save(); }
+  });
+  document.addEventListener('focusout', e => {
+    const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (!ta) return; delete ta.dataset.snap;
+    const d = ta.closest('.nb-fpi'), v = fpiNote(d);   // an empty post-it left behind goes away
+    if (v && !String(v.text || '').trim() && !d.classList.contains('drag')) setTimeout(() => { if (d.contains(document.activeElement)) return; delete NT()[d.dataset.n]; save(); d.remove(); }, 150);
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.nb .nb-fpi button'); if (!b || !H || !H.own) return; e.preventDefault();
+    const d = b.closest('.nb-fpi'), v = fpiNote(d); if (!v) return; snap();
+    if (b.classList.contains('nb-fpi-x')) { delete NT()[d.dataset.n]; d.remove(); }
+    else { v.pi = PIC[(PIC.indexOf(v.pi) + 1) % PIC.length]; PIC.forEach(k => d.classList.toggle('pi-' + k, k === v.pi)); }
+    save();
+  });
+  // ⠿ dragging by the top strip, anywhere on the page; on the drop it sticks to the word nearest its corner
+  let FD = null;
+  document.addEventListener('pointerdown', e => {
+    const top = e.target.closest && e.target.closest('.nb .nb-fpi-top'); if (!top || e.target.closest('button') || !H || !H.own) return;
+    const d = top.closest('.nb-fpi'); e.preventDefault(); e.stopPropagation();
+    FD = { d, id: e.pointerId, x: e.clientX, y: e.clientY, l: parseFloat(d.style.left), t: parseFloat(d.style.top), moved: false };
+    d.classList.add('drag'); try { top.setPointerCapture(e.pointerId); } catch (x) {}
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (!FD || e.pointerId !== FD.id) return; const pgEl = FD.d.closest('.nb-page'), pr = pgEl.getBoundingClientRect();
+    const dx = e.clientX - FD.x, dy = e.clientY - FD.y; if (!FD.moved && Math.hypot(dx, dy) < 4) return; FD.moved = true;
+    FD.d.style.left = Math.max(4, Math.min(pr.width - FPW - 4, FD.l + dx)) + 'px'; FD.d.style.top = Math.max(4, Math.min(pr.height - FPW - 4, FD.t + dy)) + 'px';
+  }, true);
+  const fdEnd = e => {
+    if (!FD || (e.pointerId != null && e.pointerId !== FD.id)) return; const { d, moved } = FD; FD = null; d.classList.remove('drag');
+    if (!moved) { const ta = d.querySelector('textarea'); if (ta) ta.focus(); return; }
+    const v = fpiNote(d); if (!v) return; const x = parseFloat(d.style.left), y = parseFloat(d.style.top), w = nearWord(d.closest('.nb-page'), x, y);
+    snap(); v.a = w ? { b: w.b, o: w.o, x: w.x } : {}; v.dx = Math.round(w ? x - w.wx : x); v.dy = Math.round(w ? y - w.wy : y);
+    const s = secs[+d.closest('.nb-page').dataset.s]; if (s && s.key) v.sec = s.key; save();
+  };
+  document.addEventListener('pointerup', fdEnd, true); document.addEventListener('pointercancel', fdEnd, true);
   // ➕ a section of their own, after the web section they chose (in the index: ➕ beside a section picks it in the form)
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.nb [data-nbins]'); if (!b || !H || !H.own) return; e.preventDefault();
@@ -1109,7 +1228,7 @@ window.ELNotebook = (function () {
     const name = f.querySelector('input').value.trim().slice(0, 60); if (!name) { f.querySelector('input').focus(); return; }
     const sl = f.querySelector('select'), k = 's' + Date.now().toString(36);
     snap(); PT()[k] = { topic: name, html: '', text: '', dr: [], day: today(), after: sl ? sl.value : null }; save(); redraw('s:' + k);
-    const s = secs.find(x => x.key === k && (x.ci || 0) === (H.ci || 0)); const id = 'n' + Date.now().toString(36);
+    const s = secs.find(x => x.key === k && (x.ci || 0) === (H.ci || 0)); const id = nid();
     if (s) { NT()[id] = { sec: k, html: '', text: '', dr: [], day: today() }; O().b[k] = [id]; editor({ kind: 'note', id, sec: s, fresh: true }); }
   });
   document.addEventListener('change', e => {
