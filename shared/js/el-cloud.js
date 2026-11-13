@@ -1134,8 +1134,10 @@ const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>
 // them from one to another (other pages too). go.vis = today's steps on the Time plan ("path#tab", "path#" a whole page): "me and they should
 // only see the SLP planned for the class", so on those learning path pages every other tab is hidden while class mode lasts (cmTabs).
 const onPage=u=>{try{return new URL(u,ROOT).pathname===location.pathname}catch(e){return false}};
-function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:g.p||"",n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
-  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===(x.p||"")))out.push({u:x.u,p:x.p||"",n:x.n||x.p||""})});
+// 📖 the Book is one tab now: a chapter tab sent by an older plan (path#ch2) is the "book" tab (elTabOf in el-catalog.js)
+const tabP=(u,p)=>window.elTabOf?elTabOf(String(u||""),p||""):p||"";
+function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:tabP(g.u,g.p),n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
+  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{const xp=x&&tabP(x.u,x.p);if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===xp))out.push({u:x.u,p:xp,n:x.n||x.p||""})});
   const f=ffRead(g);if(f)f.ps.forEach(p=>{if(!out.some(y=>y.u===f.u&&y.p===p))out.push({u:f.u,p,n:ffName(p,lockCa()),ff:true})});return out}
 const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
 // the tab the student is on: the active tab, or the panel shown when the page opened on a #tab link without marking a tab (the bar then
@@ -1153,7 +1155,7 @@ const FF_K="el_cm_ff";
 function ffRead(g){if(!g||!g.cm)return null;try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.s===g.s&&o.u&&Array.isArray(o.ps)?o:null}catch(e){return null}}
 // the chapters granted on this page while that class mode lasts (known before live/{group} is read: the page's first locks)
 function ffPage(){try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.u&&Array.isArray(o.ps)&&Date.now()<+o.until&&onPage(o.u)?o.ps:[]}catch(e){return []}}
-const ffName=(p,ca)=>"📖 "+(ca?"Llibre · Capítol ":"Book · Chapter ")+String(p).replace(/^ch/,"");
+const ffName=(p,ca)=>"📖 "+(ca?"El llibre":"The book");
 const samePath=(a,b)=>{try{return new URL(a,ROOT).pathname===new URL(b,ROOT).pathname}catch(e){return false}};
 const ffAct=u=>(window.EL_CATALOG||[]).find(y=>y.path&&samePath(y.path,u));
 const ffDoneSet=a=>new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));
@@ -1165,8 +1167,8 @@ function ffBook(g){const ps=g&&g.cm&&Array.isArray(g.ff)?g.ff:[];if(!ps.length)r
 function ffGo(){const g=LOCK;if(!g||!g.cm)return;const ca=lockCa(),bk=ffBook(g);if(!bk)return;
   const left=cmEn(g).filter(x=>!ffDone(x));
   if(left.length){lockToast((ca?"✋ Primer acaba: ":"✋ First finish: ")+left.map(x=>x.n||x.p).join(", "));return}
-  const d=ffDoneSet(bk),nx=((window.EL_ACTIONS||{})[bk.id]||[]).find(k=>!d.has(k));
-  if(!nx){lockToast(ca?"🎉 Ja has llegit tot el llibre! Ajuda un company o repassa la feina d'avui.":"🎉 You've read the whole book! Help a classmate or look back at today's work.");return}
+  const d=ffDoneSet(bk),left2=((window.EL_ACTIONS||{})[bk.id]||[]).find(k=>!d.has(k)),nx="book";   // one tab: the book opens where they stopped
+  if(!left2){lockToast(ca?"🎉 Ja has llegit tot el llibre! Ajuda un company o repassa la feina d'avui.":"🎉 You've read the whole book! Help a classmate or look back at today's work.");return}
   const f=ffRead(g)&&samePath(ffRead(g).u,bk.path)?ffRead(g):{s:g.s,u:bk.path,ps:[]};f.until=g.until||Date.now()+60*60e3;if(!f.ps.includes(nx))f.ps.push(nx);
   try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}
   if(onPage(bk.path)){window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(nx);if(window.elSecFree)elSecFree([nx])}
@@ -1180,7 +1182,7 @@ const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lock
 window.elCmTabOk=p=>!LOCK||!LOCK.cm||!lockHere()||cmTabOk(p);   // ⛶ one step full screen (el-app.js): Previous / Next only through these
 // only today's steps on a learning path page (students and the class tab): keep = panel ids shown in any case
 function cmTabs(vis,keep){const ts=[...document.querySelectorAll(".tab[data-panel]")];if(!ts.length&&!document.querySelector(".el-cm-hide"))return;
-  const pv=(Array.isArray(vis)?vis:[]).map(String).filter(k=>onPage(k.slice(0,k.indexOf("#")))).map(k=>k.slice(k.indexOf("#")+1)),on=pv.length>0&&!pv.includes(""),ok=new Set([...pv,...(keep||[])]);
+  const pv=(Array.isArray(vis)?vis:[]).map(String).filter(k=>onPage(k.slice(0,k.indexOf("#")))).map(k=>tabP(k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1))),on=pv.length>0&&!pv.includes(""),ok=new Set([...pv,...(keep||[])]);
   if(on&&!document.getElementById("el-cm-hide-css")){const st=document.createElement("style");st.id="el-cm-hide-css";st.textContent=".tab.el-cm-hide{display:none!important}";document.head.append(st)}
   ts.forEach(t=>{const x=on&&!ok.has(t.dataset.panel);if(t.classList.contains("el-cm-hide")!==x)t.classList.toggle("el-cm-hide",x)});
   return on}
