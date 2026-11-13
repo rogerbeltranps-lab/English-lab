@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113c', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113e', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -85,9 +85,9 @@ window.ELNotebook = (function () {
     const r = g.res, pc = r && r.of ? Math.round(r.r / r.of * 100) : null, miss = (r && r.miss) || [];
     const hasNotes = Object.values(g.notes || {}).some(p => String(p.text || '').trim()), absent = !r && !hasNotes;
     const stamp = r ? `<span class="nb-stamp${pc >= 80 ? ' ok' : ''}">${r.r}/${r.of}${pc >= 80 ? ' ✓' : ''}</span>` : '';
-    const parts = (g.parts || []).map(p => {
+    const parts = (g.parts || []).map((p, pi) => {
       const n = (g.notes || {})[p.k], txt = n && String(n.text || '').trim();
-      return `<div class="nb-slip">${p.slides && p.slides.length ? p.slides.map(H.slide).join('') : `<h4>${H.md(p.topic)}</h4>`}</div>`
+      return `<div class="nb-slip" data-gs="gm-${fk(g.id)}~${pi}">${p.slides && p.slides.length ? p.slides.map(H.slide).join('') : `<h4>${H.md(p.topic)}</h4>`}</div>`
         + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}</span>${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html, (n.dr || []).length)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
     }).join('');
     let study = '';
@@ -106,7 +106,7 @@ window.ELNotebook = (function () {
     const p = g.gt || {}, rd = /-rd$/.test(g.id), txt = String(p.text || '').trim();
     const sum = (p.sum || []).length ? `<div class="nb-slip">${p.sum.map(b => `<div class="ex-rule">${H.safe(b)}</div>`).join('')}<span class="nb-clip">📎 ${t('de la pissarra', 'from the whiteboard')}</span></div>` : '';
     const mine = p.html || (p.dr && p.dr.length) ? `<div class="nb-notes">${clean(p.html, (p.dr || []).length)}${svg(p.dr)}</div>` : txt ? `<div class="nb-mine">${lines(txt)}</div>` : `<p class="nb-pencil">${t('No vas prendre apunts aquí.', 'You didn\'t take notes here.')}</p>`;
-    return `<div class="nb-game"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
+    return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
   const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬' };
@@ -149,6 +149,8 @@ window.ELNotebook = (function () {
 
   // 📝 the Exams section's two parts: 🎯 the exam and 🎬 the final product
   const rel = h => { const m = location.pathname.match(/\/[24]eso\/[^/]+\/[^/]*$/); return m ? '../../' + h : h; };
+  // the cover's logo kept loaded and decoded, so the printed cover never shows an empty box where it goes (Roger, 13 Nov 2026: "fav icon missing")
+  const LOGO = new Image(); LOGO.src = rel('favicon-192.png'); if (LOGO.decode) LOGO.decode().catch(() => {});
   // 📋 the final product rubric with the student's level underlined in every row (Roger, 13 Nov 2026: "in the final product, the rubric
   // underlining their result in each indicator"), with the teacher's ✔ / ➜ notes of that row under it. LS2: the rows of EL_GRADING fp.rows,
   // their indicators (NA … AE) and the level the teacher gave (results levels[step][c], one lower for a group row when x.down);
@@ -334,7 +336,7 @@ window.ELNotebook = (function () {
       + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
       + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
     // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
-    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
+    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40" decoding="sync"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
       + `<div class="nb-fr-label">${H.own ? `<button type="button" class="nb-ui nb-cvbtn" title="${t('Canvia el color i el disseny de la portada', 'Change the colour and design of the cover')}">🎨 <span>${t('La meva portada', 'My cover')}</span></button>` : ''}<div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
       + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
       + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
@@ -393,8 +395,9 @@ window.ELNotebook = (function () {
         const ic = KIND[pt.kind] || '📝', nm = esc(pt.name);
         let h = `<div class="nb-postit k-${pt.kind}">${ic} ${nm}${pt.day && pt.day !== true ? `<small>${esc(H.exDay(pt.day))}</small>` : ''}</div>`;
         if (pt.title && pt.title !== pt.name) h += `<div class="nb-h3">${esc(pt.title)}</div>`;
-        pt.terms.forEach(g => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
-        pt.grammar.forEach(g => { h += `<div class="nb-slip"><h4>${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
+        const pid = key + '-p-' + fk(pt.id);
+        pt.terms.forEach((g, gi) => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3" data-gs="${pid}~v${gi}">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
+        pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
         else if (pt.todo) h += todo(pt.todo);
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
@@ -443,6 +446,39 @@ window.ELNotebook = (function () {
     const all = fixed.concat(list.map(k => mov.find(p => p.key === k)));
     // the index: the page numbers are written in once the pages are laid out (data-nbto)
     const li = (l, to) => `<a data-nbto="${to}"><span class="t">${l}</span><span class="dots"></span><span class="n">00</span></a>`;
+    // ✨ the last page: a summary of the LS (Roger, 13 Nov 2026: "on the last page, there should be a summary of the grammar indicating the
+    // pages, and vocabulary topics and expressions. And a final sentence bigger and bolded"): every grammar point and vocabulary topic with
+    // the page it is on, the expressions (the words of more than one word), and "Do shadowing, I promise it works!"
+    const sg = [], sv = [], sx = [], sxSeen = new Set(), seenT = new Set();
+    // one line per point (the same point in a part and in a game is listed once, at its first page)
+    const once = (list, html, to) => { const k = plainOf(html).replace(/\s+/g, ' ').trim().toLowerCase(); if (!k || seenT.has((list === sg ? 'g' : 'v') + k)) return; seenT.add((list === sg ? 'g' : 'v') + k); list.push([html, to]); };
+    ex.lps.forEach(lp => {
+      const tag = ` <small class="nb-sumlp">LP${esc(lp.n)}</small>`, from = sg.length, fromV = sv.length;
+      (lp.parts || []).forEach(pt => {
+        const pid = 'lp' + lp.n + '-p-' + fk(pt.id);
+        pt.grammar.forEach((g, gi) => once(sg, g.title, 'g:' + pid + '~' + gi));
+        pt.terms.forEach((g, gi) => {
+          if (!(g.items || []).length) return;
+          once(sv, g.g || esc(pt.title && pt.title !== pt.name ? pt.title : pt.name), pt.terms.length > 1 || g.g ? 'g:' + pid + '~v' + gi : 'b:' + pid);
+          g.items.forEach(x => { const w = plainOf(x.en).replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim(), k = w.toLowerCase();
+            if (w.split('/').some(v => /\s/.test(v.trim().replace(/^(a|an|the|to)\s+/i, ''))) && !sxSeen.has(k)) { sxSeen.add(k); sx.push(x); } });
+        });
+      });
+      // the theory of the class games and the grammar explained on the whiteboard, too
+      games.filter(g => H.lpOf(g) === String(lp.n)).forEach(g => {
+        if (g.gt) { if (!/-rd$/.test(g.id)) once(sg, esc(gname(g)), 'g:gt-' + fk(g.id)); return; }
+        (g.parts || []).forEach((p, pi) => once(g.kind === 'vocab' ? sv : sg, H.md(p.topic), 'g:gm-' + fk(g.id) + '~' + pi));
+      });
+      for (let i = from; i < sg.length; i++) sg[i] = li(sg[i][0] + tag, sg[i][1]);
+      for (let i = fromV; i < sv.length; i++) sv[i] = li(sv[i][0] + tag, sv[i][1]);
+    });
+    const sumUl = (ic, ca, en, items) => items.length ? `<div class="nb-h2">${ic} <span class="u">${t(ca, en)}</span></div><ul class="nb-idx nb-sum">${items.map(x => `<li>${x}</li>`).join('')}</ul>` : '';
+    all.push({ key: 'sum', fixed: true, tab: t('Resum', 'Summary'), l: '✨ ' + t('Resum', 'Summary'), blocks: [],
+      head: `<p class="nb-h1"><u>✨ ${t('Resum', 'Summary')}</u> <small class="nb-chap">· ${esc(chapName((window.EL_LS || []).find(l => l.id === H.LS) || {}))}</small></p>`
+        + sumUl('🧩', 'Gramàtica', 'Grammar', sg) + sumUl('📚', 'Vocabulari: temes', 'Vocabulary topics', sv)
+        + (sx.length ? `<div class="nb-h2">💬 <span class="u">${t('Expressions', 'Expressions')}</span></div><ul class="nb-voc">${sx.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>` : '')
+        + (!sg.length && !sv.length && !sx.length ? `<p class="nb-pencil">${t('Quan feu gramàtica i vocabulari a classe, el resum apareixerà aquí.', 'When you do grammar and vocabulary in class, the summary will appear here.')}</p>` : '')
+        + `<p class="nb-final">${t('Fes shadowing, t\'ho prometo: funciona!', 'Do shadowing, I promise it works!')}</p>` });
     const ix = all.slice(2).map(s => {
       const at = list.indexOf(s.key), sub = s.blocks.filter(b => b.l);
       const mv = H.own && at >= 0 ? `<span class="nb-mv nb-ui"><button type="button" data-nbmv="-1" data-k="${s.key}" aria-label="${t('Puja', 'Move up')}" ${at === 0 ? 'disabled' : ''}>▲</button><button type="button" data-nbmv="1" data-k="${s.key}" aria-label="${t('Baixa', 'Move down')}" ${at === list.length - 1 ? 'disabled' : ''}>▼</button></span>` : '';
@@ -613,10 +649,11 @@ window.ELNotebook = (function () {
       if (pc.dataset.off === '0' && H.own) pc.insertAdjacentHTML('afterbegin', tools(pc));
     });
     // page numbers in the index and the tabs
-    const secStart = {}, blkPage = {};
-    pages.forEach((p, i) => { const k = (secs[p.s] || {}).key; if (secStart[k] == null) secStart[k] = i; p.el.querySelectorAll('.nb-blk[data-b]').forEach(b => { if (blkPage[b.dataset.b] == null) blkPage[b.dataset.b] = i; }); });
-    const to = v => { const [k, id] = [v.slice(0, 1), v.slice(2)]; const i = k === 's' ? secStart[id] : blkPage[id]; return i == null ? null : i; };
-    root.querySelectorAll('[data-nbto]').forEach(a => { const i = to(a.dataset.nbto); if (i == null) return; a.dataset.nbgo = i; const n = a.querySelector('.n'); if (n) n.textContent = i + 1; });
+    const secStart = {}, blkPage = {}, gsPage = {};
+    pages.forEach((p, i) => { const k = (secs[p.s] || {}).key; if (secStart[k] == null) secStart[k] = i; p.el.querySelectorAll('.nb-blk[data-b]').forEach(b => { if (blkPage[b.dataset.b] == null) blkPage[b.dataset.b] = i; });
+      p.el.querySelectorAll('[data-gs]').forEach(g => { if (gsPage[g.dataset.gs] == null) gsPage[g.dataset.gs] = i; }); });
+    const to = v => { const [k, id] = [v.slice(0, 1), v.slice(2)]; const i = k === 's' ? secStart[id] : k === 'g' ? (gsPage[id] != null ? gsPage[id] : blkPage[id.replace(/~v?\d+$/, '')]) : blkPage[id]; return i == null ? null : i; };
+    root.querySelectorAll('[data-nbto]').forEach(a => { const i = to(a.dataset.nbto); if (i == null) { const n = a.querySelector('.n'); if (n && n.textContent === '00') n.textContent = ''; return; } a.dataset.nbgo = i; const n = a.querySelector('.n'); if (n) n.textContent = i + 1; });
     sp.querySelectorAll('.nb-page').forEach(p => { const i = +p.dataset.i; p.setAttribute('aria-label', t('Pàgina', 'Page') + ' ' + (i + 1)); });
     const pl = root.querySelector('.nb-plist'); if (pl) pl.innerHTML = pages.map((p, i) => `<label><input type="checkbox" value="${i}"> <b>${i + 1}</b> ${esc(pname(p))}</label>`).join('');
     const pa = root.querySelector('[data-nbpr="all"]'); if (pa) pa.textContent = t('Tota la llibreta', 'The whole notebook') + ` (${pages.length})`;

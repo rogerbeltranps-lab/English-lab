@@ -135,11 +135,16 @@ html.el-nb-plain .nb-idx .lp>a{font-size:17px}
   html.nb-printsel .nb-page:not(.nb-pr){display:none!important}
   .nb-page{display:block!important;border-radius:0!important;break-after:page;overflow:visible}
   .nb-paper{position:relative;inset:auto;overflow:visible}
-  .nb-pno{position:static;display:block;text-align:right}
-  /* the pages are laid out for the sheet (html.nb-prlay, el-notebook.js beforeprint): 700 x 950 px fits A4 and Letter */
+  /* one page number only: the sheet's "7 / 9" at the foot (el-copyright.js), not the notebook's handwritten one as well (Roger, 13 Nov 2026:
+     "in the printing mode, the numbers are repeated") */
+  .nb-pno{display:none!important}
+  /* each page on its own sheet with no top margin, so the browser's date and title line has no room on the notebook's sheets; the space
+     at the top is the page's own */
+  .nb-page{page:nbsheet;padding-top:10mm}
+  /* the pages are laid out for the sheet (html.nb-prlay, el-notebook.js beforeprint): 700 x 1020 px fills A4 */
   html.nb-prlay .nb-page{width:700px;max-width:100%}
   /* the cover fills its sheet, like a real cover */
-  .nb-page.nb-cvp .nb-paper{box-sizing:border-box;min-height:98vh}
+  .nb-page.nb-cvp .nb-paper{box-sizing:border-box;min-height:calc(98vh - 10mm)}
 }
 
 /* ---------- 📘 the whiteboard (in class, while the teacher explains) ---------- */
@@ -489,9 +494,11 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-num small{font:12px/1.25 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
 @media print{.nb-fr-rings,.nb-fr-nums,.nb-fr-num,.nb-fr-ring{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 @media (max-width:640px){.nb-fr-nums{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}.nb-fr-num b{font-size:19px}.nb-fr-num span{font-size:12px}}
-/* 🖨 while printing, the pages are measured on a sheet: one page, 700 x 950 px, fits A4 and Letter with the copyright line */
-html.nb-prlay .nb-spread{flex:none;width:700px;height:950px;grid-template-columns:minmax(0,1fr);margin:0}
-html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px}
+/* 🖨 while printing, the pages are measured on a sheet: one page, 700 x 1020 px, fills an A4 sheet (the page's 10 mm at the top, the
+   copyright line at the foot) so nothing that would fit goes on to the next sheet (Roger: "the last paragraph could've fitted on the same page") */
+@page nbsheet{margin:0 10mm 12mm}
+html.nb-prlay .nb-spread{flex:none;width:700px;height:1020px;grid-template-columns:minmax(0,1fr);margin:0}
+html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px;padding-bottom:10px}
 @media print{html.nb-prlay .nb-spread{display:block;width:auto;height:auto}}
 /* 🖨 the full-screen notebook prints alone: nothing of the page around it (no last sheet with the page's header only) */
 @media print{html.el-nb-full body *:not(:has(.nb)):not(.nb):not(.nb *):not(.el-copyright){display:none!important}}
@@ -540,3 +547,9 @@ html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px}
 .nb-fr-more .nb-fr-t b{font-weight:700}
 .nb-fr-more .nb-fr-stats{gap:0;margin:0;font:500 21px/32px var(--nb-hand)}
 .nb-fr-more .nb-fr-key{font:500 18px/32px var(--nb-hand);color:var(--nb-pencil);margin:0}
+/* ✨ the last page: the LS summary (grammar points and vocabulary topics with their pages, the expressions) and the big final sentence */
+.nb-sum>li>a{font-size:21px;font-weight:600}
+html.el-nb-plain .nb-sum>li>a{font-size:16px}
+.nb-sum .nb-sumlp{font:600 12px var(--nb-sans,system-ui,sans-serif);color:var(--nb-pencil);margin-left:4px}
+.nb-final{margin:26px 0 8px;text-align:center;font:700 38px/1.15 var(--nb-hand);color:var(--nb-ink);transform:rotate(-1.5deg)}
+html.el-nb-plain .nb-final{font-size:28px}
