@@ -124,7 +124,16 @@ window.ELNotebook = (function () {
     const pc = w.of ? w.right / w.of : 1;
     return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
   }
-  const noteHtml = v => `<div class="nb-notes${/^[ygpb]$/.test(v.pi || '') ? ' nb-pi pi-' + v.pi : ''}">${v.html ? clean(v.html) : lines(v.text)}${svg(v.dr)}</div>`;
+  // ⬜ an activity of a tab done in class that the student hasn't done yet: a "To do" note (Catalan for Starter/Base, as the rest of the
+  // notebook) and its questions with a line to answer them, the options of a choice question in a fixed order (Roger, 13 Nov 2026)
+  function todo(w) {
+    const line = '<span class="nb-gap"></span>';
+    const li = x => `<li>${blank.test(x.q) ? String(x.q).replace(blank, line) : `${x.q}${x.o ? '' : ' ' + line}`}${x.o ? `<span class="nb-opts">${x.o.map(o => `<span>▢ ${esc(o)}</span>`).join('')}</span>` : ''}</li>`;
+    return `<div class="nb-work nb-todo"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')}<span class="nb-tdo">${t('Per fer', 'To do')}</span></div>`
+      + (w.task ? `<p class="nb-pencil">${esc(plainOf(w.task)).slice(0, 400)}</p>` : '')
+      + (w.qs.length ? `<ol class="nb-ans nb-tdq">${w.qs.map(li).join('')}</ol>` : `<p class="nb-pencil">${t('Encara no ho has fet: obre el learning path per fer-ho.', 'You haven\'t done it yet: open the learning path to do it.')}</p>`) + `</div>`;
+  }
+  const noteHtml = v => `${v.w ? `<span class="nb-when nb-qw">📍 ${esc(v.w)}${v.day ? ' · ' + esc(H.exDay(v.day)) : ''}</span>` : ''}<div class="nb-notes${/^[ygpb]$/.test(v.pi || '') ? ' nb-pi pi-' + v.pi : ''}">${v.html ? clean(v.html) : lines(v.text)}${svg(v.dr)}</div>`;
 
   // the parts of a section in the student's order (new parts go after the one they follow by default)
   function ordered(key, blocks) {
@@ -135,6 +144,37 @@ window.ELNotebook = (function () {
 
   // 📝 the Exams section's two parts: 🎯 the exam and 🎬 the final product
   const rel = h => { const m = location.pathname.match(/\/[24]eso\/[^/]+\/[^/]*$/); return m ? '../../' + h : h; };
+  // 📋 the final product rubric with the student's level underlined in every row (Roger, 13 Nov 2026: "in the final product, the rubric
+  // underlining their result in each indicator"), with the teacher's ✔ / ➜ notes of that row under it. LS2: the rows of EL_GRADING fp.rows,
+  // their indicators (NA … AE) and the level the teacher gave (results levels[step][c], one lower for a group row when x.down);
+  // LS1: the rubric the teacher marked with (EL_FP_RUBRICS), level = the part's mark ÷ 2.5, as on the board (today.html fbRubric).
+  const DEG = { AE: ['Excel·lent', 'Excellent'], AN: ['Notable', 'Good'], AS: ['Satisfactori', 'Satisfactory'], NA: ['No satisfactori', 'Not achieved'] };
+  function fpRubric(G, x, parts) {
+    const lvOfM = m => { const v = parseFloat(String(m).replace(',', '.')); return isNaN(v) ? null : Math.max(0, Math.min(4, Math.round(v / 2.5))); };
+    const fb = p => p && (p.ok.length || p.todo.length) ? `<ul class="nb-fbl">${p.ok.map(y => `<li class="ok">✔ ${esc(y)}</li>`).join('')}${p.todo.map(y => `<li class="todo">➜ ${esc(y)}</li>`).join('')}</ul>` : '';
+    const row = (name, sub, w, cells, on, mark, p) => `<div class="nb-rub"><div class="nb-h3">${esc(name)}${sub ? ` <small>${esc(sub)}</small>` : ''}${w != null ? ` <small>(${esc(w)} %)</small>` : ''}${mark != null ? ` <span class="nb-stamp${mark >= 8 ? ' ok' : ''}">${String(mark).replace('.', ',')} / 10</span>` : ''}</div>`
+      + `<ul class="nb-rbl">${cells.map((c, k) => `<li${k === on ? ' class="on"' : ''}><b>${esc(c[0])}</b> ${k === on ? `<span class="nb-hl">${esc(c[1])}</span> <span class="nb-you">◀ ${t('tu', 'you')}</span>` : esc(c[1])}</li>`).join('')}</ul>`
+      + (on == null && mark === 0 ? `<p class="nb-pencil">${t('Sense evidència', 'No evidence')} ◀ ${t('tu', 'you')}</p>` : '') + fb(p) + `</div>`;
+    const R = (window.EL_FP_RUBRICS || {})[G.fp.a];
+    if (!G.fp.rows && R && R.rows.length && parts.length === R.rows.length) {
+      return `<div class="nb-when">${t('La rúbrica: el teu nivell està subratllat a cada fila.', 'The rubric: your level is underlined in every row.')}</div>`
+        + R.rows.map((r, i) => { const p = parts[i], L = lvOfM(p.m), on = L ? 4 - L : null;
+          return row(r.name, r.sub, r.w, r.d.map((d, k) => [R.levels[k], d]), on != null && on < r.d.length ? on : null, parseFloat(String(p.m).replace(',', '.')), p); }).join('');
+    }
+    if (!(G.fp.rows || []).length) return '';
+    const lv = x.levels || {}, found = (G.fp.rows || []).some(r => (lv[r.step] || {})[r.c]);
+    if (!found && !parts.length) return '';
+    return `<div class="nb-when">${t('La rúbrica: el teu nivell està subratllat a cada indicador.', 'The rubric: your level is underlined in every indicator.')}</div>`
+      + G.fp.rows.map((r, i) => {
+        const p = parts.find(y => y.n.toLowerCase() === String(r.name).toLowerCase()) || (parts.length === G.fp.rows.length ? parts[i] : null);
+        let d = (lv[r.step] || {})[r.c]; if (d && r.step === 'group' && (x.down || {})[r.c] && window.elDegreeDown) d = elDegreeDown(d);
+        if (!d && p) { const L = lvOfM(p.m); d = L ? ['NA', 'AS', 'AN', 'AE'][L - 1] : null; }
+        const ind = (H.ca && G.indCa && G.indCa[r.c]) || (G.ind || {})[r.c] || [];
+        const cells = ['AE', 'AN', 'AS', 'NA'].map((k, j) => [`${k} · ${t(DEG[k][0], DEG[k][1])}`, ind[3 - j] || '']);
+        const mark = d ? (window.EL_DEGREE_MARK || {})[d] : p ? parseFloat(String(p.m).replace(',', '.')) : null;
+        return row(r.name, /^\d/.test(r.c) ? r.c : '', r.w, cells, d ? ['AE', 'AN', 'AS', 'NA'].indexOf(d) : null, mark, p);
+      }).join('');
+  }
   function examBlocks(ex) {
     const G = (window.EL_GRADING || {})[H.LS] || {}, rs = H.rs || {}, out = [];
     const stamp = v => v == null ? '' : `<span class="nb-stamp${v >= 8 ? ' ok' : ''}">${String(Math.round(v * 10) / 10).replace('.', ',')} / 10</span>`;
@@ -148,12 +188,21 @@ window.ELNotebook = (function () {
       if (!got.length) h += `<p class="nb-pencil">${t('Quan el professor l\'hagi corregit, aquí hi tindràs la nota de cada part, les preguntes que cal revisar corregides i el teu writing corregit.', 'Once your teacher has marked it, you\'ll find here the mark of each part, the questions to review corrected and your writing corrected.')}</p>`;
       else {
         h += `<div class="nb-wh">🧮 ${t('La meva nota', 'My mark')} ${stamp(mark)}</div><ul class="nb-xparts">${got.map(([k, nm, mx]) => { const m = +(sc[k].max || mx || e.max), v = +sc[k].score; return `<li><b>${esc(nm)}</b> <span class="${v / m >= .5 ? 'ok' : 'ko'}">${String(Math.round(v * 10) / 10).replace('.', ',')} / ${m}</span></li>`; }).join('')}</ul>`;
-        const qs = (r.questions || []).filter(q => !(q.ok || (+q.got || 0) >= (+q.pts || 0) && q.pts));
-        if (qs.length) h += `<div class="nb-work"><div class="nb-wh">❓ ${t('Preguntes que cal revisar', 'Questions to review')}</div><ol class="nb-ans">${qs.map(q => `<li>${esc(q.text || '')} <span class="nb-arrow">→</span> ${fix(q.mine, q.right)} <i class="nb-cross">✗</i>${q.why ? `<small class="nb-why">${esc(q.why)}</small>` : ''}</li>`).join('')}</ol></div>`;
+        // (Roger, 13 Nov 2026: "in the exam I want all the questions and their answers, and the feedback I gave them"): every question of
+        // the report, part by part, the student's answer in blue pen with ✓, or crossed out with the right one in green and why
+        const all = (r.questions || []).slice().sort((a, b) => (+a.q || 0) - (+b.q || 0)), groups = [];
+        all.forEach(q => { const p = q.part || ''; let g = groups.find(y => y.p === p); if (!g) groups.push(g = { p, qs: [] }); g.qs.push(q); });
+        const PI = { Listening: '🎧', Reading: '📖', Vocabulary: '🔤', Grammar: '🧩' }, n1 = v => String(Math.round((+v || 0) * 10) / 10).replace('.', ',');
+        const qli = q => { const pts = +q.pts || 0, got = q.ok ? pts : +q.got || 0, ok = q.ok || (pts && got >= pts), mine = String(q.mine || '').trim();
+          return `<li>${esc(q.text || '')} <span class="nb-arrow">→</span> ${ok ? `<span class="nb-giv">${esc(mine || q.right || '')}</span> <i class="nb-tick">✓</i>` : `${fix(mine, q.right)} <i class="nb-cross">✗</i>`}`
+            + (pts ? ` <small class="nb-pts">${n1(got)}/${n1(pts)}</small>` : '') + (!ok && q.why ? `<small class="nb-why">💡 ${esc(q.why)}</small>` : '') + `</li>`; };
+        if (all.length) h += `<div class="nb-work"><div class="nb-wh">❓ ${t('Totes les preguntes', 'All the questions')}${r.full ? '' : ` <small>· ${t('les que cal revisar', 'the ones to review')}</small>`}</div>`
+          + groups.map(g => `${g.p ? `<div class="nb-h3">${PI[g.p] || '📝'} ${esc(g.p)}</div>` : ''}<ol class="nb-ans" start="${+g.qs[0].q || 1}">${g.qs.map(qli).join('')}</ol>`).join('') + `</div>`;
         const w = r.writing;
         if (w) {
           const rub = (w.rubric || []).map(y => Array.isArray(y) ? y : [y.name, y.score, y.max]), tot = rub.reduce((a, y) => [a[0] + (+y[1] || 0), a[1] + (+y[2] || 0)], [0, 0]);
           h += `<div class="nb-wh">✍️ ${t('El meu writing', 'My writing')}${tot[1] ? ` <span class="nb-stamp${tot[0] / tot[1] >= .8 ? ' ok' : ''}">${String(Math.round(tot[0] * 10) / 10).replace('.', ',')} / ${tot[1]}</span>` : ''}</div>`;
+          if (rub.length) h += `<ul class="nb-xparts">${rub.map(y => `<li><b>${esc(y[0])}</b> <span class="${(+y[1] || 0) / (+y[2] || 1) >= .5 ? 'ok' : 'ko'}">${String(Math.round((+y[1] || 0) * 10) / 10).replace('.', ',')} / ${esc(y[2])}</span></li>`).join('')}</ul>`;
           if (w.feedback) h += `<div class="nb-slip"><h4>💬 ${t('Comentari del professor', 'Your teacher\'s comment')}</h4><div class="ex-rule">${lines(w.feedback)}</div></div>`;
           if ((w.errors || []).length) h += `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves errades, corregides', 'My mistakes, corrected')}</div><ol class="nb-ans">${w.errors.map(y => `<li>${fix(y.orig, y.fix)}${y.why ? `<small class="nb-why">${esc(y.why)}</small>` : ''}</li>`).join('')}</ol></div>`;
         }
@@ -176,7 +225,9 @@ window.ELNotebook = (function () {
           if (cur && /^✔/.test(s2)) { cur.ok.push(s2.replace(/^✔\s*/, '')); return; } if (cur && /^➜/.test(s2)) { cur.todo.push(s2.replace(/^➜\s*/, '')); return; }
           if (cur) (cur.todo.length ? cur.todo : cur.ok).push(s2); else com.push(s2); });
         if (com.length) h += `<div class="nb-slip"><h4>💬 ${t('Feedback del professor', 'Your teacher\'s feedback')}</h4><div class="ex-rule">${lines(com.join('\n'))}</div></div>`;
-        parts.forEach(p => { const v = parseFloat(p.m.replace(',', '.'));
+        const rb = fpRubric(G, x, parts);
+        if (rb) h += rb;
+        else parts.forEach(p => { const v = parseFloat(p.m.replace(',', '.'));
           h += `<div class="nb-h3">${esc(p.n)} <small>(${esc(p.w)} %)</small> <span class="nb-stamp${v >= 8 ? ' ok' : ''}">${esc(p.m)} / 10</span></div>`
             + (p.ok.length || p.todo.length ? `<ul class="nb-fbl">${p.ok.map(y => `<li class="ok">✔ ${esc(y)}</li>`).join('')}${p.todo.map(y => `<li class="todo">➜ ${esc(y)}</li>`).join('')}</ul>` : ''); });
       }
@@ -184,6 +235,55 @@ window.ELNotebook = (function () {
       out.push({ id: 'x-fp', l: '🎬 ' + t('Producte final', 'Final product'), side: t('Producte final', 'Final product'), kind: 'fp', html: h });
     }
     return out;
+  }
+  // 📘 the front cover (Roger, 13 Nov 2026: "Fes una portada per a cada alumne … els resums de les LS amb: competències treballades en les
+  // activitats que consten a la llibreta, i AS, AN... amb l'indicador d'avaluació que els pertoca. Els percentatges d'encerts dels jocs, Les
+  // activitats ben fetes en general (n/m) per cada communicative competence … El nom de l'alumne curs i English Lab, Roger Beltran i el curs
+  // 2026/2027 amb el fav icon"; "La portada tb surt al obrir la llibreta"; "Per defecte la portada surt sempre"). Page 1 of every chapter and
+  // of every print. One summary per LS of the course with something in it: from the learning paths' answers on this device (each step's
+  // criteria in EL_STEP_CRITERIA; first try), the class games (myGames) and the results (the teacher's final level for a criterion wins).
+  const lsSum = L => {
+    const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {};
+    (window.EL_CATALOG || []).filter(a => a.ls === L.id && a.keys && a.keys[0]).forEach(a => {
+      let st = null; try { st = JSON.parse(localStorage.getItem(a.keys[0]) || 'null'); } catch (e) {}
+      const items = (st && st.items) || {}, first = {};
+      Object.entries(items).forEach(([k, r]) => { const id = k.replace(/_[^_]+$/, ''); if (!r || !Array.isArray(r.ok) || !r.ok.length) return; if (!first[id] || String(r.date || '') < String(first[id].date || '')) first[id] = r; });
+      Object.entries(first).forEach(([id, r]) => {
+        const cs = ((SC[a.id] || {})[id] || []).filter(c => /^\d+\.\d+$/.test(c)); if (!cs.length) return;
+        const right = r.ok.filter(Boolean).length, of = r.ok.length;
+        cs.forEach(c => { const x = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); x.r += right; x.of += of; x.n++; });
+        [...new Set(cs.map(c => c.split('.')[0]))].forEach(k => { const y = comp[k] || (comp[k] = { ok: 0, of: 0 }); y.of++; if (right / of >= .5) y.ok++; });
+      });
+    });
+    const x = (H.rs || {})[L.id + '/assessment'] || {}, fin = x.final || {};
+    Object.keys(fin).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { if (!crit[c]) crit[c] = { r: 0, of: 0, n: 0 }; });
+    const rows = Object.keys(crit).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map(c => {
+      const v = crit[c], deg = fin[c] || (v.of ? window.elDegree && elDegree(v.r / v.of * 10) : null), i = (window.EL_DEGREES || []).indexOf(deg);
+      const ind = i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '';
+      return { c, deg, ind, comp: window.elCompetence ? elCompetence(c) : '' };
+    });
+    const g = window.elGameStats ? elGameStats(Object.values(H.mg || {}).filter(y => y && y.ls === L.id)) : {};
+    const e = G.exam, sc = x.sections || {}, got = e ? e.sections.filter(([k]) => sc[k] && sc[k].score != null) : [];
+    const mx = got.reduce((n, [k, , m]) => n + (+(sc[k].max || m || e.max)), 0), exam = mx ? got.reduce((n, [k]) => n + (+sc[k].score), 0) / mx * 10 : null;
+    const f = G.fp && (H.rs || {})[G.fp.a] || {}, fp = f.max ? (+f.score || 0) / f.max * 10 : null;
+    return { L, rows, comp, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
+  };
+  function front() {
+    const me0 = (window.EL_LS || []).find(l => l.id === H.LS) || {}, grp = String(H.group || '').replace(/^(\d)ESO\s*([A-Z])?$/i, (m, n, l) => `${n} ESO${l ? ' ' + l : ''}`) || String(me0.course || '').replace(/^(\d)eso$/, '$1 ESO');
+    const n1 = v => v == null ? '–' : String(Math.round(v * 10) / 10).replace('.', ',');
+    const DG = { NA: t('No assolit', 'Not achieved'), AS: t('Assoliment satisfactori', 'Satisfactory'), AN: t('Assoliment notable', 'Good'), AE: t('Assoliment excel·lent', 'Excellent') };
+    // the student's level (Roger: "a la portada tb surt el nivell i nom (core...)"): "A2 · Core"
+    const LVN = { beginners: 'Starter', insecure: 'Base', safe: 'Core', daring: 'Plus', native: 'Pro' }, lv = String(H.level || '').toLowerCase();
+    const lvl = lv && LVN[lv] ? [window.elCefr ? elCefr(me0.course, lv) : '', LVN[lv]].filter(Boolean).join(' · ') : '';
+    const sums = chapters().map(lsSum).filter(y => y.any || y.L.id === H.LS);
+    const box = y => `<div class="nb-fr-ls"><div class="nb-fr-lh">📚 ${esc(chapName(y.L))}${y.exam != null ? ` <span class="nb-fr-k">📝 ${t('Examen', 'Exam')} <b>${n1(y.exam)}</b></span>` : ''}${y.fp != null ? ` <span class="nb-fr-k">🎬 ${t('Producte final', 'Final product')} <b>${n1(y.fp)}</b></span>` : ''}</div>`
+      + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
+      + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
+      + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
+    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="34" height="34"><b>English Lab</b><span>Roger Beltran · ${t('curs', 'school year')} 2026/2027</span></div>`
+      + `<div class="nb-fr-name">${esc(H.name || '')}</div><div class="nb-fr-course">${esc(grp)}${lvl ? ` · <span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div><div class="nb-fr-title">📓 ${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+      + sums.map(box).join('')
+      + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} · ${t('ben feta = la meitat o més bé al primer intent', 'done well = half or more right on the first try')}</p></div><div class="nb-break"></div>`;
   }
   // 📚 the chapters (Roger, 13 Nov 2026: "Notebooks should have chapters call LS1 (Name) LS2 (Name)"): one chapter per LS of the course,
   // each on its LS page (#notes); the chapter name is "LS2 (Seasons & Celebrations)"
@@ -199,7 +299,7 @@ window.ELNotebook = (function () {
     // the cover
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
     const when = n == null || n < 0 ? '' : n === 0 ? t('avui!', 'today!') : n === 1 ? t('demà!', 'tomorrow!') : t(`d'aquí a ${n} dies`, `in ${n} days`);
-    out.push({ key: 'cover', fixed: true, blocks: [], head: `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p><div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>
+    out.push({ key: 'cover', fixed: true, blocks: [], head: front() + `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p><div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>
       <div class="nb-links">${ex.sample ? `<a href="${esc(ex.sample)}">📝 ${t('Examen de mostra', 'Sample exam')}</a>` : ''}<button type="button" class="nb-printbtn">🖨 ${t('Imprimeix la llibreta', 'Print my notebook')}</button></div>
       <div class="nb-sticky">${ex.exam ? `🎯 ${t('EXAMEN', 'EXAM')}: ${esc(H.exDay(ex.exam))}${when ? ' · ' + when : ''}` : '🎯 ' + t('Què entra a l\'examen', 'What\'s in the exam')}<small>${t('Tot el que hi ha en aquesta llibreta és el que hem fet a classe: és el que entra a l\'examen. Cada vegada que fem alguna cosa nova, apareix aquí.', 'Everything in this notebook is what we did in class: it\'s what goes in the exam. Each time we do something new, it appears here.')}</small></div>
       ${ex.dropped.length ? `<p class="nb-pencil">✂️ ${t('No entra a l\'examen', 'Not in your exam')}: ${ex.dropped.map(a => `LP${esc(a.n)} ${esc(a.title)}`).join(' · ')}</p>` : ''}
@@ -225,8 +325,9 @@ window.ELNotebook = (function () {
         pt.terms.forEach(g => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
         pt.grammar.forEach(g => { h += `<div class="nb-slip"><h4>${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
+        else if (pt.todo) h += todo(pt.todo);
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
-        blocks.push({ id: key + '-p-' + fk(pt.id), l: ic + ' ' + nm, side: pt.name, kind: pt.kind, html: h });
+        blocks.push({ id: key + '-p-' + fk(pt.id), l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm">${t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
       });
       // the class games and the whiteboard notes go after the part they belong to (vocabulary / grammar / reading), else at the end
       const after = (k, list) => { const at = blocks.map(b => b.kind).lastIndexOf(k); blocks.splice(at < 0 ? blocks.length : at + 1, 0, ...list); };
@@ -260,6 +361,11 @@ window.ELNotebook = (function () {
         blocks: ordered(k, body.concat(notesOf(k))),
         foot: H.own ? `<div class="nb-links nb-ui"><button type="button" class="nb-addnote" data-sec="${k}">✍ ${t('Escriu-hi', 'Write here')}</button><button type="button" class="nb-del" data-sid="${k}">🗑 ${t('Esborra aquesta secció', 'Delete this section')}</button></div>` : '' });
     });
+    // ✍ Quick notes: the notes taken with the 📓 button on a page that is not a learning path of this notebook (el-cloud.js qnOpen), and
+    // any note whose section is not in the notebook (a learning path the class hasn't started yet), so a note never gets lost
+    const keys = new Set(out.map(x => x.key)), lost = Object.entries(NT()).filter(([, v]) => v && v.sec !== 'qn' && !keys.has(v.sec));
+    const qn = notesOf('qn').concat(lost.map(([id, v]) => ({ id, note: true, html: noteHtml(v) })));
+    if (qn.length) out.push({ key: 'qn', tab: '📍', l: '📍 ' + t('Notes ràpides', 'Quick notes'), head: `<p class="nb-h1"><u>📍 ${t('Notes ràpides', 'Quick notes')}</u></p>`, blocks: ordered('qn', qn), foot: addBtn('qn') });
     const fixed = out.slice(0, 2), mov = out.slice(2), list = O().list.filter(k => mov.some(p => p.key === k));
     mov.forEach((p, i) => { if (list.includes(p.key)) return; let j = -1; for (let q = i - 1; q >= 0 && j < 0; q--) j = list.indexOf(mov[q].key); list.splice(j + 1, 0, p.key); });
     order = list;
@@ -352,16 +458,20 @@ window.ELNotebook = (function () {
   });
 
   // ---------- the pages: nothing scrolls, what does not fit goes on to the next page ----------
-  const SPLIT = '.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-game,.nb-slip,.ex-rule,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
+  const SPLIT = '.nb-front,.nb-fr-ls,.nb-fr-crit,.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-opts,.nb-rub,ul.nb-rbl,ul.nb-xparts,ul.nb-fbl,.nb-game,.nb-slip,.ex-rule,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
   const SKIP = '.nb-mdate,.nb-ui';
   function flow(sp, frag, si) {
     let page, paper, cur, stack = [], leaves = 0;
     const newPage = () => {
+      // a numbered list that goes on to the next page goes on with its numbers (start = the first one + the items already placed)
+      const prev = []; for (let e = cur; e && paper && e !== paper; e = e.parentNode) prev.unshift(e);
       if (page) page.classList.remove('nb-meas');
       page = document.createElement('section'); page.className = 'nb-page nb-meas'; page.dataset.i = pages.length; page.dataset.s = si;
       page.innerHTML = `<div class="nb-paper"></div><span class="nb-pno">${pages.length + 1}</span><span class="nb-corner" aria-hidden="true"></span>`; sp.append(page);
       paper = page.firstChild; pages.push({ s: si, el: page });
-      cur = paper; stack.forEach(s => { const c = s.cloneNode(false); c.classList.add('nb-cont'); cur.append(c); cur = c; }); leaves = 0;
+      cur = paper; stack.forEach((s, i) => { const c = s.cloneNode(false); c.classList.add('nb-cont');
+        const o = prev.length === stack.length ? prev[i] : null; if (c.tagName === 'OL' && o) c.start = (o.start || 1) + o.querySelectorAll(':scope>li').length;
+        cur.append(c); cur = c; }); leaves = 0;
     };
     const fits = () => paper.scrollHeight <= paper.clientHeight + 1;
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
@@ -388,6 +498,7 @@ window.ELNotebook = (function () {
     };
     const counts = n => n.nodeType === 1 ? !n.matches(SKIP) : !!n.nodeValue.trim();
     const place = node => {
+      if (node.nodeType === 1 && node.classList.contains('nb-break')) { if (leaves) newPage(); return; }
       cur.append(node);
       if (fits()) { if (counts(node)) leaves++; return; }
       node.remove();
@@ -500,6 +611,7 @@ window.ELNotebook = (function () {
     box.innerHTML = `<div class="nb"><div class="nb-bar" role="navigation" aria-label="${t('Pestanyes de la llibreta', 'Notebook tabs')}">${tabs}<span class="nb-sp"></span>`
       + (H.own ? '<span class="nb-saved nb-pencil" role="status"></span>' : '')
       + `<span class="nb-pwrap"><button type="button" class="nb-tool nb-printbtn" aria-expanded="false">🖨 ${t('Imprimeix', 'Print')}</button><div class="nb-pmenu" hidden><b>🖨 ${t('Què vols imprimir?', 'What do you want to print?')}</b>`
+      + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
@@ -811,6 +923,9 @@ window.ELNotebook = (function () {
   // or the whole notebook. One page per sheet; el-copyright.js adds the copyright line and the page numbers to every printed sheet.
   function printPages(set) {
     const h = document.documentElement, root = document.querySelector('.nb'); if (!root) return;
+    // the cover always goes first unless the student unticks it (Roger: "Per defecte la portada surt sempre")
+    const cov = root.querySelector('.nb-pcov input');
+    if (set && (!cov || cov.checked)) set = [...new Set(pages.map((p, i) => p.el.querySelector('.nb-front') ? i : -1).filter(i => i >= 0).concat(set))].sort((a, b) => a - b);
     if (set) { h.classList.add('nb-printsel'); pages.forEach((p, i) => p.el.classList.toggle('nb-pr', set.includes(i))); }
     const menu = root.querySelector('.nb-pmenu'); if (menu) menu.hidden = true;
     const off = () => { h.classList.remove('nb-printsel'); root.querySelectorAll('.nb-pr').forEach(p => p.classList.remove('nb-pr')); removeEventListener('afterprint', off); };

@@ -62,8 +62,13 @@ window.ELExam = (function () {
       panels.forEach(p => {
         const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx);
         if (!tab && !work) return;
+        // (Roger, 13 Nov 2026: "even if the students don't do the activities, they must appear in the notebook, not done, with a note
+        // (to do / per fer, depending on the level), and the theory of the SLPs too"): a tab done in class that the student hasn't done
+        // shows its questions, unanswered, under a "To do" note; its theory shows anyway
+        const sd = (st && st.done) || {}, did = p.type === 'vocab' ? !!sd.practice : !!sd[p.id];
+        const todo = work || did || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
         parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
-          terms: tab ? termsOf(p) : [], grammar: tab ? gramOf(p) : [], work });
+          terms: termsOf(p), grammar: gramOf(p), work, todo });
       });
       out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
@@ -92,6 +97,12 @@ window.ELExam = (function () {
     if (!qs.length) return null;
     const scored = qs.filter(x => !x.guess);
     return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+  }
+  // the questions of an activity not done yet, at the student's route, without answers: {task, qs: [{q, o: options in a fixed order}]}
+  function toDo(p, level, tx) {
+    const src = p.type === 'vocab' ? p.practice : p.items, list = !src ? [] : Array.isArray(src) ? forLevel(src, level) : forLevel(src, level);
+    const qs = list.filter(it => it && typeof it === 'object' && it.q).map(it => ({ q: tx(it.q), o: Array.isArray(it.o) ? it.o.map(tx).filter(Boolean).sort((a, b) => a.localeCompare(b)) : null }));
+    return { task: tx(p.task) || tx(p.intro) || '', qs };
   }
   return { build, lps, plan, ROUTES };
 })();
