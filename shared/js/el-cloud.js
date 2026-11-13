@@ -1057,8 +1057,8 @@ function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-t
   clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
 // the 🎓 class mode bar is fixed on top of the page: the page moves down by its height (body padding, the sticky top bar with 🔍 Dictionary,
 // the left menu and the path's column), so nothing hides behind it (problem report, 2ESOA, 13 Nov 2026: "the top green line is covering
-// the dictionary"). The 🌟 cheer bar (inline padding) and ⛶ one step full screen (slpPlace, !important) already add the bar's height.
-function lockPad(){const b=document.getElementById("el-lock"),h=b&&b.offsetHeight||0,R=document.documentElement;
+// the dictionary"). The 🌟 line under it counts too; ⛶ one step full screen (slpPlace, !important) adds the bars' height itself.
+function lockPad(){const b=document.getElementById("el-lock"),c=document.getElementById("el-cmcheer"),h=(b&&b.offsetHeight||0)+(c&&c.offsetHeight||0),R=document.documentElement;
   if(h&&!document.getElementById("el-lock-pad-css")){const st=document.createElement("style");st.id="el-lock-pad-css";
     st.textContent="body.el-lockpad{padding-top:var(--el-lock-h,0px)}body.el-lockpad .topbar{top:var(--el-lock-h,0px)!important}body.el-lockpad .elrail{top:var(--el-lock-h,0px)!important}body.el-lockpad .ellpside{top:calc(var(--el-lock-h,0px) + 70px);max-height:calc(100vh - var(--el-lock-h,0px) - 80px)}";document.head.append(st)}
   if(R.style.getPropertyValue("--el-lock-h")!==h+"px")R.style.setProperty("--el-lock-h",h+"px");
@@ -1213,16 +1213,10 @@ function cmGo(g){
 // tell them positive things, can you make it visible for 4 minutes once I start the class mode? on the top of their screen"): the same
 // "Hi Pau, …" line as their board (ELCheer.student in el-cheer.js, Catalan for Starter/Base), in a bar at the top of whatever page class
 // mode takes them to, for the first 4 minutes after the teacher started it (go.s), then it goes away. No extra reads or writes.
-const CHEER_MS=4*60e3;let cheerT=0,cheerPad=null;
+const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
-// The 🎓 class mode bar (el-lock) and the 🌟 line are fixed on top of the screen: the page moves down by their height, and its sticky top bar
-// (with 🔍 Dictionary) and steps column stop under them, not behind them (problem report, 2ESOA, 13 Nov 2026: "the top green line is
-// covering the dictionary"). ⛶ one step full screen places its own bar (el-app.js slpPlace).
-function cmTopSpace(){const l=document.getElementById("el-lock"),c=document.getElementById("el-cmcheer"),h=(l?l.offsetHeight:0)+(c?c.offsetHeight:0),R=document.documentElement,B=document.body;
-  if(h&&!document.getElementById("el-cm-top-css")){const st=document.createElement("style");st.id="el-cm-top-css";
-    st.textContent="html.elcmtop .topbar{top:var(--el-cm-top,0px)!important}html.elcmtop .ellpside{top:calc(70px + var(--el-cm-top,0px))!important}";document.head.append(st)}
-  if(h){R.style.setProperty("--el-cm-top",h+"px");R.classList.add("elcmtop");if(cheerPad===null)cheerPad=B.style.paddingTop||"";if(!B.classList.contains("elslpfs"))B.style.paddingTop=h+"px"}
-  else if(cheerPad!==null){R.style.removeProperty("--el-cm-top");R.classList.remove("elcmtop");if(!B.classList.contains("elslpfs"))B.style.paddingTop=cheerPad;cheerPad=null}}
+// the 🌟 line sits under the 🎓 class mode bar: lockPad moves the page down by both (one place for it, #550 + #551)
+function cmTopSpace(){lockPad()}
 function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&&g.s?g.s+CHEER_MS:0;
   if(!end||Date.now()>=end||!user||!isStudent(user)||AS){if(was)cheerOff();return}
   if(was&&was.dataset.s===String(g.s))return;
