@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113c', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
