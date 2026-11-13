@@ -953,11 +953,11 @@ function rtFollow(rt){rtNow=rt||null;
   document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
   document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
   if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
-  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();rtRestore();return}
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();wbClose();rtRestore();return}
   if(rt.p)return rtGram(rt);
   const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();
-  if(rt.x){rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
+  if(rt.x){wbClose();rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
       n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
     return}
   if(typeof rt.h==="string"&&rt.h){
@@ -966,6 +966,7 @@ function rtFollow(rt){rtNow=rt||null;
     if(sig!==rtSig){box.innerHTML=rt.h;rtSig=sig;let n=document.getElementById("el-rt-note");
       if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}
       n.textContent=lockCa()?"📖 Llegim junts: ara tothom té el mateix text que a la pissarra. El teu text torna quan hagis de respondre.":"📖 Reading together: everyone has the same text as on the board now. Your own text comes back when it's time to answer."}}
+    if(typeof rt.h==="string"&&rt.h)wbShow(rt,"reading",rt.h,box);
   if(!(rt.k>=0))return;
   const bl=[...box.children].filter(e=>!e.classList.contains("tiny"));if(!bl.length)return;
   const i=rt.chat&&bl.length!==rt.n?Math.round(rt.k*(bl.length-1)/Math.max(1,rt.n-1)):Math.min(rt.k,bl.length-1),el=bl[i];
@@ -1014,10 +1015,73 @@ function gtBox(box,rt){
 function gtClose(){const f=document.getElementById("el-gt-notes");if(GTN.dirty)gtSave();if(f)f.remove()}
 addEventListener("pagehide",()=>{if(GTN.dirty)gtSave()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&GTN.dirty)gtSave()});
+/* 📘 📖 Only a whiteboard while the teacher explains (Roger, 13 Nov 2026: "when doing an activity together, and I'm explaining theory I want
+   students to only see a whiteboard and that when they take notes it looks like hand writing and they can underline, highlight, etc. this
+   notes appear in their notes"; "when doing theory like grammar or whatever, they must only see their notes"): while rt names this page
+   and it is not ⏱ Your turn yet, a student's Chromebook shows shared/js/el-whiteboard.js over the page: the projector's boxes (Grammar
+   together) or text (Read together) with the part being explained marked, and their handwriting page (el-pad.js). The page is saved like
+   📝 Take your notes was (2.5 s after they stop, on Your turn, when the page closes), in students/{uid}/notes/gt-<course>-<ls>-<page>
+   (reading: …-rd) parts.gt = {topic, day, sum, text, html: their page with its marks (nb-* classes only), dr: their drawings, at}; one read
+   per page brings back what they wrote before. 📓 My notebook on the LS page shows it (el-notebook.js). If the whiteboard can't load, the
+   old 📝 box under the boxes comes back (grammar). The teacher and 👁 Student view never get it. */
+const WB={m:null,p:null,fail:false,deck:"",v:null,dirty:false,t:0,rt:null,kind:"",loaded:"",ca:false,box:null};
+const wbDeck=k=>gtDeck()+(k==="reading"?"-rd":"");
+const wbT=(c,e)=>WB.ca?c:e;
+const wbMod=()=>WB.p||(WB.p=import("./el-whiteboard.js").then(m=>(WB.m=m)).catch(e=>{console.warn("whiteboard",e);WB.fail=true;throw e}));
+const wbTitle=()=>{const b=WB.box,pn=b&&(b.closest(".panel")||b.closest("section"));return String(((pn&&pn.querySelector(".panel-head h2"))||{}).textContent||"").trim()};
+function wbShow(rt,kind,html,box){
+  if(!user||!isStudent(user)||AS||WB.fail)return false;
+  const deck=wbDeck(kind);
+  if(WB.deck!==deck){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.deck=deck;WB.v=null;WB.dirty=false}
+  WB.rt=WB.srt=rt;WB.kind=kind;WB.ca=lockCa();WB.box=box;
+  const go=()=>{if(!WB.rt||WB.deck!==deck)return;
+    WB.m.render({kind,title:wbTitle(),head:window.LP&&window.LP.n?"LP"+window.LP.n:"",html,k:rt.k,n:rt.n,chat:rt.chat,ca:WB.ca,saved:WB.v,
+      onChange:v=>{WB.v=v;WB.dirty=true;WB.m.status(wbT("Desant…","Saving…"));clearTimeout(WB.t);WB.t=setTimeout(wbSave,2500)}});
+    if(!WB.dirty&&WB.loaded!==deck)WB.m.status(wbT("Es desa sol a 📓 La meva llibreta","Saved by itself in 📓 My notebook"));
+    if(WB.loaded!==deck){WB.loaded=deck;getDoc(doc(db,"students",user.uid,"notes",deck)).then(x=>{const p=x.exists()?((x.data().parts||{}).gt||{}):null;
+      if(p&&(p.html||p.text||(p.dr||[]).length)&&!WB.dirty&&WB.deck===deck&&WB.m.isOpen()){WB.v={html:p.html||"",text:p.text||"",dr:p.dr||[]};WB.m.set(WB.v)}}).catch(e=>console.warn("whiteboard notes",e))}};
+  if(WB.m)go();else wbMod().then(go).catch(()=>{if(kind==="grammar"&&WB.rt)gtBox(box,rt)});
+  return true;
+}
+async function wbSave(){
+  clearTimeout(WB.t);if(!WB.dirty||!WB.v||!user||!isStudent(user)||AS||!WB.srt)return;WB.dirty=false;
+  const rt=WB.srt,kind=WB.kind,deck=WB.deck,v=WB.v,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath);
+  let sum=[];if(kind==="grammar"){const d=document.createElement("div");d.innerHTML=(WB.ca&&rt.hc)||rt.h||"";
+    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return c.innerHTML.trim().slice(0,1500)}).slice(0,12)}
+  const html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
+  const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+  if(WB.m)WB.m.status(wbT("Desant…","Saving…"));
+  try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck,
+      title:(kind==="grammar"?"📘 ":"📖 ")+(wbTitle()||(kind==="grammar"?"Grammar":"Reading")),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",
+      parts:{gt:{topic:kind==="grammar"?"How it works · together":"Reading together",day,sum,text:String(v.text||"").slice(0,3000),html,dr,at:now}},updated:now},{merge:true});
+    if(WB.m&&WB.deck===deck)WB.m.status(wbT("✓ Desat a 📓 La meva llibreta","✓ Saved in 📓 My notebook"))}
+  catch(e){console.warn("whiteboard notes",e);WB.dirty=true;if(WB.m)WB.m.status(wbT("⚠ Encara no s'ha desat: continua, ho torna a provar","⚠ Not saved yet: keep going, it tries again"));WB.t=setTimeout(wbSave,8e3)}
+}
+function wbClose(){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.rt=null}
+addEventListener("pagehide",()=>{if(WB.dirty)wbSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&WB.dirty)wbSave()});
+/* 📓 My notebook, always at hand (Roger, 13 Nov 2026: "a floating icon like a notebook always present"): on every page of an LS from LS2 on
+   (LS1 has no notebook), a round 📓 button bottom left opens the LS page's notebook (#notes). Hidden on the notebook itself and under the
+   whiteboard. No reads. */
+function nbFab(){
+  if(!lsId||!m||document.getElementById("el-nbfab"))return;
+  const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum||elLsNum(L)==="LS1")return;
+  const home=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html";
+  const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
+    "#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
+    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab{display:none}@media print{#el-nbfab{display:none}}";
+  document.head.append(st);
+  const a=document.createElement("a");a.id="el-nbfab";a.href=home+"#notes";
+  const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
+  lab();document.body.append(a);
+  const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&/\/(index\.html)?$/.test(location.pathname));
+  here();addEventListener("hashchange",here);setTimeout(lab,4000);
+}
+setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
 function rtGram(rt){
   const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();const ca=lockCa();
-  if(rt.x){gtClose();rtRestore();const hs=new Set(rt.hs||[]);let c=0;
+  if(rt.x){gtClose();wbClose();rtRestore();const hs=new Set(rt.hs||[]);let c=0;
     box.querySelectorAll(".model").forEach(m=>{if(!hs.has(rtNorm(m.textContent))){m.classList.add("el-rt-newbox");c++}});
     if(c)rtNote(box,"x",ca?"🆕 Els requadres en verd són del teu nivell i no els hem vist junts: llegeix-los ara, abans de començar.":"🆕 The green boxes are for your level and we didn't see them together: read them now, before you start.");
     return}
@@ -1027,7 +1091,7 @@ function rtGram(rt){
     const sig="g|"+rt.l+"|"+(ca?1:0)+"|"+h.length+"|"+h.slice(0,80);
     if(sig!==rtSig){box.innerHTML=h;rtSig=sig;
       rtNote(box,"",ca?"📘 Aprenem junts: ara tothom veu la mateixa explicació que a la pissarra. La del teu nivell torna quan hagis de practicar.":"📘 Learning together: everyone sees the same explanation as on the board now. Your level's comes back when it's time to practise.")}
-    gtBox(box,rt)}
+    if(!wbShow(rt,"grammar",h,box))gtBox(box,rt)}
   if(!(rt.k>=0))return;
   const bl=[...box.querySelectorAll(".model")];if(!bl.length)return;
   const el=bl[Math.min(rt.k,bl.length-1)];el.classList.add("el-rt-cur");const k=rt.u+"|g|"+rt.k;
