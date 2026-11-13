@@ -211,6 +211,7 @@ html.elb-lock{overflow:hidden}
     });
     book.addEventListener('pointermove', e => {
       const d = drag; if (!d || e.pointerId !== d.id) return;
+      if (e.pointerType === 'mouse' && !(e.buttons & 1)) return drop(e);   // the button is up but its pointerup never came (Roger, 13 Nov 2026: "when I drag I can't release")
       const dx = e.clientX - d.x, dy = e.clientY - d.y;
       if (!d.t) {
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
@@ -233,10 +234,14 @@ html.elb-lock{overflow:hidden}
       noClick = Date.now() + 400;   // the tap that ends a drag is not a tap on the page
       const h = d.hist, a = h[0], b = h[h.length - 1], v = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0;   // px per ms, + to the right
       const flick = (d.dir > 0 ? -v : v) > .45 && d.p > .04, back = (d.dir > 0 ? v : -v) > .45;
-      const all = e.type !== 'pointercancel' && !back && (d.p > .33 || flick);
+      const all = e.type !== 'pointercancel' && !back && (d.p > .25 || flick);
       busy = false; go(d.t, all, all ? .22 + .45 * (1 - d.p) : .18 + .35 * d.p);
     };
-    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop);
+    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop); book.addEventListener('lostpointercapture', drop);
+    // let go anywhere: outside the book, outside the page's frame (the preview), or the window losing the mouse
+    const dropAny = e => { if (drag && (!e || e.pointerId == null || e.pointerId === drag.id)) drop({ type: 'pointerup', pointerId: drag.id, timeStamp: e && e.timeStamp || performance.now() }); };
+    const mUp = e => dropAny({ timeStamp: e.timeStamp }), wBlur = () => dropAny();
+    addEventListener('pointerup', dropAny, true); addEventListener('mouseup', mUp, true); addEventListener('blur', wBlur);
     book.addEventListener('click', e => { if (Date.now() < noClick) { e.preventDefault(); e.stopPropagation(); } }, true);
     function toggleFull(on, stay, keepFs) {
       full = on == null ? !full : on;
@@ -278,6 +283,7 @@ html.elb-lock{overflow:hidden}
         if (dead) return; if (full) toggleFull(false, true, keepFs); dead = true;
         document.removeEventListener('fullscreenchange', fc); document.removeEventListener('webkitfullscreenchange', fc);
         removeEventListener('resize', rz); if (ro) ro.disconnect();
+        removeEventListener('pointerup', dropAny, true); removeEventListener('mouseup', mUp, true); removeEventListener('blur', wBlur);
         if (endEl && home) home.appendChild(endEl);
         el.innerHTML = '';
       }
