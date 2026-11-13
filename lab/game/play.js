@@ -164,7 +164,7 @@ app$.addEventListener("click",async e=>{
 });
 
 // 🕵️ Code Breakers (Roger, 11 Nov 2026): live/{group}.mode "cb" = each student at their own pace; cb-play.js draws the screen
-function cb(){if(!CBP)CBP=cbPlayer({S,G,esc,md,pic,T,app$,user:()=>user,x:()=>x,ref:()=>ref,mySid:()=>mySid,saved:()=>joined,first,
+function cb(){if(!CBP)CBP=cbPlayer({S,G,esc,md,pic,T,lang:()=>CA,app$,user:()=>user,x:()=>x,ref:()=>ref,mySid:()=>mySid,saved:()=>joined,first,
   cmWait:()=>cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"",
   active:()=>gameOn()&&mySid===x.sid});return CBP}
 // A new game: start with no answers; the same game again (a reload): keep mine.

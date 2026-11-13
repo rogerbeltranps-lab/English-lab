@@ -347,10 +347,11 @@
     const inf = h.querySelector(".inf"), on = document.body.classList.contains("elpinfo");
     inf.setAttribute("aria-expanded", on ? "true" : "false");
     inf.setAttribute("aria-label", on ? t("Torna al pas", "Back to the step") : t("Sobre aquest learning path: com funciona, guia d'estudi, el meu objectiu", "About this learning path: how it works, study guide, my goal"));
-    // ⋯ only for a signed-in student: Problem and Idea are the buttons of their account bar (el-cloud.js)
-    const mo = h.querySelector(".mo");
-    mo.hidden = !(who.role === "student" && !who.as); mo.setAttribute("aria-label", t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
-    h.querySelector(".mm").innerHTML = `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
+    // ⋯ only for a signed-in student (Problem and Idea) or the teacher (Problem only; Roger, 13 Nov 2026): the buttons of their account bar (el-cloud.js)
+    const mo = h.querySelector(".mo"), tch = who.role === "teacher";
+    mo.hidden = !((who.role === "student" || tch) && !who.as); mo.setAttribute("aria-label", tch ? "More: report a problem" : t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
+    h.querySelector(".mm").innerHTML = tch ? `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>Report a problem</button>`
+      : `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
   }
   // ---- ⛶ one step (an "SLP") full screen (Roger, 12 Nov 2026, whiteboard: "Fullscreen SLP"): a ⛶ button in each step's heading
   // shows only that step, wide, with the browser in full screen: no menu, no top bar, no left column. A slim bar on top keeps the

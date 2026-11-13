@@ -102,7 +102,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag details{margin:6px 0;border:1.5px solid #e0e7ff;border-radius:12px;padding:4px 8px}#el-cmag summary{cursor:pointer;font-weight:800;padding:4px 0;list-style-position:inside}
 #el-cmag summary small{color:#64748b;font-weight:600}#el-cmag .chips{display:flex;flex-wrap:wrap;gap:5px;padding:4px 0 6px}
 #el-cmag .chip{border:1.5px solid #c7d2fe;border-radius:999px;background:#eef2ff;color:#1e1b4b;font:700 13px system-ui,sans-serif;padding:5px 10px;cursor:pointer}
-#el-cmag .chip:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .chip.done{background:#f1f5f9;border-color:#e2e8f0;color:#64748b;cursor:default}
+#el-cmag .chip:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .chip.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6}#el-cmag .chip.shd:hover{border-color:#7c3aed}#el-cmag .chip.shd span{color:#7c3aed}#el-cmag .chip.done{background:#f1f5f9;border-color:#e2e8f0;color:#64748b;cursor:default}
 #el-cmag .back{border:0;background:none;color:#4338ca;font:800 14px system-ui,sans-serif;cursor:pointer;padding:2px 0;margin:0 0 6px}
 #el-cmag.dock .row .it{flex-wrap:wrap;gap:2px 6px;padding:5px 7px}#el-cmag.dock .row .it>span:not(.m):not(.go){flex:1 1 100%}#el-cmag.dock .row .it .m{order:3}#el-cmag.dock .row .it .go{order:4;margin-left:auto}
 #el-cmag.dock .en,#el-cmag.dock .mo{width:30px;font-size:14px;border-radius:10px}#el-cmag.dock .acts{margin-left:35px}#el-cmag.dock .acts button{font-size:12px;padding:4px 8px}
@@ -153,6 +153,22 @@ export function plan(){if(!L)return null;const its=todayItems().filter(z=>!isGam
   const ff=todayLs().map(x=>[x,bookOf(x)]).filter(([x,a])=>a&&window.elLpOpen&&elLpOpen(a,x.info,C.g,true)).map(([,a])=>a.path);
   return {vis:its.map(z=>z.a.path+"#"+z.p),ps:its.filter(z=>EN.has(z.it)).map(z=>({u:z.a.path,p:z.p,n:lpShort(z.x,z.a)+(z.p?" · "+itName(z.a,z.p):"")})),ff}}
 export const hasToday=()=>todayItems().length>0;
+// 🔥 the warm-up's class games (el-warmup.js, Roger 13 Nov 2026): the vocabulary and grammar games of today's learning paths (and any game on
+// today), else of the paths on the latest earlier class day of the agenda: {decks: [ids], title}
+export function warmDecks(){const G=(window.EL_GAMES||[]).filter(g=>g.kind==="vocab"||g.kind==="grammar"),ids=new Set(),names=new Set();
+  const lsName=x=>String(x.ls.title||"").replace(/^\d\s*ESO\s*·\s*/i,"").toLowerCase();
+  const add=(x,a)=>{const t=String(a.title||"").split(/[:(]/)[0].trim().toLowerCase(),
+    hit=G.filter(g=>g.course===x.ls.course&&String(g.ls||"").toLowerCase().includes(lsName(x))&&t&&String(g.lp||"").split(" · ").slice(1).join(" · ").toLowerCase().startsWith(t));
+    hit.forEach(g=>{ids.add(g.id);names.add(g.lp)})};
+  const onDay=d=>{(L||[]).forEach(x=>((x.ag.days||{})[d]||[]).map(String).forEach(it=>{const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;const a=byId(it.slice(0,i)),p=it.slice(i+1);
+    if(/^game:(?!cb-)/.test(p)){const g=G.find(z=>z.id===p.slice(5));if(g){ids.add(g.id);names.add(g.lp)}}else if(a&&!/\/book\.html$/.test(a.path||""))add(x,a)}))};
+  const t=today();onDay(t);
+  if(!ids.size){const ds=[...new Set((L||[]).flatMap(x=>Object.keys(x.ag.days||{})))].filter(d=>d<t).sort().reverse();for(const d of ds){onDay(d);if(ids.size)break}}
+  // nothing planned yet: the latest learning path with class games of the course's latest LS on the Time plan
+  if(!ids.size){for(const x of (L||[]).slice().reverse()){const gs=G.filter(g=>g.course===x.ls.course&&String(g.ls||"").toLowerCase().includes(lsName(x)));
+    const lp=gs.map(g=>g.lp).sort((a,b)=>(+(String(b).match(/^LP(\d+)/)||[0,0])[1])-(+(String(a).match(/^LP(\d+)/)||[0,0])[1]))[0];
+    if(lp){gs.filter(g=>g.lp===lp).forEach(g=>{ids.add(g.id);names.add(g.lp)});break}}}
+  return {decks:[...ids],title:[...names].join(" + ")}}
 // 🏠 the homework made for one tab on day d for the next class (the Time plan's 🏠 switch, teacher.html hwNext): [id, homework] or null
 const hwOf=x=>(((x.info||{}).homework||{})[C.g])||{};
 function hwNext(x,d,it){const i=it.indexOf("#"),aid=it.slice(0,i),p=it.slice(i+1);
@@ -235,7 +251,7 @@ async function draw(){if(!box)return;
   const len=+((window.EL_TIMETABLE||{}).len)||60,tabs=its.filter(z=>z.a&&!isGame(z.p)),allOn=tabs.length>0&&tabs.every(z=>EN.has(z.it)||hereIs(z.a,z.p)),nOn=tabs.filter(z=>EN.has(z.it)&&!hereIs(z.a,z.p)).length;
   box.innerHTML=`<div class="hd"><b>📋 ${live?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
     +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
-    +`<div class="tools">${live&&nTab>1?`<button data-all="1" class="${allOn?"on":""}" title="${allOn?"Back to one step: students follow your tab":"Students can move between all of today's steps"}">👥 ${allOn?"Only mine":"Open all"}</button>`:""}<button data-add="1" title="Put another step on today's class: it opens and students can do it">➕ Add a step</button></div>`
+    +`<div class="tools">${live&&nTab>1?`<button data-all="1" class="${allOn?"on":""}" title="${allOn?"Back to one step: students follow your tab":"Students can move between all of today's steps"}">👥 ${allOn?"Only mine":"Open all"}</button>`:""}<button data-wu="1" title="A quick whole-class game with the words and grammar of today’s learning path (hangman, word order…): you tap what the students call out">🔥 Warm-up</button><button data-add="1" title="Put another step on today's class: it opens and students can do it">➕ Add a step</button></div>`
     +(live&&nOn?`<p class="hint">👥 Students can move between ${nOn+1} steps.</p>`:"")+msg()
     +(tot?`<p class="tot ${tot>len?"over":""}">⏱ ${tot} of ${len} min planned</p>`:"")
     +(body||`<p class="msg">Nothing on the agenda${live?" today":""} for ${E(C.gname)}. Plan it in the dashboard's Time plan, or ➕ add a step.</p>`);
@@ -244,6 +260,10 @@ async function draw(){if(!box)return;
 function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];let body="";const many=L.length>1;
   [...L].reverse().forEach(x=>{const as=(window.EL_CATALOG||[]).filter(a=>a.ls===x.ls.id&&secs(a).length&&!a.checkpoint&&!a.optional);if(!as.length)return;
     if(many)body+=`<div class="lp">${E(x.ls.title.replace(/^\dESO · /,""))}</div>`;
+    // 🎬 the unit's shadowing video with the whole class (Roger, 13 Nov 2026: "the shadowing of the unit should be on the menu to add steps
+    // during class mode"): goes on today's class like the Time plan's 🎬 Shadowing (the note SHD) and plays at once
+    if(x.ls.shadowing){const tday=((x.ag.days||{})[t]||[]).includes(SHD),n=its.push({x,shd:true})-1;
+      body+=`<div class="chips sh"><button class="chip shd" data-ad="${n}" title="${tday?"Already on today: play it now":"Add it to today's class and play the video now"}">🎬 Shadowing · whole class${tday?" ✓":""} <span>▶</span></button></div>`}
     as.forEach(a=>{const shut=window.elLpOpen&&!elLpOpen(a,x.info,C.g,true),here=hereIs(a,"");
       body+=`<details ${here?"open":""}><summary>${E(lpLab(x,a))}${shut?" <small>· not opened yet</small>":""}</summary><div class="chips">`
         +secs(a).map(([p,nm])=>{const it=a.id+"#"+p;if(on.has(it))return `<span class="chip done" title="Already on today">✓ ${E(nm)}</span>`;
@@ -251,7 +271,7 @@ function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];
   box.innerHTML=`<div class="hd"><b>➕ Add a step</b><button class="x" data-x="1" title="Hide">✕</button></div><button class="back" data-back="1">‹ Back to today</button>`+msg()
     +`<p class="msg" style="margin-top:0">It goes on today's class on the Time plan, opens for ${E(C.gname)} and students can do it (👥).</p>`+(body||`<p class="msg">No learning paths found.</p>`);
   box._add=its}
-function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();
+function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.wu)return warmOpen();
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
   if(b.dataset.c!=null){const y=(box._its||[])[+b.dataset.c],r=y&&readingOf(y.a.path,y.p);if(r)openCorrect(C.root,Object.assign({tab:y.p,g:C.g},r));return}
@@ -274,7 +294,11 @@ function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dat
   go(x,b)}
 const busy=async(b,f)=>{b.disabled=true;try{await f()}catch(err){console.warn("class mode",err);say("✗ Not saved: "+(err.code||err.message||err),true)}b.disabled=false;draw()};
 // ➕ on today's agenda (taken off a later day where it was planned), open for the group, 👥 for the students
-function addStep(y,b){if(!y)return;const t=today();return busy(b,async()=>{await ensureOpen(y.x,y.a,y.p);
+function addStep(y,b){if(!y)return;const t=today();
+  if(y.shd){const src=new URL(y.x.ls.shadowing,C.root).href;return busy(b,async()=>{
+    await agWrite(y.x,ag=>{if((ag.days[t]||[]).includes(SHD))return false;addIt(ag,t,SHD)});
+    ADD=false;say("🎬 Shadowing is on today's class");play(src)})}
+  return busy(b,async()=>{await ensureOpen(y.x,y.a,y.p);
   await agWrite(y.x,ag=>{Object.keys(ag.days).forEach(d=>{if(d>t)rmIt(ag,d,y.it)});addIt(ag,t,y.it)});
   EN.add(y.it);enSave();ADD=false;say("➕ "+lpShort(y.x,y.a)+" · "+itName(y.a,y.p)+" is on today: students can do it (👥)")})}
 // 🏠 homework for the next class, or taken off again
@@ -302,6 +326,9 @@ function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(
   vid.innerHTML='<video controls autoplay playsinline></video><button type="button">✕ Close the video</button>';vid.querySelector("video").src=src;
   vid.querySelector("button").onclick=()=>{vid.remove();vid=null};document.body.append(vid)}
 // the "now" mark follows the class tab (a tab clicked on the page)
+// 🔥 the warm-up game over the class tab (el-warmup.js); also when class mode starts (el-cloud.js cmTeacher)
+export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}const w=warmDecks();if(auto&&!w.decks.length)return;
+  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s},w))}
 export function refresh(){if(box&&L)draw()}
 
 // ⏹ The end of the class: each of today's steps ✔ Finished, ⏭ Next class or 🏠 Homework (Roger, 12 Nov 2026: "When I finish the class mode, a
