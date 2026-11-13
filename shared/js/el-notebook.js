@@ -1017,11 +1017,11 @@ window.ELNotebook = (function () {
   // or the whole notebook. One page per sheet; el-copyright.js adds the copyright line and the page numbers to every printed sheet.
   // 🎨 the cover's colour and design (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"): saved in the
   // notebook (parts.cv = {c, d}) and on this device for the other chapters; only colours change, so nothing is laid out again
-  // green by default (Roger: "Set green as a default")
+  // green with stars by default (Roger: "Set green as a default", "I mean green with stars")
   const CVC = { green: ['#1f5c3f', 'Verd', 'Green'], blue: ['#1f3c73', 'Blau', 'Blue'], red: ['#8e2430', 'Vermell', 'Red'], purple: ['#4a2c6e', 'Lila', 'Purple'],
     black: ['#2a2d33', 'Negre', 'Black'], pink: ['#a3365f', 'Rosa', 'Pink'], orange: ['#a8501c', 'Taronja', 'Orange'], teal: ['#1d5e66', 'Turquesa', 'Teal'] };
-  const CVD = { cloth: ['Tela', 'Cloth'], dots: ['Punts', 'Dots'], stripes: ['Ratlles', 'Stripes'], checks: ['Quadres', 'Checks'], stars: ['Estrelles', 'Stars'], plain: ['Llisa', 'Plain'] };
-  const cvGet = () => { let c = H && PT().cv; if (!c || !c.c) try { c = JSON.parse(localStorage.getItem('el_nb_cv') || 'null'); } catch (e) {} return c && CVC[c.c] ? { c: c.c, d: CVD[c.d] ? c.d : 'cloth' } : { c: 'green', d: 'cloth' }; };
+  const CVD = { stars: ['Estrelles', 'Stars'], cloth: ['Tela', 'Cloth'], dots: ['Punts', 'Dots'], stripes: ['Ratlles', 'Stripes'], checks: ['Quadres', 'Checks'], plain: ['Llisa', 'Plain'] };
+  const cvGet = () => { let c = H && PT().cv; if (!c || !c.c) try { c = JSON.parse(localStorage.getItem('el_nb_cv') || 'null'); } catch (e) {} return c && CVC[c.c] ? { c: c.c, d: CVD[c.d] ? c.d : 'stars' } : { c: 'green', d: 'stars' }; };
   const cvSet = root => { const c = cvGet(); if (root) { root.dataset.cv = c.c; root.dataset.cvd = c.d; } };
   function cvPick(btn) {
     document.querySelectorAll('.nb-cvpick').forEach(x => x.remove());
