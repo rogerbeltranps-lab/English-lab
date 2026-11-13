@@ -420,7 +420,9 @@ function asBanner(){if(!AS||document.getElementById("el-as-frame"))return;
   const t=document.createElement("button");t.type="button";t.textContent="👁 "+(AS.name||AS.email||"Student")+" · ✕";
   t.title="Student view (read-only, nothing is saved). Click to exit and go back to your dashboard.";t.onclick=asExit;
   t.style.cssText="position:absolute;top:0;left:50%;transform:translateX(-50%);pointer-events:auto;border:0;border-radius:0 0 8px 8px;background:#dc2626;color:#fff;font:600 11px system-ui,sans-serif;padding:1px 8px 2px;cursor:pointer;opacity:.85";
-  f.append(t);(document.body||document.documentElement).append(f)}
+  f.append(t);(document.body||document.documentElement).append(f);
+  // never on paper (Roger, 13 Nov 2026: "No vull la línia vermella que surt aquí", the printed notebook)
+  const ps=document.createElement("style");ps.textContent="@media print{#el-as-frame{display:none!important}}";document.head.append(ps)}
 // The learning path the teacher has pulled up for the group (ls/{id}.push[group], elPullFor in el-catalog.js; Roger, 2 Nov 2026): on any
 // other page of this LS a bar "📌 Your teacher wants you to open …" with Open it →; on that learning path itself its tab opens once (the
 // first time the student lands there after the teacher pulled it up). ✕ hides the bar until the teacher pulls up something else.
@@ -1142,7 +1144,7 @@ function nbFab(){
   if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname))return;
   let href=null;
   if(lsId&&m){const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum)return;
-    if(elLsNum(L)!=="LS1"){href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}}
+    href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}
   else{try{href=localStorage.getItem("el_nb")}catch(e){}}
   const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
     "#el-nbfab[hidden]{display:none}#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
@@ -1151,12 +1153,66 @@ function nbFab(){
   const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
   const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
   lab();document.body.append(a);
+  a.addEventListener("click",e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;if(qnOpen()){e.preventDefault();}});
   const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&!!lsId&&/\/(index\.html)?$/.test(location.pathname));
   here();addEventListener("hashchange",here);setTimeout(lab,4000);
   // the board knows the student's LS now: its notebook (an LS1 or no LS: no button)
   window.elNbFab=h=>{try{if(h)localStorage.setItem("el_nb",h);else localStorage.removeItem("el_nb")}catch(e){}a.hidden=!h;if(h)a.href=h;else a.removeAttribute("href")};
 }
 setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
+/* ✍ A quick note from any page (Roger, 13 Nov 2026: "is the floating icon of the notebook always available, so that students can note
+   what they need when they need it?"): for a signed-in student the 📓 button opens a small handwriting page (el-pad.js: pens, highlighters,
+   underline) over the page they are on, so they don't leave the activity. It is saved by itself (2 s after they stop, on ✓ and when the
+   page closes) into their notebook, students/{uid}/notes/nb-<LS> parts.n.<id> = {sec: "lp<n>" (the learning path they are in) or "qn"
+   (✍ Quick notes), html, text, dr, day, w: where they wrote it}, merged, so nothing else of the notebook is touched. "Open my notebook"
+   still goes to the whole notebook. No reads. */
+const QN={w:null,p:null,id:"",v:null,dirty:false,t:0,ls:"",sec:"",where:""};
+const qnLs=()=>{if(lsId)return lsId;let h="";try{h=localStorage.getItem("el_nb")||""}catch(e){}const x=h.match(/\/((2|4)eso)\/([^/]+)\/(index\.html)?#notes$/);return x?x[1]+"-"+x[3]:""};
+function qnOpen(){
+  if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off"))return false;
+  const ls=qnLs();if(!ls)return false;
+  if(QN.w){qnClose();return true}
+  const ca=lockCa(),T=(c,e2)=>ca?c:e2,LP=window.LP,tab=document.querySelector(".tab.active[data-panel]");
+  const lpN=LP&&LP.n&&lsId===ls?String(LP.n):"",step=String((tab&&(tab.innerText||tab.textContent))||"").replace(/\s+/g," ").trim().replace(/^\d+\s*/,"").slice(0,60);
+  const where=lpN?("LP"+lpN+(step?" · "+step:"")):String(document.title||"").replace(/\s*[·|–-]\s*English Lab.*$/i,"").slice(0,60);
+  if(!QN.id||QN.ls!==ls||QN.where!==where){if(QN.dirty)qnSave();QN.id="n"+Date.now().toString(36);QN.v=null;QN.dirty=false}
+  QN.ls=ls;QN.sec=lpN?"lp"+lpN:"qn";QN.where=where;
+  if(!document.getElementById("el-qn-css")){const st=document.createElement("style");st.id="el-qn-css";st.textContent=
+    "#el-qn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:78px;z-index:9991;width:min(520px,calc(100vw - 28px));height:min(430px,calc(100vh - 110px));display:flex;flex-direction:column;background:#fffef8;border:2px solid #1f4fb5;border-radius:14px;box-shadow:0 14px 34px rgba(20,40,90,.3);font:15px/1.35 system-ui,sans-serif;color:#1e293b;overflow:hidden}"+
+    "#el-qn .qn-top{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #dbe4f5;background:#f3f6fd}#el-qn .qn-top b{white-space:nowrap}#el-qn .qn-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:13px}"+
+    "#el-qn .qn-b{border:1px solid #c7d2ea;background:#fff;border-radius:8px;padding:4px 10px;font:600 13px system-ui,sans-serif;color:#1f4fb5;cursor:pointer;text-decoration:none;white-space:nowrap}#el-qn .qn-ok{background:#1f4fb5;color:#fff;border-color:#1f4fb5}"+
+    "#el-qn .qn-host{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:6px 8px}#el-qn .qn-st{padding:3px 10px 6px;font-size:12px;color:#64748b}#el-qn .pad-tools{margin:0 0 10px;border-radius:8px;border:1px solid #d5dce5}"+
+    "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
+  const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
+  const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
+  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
+  w.querySelector(".qn-w").textContent="📍 "+where;
+  document.body.append(w);QN.w=w;
+  const st=s2=>{const x=QN.w&&QN.w.querySelector(".qn-st");if(x)x.textContent=s2};
+  st(T("Es desa sol a la teva llibreta, a "+(lpN?"LP"+lpN:"✍ Notes ràpides")+".","Saved by itself in your notebook, in "+(lpN?"LP"+lpN:"✍ Quick notes")+"."));
+  w.querySelector(".qn-ok").addEventListener("click",()=>qnClose());
+  w.querySelector(".qn-open")?.addEventListener("click",()=>{if(QN.dirty)qnSave()});
+  w.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();qnClose()}});
+  import("./el-pad.js").then(P=>{if(QN.w!==w)return;
+    QN.p=P.pad(w.querySelector(".qn-host"),{html:QN.v&&QN.v.html,text:QN.v&&QN.v.text,dr:QN.v&&QN.v.dr,ca,ph:T("Escriu aquí el que vulguis recordar. Pots canviar de boli, subratllar i marcar.","Write here what you want to remember. You can change pens, highlight and underline."),
+      onChange:v=>{QN.v=v;QN.dirty=true;st(T("Desant…","Saving…"));clearTimeout(QN.t);QN.t=setTimeout(qnSave,2000)}});
+    QN.st=st;setTimeout(()=>{if(QN.p&&QN.p.ed)QN.p.ed.focus()},30)}).catch(e=>{console.warn("quick note",e);qnClose();if(href)location.href=href});
+  return true;
+}
+async function qnSave(){
+  clearTimeout(QN.t);if(!QN.dirty||!QN.v||!user||!isStudent(user)||AS)return;QN.dirty=false;
+  const v=QN.v,ca=lockCa(),T=(c,e2)=>ca?c:e2,st=QN.w&&QN.st,id=QN.id,deck="nb-"+QN.ls;
+  const L=(window.EL_LS||[]).find(l=>l.id===QN.ls)||{},html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
+  if(!html.replace(/<[^>]*>/g,"").trim()&&!String(v.text||"").trim()&&!dr.length)return;
+  const day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+  try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:QN.ls,course:L.course||(QN.ls.match(/^\d+eso/)||[""])[0],deck,title:"📓 My notebook",lp:"",
+      parts:{n:{[id]:{sec:QN.sec,html,text:String(v.text||"").slice(0,3000),dr,day,w:QN.where}}},updated:serverTimestamp()},{merge:true});
+    if(st&&QN.id===id)st(T("✓ Desat a la teva llibreta","✓ Saved in your notebook"))}
+  catch(e){console.warn("quick note",e);QN.dirty=true;if(st)st(T("⚠ Encara no s'ha desat: ho torna a provar","⚠ Not saved yet: it tries again"));QN.t=setTimeout(qnSave,8e3)}
+}
+function qnClose(){if(QN.p)QN.v=Object.assign(QN.v||{},QN.p.get());if(QN.dirty)qnSave();if(QN.w)QN.w.remove();QN.w=null;QN.p=null}
+addEventListener("pagehide",()=>{if(QN.dirty)qnSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&QN.dirty)qnSave()});
 function rtGram(rt){
   const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();const ca=lockCa();
