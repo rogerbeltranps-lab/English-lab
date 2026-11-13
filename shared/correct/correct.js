@@ -70,8 +70,12 @@ function explainAll(){
   const B=gBoxes(),g=LP.panels.find(p=>p.id==="grammar");
   return `<div class="chips"><span class="chip all">📘 How it works · together</span>`+
     ["all"].concat(ROUTES).map(v=>`<button class="chip lvb ${v===GV?"on":""}" data-gv="${v}" title="${v==="all"?"Every level's boxes, each with its level":"Only the "+NAME[v]+" boxes"}">${v==="all"?"All levels":NAME[v]}</button>`).join("")+`</div>`+
-    `<h1 class="gt">${esc(tx(g.title))}</h1>`+
-    `<div class="gxs ${RP>=0?"focus":""}">`+B.map((b,i)=>`<div class="gx ${i===RP?"now":""}" data-rp="${i}"><span class="chip ${lvCls(b)}">${b.all?"👥 ":""}${esc(b.lab)}</span><div class="en">${b.en}</div>${b.ca&&X.norm(b.ca)!==X.norm(b.en)?`<div class="cax">${b.ca}</div>`:""}</div>`).join("")+`</div>`+
+    // 📓 drawn like the student's notebook (Roger, 13 Nov 2026: "when I explain the theory, I want the slide look like this"): lined paper,
+    // a 🧩 Grammar post-it, the title in pencil and each box a taped slip in the teacher's handwriting, the same boxes (panel.explain)
+    // and the same el-notebook.css classes as the notebook, only bigger for the projector (.nbx in index.html).
+    // A visual box's Catalan copy (cards, tables) stays on the Base / Starter Chromebooks only: on the projector it doubled the box
+    `<div class="nb-postit k-grammar">🧩 Grammar</div><h1 class="gt nb-h3">${esc(tx(g.title))}</h1>`+
+    `<div class="gxs ${RP>=0?"focus":""}">`+B.map((b,i)=>`<div class="gx nb-slip ${i===RP?"now":""}" data-rp="${i}"><span class="chip ${lvCls(b)}">${b.all?"👥 ":""}${esc(b.lab)}</span><div class="en">${b.en}</div>${b.ca&&X.norm(b.ca)!==X.norm(b.en)&&!/<(div|table)\b/i.test(b.ca)?`<div class="cax">${b.ca}</div>`:""}</div>`).join("")+`</div>`+
     `<p class="hint">${GV==="all"?"Every level's explanation, each box with the levels that have it.":"The "+NAME[GV]+" explanation."}${G?" Every Chromebook shows these same boxes now (Base and Starter in Catalan where there is a translation) and follows the yellow one; their own level's boxes come back for ⏱ Your turn"+(GV==="all"?".":", with the ones not seen together in green.")+" Space, → or a click: next box.":""}</p>`;
 }
 // what the students' "How it works" box shows while explaining together (el-cloud.js rtFollow, rt.p): the same boxes, English (h) and
@@ -310,7 +314,7 @@ function timer(k){if(k==="tgo"){TM.on=!TM.on&&TM.left>0;clearInterval(TM.iv);if(
 const label=s=>s.kind==="explain"?"📘":s.kind==="readall"?"📖":s.kind==="turn"?"⏱":s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&/shared|own/.test(x.kind)&&x.panel===s.panel).indexOf(s)+1);
 function draw(){
   const s=slides[at],open=shown.has(at);
-  $("out").outerHTML=`<div class="card" id="out">${!s?"":s.kind==="explain"?explainAll():s.gram?gram(s,open):s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
+  $("out").outerHTML=`<div class="card${s&&s.kind==="explain"?" nbx":""}" id="out">${!s?"":s.kind==="explain"?explainAll():s.gram?gram(s,open):s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
   const m=$("tmini");if(m)m.textContent=(TM.on||TM.left<TM.len)&&s&&s.kind!=="turn"?"⏱ "+(TM.left?mmss(TM.left):"Time!"):"";
   let lastPanel=null;
   $("dots").innerHTML=slides.map((x,i)=>{const pk=x.panel+(x.pro?"p":"")+(x.gram?"|"+(x.all?"all":x.on[0]):""),gap=lastPanel&&lastPanel!==pk?'<span class="gap"></span>':"";lastPanel=pk;   // grammar: a gap between Everyone, Base, Core+ and Plus
@@ -330,7 +334,8 @@ function act(k){if(k==="para"){const n=document.querySelectorAll("[data-rp]").le
 function closeIt(){const s=slides[at];if(poll){clearInterval(poll);poll=null}if(s)at=-1;rtSend().finally(()=>{at=0;closeGo()})}
 window.addEventListener("pagehide",()=>{if(rtLast){at=-1;rtSend()}});
 function closeGo(){if(EMBED&&parent!==window)parent.postMessage({elCorrect:"close"},location.origin);else if(history.length>1)history.back();else window.close()}
-document.addEventListener("click",e=>{const p=e.target.closest("[data-rp]");if(p){RP=+p.dataset.rp;return draw()}
+document.addEventListener("click",e=>{if(e.target.closest("details"))return;   // 🙌 All together: ▶ Answer opens in place (a redraw would close it)
+  const p=e.target.closest("[data-rp]");if(p){RP=+p.dataset.rp;return draw()}
   const b=e.target.closest("button");if(!b)return;if(b.dataset.i!=null){at=+b.dataset.i;draw()}else if(b.dataset.rl){RL=b.dataset.rl;try{localStorage.setItem(RL_K,RL)}catch(x){}draw()}
   else if(b.dataset.gv){GV=b.dataset.gv;RP=-1;try{localStorage.setItem(GV_K,GV)}catch(x){}draw()}
   else if(b.dataset.tm)timer(b.dataset.tm==="+1"?"+1":b.dataset.tm);else if(b.dataset.k)act(b.dataset.k)});
