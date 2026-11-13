@@ -142,7 +142,20 @@ window.ELNotebook = (function () {
   }
   // ⬜ an activity of a tab done in class that the student hasn't done yet: a "To do" note (Catalan for Starter/Base, as the rest of the
   // notebook) and its questions with a line to answer them, the options of a choice question in a fixed order (Roger, 13 Nov 2026)
+  // 👁 in the teacher's student view the link opens through that student's board (today.html?student=uid&go=…, as the 📍 links of
+  // problem reports do): a new tab doesn't keep this tab's student view, so the learning path opened as the teacher (Roger, 13 Nov 2026:
+  // "this brought me to the SLP but as a teacher not a student"). Students' own links stay as they were.
+  function asLink(href) {
+    if (!href || !H || !H.preview || !H.uid || H.uid === 'demo') return href;
+    try {
+      const root = me ? new URL('../../', me) : new URL('../../', location.href), u = new URL(href, location.href);
+      if (u.origin !== root.origin || !u.pathname.startsWith(root.pathname)) return href;
+      const rel = u.pathname.slice(root.pathname.length) + u.hash.replace(/[!'()*~]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());   // today.html's go= takes only these characters
+      return root.href + 'today.html?student=' + encodeURIComponent(H.uid) + '&go=' + encodeURIComponent(rel);
+    } catch (e) { return href; }
+  }
   function todo(w, go) {
+    go = asLink(go);
     const line = '<span class="nb-gap"></span>';
     const li = x => `<li>${blank.test(x.q) ? String(x.q).replace(blank, line) : `${x.q}${x.o ? '' : ' ' + line}`}${x.o ? `<span class="nb-opts">${x.o.map(o => `<span>▢ ${esc(o)}</span>`).join('')}</span>` : ''}</li>`;
     return `<div class="nb-work nb-todo"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')}${go ? `<a class="nb-tdo nb-tdgo" href="${esc(go)}" target="_blank" rel="noopener" title="${t('Obre aquesta activitat al learning path', 'Open this activity on the learning path')}">${t('Per fer', 'To do')} ➜</a>` : `<span class="nb-tdo">${t('Per fer', 'To do')}</span>`}</div>`
