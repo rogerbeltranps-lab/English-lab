@@ -911,19 +911,52 @@ function rtCss(){if(!document.getElementById("el-rt-css")){const st=document.cre
     st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}"+
       "#el-rt-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7cc;border:2px solid #ffd34d;font:700 15px system-ui,sans-serif;color:#713f12}"+
       "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}"+
-      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}";document.head.append(st)}}
+      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}"+
+      ".el-rc-cur{box-shadow:0 0 0 4px #ffd34d!important;border-radius:12px;background:#fffbea!important}"+
+      ".el-rc{margin-top:10px;padding:10px 14px;border-radius:12px;border:2px solid;font:600 16px/1.45 system-ui,sans-serif}.el-rc.ok{background:#e9f7ef;border-color:#2e8b57;color:#14532d}"+
+      ".el-rc.no{background:#fef2f2;border-color:#ef4444;color:#7f1d1d}.el-rc .r{margin-top:4px;color:#14532d}"+
+      ".el-rc-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#eef2ff;border:2px solid #6366f1;font:700 15px system-ui,sans-serif;color:#312e81}";document.head.append(st)}}
 function rtNote(box,cls,txt){let n=document.getElementById("el-rt-note");if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}n.className=cls;n.textContent=txt}
+/* ✅ Correcting together (Roger, 13 Nov 2026: "when correcting the reading I want students to see the feedback on their Chromebook with the
+   answers according to their level and see what they did"): on the projector's question slides rt.c = {p: the step, qs: [{q, a}] the
+   question (one per level when each level has its own), s: the answer is shown}. The student's own question with that text is outlined and
+   brought into view; once the teacher shows the answer, a box under it says what they answered (✓ / ✗) and the right answer of their level.
+   A question their level does not have: a line saying so (listen). The boxes stay for the questions already corrected, until the screen
+   closes. Nothing is written and their answers are not touched. */
+const rcEsc=v=>String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rcClear(){document.querySelectorAll(".el-rc,#el-rc-note").forEach(e=>e.remove());document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"))}
+const rcTitle=el=>{const t=el.querySelector(".q-title");if(!t)return"";const c=t.cloneNode(true);c.querySelectorAll(".q-ca,small").forEach(x=>x.remove());return rtNorm(c.textContent.replace(/^\s*\d+\.\s*/,"").replace(/🔮/g,""))};
+function rtCorrect(c,box){
+  document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"));const old=document.getElementById("el-rc-note");if(old)old.remove();
+  if(!c||!Array.isArray(c.qs))return;
+  const list=document.getElementById(c.p+"Form")||document.getElementById(c.p+"List");if(!list||list.offsetParent===null)return;
+  const ca=lockCa(),want=c.qs.map(x=>rtNorm(x.q));let hit=null,q=null;
+  [...list.querySelectorAll(".question")].some(el=>{const i=want.indexOf(rcTitle(el));if(i<0)return false;hit=el;q=c.qs[i];return true});
+  if(!hit){const n=document.createElement("p");n.id="el-rc-note";n.className="el-rc-note";
+    n.textContent=ca?"✅ Ara corregim una pregunta que no és al teu reading: escolta i busca-la al text de la pissarra.":"✅ We're correcting a question that isn't in your reading now: listen and find it in the text on the board.";
+    list.before(n);const k="c|none|"+want.join("|");if(k!==rtKey){rtKey=k;n.scrollIntoView({block:"center",behavior:"smooth"})}return}
+  hit.classList.add("el-rc-cur");const k="c|"+rcTitle(hit)+"|"+(c.s?1:0);if(k!==rtKey){rtKey=k;const ae=document.activeElement;if(!(ae&&ae.closest&&ae.closest("input[type=text],textarea")))hit.scrollIntoView({block:"center",behavior:"smooth"})}
+  if(!c.s)return;
+  // what they answered: the option they picked (0 = the right one in the data) or what they typed (the page's own ✓ when they checked)
+  const r=hit.querySelector("input[type=radio]:checked"),t=hit.querySelector("input.typed,input[type=text]"),fb=hit.querySelector(".feedback");
+  const said=r?(r.closest("label")||{}).textContent||"":t?t.value.trim():"";
+  const ok=r?+r.value===0:t?(fb&&fb.classList.contains("ok"))||[].concat(q.a||[],q.alt||[]).some(a=>rtNorm(a)===rtNorm(said)):false;
+  let b=hit.querySelector(".el-rc");if(!b){b=document.createElement("div");b.className="el-rc";hit.append(b)}
+  b.className="el-rc "+(ok?"ok":"no");
+  b.innerHTML=(said?`<div>${ca?"La teva resposta":"Your answer"}: <b>${rcEsc(said)}</b> ${ok?"✓":"✗"}</div>`:`<div>${ca?"No l'has resposta.":"You didn't answer it."}</div>`)+
+    (ok?`<div class="r">✓ ${ca?"Correcte!":"Right!"}</div>`:`<div class="r">✓ ${ca?"Resposta correcta":"Right answer"}: <b>${rcEsc(q.a||"")}</b></div>`);
+}
 function rtFollow(rt){rtNow=rt||null;
   document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
   document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
   if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
-  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();rtRestore();return}
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();rtRestore();rcClear();return}
   if(rt.p)return rtGram(rt);
   const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();
   if(rt.x){rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
       n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
-    return}
+    rtCorrect(rt.c,box);return}
   if(typeof rt.h==="string"&&rt.h){
     if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
     const sig=rt.l+"|"+rt.h.length+"|"+rt.h.slice(0,80);
