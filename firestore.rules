@@ -178,6 +178,12 @@ service cloud.firestore {
     match /gameResults/{id} {
       allow read, write: if isTeacher();
     }
+    // 📈 class results (Roger, 13 Nov 2026: "I need to see the statistic right away but also somewhere else to assess my performance"):
+    // classResults/{group}_{ls}_{lp}_{tab}_{day}, who did the grammar / reading of ✅ Correct together and how, written by
+    // shared/correct/correct.js from ⏱ Your turn on and read by the dashboard's 📊 Class results. Only the teacher.
+    match /classResults/{id} {
+      allow read, write: if isTeacher();
+    }
     // each student's own class game results (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what
     // to study"): myGames/{email}.games[{group}_{sid}], written by the board at the end of a game (lab/game/host.js); the student reads only
     // their own (📝 Your notes on the LS page, shared/js/el-notes.js)
