@@ -98,21 +98,90 @@ function gram(s,open){
      :`<div class="ans hid">? &nbsp;Think, then say your answer</div>`)+only;
 }
 /* ---------- the students' answers (one read per student: their progress for this LS) ---------- */
+/* 📊 Who did it and how (Roger, 13 Nov 2026: "I want to see who's done the activities during the grammar … their % of good answers and who
+   did it, I need to see the statistic right away but also somewhere else to assess my performance"): on ⏱ Your turn, every student of the
+   group with what they did (✅ checked: right on their first check and %, ✏ working: answers typed but not checked yet, — not started) and
+   the class %, read again every 30 s while that slide is on screen (one read per student; the group's list is read once). From ⏱ Your turn
+   on, each read is also saved in classResults/{group}_{ls}_{lp}_{tab}_{day} (teacher only), which the dashboard shows in 📊 Class results. */
+const PID=GRAM?"grammar":"read";
+let ST=null,CLASS_AT=0,STARTED=0,savedSig="";
 const norm=s=>String(s==null?"":s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+const ymd=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+// the step's questions on a level (Pro: data/native/<lp>.js)
+function stepAt(L){const p=L==="native"?(LP.native||{})[PID]:LP.panels.find(x=>x.id===PID);return p&&p.items?{p,items:X.forLevel(p.items,L||"insecure")}:{p:null,items:[]}}
+function rowOf(s,state,L){
+  const f=state&&state.tries&&state.tries[PID],l=state&&state.last&&state.last[PID],lev=L||(f&&f.level)||"";
+  const ty=state&&state.typing&&state.typing[PID+"_"+lev],it=f&&state.items&&state.items[PID+"_"+f.level];
+  return {e:s.email,n:s.name,l:lev,ok:f?f.score:null,max:f?f.max:null,at:f?f.date:null,lok:l?l.score:null,lmax:l?l.max:null,lat:l?l.date:null,
+    typed:Array.isArray(ty)?ty.filter(v=>v!=null&&v!=="").length:0,of:stepAt(lev).items.length,fl:f?f.level:null,qi:it?it.q:null,qok:it?it.ok:null};
+}
 async function classAnswers(){
   if(!G)return null;
   const app=getApps()[0]||initializeApp(CONFIG),db=getFirestore(app),lsId=LS.replace("/","-");
-  const st=await getDocs(query(collection(db,"students"),where("group","==",G)));
-  const by={},lv={};let n=0,done=0;
-  await Promise.all(st.docs.map(async s=>{
+  if(!ST){const st=await getDocs(query(collection(db,"students"),where("group","==",G)));
+    ST=st.docs.map(d=>({id:d.id,name:d.data().name||"",email:String(d.data().email||"").toLowerCase()})).filter(s=>!TEACHERS.includes(s.email))}
+  const by={},lv={},rows=[];let n=0,done=0;
+  await Promise.all(ST.map(async s=>{
     const p=await getDoc(doc(db,"students",s.id,"progress",lsId)).catch(()=>null);
     const d=p&&p.exists()?(p.data().data||{}):{};let state=null;try{state=JSON.parse(d[LP.key]||"null")}catch(e){}
     const L=d[LP.key+"Level"]||null;if(L)lv[L]=(lv[L]||0)+1;
-    if(!state||!state.ans)return;n++;if(state.ans[GRAM?"grammar":"read"])done++;
+    rows.push(rowOf(s,state,L));
+    if(!state||!state.ans)return;n++;if(state.ans[PID])done++;
     Object.entries(state.ans).forEach(([pid,a])=>{if(!a||!Array.isArray(a.v)||!Array.isArray(a.q))return;
       a.q.forEach((q,i)=>{const v=a.v[i];if(v==null||v==="")return;const k=pid+"|"+q+"|"+(a.l||"");(by[k]=by[k]||[]).push(v)})});
   }));
-  return {n,by,lv,done,students:st.size};
+  CLASS_AT=Date.now();
+  return {n,by,lv,done,students:ST.length,rows};
+}
+const pctOf=r=>r.ok!=null&&r.max?Math.round(100*r.ok/r.max):null;
+// the class in numbers: checked / working / not started, the class % (each student counts the same) and the students who checked today
+function sumUp(rows){const today=ymd(Date.now()),ck=rows.filter(r=>r.ok!=null&&r.max),wk=rows.filter(r=>r.ok==null&&r.typed),ps=ck.map(pctOf);
+  return {n:rows.length,done:ck.length,work:wk.length,none:rows.length-ck.length-wk.length,today:ck.filter(r=>r.at&&ymd(r.at)===today).length,
+    pct:ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):null}}
+// right / tried for each sentence on the students' first check (state.items), hardest first
+function perQuestion(rows){const m={};
+  rows.forEach(r=>{if(!r.qi||!r.qok)return;const p=stepAt(r.fl).p;if(!p)return;
+    r.qi.forEach((j,i)=>{const it=Array.isArray(p.items)?p.items[j]:null;if(!it)return;const t=tx(it.q),k=(r.fl==="native"?"P|":"")+t;
+      const x=m[k]=m[k]||{t,ok:0,n:0,pro:r.fl==="native"};x.n++;if(r.qok[i])x.ok++})});
+  return Object.values(m).sort((a,b)=>a.ok/a.n-b.ok/b.n)}
+const shortN=r=>{const w=String(r.n||r.e.split("@")[0]).trim().split(/\s+/);return w[0]+(w[1]?" "+w[1][0]+".":"")};
+const hm=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,"0")+":"+String(x.getMinutes()).padStart(2,"0")};
+const NM_K="el_cx_names";let NM=true;try{NM=localStorage.getItem(NM_K)!=="0"}catch(e){}
+function resBox(){
+  if(!G)return "";
+  if(!CLASS)return `<p class="done"><button class="sm" data-k="who">🔄 Who has done it?</button></p>`;
+  const R=CLASS.rows||[],S=sumUp(R),what=GRAM?"grammar":"reading";
+  const chip=r=>{const p=pctOf(r),c=p==null?(r.typed?"w":"n"):p>=80?"g":p>=50?"a":"r",earlier=r.at&&ymd(r.at)!==ymd(Date.now());
+    return `<span class="rc ${c}" title="${esc(r.n||r.e)} · ${X.NAME[r.l]||""}${r.at?" · first check "+(earlier?ymd(r.at):hm(r.at)):""}${r.lat&&r.lat!==r.at?" · latest "+r.lok+"/"+r.lmax:""}">`+
+      `${NM?esc(shortN(r))+" ":""}${p!=null?`<b>${p}%</b><small>${r.ok}/${r.max}${earlier?" · before":""}</small>`:r.typed?`<b>✏</b><small>${r.typed}/${r.of}</small>`:`<b>—</b>`}</span>`};
+  const ord=(a,b)=>shortN(a).localeCompare(shortN(b)),ck=R.filter(r=>pctOf(r)!=null).sort(ord),wk=R.filter(r=>pctOf(r)==null&&r.typed).sort(ord),no=R.filter(r=>pctOf(r)==null&&!r.typed).sort(ord);
+  return `<div class="res" id="res"><div class="rsum"><span class="big2">${S.pct==null?"–":S.pct+" %"}</span><span>right on their first check of the ${what}</span>`+
+    `<span class="rn"><b>✅ ${S.done}</b> checked${S.done&&S.today<S.done?` (${S.done-S.today} before today)`:""} · <b>✏ ${S.work}</b> working · <b>— ${S.none}</b> not started</span></div>`+
+    `<div class="rgrid">${ck.concat(wk,no).map(chip).join("")}</div>`+
+    `<p class="rfoot"><button class="sm" data-k="who">🔄 Update</button><button class="sm" data-k="names">${NM?"🙈 Hide names":"👁 Show names"}</button>`+
+    `<span>Updated ${hm(CLASS_AT)}${slides[at]&&slides[at].kind==="turn"?" · again every 30 s":""}${STARTED||slides[at]&&slides[at].kind==="turn"?" · saved in the dashboard, 📊 Class results":""}</span></p></div>`;
+}
+// the box alone (a refresh while the slide is on screen keeps the timer and the scroll)
+function resDraw(){const b=$("res");if(b)b.outerHTML=resBox();else if(slides[at]&&slides[at].kind==="turn")draw()}
+let refreshing=null;
+function refresh(){if(!G||refreshing)return refreshing||Promise.resolve();
+  refreshing=classAnswers().then(c=>{CLASS=c;resSave()}).catch(e=>console.warn("class answers",e)).finally(()=>{refreshing=null});return refreshing}
+// every 30 s while ⏱ Your turn is on screen (and the tab is seen); one read once more when the sentences start
+let poll=null,wasTurn=false;
+function livePoll(){const on=!!G&&!!slides[at]&&slides[at].kind==="turn";
+  if(on&&!STARTED){STARTED=Date.now();resSave()}
+  if(on&&!poll)poll=setInterval(()=>{if(document.visibilityState==="visible")refresh().then(resDraw)},30000);
+  if(!on&&poll){clearInterval(poll);poll=null}
+  if(wasTurn&&!on&&Date.now()-CLASS_AT>10000)refresh().then(()=>{if(slides[at]&&slides[at].gram||slides[at]&&/shared|own/.test(slides[at].kind))draw()});
+  wasTurn=on}
+// 📈 the lesson's results, kept for the dashboard: one document a group, learning path, tab and day, written only when something changed
+function resSave(){
+  if(!G||!STARTED||!CLASS||!CLASS.rows)return;
+  const rows=CLASS.rows.map(({qi,qok,...r})=>r).sort((a,b)=>a.e<b.e?-1:1),S=sumUp(CLASS.rows),qs=perQuestion(CLASS.rows),day=ymd(STARTED);
+  const sig=JSON.stringify([rows,qs]);if(sig===savedSig)return;savedSig=sig;
+  const a=(window.EL_CATALOG||[]).find(x=>x.path===LS+"/"+LPF+".html"),id=[G,LS.replace("/","-"),LPF,PID,day].join("_");
+  setDoc(doc(getFirestore(getApps()[0]),"classResults",id),{group:G,ls:LS,lp:LPF,tab:PID,day,from:STARTED,at:Date.now(),
+    title:a?(window.elLpLabel?elLpLabel(a):a.title):LP.title,sum:S,rows,qs}).catch(e=>{savedSig="";console.warn("class results",e)});
 }
 // right / answered for one question: MC answers are the option's place in the data (0 = the right one), typed ones are compared as text
 function tally(panel,qid,routes,item){
@@ -206,7 +275,7 @@ function rtSend(){
 const mmss=n=>Math.floor(n/60)+":"+String(n%60).padStart(2,"0");
 function turn(){
   if(GRAM)return gTurn();
-  const who=G&&CLASS?`<p class="done">✅ ${CLASS.done} of ${CLASS.students} have checked the reading <button class="sm" data-k="who">🔄 Update</button></p>`:G?`<p class="done"><button class="sm" data-k="who">🔄 Who has finished?</button></p>`:"";
+  const who=resBox();
   return `<div class="chips"><span class="chip all">⏱ Your turn</span></div><h1>Answer the questions of your level on your Chromebook</h1>`+
     `<p class="ca">Respon les preguntes del teu nivell al Chromebook. Pots tornar a llegir el teu text.</p>`+
     (G?`<p class="ca">🆕 First read the <b style="background:#bbf7d0;color:#14532d;padding:0 4px;border-radius:4px">green words</b>: what your text says that the ${NAME[RL]} text didn't. · Primer llegeix les paraules en verd.</p>`:"")+
@@ -214,11 +283,11 @@ function turn(){
     `<div class="tbtn"><button data-k="tgo" class="pri2">${TM.on?"⏸ Pause":TM.left<TM.len&&TM.left>0?"▶ Go on":"▶ Start"}</button>${[5,10,15].map(m=>`<button data-tm="${m}" class="${TM.len===m*60?"on":""}">${m} min</button>`).join("")}<button data-tm="+1">+1 min</button></div>`+who;
 }
 function gTurn(){
-  const who=G&&CLASS?`<p class="done">✅ ${CLASS.done} of ${CLASS.students} have checked the grammar <button class="sm" data-k="who">🔄 Update</button></p>`:G?`<p class="done"><button class="sm" data-k="who">🔄 Who has finished?</button></p>`:"";
+  const who=resBox();
   return `<div class="chips"><span class="chip all">⏱ Your turn</span></div><h1>Do the grammar exercise of your level on your Chromebook</h1>`+
     `<p class="ca">Fes l'exercici de gramàtica del teu nivell al Chromebook. Pots tornar a mirar «Com funciona».</p>`+
     (G&&GV!=="all"?`<p class="ca">🆕 First read the <b style="background:#bbf7d0;color:#14532d;padding:0 4px;border-radius:4px">green boxes</b>: what your level has that we didn't see together. · Primer llegeix els requadres en verd.</p>`:"")+
-    `<div class="timer ${TM.left<=0?"up":""}" id="tbig">${TM.left<=0?"⏰ Time!":mmss(TM.left)}</div>`+
+    `<div class="timer ${TM.left<=0?"up":""} ${G?"tsm":""}" id="tbig">${TM.left<=0?"⏰ Time!":mmss(TM.left)}</div>`+
     `<div class="tbtn"><button data-k="tgo" class="pri2">${TM.on?"⏸ Pause":TM.left<TM.len&&TM.left>0?"▶ Go on":"▶ Start"}</button>${[5,10,15].map(m=>`<button data-tm="${m}" class="${TM.len===m*60?"on":""}">${m} min</button>`).join("")}<button data-tm="+1">+1 min</button></div>`+who;
 }
 function tick(){if(!TM.on)return;TM.left=Math.max(0,TM.left-1);if(!TM.left){TM.on=false;clearInterval(TM.iv)}
@@ -239,14 +308,15 @@ function draw(){
   $("bar").innerHTML=`<button data-k="back" ${at?"":"disabled"}>◀ Back</button>`+
     (plain?(rk&&RP<last?`<button class="pri" data-k="para">▶ ${RP<0?(s.kind==="explain"?"Start":"Start reading"):s.kind==="explain"?"Next box":"Next sentence"}</button><button data-k="next">Skip ▶</button>`:`<button class="pri" data-k="next">Next ▶</button>`):open?`<button class="pri" data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`:`<button class="pri" data-k="show">👁 ${s&&s.kind==="log"?"Show the model notes":"Show the answer"}</button>`+`<button data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`)+
     `<button data-k="close">✕ Close</button><span class="keys">Space: show / next · ← →</span>`;
-  rtSend();
+  rtSend();livePoll();
   const cur=document.querySelector("[data-rp].now");if(cur)cur.scrollIntoView({block:"center"});else document.querySelector("main").scrollTop=0;
 }
 function act(k){if(k==="para"){const n=document.querySelectorAll("[data-rp]").length;if(RP<n-1)RP++;else if(at<slides.length-1)at++;}
-  else if(k==="who"){classAnswers().then(c=>{CLASS=c;draw()}).catch(e=>console.warn("class answers",e));return}
+  else if(k==="who"){refresh().then(resDraw);return}
+  else if(k==="names"){NM=!NM;try{localStorage.setItem(NM_K,NM?"1":"0")}catch(x){}resDraw();return}
   else if(k==="tgo")return timer(k);
   else if(k==="back"&&at>0)at--;else if(k==="next"&&at<slides.length-1)at++;else if(k==="show")shown.add(at);else if(k==="close")return closeIt();draw()}
-function closeIt(){const s=slides[at];if(s)at=-1;rtSend().finally(()=>{at=0;closeGo()})}
+function closeIt(){const s=slides[at];if(poll){clearInterval(poll);poll=null}if(s)at=-1;rtSend().finally(()=>{at=0;closeGo()})}
 window.addEventListener("pagehide",()=>{if(rtLast){at=-1;rtSend()}});
 function closeGo(){if(EMBED&&parent!==window)parent.postMessage({elCorrect:"close"},location.origin);else if(history.length>1)history.back();else window.close()}
 document.addEventListener("click",e=>{const p=e.target.closest("[data-rp]");if(p){RP=+p.dataset.rp;return draw()}

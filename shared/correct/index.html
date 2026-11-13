@@ -12,7 +12,8 @@
      The Reading tab starts with 📖 Read together (one level's version, a paragraph at a time) and ⏱ Your turn (a countdown while each
      student answers their own level), then the questions. Opened from the class tab (✅ Correct on the class mode bar, on a Reading or Reading log tab) or from 📋 Today; embed=1: it sits over
      the class tab (shared/correct/open.js) and ✕ Close takes it away. Teacher only. Reads the Learning Path's data (never changes it) and,
-     with a group, the students' saved answers once (one read per student) for "Right in the class". correct.js draws it. -->
+     with a group, the students' saved answers once (one read per student) for "Right in the class", and on ⏱ Your turn every 30 s for
+     📊 who did it and how (saved in classResults for the dashboard's 📊 Class results). correct.js draws it. -->
 <style>
 :root{--bg:#0f2a3a;--bar:#0b1f2b;--card:#fff;--ink:#13222c;--muted:#5f6b73;--line:#e3e7eb;--ok:#1f6b40;--okbg:#e9f7ef;--okb:#2e8b57;--blue:#2b4fa8;--bluebg:#dfe9ff;--mark:#ffe680;--dot:#24485c}
 *{box-sizing:border-box}
@@ -57,10 +58,20 @@ table.log{border-collapse:collapse;width:100%;table-layout:fixed}
 .chip.lvb{border:0;cursor:pointer;font-family:inherit}.chip.lvb:hover{outline:2px solid var(--blue)}
 .rt{max-width:1050px}.rt p{font-size:23px;line-height:1.6;margin:0 0 14px;padding:4px 12px;border-left:5px solid transparent;border-radius:6px;cursor:pointer}
 .rt.focus p{opacity:.55}.rt.focus p.cur{opacity:1;border-left-color:#ffd34d;background:#fffbea}.rt span[data-rp]{border-radius:5px;padding:1px 2px}.rt span.now{background:#ffe680;box-shadow:0 0 0 2px #ffe680}
-.timer{font-size:120px;font-weight:800;line-height:1.1;margin:10px 0;font-variant-numeric:tabular-nums}.timer.up{color:#b91c1c}
+.timer{font-size:120px;font-weight:800;line-height:1.1;margin:10px 0;font-variant-numeric:tabular-nums}.timer.tsm{font-size:76px;margin:4px 0 8px}.timer.up{color:#b91c1c}
 .tbtn{display:flex;gap:8px;flex-wrap:wrap}.tbtn button,.sm{font:700 16px system-ui,sans-serif;padding:8px 16px;border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 .tbtn button.on{border-color:var(--blue);color:var(--blue)}.tbtn .pri2{background:#ffd34d;border-color:#ffd34d}.sm{font-size:14px;padding:4px 12px;margin-left:8px}
 .ca{font-size:18px;color:var(--muted);margin:-6px 0 4px}.done{font-size:18px;margin-top:18px}
+/* 📊 who did it and how, on ⏱ Your turn */
+.res{margin-top:16px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;max-width:1150px}
+.rsum{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:17px;color:var(--muted)}.rsum .big2{font-size:40px;font-weight:800;color:var(--ink);line-height:1}
+.rsum .rn{flex-basis:100%;color:var(--ink);font-size:16px}
+.rgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.rc{display:inline-flex;align-items:baseline;gap:5px;padding:4px 10px;border-radius:10px;font-size:15px;border:2px solid transparent;white-space:nowrap}
+.rc b{font-size:16px}.rc small{font-size:12px;opacity:.75}
+.rc.g{background:#e9f7ef;border-color:#9fd9b5;color:#14532d}.rc.a{background:#fff7e0;border-color:#f5d27a;color:#7a4b00}.rc.r{background:#fde8e8;border-color:#f3a5a5;color:#8b1c1c}
+.rc.w{background:#eef3ff;border-color:#b9cbf5;color:#2b4fa8}.rc.n{background:#f4f6f8;color:#9aa4ad}
+.rfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 0;font-size:13px;color:var(--muted)}.rfoot .sm{margin-left:0}
 #tmini{font-weight:800;color:#ffd34d;font-variant-numeric:tabular-nums}
 /* 📘 grammar: the explanation boxes, then one gap-fill sentence a slide */
 h1.gt{font-size:26px;margin:2px 0 12px}

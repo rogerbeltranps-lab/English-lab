@@ -51,7 +51,20 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
 tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .gnotes{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:6px;vertical-align:middle;border:1px solid #c7d2fe;border-radius:8px;background:#eef2ff;text-decoration:none;font-size:16px}.gnotes:hover{background:#e0e7ff;border-color:#3157d5}.grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
-.indrub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 2px}.ir{border:1.5px solid;border-radius:9px;padding:6px 8px;font-size:12.5px;line-height:1.35;color:#334155}.ir b{display:block;font-size:12px;margin-bottom:2px}.ir b small{font-weight:600;color:#64748b}.ir-na{border-color:#fca5a5;background:#fef2f2}.ir-na b{color:#991b1b}.ir-as{border-color:#86efac;background:#f0fdf4}.ir-as b{color:#166534}.ir-an{border-color:#93c5fd;background:#eff6ff}.ir-an b{color:#1e40af}.ir-ae{border-color:#c4b5fd;background:#f5f3ff}.ir-ae b{color:#5b21b6}@media (max-width:900px){.indrub{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
+.indrub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 2px}.ir{border:1.5px solid;border-radius:9px;padding:6px 8px;font-size:12.5px;line-height:1.35;color:#334155}.ir b{display:block;font-size:12px;margin-bottom:2px}.ir b small{font-weight:600;color:#64748b}.ir-na{border-color:#fca5a5;background:#fef2f2}.ir-na b{color:#991b1b}.ir-as{border-color:#86efac;background:#f0fdf4}.ir-as b{color:#166534}.ir-an{border-color:#93c5fd;background:#eff6ff}.ir-an b{color:#1e40af}.ir-ae{border-color:#c4b5fd;background:#f5f3ff}.ir-ae b{color:#5b21b6}@media (max-width:900px){.indrub{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* 📊 Class results */
+.crg{display:flex;flex-wrap:wrap;gap:10px}.crgc{display:grid;gap:2px;text-align:left;min-width:170px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;font:inherit;color:#0f172a;flex:0 1 170px}
+.crgc.on{border-color:#2563eb;box-shadow:0 0 0 2px #bfdbfe}.crgc.all{place-content:center;color:#2563eb;font-weight:600}.crgc small{color:#64748b}.crbig{font-size:26px;font-weight:800;line-height:1.1}
+.crsp{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:4px}.crsp i{display:block;width:10px;border-radius:3px 3px 0 0}
+.crl{border:1px solid #e2e8f0;border-radius:10px;margin:8px 0}.crl.on{border-color:#93c5fd}
+.crh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;padding:9px 12px;border:0;background:none;font:inherit;text-align:left;cursor:pointer;color:#0f172a}
+.crh .crd{min-width:92px;color:#64748b;font-weight:600}.crh .crn{flex:1;min-width:200px}.crh .crbig{font-size:20px}.crh .crm{color:#475569;font-size:13.5px}.crh .crx{color:#94a3b8}
+.crb{padding:0 12px 12px}.crb h3{font-size:14px;margin:12px 0 6px}
+.crt{border-collapse:collapse;width:100%;font-size:14px}.crt th,.crt td{border-bottom:1px solid #eef2f6;padding:5px 8px;text-align:left}.crt th{font-size:12.5px;color:#64748b}
+.crq div{display:grid;grid-template-columns:110px 48px 44px 1fr;gap:8px;align-items:center;font-size:14px;padding:3px 0}.crq small{color:#64748b}
+.crqb{height:9px;background:#f1f5f9;border-radius:5px;overflow:hidden}.crqb i{display:block;height:100%}
+@media (max-width:640px){.crgc{flex:1 1 140px;min-width:0}.crq div{grid-template-columns:70px 44px 1fr}.crq small{display:none}.crt th:nth-child(5),.crt td:nth-child(5){display:none}}
+</style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
 .tshell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:start}.tpage{min-width:0}
@@ -266,7 +279,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -1115,7 +1128,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
-    +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}</div>`
+    +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
@@ -1408,12 +1421,14 @@ function render0(){
     +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const np=S.D.pb.filter(x=>!x.fixed).length,m=np+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length;return m?`<small class="${np?"late":""}">${m}</small>`:""})())
     +hp("tt","🗓 Timetable","Your classes with each group, days off","")
     +nv("qa","🔎 Questions","","Which questions students answer well or badly the first time, by route and group")
+    +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
     +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
     +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
     +`<button class="nv" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
+  if(S.g==="cres"){$("#main").innerHTML=crPage();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
   if(S.g==="lss"){$("#main").innerHTML=lssPage();return}
   if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
@@ -1866,6 +1881,42 @@ function lssPage(){
   return head("","",`🧭 Learning situations`,"Choose a course")
     +`<div class="tiles lsts">${LSC.map(([c,name])=>{const lss=EL_LS.filter(x=>x.course===c),cur=lss.filter(x=>nowIn(x).length);
       return `<a class="tile" href="#" data-do="place" data-p="c:${c}"><span class="ti"><b class="lsc">${name}</b><span class="tb">${plural(lss.length,"LS")}</span></span><span><small>${esc(GR.filter(g=>g.course===c).map(g=>g.name).join(" · "))}</small>${cur.length?`<small>Now: ${cur.map(x=>esc(elLsNum(x)+" · "+short(x))).join(", ")}</small>`:""}</span></a>`}).join("")}</div>`;
+}
+/* ---- 📊 Class results (Roger, 13 Nov 2026: "I need to see the statistic right away but also somewhere else to assess my performance"):
+   every ✅ Correct together lesson (Grammar or Reading, shared/correct/correct.js) saved from ⏱ Your turn on, in classResults/{group}_{ls}_{lp}_{tab}_{day}:
+   the class %, who checked (right on their first check), who was still working and who did not start, and the sentences the class found
+   hardest. One read per lesson, the latest 80, only when this page is opened. */
+let CRES=null;S.cr=S.cr||{g:"all",open:null};
+function crLoad(){if(CRES)return;if(DEMO){CRES={list:(DEMO.classResults||[]).slice()};return}CRES={busy:true,list:[]};
+  F.getDocs(F.query(F.collection(db(),"classResults"),F.orderBy("at","desc"),F.limit(80))).then(q=>{CRES={list:q.docs.map(d=>Object.assign({id:d.id},d.data()))};if(S.g==="cres")render()})
+    .catch(e=>{console.warn("class results",e);CRES={list:[],err:true};if(S.g==="cres")render()})}
+function crPage(){crLoad();
+  const head=`<div class="ph"><h1>📊 Class results</h1><p class="sub">Grammar and reading corrected together (✅ Correct in class mode): who did it and the % right on their first check, lesson by lesson. Saved from ⏱ Your turn on.</p></div>`;
+  if(CRES.busy)return head+`<div class="box"><p class="muted">Loading…</p></div>`;
+  const L=CRES.list,gs=GR.filter(g=>L.some(x=>x.group===g.id)),gsel=gs.some(g=>g.id===S.cr.g)?S.cr.g:"all",show=L.filter(x=>gsel==="all"||x.group===gsel);
+  if(!L.length)return head+`<div class="box"><p class="muted">${CRES.err?"Could not read the class results.":"Nothing yet. Open ✅ Correct on a Grammar or Reading tab in class mode and go to ⏱ Your turn: from then on the lesson is saved here."}</p></div>`;
+  const byMail={};Object.values(S.P||{}).forEach(s=>{if(s.email)byMail[s.email.toLowerCase()]=s;if(s.rid)byMail[s.rid]=s});
+  const nm=r=>{const s=byMail[r.e];return s?fullName(s):r.n||r.e},gname=id=>(GR.find(g=>g.id===id)||{}).name||id,LVN={beginners:"Starter",insecure:"Base",safe:"Core",daring:"Plus",native:"Pro"};
+  const pc=x=>x==null?"–":x+" %",col=x=>x==null?"#cbd5e1":x>=80?"#16a34a":x>=50?"#d97706":"#dc2626";
+  const avg=a=>{const v=a.map(x=>x.sum&&x.sum.pct).filter(x=>x!=null);return v.length?Math.round(v.reduce((p,q)=>p+q,0)/v.length):null};
+  const date=d=>new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+  // per group: the average of its lessons and the latest ones as bars, oldest on the left (how the class is going)
+  const groups=`<div class="box"><h2>By group</h2><div class="crg">`+gs.map(g=>{const xs=L.filter(x=>x.group===g.id),a=avg(xs);
+    return `<button class="crgc ${gsel===g.id?"on":""}" data-do="crg" data-g="${g.id}" title="Show only ${esc(g.name)}"><b>${esc(g.name)}</b><span class="crbig" style="color:${col(a)}">${pc(a)}</span><small>${xs.length} ${xs.length===1?"lesson":"lessons"} · average</small>`+
+      `<span class="crsp">${xs.slice(0,10).reverse().map(x=>`<i style="height:${Math.max(4,(x.sum&&x.sum.pct)||0)}%;background:${col(x.sum&&x.sum.pct)}" title="${esc(date(x.day))} · ${esc(x.title||x.lp)} · ${pc(x.sum&&x.sum.pct)}"></i>`).join("")}</span></button>`}).join("")+
+    (gsel!=="all"?`<button class="crgc all" data-do="crg" data-g="all">Every group</button>`:"")+`</div></div>`;
+  const one=x=>{const S2=x.sum||{},rows=(x.rows||[]).slice(),open=S.cr.open===x.id,pct=r=>r.ok!=null&&r.max?Math.round(100*r.ok/r.max):null;
+    rows.sort((a,b)=>(pct(b)==null?-1:pct(b))-(pct(a)==null?-1:pct(a))||(b.typed||0)-(a.typed||0)||nm(a).localeCompare(nm(b)));
+    const st=r=>{const p=pct(r),earlier=r.at&&r.at.slice(0,10)!==x.day&&new Date(r.at).toDateString()!==new Date(x.day+"T12:00").toDateString();
+      return p!=null?`<td><b style="color:${col(p)}">${p} %</b></td><td>${r.ok} / ${r.max}${earlier?' <span class="tag">before</span>':""}</td><td>${r.lat&&r.lat!==r.at&&r.lmax?r.lok+" / "+r.lmax:""}</td>`
+        :r.typed?`<td colspan="3" class="muted">✏ working: ${r.typed} of ${r.of} answered, not checked</td>`:`<td colspan="3" class="muted">— not started</td>`};
+    const body=!open?"":`<div class="crb"><table class="crt"><thead><tr><th>Student</th><th>Level</th><th>First check</th><th>Right</th><th>Latest check</th></tr></thead><tbody>`+
+      rows.map(r=>`<tr><td>${esc(nm(r))}</td><td>${LVN[r.l]||""}</td>${st(r)}</tr>`).join("")+`</tbody></table>`+
+      ((x.qs||[]).length?`<h3>Sentences, hardest first</h3><div class="crq">`+x.qs.map(q=>{const p=Math.round(100*q.ok/q.n);
+        return `<div><span class="crqb"><i style="width:${p}%;background:${col(p)}"></i></span><b>${p} %</b><small>${q.ok}/${q.n}</small><span>${q.pro?'<span class="tag">Pro</span> ':""}${esc(q.t)}</span></div>`}).join("")+`</div>`:"")+`</div>`;
+    return `<div class="crl ${open?"on":""}"><button class="crh" data-do="cro" data-id="${esc(x.id)}" aria-expanded="${open}"><span class="crd">${esc(date(x.day))}</span><span class="crn"><b>${esc(gname(x.group))}</b> · ${x.tab==="grammar"?"📘 Grammar":"📖 Reading"} · ${esc(x.title||x.lp)}</span>`+
+      `<span class="crbig" style="color:${col(S2.pct)}">${pc(S2.pct)}</span><span class="crm">✅ ${S2.done||0} of ${S2.n||0} checked${S2.work?" · ✏ "+S2.work+" working":""}${S2.none?" · — "+S2.none+" not started":""}</span><span class="crx">${open?"▲":"▼"}</span></button>${body}</div>`};
+  return head+groups+`<div class="box"><h2>Lessons${gsel!=="all"?" · "+esc(gname(gsel)):""}</h2>`+show.map(one).join("")+`</div>`;
 }
 function qaTab(){
   const lss=EL_LS.filter(l=>!((window.EL_GRADING||{})[l.id]||{}).only);
@@ -4428,6 +4479,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>{bothLs(k.a);cellPanel(u,k.a)},close:()=>$("#dlg").close(),
     qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";S.place="home";render();scrollTo(0,0)},
+    crg:()=>{S.cr.g=k.g;render()},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
     grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
