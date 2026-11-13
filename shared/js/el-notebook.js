@@ -14,7 +14,7 @@
 // Students make it theirs ("has de poder editar i afegir coses i moure seccions"): select words of any page to highlight, underline or
 // circle them; ✍ add a note after any part; ▲ ▼ move the parts of a page and, in the index, whole sections; add sections of their own; edit
 // what they wrote on the whiteboard. Everything is saved in notes/nb-<LS> (el-notes.js), the whiteboard notes in their own doc.
-// "Aa Print letters" switches the handwriting to plain letters for students who read print better (remembered on the device).
+// (no "Aa Print letters" any more: Roger, 13 Nov 2026)
 // No Firestore reads of its own: el-notes.js passes what it already read. Only LS2+ home pages load it (LS1 has no #notes).
 window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
@@ -24,7 +24,7 @@ window.ELNotebook = (function () {
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
-  if (store.get(PLAIN) === '1') document.documentElement.classList.add(PLAIN);
+  // (Roger, 13 Nov 2026: "I don't want Aa Print letters"): no button any more; always the handwriting
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // what the student wrote on a handwriting page: only the notebook's own marks are kept (a doc is the student's own, so it is cleaned
@@ -83,7 +83,7 @@ window.ELNotebook = (function () {
     const parts = (g.parts || []).map(p => {
       const n = (g.notes || {})[p.k], txt = n && String(n.text || '').trim();
       return `<div class="nb-slip">${p.slides && p.slides.length ? p.slides.map(H.slide).join('') : `<h4>${H.md(p.topic)}</h4>`}</div>`
-        + (txt ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}</span>${lines(txt)}</div>` : '');
+        + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}</span>${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
     }).join('');
     let study = '';
     if (absent) study = `<div class="nb-sticky pink">${t('No vas fer aquest joc', 'You missed this game')}<small>${t('Llegeix la teoria i copia-la a la teva llibreta. Si tens dubtes, pregunta al professor.', 'Read the theory and copy it into your notebook. If anything is not clear, ask your teacher.')}</small></div>`;
@@ -113,6 +113,7 @@ window.ELNotebook = (function () {
     const pen = x => esc(x).replace(/&amp;(#?\w+;)/g, '&$1');
     // a short right answer is written above the crossed-out one; a long one after it, so it never covers the line above
     const fix = x => x.ok || x.guess ? `<span class="nb-giv">${pen(x.given) || '—'}</span>`
+      : !String(x.given || '').trim() ? `<span class="nb-fix in">${pen(x.right)}</span>`
       : String(x.right).length <= Math.max(14, String(x.given).length + 4) ? `<span class="nb-corr"><s class="nb-giv">${pen(x.given) || '&nbsp;—&nbsp;'}</s><span class="nb-fix">${pen(x.right)}</span></span>`
       : `<s class="nb-giv nb-x">${pen(x.given) || '&nbsp;—&nbsp;'}</s> <span class="nb-fix in">${pen(x.right)}</span>`;
     const li = x => {
@@ -145,7 +146,7 @@ window.ELNotebook = (function () {
       <div class="nb-links">${ex.sample ? `<a href="${esc(ex.sample)}">📝 ${t('Examen de mostra', 'Sample exam')}</a>` : ''}<button type="button" class="nb-printbtn">🖨 ${t('Imprimeix la llibreta', 'Print my notebook')}</button></div>
       <div class="nb-sticky">${ex.exam ? `🎯 ${t('EXAMEN', 'EXAM')}: ${esc(H.exDay(ex.exam))}${when ? ' · ' + when : ''}` : '🎯 ' + t('Què entra a l\'examen', 'What\'s in the exam')}<small>${t('Tot el que hi ha en aquesta llibreta és el que hem fet a classe: és el que entra a l\'examen. Cada vegada que fem alguna cosa nova, apareix aquí.', 'Everything in this notebook is what we did in class: it\'s what goes in the exam. Each time we do something new, it appears here.')}</small></div>
       ${ex.dropped.length ? `<p class="nb-pencil">✂️ ${t('No entra a l\'examen', 'Not in your exam')}: ${ex.dropped.map(a => `LP${esc(a.n)} ${esc(a.title)}`).join(' · ')}</p>` : ''}
-      <div class="nb-legend"><b>${t('Com es llegeix', 'How to read it')}</b><br>📎 ${t('paper enganxat = del professor', 'glued slip = from your teacher')} · 🩷 ${t('nota rosa = estudia-ho', 'pink note = study it again')}<br><span style="color:var(--nb-ink)">${t('boli blau', 'blue pen')}</span> = ${t('els teus apunts', 'your own notes')} · <span style="color:var(--nb-red)">${t('cercle', 'circle')}</span> = ${t('el teu resultat al joc', 'your game result')}</div>
+      <div class="nb-legend"><b>${t('Com es llegeix', 'How to read it')}</b><br>📎 ${t('paper enganxat = del professor', 'glued slip = from your teacher')} · <span class="nb-swp"></span> ${t('nota rosa = estudia-ho', 'pink note = study it again')}<br><span style="color:var(--nb-ink)">${t('boli blau', 'blue pen')}</span> = ${t('els teus apunts', 'your own notes')} · <span style="color:var(--nb-green)">${t('verd', 'green')}</span> = ${t('la correcció', 'the correction')} · <span style="color:var(--nb-red)">${t('cercle', 'circle')}</span> = ${t('la teva nota', 'your score')}</div>
       ${H.own ? `<div class="nb-legend"><b>${t('És la teva llibreta', 'It\'s your notebook')}</b><br>🖍 ${t('Tria unes paraules per subratllar-les o encerclar-les.', 'Select some words to highlight, underline or circle them.')}<br>✍ ${t('Afegeix notes on vulguis i mou les parts amb ▲ ▼.', 'Add notes anywhere and move the parts with ▲ ▼.')}<br>👉 ${t('Arrossega la pàgina per passar-la.', 'Drag a page to turn it.')}</div>` : ''}
 ` });
     out.push({ key: 'index', fixed: true, blocks: [], head: '' });
@@ -172,10 +173,15 @@ window.ELNotebook = (function () {
       });
       // the class games and the whiteboard notes go after the part they belong to (vocabulary / grammar / reading), else at the end
       const after = (k, list) => { const at = blocks.map(b => b.kind).lastIndexOf(k); blocks.splice(at < 0 ? blocks.length : at + 1, 0, ...list); };
-      after('vocab', voc.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) })));
+      // (Roger, 13 Nov 2026: games have no theory any more and notes are taken in the SLP; the notes taken in a game before "should appear in
+      // her notebook, well classified, in the vocabulary or grammar section"): a game goes inside that LP's Vocabulary / Grammar part, with
+      // no index line of its own; only when the LP has no such part it stays a part of its own
+      const into = (k, g) => { const b = blocks.filter(x => x.kind === k).pop(); if (!b) return false; b.html += game(g); return true; };
+      const vocOwn = voc.filter(g => !into('vocab', g)), gramOwn = gram.filter(g => !into('grammar', g));
+      after('vocab', vocOwn.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) })));
       after('read', rd.map(g => ({ id: fk('g-' + g.id), l: '📖 ' + t('Apunts de la lectura', 'Reading notes'), html: together(g), gt: true })));
       after('grammar', gt.map(g => ({ id: fk('g-' + g.id), l: '✍ ' + t('Apunts de la pissarra', 'My whiteboard notes'), html: together(g), gt: true }))
-        .concat(gram.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) }))));
+        .concat(gramOwn.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) }))));
       const empty = !blocks.length ? `<p class="nb-pencil">${t('En aquest learning path heu fet pràctica de comprensió i expressió: obre\'l per repassar-lo.', 'In this learning path you practised the skills: open it to look at it again.')}</p>` : '';
       out.push({ key, tab: 'LP' + lp.n, l: `LP${esc(lp.n)} ${esc(lp.title)}`, head: head + empty, blocks: ordered(key, blocks.concat(notesOf(key))), foot: addBtn(key) + `<div class="nb-links"><a href="${esc(lp.href)}">${t('Obre el learning path', 'Open the learning path')} →</a></div>` });
     });
@@ -284,7 +290,7 @@ window.ELNotebook = (function () {
   });
 
   // ---------- the pages: nothing scrolls, what does not fit goes on to the next page ----------
-  const SPLIT = '.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-game,.nb-slip,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
+  const SPLIT = '.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-game,.nb-slip,.ex-rule,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
   const SKIP = '.nb-mdate,.nb-ui';
   function flow(sp, frag, si) {
     let page, paper, cur, stack = [], leaves = 0;
@@ -297,12 +303,26 @@ window.ELNotebook = (function () {
     };
     const fits = () => paper.scrollHeight <= paper.clientHeight + 1;
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab';
-    const breakBefore = () => {
-      const keep = []; let x = cur.lastChild;
-      while (x && ((x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(HEAD)))) { if (x.nodeType === 1) keep.unshift(x); x = x.previousSibling; }
-      const n = keep.length && keep.length < leaves ? keep : [];
-      n.forEach(e => e.remove()); newPage(); n.forEach(e => { cur.append(e); leaves++; });
+    // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
+    // part whose first line didn't fit (it goes up through the part's boxes)
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh';
+    const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
+    const breakBefore = force => {
+      const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
+      for (;;) {
+        while (x && (blank(x) || (x.nodeType === 1 && x.matches(HEAD)))) { if (x.nodeType === 1 && !blank(x)) keep.unshift({ e: x, lvl }); x = x.previousSibling; }
+        if (x || box === paper || !keep.length && box.textContent.trim()) break;
+        x = box.previousSibling; box = box.parentNode; lvl--;
+      }
+      // only headings on this page so far: the part stays here with them (made a bit smaller if it must)
+      if (!force && keep.length && keep.length >= leaves) return false;
+      const n = keep.length && keep.length < leaves ? keep : [], old = cur, oldPaper = paper;
+      n.forEach(k => k.e.remove());
+      // no empty boxes left behind at the bottom of the old page
+      for (let e = old; e && e !== oldPaper && !e.textContent.trim() && !e.querySelector('img,svg,canvas');) { const p = e.parentNode; e.remove(); e = p; }
+      newPage();
+      const chain = [paper]; for (let c = paper; chain.length <= stack.length;) { c = c.lastElementChild; if (!c) break; chain.push(c); }
+      n.forEach(k => { const at = chain[Math.min(k.lvl, chain.length - 1)]; at.insertBefore(k.e, chain[k.lvl + 1] && chain[k.lvl + 1].parentNode === at ? chain[k.lvl + 1] : null); leaves++; });
     };
     const counts = n => n.nodeType === 1 ? !n.matches(SKIP) : !!n.nodeValue.trim();
     const place = node => {
@@ -311,12 +331,12 @@ window.ELNotebook = (function () {
       node.remove();
       if (node.nodeType === 1 && node.matches(SPLIT) && (node.childNodes.length > 1 || (node.firstChild && node.firstChild.nodeType === 1))) {
         const shell = node.cloneNode(false), c = shell.cloneNode(false); cur.append(c);
-        if (!fits() && leaves) { c.remove(); breakBefore(); return place(node); }
+        if (!fits() && leaves) { c.remove(); breakBefore(true); return place(node); }
         stack.push(shell); cur = c;
         [...node.childNodes].forEach(place);
         stack.pop(); cur = cur.parentNode; return;
       }
-      if (leaves) { breakBefore(); return place(node); }
+      if (leaves && breakBefore() !== false) return place(node);
       // alone on a new page and still too tall: a bit smaller, so it fits
       cur.append(node); leaves++;
       if (node.nodeType === 1) { const h = node.getBoundingClientRect().height, over = paper.scrollHeight - paper.clientHeight; if (h > 0 && over > 0) node.style.zoom = String(Math.max(.35, (h - over - 4) / h)); }
@@ -420,7 +440,6 @@ window.ELNotebook = (function () {
       + `<span class="nb-pwrap"><button type="button" class="nb-tool nb-printbtn" aria-expanded="false">🖨 ${t('Imprimeix', 'Print')}</button><div class="nb-pmenu" hidden><b>🖨 ${t('Què vols imprimir?', 'What do you want to print?')}</b>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
-      + `<button type="button" class="nb-tool nb-plain" aria-pressed="${plain}">${plain ? '✍ ' + t('Lletra de mà', 'Handwriting') : 'Aa ' + t('Lletra d\'impremta', 'Print letters')}</button>`
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav></div>`
@@ -474,7 +493,7 @@ window.ELNotebook = (function () {
       { el: '.nb-spread', at: '.nb-work', ic: '🖍', h: t('Subratlla i encercla', 'Highlight and circle'), p: t('Tria unes paraules amb el ratolí o el dit i apareixeran els subratlladors: groc, verd, rosa, subratllar, ondulat, encerclar. 🧽 ho treu.', 'Select some words with the mouse or your finger and the highlighters appear: yellow, green, pink, underline, wavy, circle. 🧽 takes it off.'), pad: -30 },
       { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota, 🟨 hi enganxa un post-it (tria el color) i ▲ ▼ la mouen. Les notes també poden passar a una altra secció.', 'In the margin of each part: ✍ adds a note below it, 🟨 sticks a post-it (choose its colour) and ▲ ▼ move it. Notes can also move on to another section.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
-      { el: '.nb-printbtn', all: '.nb-pwrap,.nb-plain', ic: '🖨', h: t('Imprimeix i lletra', 'Print and letters'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta. Si llegeixes millor la lletra d\'impremta, toca Aa.', '🖨 prints these pages, the ones you choose or the whole notebook. If you read print letters better, tap Aa.') },
+      { el: '.nb-printbtn', ic: '🖨', h: t('Imprimeix', 'Print'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta.', '🖨 prints these pages, the ones you choose or the whole notebook.') },
       { el: '.nb-close', all: '.nb-close,.nb-help', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
     ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
   }
@@ -610,6 +629,7 @@ window.ELNotebook = (function () {
     let v, title, del = true;
     if (o.kind === 'note') { v = NT()[o.id]; title = '✍ ' + t('La meva nota', 'My note'); }
     else if (o.kind === 'own') { v = PT()[o.k]; title = '✍ ' + esc(v && v.topic || ''); del = false; }
+    else if (o.kind === 'gn') { const N = o.g.notes || (o.g.notes = {}); v = N[o.k] || (N[o.k] = { text: '' }); title = '✍ ' + t('Els meus apunts', 'My notes') + ' · ' + esc(gname(o.g)); del = false; }
     else { v = o.g.gt; title = '✍ ' + t('Els meus apunts de classe', 'My notes from class') + ' · ' + esc(gname(o.g)); del = false; }
     if (!v) return;
     const w = document.createElement('div'); w.className = 'nb-ed'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', plainOf(title));
@@ -621,7 +641,7 @@ window.ELNotebook = (function () {
       if (ED == null || ED.w !== w) return;
       ED.p = P.pad(w.querySelector('.nb-ed-host'), { html: v.html, text: v.text, dr: v.dr, ca: H.ca, ph: t('Escriu aquí. Pots canviar de boli, subratllar i marcar.', 'Write here. You can change pens, highlight and underline.'), onChange: x => {
         Object.assign(v, x);
-        if (o.kind === 'gt') { status(t('Desant…', 'Saving…')); clearTimeout(ED.gtT); ED.gtT = setTimeout(() => gtSave(o.g), 1500); } else save();
+        if (o.kind === 'gt' || o.kind === 'gn') { status(t('Desant…', 'Saving…')); clearTimeout(ED.gtT); ED.gtT = setTimeout(() => o.kind === 'gn' ? gnSave(o.g, o.k) : gtSave(o.g), 1500); } else save();
       } });
       setTimeout(() => { if (ED && ED.p) ED.p.ed.focus(); }, 30);
     }).catch(e => console.warn('notebook pad', e));
@@ -633,6 +653,14 @@ window.ELNotebook = (function () {
       delete NT()[o.id]; const L = O().b[o.sec.key]; if (L) O().b[o.sec.key] = L.filter(x => x !== o.id); save(); ED = null; w.remove(); redraw('s:' + o.sec.key);
     });
   }
+  // ✏️ the notes taken in a class game, edited in the notebook (Roger, 13 Nov 2026: "notes taken during the activities must be editable"):
+  // back into that game's own notes doc (students/{uid}/notes/<deck>, parts.<k>: text + the page with its marks)
+  function gnSave(g, k) { const v = (g.notes || {})[k]; if (!H.saveGn || !v) return; Promise.resolve(H.saveGn(g.id, k, { text: String(v.text || '').slice(0, 3000), html: v.html || '', dr: v.dr || [] })).then(() => status('✓ ' + t('Desat', 'Saved'))).catch(() => status('⚠ ' + t('No s\'ha desat: torna-ho a provar', 'Not saved: try again'))); }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.nb .nb-gned'); if (!b || !H || !H.own) return; e.preventDefault();
+    const g = Object.values(gamesById).find(x => x.id === b.dataset.g), blk = b.closest('.nb-blk'), s = blk && secOf(blk.dataset.b); if (!g || !s) return;
+    editor({ kind: 'gn', g, k: b.dataset.k, sec: s, blk: blk.dataset.b });
+  });
   function gtSave(g) { if (!H.saveGt) return; Promise.resolve(H.saveGt(g.id, g.gt)).then(() => status('✓ ' + t('Desat', 'Saved'))).catch(() => status('⚠ ' + t('No s\'ha desat: torna-ho a provar', 'Not saved: try again'))); }
   function closeEditor(quiet) {
     const E = ED; if (!E) return; ED = null;
@@ -640,8 +668,9 @@ window.ELNotebook = (function () {
     const o = E.o;
     if (o.kind === 'note' && !hasInk(E.v)) { delete NT()[o.id]; const L = O().b[o.sec.key]; if (L) O().b[o.sec.key] = L.filter(x => x !== o.id); save(); }
     else if (o.kind === 'gt') { clearTimeout(E.gtT); gtSave(o.g); }
+    else if (o.kind === 'gn') { clearTimeout(E.gtT); gnSave(o.g, o.k); }
     else save();
-    E.w.remove(); if (!quiet) redraw(o.kind === 'note' && NT()[o.id] ? 'b:' + o.id : 's:' + o.sec.key);
+    E.w.remove(); if (!quiet) redraw(o.kind === 'note' && NT()[o.id] ? 'b:' + o.id : o.kind === 'gn' && o.blk ? 'b:' + o.blk : 's:' + o.sec.key);
   }
 
   // 📖 Turning the pages (Roger, 13 Nov 2026: "I want them to be able to drag the pages to turn them"): ◀ ▶, the arrow keys and dragging a

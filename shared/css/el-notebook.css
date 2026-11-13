@@ -352,3 +352,9 @@ html.nb-touring .eldict-tipbox{display:none!important}
 .nb .nb-help{min-width:40px}
 @media print{.nb-tour{display:none}}
 html.nb-touring .nb-bt{opacity:1}
+/* the corrections in green (Roger, 13 Nov 2026: "use green for the corrections"); what was wrong is still crossed out in red */
+.nb .nb-fix{color:var(--nb-green)}
+.nb-swp{display:inline-block;width:16px;height:13px;background:#f7b9cf;box-shadow:0 1px 2px rgba(0,0,0,.2);transform:rotate(-4deg);vertical-align:-1px}
+.nb .nb-gned{margin-left:8px;font:600 13px/1 var(--nb-sans,system-ui,sans-serif);border:1px solid #c9d3e6;background:#fff;color:#2f5bd3;border-radius:8px;padding:4px 8px;cursor:pointer;vertical-align:2px}
+.nb .nb-gned:hover{background:#e8eefc}
+.nb .nb-gned:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
