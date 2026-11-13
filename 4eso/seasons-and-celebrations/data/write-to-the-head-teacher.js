@@ -193,12 +193,16 @@ window.LP = {
         { p: 'like', q: 'I would like ___ ___ (explain) our idea.', a: ['to explain'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
         { p: 'like', q: 'We would ___ to use the hall.', a: ['like'], ca: 'would like to.', en: 'would like to.' },
         { p: 'like', r: 'insecure', only: ['insecure'], q: 'We ___ ___ to use the school hall on 18 December. (ens agradaria)', a: ['would like'], ca: 'would like to per demanar.', en: 'would like to.' },
+        { p: 'like', a: [], own: { must: ["\\b(would|['’]d) like to\\b"], min: 8 }, q: "Your turn: two things your class would like to do on the celebration day, with <b>We would like to…</b> <span class=\"tiny\">(Dues coses que la teva classe voldria fer el dia de la festa.)</span>", show: "We would like to have a party in the hall, and we would like to play music.", ca: "Fes servir We would like to + verb.", en: "Use We would like to + verb." },
         { p: 'writing', r: 'insecure', only: ['insecure'], q: 'I am writing ___ ___ (propose) a celebration day.', a: ['to propose'], ca: 'I am writing + to + verb.', en: 'I am writing + to + verb.' },
+        { p: 'writing', r: 'insecure', a: [], own: { must: ["\\b(am|['’]m) writing to\\b"], min: 6 }, q: "Your turn: write the first sentence of your email to the head teacher. <span class=\"tiny\">(La primera frase del teu correu a la directora.)</span>", show: "I am writing to propose a celebration day at our school.", ca: "Comença amb I am writing to…", en: "Start with I am writing to…" },
         { p: 'polite', r: 'safe', q: '___ it be possible to start at 10.00?', a: ['would'], en: 'Would it be possible to…?' },
         { p: 'polite', r: 'safe', q: '___ we put up posters in the corridor?', a: ['could'], en: 'Could we…?' },
+        { p: 'polite', r: 'safe', a: [], own: { must: ["\\bcould we\\b", "\\bwould it be possible to\\b"], min: 10 }, q: "Your turn: two requests for your email: one with <b>Could we…?</b> and one with <b>Would it be possible to…?</b>", show: "Could we use the school hall? Would it be possible to start at 10?", en: "Use Could we…? and Would it be possible to…?" },
         { p: 'formal', r: 'daring', q: 'We look forward to ___ (welcome) families.', a: ['welcoming'], en: 'look forward to + -ing.' },
         { p: 'formal', r: 'daring', q: 'Correct the word: “I look forward to hear from you.” → ___', a: ['hearing'], en: 'look forward to + -ing.' },
-        { p: 'formal', r: 'daring', q: '___ the hall is small, we can also use the gym.', a: ['although', 'even though'], en: 'Concession.' }
+        { p: 'formal', r: 'daring', q: '___ the hall is small, we can also use the gym.', a: ['although', 'even though'], en: 'Concession.' },
+        { p: 'formal', r: 'daring', a: [], own: { must: ["\\balthough\\b"], min: 8 }, q: "Your turn: think of one worry the head teacher could have and answer it with <b>Although…</b>", show: "Although the hall is small, we can also use the gym.", en: "Use Although + a full sentence." }
       ] },
     { id: 'write', type: 'writing', product: 5, tab: { ca: 'El correu', en: 'The email' }, title: { ca: 'Peça 5: el correu a la direcció', en: 'Piece 5: the email to the head teacher' },
       intro: { ca: 'Escriu l’esborrany, demana feedback amb IA, millora’l aquí i torna’l a desar: aquesta és la versió que entregaràs amb el producte final.', en: 'Write a draft, get AI feedback, improve it here and save it again: this is the version you will submit with the final product.' },
