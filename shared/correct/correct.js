@@ -146,7 +146,7 @@ function shared(s,open){
      "")+cbHint(open);
 }
 // ✅ what the Chromebooks show meanwhile (el-cloud.js rtCorrect)
-const cbHint=open=>G&&!GRAM?`<p class="hint">💻 ${open?"Every Chromebook now shows the student's own answer, ✓ or ✗, and the right answer of their level.":"Every Chromebook marks this question in the student's own reading; their answer and the right one appear when you show it."}</p>`:"";
+const cbHint=open=>G&&!GRAM?`<p class="hint">💻 ${open?"Every Chromebook now shows, in a card the student can move, their own answer, ✓ or ✗, the right answer of their level and where their text says it.":"Every Chromebook marks this question in the student's own reading; their answer and the right one appear when you show it."}</p>`:"";
 function own(s,open){
   return `<div class="chips"><span class="chip all">👥 Question ${s.num}</span><span class="chip on">each level has its own</span></div>`+
     `<div class="where" style="--n:${s.per.length}">`+s.per.map(p=>{if(p.none)return `<div class="col"><h3>${NAME[p.r]}</h3><div class="none">No question ${s.num}</div></div>`;
@@ -198,8 +198,11 @@ function rtSend(){
   // the right answer of their level (el-cloud.js rtCorrect; Roger, 13 Nov 2026: "students see the feedback on their Chromebook with the
   // answers according to their level and see what they did")
   const P1=t=>X.plain(t).replace(/\s+/g," ").trim();
-  const c=s&&!s.gram&&(s.kind==="shared"||s.kind==="own")?{p:s.panel,s:shown.has(at),qs:s.kind==="shared"?[{q:P1(s.q),a:P1(s.ans),alt:(s.alt||[]).map(P1)}]
-    :s.per.filter(p=>!p.none).map(p=>({q:P1(p.q),a:P1(p.ans)}))}:null;
+  // once the answer is shown, also where each level's text says it (w, or h per question when each level has its own): the snippet of the
+  // projector's "Where the text says it", the sentence marked, for the student's floating card
+  const op=shown.has(at),sn=p=>op&&p.ev&&p.ev.length?X.snippet(p,true):"";
+  const c=s&&!s.gram&&(s.kind==="shared"||s.kind==="own")?{p:s.panel,s:op,qs:s.kind==="shared"?[{q:P1(s.q),a:P1(s.ans),alt:(s.alt||[]).map(P1)}]
+    :s.per.filter(p=>!p.none).map(p=>({q:P1(p.q),a:P1(p.ans),h:sn(p)})),w:s.kind==="shared"?s.per.map(p=>({r:p.r,n:p.num,h:sn(p)})):[]}:null;
   if(after){const tx=X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL),v={u:LS+"/"+LPF+".html",k:-1,x:1,l:RL,h:tx.chat?tx.units.map(u=>esc(u.who)+": "+esc(u.s)).join("<br>"):tx.html,c,at:Date.now()},key=v.u+"|x|"+v.l+"|"+(c?at+"|"+(c.s?1:0):"");
     if(key===rtLast)return Promise.resolve();rtLast=key;
     return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("read together",e))}
