@@ -568,6 +568,22 @@ function fsPanel(getG,redraw,owns){
   function frTop(h){const fr=document.getElementById("el-correct");if(!fr)return;const t=h?h+"px":"0px";if(fr.style.top!==t){fr.style.top=t;fr.style.height=h?"calc(100vh - "+h+"px)":"100vh"}}
   // in the class tab (on the projector) one line of counts (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen … students
   // played to log in and out so that their name appeared"): the names open under it only when the teacher taps a count (P.wl.open)
+  // ✥ Drag it anywhere (Roger, 13 Nov 2026: "I want to be able to move this icon"): a press that moves more than 6 px drags the panel (or the
+  // 👥 chip) instead of pressing its button; where it is left is kept on this computer (el_t_fspos, its top-left corner) and used again
+  // on every page, kept on screen when it grows or the window shrinks. Not the strip above ✅ Correct together. No reads, no writes.
+  const POS="el_t_fspos",posGet=()=>{try{const p=JSON.parse(localStorage.getItem(POS)||"null");return p&&isFinite(p.x)&&isFinite(p.y)?p:null}catch(e){return null}};
+  const fit=(f,x,y)=>{f.style.left=Math.max(4,Math.min(x,innerWidth-f.offsetWidth-4))+"px";f.style.top=Math.max(4,Math.min(y,innerHeight-f.offsetHeight-4))+"px";f.style.right=f.style.bottom="auto"};
+  const place=f=>{const p=posGet();if(p)fit(f,p.x,p.y)};
+  function drag(f){let sx=0,sy=0,ox=0,oy=0,on=false,pid=null;f.style.touchAction="none";f.style.cursor="grab";f.title="Drag to move it";
+    // move and release are followed on the whole window: a quick drag leaves the panel before it has moved
+    const mv=e=>{if(pid!==e.pointerId)return;const dx=e.clientX-sx,dy=e.clientY-sy;
+      if(!on){if(Math.abs(dx)+Math.abs(dy)<7)return;on=true;f.dataset.moving="1";f.style.cursor="grabbing"}
+      e.preventDefault();fit(f,ox+dx,oy+dy)};
+    const up=e=>{if(pid!==e.pointerId)return;pid=null;removeEventListener("pointermove",mv);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+      if(!on)return;on=false;delete f.dataset.moving;f.style.cursor="grab";f.dataset.dragged="1";setTimeout(()=>{delete f.dataset.dragged},400);
+      try{origSet.call(localStorage,POS,JSON.stringify({x:parseInt(f.style.left),y:parseInt(f.style.top)}))}catch(x){}};
+    f.addEventListener("pointerdown",e=>{if(e.button||e.target.closest(".el-wlbox"))return;const r=f.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;pid=e.pointerId;on=false;
+      addEventListener("pointermove",mv);addEventListener("pointerup",up);addEventListener("pointercancel",up)})}
   P.float=function(){if(!owns())return;const w=P.roll();let f=document.getElementById("el-fsfloat");
     if(!w.active){if(f&&f.dataset.o===id){f.remove();frTop(0)}return}
     // over ✅ Correct together: a strip above it, or with ✕ Hide only the 👥 chip, bottom right (over the frame's empty corner)
@@ -576,8 +592,8 @@ function fsPanel(getG,redraw,owns){
     if(!f){f=document.createElement("div");f.id="el-fsfloat";f.dataset.o=id;f.dataset.mode=mode;
       f.style.cssText=dock?"position:fixed;top:0;left:0;right:0;z-index:2147483001;background:#fff;border-bottom:3px solid #ffd34d;padding:4px 16px 5px;font:600 14px system-ui,sans-serif;color:#1e293b;box-shadow:0 3px 10px rgba(0,0,0,.25)"
         :"position:fixed;"+(cr?"bottom:12px":"top:10px")+";right:12px;z-index:2147483001;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),P.G,AT.cur,AT.w,P.ro[P.G]||[]).then(r=>{if(r)redraw()});return}
-        if(b.dataset.hide){P.wl.hide=!P.wl.hide;redraw()}else if(b.dataset.wl){P.wl.open=P.wl.open===b.dataset.wl?null:b.dataset.wl;redraw()}else P.toggle().then(redraw)};document.body.append(f)}
+      f.onclick=e=>{const b=e.target.closest("button");if(!b||f.dataset.dragged)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),P.G,AT.cur,AT.w,P.ro[P.G]||[]).then(r=>{if(r)redraw()});return}
+        if(b.dataset.hide){P.wl.hide=!P.wl.hide;redraw()}else if(b.dataset.wl){P.wl.open=P.wl.open===b.dataset.wl?null:b.dataset.wl;redraw()}else P.toggle().then(redraw)};document.body.append(f);if(!dock)drag(f)}
     // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
     if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;redraw()}).catch(e=>console.warn("attendance",e))}
     const aS=AT.m?AT.m.attClass(g,P.tt(),P.eff(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,redraw):undefined;
@@ -592,7 +608,7 @@ function fsPanel(getG,redraw,owns){
       +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+P.hm(P.eff().until)+(P.eff().auto?' (class, by your timetable)':''):'')+'</div>'
       +wl.line+wl.list;
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}
-    if(dock)frTop(f.offsetHeight)};
+    if(dock)frTop(f.offsetHeight);else if(!f.dataset.moving)place(f)};   // not while it is being dragged
   return P}
 async function teacherSections(info){
   for(const [f,v] of [["el-sections","EL_SECTIONS"],["el-plan","EL_PLAN"]])if(!window[v])await new Promise(r=>{const sc=document.createElement("script");sc.src=new URL("shared/js/"+f+".js",ROOT).href;sc.onload=sc.onerror=r;document.head.append(sc)});
