@@ -45,16 +45,22 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('📊', 'Quantes vegades? <em>always, usually, never</em>', 'Aquestes paraules diuen com de sovint fas una cosa.') +
               scale([['green', '100 %', 'always'], ['teal', '80 %', 'usually'], ['amber', '50 %', 'sometimes'], ['red', '0 %', 'never']]) +
               row(card('blue', '📍 On van?', ex('<b>davant</b> del verb: I <b>usually</b> play on Saturdays.') + ex('She <b>never</b> gets up late.') + ex('<b>darrere</b> de <em>be</em>: He <b>is always</b> happy.'))) +
               mistakes('Compte!', bad('I play usually on Saturdays.', 'I <b>usually play</b> on Saturdays.'), bad('She gets never up late.', 'She <b>never gets</b> up late.')) +
+              together(true, ['Order: never / I / late / get up → ___', 'I never get up late.']) +
               turn('Ara tu:', 'una cosa que fas sempre, una que fas normalment i una que no fas mai.'),
             en: head('📊', 'How often? <em>always, usually, never</em>', 'These words say how often you do something.') +
               scale([['green', '100 %', 'always'], ['teal', '80 %', 'usually'], ['amber', '50 %', 'sometimes'], ['red', '0 %', 'never']]) +
               row(card('blue', '📍 Where do they go?', ex('<b>before</b> the verb: I <b>usually</b> play on Saturdays.') + ex('She <b>never</b> gets up late.') + ex('<b>after</b> <em>be</em>: He <b>is always</b> happy.'))) +
               mistakes('Watch out', bad('I play usually on Saturdays.', 'I <b>usually play</b> on Saturdays.'), bad('She gets never up late.', 'She <b>never gets</b> up late.')) +
+              together(false, ['Order: never / I / late / get up → ___', 'I never get up late.']) +
               turn('Your turn:', 'one thing you always do, one you usually do and one you never do.') },
           { ca: head('🕐', 'Expressions de temps: <em>on</em>, <em>at</em>, <em>in</em> o res?', '') +
               row(card('purple', 'ON + dies', ex('<b>on</b> Saturdays') + ex('<b>on</b> Saturday mornings'), 160),
@@ -62,6 +68,7 @@ window.LP = {
                 card('blue', 'IN', ex('<b>in</b> winter · <b>in</b> summer') + ex('<b>in</b> the morning'), 160),
                 card('teal', '— res', ex('<b>every</b> weekend') + ex('<b>today</b> · <b>now</b> · <b>this</b> weekend'), 160)) +
               mistakes('Compte!', bad('in Saturday', '<b>on</b> Saturday'), bad('on every weekend', '<b>every</b> weekend'), bad('every weekends', 'every <b>weekend</b>')) +
+              together(true, ['___ Sundays · ___ the weekend · ___ summer', 'on · at · in']) +
               turn('Ara tu:', 'què fas <em>on Saturday mornings</em>, <em>in summer</em> i <em>this weekend</em>?'),
             en: head('🕐', 'Time expressions: <em>on</em>, <em>at</em>, <em>in</em> or nothing?', '') +
               row(card('purple', 'ON + days', ex('<b>on</b> Saturdays') + ex('<b>on</b> Saturday mornings'), 160),
@@ -69,6 +76,7 @@ window.LP = {
                 card('blue', 'IN', ex('<b>in</b> winter · <b>in</b> summer') + ex('<b>in</b> the morning'), 160),
                 card('teal', '— nothing', ex('<b>every</b> weekend') + ex('<b>today</b> · <b>now</b> · <b>this</b> weekend'), 160)) +
               mistakes('Watch out', bad('in Saturday', '<b>on</b> Saturday'), bad('on every weekend', '<b>every</b> weekend'), bad('every weekends', 'every <b>weekend</b>')) +
+              together(false, ['___ Sundays · ___ the weekend · ___ summer', 'on · at · in']) +
               turn('Your turn:', 'what do you do <em>on Saturday mornings</em>, <em>in summer</em> and <em>this weekend</em>?') }
         ];
       })(),
@@ -171,6 +179,10 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('🔁👀', 'Present Simple o Present Continuous?', 'Normalment (un hàbit) o ara mateix?') +
               row(card('blue', '🔁 Present Simple = HÀBITS', timeline([[10], [30], [50], [70], [90]], false, 'Passa una vegada i una altra.') +
@@ -181,6 +193,7 @@ window.LP = {
                   '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look!', 'Listen!'].map(w => pill('orange', w)).join('') + '</div>', 280)) +
               tip('Truc:', 'busca la paraula de temps. <em>every, usually, never</em> → Present Simple · <em>now, today, Look!</em> → Present Continuous.') +
               mistakes('Compte!', bad('I’m usually playing on Saturdays.', 'I usually <b>play</b> on Saturdays.'), bad('Look! She skates.', 'Look! She<b>’s skating</b>.'), bad('Mei come every Sunday.', 'Mei <b>comes</b> every Sunday.')) +
+              together(true, ['Look! Ana ___ (skate).', '’s skating'], ['Ana ___ (skate) every Sunday.', 'skates']) +
               turn('Ara tu:', 'una cosa que fas normalment els dissabtes i una que estàs fent ara.'),
             en: head('🔁👀', 'Present Simple or Present Continuous?', 'Usually (a habit) or right now?') +
               row(card('blue', '🔁 Present Simple = HABITS', timeline([[10], [30], [50], [70], [90]], false, 'It happens again and again.') +
@@ -191,22 +204,27 @@ window.LP = {
                   '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look!', 'Listen!'].map(w => pill('orange', w)).join('') + '</div>', 280)) +
               tip('Trick:', 'look for the time word. <em>every, usually, never</em> → Present Simple · <em>now, today, Look!</em> → Present Continuous.') +
               mistakes('Watch out', bad('I’m usually playing on Saturdays.', 'I usually <b>play</b> on Saturdays.'), bad('Look! She skates.', 'Look! She<b>’s skating</b>.'), bad('Mei come every Sunday.', 'Mei <b>comes</b> every Sunday.')) +
+              together(false, ['Look! Ana ___ (skate).', '’s skating'], ['Ana ___ (skate) every Sunday.', 'skates']) +
               turn('Your turn:', 'one thing you usually do on Saturdays and one thing you are doing now.') },
           { ca: head('↔️', 'Hàbit + ara en una sola frase', 'Uneix-les amb <b>but</b>: el que fas normalment, però avui és diferent.') +
               table([['🔁 Normalment (Present Simple)', 'but', '👀 Avui / ara (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
+              together(true, ['I usually ___ (walk) to school, but today I ___ (go) by bus.', 'walk · ’m going']) +
               turn('Ara tu:', 'escriu una frase com aquestes sobre tu: <em>I usually…, but today I’m…</em>'),
             en: head('↔️', 'Habit + now in one sentence', 'Join them with <b>but</b>: what you usually do, but today is different.') +
               table([['🔁 Usually (Present Simple)', 'but', '👀 Today / now (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
+              together(false, ['I usually ___ (walk) to school, but today I ___ (go) by bus.', 'walk · ’m going']) +
               turn('Your turn:', 'write a sentence like these about you: <em>I usually…, but today I’m…</em>') },
           { r: 'safe', en: head('🧠', 'State verbs: no -ing, even now', 'They are about what you think, feel, want or know, not actions you can see.') +
               '<div>' + ['like', 'love', 'hate', 'want', 'need', 'know', 'prefer', 'understand', 'believe', 'mean'].map(w => pill('purple', w)).join('') + '</div>' +
               row(card('red', '✗ Not with -ing', ex('<del>I’m wanting a new helmet.</del>') + ex('<del>Are you knowing the rules?</del>')), card('green', '✓ Present Simple', ex('I <b>want</b> a new helmet now.') + ex('<b>Do</b> you <b>know</b> the rules?') + ex('I <b>don’t understand</b> this exercise.'))) +
               mistakes('Watch out', bad('I’m needing new gloves.', 'I <b>need</b> new gloves.')) +
+              together(false, ['I ___ (need) a new pen right now.', 'need'], ['She ___ (know) the answer.', 'knows']) +
               turn('Your turn:', 'three sentences about you right now with <em>want, need</em> and <em>know</em>.') },
           { r: 'daring', en: head('⏳', 'For a while, and the two meanings of <em>think</em>') +
               row(card('blue', '⏳ Present Continuous for TEMPORARY things', ex('This month I<b>’m training</b> for a race.') + ex('My cousin <b>is living</b> with us this year.') + small('True for a limited time, not only this second.')),
                 card('purple', '🤔 think: opinion or activity?', ex('I <b>think</b> skating is great.', 'opinion → Present Simple') + ex('I<b>’m thinking</b> about my next video.', 'an activity now → continuous'))) +
               mistakes('Watch out', bad('I’m thinking skating is great.', 'I <b>think</b> skating is great.'), bad('Leo is knowing all the routes.', 'Leo <b>knows</b> all the routes.')) +
+              together(false, ['This week my aunt ___ (stay) with us.', 'is staying'], ['I ___ (think) it’s a good idea.', 'think']) +
               turn('Your turn:', 'something you are doing this month (not now) and your opinion about it with <em>I think…</em>') }
         ];
       })(),

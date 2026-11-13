@@ -142,31 +142,41 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('🙏', '<em>would like to</em> + verb: demanar amb educació', 'En un correu formal no diem <em>we want</em>: diem <b>we would like to</b>.') +
               scale([['slate', '👥', 'We / I'], ['blue', 'would like', '(’d like)'], ['green', 'to + verb', 'to organise · to invite']]) +
               row(card('red', '😐 Massa directe', ex('We <b>want</b> to use the hall.')), card('green', '🙂 Educat', ex('We <b>would like to</b> use the hall.') + ex('I <b>would like to</b> explain our idea.') + ex('We <b>would like to</b> invite families.'))) +
               mistakes('Compte!', bad('We would like organise…', 'We would like <b>to</b> organise…'), bad('We would like to organising…', 'We would like to <b>organise</b>…')) +
+              together(true, ['We would like ___ ___ (organise) a party.', 'to organise'], ['I ___ ___ ___ explain our idea. (m’agradaria)', 'would like to']) +
               turn('Ara tu:', 'dues coses que la teva classe voldria fer el dia de la festa, amb <em>We would like to…</em>'),
             en: head('🙏', '<em>would like to</em> + verb: asking politely', 'In a formal email we don’t say <em>we want</em>: we say <b>we would like to</b>.') +
               scale([['slate', '👥', 'We / I'], ['blue', 'would like', '(’d like)'], ['green', 'to + verb', 'to organise · to invite']]) +
               row(card('red', '😐 Too direct', ex('We <b>want</b> to use the hall.')), card('green', '🙂 Polite', ex('We <b>would like to</b> use the hall.') + ex('I <b>would like to</b> explain our idea.') + ex('We <b>would like to</b> invite families.'))) +
               mistakes('Watch out', bad('We would like organise…', 'We would like <b>to</b> organise…'), bad('We would like to organising…', 'We would like to <b>organise</b>…')) +
+              together(false, ['We would like ___ ___ (organise) a party.', 'to organise'], ['I ___ ___ ___ explain our idea. (m’agradaria)', 'would like to']) +
               turn('Your turn:', 'two things your class would like to do on the celebration day, with <em>We would like to…</em>') },
           { r: 'insecure', only: ['insecure'], ca: head('✉️', '<em>I am writing to</em> + verb: per què escrius', 'És la primera frase del correu, després de <em>Dear…</em>') +
               row(card('blue', 'I am writing to + verb', ex('I am writing to <b>propose</b> a celebration day.', 'proposar') + ex('I am writing to <b>ask</b> about the school hall.', 'preguntar') + ex('I am writing to <b>invite</b> you to our event.', 'convidar'))) +
-              mistakes('Compte!', bad('I am writing for propose…', 'I am writing <b>to</b> propose…')) + turn('Ara tu:', 'escriu la primera frase del teu correu a la directora.'),
-            en: head('✉️', '<em>I am writing to</em> + verb: why you are writing') + ex('I am writing to <b>propose</b> a celebration day.') + ex('I am writing to <b>ask</b> about the school hall.') + turn('Your turn:', 'write the first sentence of your email.') },
+              mistakes('Compte!', bad('I am writing for propose…', 'I am writing <b>to</b> propose…')) + together(true, ['I am writing ___ ___ (ask) about the hall.', 'to ask']) +
+              turn('Ara tu:', 'escriu la primera frase del teu correu a la directora.'),
+            en: head('✉️', '<em>I am writing to</em> + verb: why you are writing') + ex('I am writing to <b>propose</b> a celebration day.') + ex('I am writing to <b>ask</b> about the school hall.') + together(false, ['I am writing ___ ___ (ask) about the hall.', 'to ask']) +
+              turn('Your turn:', 'write the first sentence of your email.') },
           { r: 'safe', en: head('🪜', 'Polite requests: the politeness ladder', 'The more formal the person, the higher you go.') +
               scale([['slate', '🙂', 'Can we…? (friends)'], ['blue', '😊', 'Could we…? (polite)'], ['purple', '🎩', 'Would it be possible to…? (very formal)']]) +
               row(card('blue', 'Could we + verb?', ex('<b>Could we use</b> the school hall?') + ex('<b>Could we put up</b> posters in the corridor?')),
                 card('purple', 'Would it be possible + to + verb?', ex('<b>Would it be possible to start</b> at 10.00?') + ex('<b>Would it be possible to use</b> the school’s speakers?'))) +
               mistakes('Watch out', bad('Could we to use the hall?', 'Could we <b>use</b> the hall?'), bad('Would it be possible use…?', 'Would it be possible <b>to</b> use…?'), bad('We want the hall.', 'Could we use the hall?', '(too direct for a head teacher)')) +
+              together(false, ['___ we use the gym? (polite)', 'Could'], ['Would it be possible ___ ___ (start) at 10?', 'to start']) +
               turn('Your turn:', 'two requests for your email: one with <em>Could we…?</em> and one with <em>Would it be possible to…?</em>') },
           { r: 'daring', en: head('🎩', 'Formal endings and answering a concern') +
               row(card('blue', '<em>look forward to</em> + -ing', ex('I look forward to <b>hearing</b> from you.') + ex('We look forward to <b>welcoming</b> families.') + small('Here <b>to</b> is a preposition, so the verb takes <b>-ing</b>.')),
                 card('orange', '🤔 Although: answer a worry before they ask', ex('<b>Although</b> the hall is small, we can also use the gym.') + ex('<b>Although</b> some families do not celebrate Diwali, the event will be about learning, not belief.'))) +
               mistakes('Watch out', bad('I look forward to hear from you.', 'I look forward to <b>hearing</b> from you.'), bad('Although the hall is small, but…', 'Although the hall is small, we…', '(no but)')) +
+              together(false, ['We look forward to ___ (see) you.', 'seeing'], ['___ it is expensive, it will be worth it.', 'Although']) +
               turn('Your turn:', 'think of one worry the head teacher could have and answer it with <em>Although…</em>') }
         ];
       })(),

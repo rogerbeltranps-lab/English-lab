@@ -43,6 +43,10 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('📆', 'Dates: <em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'nit · hora · període de festa']]) +
@@ -51,6 +55,7 @@ window.LP = {
                 card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
               row(card('teal', '🔁 Sense preposició', ex('We celebrate it <b>every year</b>.', 'cada any') + ex('It happens <b>once a year</b>.', 'un cop l’any') + ex('We prepare <b>the night before</b>.', 'la nit abans'))) +
               mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: sense preposició)')) +
+              together(true, ['Thanksgiving is ___ November. The Castanyada is ___ 31 October. We eat turrón ___ Christmas.', 'in · on · at']) +
               turn('Ara tu:', 'quan és la teva festa preferida? Digues-ho amb <em>in, on</em> o <em>at</em>.'),
             en: head('📆', 'Dates: <em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'night · clock time · holiday time']]) +
@@ -59,11 +64,13 @@ window.LP = {
                 card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
               row(card('teal', '🔁 No preposition', ex('We celebrate it <b>every year</b>.') + ex('It happens <b>once a year</b>.') + ex('We prepare <b>the night before</b>.'))) +
               mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: no preposition)')) +
+              together(false, ['Thanksgiving is ___ November. The Castanyada is ___ 31 October. We eat turrón ___ Christmas.', 'in · on · at']) +
               turn('Your turn:', 'when is your favourite celebration? Say it with <em>in, on</em> or <em>at</em>.') },
           { r: 'safe', en: head('🔗', 'Verb + preposition and comparing words', 'The preposition is fixed: learn it with the word.') +
               row(card('blue', 'Verb + preposition', table([['Word', 'Example'], ['contribute <b>to</b>', 'Everyone <b>contributes to</b> the party.'], ['depend <b>on</b>', 'The date <b>depends on</b> the moon.'], ['come <b>from</b>', 'Halloween <b>comes from</b> Samhain.'], ['be known <b>for</b>', 'Leicester <b>is known for</b> its Diwali lights.'], ['be associated <b>with</b>', 'Pumpkins <b>are associated with</b> Halloween.']]), 300),
                 card('green', 'Comparing', table([['Word', 'Example'], ['similar <b>to</b>', 'It’s <b>similar to</b> a harvest festival.'], ['different <b>from</b>', 'It’s <b>different from</b> Christmas.'], ['<b>both</b> … <b>and</b> …', '<b>Both</b> Diwali <b>and</b> Hanukkah use lights.'], ['<b>unlike</b> + noun', '<b>Unlike</b> Halloween, it’s at home.']]), 300)) +
               mistakes('Watch out', bad('It depends of the moon.', 'It depends <b>on</b> the moon.'), bad('similar than', 'similar <b>to</b>'), bad('known by its lights', 'known <b>for</b> its lights')) +
+              together(false, ['It depends ___ the weather.', 'on'], ['Halloween comes ___ Samhain.', 'from']) +
               turn('Your turn:', 'one sentence with <em>comes from</em> and one with <em>is known for</em> about a celebration you know.') }
         ];
       })(),
@@ -181,6 +188,10 @@ window.LP = {
         const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
         const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
         const PAIRS = ['bor', 'excit', 'tir', 'interest', 'amaz', 'surpris', 'disappoint', 'frighten'].map(w => [w + '<b style="color:#1d4ed8">ed</b>', w + '<b style="color:#c2410c">ing</b>']);
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         // a timeline from the past to now, with dots where things happen (x in %) and an optional ✗ at "now"
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:' + x + '%;top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-25%);font-size:.95em;color:#1d4ed8">' + t + '</span>' : '')).join('') +
@@ -193,21 +204,25 @@ window.LP = {
               row(card('orange', '↔️ Contrast · però', pill('orange', 'but') + ex('I like costumes, <b>but</b> I don’t like scary films.') + ex('It’s cold outside, <b>but</b> the house is cosy.')),
                 card('purple', '❓ Raó · perquè', pill('purple', 'because') + ex('I love Halloween <b>because</b> I can dress up.') + ex('We stay at home <b>because</b> it’s a family day.'))) +
               mistakes('Compte!', bad('We eat also panellets.', 'We <b>also</b> eat panellets.'), bad('Because I like it.', 'I go <b>because</b> I like it.', '(sola no és una frase)')) +
+              together(true, ['We eat chestnuts ___ we drink hot chocolate.', 'and'], ['I stay at home ___ it’s a family day.', 'because']) +
               turn('Ara tu:', 'explica tres passos de la teva festa preferida amb <em>First, Then, Finally</em>, i per què t’agrada amb <em>because</em>.'),
             en: head('🔗', 'Connectors: words that join your ideas', 'They tell the reader the order, what you add, what is different and why.') +
               row(card('blue', '1️⃣ Order', pill('blue', 'First,') + pill('blue', 'Then,') + pill('blue', 'Finally,') + ex('<b>First</b>, we clean the house.') + ex('<b>Then</b>, we decorate it.')),
                 card('green', '➕ Add', pill('green', 'and') + pill('green', 'also') + ex('We <b>also</b> eat sweet potatoes.')),
                 card('orange', '↔️ Contrast', pill('orange', 'but') + ex('I like costumes, <b>but</b> I don’t like scary films.')),
                 card('purple', '❓ Reason', pill('purple', 'because') + ex('I love Halloween <b>because</b> I can dress up.'))) +
-              mistakes('Watch out', bad('We eat also panellets.', 'We <b>also</b> eat panellets.')) + turn('Your turn:', 'three steps of your favourite celebration with <em>First, Then, Finally</em>.') },
+              mistakes('Watch out', bad('We eat also panellets.', 'We <b>also</b> eat panellets.')) + together(false, ['We eat chestnuts ___ we drink hot chocolate.', 'and'], ['I stay at home ___ it’s a family day.', 'because']) +
+              turn('Your turn:', 'three steps of your favourite celebration with <em>First, Then, Finally</em>.') },
           { p: 'custom', r: 'insecure', only: ['insecure'],
             ca: head('📅', 'Costums: què fem cada any', 'Per a coses que passen <b>sempre</b> o <b>cada any</b>: <b>Present Simple</b>.') +
               row(card('teal', '🗓 Quan és la festa', ex('It <b>takes place</b> in November.', 'té lloc') + ex('It <b>is held</b> on 31 October.', 'es fa') + ex('It <b>is celebrated</b> in spring.', 'se celebra') + '<div style="margin-top:4px">' + pill('teal', 'in + mes / estació') + pill('teal', 'on + dia / data') + '</div>'),
                 card('blue', '✅ Què fem', ex('We <b>eat</b> panellets.') + ex('My grandma <b>makes</b> a special cake.', 'he / she → -s')),
                 card('orange', '🚫 Què no fem', ex('We <b>don’t work</b> on 25 December.') + ex('My cousins <b>don’t celebrate</b> Halloween.') + ex('My dad <b>doesn’t eat</b> chestnuts.', 'he / she → doesn’t'))) +
               mistakes('Compte!', bad('We don’t works.', 'We don’t <b>work</b>.', '(després de don’t / doesn’t, verb sense -s)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
+              together(true, ['The Castanyada ___ ___ on 31 October. (es fa)', 'is held']) +
               turn('Ara tu:', 'digues quan és la teva festa preferida i una cosa que <b>no</b> fas aquell dia.'),
-            en: head('📅', 'Customs: what we do every year') + ex('It <b>takes place</b> in November. It <b>is held</b> on 31 October.') + ex('We <b>don’t work</b> on 25 December.') + turn('Your turn:', 'when is your favourite celebration, and one thing you don’t do that day?') },
+            en: head('📅', 'Customs: what we do every year') + ex('It <b>takes place</b> in November. It <b>is held</b> on 31 October.') + ex('We <b>don’t work</b> on 25 December.') + together(false, ['The Castanyada ___ ___ on 31 October. (es fa)', 'is held']) +
+              turn('Your turn:', 'when is your favourite celebration, and one thing you don’t do that day?') },
           { p: 'past', r: 'safe', en: head('⏳', 'Past Simple or <em>used to</em>?', 'Both talk about the past, but they tell a different story. Look at the timelines.') +
               row(card('blue', '🅰 Past Simple = ONE finished event', timeline([[30, '1621']], false, 'It happened once, often with a date or <em>yesterday, last year, in 1621</em>.') +
                   ex('The Pilgrims <b>sailed</b> to America in 1620.', 'regular: + -ed') + ex('The first Thanksgiving <b>took</b> place in 1621.', 'irregular') + ex('The Wampanoag <b>taught</b> them to grow corn.', 'irregular') + ex('Lincoln <b>made</b> it official in 1863.', 'irregular'), 300),
@@ -217,6 +232,7 @@ window.LP = {
               card('amber', '📚 Irregular verbs: learn them by heart!', '<div style="display:flex;flex-wrap:wrap;gap:4px">' + [['take', 'took'], ['make', 'made'], ['go', 'went'], ['eat', 'ate'], ['bring', 'brought'], ['teach', 'taught'], ['give', 'gave'], ['sing', 'sang'], ['become', 'became'], ['begin', 'began'], ['have', 'had'], ['come', 'came']].map(([a, b]) => '<span style="padding:2px 8px;border-radius:8px;background:#fff;border:1px solid #fcd34d">' + a + ' → <b>' + b + '</b></span>').join('') + '</div><div style="margin-top:4px;font-size:.9em">Regular: <em>sail → sailed · celebrate → celebrated · carve → carved</em></div>', 600) +
               tip('🅰 or 🅱?', '<u>One time</u>, maybe with a date → Past Simple: <em>In 1621 they <b>had</b> a feast.</em> · <u>Many times</u>, and not true now → used to: <em>Every year they <b>used to have</b> a feast.</em>') +
               mistakes('Watch out', bad('We used to went.', 'We used to <b>go</b>.', '(base form after used to)'), bad('They didn’t had food.', 'They didn’t <b>have</b> food.'), bad('Did you used to…?', 'Did you <b>use to</b>…?', '(no -d after did)'), bad('I use to go every Sunday.', 'I <b>usually</b> go every Sunday.', '(used to = only past)')) +
+              together(false, ['In 1621 they ___ (have) a feast.', 'had'], ['My grandparents ___ ___ ___ (roast) chestnuts in the street. Now they buy them.', 'used to roast']) +
               turn('Your turn:', 'one thing you <em>used to</em> do at Halloween or Christmas when you were 7, one thing you <em>didn’t use to</em> do, and one thing that happened <u>last</u> Christmas.') },
           { p: 'rel', r: 'safe', en: head('🎯', 'Relatives: who, which, that, where, when', 'They come <u>right after a noun</u> and tell us <b>exactly which</b> person, thing, place or time we mean. “That’s the woman.” Which woman? → “That’s the woman <b>who makes the best panellets</b>.”') +
               row(card('blue', '👤 who / that → people', ex('The Wampanoag were the people <b>who</b> lived in the area.') + ex('Squanto was the man <b>who</b> helped the Pilgrims.'), 200),
@@ -233,6 +249,7 @@ window.LP = {
                   card('purple', '💬 Non-defining: <b>, which … ,</b>', ex('Diwali<b>, which</b> is celebrated in autumn<b>,</b> is the festival of lights.') + ex('Squanto<b>, who</b> spoke English<b>,</b> helped the Pilgrims.') + '<div style="font-size:.9em;color:#475569;margin-top:4px"><b>EXTRA</b> information about a name we already know. Take it away and the sentence still works. Only <b>who / which</b>, never <em>that</em>.</div>', 230)) +
                 '<div style="font-size:.95em">🧪 <b>Test:</b> cover the relative part with your finger. Do you still know <u>which one</u>? Yes → non-defining, add commas. No → defining, no commas.</div>', 600) +
               mistakes('Watch out', bad('a festival which it started in Ireland', 'a festival <b>which</b> started in Ireland', '(don’t say it twice)'), bad('cakes which we eat them', 'cakes <b>which</b> we eat'), bad('the people which', 'the people <b>who</b>'), bad('the place which the parade ends', 'the place <b>where</b> the parade ends'), bad('Diwali, that is celebrated in autumn, …', 'Diwali<b>, which</b> is celebrated in autumn, …', '(never that between commas)')) +
+              together(false, ['Squanto was the man ___ helped the Pilgrims.', 'who'], ['Diwali, ___ is in autumn, is the festival of lights.', 'which (never that)']) +
               turn('Your turn:', 'describe your town’s festa: a person (<em>who</em>), a thing you eat (<em>which</em>), a place (<em>where</em>) and a day (<em>when</em>).') },
           { p: 'comp', r: 'safe', en: head('⚖️', 'Comparing two celebrations', 'Say what is <b>the same</b> and what is <b>different</b>, in one sentence.') +
               row(card('green', '🟰 The same', pill('green', 'Both … and …') + pill('green', 'similar to') + pill('green', 'like') +
@@ -242,11 +259,13 @@ window.LP = {
               table([['Word', 'What comes after it', 'Example'], ['<b>whereas / while</b>', 'a full sentence (comma before)', '… costumes<b>, whereas</b> the Castanyada is about food.'], ['<b>unlike / like</b>', 'a noun, then a comma', '<b>Unlike</b> Halloween<b>,</b> the Castanyada…'], ['<b>similar to / different from</b>', 'a noun', 'similar <b>to</b> Thanksgiving · different <b>from</b> Halloween'], ['<b>both … and</b>', 'two nouns + plural verb', '<b>Both</b> Diwali <b>and</b> Hanukkah <b>are</b>…']]) +
               tip('How to build it:', 'take one fact from each celebration and choose the word. <em>Halloween: costumes · Castanyada: chestnuts</em> → <em>At Halloween people wear costumes, <b>whereas</b> at the Castanyada they eat chestnuts.</em>') +
               mistakes('Watch out', bad('Both Diwali and Hanukkah is…', 'Both Diwali and Hanukkah <b>are</b>…'), bad('similar than', 'similar <b>to</b>'), bad('different of', 'different <b>from</b>'), bad('Unlike Halloween is…', 'Unlike Halloween, the Castanyada is…')) +
+              together(false, ['___ Halloween ___ the Castanyada are on 31 October.', 'Both … and'], ['Halloween is about costumes, ___ the Castanyada is about food.', 'whereas']) +
               turn('Your turn:', 'compare your favourite celebration with one from another country: one thing that is the same (<em>both… and</em>) and one that is different (<em>whereas</em> or <em>unlike</em>).') },
           { p: 'plus', r: 'daring', en: head('➕', 'Extra information and concession', 'Non-defining relatives are in the relatives box: here you use them in longer sentences, with <em>although</em>.') +
               card('purple', '💬 Extra information, between commas', ex('Lincoln<b>, who</b> was president in 1863<b>,</b> made it official.') + ex('Thanksgiving<b>, which</b> takes place in November<b>,</b> became official in 1863.'), 600) +
               card('orange', '🤔 Concession: two ideas that seem to clash', ex('<b>Although</b> Halloween started in Europe, it is now very popular in the USA.') + ex('We had fun <b>even though</b> it rained.') + ex('Many families love the feast. <b>On the other hand</b>, some Native Americans see it as a day of mourning.'), 600) +
               mistakes('Watch out', bad('Diwali, that is celebrated…', 'Diwali, <b>which</b> is celebrated…'), bad('Although it rained, but we had fun.', 'Although it rained, we had fun.', '(no but)')) +
+              together(false, ['___ it rained, we had fun.', 'Although (Even though)']) +
               turn('Your turn:', 'add extra information about a celebration with <em>, which … ,</em> and make one sentence with <em>although</em>.') },
           { p: 'feel',
             ca: head('😊', 'Sentiments: -ed o -ing?', 'Molts adjectius tenen dues formes, i no volen dir el mateix!') +
@@ -255,6 +274,7 @@ window.LP = {
               tip('Truc:', 'pregunta’t <u>qui</u> sent què. 🎬 <em>The film was <b>frightening</b></em> → 😱 <em>so I was <b>frightened</b>.</em>') +
               table([['🙋 -ed (persona)', '🎆 -ing (cosa)']].concat(PAIRS)) +
               mistakes('Compte!', bad('I’m boring.', 'I’m <b>bored</b>.', '(“I’m boring” = sóc una persona avorrida!)'), bad('interested on', 'interested <b>in</b>')) +
+              together(true, ['The film was ___ (frighten).', 'frightening'], ['I was ___ (bore) at the parade.', 'bored']) +
               turn('Ara tu:', 'digues com et sents en una festa (-ed) i com és alguna cosa d’aquella festa (-ing).'),
             en: head('😊', 'Feelings: -ed or -ing?', 'Many feeling adjectives have two forms, and they don’t mean the same thing!') +
               row(card('blue', '🙋 -ed = how YOU feel', ex('I’m <b>bored</b>.') + ex('We were <b>excited</b> about the party.') + ex('She was <b>tired</b> after the parade.') + ex('My brother was <b>frightened</b> of the masks.') + ex('I’m <b>interested in</b> Diwali.')),
@@ -262,6 +282,7 @@ window.LP = {
               tip('Trick:', 'ask <u>who</u> feels what. 🎬 <em>The film was <b>frightening</b></em> → 😱 <em>so I was <b>frightened</b>.</em>') +
               table([['🙋 -ed (person)', '🎆 -ing (thing)']].concat(PAIRS)) +
               mistakes('Watch out', bad('I’m boring.', 'I’m <b>bored</b>.', '(“I’m boring” = you are a boring person!)'), bad('interested on', 'interested <b>in</b>')) +
+              together(false, ['The film was ___ (frighten).', 'frightening'], ['I was ___ (bore) at the parade.', 'bored']) +
               turn('Your turn:', 'say how you feel at a celebration (-ed) and what something there is like (-ing).') }
         ];
       })(),

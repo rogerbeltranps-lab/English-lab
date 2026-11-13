@@ -45,6 +45,10 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('⚽🏊🥋', '<em>play</em>, <em>go</em> o <em>do</em>?', 'En català sempre diem “fer” o “jugar”, però en anglès depèn de l’activitat.') +
               row(card('blue', '⚽ play + esports amb pilota i jocs', ex('<b>play</b> football · basketball') + ex('<b>play</b> video games') + small('🎸 Instruments: <b>play the</b> guitar · <b>play the</b> piano'), 200),
@@ -52,6 +56,7 @@ window.LP = {
                 card('purple', '🥋 do + activitats sense pilota', ex('<b>do</b> karate') + ex('<b>do</b> gymnastics') + ex('<b>do</b> yoga'), 200)) +
               row(card('slate', '🎵 Altres', ex('<b>listen to</b> music', 'amb to!') + ex('<b>meet</b> friends') + ex('<b>read</b> comics · <b>draw</b> · <b>dance</b>'))) +
               mistakes('Compte!', bad('I do football.', 'I <b>play</b> football.'), bad('I go to swim.', 'I <b>go swimming</b>.'), bad('He plays karate.', 'He <b>does</b> karate.'), bad('I listen music.', 'I listen <b>to</b> music.')) +
+              together(true, ['I ___ basketball · I ___ swimming · I ___ karate', 'play · go · do'], ['She plays ___ guitar.', 'the']) +
               turn('Ara tu:', 'escriu tres coses que fas al teu temps lliure: una amb <em>play</em>, una amb <em>go</em> i una amb <em>do</em>.'),
             en: head('⚽🏊🥋', '<em>play</em>, <em>go</em> or <em>do</em>?', 'It depends on the activity.') +
               row(card('blue', '⚽ play + ball sports and games', ex('<b>play</b> football · basketball') + ex('<b>play</b> video games') + small('🎸 Instruments: <b>play the</b> guitar · <b>play the</b> piano'), 200),
@@ -59,17 +64,20 @@ window.LP = {
                 card('purple', '🥋 do + activities without a ball', ex('<b>do</b> karate') + ex('<b>do</b> gymnastics') + ex('<b>do</b> yoga'), 200)) +
               row(card('slate', '🎵 Others', ex('<b>listen to</b> music', 'with to!') + ex('<b>meet</b> friends') + ex('<b>read</b> comics · <b>draw</b> · <b>dance</b>'))) +
               mistakes('Watch out', bad('I do football.', 'I <b>play</b> football.'), bad('I go to swim.', 'I <b>go swimming</b>.'), bad('He plays karate.', 'He <b>does</b> karate.'), bad('I listen music.', 'I listen <b>to</b> music.')) +
+              together(false, ['I ___ basketball · I ___ swimming · I ___ karate', 'play · go · do'], ['She plays ___ guitar.', 'the']) +
               turn('Your turn:', 'three things you do in your free time: one with <em>play</em>, one with <em>go</em> and one with <em>do</em>.') },
           { r: 'safe', en: head('📅', 'How often?', 'Put these at the <b>end</b> of the sentence.') +
               scale([['green', '1️⃣', 'once a week'], ['teal', '2️⃣', 'twice a week'], ['blue', '3️⃣', 'three times a week'], ['purple', '📅', 'every day']]) +
               row(card('blue', 'Examples', ex('I go swimming <b>once a week</b>.') + ex('We train <b>twice a week</b>.') + ex('He practises <b>every day</b>.') + ex('I meet friends <b>at the weekend</b>.') + ex('I read comics <b>in my free time</b>.'))) +
               mistakes('Watch out', bad('two times a week', '<b>twice</b> a week'), bad('every days', 'every <b>day</b>'), bad('in the weekend', '<b>at</b> the weekend')) +
+              together(false, ['I train ___ a week. (2 times)', 'twice']) +
               turn('Your turn:', 'how often do you do your favourite activity?') },
           { r: 'daring', en: head('⭐', 'Talking about hobbies', 'These take <b>-ing</b> after them.') +
               row(card('blue', 'be good at + -ing / noun', ex('She is <b>good at drawing</b>.') + ex('I’m <b>good at</b> maths.')),
                 card('purple', 'spend time + -ing', ex('I <b>spend</b> a lot of <b>time playing</b> the piano.')),
                 card('green', 'join a club · practise', ex('He wants to <b>join</b> a chess <b>club</b>.') + ex('They <b>practise</b> after school.', 'verb: practi<b>s</b>e'))) +
               mistakes('Watch out', bad('good in drawing', 'good <b>at</b> drawing'), bad('I spend time to play.', 'I spend time <b>playing</b>.')) +
+              together(false, ['She’s good ___ singing.', 'at']) +
               turn('Your turn:', 'something you are good at and how you spend your free time.') }
         ];
       })(),

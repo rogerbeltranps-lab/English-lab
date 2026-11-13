@@ -119,36 +119,46 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('❤️', 'love / like / don’t mind / hate + verb-ing', 'Després d’aquests verbs, l’acció va amb <b>-ing</b>.') +
               scale([['green', '😍', 'love'], ['teal', '🙂', 'like'], ['slate', '😐', 'don’t mind'], ['orange', '🙁', 'don’t like'], ['red', '😖', 'hate']]) +
               row(card('blue', '➕ ➖ ❓', ex('I <b>love skating</b>.') + ex('She <b>hates losing</b>.') + ex('We <b>don’t like getting</b> up early.') + ex('<b>Do</b> you <b>like playing</b> online? — Yes, I do.') + small('La -ing s’escriu igual que al Present Continuous: <em>swimming, dancing</em>.'))) +
               mistakes('Compte!', bad('I like play video games.', 'I like <b>playing</b> video games.'), bad('She hate losing.', 'She <b>hates</b> losing.', '(she → -s)')) +
+              together(true, ['I love ___ (dance).', 'dancing'], ['She doesn’t like ___ (run).', 'running']) +
               turn('Ara tu:', 'una cosa que t’encanta fer, una que no t’importa i una que odies, amb -ing.'),
             en: head('❤️', 'love / like / don’t mind / hate + verb-ing', 'After these verbs, the action takes <b>-ing</b>.') +
               scale([['green', '😍', 'love'], ['teal', '🙂', 'like'], ['slate', '😐', 'don’t mind'], ['orange', '🙁', 'don’t like'], ['red', '😖', 'hate']]) +
               row(card('blue', '➕ ➖ ❓', ex('I <b>love skating</b>.') + ex('She <b>hates losing</b>.') + ex('We <b>don’t like getting</b> up early.') + ex('<b>Do</b> you <b>like playing</b> online? — Yes, I do.') + small('Same -ing spelling as the Present Continuous: <em>swimming, dancing</em>.'))) +
               mistakes('Watch out', bad('I like play video games.', 'I like <b>playing</b> video games.'), bad('She hate losing.', 'She <b>hates</b> losing.', '(she → -s)')) +
+              together(false, ['I love ___ (dance).', 'dancing'], ['She doesn’t like ___ (run).', 'running']) +
               turn('Your turn:', 'one thing you love doing, one you don’t mind and one you hate, with -ing.') },
           { ca: head('📢', 'Imperatius: consells i instruccions', 'El verb sol, <b>sense subjecte</b> (sense <em>you</em>).') +
               row(card('green', '✅ Fes-ho: verb', ex('<b>Take</b> a break every 30 minutes.') + ex('<b>Go</b> outside and <b>play</b> with your friends.') + ex('<b>Switch off</b> your phone at night.')),
                 card('red', '🚫 No ho facis: Don’t + verb', ex('<b>Don’t use</b> your phone in bed.') + ex('<b>Don’t check</b> your phone every five minutes.'))) +
               mistakes('Compte!', bad('You put your phone away.', '<b>Put</b> your phone away.', '(sense you)'), bad('Don’t to use your phone.', 'Don’t <b>use</b> your phone.'), bad('No use your phone.', '<b>Don’t</b> use your phone.')) +
+              together(true, ['___ your phone in your bag. (posar)', 'Put'], ['___ ___ (not / play) games after 10.', 'Don’t play']) +
               turn('Ara tu:', 'escriu tres consells per a un company que fa servir massa el mòbil: dos de fer i un de no fer.'),
             en: head('📢', 'Imperatives: tips and instructions', 'The verb alone, <b>no subject</b> (no <em>you</em>).') +
               row(card('green', '✅ Do it: verb', ex('<b>Take</b> a break every 30 minutes.') + ex('<b>Go</b> outside and <b>play</b> with your friends.') + ex('<b>Switch off</b> your phone at night.')),
                 card('red', '🚫 Don’t do it: Don’t + verb', ex('<b>Don’t use</b> your phone in bed.') + ex('<b>Don’t check</b> your phone every five minutes.'))) +
               mistakes('Watch out', bad('You put your phone away.', '<b>Put</b> your phone away.', '(no you)'), bad('Don’t to use your phone.', 'Don’t <b>use</b> your phone.'), bad('No use your phone.', '<b>Don’t</b> use your phone.')) +
+              together(false, ['___ your phone in your bag. (posar)', 'Put'], ['___ ___ (not / play) games after 10.', 'Don’t play']) +
               turn('Your turn:', 'three tips for a friend who uses the phone too much: two do’s and one don’t.') },
           { r: 'safe', en: head('💬', 'A tip with a reason', 'A tip is stronger when you say why.') +
               table([['Tip (imperative)', 'because → the reason', 'so → the result'], ['Switch off your phone at night,', '<b>because</b> the light keeps you awake.', ''], ['Set a time limit,', '', '<b>so</b> you have time for other things.'], ['Keep your phone out of your bedroom,', '<b>because</b> you sleep better.', ''], ['Turn off notifications,', '', '<b>so</b> you can concentrate.']]) +
               mistakes('Watch out', bad('Set a time limit, because you have time for other things.', 'Set a time limit, <b>so</b> you have time…', '(result → so)')) +
+              together(false, ['Go to bed early, ___ you aren’t tired at school.', 'so'], ['Take a break, ___ your eyes get tired.', 'because']) +
               turn('Your turn:', 'two tips, one with <em>because</em> and one with <em>so</em>.') },
           { r: 'daring', en: head('🔄', '<em>instead of</em> + -ing and <em>enough</em>') +
               row(card('blue', 'instead of + -ing', ex('Go outside <b>instead of watching</b> videos.') + ex('Read a book <b>instead of scrolling</b>.')),
                 card('purple', 'enough = as much as you need', ex('One hour a day is <b>enough</b>.') + ex('I don’t have <b>enough</b> time.', 'enough + noun'))) +
               tip('like + to?', 'British English also says <em>I like to swim in the morning</em> for habits, but use <em>-ing</em> in this LS.') +
               mistakes('Watch out', bad('instead of watch', 'instead of <b>watching</b>'), bad('It isn’t enough big.', 'It isn’t big <b>enough</b>.', '(adjective + enough)')) +
+              together(false, ['Walk to school ___ ___ ___ (go) by car.', 'instead of going'], ['Is the room big ___?', 'enough']) +
               turn('Your turn:', 'one tip with <em>instead of</em> and one sentence with <em>enough</em>.') }
         ];
       })(),

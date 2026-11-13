@@ -41,22 +41,29 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('🧩', 'Paraules que van juntes', 'Alguns verbs porten una paraula petita al darrere. Aprèn-los junts, com una sola paraula.') +
               row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.', 'disfressar-se de')),
                 card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.', 'donar a') + ex('I <b>get presents from</b> my grandparents.', 'rebre de')),
                 card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'sense to!') + ex('We <b>eat together</b> on 25 December.'))) +
               mistakes('Compte!', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')) +
+              together(true, ['I dressed up ___ a vampire.', 'as'], ['We ___ our grandparents on Sundays. (visitar)', 'visit']) +
               turn('Ara tu:', 'què fas en una festa? Fes servir <em>dress up as</em> i <em>give presents to</em>.'),
             en: head('🧩', 'Words that go together', 'Some verbs take a little word after them. Learn them together, like one word.') +
               row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.')),
                 card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.') + ex('I <b>get presents from</b> my grandparents.')),
                 card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'no to!') + ex('We <b>eat together</b> on 25 December.'))) +
               mistakes('Watch out', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')) +
+              together(false, ['I dressed up ___ a vampire.', 'as'], ['We ___ our grandparents on Sundays. (visitar)', 'visit']) +
               turn('Your turn:', 'what do you do at a celebration? Use <em>dress up as</em> and <em>give presents to</em>.') },
           { r: 'safe', en: head('🔗', 'Verbs + little words (Safe words)', 'The little word is part of the verb: don’t change it.') +
               table([['Verb', 'What comes after', 'Example'], ['<b>take part in</b>', 'a noun', 'I <b>take part in</b> the parade.'], ['<b>look forward to</b>', 'a noun or <b>-ing</b>', 'I <b>look forward to</b> the holidays. · I <b>look forward to seeing</b> you.'], ['<b>get together</b> (with)', 'people', 'Families <b>get together</b> at Christmas.'], ['<b>pass down</b>', 'a tradition', 'Recipes are <b>passed down</b> from grandparents.'], ['<b>wish someone</b> a happy…', 'a person + a happy…', 'We <b>wish everyone a happy</b> new year.']]) +
               mistakes('Watch out', bad('take part on the parade', 'take part <b>in</b> the parade'), bad('I look forward to see you.', 'I look forward to <b>seeing</b> you.', '(to + -ing)')) +
+              together(false, ['I take part ___ the correfoc.', 'in'], ['I look forward to ___ (see) my cousins.', 'seeing']) +
               turn('Your turn:', 'something you <em>take part in</em> and something you <em>look forward to</em> this year.') }
         ];
       })(),
@@ -162,6 +169,10 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('📅', 'Present Simple per als costums', 'Per a coses que passen <b>cada any</b>, sempre igual: el que la gent fa en una festa.') +
               row(card('blue', '➕ Què fem', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
@@ -169,6 +180,7 @@ window.LP = {
                 card('purple', '❓ Preguntes', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.'))) +
               table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?']]) +
               mistakes('Compte!', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?')) +
+              together(true, ['My grandma ___ (make) panellets every year.', 'makes'], ['We ___ (not / go) to school on 25 December.', 'don’t go'], ['___ your family ___ (celebrate) Halloween?', 'Does … celebrate']) +
               turn('Ara tu:', 'dues coses que fa la teva família per Nadal i una que <b>no</b> fa.'),
             en: head('📅', 'Present Simple for customs', 'For things that happen <b>every year</b>, always the same: what people do at a celebration.') +
               row(card('blue', '➕ What we do', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
@@ -176,18 +188,21 @@ window.LP = {
                 card('purple', '❓ Questions', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.'))) +
               table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?']]) +
               mistakes('Watch out', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?')) +
+              together(false, ['My grandma ___ (make) panellets every year.', 'makes'], ['We ___ (not / go) to school on 25 December.', 'don’t go'], ['___ your family ___ (celebrate) Halloween?', 'Does … celebrate']) +
               turn('Your turn:', 'two things your family does at Christmas and one thing it <b>doesn’t</b> do.') },
           { ca: head('🧩', 'Frases fetes per dir QUAN és una festa', 'Aprèn-les senceres: només canvies la data.') +
               row(card('teal', 'It <b>is celebrated</b> … · se celebra', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
                 card('teal', 'It <b>takes place</b> … · té lloc', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
                 card('teal', 'It <b>is held</b> … · es fa', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
               mistakes('Compte!', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(la festa no celebra: és celebrada)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
+              together(true, ['Diwali ___ ___ in autumn. (se celebra)', 'is celebrated'], ['The parade ___ ___ at night. (té lloc)', 'takes place']) +
               turn('Ara tu:', 'digues quan i on es fa la festa major del teu poble amb <em>It takes place…</em> i <em>It is held…</em>'),
             en: head('🧩', 'Ready-made chunks to say WHEN a celebration is', 'Learn them whole: you only change the date.') +
               row(card('teal', 'It <b>is celebrated</b> …', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
                 card('teal', 'It <b>takes place</b> …', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
                 card('teal', 'It <b>is held</b> …', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
               mistakes('Watch out', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(the festival doesn’t celebrate: people celebrate it)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
+              together(false, ['Diwali ___ ___ in autumn. (se celebra)', 'is celebrated'], ['The parade ___ ___ at night. (té lloc)', 'takes place']) +
               turn('Your turn:', 'say when and where your town’s festa is with <em>It takes place…</em> and <em>It is held…</em>') },
           { ca: head('🔍', '<em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'hora · nit · període de festa']]) +
@@ -195,6 +210,7 @@ window.LP = {
                 card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
                 card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
               mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October', '(una data → on)'), bad('on Christmas', '<b>at</b> Christmas', '(però <b>on</b> Christmas Day: un dia)'), bad('in night', '<b>at</b> night')) +
+              together(true, ['___ 31 October · ___ winter · ___ Christmas · ___ night', 'on · in · at · at'], ['My birthday is ___ May, ___ 12 May.', 'in · on']) +
               turn('Ara tu:', 'quan és el teu aniversari? Digues el mes (<em>in</em>), el dia (<em>on</em>) i a quina hora fas la festa (<em>at</em>).'),
             en: head('🔍', '<em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'clock time · night · holiday time']]) +
@@ -202,11 +218,13 @@ window.LP = {
                 card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
                 card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
               mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October', '(a date → on)'), bad('on Christmas', '<b>at</b> Christmas', '(but <b>on</b> Christmas Day: one day)'), bad('in night', '<b>at</b> night')) +
+              together(false, ['___ 31 October · ___ winter · ___ Christmas · ___ night', 'on · in · at · at'], ['My birthday is ___ May, ___ 12 May.', 'in · on']) +
               turn('Your turn:', 'when is your birthday? Say the month (<em>in</em>), the day (<em>on</em>) and the time of your party (<em>at</em>).') },
           { r: 'daring', en: head('🔄', 'Present Simple passive', 'Use it when the <b>custom</b> matters, not who does it.') +
               scale([['slate', '📦', 'thing'], ['blue', 'am / is / are', ''], ['purple', 'past participle', 'carved · given · sold']]) +
               table([['Active (who does it)', '→ Passive (the custom)'], ['People <b>carve</b> pumpkins.', 'Pumpkins <b>are carved</b>.'], ['People <b>exchange</b> gifts at midnight.', 'Gifts <b>are exchanged</b> at midnight.'], ['They <b>don’t sell</b> chestnuts in summer.', 'Chestnuts <b>aren’t sold</b> in summer.'], ['People <b>light</b> a candle every night.', 'A candle <b>is lit</b> every night.']]) +
               mistakes('Watch out', bad('Pumpkins are carve.', 'Pumpkins are <b>carved</b>.'), bad('Gifts is exchanged.', 'Gifts <b>are</b> exchanged.', '(plural → are)')) +
+              together(false, ['People decorate the streets. → The streets ___ ___.', 'are decorated'], ['People eat turkey. → Turkey ___ ___.', 'is eaten']) +
               turn('Your turn:', 'two customs of your favourite celebration in the passive: <em>… is eaten, … are decorated</em>.') }
         ];
       })(),

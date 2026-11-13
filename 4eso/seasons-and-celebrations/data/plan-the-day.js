@@ -124,6 +124,10 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
+        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
+        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
+          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { ca: head('🔮', 'Parlar del futur: <em>going to</em>, <em>will</em>, <em>There will be</em>', 'Depèn de <b>quan</b> has pres la decisió.') +
               row(card('blue', '🗓 going to = un PLA que ja tens', ex('We’re <b>going to decorate</b> the hall.', 'ja ho hem decidit') + ex('Ana is <b>going to make</b> the posters.', 'ja té el paper') + small('am / is / are + going to + verb')),
@@ -131,6 +135,7 @@ window.LP = {
                 card('green', '🎪 There will be + nom', ex('<b>There will be</b> music and food.') + ex('<b>There will be</b> four stalls.') + small('= hi haurà'))) +
               table([['', 'going to', 'will'], ['➕', 'We’re <b>going to</b> invite families.', 'I’<b>ll</b> help you.'], ['➖', 'We <b>aren’t going to</b> invite other schools.', 'I <b>won’t</b> be late.'], ['❓', '<b>Are</b> you <b>going to</b> come?', '<b>Will</b> you help me?']]) +
               mistakes('Compte!', bad('We going to decorate.', 'We<b>’re</b> going to decorate.', '(falta are)'), bad('I will to bring the music.', 'I’ll <b>bring</b> the music.', '(sense to)'), bad('There will have music.', 'There will <b>be</b> music.')) +
+              together(true, ['“The bin is full!” “I ___ take it out!”', '’ll (will)'], ['We decided last week: we ___ ___ ___ have a party on Friday.', '’re going to'], ['___ ___ ___ a DJ and a cake. (hi haurà)', 'There will be']) +
               turn('Ara tu:', 'un pla per al cap de setmana (<em>going to</em>) i una oferta per ajudar un company (<em>I’ll…</em>).'),
             en: head('🔮', 'Talking about the future: <em>going to</em>, <em>will</em>, <em>There will be</em>', 'It depends on <b>when</b> you made the decision.') +
               row(card('blue', '🗓 going to = a PLAN you already have', ex('We’re <b>going to decorate</b> the hall.', 'we decided before') + ex('Ana is <b>going to make</b> the posters.', 'she bought the paper') + small('am / is / are + going to + verb')),
@@ -138,16 +143,19 @@ window.LP = {
                 card('green', '🎪 There will be + noun', ex('<b>There will be</b> music and food.') + ex('<b>There will be</b> four stalls.'))) +
               table([['', 'going to', 'will'], ['➕', 'We’re <b>going to</b> invite families.', 'I’<b>ll</b> help you.'], ['➖', 'We <b>aren’t going to</b> invite other schools.', 'I <b>won’t</b> be late.'], ['❓', '<b>Are</b> you <b>going to</b> come?', '<b>Will</b> you help me?']]) +
               mistakes('Watch out', bad('We going to decorate.', 'We<b>’re</b> going to decorate.', '(are is missing)'), bad('I will to bring the music.', 'I’ll <b>bring</b> the music.', '(no to)'), bad('There will have music.', 'There will <b>be</b> music.')) +
+              together(false, ['“The bin is full!” “I ___ take it out!”', '’ll (will)'], ['We decided last week: we ___ ___ ___ have a party on Friday.', '’re going to'], ['___ ___ ___ a DJ and a cake. (hi haurà)', 'There will be']) +
               turn('Your turn:', 'one plan for the weekend (<em>going to</em>) and one offer to help a classmate (<em>I’ll…</em>).') },
           { r: 'safe', en: head('📅', 'Three more futures', 'For a real event you need more than <em>going to</em> and <em>will</em>.') +
               row(card('purple', '🤝 Present Continuous = ARRANGED with someone', ex('We’<b>re meeting</b> the head teacher on Monday at 9.') + ex('We’<b>re performing</b> a dance at 12.') + small('It’s in the diary: a day, a time, other people.')),
                 card('teal', '🕙 Present Simple = the TIMETABLE', ex('The event <b>starts</b> at 10.00.') + ex('The bus <b>leaves</b> at 8.15 tomorrow.') + small('Programmes, timetables, opening hours.')),
                 card('orange', '🔮 will = a PREDICTION (your opinion)', ex('I think everyone <b>will love</b> it.') + ex('It <b>will be</b> a great day.') + small('Often with <em>I think, I’m sure, probably</em>.'))) +
               mistakes('Watch out', bad('We will meet the head teacher on Monday at 9.', 'We’<b>re meeting</b> the head teacher on Monday at 9.', '(it’s arranged)'), bad('The event is starting at 10.00.', 'The event <b>starts</b> at 10.00.', '(timetable)')) +
+              together(false, ['The film ___ (start) at 8.00. (cinema timetable)', 'starts'], ['We ___ ___ (meet) Ms Puig tomorrow at 9. (it’s in her diary)', '’re meeting']) +
               turn('Your turn:', 'one arrangement you have this week, one timetable (school, bus, match) and one prediction about the celebration day.') },
           { r: 'daring', en: head('🧭', 'One plan, five futures', 'Choose the form by the <b>reason</b>, not by the time.') +
               table([['Why?', 'Form', 'Example'], ['🗓 decided before', 'going to', 'We’re <b>going to set up</b> four stalls.'], ['🤝 arranged with someone', 'Present Continuous', 'We’<b>re meeting</b> the head teacher on Monday.'], ['🕙 on the programme', 'Present Simple', 'The doors <b>open</b> at 9.30.'], ['⚡ decided now / offered', 'will', '“Nobody has a speaker.” “I’<b>ll bring</b> mine.”'], ['🔮 an opinion', 'will', 'I think it <b>will be</b> a success.'], ['👀 you can SEE it coming', 'going to', 'Look at those clouds! It’s <b>going to rain</b>.']]) +
               mistakes('Watch out', bad('Look at those clouds! It will rain.', 'It’s <b>going to</b> rain.', '(you can see it)'), bad('We will use the hall on Friday. (she has said yes)', 'We’<b>re using</b> the hall on Friday.')) +
+              together(false, ['Look at those clouds! It ___ ___ ___ (snow).', '’s going to snow'], ['I think the party ___ ___ (be) great.', 'will be']) +
               turn('Your turn:', 'write your plan for the day with at least four of the five futures and say why you chose each one.') }
         ];
       })(),
