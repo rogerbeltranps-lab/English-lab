@@ -523,6 +523,74 @@ function trimJump(a,info,g){const sel=document.getElementById("sessionJump");if(
 // section opened so far (elSecLockedFor, elSecPending in el-catalog.js). A learning path still locked for the group shows a warning with
 // an Open button (ls/{id}.open, locked, lockedKeys, as api.lpOpen). LS1 pages are left as they are (Roger: leave LS1 alone).
 // The learning path pages do not load el-sections.js (the section list the dashboard uses), so it is loaded here for the teacher only.
+// 👥 Who is in the class, at the top right of a teacher's page (#el-fsfloat): ⛶ full screen for the group (live/{group}.fs = {on, at, until},
+// as on the dashboard; fsCheck below), who left (live/{group}/fsLeft) and who is not connected (live/{group}/here, elClassWatch and
+// elClassRoll in el-catalog.js), while full screen or a class game is on. One line of counts, the names under it on a tap (elWhoLine).
+// Made for the group picked in the learning path's bar (teacherSections) and, on the class tab, for the class mode's group (cmTeacher).
+// Roger, 13 Nov 2026: "I need to see who is in class during class mode and during the activities done together (grammar and reading)":
+// the class tab used to show the group last picked in a learning path's bar (a class mode started from the dashboard for 2ESO B showed
+// 2ESO A, out of its class, so nothing), showed nothing on pages without that bar (recall checkpoints…), and ✅ Correct together
+// (shared/correct/open.js) covered it. Now the class tab always shows its class mode's group, on every page, and while ✅ Correct
+// together is open the line sits as a strip above it (the frame starts under it). getG() = the group, redraw() = the page's redraw,
+// owns() = this one draws #el-fsfloat now (the class tab's panel wins while class mode is on). Listeners on the same documents are
+// shared by the Firestore SDK, so two panels for one group cost no more reads.
+let fsPanelN=0;const fsRoster={},fsAll=new Set();   // each group's student list, read once per page for every panel (fsAll: their redraws)
+function fsPanel(getG,redraw,owns){
+  const P={G:null,X:null,live:null,list:[],here:[],ro:fsRoster,wl:{open:null,hide:false}},id=String(++fsPanelN);
+  let sD=null,sL=null,sH=null,AT=null;
+  const gname=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).name||g,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  // in force now: the switch (P.X) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
+  P.tt=()=>(P.live&&P.live.tt)||elTT(P.G);P.eff=()=>elFsEff(P.X,P.tt());
+  const w0=()=>elClassWatch(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here);
+  P.watch=function(){const g=getG();if(!g||P.G===g)return;[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=g;P.X=P.live=null;P.list=[];P.here=[];
+    sD=onSnapshot(doc(db,"live",g),s=>{if(P.G!==g)return;P.live=s.exists()?s.data():null;P.X=(P.live&&P.live.fs)||null;listen();redraw()},e=>console.warn("live",e))};
+  function listen(){const g=P.G;if(!g)return;const on=w0().active;
+    if(on&&!sL){sL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{P.list=c.docs.map(d=>Object.assign({e:d.id},d.data()));redraw()},e=>console.warn("fsLeft",e));
+      sH=onSnapshot(collection(db,"live",g,"here"),c=>{P.here=c.docs.map(d=>Object.assign({e:d.id},d.data()));redraw()},e=>console.warn("here",e));
+      if(!P.ro[g]){P.ro[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{P.ro[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});fsAll.forEach(f=>f())}).catch(e=>{delete P.ro[g];console.warn("roster",e)})}}
+    else if(!on&&sL){sL();sH&&sH();sL=sH=null;P.list=[];P.here=[]}}
+  const iv=setInterval(()=>{if(P.live){listen();redraw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
+  const onCr=()=>redraw();window.addEventListener("el-correct",onCr);fsAll.add(redraw);   // ✅ Correct together opened or closed (shared/correct/open.js)
+  P.stop=()=>{[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=null;clearInterval(iv);window.removeEventListener("el-correct",onCr);fsAll.delete(redraw);
+    const f=document.getElementById("el-fsfloat");if(f&&f.dataset.o===id){f.remove();frTop(0)}};
+  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
+  P.toggle=async()=>{const g=P.G,now=Date.now(),c=elSlotNow(P.tt(),now),v=P.eff()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
+    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});return v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);return "✗ Not saved: "+(e.code||e.message||e)}};
+  P.hm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
+  // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once)
+  P.roll=()=>elClassRoll(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here,P.ro[P.G]||[]);
+  P.why=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+P.hm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+P.hm(y.seen):y.why==="lost"?"lost connection · since "+P.hm(y.seen):"not connected";
+  const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField});
+  // the ✅ Correct together frame starts under the strip (h px), back to the top when the strip goes
+  function frTop(h){const fr=document.getElementById("el-correct");if(!fr)return;const t=h?h+"px":"0px";if(fr.style.top!==t){fr.style.top=t;fr.style.height=h?"calc(100vh - "+h+"px)":"100vh"}}
+  // in the class tab (on the projector) one line of counts (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen … students
+  // played to log in and out so that their name appeared"): the names open under it only when the teacher taps a count (P.wl.open)
+  P.float=function(){if(!owns())return;const w=P.roll();let f=document.getElementById("el-fsfloat");
+    if(!w.active){if(f&&f.dataset.o===id){f.remove();frTop(0)}return}
+    // over ✅ Correct together: a strip above it, or with ✕ Hide only the 👥 chip, bottom right (over the frame's empty corner)
+    const g=P.G,cr=!!document.getElementById("el-correct"),dock=cr&&!P.wl.hide,mode=dock?"dock":cr?"chip":"float";
+    if(f&&(f.dataset.o!==id||f.dataset.mode!==mode)){f.remove();f=null;frTop(0)}
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.dataset.o=id;f.dataset.mode=mode;
+      f.style.cssText=dock?"position:fixed;top:0;left:0;right:0;z-index:2147483001;background:#fff;border-bottom:3px solid #ffd34d;padding:4px 16px 5px;font:600 14px system-ui,sans-serif;color:#1e293b;box-shadow:0 3px 10px rgba(0,0,0,.25)"
+        :"position:fixed;"+(cr?"bottom:12px":"top:10px")+";right:12px;z-index:2147483001;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),P.G,AT.cur,AT.w,P.ro[P.G]||[]).then(r=>{if(r)redraw()});return}
+        if(b.dataset.hide){P.wl.hide=!P.wl.hide;redraw()}else if(b.dataset.wl){P.wl.open=P.wl.open===b.dataset.wl?null:b.dataset.wl;redraw()}else P.toggle().then(redraw)};document.body.append(f)}
+    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
+    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;redraw()}).catch(e=>console.warn("attendance",e))}
+    const aS=AT.m?AT.m.attClass(g,P.tt(),P.eff(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,redraw):undefined;
+    if(aS)AT.m.attLate(atApi(),g,aS,w);
+    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;";
+    const av=aS?AT.m.attView(w,aR,false):undefined,wl=elWhoLine(w,{open:P.wl.open,av,why:P.why,hm:P.hm});
+    // ✕ Hide (Roger, 10 Nov 2026: "can I hide the message?"): only a small 👥 in/of chip stays, a tap shows the panel again (this tab only)
+    const hb='<button data-hide="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(P.wl.hide?"Show who is in, who left and who is not here":"Hide this message")+'">'+(P.wl.hide?'👥 '+w.inn.length+'/'+w.n:'✕ Hide')+'</button>';
+    f.style.padding=dock?(P.wl.hide?"3px 16px":"4px 16px 5px"):P.wl.hide?"4px 6px":"8px 12px";
+    const h=P.wl.hide?hb:dock?'<div style="display:flex;gap:4px 12px;align-items:center;flex-wrap:wrap"><b style="white-space:nowrap">👥 '+E(gname(g))+'</b>'+wl.line.replace("margin-top:4px","margin:0")+'<span style="flex:1"></span>'+hb+'</div>'+wl.list
+      :'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+E(gname(g))+' in full screen':'🎮 '+E(gname(g))+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+P.hm(P.eff().until)+(P.eff().auto?' (class, by your timetable)':''):'')+'</div>'
+      +wl.line+wl.list;
+    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}
+    if(dock)frTop(f.offsetHeight)};
+  return P}
 async function teacherSections(info){
   for(const [f,v] of [["el-sections","EL_SECTIONS"],["el-plan","EL_PLAN"]])if(!window[v])await new Promise(r=>{const sc=document.createElement("script");sc.src=new URL("shared/js/"+f+".js",ROOT).href;sc.onload=sc.onerror=r;document.head.append(sc)});
   const a=(window.EL_CATALOG||[]).find(x=>x.id===actId),secs=a&&(window.EL_SECTIONS||{})[a.id];
@@ -530,7 +598,9 @@ async function teacherSections(info){
   const ls=(window.EL_LS||[]).find(l=>l.id===lsId),course=lsId.split("-")[0];
   let grs=(window.EL_GROUPS||[]).filter(g=>elLsForGroup(ls,info,g.id));if(!grs.length)grs=(window.EL_GROUPS||[]).filter(g=>g.course===course);if(!grs.length)return;
   const k=a.id.replace("/","__"),ref=doc(db,"ls",lsId),all=secs.map(x=>x[0]),nm=id=>(secs.find(x=>x[0]===id)||[])[1]||id;
-  let g=localStorage.getItem("el_t_secgroup");if(!grs.some(x=>x.id===g))g=grs[0].id;
+  let g=localStorage.getItem("el_t_secgroup");
+  {const c=cmRead();if(c&&grs.some(x=>x.id===c.g))g=c.g}   // the class tab: its class mode's group (opened from the dashboard, the bar may remember another)
+  if(!grs.some(x=>x.id===g))g=grs[0].id;
   let msg="",busy=false;
   const st=document.createElement("style");st.textContent=".el-tsec{margin:0 0 10px;padding:10px 14px;border:2px solid #a5b4fc;border-radius:12px;background:#eef2ff;font:14px system-ui,sans-serif;color:#1e1b4b}"
     +".el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.el-tsec b{margin-right:4px}.el-tsec button{border:1px solid #c7d2fe;background:#fff;color:#3730a3;border-radius:999px;padding:3px 12px;cursor:pointer;font:600 13px system-ui,sans-serif}"
@@ -556,52 +626,11 @@ async function teacherSections(info){
   const cmOpen=()=>{const now=Date.now(),until=(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS,u=new URL(location.href);
     u.searchParams.set("elcm",g+"."+until);window.open(u.href,"_blank","noopener")};
   const cmStop=()=>setDoc(doc(db,"live",g),{go:null,fs:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
-  // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
-  // (live/{group}/fsLeft), live for the group chosen in this bar
-  // and who is not connected (live/{group}/here, elClassWatch in el-catalog.js), while full screen or a class game is on
-  let fsStop=null,fsStopL=null,fsStopH=null,fsG=null,fsX=null,fsLive=null,fsList=[],fsHere=[];
-  // in force now: the switch (fsX) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
-  const fsTT=()=>(fsLive&&fsLive.tt)||elTT(g),fsE=()=>elFsEff(fsX,fsTT());
-  const fsW=()=>elClassWatch(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere);
-  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL,fsStopH].forEach(f=>f&&f());fsStop=fsStopL=fsStopH=null;fsG=g;fsX=fsLive=null;fsList=[];fsHere=[];
-    fsStop=onSnapshot(doc(db,"live",g),s=>{fsLive=s.exists()?s.data():null;fsX=(fsLive&&fsLive.fs)||null;fsListen();draw()},e=>console.warn("live",e))}
-  function fsListen(){const on=fsW().active;
-    if(on&&!fsStopL){fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("fsLeft",e));
-      fsStopH=onSnapshot(collection(db,"live",g,"here"),c=>{fsHere=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("here",e));
-      if(!fsRo[g]){fsRo[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{fsRo[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});draw()}).catch(e=>{delete fsRo[g];console.warn("roster",e)})}}
-    else if(!on&&fsStopL){fsStopL();fsStopH&&fsStopH();fsStopL=fsStopH=null;fsList=[];fsHere=[]}}
-  setInterval(()=>{if(fsLive){fsListen();draw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
-  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
-  async function fsToggle(){const now=Date.now(),c=elSlotNow(fsTT(),now),v=fsE()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
-    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
-  const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
-  // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
-  // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once), ▾ makes it small,
-  // and it opens again by itself when a student who was in goes out (elClassRoll in el-catalog.js)
-  // in the class tab (on the projector) the panel starts small: the counts and who left by name, everybody one tap away
-  // since 10 Nov 2026 (Roger: "this was too big and I couldn't see the screen … students played to log in and out so that their name appeared"):
-  // one line of counts (elWhoLine in el-catalog.js), the names open under it only when the teacher taps a count (fsWl.open)
-  const fsRo={},fsWl={open:null,hide:false},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
-  const fsRoll=()=>elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]);
-  const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
-  let AT=null;const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField}),attRedraw=()=>draw();
-  function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
-    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147483000;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),g,AT.cur,AT.w,fsRo[g]||[]).then(r=>{if(r)draw()});return}
-        if(b.dataset.hide){fsWl.hide=!fsWl.hide;draw()}else if(b.dataset.wl){fsWl.open=fsWl.open===b.dataset.wl?null:b.dataset.wl;draw()}else fsToggle()};document.body.append(f)}
-    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
-    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;draw()}).catch(e=>console.warn("attendance",e))}
-    const aS=AT.m?AT.m.attClass(g,fsTT(),fsE(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,attRedraw):undefined;
-    if(aS)AT.m.attLate(atApi(),g,aS,w);
-    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;";
-    const av=aS?AT.m.attView(w,aR,false):undefined,wl=elWhoLine(w,{open:fsWl.open,av,why:fsWhy,hm:fsHm});
-    // ✕ Hide (Roger, 10 Nov 2026: "can I hide the message?"): only a small 👥 in/of chip stays, a tap shows the panel again (this tab only)
-    const hb='<button data-hide="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsWl.hide?"Show who is in, who left and who is not here":"Hide this message")+'">'+(fsWl.hide?'👥 '+w.inn.length+'/'+w.n:'✕ Hide')+'</button>';
-    f.style.padding=fsWl.hide?"4px 6px":"8px 12px";
-    const h=fsWl.hide?hb:'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
-      +wl.line+wl.list;
-    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
+  // 👥 who is in the class (fsPanel above): for the group picked in this bar; on the class tab the class mode's own panel shows instead
+  const FP=fsPanel(()=>g,()=>draw(),()=>!cmOn);
+  const fsWatch=()=>FP.watch(),fsE=()=>FP.eff(),fsRoll=()=>FP.roll(),fsHm=FP.hm,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  const fsToggle=()=>FP.toggle().then(m=>{msg=m;draw()});
+  const fsFloat=()=>FP.float();
   // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
   function fsRow(w){const x=fsE(),on=!!x;
     const {gone,never}=elWhoLeft(w);   // counts only: the names are in the panel at the top right, one tap away (Roger, 10 Nov 2026)
@@ -617,7 +646,7 @@ async function teacherSections(info){
         return ms?'<em class="y">✓ '+nm+' · '+plDay(ms)+'</em>':'<em class="n">✗ '+nm+' · not yet</em>'}).join("");
       if(s.dataset.h!==h){s.dataset.h=h;s.innerHTML=h;s.title="Played in class by each group (✓ day / ✗ not yet)"}})}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
-  function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
+  function cmRow(){fsWatch();const x=FP.live&&FP.live.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
     return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
       +(mine?'<span class="now">This tab is the class tab: '+gname(g)+' follows it'+(x&&x.until?' until '+fsHm(x.until):'')+'</span><button class="g" data-cm="-">⏹ Stop class mode</button>'
         :on?'<span class="now">On: they follow your class tab ('+E(x.t||"")+(x.pn?" · "+E(x.pn):"")+')</span><button class="g" data-cm="-">⏹ Stop class mode</button><button data-cm="1">Start it here instead</button>'
@@ -642,7 +671,7 @@ async function teacherSections(info){
       +cmRow()
       +(elLpOpen(a,info,g,true)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
-    fsFloat(fsRoll())
+    fsFloat()
     gamesPlayed();
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
@@ -1304,7 +1333,9 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   const crRe=/^[24]eso\/(?!my-real-routine\/)[a-z0-9-]+\/[a-z0-9-]+\.html$/;
   const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log"||x.p==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(x.u.replace(/\.html$/,"")))};   // 📘 grammar: LS2 LP3 first
   const crOpen=()=>crLoad().then(m=>{const x=state(),r=m.readingOf(x.u,x.p);if(r)m.openCorrect(ROOT,Object.assign({tab:x.p,g:o.g},r))}).catch(e=>console.warn("correct",e));
-  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
+  // 👥 who is in the class, on every page this tab goes to and over ✅ Correct together (fsPanel; Roger, 13 Nov 2026)
+  const FPc=fsPanel(()=>o.g,()=>FPc.float(),()=>cmOn);FPc.watch();
+  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;FPc.stop();if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
   cmTabs(null);if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
   // ⏹ Stop: first the end-of-class window (✔ Finished / ⏭ Next class / 🏠 Homework for today's steps, el-cm-agenda.js wrapUp; Roger, 12 Nov
   // 2026), then the students are let go. ↩ Back to class keeps class mode on.
