@@ -1069,7 +1069,7 @@ function gtState(st){if(st!=null)GTN.st=st;const e=document.getElementById("el-g
 async function gtSave(){
   clearTimeout(GTN.t);if(!GTN.dirty||!user||!isStudent(user)||AS||!GTN.rt)return;GTN.dirty=false;
   const rt=GTN.rt,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath),d=document.createElement("div");d.innerHTML=(GTN.ca&&rt.hc)||rt.h||"";
-  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12);
+  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector(":scope>span:first-child");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12);
   const title=(document.querySelector('#'+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .panel-head h2")||{}).textContent||"";
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});gtState("saving");
   try{await setDoc(doc(db,"students",user.uid,"notes",gtDeck()),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck:gtDeck(),
@@ -1124,7 +1124,7 @@ async function wbSave(){
   clearTimeout(WB.t);if(!WB.dirty||!WB.v||!user||!isStudent(user)||AS||!WB.srt)return;WB.dirty=false;
   const rt=WB.srt,kind=WB.kind,deck=WB.deck,v=WB.v,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath);
   let sum=[];if(kind==="grammar"){const d=document.createElement("div");d.innerHTML=(WB.ca&&rt.hc)||rt.h||"";
-    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector("span");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12)}
+    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector(":scope>span:first-child");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12)}
   const html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
   if(WB.m)WB.m.status(wbT("Desant…","Saving…"));

@@ -410,6 +410,8 @@ var LS2 = (function () {
   R.vocab = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
+      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar
+      (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group" aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +

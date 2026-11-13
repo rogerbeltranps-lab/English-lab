@@ -22,6 +22,56 @@ window.LP = {
       intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights',
       core: { beginners: ['now', 'right now', 'today', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never'], insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
+      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
+         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('📊', 'Quantes vegades? <em>always, usually, never</em>', 'Aquestes paraules diuen com de sovint fas una cosa.') +
+              scale([['green', '100 %', 'always'], ['teal', '80 %', 'usually'], ['amber', '50 %', 'sometimes'], ['red', '0 %', 'never']]) +
+              row(card('blue', '📍 On van?', ex('<b>davant</b> del verb: I <b>usually</b> play on Saturdays.') + ex('She <b>never</b> gets up late.') + ex('<b>darrere</b> de <em>be</em>: He <b>is always</b> happy.'))) +
+              mistakes('Compte!', bad('I play usually on Saturdays.', 'I <b>usually play</b> on Saturdays.'), bad('She gets never up late.', 'She <b>never gets</b> up late.')) +
+              turn('Ara tu:', 'una cosa que fas sempre, una que fas normalment i una que no fas mai.'),
+            en: head('📊', 'How often? <em>always, usually, never</em>', 'These words say how often you do something.') +
+              scale([['green', '100 %', 'always'], ['teal', '80 %', 'usually'], ['amber', '50 %', 'sometimes'], ['red', '0 %', 'never']]) +
+              row(card('blue', '📍 Where do they go?', ex('<b>before</b> the verb: I <b>usually</b> play on Saturdays.') + ex('She <b>never</b> gets up late.') + ex('<b>after</b> <em>be</em>: He <b>is always</b> happy.'))) +
+              mistakes('Watch out', bad('I play usually on Saturdays.', 'I <b>usually play</b> on Saturdays.'), bad('She gets never up late.', 'She <b>never gets</b> up late.')) +
+              turn('Your turn:', 'one thing you always do, one you usually do and one you never do.') },
+          { ca: head('🕐', 'Expressions de temps: <em>on</em>, <em>at</em>, <em>in</em> o res?', '') +
+              row(card('purple', 'ON + dies', ex('<b>on</b> Saturdays') + ex('<b>on</b> Saturday mornings'), 160),
+                card('orange', 'AT', ex('<b>at</b> the weekend') + ex('<b>at</b> the moment'), 160),
+                card('blue', 'IN', ex('<b>in</b> winter · <b>in</b> summer') + ex('<b>in</b> the morning'), 160),
+                card('teal', '— res', ex('<b>every</b> weekend') + ex('<b>today</b> · <b>now</b> · <b>this</b> weekend'), 160)) +
+              mistakes('Compte!', bad('in Saturday', '<b>on</b> Saturday'), bad('on every weekend', '<b>every</b> weekend'), bad('every weekends', 'every <b>weekend</b>')) +
+              turn('Ara tu:', 'què fas <em>on Saturday mornings</em>, <em>in summer</em> i <em>this weekend</em>?'),
+            en: head('🕐', 'Time expressions: <em>on</em>, <em>at</em>, <em>in</em> or nothing?', '') +
+              row(card('purple', 'ON + days', ex('<b>on</b> Saturdays') + ex('<b>on</b> Saturday mornings'), 160),
+                card('orange', 'AT', ex('<b>at</b> the weekend') + ex('<b>at</b> the moment'), 160),
+                card('blue', 'IN', ex('<b>in</b> winter · <b>in</b> summer') + ex('<b>in</b> the morning'), 160),
+                card('teal', '— nothing', ex('<b>every</b> weekend') + ex('<b>today</b> · <b>now</b> · <b>this</b> weekend'), 160)) +
+              mistakes('Watch out', bad('in Saturday', '<b>on</b> Saturday'), bad('on every weekend', '<b>every</b> weekend'), bad('every weekends', 'every <b>weekend</b>')) +
+              turn('Your turn:', 'what do you do <em>on Saturday mornings</em>, <em>in summer</em> and <em>this weekend</em>?') }
+        ];
+      })(),
       groups: [
         { g: 'Now (Present Continuous)', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
         { g: 'Usually (Present Simple)', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
@@ -97,12 +147,69 @@ window.LP = {
         ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']], marks: [["**Hi**‿**ev**eryone, ↗ I'm **Mei**, ↗ and **wel**come to my **Sat**urday **vlog**! ↘"], ["**Right** **now** I'm‿at the **ice** **rink**‿in the **town** **square**. ↘"], ["It's De**cem**ber, ↗ so it's **real**ly **cold**, ↗ a**bout** **three** de**grees**, ↗ and‿it's **cloud**y. ↘"], ["I'm **wear**ing‿a **wool**ly **hat**, ↗ **gloves**‿and‿a **big** **red** **jack**et. ↘"], ["**Look**! ↘ My **broth**er **Kai**‿is **skat**ing be**hind** me, ↗ and he's **fall**ing… ↗ a**gain**! ↘"], ["I **us**ually **come** **here**‿on **Sun**day after**noons** with my **fam**ily, ↗ **just** for **fun**. ↘"]], cues: [[0.73, 4.64, 0.74, 5.25], [4.99, 7.79, 5.74, 8.94], [8.24, 13.92, 9.91, 16.52], [14.24, 17.77, 16.98, 21.18], [17.91, 23.75, 21.66, 28.43], [24.16, 28.19, 29.37, 33.99]] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: '<strong>Present Simple</strong> = hàbits i coses que passen sempre: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Marcadors: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = ara: <em>Today I’m playing inside. Look! She’s skating.</em> Marcadors: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>', en: '<strong>Present Simple</strong> = habits and things that are always true: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Markers: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = now: <em>Today I’m playing inside. Look! She’s skating.</em> Markers: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>' },
-        { ca: '<strong>Contrast:</strong> <em>I usually go swimming, but today I’m watching a match.</em> (hàbit + ara)', en: '<strong>Contrast:</strong> <em>I usually go swimming, but today I’m watching a match.</em> (habit + now)' },
-        { r: 'safe', en: '<strong>State verbs</strong> are not used in the continuous, even for now: <em>like, love, hate, want, need, know, prefer, understand, believe, mean</em>. <em>I want a new bike now</em> (not <del>I’m wanting</del>). <em>Do you understand?</em>' },
-        { r: 'daring', en: '<strong>Temporary situations:</strong> the Present Continuous also describes things that are true for a limited time, not only this second: <em>This month I’m training for a race. My cousin is living with us this year.</em> · <strong>think</strong> has two meanings: <em>I think skating is great</em> (opinion, no continuous) · <em>I’m thinking about my next video</em> (an activity now).' }
-      ],
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('🔁👀', 'Present Simple o Present Continuous?', 'Normalment (un hàbit) o ara mateix?') +
+              row(card('blue', '🔁 Present Simple = HÀBITS', timeline([[10], [30], [50], [70], [90]], false, 'Passa una vegada i una altra.') +
+                  ex('I usually <b>play</b> on Saturdays.') + ex('She <b>goes</b> skating every Sunday.', 'he / she → -s') + ex('We never <b>play</b> football in winter.') +
+                  '<div>' + ['usually', 'always', 'never', 'every day', 'on Saturdays', 'in winter'].map(w => pill('blue', w)).join('') + '</div>', 280),
+                card('orange', '👀 Present Continuous = ARA', timeline([[100, 'ara']], false, 'Passa en aquest moment.') +
+                  ex('Today I<b>’m playing</b> inside.') + ex('Look! She<b>’s skating</b>.') + ex('Right now she<b>’s practising</b> her turns.') +
+                  '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look!', 'Listen!'].map(w => pill('orange', w)).join('') + '</div>', 280)) +
+              tip('Truc:', 'busca la paraula de temps. <em>every, usually, never</em> → Present Simple · <em>now, today, Look!</em> → Present Continuous.') +
+              mistakes('Compte!', bad('I’m usually playing on Saturdays.', 'I usually <b>play</b> on Saturdays.'), bad('Look! She skates.', 'Look! She<b>’s skating</b>.'), bad('Mei come every Sunday.', 'Mei <b>comes</b> every Sunday.')) +
+              turn('Ara tu:', 'una cosa que fas normalment els dissabtes i una que estàs fent ara.'),
+            en: head('🔁👀', 'Present Simple or Present Continuous?', 'Usually (a habit) or right now?') +
+              row(card('blue', '🔁 Present Simple = HABITS', timeline([[10], [30], [50], [70], [90]], false, 'It happens again and again.') +
+                  ex('I usually <b>play</b> on Saturdays.') + ex('She <b>goes</b> skating every Sunday.', 'he / she → -s') + ex('We never <b>play</b> football in winter.') +
+                  '<div>' + ['usually', 'always', 'never', 'every day', 'on Saturdays', 'in winter'].map(w => pill('blue', w)).join('') + '</div>', 280),
+                card('orange', '👀 Present Continuous = NOW', timeline([[100, 'now']], false, 'It is happening at this moment.') +
+                  ex('Today I<b>’m playing</b> inside.') + ex('Look! She<b>’s skating</b>.') + ex('Right now she<b>’s practising</b> her turns.') +
+                  '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look!', 'Listen!'].map(w => pill('orange', w)).join('') + '</div>', 280)) +
+              tip('Trick:', 'look for the time word. <em>every, usually, never</em> → Present Simple · <em>now, today, Look!</em> → Present Continuous.') +
+              mistakes('Watch out', bad('I’m usually playing on Saturdays.', 'I usually <b>play</b> on Saturdays.'), bad('Look! She skates.', 'Look! She<b>’s skating</b>.'), bad('Mei come every Sunday.', 'Mei <b>comes</b> every Sunday.')) +
+              turn('Your turn:', 'one thing you usually do on Saturdays and one thing you are doing now.') },
+          { ca: head('↔️', 'Hàbit + ara en una sola frase', 'Uneix-les amb <b>but</b>: el que fas normalment, però avui és diferent.') +
+              table([['🔁 Normalment (Present Simple)', 'but', '👀 Avui / ara (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
+              turn('Ara tu:', 'escriu una frase com aquestes sobre tu: <em>I usually…, but today I’m…</em>'),
+            en: head('↔️', 'Habit + now in one sentence', 'Join them with <b>but</b>: what you usually do, but today is different.') +
+              table([['🔁 Usually (Present Simple)', 'but', '👀 Today / now (Present Continuous)'], ['I usually <b>go</b> swimming,', 'but', 'today I<b>’m watching</b> a match.'], ['I usually <b>wear</b> trainers,', 'but', 'today I<b>’m wearing</b> boots.'], ['Noah usually <b>rides</b> his bike,', 'but', 'today he<b>’s filming</b>.']]) +
+              turn('Your turn:', 'write a sentence like these about you: <em>I usually…, but today I’m…</em>') },
+          { r: 'safe', en: head('🧠', 'State verbs: no -ing, even now', 'They are about what you think, feel, want or know, not actions you can see.') +
+              '<div>' + ['like', 'love', 'hate', 'want', 'need', 'know', 'prefer', 'understand', 'believe', 'mean'].map(w => pill('purple', w)).join('') + '</div>' +
+              row(card('red', '✗ Not with -ing', ex('<del>I’m wanting a new helmet.</del>') + ex('<del>Are you knowing the rules?</del>')), card('green', '✓ Present Simple', ex('I <b>want</b> a new helmet now.') + ex('<b>Do</b> you <b>know</b> the rules?') + ex('I <b>don’t understand</b> this exercise.'))) +
+              mistakes('Watch out', bad('I’m needing new gloves.', 'I <b>need</b> new gloves.')) +
+              turn('Your turn:', 'three sentences about you right now with <em>want, need</em> and <em>know</em>.') },
+          { r: 'daring', en: head('⏳', 'For a while, and the two meanings of <em>think</em>') +
+              row(card('blue', '⏳ Present Continuous for TEMPORARY things', ex('This month I<b>’m training</b> for a race.') + ex('My cousin <b>is living</b> with us this year.') + small('True for a limited time, not only this second.')),
+                card('purple', '🤔 think: opinion or activity?', ex('I <b>think</b> skating is great.', 'opinion → Present Simple') + ex('I<b>’m thinking</b> about my next video.', 'an activity now → continuous'))) +
+              mistakes('Watch out', bad('I’m thinking skating is great.', 'I <b>think</b> skating is great.'), bad('Leo is knowing all the routes.', 'Leo <b>knows</b> all the routes.')) +
+              turn('Your turn:', 'something you are doing this month (not now) and your opinion about it with <em>I think…</em>') }
+        ];
+      })(),
       items: [
         { q: 'I usually ___ (go) swimming on Saturdays.', a: ['go'], ca: 'usually → hàbit.', en: 'usually → habit.' },
         { q: 'Today I ___ (watch) my sister’s match.', a: ['am watching', "'m watching"], ca: 'today → ara.', en: 'today → now.' },

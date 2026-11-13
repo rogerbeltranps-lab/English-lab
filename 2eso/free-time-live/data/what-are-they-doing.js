@@ -21,6 +21,59 @@ window.LP = {
       intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'crowd · half-time · highlights',
       core: { beginners: ['T-shirt', 'trainers', 'shorts', 'cap', 'It’s sunny', 'It’s cold', 'It’s hot', 'It’s raining'], insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
+      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
+         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('☀️', 'El temps: <em>It’s</em> + adjectiu', 'En anglès el temps sempre comença amb <b>It’s</b> (“fa”, “està”).') +
+              row(card('amber', 'nom → adjectiu: + y', ex('sun → sun<b>ny</b> → <b>It’s sunny</b>.', 'fa sol') + ex('cloud → cloud<b>y</b> → <b>It’s cloudy</b>.', 'està ennuvolat') + ex('wind → wind<b>y</b> → <b>It’s windy</b>.', 'fa vent'), 220),
+                card('blue', '🌡 fred i calor', ex('<b>It’s cold</b>.', 'fa fred') + ex('<b>It’s hot</b>.', 'fa calor'), 180),
+                card('purple', '🌧 ara mateix: -ing', ex('<b>It’s raining</b>.', 'plou') + ex('<b>It’s snowing</b>.', 'neva'), 180)) +
+              mistakes('Compte!', bad('Is sunny.', '<b>It’s</b> sunny.', '(sempre amb It)'), bad('It’s sun.', 'It’s <b>sunny</b>.'), bad('It makes cold.', 'It’s <b>cold</b>.', '(no “makes”)')) +
+              turn('Ara tu:', 'quin temps fa avui? I què portes posat? <em>It’s… I’m wearing…</em>'),
+            en: head('☀️', 'The weather: <em>It’s</em> + adjective', 'In English, the weather always starts with <b>It’s</b>.') +
+              row(card('amber', 'noun → adjective: + y', ex('sun → sun<b>ny</b> → <b>It’s sunny</b>.') + ex('cloud → cloud<b>y</b> → <b>It’s cloudy</b>.') + ex('wind → wind<b>y</b> → <b>It’s windy</b>.'), 220),
+                card('blue', '🌡 cold and hot', ex('<b>It’s cold</b>.') + ex('<b>It’s hot</b>.'), 180),
+                card('purple', '🌧 right now: -ing', ex('<b>It’s raining</b>.') + ex('<b>It’s snowing</b>.'), 180)) +
+              mistakes('Watch out', bad('Is sunny.', '<b>It’s</b> sunny.', '(always with It)'), bad('It’s sun.', 'It’s <b>sunny</b>.'), bad('It makes cold.', 'It’s <b>cold</b>.')) +
+              turn('Your turn:', 'what’s the weather like today? And what are you wearing? <em>It’s… I’m wearing…</em>') },
+          { ca: head('👕', 'Roba: <em>wear</em> i l’ordre de les paraules', 'El color va <b>davant</b> de la peça de roba.') +
+              row(card('green', '🎨 color + roba', ex('a <b>red</b> T-shirt', 'una samarreta vermella') + ex('<b>blue</b> shorts') + ex('new trainers')),
+                card('blue', '👀 wear = portar posat', ex('He’s <b>wearing</b> a red T-shirt.') + ex('We <b>wear</b> a uniform at school.') + ex('She’s <b>wearing</b> a costume.'))) +
+              mistakes('Compte!', bad('a T-shirt red', 'a <b>red</b> T-shirt'), bad('He’s carrying a cap.', 'He’s <b>wearing</b> a cap.', '(a sobre del cos → wear)')) +
+              turn('Ara tu:', 'descriu què porta posat un company: <em>He’s / She’s wearing…</em>'),
+            en: head('👕', 'Clothes: <em>wear</em> and word order', 'The colour goes <b>before</b> the clothes.') +
+              row(card('green', '🎨 colour + clothes', ex('a <b>red</b> T-shirt') + ex('<b>blue</b> shorts') + ex('new trainers')),
+                card('blue', '👀 wear', ex('He’s <b>wearing</b> a red T-shirt.') + ex('We <b>wear</b> a uniform at school.') + ex('She’s <b>wearing</b> a costume.'))) +
+              mistakes('Watch out', bad('a T-shirt red', 'a <b>red</b> T-shirt'), bad('He’s carrying a cap.', 'He’s <b>wearing</b> a cap.', '(on your body → wear)')) +
+              turn('Your turn:', 'describe what a classmate is wearing: <em>He’s / She’s wearing…</em>') },
+          { r: 'safe', en: head('🏟', 'Events and more weather', 'Words that go together.') +
+              row(card('blue', 'Events', ex('<b>go to</b> a concert · a match · a festival') + ex('<b>win / lose</b> a match') + ex('<b>score</b> a goal') + ex('<b>take part in</b> a competition', 'Daring')),
+                card('purple', 'More weather', ex('<b>What’s the weather like?</b> — It’s foggy.') + ex('It’s <b>freezing</b>! Minus two <b>degrees</b>.') + ex('It’s <b>stormy</b>, so the fair is closed.'))) +
+              mistakes('Watch out', bad('win the other team', '<b>beat</b> the other team / <b>win</b> the match'), bad('How is the weather like?', '<b>What’s</b> the weather like?')) +
+              turn('Your turn:', 'tell your partner about an event you went to: where, the weather and who won.') }
+        ];
+      })(),
       groups: [
         { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
         { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
@@ -147,12 +200,67 @@ window.LP = {
         ['Emma', 'It’s cold and rainy outside, but inside it’s hot. There are about two hundred students watching. Some of them are eating sandwiches!']], marks: [["Hel**lo**‿and **wel**come to **School** **Ra**dio! ↘", "We’re‿at the **sports** **hall** and the **big** **match**‿is **start**ing: the **Blue** **Team** a**gainst** the **Green** **Team**. ↘", "**Sam**, ↗ what’s **hap**pening? ↘"], ["**Well**, ↗ **Em**ma, ↗ the **Blue** **Team**‿is **wear**ing their **new** **white** **u**niform and the **Green** **Team** is **wear**ing **green** **T**-shirts‿and **black** **shorts**. ↘", "The **play**ers are **warm**ing‿**up** and the **crowd** is **cheer**ing. ↘", "It’s **ve**ry **noi**sy in **here**! ↘"], ["It’s **cold** and **rain**y‿out**side**, ↗ but in**side** it’s **hot**. ↘", "There are‿a**bout** **two** **hun**dred **stu**dents **watch**ing. ↘", "**Some**‿of them are **eat**ing **sand**wiches! ↘"]], cues: [[0.51, 3.23, 0.51, 3.64], [3.45, 9.21, 3.95, 10.73], [9.27, 11.01, 10.81, 12.77], [11.82, 20.06, 13.59, 23.18], [20.38, 23.78, 23.65, 27.61], [23.97, 25.77, 27.88, 29.92], [26.59, 30.52, 30.77, 35.3], [30.73, 33.41, 35.59, 38.72], [33.59, 36.31, 38.97, 42.12]] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: '<strong>Present Continuous = am / is / are + verb-ing.</strong> Per a accions que passen <em>ara</em>. <em>I am (I’m) playing · She is (She’s) skating · They are (They’re) watching.</em> Negativa: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Pregunta: <em>Are you playing? Is she skating? What are they doing?</em> Resposta curta: <em>Yes, I am. / No, she isn’t.</em>', en: '<strong>Present Continuous = am / is / are + verb-ing</strong>, for actions happening <em>now</em>. <em>I’m playing · She’s skating · They’re watching.</em> Negative: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Questions: <em>Are you playing? Is she skating? What are they doing?</em> Short answers: <em>Yes, I am. / No, she isn’t.</em>' },
-        { ca: '<strong>Ortografia de -ing:</strong> play → play<strong>ing</strong> · danc<del>e</del> → danc<strong>ing</strong> (treu la -e) · swi<strong>m</strong> → swi<strong>mm</strong>ing, ru<strong>n</strong> → ru<strong>nn</strong>ing, si<strong>t</strong> → si<strong>tt</strong>ing (vocal + consonant: dobla la consonant).', en: '<strong>-ing spelling:</strong> play → play<strong>ing</strong> · danc<del>e</del> → danc<strong>ing</strong> (drop the -e) · swi<strong>m</strong> → swi<strong>mm</strong>ing, ru<strong>n</strong> → ru<strong>nn</strong>ing, si<strong>t</strong> → si<strong>tt</strong>ing (one vowel + one consonant: double the consonant).' },
-        { r: 'safe', en: '<strong>Time markers:</strong> <em>now, right now, at the moment, today, this weekend, this week, Look! / Listen!</em> · Short answers never use contractions: <em>Yes, she is</em> (not <del>Yes, she’s</del>).' },
-        { r: 'daring', en: '<strong>Word order in questions:</strong> (Question word) + am / is / are + subject + verb-ing: <em>Why are they cheering? Who is scoring?</em> (with <em>who</em> as the subject, no extra pronoun).' }
-      ],
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('👀', 'Present Continuous: el que passa ARA', 'Mira la foto: què està fent cadascú en aquest moment?') +
+              scale([['slate', '🙋', 'I / she / they'], ['blue', 'am / is / are', '’m · ’s · ’re'], ['green', 'verb + ing', 'playing · skating']]) +
+              table([['', '➕', '➖', '❓', 'Resposta curta'], ['I', 'I<b>’m playing</b>', 'I<b>’m not playing</b>', '<b>Am</b> I <b>playing</b>?', 'Yes, I am. / No, I’m not.'], ['he / she / it', 'She<b>’s skating</b>', 'She <b>isn’t skating</b>', '<b>Is</b> she <b>skating</b>?', 'Yes, she is. / No, she isn’t.'], ['you / we / they', 'They<b>’re watching</b>', 'They <b>aren’t watching</b>', '<b>Are</b> they <b>watching</b>?', 'Yes, they are. / No, they aren’t.']]) +
+              row(card('blue', '📸 Exemples', ex('Look! Pol <b>is skating</b> on the big ramp.') + ex('I<b>’m watching</b> a match right now.') + ex('What <b>are</b> they <b>doing</b>? — They<b>’re taking</b> photos.'))) +
+              mistakes('Compte!', bad('She skating.', 'She<b>’s</b> skating.', '(falta is)'), bad('Are you play?', 'Are you <b>playing</b>?'), bad('Yes, I’m.', 'Yes, I <b>am</b>.', '(sense contracció al final)')) +
+              turn('Ara tu:', 'mira la classe: escriu què estan fent tres companys ara mateix.'),
+            en: head('👀', 'Present Continuous: what is happening NOW', 'Look at the photo: what is everyone doing at this moment?') +
+              scale([['slate', '🙋', 'I / she / they'], ['blue', 'am / is / are', '’m · ’s · ’re'], ['green', 'verb + ing', 'playing · skating']]) +
+              table([['', '➕', '➖', '❓', 'Short answer'], ['I', 'I<b>’m playing</b>', 'I<b>’m not playing</b>', '<b>Am</b> I <b>playing</b>?', 'Yes, I am. / No, I’m not.'], ['he / she / it', 'She<b>’s skating</b>', 'She <b>isn’t skating</b>', '<b>Is</b> she <b>skating</b>?', 'Yes, she is. / No, she isn’t.'], ['you / we / they', 'They<b>’re watching</b>', 'They <b>aren’t watching</b>', '<b>Are</b> they <b>watching</b>?', 'Yes, they are. / No, they aren’t.']]) +
+              row(card('blue', '📸 Examples', ex('Look! Pol <b>is skating</b> on the big ramp.') + ex('I<b>’m watching</b> a match right now.') + ex('What <b>are</b> they <b>doing</b>? — They<b>’re taking</b> photos.'))) +
+              mistakes('Watch out', bad('She skating.', 'She<b>’s</b> skating.', '(is is missing)'), bad('Are you play?', 'Are you <b>playing</b>?'), bad('Yes, I’m.', 'Yes, I <b>am</b>.', '(no contraction at the end)')) +
+              turn('Your turn:', 'look around the class: write what three classmates are doing right now.') },
+          { ca: head('✍️', 'Com s’escriu la -ing?', 'Tres regles, i ja les saps totes.') +
+              row(card('green', '1️⃣ Normalment: + ing', ex('play → play<b>ing</b>') + ex('watch → watch<b>ing</b>') + ex('read → read<b>ing</b>'), 180),
+                card('orange', '2️⃣ Acaba en -e: treu la -e', ex('danc<del>e</del> → danc<b>ing</b>') + ex('mak<del>e</del> → mak<b>ing</b>') + ex('writ<del>e</del> → writ<b>ing</b>'), 180),
+                card('purple', '3️⃣ Vocal + consonant: dobla-la', ex('swi<b>m</b> → swi<b>mm</b>ing') + ex('ru<b>n</b> → ru<b>nn</b>ing') + ex('si<b>t</b> → si<b>tt</b>ing · ge<b>t</b> → ge<b>tt</b>ing'), 180)) +
+              mistakes('Compte!', bad('danceing', 'danc<b>ing</b>'), bad('runing', 'ru<b>nn</b>ing'), bad('studing', 'stud<b>y</b>ing', '(la -y es queda)')) +
+              turn('Ara tu:', 'escriu la forma -ing de: <em>swim, ride, shop, cook, have</em>.'),
+            en: head('✍️', 'How do you spell -ing?', 'Three rules, and you know them all.') +
+              row(card('green', '1️⃣ Usually: + ing', ex('play → play<b>ing</b>') + ex('watch → watch<b>ing</b>') + ex('read → read<b>ing</b>'), 180),
+                card('orange', '2️⃣ Ends in -e: drop the -e', ex('danc<del>e</del> → danc<b>ing</b>') + ex('mak<del>e</del> → mak<b>ing</b>') + ex('writ<del>e</del> → writ<b>ing</b>'), 180),
+                card('purple', '3️⃣ Vowel + consonant: double it', ex('swi<b>m</b> → swi<b>mm</b>ing') + ex('ru<b>n</b> → ru<b>nn</b>ing') + ex('si<b>t</b> → si<b>tt</b>ing · ge<b>t</b> → ge<b>tt</b>ing'), 180)) +
+              mistakes('Watch out', bad('danceing', 'danc<b>ing</b>'), bad('runing', 'ru<b>nn</b>ing'), bad('studing', 'stud<b>y</b>ing', '(keep the -y)')) +
+              turn('Your turn:', 'write the -ing form of: <em>swim, ride, shop, cook, have</em>.') },
+          { r: 'safe', en: head('⏱', 'Words that say NOW', 'When you see them, think Present Continuous.') +
+              '<div>' + ['now', 'right now', 'at the moment', 'today', 'this weekend', 'this week', 'Look!', 'Listen!'].map(w => pill('blue', w)).join('') + '</div>' +
+              row(card('blue', 'Examples', ex('The crowd <b>is cheering</b> at the moment.') + ex('<b>Listen!</b> Somebody <b>is playing</b> the guitar.') + ex('<b>This weekend</b> we<b>’re playing</b> in a tournament.'))) +
+              tip('Short answers:', 'never contract at the end. <em>Is she playing well? — Yes, she <b>is</b>.</em>') +
+              mistakes('Watch out', bad('Yes, she’s.', 'Yes, she <b>is</b>.')) + turn('Your turn:', 'two sentences about this weekend with <em>this weekend</em> and <em>at the moment</em>.') },
+          { r: 'daring', en: head('❓', 'Word order in questions', 'Question word → am / is / are → who → verb-ing.') +
+              table([['Question word', 'am / is / are', 'subject', 'verb-ing', '?'], ['Why', 'are', 'the fans', 'cheering', '?'], ['What', 'is', 'Marta', 'doing', '?'], ['Where', 'are', 'you', 'going', '?']]) +
+              tip('Who as the subject:', 'no extra person after it: <em><b>Who is scoring</b>? — Marc!</em>') +
+              mistakes('Watch out', bad('Why the fans are cheering?', 'Why <b>are</b> the fans cheering?'), bad('Who is he scoring?', 'Who is scoring?')) +
+              turn('Your turn:', 'ask your partner three questions about a photo with <em>What, Why, Who</em>.') }
+        ];
+      })(),
       items: [
         { q: 'Look! Pol ___ (skate) on the big ramp.', a: ['is skating', "'s skating"], ca: 'he → is + skating.', en: 'he → is + skating.' },
         { q: 'I ___ (watch) a basketball match right now.', a: ['am watching', "'m watching"], ca: 'I → am + watching.', en: 'I → am + watching.' },

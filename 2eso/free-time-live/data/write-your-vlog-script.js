@@ -105,11 +105,58 @@ window.LP = {
         ['Noah', 'Next week I\'m racing too. Wish me luck!']], marks: [["**Hey**, ↗ what's‿**up**? ↘", "I'm **No**ah, ↗ and to**day** I'm‿at the **bike** **park** with my **friends**. ↘"], ["It's **Sat**urday **morn**ing, ↗ it's **sun**ny‿and **real**ly **wind**y, ↗ so it's **per**fect for **rid**ing. ↘"], ["I'm **wear**ing my **hel**met, ↗ **gloves**‿and my **old** **blue** **track**suit, ↗ be**cause** the **park**‿is **full**‿of **mud**. ↘"], ["Be**hind** me, ↗ **Le**o‿and **Sar**a are **rac**ing **down** the **hill**. ↘", "**Le**o‿is **win**ning, ↗ as‿**us**ual! ↘"], ["I **us**ually **ride** **here** with my **dad**‿on **Sun**day **morn**ings, ↗ and we **go** **slow**ly. ↘"], ["But **this** week**end** I'm **film**ing‿a **race** for our **club** **chan**nel, ↗ so I'm **not** **rid**ing, ↗ I'm **hold**ing the **cam**era. ↘"], ["**Next** **week** I'm **rac**ing **too**. ↘ **Wish** me **luck**! ↘"]], cues: [[0.72, 1.79, 0.73, 1.97], [1.79, 5.28, 1.97, 6.07], [5.28, 10.73, 6.07, 12.5], [10.88, 16.75, 13.03, 19.99], [16.87, 20.34, 20.44, 24.41], [20.37, 22.56, 24.53, 27.17], [22.69, 26.85, 27.64, 32.45], [27.12, 33.19, 32.84, 39.92], [34.25, 37.46, 41.6, 45.28]] } },
     { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Repàs: les formes del vlog', en: 'Review: the forms of the vlog' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Tot el que necessites per al guió: Present Continuous (ara), Present Simple (normalment), like + -ing, imperatius i expressions de temps.', en: 'Everything you need for the script: Present Continuous (now), Present Simple (usually), like + -ing, imperatives and time expressions.' },
-      explain: [
-        { ca: '<strong>El guió del vlog en quatre formes:</strong> ara → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · normalment → Present Simple (<em>I usually climb on Saturdays</em>) · gustos → <em>love / like / hate + -ing</em> · consells → imperatius (<em>Take a break. Don’t…</em>). Expressions de temps: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.', en: '<strong>The vlog script in four forms:</strong> now → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · usually → Present Simple (<em>I usually climb on Saturdays</em>) · likes → <em>love / like / hate + -ing</em> · tips → imperatives (<em>Take a break. Don’t…</em>). Time expressions: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.' },
-        { r: 'safe', en: '<strong>Linking sentences:</strong> <em>and</em> (adds), <em>but</em> (contrast), <em>because</em> (reason), <em>so</em> (result): <em>I love climbing because it’s like a puzzle, so I train twice a week.</em>' },
-        { r: 'daring', en: '<strong>Longer descriptions:</strong> join ideas with <em>and, but, because, so</em>, add a temporary situation (<em>This month I’m…</em>) and an opinion with a state verb (<em>I think…, I believe…, I prefer… to…</em>).' }
-      ],
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('🎥', 'El guió del vlog en quatre formes', 'Cada part del vlog té la seva forma. Repàs del que ja saps.') +
+              row(card('orange', '👀 Ara: am / is / are + -ing', ex('Today I<b>’m</b> at the skate park.') + ex('Right now my friends <b>are skating</b>.'), 200),
+                card('blue', '🔁 Normalment: Present Simple', ex('I usually <b>come</b> here on Saturdays.') + ex('My sister <b>trains</b> twice a week.'), 200),
+                card('pink', '❤️ Gustos: love / like / hate + -ing', ex('I <b>love skating</b> because it’s fast.') + ex('Do you <b>like watching</b> basketball?'), 200),
+                card('green', '💡 Consells: imperatius', ex('<b>Take</b> a break every thirty minutes.') + ex('<b>Don’t use</b> your phone in bed.'), 200)) +
+              '<div>' + ['today', 'right now', 'at the moment'].map(w => pill('orange', w)).join('') + ['usually', 'on Saturday mornings', 'twice a week'].map(w => pill('blue', w)).join('') + '</div>' +
+              mistakes('Compte!', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) +
+              turn('Ara tu:', 'una frase de cada color per al teu vlog.'),
+            en: head('🎥', 'The vlog script in four forms', 'Each part of the vlog has its own form. A review of what you know.') +
+              row(card('orange', '👀 Now: am / is / are + -ing', ex('Today I<b>’m</b> at the skate park.') + ex('Right now my friends <b>are skating</b>.'), 200),
+                card('blue', '🔁 Usually: Present Simple', ex('I usually <b>come</b> here on Saturdays.') + ex('My sister <b>trains</b> twice a week.'), 200),
+                card('pink', '❤️ Likes: love / like / hate + -ing', ex('I <b>love skating</b> because it’s fast.') + ex('Do you <b>like watching</b> basketball?'), 200),
+                card('green', '💡 Tips: imperatives', ex('<b>Take</b> a break every thirty minutes.') + ex('<b>Don’t use</b> your phone in bed.'), 200)) +
+              '<div>' + ['today', 'right now', 'at the moment'].map(w => pill('orange', w)).join('') + ['usually', 'on Saturday mornings', 'twice a week'].map(w => pill('blue', w)).join('') + '</div>' +
+              mistakes('Watch out', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) +
+              turn('Your turn:', 'one sentence of each colour for your vlog.') },
+          { r: 'safe', en: head('🔗', 'Linking sentences', 'Four little words make your vlog sound natural.') +
+              scale([['green', '➕ and', 'adds'], ['orange', '↔️ but', 'contrast'], ['purple', '❓ because', 'reason'], ['blue', '➡️ so', 'result']]) +
+              row(card('slate', 'Example', ex('I love climbing <b>because</b> it’s like a puzzle, <b>so</b> I train twice a week.') + ex('I hate falling, <b>but</b> you learn from it.') + ex('It’s cold, <b>so</b> I’m wearing a jacket.'))) +
+              mistakes('Watch out', bad('I want to get better, because I practise every day.', 'I want to get better, <b>so</b> I practise every day.', '(result → so)')) +
+              turn('Your turn:', 'one sentence for your vlog with <em>because</em> and <em>so</em>.') },
+          { r: 'daring', en: head('📝', 'Longer descriptions', 'Mix the forms in one paragraph.') +
+              card('slate', 'Model', '<div style="line-height:1.7">I usually <b>skate</b> on Saturdays, <span style="background:#ffedd5">but this month I<b>’m training</b> for a competition</span>, <b>so</b> I come every day. <span style="background:#ede9fe">I <b>think</b> bouldering is the most fun</span>, and <span style="background:#ede9fe">I <b>prefer</b> the park <b>to</b> the sports hall</span>. For me, climbing <b>means</b> freedom.</div>' + small('🟧 temporary situation · 🟪 opinion with a state verb'), 600) +
+              mistakes('Watch out', bad('I’m thinking bouldering is fun.', 'I <b>think</b> bouldering is fun.'), bad('I prefer the park than the hall.', 'I prefer the park <b>to</b> the hall.')) +
+              turn('Your turn:', 'write three linked sentences: a temporary situation, an opinion and a reason.') }
+        ];
+      })(),
       items: [
         { q: 'Today I ___ (be) at the skate park.', a: ['am', "'m"], ca: 'Today I am at…', en: 'Today I am at…' },
         { q: 'Right now my friends ___ (skate).', a: ['are skating', "'re skating"], ca: 'right now → ara.', en: 'right now → now.' },

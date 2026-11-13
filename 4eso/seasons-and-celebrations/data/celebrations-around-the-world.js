@@ -18,6 +18,48 @@ window.LP = {
       intro: { ca: 'Explora cada expressió, practica amb les targetes i completa les frases.', en: 'Explore each expression, practise with the cards and complete the sentences.' },
       receptive: 'menorah · diyas (oil lamps) · lanterns · reunion dinner · Advent calendar · Caga Tió',
       core: { insecure: ['celebration', 'festival', 'holiday', 'tradition', 'custom', 'parade', 'fireworks', 'lights', 'candles', 'decorations', 'present / gift', 'costume', 'special meal', 'relatives', 'celebrate', 'decorate', 'dress up', 'give / get presents', 'visit relatives', 'light candles'], safe: ['tradition', 'custom', 'parade', 'fireworks', 'decorations', 'relatives', 'celebrate', 'dress up', 'light candles', 'gather', 'get together', 'take part in', 'look forward to', 'pass down', 'share a meal', 'exchange gifts', 'meaningful', 'traditional', 'religious', 'crowded'], daring: ['tradition', 'custom', 'celebrate', 'take part in', 'look forward to', 'pass down', 'mark an occasion', 'exchange gifts', 'meaningful', 'religious', 'secular', 'belonging', 'heritage', 'roots', 'community', 'ritual', 'gratitude', 'commemorate', 'honour the dead / ancestors', 'the festive season'] },
+      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
+         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('🧩', 'Paraules que van juntes', 'Alguns verbs porten una paraula petita al darrere. Aprèn-los junts, com una sola paraula.') +
+              row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.', 'disfressar-se de')),
+                card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.', 'donar a') + ex('I <b>get presents from</b> my grandparents.', 'rebre de')),
+                card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'sense to!') + ex('We <b>eat together</b> on 25 December.'))) +
+              mistakes('Compte!', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')) +
+              turn('Ara tu:', 'què fas en una festa? Fes servir <em>dress up as</em> i <em>give presents to</em>.'),
+            en: head('🧩', 'Words that go together', 'Some verbs take a little word after them. Learn them together, like one word.') +
+              row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.')),
+                card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.') + ex('I <b>get presents from</b> my grandparents.')),
+                card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'no to!') + ex('We <b>eat together</b> on 25 December.'))) +
+              mistakes('Watch out', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')) +
+              turn('Your turn:', 'what do you do at a celebration? Use <em>dress up as</em> and <em>give presents to</em>.') },
+          { r: 'safe', en: head('🔗', 'Verbs + little words (Safe words)', 'The little word is part of the verb: don’t change it.') +
+              table([['Verb', 'What comes after', 'Example'], ['<b>take part in</b>', 'a noun', 'I <b>take part in</b> the parade.'], ['<b>look forward to</b>', 'a noun or <b>-ing</b>', 'I <b>look forward to</b> the holidays. · I <b>look forward to seeing</b> you.'], ['<b>get together</b> (with)', 'people', 'Families <b>get together</b> at Christmas.'], ['<b>pass down</b>', 'a tradition', 'Recipes are <b>passed down</b> from grandparents.'], ['<b>wish someone</b> a happy…', 'a person + a happy…', 'We <b>wish everyone a happy</b> new year.']]) +
+              mistakes('Watch out', bad('take part on the parade', 'take part <b>in</b> the parade'), bad('I look forward to see you.', 'I look forward to <b>seeing</b> you.', '(to + -ing)')) +
+              turn('Your turn:', 'something you <em>take part in</em> and something you <em>look forward to</em> this year.') }
+        ];
+      })(),
       groups: [
         { g: 'Celebrations', items: [['celebration', 'celebració', 'It’s a family celebration.'], ['festival', 'festival, festa', 'Diwali is a festival of lights.'], ['holiday', 'festiu, vacances', 'Christmas is a holiday.'], ['tradition', 'tradició', 'It’s an old tradition.'], ['custom', 'costum', 'Eating grapes is a New Year custom.'], ['party', 'festa', 'We have a party at home.'], ['parade', 'desfilada', 'There’s a parade in the street.'], ['fireworks', 'focs artificials', 'We watch the fireworks.'], ['lights', 'llums', 'The streets are full of lights.'], ['candles', 'espelmes', 'We light candles.'], ['decorations', 'decoració', 'We put up decorations.'], ['present / gift', 'regal', 'I get a present.'], ['costume', 'disfressa', 'She wears a witch costume.'], ['mask', 'màscara', 'He wears a mask.'], ['card', 'postal, targeta', 'I send a card to my aunt.'], ['special meal', 'àpat especial', 'We have a special meal.'], ['guests', 'convidats', 'We have ten guests.'], ['relatives', 'familiars, parents', 'We visit our relatives.']] },
         { g: 'Celebration verbs', items: [['celebrate', 'celebrar', 'We celebrate it every year.'], ['decorate', 'decorar', 'We decorate the house.'], ['dress up', 'disfressar-se, mudar-se', 'Children dress up.'], ['give / get presents', 'fer / rebre regals', 'We give presents at Christmas.'], ['sing', 'cantar', 'We sing songs.'], ['dance', 'ballar', 'People dance in the square.'], ['cook', 'cuinar', 'My dad cooks a special meal.'], ['eat together', 'menjar junts', 'The family eats together.'], ['visit relatives', 'visitar familiars', 'We visit relatives in Girona.'], ['light candles', 'encendre espelmes', 'They light candles every night.'], ['wear special clothes', 'portar roba especial', 'People wear special clothes.']] },
@@ -96,12 +138,78 @@ window.LP = {
       ] },
     { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa les frases. Si falles dues vegades, et mostrarem la resposta.', en: 'Read how it works and complete the sentences. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: 'Fem servir el <strong>Present Simple</strong> per parlar de costums que es repeteixen cada any: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>', en: 'We use the <strong>Present Simple</strong> for customs that happen every year: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>' },
-        { ca: 'Aprèn aquestes frases tal qual: <em>It is celebrated on… · It takes place in… · It is held in…</em>', en: 'Useful chunks: <em>It is celebrated on… · It takes place in… · It is held in…</em>' },
-        { ca: '<strong>on</strong> + data o dia (<em>on 31 October, on New Year’s Eve</em>) · <strong>in</strong> + mes o estació (<em>in November, in winter</em>) · <strong>at</strong> + període de festa o la nit (<em>at Christmas, at night</em>).', en: '<strong>on</strong> + date or day (<em>on 31 October, on New Year’s Eve</em>) · <strong>in</strong> + month or season (<em>in November, in winter</em>) · <strong>at</strong> + festival time or night (<em>at Christmas, at night</em>).' },
-        { r: 'daring', en: '<strong>Present Simple passive</strong> (am / is / are + past participle) to focus on the custom, not the people: <em>Pumpkins are carved. Gifts are exchanged at midnight.</em>' }
-      ],
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('📅', 'Present Simple per als costums', 'Per a coses que passen <b>cada any</b>, sempre igual: el que la gent fa en una festa.') +
+              row(card('blue', '➕ Què fem', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
+                card('orange', '➖ Què no fem', ex('We <b>don’t work</b> on 25 December.') + ex('My dad <b>doesn’t eat</b> turkey.', 'he / she / it → doesn’t') + small('Després de <b>don’t / doesn’t</b>: verb sense -s.')),
+                card('purple', '❓ Preguntes', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.'))) +
+              table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?']]) +
+              mistakes('Compte!', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?')) +
+              turn('Ara tu:', 'dues coses que fa la teva família per Nadal i una que <b>no</b> fa.'),
+            en: head('📅', 'Present Simple for customs', 'For things that happen <b>every year</b>, always the same: what people do at a celebration.') +
+              row(card('blue', '➕ What we do', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
+                card('orange', '➖ What we don’t do', ex('We <b>don’t work</b> on 25 December.') + ex('My dad <b>doesn’t eat</b> turkey.', 'he / she / it → doesn’t') + small('After <b>don’t / doesn’t</b>: no -s on the verb.')),
+                card('purple', '❓ Questions', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.'))) +
+              table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?']]) +
+              mistakes('Watch out', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?')) +
+              turn('Your turn:', 'two things your family does at Christmas and one thing it <b>doesn’t</b> do.') },
+          { ca: head('🧩', 'Frases fetes per dir QUAN és una festa', 'Aprèn-les senceres: només canvies la data.') +
+              row(card('teal', 'It <b>is celebrated</b> … · se celebra', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
+                card('teal', 'It <b>takes place</b> … · té lloc', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
+                card('teal', 'It <b>is held</b> … · es fa', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
+              mistakes('Compte!', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(la festa no celebra: és celebrada)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
+              turn('Ara tu:', 'digues quan i on es fa la festa major del teu poble amb <em>It takes place…</em> i <em>It is held…</em>'),
+            en: head('🧩', 'Ready-made chunks to say WHEN a celebration is', 'Learn them whole: you only change the date.') +
+              row(card('teal', 'It <b>is celebrated</b> …', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
+                card('teal', 'It <b>takes place</b> …', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
+                card('teal', 'It <b>is held</b> …', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
+              mistakes('Watch out', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(the festival doesn’t celebrate: people celebrate it)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) +
+              turn('Your turn:', 'say when and where your town’s festa is with <em>It takes place…</em> and <em>It is held…</em>') },
+          { ca: head('🔍', '<em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'hora · nit · període de festa']]) +
+              row(card('blue', 'IN', ex('<b>in</b> November') + ex('<b>in</b> winter') + ex('<b>in</b> 2025') + ex('<b>in</b> the morning'), 180),
+                card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
+                card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
+              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October', '(una data → on)'), bad('on Christmas', '<b>at</b> Christmas', '(però <b>on</b> Christmas Day: un dia)'), bad('in night', '<b>at</b> night')) +
+              turn('Ara tu:', 'quan és el teu aniversari? Digues el mes (<em>in</em>), el dia (<em>on</em>) i a quina hora fas la festa (<em>at</em>).'),
+            en: head('🔍', '<em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'clock time · night · holiday time']]) +
+              row(card('blue', 'IN', ex('<b>in</b> November') + ex('<b>in</b> winter') + ex('<b>in</b> 2025') + ex('<b>in</b> the morning'), 180),
+                card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
+                card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
+              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October', '(a date → on)'), bad('on Christmas', '<b>at</b> Christmas', '(but <b>on</b> Christmas Day: one day)'), bad('in night', '<b>at</b> night')) +
+              turn('Your turn:', 'when is your birthday? Say the month (<em>in</em>), the day (<em>on</em>) and the time of your party (<em>at</em>).') },
+          { r: 'daring', en: head('🔄', 'Present Simple passive', 'Use it when the <b>custom</b> matters, not who does it.') +
+              scale([['slate', '📦', 'thing'], ['blue', 'am / is / are', ''], ['purple', 'past participle', 'carved · given · sold']]) +
+              table([['Active (who does it)', '→ Passive (the custom)'], ['People <b>carve</b> pumpkins.', 'Pumpkins <b>are carved</b>.'], ['People <b>exchange</b> gifts at midnight.', 'Gifts <b>are exchanged</b> at midnight.'], ['They <b>don’t sell</b> chestnuts in summer.', 'Chestnuts <b>aren’t sold</b> in summer.'], ['People <b>light</b> a candle every night.', 'A candle <b>is lit</b> every night.']]) +
+              mistakes('Watch out', bad('Pumpkins are carve.', 'Pumpkins are <b>carved</b>.'), bad('Gifts is exchanged.', 'Gifts <b>are</b> exchanged.', '(plural → are)')) +
+              turn('Your turn:', 'two customs of your favourite celebration in the passive: <em>… is eaten, … are decorated</em>.') }
+        ];
+      })(),
       items: [
         { q: 'Children ___ (dress) up at Halloween.', a: ['dress'], ca: 'Children és plural: sense -s.', en: 'Children is plural: no -s.' },
         { q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'], ca: 'She → verb + -s.', en: 'She → verb + -s.' },
