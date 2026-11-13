@@ -309,23 +309,29 @@ let AS=null;
 const TX=null;
 async function load(u){
   if(DEMO)return DEMO;
+  // The reads go out together, not one after the other (Roger, 13 Nov 2026, the student view on his phone: "It took ages to load"): on a
+  // phone each read waits a whole network round trip, and about a dozen in a row kept the board on "Carregant…" for many seconds. First
+  // the student's own documents and the LSs, then what needs their email or group. The LSs come from the page's own cached read (lsNow),
+  // which el-cloud.js has already made for the menus: the same answer, fewer reads.
   const sid=AS||u.uid,db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
-  try{const s=await F.getDoc(F.doc(db,"students",sid));if(s.exists())D.me=s.data()}catch(e){}
+  const lsOne=id=>(ELCloud.lsNow||ELCloud.lsInfo)(id).then(i=>{D.ls[id]=i}).catch(e=>{console.warn("ls",id,e);D.ls[id]={}});
+  await Promise.all([
+    F.getDoc(F.doc(db,"students",sid)).then(s=>{if(s.exists())D.me=s.data()}).catch(()=>{}),
+    !AS&&ELCloud.results
+      ?Promise.all([ELCloud.results(true).then(o=>{for(const r of Object.values(o))if(r&&r.activity)D.rs[r.activity]=r}).catch(()=>{}),
+        ELCloud.levels().then(o=>Object.assign(D.lv,o)).catch(()=>{})])
+      :Promise.all([q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data()),q(["students",sid,"levels"],l=>D.lv[l.id]=l.data())]),
+    q(["students",sid,"progress"],p=>D.pg[p.id]=p.data().data||{}),
+    ...EL_LS.map(l=>lsOne(l.id))]);
   const mail=(AS?D.me.email||"":u.email||"").toLowerCase();
   D.me.name=D.me.name||(AS?mail:u.displayName||u.email);
   if(!AS&&ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
-  // the student's own results and levels: the reads el-cloud.js shares with the page's cards (one each; results fresh from the server here)
-  if(!AS&&ELCloud.results){try{for(const r of Object.values(await ELCloud.results(true)))if(r&&r.activity)D.rs[r.activity]=r}catch(e){}
-    try{Object.assign(D.lv,await ELCloud.levels())}catch(e){}}
-  else{await q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data());
-  await q(["students",sid,"levels"],l=>D.lv[l.id]=l.data())}
-  await q(["students",sid,"progress"],p=>D.pg[p.id]=p.data().data||{});
   elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
-  for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
-  try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}
-  try{const g=await F.getDoc(F.doc(db,"myGames",mail));if(g.exists())D.mg=g.data().games||{}}catch(e){}   // 🧩 📚 class game circles (gamesCard)
-  if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
-  if(!AS)try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
+  await Promise.all([
+    F.getDoc(F.doc(db,"points",mail)).then(p=>{if(p.exists())D.pt=p.data()}).catch(()=>{}),
+    F.getDoc(F.doc(db,"myGames",mail)).then(g=>{if(g.exists())D.mg=g.data().games||{}}).catch(()=>{}),   // 🧩 📚 class game circles (gamesCard)
+    D.me.group?F.getDoc(F.doc(db,"teams",D.me.group)).then(t=>{if(t.exists())D.tm=t.data()}).catch(()=>{}):null,
+    AS?null:ELCloud.announcements().then(a=>{D.ann=a}).catch(e=>console.warn("announcements",e))]);
   return D;
 }
 const all=()=>!DEMO&&!AS&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)

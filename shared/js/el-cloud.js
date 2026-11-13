@@ -1148,7 +1148,9 @@ function nbFab(){
   else{try{href=localStorage.getItem("el_nb")}catch(e){}}
   const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
     "#el-nbfab[hidden]{display:none}#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
-    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none}@media print{#el-nbfab{display:none}}";
+    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none}@media print{#el-nbfab{display:none}}"+
+    // on a phone, above the students' tab bar (el-phone.css), not over 🏠 Home
+    "@media (max-width:640px){body.elptab #el-nbfab{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}";
   document.head.append(st);
   const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
   const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
@@ -1182,7 +1184,7 @@ function qnOpen(){
     "#el-qn .qn-top{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #dbe4f5;background:#f3f6fd}#el-qn .qn-top b{white-space:nowrap}#el-qn .qn-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:13px}"+
     "#el-qn .qn-b{border:1px solid #c7d2ea;background:#fff;border-radius:8px;padding:4px 10px;font:600 13px system-ui,sans-serif;color:#1f4fb5;cursor:pointer;text-decoration:none;white-space:nowrap}#el-qn .qn-ok{background:#1f4fb5;color:#fff;border-color:#1f4fb5}"+
     "#el-qn .qn-host{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:6px 8px}#el-qn .qn-st{padding:3px 10px 6px;font-size:12px;color:#64748b}#el-qn .pad-tools{margin:0 0 10px;border-radius:8px;border:1px solid #d5dce5}"+
-    "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
+    "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
   const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
   const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
   w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
