@@ -1103,7 +1103,8 @@ window.ELNotebook = (function () {
   // of the page, written on straight away, dragged anywhere by its top strip. Each one is stuck to the word nearest its corner (a: {b: the
   // part, o: where the word starts in that part's text, x: its first letters}, dx/dy from that word), so when pages flow differently it
   // comes back beside the same word. Kept with the other notes in n: {sec, fl: 1, a, dx, dy, text, pi, day}.
-  const FPW = 156;
+  const FPW = 156, FPMIN = 100, FPMAX = 320, FPPAGE = 5;   // size (px; the student can make it smaller or bigger) and at most 5 per page (Roger, 13 Nov 2026)
+  const fpSize = v => [Math.max(FPMIN, Math.min(FPMAX, +v.w || FPW)), Math.max(FPMIN, Math.min(FPMAX, +v.h || FPW))];
   const pageOf = i => pages[i] && pages[i].el;
   // the word nearest a point of a page (page coordinates): its part, where it starts and its box
   function nearWord(pgEl, x, y) {
@@ -1153,7 +1154,7 @@ window.ELNotebook = (function () {
         const pr = at.pgEl.getBoundingClientRect(); let wx = 0, wy = 0;
         if (at.tn) { const r = document.createRange(); r.setStart(at.tn, at.k); r.setEnd(at.tn, Math.min(at.tn.nodeValue.length, at.k + 1)); const q = r.getClientRects()[0]; if (q) { wx = q.left - pr.left; wy = q.top - pr.top; } }
         else if (at.el) { const q = at.el.getBoundingClientRect(); wx = q.left - pr.left; wy = q.top - pr.top; }
-        const x = Math.max(4, Math.min(pr.width - FPW - 4, wx + (+v.dx || 0))), y = Math.max(4, Math.min(pr.height - FPW - 4, wy + (+v.dy || 0)));
+        const [fw, fh] = fpSize(v), x = Math.max(4, Math.min(pr.width - fw - 4, wx + (+v.dx || 0))), y = Math.max(4, Math.min(pr.height - fh - 4, wy + (+v.dy || 0)));
         at.pgEl.append(fpiEl(id, v, ci, x, y));
       });
     });
@@ -1162,20 +1163,29 @@ window.ELNotebook = (function () {
   const PIC = ['y', 'p', 'g', 'b'];
   function fpiEl(id, v, ci, x, y) {
     const d = document.createElement('div'); d.className = `nb-fpi nb-ui pi-${PIC.includes(v.pi) ? v.pi : 'y'}`; d.dataset.n = id; d.dataset.ci = ci;
-    d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.setProperty('--rot', ((parseInt(id.slice(-2), 36) || 0) % 5 - 2) * .7 + 'deg');
-    d.innerHTML = H.own ? `<div class="nb-fpi-top" title="${t('Arrossega\'l on vulguis', 'Drag it anywhere')}"><span aria-hidden="true">⠿</span><button type="button" class="nb-fpi-c" title="${t('Canvia el color', 'Change the colour')}" aria-label="${t('Canvia el color', 'Change the colour')}"></button><button type="button" class="nb-fpi-x" title="${t('Treu el post-it', 'Remove the post-it')}" aria-label="${t('Treu el post-it', 'Remove the post-it')}">✕</button></div><textarea maxlength="400" spellcheck="false" autocomplete="off" aria-label="Post-it" placeholder="${t('Escriu aquí…', 'Write here…')}">${esc(v.text || '')}</textarea>`
+    const [fw, fh] = fpSize(v); d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.width = fw + 'px'; d.style.height = fh + 'px'; d.style.setProperty('--rot', ((parseInt(id.slice(-2), 36) || 0) % 5 - 2) * .7 + 'deg');
+    d.innerHTML = H.own ? `<div class="nb-fpi-top" title="${t('Arrossega\'l on vulguis', 'Drag it anywhere')}"><span aria-hidden="true">⠿</span><button type="button" class="nb-fpi-c" title="${t('Canvia el color', 'Change the colour')}" aria-label="${t('Canvia el color', 'Change the colour')}"></button><button type="button" class="nb-fpi-x" title="${t('Treu el post-it', 'Remove the post-it')}" aria-label="${t('Treu el post-it', 'Remove the post-it')}">✕</button></div><textarea maxlength="400" spellcheck="false" autocomplete="off" aria-label="Post-it" placeholder="${t('Escriu aquí…', 'Write here…')}">${esc(v.text || '')}</textarea><span class="nb-fpi-rs" title="${t('Arrossega per fer-lo més gran o més petit', 'Drag to make it bigger or smaller')}" aria-hidden="true"></span>`
       : `<div class="nb-fpi-top"></div><div class="nb-fpi-t">${esc(v.text || '')}</div>`;
     return d;
   }
   const fpiNote = d => { use(+d.dataset.ci); return NT()[d.dataset.n]; };
   // a new post-it at x, y of a page (page coordinates), stuck to the nearest word, ready to write on
   function fpiNew(pgEl, x, y) {
-    if (!pgEl || !H || !H.own) return; use(+(pgEl.dataset.ci || 0));
+    if (!pgEl || !H || !H.own) return;
+    if (pgEl.querySelectorAll('.nb-fpi').length >= FPPAGE) return fpiFull(pgEl);
+    use(+(pgEl.dataset.ci || 0));
     const w = nearWord(pgEl, x, y), s = secs[+pgEl.dataset.s] || {}, id = nid();
     snap();
     NT()[id] = { sec: s.key || 'qn', fl: 1, a: w ? { b: w.b, o: w.o, x: w.x } : {}, dx: Math.round(w ? x - w.wx : x), dy: Math.round(w ? y - w.wy : y), text: '', html: '', dr: [], day: today(), pi: 'y' };
     save(); fpiPlace();
     const el = document.querySelector(`.nb-spread .nb-fpi[data-n="${id}"] textarea`); if (el) el.focus();
+  }
+  // no more than 5 on a page: a short note says so, on that page
+  function fpiFull(pgEl) {
+    pgEl.querySelectorAll('.nb-fpfull').forEach(x => x.remove());
+    const m = document.createElement('div'); m.className = 'nb-fpfull nb-ui'; m.setAttribute('role', 'status');
+    m.textContent = t(`Com a màxim ${FPPAGE} post-its per pàgina. Treu-ne un (✕) o posa'l en una altra pàgina.`, `${FPPAGE} post-its per page at most. Remove one (✕) or use another page.`);
+    pgEl.append(m); setTimeout(() => m.remove(), 4000);
   }
   document.addEventListener('focusin', e => { const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (ta && !ta.dataset.snap) { ta.dataset.snap = '1'; snap(); } });
   document.addEventListener('input', e => {
@@ -1197,19 +1207,23 @@ window.ELNotebook = (function () {
   // ⠿ dragging by the top strip, anywhere on the page; on the drop it sticks to the word nearest its corner
   let FD = null;
   document.addEventListener('pointerdown', e => {
-    const top = e.target.closest && e.target.closest('.nb .nb-fpi-top'); if (!top || e.target.closest('button') || !H || !H.own) return;
+    const top = e.target.closest && e.target.closest('.nb .nb-fpi-top,.nb .nb-fpi-rs'); if (!top || e.target.closest('button') || !H || !H.own) return;
     const d = top.closest('.nb-fpi'); e.preventDefault(); e.stopPropagation();
-    FD = { d, id: e.pointerId, x: e.clientX, y: e.clientY, l: parseFloat(d.style.left), t: parseFloat(d.style.top), moved: false };
+    FD = { d, id: e.pointerId, x: e.clientX, y: e.clientY, l: parseFloat(d.style.left), t: parseFloat(d.style.top), w: d.offsetWidth, h: d.offsetHeight, rs: top.classList.contains('nb-fpi-rs'), moved: false };
     d.classList.add('drag'); try { top.setPointerCapture(e.pointerId); } catch (x) {}
   }, true);
   document.addEventListener('pointermove', e => {
     if (!FD || e.pointerId !== FD.id) return; const pgEl = FD.d.closest('.nb-page'), pr = pgEl.getBoundingClientRect();
     const dx = e.clientX - FD.x, dy = e.clientY - FD.y; if (!FD.moved && Math.hypot(dx, dy) < 4) return; FD.moved = true;
-    FD.d.style.left = Math.max(4, Math.min(pr.width - FPW - 4, FD.l + dx)) + 'px'; FD.d.style.top = Math.max(4, Math.min(pr.height - FPW - 4, FD.t + dy)) + 'px';
+    if (FD.rs) {   // ◢ the corner: bigger or smaller, inside the page
+      FD.d.style.width = Math.max(FPMIN, Math.min(FPMAX, pr.width - FD.l - 4, FD.w + dx)) + 'px'; FD.d.style.height = Math.max(FPMIN, Math.min(FPMAX, pr.height - FD.t - 4, FD.h + dy)) + 'px'; return;
+    }
+    FD.d.style.left = Math.max(4, Math.min(pr.width - FD.w - 4, FD.l + dx)) + 'px'; FD.d.style.top = Math.max(4, Math.min(pr.height - FD.h - 4, FD.t + dy)) + 'px';
   }, true);
   const fdEnd = e => {
-    if (!FD || (e.pointerId != null && e.pointerId !== FD.id)) return; const { d, moved } = FD; FD = null; d.classList.remove('drag');
+    if (!FD || (e.pointerId != null && e.pointerId !== FD.id)) return; const { d, moved, rs } = FD; FD = null; d.classList.remove('drag');
     if (!moved) { const ta = d.querySelector('textarea'); if (ta) ta.focus(); return; }
+    if (rs) { const v = fpiNote(d); if (!v) return; snap(); v.w = Math.round(d.offsetWidth); v.h = Math.round(d.offsetHeight); save(); return; }
     const v = fpiNote(d); if (!v) return; const x = parseFloat(d.style.left), y = parseFloat(d.style.top), w = nearWord(d.closest('.nb-page'), x, y);
     snap(); v.a = w ? { b: w.b, o: w.o, x: w.x } : {}; v.dx = Math.round(w ? x - w.wx : x); v.dy = Math.round(w ? y - w.wy : y);
     const s = secs[+d.closest('.nb-page').dataset.s]; if (s && s.key) v.sec = s.key; save();
