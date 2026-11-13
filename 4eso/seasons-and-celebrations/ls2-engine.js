@@ -670,9 +670,14 @@ var LS2 = (function () {
     const el = $('#bookBook'); if (!el || !window.ELBook) return;
     if (ONE.book) ONE.book.destroy(true);
     ONE.c = c;
-    const pages = c.media && c.media.pages ? byLevel(c.media.pages) : [], n = LP.panels.indexOf(c) + 1;
+    const pg = x => x && x.media && x.media.pages ? byLevel(x.media.pages) : [], pages = pg(c), n = LP.panels.indexOf(c) + 1;
+    const nx = LP.panels.find(x => x.prev === c.id), pv = LP.panels.find(x => x.id === c.prev);
+    // the paper turns on into the next chapter once this one is answered, and back into the one before (Roger, 13 Nov 2026: "they should
+    // be able to drag on to the next chapter")
     ONE.book = ELBook.mount(el, pages, { ca: ca(), title: tx(c.title), end: $('#' + c.id + 'QPage'), atEnd: c._after, start: i,
       pre: (ca() ? 'Capítol ' : 'Chapter ') + n + ' · ',
+      after: nx ? pg(nx) : null, before: pv ? pg(pv).concat([$('#' + pv.id + 'QPage')]) : null, canNext: () => !!state.done[c.id],
+      nextLabel: nx ? tx(nx.tab) : '', more: d => { const full = !!ONE.book && ONE.book.isFull(), to = d > 0 ? nx : pv; if (to) oneShow(to, d > 0 ? 0 : 'end', full); },
       onTurn: k => { const o = state.bookAt || {}; if (o.c !== c.id || o.i !== k) { state.bookAt = { c: c.id, i: k }; save(); } } });
     if (full && ONE.book) ONE.book.open();
     oneChs();
@@ -705,7 +710,7 @@ var LS2 = (function () {
       const pg = $('#' + id + 'QPage'); pg.classList.add('locked');
       $$('#' + id + 'Form input').forEach(x => { x.disabled = true; });
       $('#' + id + 'Check').hidden = true; $('#' + id + 'How').hidden = true;
-      after(); oneChs();
+      after(); oneChs(); if (ONE.c === p && ONE.book) ONE.book.refresh();
     }
     function after() {
       const el = $('#' + id + 'After'); if (!el || !$('#' + id + 'QPage').classList.contains('locked')) return;

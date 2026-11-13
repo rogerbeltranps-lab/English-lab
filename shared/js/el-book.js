@@ -10,8 +10,9 @@
    Full screen is the browser's (on <html>, so going from one chapter to the next keeps it) plus a cover over the page; it leaves the
    browser's full screen only if it entered it (class mode keeps its own).
    opts: {ca: Catalan labels, title: the chapter's name (alt text), end: element, atEnd(): the end page is on screen}.
-   opts.start: the page to open at; opts.pre: words before "Page n of m"; opts.onTurn(i): the page on screen changed.
-   Returns {open(), close(keepBrowserFullScreen), isFull(), toEnd(), destroy(keepBrowserFullScreen)}. Used by ls2-engine.js on book.html. */
+   opts.start: the page to open at ('end': the last); opts.pre: words before "Page n of m"; opts.onTurn(i): the page on screen changed.
+   opts.after/before/canNext()/more(d)/nextLabel: going on to the chapter after or before (see setup).
+   Returns {open(), close(keepBrowserFullScreen), isFull(), refresh(), toEnd(), destroy(keepBrowserFullScreen)}. Used by ls2-engine.js on book.html. */
 (function () {
   const R = 210 / 148;   // A5
   const css = `
@@ -114,16 +115,17 @@ html.elb-lock{overflow:hidden}
     const q = s => el.querySelector(s), L = q('.elb-l'), Rp = q('.elb-r'), leaf = q('.elb-leaf'), book = q('.elb-book'), stage = q('.elb-stage');
     const nb = q('.elb-n'), bp = q('.elb-p'), bx = q('.elb-x'), bz = q('.elb-z'), bf = q('.elb-f'), tip = q('.elb-tip'), hold = q('.elb-hold');
     if (endEl) hold.appendChild(endEl);
-    let i = Math.max(0, Math.min(n - 1, o.start | 0)), busy = false, full = false, zoom = false, single = false, seen = false, dead = false, atI = -1;
+    let i = o.start === 'end' ? n - 1 : Math.max(0, Math.min(n - 1, o.start | 0)), busy = false, full = false, zoom = false, single = false, seen = false, dead = false, atI = -1;
     // the end page on the moving paper: a copy without ids or names (the live form stays where the engine finds it)
     const copyOf = x => { const c = x.cloneNode(true); c.classList.add('elb-copy'); c.removeAttribute('id'); c.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); }); c.querySelectorAll('input,button,a').forEach(e => { e.tabIndex = -1; if ('disabled' in e) e.disabled = true; }); return c; };
-    const set = (box, k) => {
-      const im = box.querySelector('img'), pg = k != null && k >= 0 && k < n ? all[k] : null, live = pg && typeof pg !== 'string' ? pg : null;
+    // set(box, k): page k of this chapter; set(box, null, x): x, a page of the chapter before or after (a picture, or a copy of its live page)
+    const set = (box, k, x) => {
+      const ext = x !== undefined, im = box.querySelector('img'), pg = ext ? x || null : k != null && k >= 0 && k < n ? all[k] : null, live = pg && typeof pg !== 'string' ? pg : null;
       Array.from(box.children).forEach(c => { if (c === endEl) hold.appendChild(c); else if (c.classList.contains('elb-copy')) c.remove(); });
       box.classList.toggle('blank', !pg); box.classList.toggle('html', !!live);
       if (!pg || live) im.removeAttribute('src');
-      if (live) box.appendChild(box.classList.contains('elb-face') ? copyOf(live) : live);
-      else if (pg) { im.src = pg; im.alt = alt(k); }
+      if (live) box.appendChild(ext || box.classList.contains('elb-face') ? copyOf(live) : live);
+      else if (pg) { im.src = pg; im.alt = ext ? (o.title || '') : alt(k); }
     };
     pages.forEach(src => { const im = new Image(); im.decoding = 'async'; im.src = src; });   // a chapter is 2–5 pages: load them all, so a turn never waits
     const step = () => single ? 1 : 2;
@@ -133,12 +135,15 @@ html.elb-lock{overflow:hidden}
       const last = Math.min(n, i + step()), qs = endEl && last === n && (single || last - i === 1);
       const lt = endEl ? Math.min(last, n - 1) : last;   // the last picture on screen (the questions page is not counted as a page)
       nb.textContent = (o.pre || '') + (qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : ''));
-      bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
+      const pre = i === 0 && !!(o.before && o.before.length && o.more);
+      bp.disabled = i === 0 && !pre; q('.elb-hit.prev').disabled = i === 0 && !pre;
       const end = i + step() >= n, onEnd = endEl && last === n;
       // the end page takes the taps (its options); the arrows, the keys and dragging the page still turn
       q('.elb-hit.prev').classList.toggle('off', !!onEnd); q('.elb-hit.next').classList.toggle('off', !!onEnd);
       bx.textContent = end ? T(ca, 'Fi', 'The end') : (endEl && i + 2 * step() >= n ? T(ca, 'Preguntes', 'Questions') + ' ▶' : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶');
-      bx.disabled = end; bx.hidden = end && !!endEl;
+      const nxt = end && !!(o.after && o.after.length && o.more) && (!o.canNext || o.canNext());
+      bx.disabled = end && !nxt; bx.hidden = end && !!endEl && !nxt;
+      if (nxt) bx.textContent = (o.nextLabel || T(ca, 'Capítol següent', 'Next chapter')) + ' ▶';
       if (onEnd && o.atEnd) o.atEnd();
       if (i !== atI) { atI = i; if (o.onTurn) o.onTurn(i); }   // where the student is (the one-book page keeps it to come back there)
     }
@@ -160,10 +165,15 @@ html.elb-lock{overflow:hidden}
     const motion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Turning: the leaf is the page that moves; under it the pages that the turn uncovers are already in place.
     // setup(dir) puts the leaf at its start (a0) and returns where it ends (a1); go() moves it to the end or back to the start.
+    // Past the end or before the start (Roger, 13 Nov 2026: "they should be able to drag on to the next chapter"): opts.after = the next
+    // chapter's pages, only once opts.canNext() (its questions answered); opts.before = the chapter before's pages and questions page. The
+    // paper turns onto them and opts.more(+1 / -1) then puts that chapter on the book (at its start / at its end).
+    const A = () => o.after || [], B = () => o.before || [];
     function setup(dir) {
-      const s = step(), to = i + dir * s;
-      if (dir > 0 && i + s >= n) return null;
-      if (dir < 0 && i === 0) return null;
+      const s = step(); let to = i + dir * s, ch = 0;
+      if (dir > 0 && i + s >= n) { if (!A().length || !o.more || (o.canNext && !o.canNext())) return null; ch = 1; }
+      if (dir < 0 && i === 0) { if (!B().length || !o.more) return null; ch = -1; }
+      const bm = B().length, bs = single ? bm - 1 : (bm - 1) - ((bm - 1) % 2);   // where the chapter before opens: its last page / spread
       seen = true; tip.hidden = true;
       const front = leaf.querySelector('.elb-front'), back = leaf.querySelector('.elb-back');
       leaf.style.transition = 'none'; leaf.classList.remove('turn');
@@ -171,31 +181,32 @@ html.elb-lock{overflow:hidden}
       if (single) {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'left center';
         // one page: the page lifts away to the left until it is edge-on (no back to show), or comes back over the page
-        if (dir > 0) { set(front, i); set(back, null); set(Rp, to); a1 = -90; }
-        else { set(front, to); set(back, null); a0 = -90; a1 = 0; }
+        if (dir > 0) { set(front, i); set(back, null); if (ch) set(Rp, null, A()[0]); else set(Rp, to); a1 = -90; }
+        else { if (ch) set(front, null, B()[bm - 1]); else set(front, to); set(back, null); a0 = -90; a1 = 0; }
       } else if (dir > 0) {
         leaf.style.left = 'var(--pw)'; leaf.style.transformOrigin = 'left center';
-        set(front, i + 1); set(back, i + 2); set(Rp, i + 3); a1 = -180;
+        set(front, i + 1); if (ch) { set(back, null, A()[0]); set(Rp, null, A()[1]); } else { set(back, i + 2); set(Rp, i + 3); } a1 = -180;
       } else {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'right center';
-        set(front, i); set(back, i - 1); set(L, i - 2); a1 = 180;
+        set(front, i); if (ch) { set(back, null, B()[bs + 1]); set(L, null, B()[bs]); } else { set(back, i - 1); set(L, i - 2); } a1 = 180;
       }
       leaf.style.transform = 'rotateY(' + a0 + 'deg)';
       leaf.classList.add('on'); void leaf.offsetWidth;
-      return { to, a0, a1 };
+      return { to, a0, a1, ch };
     }
     function go(t, all, sec) {
       busy = true;
       leaf.style.transition = 'transform ' + sec + 's cubic-bezier(.3,.1,.3,1)'; leaf.classList.add('turn');
       leaf.style.transform = 'rotateY(' + (all ? t.a1 : t.a0) + 'deg)';
       let done = false;
-      const end = () => { if (done) return; done = true; if (all) i = t.to; draw(); leaf.classList.remove('on', 'turn'); leaf.style.transition = ''; busy = false; };
+      const end = () => { if (done) return; done = true; if (all && t.ch) { busy = false; o.more(t.ch); return; }   // the other chapter takes the book
+        if (all) i = t.to; draw(); leaf.classList.remove('on', 'turn'); leaf.style.transition = ''; busy = false; };
       leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
       setTimeout(end, sec * 1000 + 300);
     }
     function turn(dir) {
       if (dead || busy || drag) return;
-      if (!motion()) { const s = step(); if ((dir > 0 && i + s >= n) || (dir < 0 && i === 0)) return; seen = true; tip.hidden = true; i = Math.max(0, i + dir * s); draw(); return; }
+      if (!motion()) { const s = step(); if ((dir > 0 && i + s >= n) || (dir < 0 && i === 0)) { const t = setup(dir); if (t) o.more(t.ch); return; } seen = true; tip.hidden = true; i = Math.max(0, i + dir * s); draw(); return; }
       const t = setup(dir); if (t) { leaf.style.transition = ''; go(t, true, .75); }
     }
     // Dragging the page (Roger, 13 Nov 2026: "I want them to pass pages by dragging them"): with a finger or the mouse the paper follows
@@ -271,12 +282,13 @@ html.elb-lock{overflow:hidden}
     });
     const ro = window.ResizeObserver ? new ResizeObserver(() => fit()) : null, rz = () => { if (full || !ro) fit(); };
     if (ro) ro.observe(el); addEventListener('resize', rz);
-    if (!single && i % 2 && innerWidth >= 700) i--;
     fit();
+    if (!single && i % 2) { i--; draw(); }   // a spread starts on an even page
     return {
       open() { if (!full) { seen = true; toggleFull(true); } },
       close(keepFs) { if (full) toggleFull(false, true, keepFs); },
       isFull: () => full,
+      refresh() { if (!busy) draw(); },
       toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); },
       // another chapter in the same place (one-book page): listeners off, the end page back home, the browser's full screen kept if asked
       destroy(keepFs) {
