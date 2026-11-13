@@ -243,15 +243,20 @@ window.LP = {
         { p: 'ps', q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'], ca: 'It → verb + -s.', en: 'It → verb + -s.' },
         { p: 'ps', r: 'insecure', q: '___ your family decorate the house? — Yes, it does.', a: ['does'], ca: 'Pregunta amb your family (it): Does…?', en: 'Question with your family (it): Does…?' },
         { p: 'ps', r: 'safe', q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'], en: 'Families is plural: no -s.' },
+        // ✏️ the box's "Your turn", written here so the teacher can read it and it shows in the notebook (Roger, 13 Nov 2026: "Why in your turn the student didn't write anything here?")
+        { p: 'ps', a: [], own: { must: ['\\b(doesn[’\']t|does not|don[’\']t|do not)\\b'], min: 8 }, q: 'Your turn: write two things your family <b>does</b> at Christmas and one thing it <b>doesn’t</b> do. <span class="tiny">(Dues coses que fa la teva família per Nadal i una que no fa.)</span>', show: 'My family decorates the house and eats a big meal, but it doesn’t go to church.', ca: 'Fes servir doesn’t + verb sense -s.', en: 'Use doesn’t + verb with no -s.' },
         { p: 'chunk', q: 'Lunar New Year ___ celebrated in late January or February.', a: ['is'], ca: 'It is celebrated…', en: 'It is celebrated…' },
         { p: 'chunk', r: 'safe', q: 'Lunar New Year ___ place in late January or February.', a: ['takes'], en: 'It takes place…' },
+        { p: 'chunk', a: [], own: { must: ['\\b(takes place|is held|is celebrated)\\b'], min: 6 }, q: 'Your turn: say when and where your town’s festa is with <em>It takes place…</em> or <em>It is held…</em> <span class="tiny">(Quan i on es fa la festa major del teu poble.)</span>', show: 'Our festa takes place in August. It is held in the main square.', ca: 'Fes servir It takes place… o It is held…', en: 'Use It takes place… or It is held…' },
         { p: 'prep', q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data concreta → on.', en: 'A date → on.' },
         { p: 'prep', q: 'Diwali takes place ___ autumn.', a: ['in'], ca: 'Estació → in.', en: 'A season → in.' },
         { p: 'prep', q: 'We visit our relatives ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'A festival period → at.' },
         { p: 'prep', q: 'People light candles ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
+        { p: 'prep', a: [], own: { must: ['\\bin\\b', '\\bon\\b', '\\bat\\b'], min: 8 }, q: 'Your turn: when is your birthday? Say the month (<b>in</b>), the day (<b>on</b>) and the time of your party (<b>at</b>). <span class="tiny">(El mes, el dia i l’hora de la teva festa.)</span>', show: 'My birthday is in May, on 12 May. My party is at five o’clock.', ca: 'Fes servir in, on i at.', en: 'Use in, on and at.' },
         { p: 'pass', r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'], en: 'are + past participle.' },
         { p: 'pass', r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
-        { p: 'pass', r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
+        { p: 'pass', r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' },
+        { p: 'pass', r: 'daring', a: [], own: { must: ['\\b(is|are)\\s+\\w+(ed|en|t|wn|ng)\\b'], min: 6 }, q: 'Your turn: two customs of your favourite celebration in the passive (<em>… is eaten, … are decorated</em>).', show: 'Panellets are eaten and the houses are decorated.', en: 'Use is / are + past participle.' }
       ] },
     { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquí es barregen coses noves i de la LS1: primer pensa quina forma necessites.', en: 'New and LS1 language mixed: first decide which form you need.' },
