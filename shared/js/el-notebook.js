@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113j', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261114a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -62,6 +62,7 @@ window.ELNotebook = (function () {
   }
 
   let H = null, secs = [], pages = [], pg = 0, LSKEY = '', order = [], last = null, saveT = 0, laid = '', gamesById = {};
+  let LOC = null, BACK = null, ANCHOR = null, SAVED = null, SPOTK = '', LAYING = false;
   // 📓 one notebook for every LS of the course (Roger, 13 Nov 2026: "make LS1 and LS2 and the following ones part of the same notebook … one
   // Index per LS is okay, but the summary I want it of everything"): CH = the chapters, one per LS, each with its own helpers (H: LS, nb =
   // its notes/nb-<LS> doc, save) and its own order of sections. H and order are the chapter in use: a tap on a page uses that page's
@@ -735,7 +736,10 @@ window.ELNotebook = (function () {
   function layout(keep, force) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || (printing() && !force)) return false;
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
-    if (keep == null) keep = atLP() || here();
+    // (opened from a learning path: ↩ goes back to where the student was in the notebook)
+    // (ANCHOR: the place the student is at, kept as a part and not as a page number, so it stays exact when the pages flow again: fonts
+    // loaded, a chapter loaded later, a note added; opened from a learning path: ↩ goes back to where the student was in the notebook)
+    if (keep == null) { const lp = atLP(); if (lp) { BACK = ANCHOR || spot() || SAVED || BACK; keep = lp; } else keep = ANCHOR || here(); }
     cvSet(root);
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
@@ -768,14 +772,41 @@ window.ELNotebook = (function () {
     const pl = root.querySelector('.nb-plist'); if (pl) pl.innerHTML = pages.map((p, i) => `<label><input type="checkbox" value="${i}"> <b>${i + 1}</b> ${esc(pname(p))}</label>`).join('');
     const pa = root.querySelector('[data-nbpr="all"]'); if (pa) pa.textContent = t('Tota la llibreta', 'The whole notebook') + ` (${pages.length})`;
     laid = W + 'x' + Hh + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
+    LOC = { secStart, blkPage, keepCi };
     // back to the same place
     if (typeof keep === 'number') pg = keep;
-    else if (keep) {
-      const [k0, c0] = String(keep).split('|'), ci = c0 == null || c0 === '' ? keepCi : +c0, [k, rest] = [k0.slice(0, 1), k0.slice(2)];
-      if (k === 's') { const [key, n] = rest.split('@'), i = secStart[ci + ':' + key]; if (i != null) { let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; pg = j; } }
-      else { const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop(); if (hit) pg = +hit.closest('.nb-page').dataset.i; else if (blkPage[ci + ':' + id] != null) pg = blkPage[ci + ':' + id]; }
-    }
-    show(); tourSoon(); return true;
+    else if (keep) { const i = locate(keep); if (i != null) pg = i; }
+    if (typeof keep === 'string') ANCHOR = keep.replace(/\|(\d+)$/, (m, c) => '|' + ((CH[+c] || {}).LS || c)); else if (typeof keep === 'number') ANCHOR = null;
+    LAYING = true; try { show(); } finally { LAYING = false; } if (!ANCHOR) ANCHOR = spot(); tourSoon(); return true;
+  }
+  // the page of a place kept by here() ('b:part@where in its text|chapter' or 's:section@page in it|chapter'), on the pages laid out now
+  function locate(keep) {
+    if (!LOC || !keep) return null;
+    const { secStart, blkPage, keepCi } = LOC, [k0, c0] = String(keep).split('|'), [k, rest] = [k0.slice(0, 1), k0.slice(2)];
+    const ci = c0 == null || c0 === '' ? keepCi : /^\d+$/.test(c0) ? +c0 : CH.findIndex(c => c.LS === c0); if (ci < 0) return null;
+    if (k === 's') { const [key, n] = rest.split('@'), i = secStart[ci + ':' + key]; if (i == null) return null; let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; return j; }
+    const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop();
+    return hit ? +hit.closest('.nb-page').dataset.i : blkPage[ci + ':' + id] != null ? blkPage[ci + ':' + id] : null;
+  }
+  // ↩ Back to where I was (Roger, 14 Nov 2026: "they should have a button to go exactly where they were before"): the notebook keeps the
+  // part on the page the student is reading (here(), not a page number: new pages come after each class and move the numbers), one per
+  // student and notebook on this device (localStorage el-nb-spot|<uid>|<book>, no Firestore). It opens there again; and after a jump
+  // (a tab, the index, a side post-it, 📓 from a learning path) ↩ takes them back to the exact place they jumped from. Pressed again, it
+  // goes back to where ↩ was pressed, so they can look something up and come back. Turning the pages one by one is not a jump.
+  const spread = i => wide() ? i - i % 2 : i;
+  // here() with the chapter's LS instead of its number (the chapters can be fewer while the notebook is still loading)
+  const spot = () => { const h = here(); return h && h.replace(/\|(\d+)$/, (m, c) => '|' + ((CH[+c] || {}).LS || c)); };
+  function jump(i) {
+    const was = ANCHOR || spot(); if (spread(Math.max(0, Math.min(pages.length - 1, i))) !== spread(pg) && was) BACK = was;
+    go(i);
+  }
+  function backBtn(a, z) {
+    const b = document.querySelector('.nb .nb-back'); if (!b) return;
+    const i = BACK ? locate(BACK) : null;
+    if (i == null || spread(i) === a) { b.hidden = true; return; }
+    const p = spread(i), q = wide() ? Math.min(p + 1, pages.length - 1) : p;
+    b.hidden = false; b.dataset.to = i;
+    b.querySelector('small').textContent = p === q ? t(`pàg. ${p + 1}`, `p. ${p + 1}`) : t(`pàg. ${p + 1}–${q + 1}`, `pp. ${p + 1}–${q + 1}`);
   }
   const relayout = keep => { if (!layout(keep)) laid = ''; };
   function tools(pc) {
@@ -803,7 +834,8 @@ window.ELNotebook = (function () {
     let cur = null; root.querySelectorAll('.nb-tab:not(.nb-ctab)').forEach(b => { if (!b.hidden && b.dataset.nbgo != null && +b.dataset.nbgo <= z) cur = b; });
     const onSum = cur && (cur.classList.contains('nb-sumtab') || cur.classList.contains('nb-fptab'));
     root.querySelectorAll('.nb-tab').forEach(b => b.setAttribute('aria-current', String(b === cur || (b.classList.contains('nb-ctab') && !onSum && +b.dataset.chap === cz && +b.dataset.nbgo <= z))));
-    store.set('el-nb-pg|' + LSKEY, String(pg)); hideSel(); side(a, z); fpiPlace();
+    store.set('el-nb-pg|' + LSKEY, String(pg)); if (!LAYING && !TOUR && !printing()) ANCHOR = spot(); if (SPOTK && ANCHOR && !TOUR && !printing()) store.set(SPOTK, ANCHOR);
+    hideSel(); side(a, z); fpiPlace(); backBtn(a, z);
   }
   // 📌 the sections of the learning path open on the screen, as post-its sticking out of the book's edge: a tap goes to that section
   function side(a, z) {
@@ -889,6 +921,10 @@ window.ELNotebook = (function () {
     CH.forEach((c, i) => { c.ci = i; c.order = null; });
     const rootCi = CH.indexOf(helpers);
     if (LSKEY !== (chs ? 'all|' : '') + H.LS) { LSKEY = (chs ? 'all|' : '') + H.LS; pg = +store.get('el-nb-pg|' + LSKEY) || 0; }
+    // the place kept for this student's notebook (one notebook for the whole course, opened from any of its LS pages)
+    const crs = ((window.EL_LS || []).find(l => l.id === H.LS) || {}).course || String(H.LS).split('-')[0];
+    const sk = 'el-nb-spot|' + (H.uid || '') + '|' + (chs ? 'all|' + crs : H.LS);
+    if (sk !== SPOTK) { SPOTK = sk; ANCHOR = SAVED = store.get(sk) || null; BACK = null; }
     secs = []; gamesById = {};
     if (!chs) { use(0); secs = build(ex, games, 'one'); secs.forEach(x => { x.ci = 0; }); CH[0].order = order; }
     else {
@@ -924,7 +960,8 @@ window.ELNotebook = (function () {
       + (!chs && chapters().length > 1 ? `<nav class="nb-chaps" aria-label="${t('Capítols', 'Chapters')}"><span class="nb-chl">📚</span>${chapters().map(l => l.id === H.LS
         ? `<span class="nb-ch on" aria-current="page" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></span>`
         : `<a class="nb-ch" href="${rel(l.id.replace(/^(\d+eso)-/, '$1/') + '/index.html#notes')}" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></a>`).join('')}</nav>` : '')
-      + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button></nav>`
+      + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button>`
+      + `<button type="button" class="nb-back" hidden title="${t('Torna exactament on eres abans', 'Go back exactly to where you were before')}">↩<span class="nb-blab"> ${t('Torna on era', 'Back to where I was')}</span> <small></small></button></nav>`
       + (H.own ? `<div class="nb-selbar" role="toolbar" aria-label="${t('Marca les paraules triades', 'Mark the words you selected')}" hidden>${MKS.map(([k, h, ca, en]) => `<button type="button" data-nbmk="${k}" title="${t(ca, en)}" aria-label="${t(ca, en)}">${h}</button>`).join('')}</div>` : '')
       + `</div>`;
     pages = []; laid = '';
@@ -1055,8 +1092,9 @@ window.ELNotebook = (function () {
 
   // ---------- one set of listeners for every redraw ----------
   document.addEventListener('click', e => {
-    const el = e.target.closest && e.target.closest('.nb [data-nbgo],.nb-prev,.nb-next,.nb-plain,.nb-close'); if (!el || !H) return;
-    if (el.dataset.nbgo != null) { e.preventDefault(); return go(+el.dataset.nbgo); }
+    const el = e.target.closest && e.target.closest('.nb [data-nbgo],.nb-prev,.nb-next,.nb-plain,.nb-close,.nb-back'); if (!el || !H) return;
+    if (el.classList.contains('nb-back')) { e.preventDefault(); const i = el.dataset.to != null ? +el.dataset.to : null; if (i != null) { BACK = ANCHOR || spot() || BACK; go(i); } return; }
+    if (el.dataset.nbgo != null) { e.preventDefault(); return jump(+el.dataset.nbgo); }
     if (el.classList.contains('nb-close')) { if (history.length > 1 && document.referrer) history.back(); else location.hash = ''; return; }
     if (el.classList.contains('nb-plain')) {
       const on = document.documentElement.classList.toggle(PLAIN); store.set(PLAIN, on ? '1' : '0');

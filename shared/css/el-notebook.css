@@ -61,6 +61,15 @@ html.el-nb-plain .nb-paper{font-size:16px}
 .nb-nav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:8px;font:600 14px var(--nb-sans);color:#5b6878}
 .nb-nav button{border:1px solid #d5dce5;background:#fff;border-radius:999px;width:40px;height:40px;font-size:17px;cursor:pointer}
 .nb-nav button:disabled{opacity:.35;cursor:default}
+/* ↩ Back to where I was: after a jump (tab, index, side post-it, opened from a learning path), back to the exact place */
+.nb-nav .nb-back{width:auto;padding:0 16px 0 13px;background:#2f6fd6;border-color:#2f6fd6;color:#fff;font:700 14px var(--nb-sans);display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(47,111,214,.35);animation:nbBackIn .35s ease-out}
+.nb-nav .nb-back small{font-weight:600;opacity:.85;font-size:12.5px}
+.nb-nav .nb-back:hover{background:#2560bd}
+.nb-nav .nb-back[hidden]{display:none}
+@keyframes nbBackIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ◀ ▶ stay in the middle where they always are: ↩ sits to their right */
+@media (min-width:601px){.nb-nav{position:relative}.nb-nav .nb-back{position:absolute;left:calc(50% + 165px);top:50%;margin-top:-20px}}
+@media (max-width:600px){.nb-nav .nb-back .nb-blab{display:none}.nb-nav .nb-back{padding:0 12px}.nb-nav:has(.nb-back:not([hidden])){justify-content:flex-start;gap:8px;padding-left:10px}}
 .nb h3,.nb h4{font-family:inherit}
 .nb-h1{font:700 34px/48px var(--nb-hand);margin:-12px 0 4px;color:var(--nb-black)}
 .nb-h1 u{text-decoration:underline double var(--nb-red);text-underline-offset:6px}
