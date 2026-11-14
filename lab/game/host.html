@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="game.css">
+<link rel="stylesheet" href="../../shared/css/el-notebook.css?v=20261114a">
 <style>
 /* The board (projector): sized by the screen, so it fills a projected 16:9 picture. */
 body{font-size:clamp(16px,1.15vw + 6px,30px)}
@@ -80,6 +81,32 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
 .notes .recap p{margin:.3em 0}.notes .recap .watch{background:#fff4d6;border-left:.3em solid var(--gold);border-radius:10px;padding:.3em .6em}
 .notes .recap table.tt{border-collapse:collapse;width:100%;margin:.3em 0}.notes .recap .tt th{background:#ede4ff;color:#4c1d95;text-align:left;padding:.2em .5em;border:2px solid #d9c8ff}
 .notes .recap .tt td{padding:.2em .5em;border:2px solid #e6dcff;vertical-align:top}
+/* 📓 the theory and 📝 notes slides drawn like the student's notebook (Roger, 14 Nov 2026: "when doing the grammar, the vocab, and the
+   reading together, and I present information, I want the slide have this style"; el-notebook.css: .nb-postit, .nb-h3, .nb-slip):
+   lined paper with the red margin, a 📚 Vocabulary / 🧩 Grammar post-it, the title in pencil, the explanation on a taped slip in the
+   teacher's handwriting (Kalam), the key words in blue ink, tables drawn in pen, ⚠️ on a yellow sticky band */
+.card.nbk{background:linear-gradient(90deg,transparent 3.2em,var(--nb-margin) 3.2em calc(3.2em + 2px),transparent calc(3.2em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line) 1.6em calc(1.6em + 1px)) var(--nb-paper);background-attachment:local;border-radius:6px;color:var(--nb-black)}
+.theory.nbk{grid-template-columns:auto 1fr;grid-template-areas:"top top" "pic tx";grid-template-rows:auto 1fr;align-items:start;row-gap:.2em;padding:.6em 1.6em 1.2em 4.4em;align-self:center;max-width:66em}
+.theory.nbk.wide{max-width:80em}
+.nbk .nbtop{grid-area:top}.theory.nbk .pic{grid-area:pic;font-size:4.6em;align-self:center}.theory.nbk.wide .pic{font-size:3.4em}.theory.nbk .tx{grid-area:tx}
+.nbk .nb-postit{font-size:1.25em;line-height:1.35;margin:.3em 0 .1em -.4em}.nbk .nb-postit small{font-size:.75em}
+.theory.nbk h2.nb-h3{font:700 1.75em/1.25 var(--nb-hand);color:var(--nb-pencil);margin:.1em 0 .1em}
+.nbk .nb-slip{margin:.9em .2em .6em;padding:.7em 1.1em .6em;font:400 1em/1.5 var(--nb-teacher);color:#222}
+.theory.nbk .nb-slip p{font-size:1.2em;margin:.35em 0}
+.nbk b.k{color:var(--nb-ink);font-weight:700}
+.nbk s.no{color:var(--nb-red)}
+.nbk .gap{border-bottom-color:#222}
+.nbk table.tt{border-collapse:collapse}.nbk .tt th,.nbk .tt td,.notes.nbk .recap .tt th,.notes.nbk .recap .tt td{border:1.5px solid #333;background:transparent;color:#222;font-weight:400}
+.nbk .tt th,.notes.nbk .recap .tt th{background:#f3f4f6;font-weight:700}
+.nbk .tt tr:nth-child(even) td{background:transparent}
+.nbk .watch,.notes.nbk .recap .watch{background:#fff8dc;border:0;border-left:.22em solid #f5b400;border-radius:0}
+.theory.nbk .ca{background:#eef6ff;border-radius:0;color:#1e3a8a}.theory.nbk .ca b{font-family:var(--nb-sans)}
+.notes.nbk{padding:.8em 1.4em 1em 4.4em}
+.notes.nbk .nhead h2{font:700 2em/1.2 var(--nb-hand);color:var(--nb-pencil)}.notes.nbk .nhead p{font-family:var(--nb-sans)}
+.notes.nbk .stat{font-family:var(--nb-sans)}
+.notes.nbk .recap{border-top:0;font-size:.9em;columns:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24em),1fr));column-gap:1.2em;align-items:start;align-content:start}.notes.nbk .recap section.nb-slip{margin:.9em .3em 1.1em;padding:.5em .9em .4em;display:block}
+.notes.nbk .recap h3{font:700 1.15em/1.3 var(--nb-teacher);color:#222}
+@media (max-width:700px){.theory.nbk{grid-template-areas:"top" "pic" "tx";grid-template-columns:1fr;padding-left:1.4em}.card.nbk{background:var(--nb-paper)}.notes.nbk{padding-left:1.2em}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:1em;height:46vh;margin-top:1em}
 .podium div{height:100%;width:11em;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
 .podium .nm{font-weight:700;font-size:1.2em;margin-bottom:.3em;text-align:center}
