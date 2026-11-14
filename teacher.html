@@ -1560,7 +1560,7 @@ const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bul
 function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().sort(byName);
   if(!a)return `<div class="box"><p class="muted">This LS has no final product on the site yet.</p></div>`;
   fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),sel=fpSelOf(a,studs),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
-  const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
+  const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft&&!(d[s.uid]||{}).manual).length;
   const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
   // 📥 Handed in (Roger, 14 Nov 2026: "I need a column with handed in and not handed in"): a video found (site, Classroom, a link or a Drive
   // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
@@ -1572,6 +1572,7 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
   const dr=u=>{const x=d[u],au=fpgAutoSt(u,a);if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(au&&!(x&&x.draft&&(x.approved||fpgMine(x))))return au;if(!x)return `<span class="muted">–</span>`;if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     const my=fpgMine(x);
+    if(x.draft&&x.manual)return x.approved||fpMarked(u,a)?"💾 your marks":`✍️ not saved <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student">💾 Save</button>`;
     return x.draft?(x.approved||fpMarked(u,a)?(x.approved&&my?"💾 your marks":"✅ approved"):my?`✏️ changed <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student; Gemini learns from your changes">💾 Save my marks</button>`
       :`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
@@ -1613,11 +1614,20 @@ document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="watch
 function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.busy[u+"|"+a.id],v=fpgVideo(u,a),x=res(u,a.id);
   const wb=(d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"),wt=` title="Gemini watches the video again and writes a new draft (about 1 minute; the old one stays until the new one is back)"`;
   if(busy&&!(d&&d.draft))return {bar:`<span>⏳ <b>Gemini is watching the video</b> ${fpgClock(u+"|"+a.id)}</span>`,rub:""};
+  // ✍️ No video Gemini can watch (Roger, 14 Nov 2026: "here I should have the table to write no evidence and comment: the link doesn't work,
+  // actually you could do this if the link doesn't work"): handed in but the link or file cannot be opened (⚠ in the table) = a draft of
+  // your own, ready made: every row No evidence (0) and a comment saying the link doesn't work; change anything, then 💾 Save. Any other
+  // student with no draft: ✍️ Mark it yourself (an empty rubric) or ❌ The link doesn't work.
+  const un=R&&!fpMarked(u,a)&&!FPG.noMan[u+"|"+a.id]?fpgUnreach(u,a):"";
+  if((!d||!d.draft)&&un){fpgManual(u,a,un);return fpSideDraft(u,a)}
   if(!d||!d.draft)return {bar:(d&&d.error?`<p style="color:#b91c1c;margin:0 0 4px">⚠️ ${esc(d.error)}</p>`:"")
     +(fpMarked(u,a)?`<b>✅ Marked${x.max?": "+x.score+"/"+x.max:""}</b> <span class="muted">(no Gemini draft)</span>`:R&&v?`<span class="muted">No Gemini draft yet.</span>`:`<span class="muted">No Gemini draft.</span>`)
-    +(R&&v?` <button class="gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:""),
+    +(R&&v?` <button class="gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:"")
+    +(R&&!fpMarked(u,a)?`<span style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px"><button class="g" data-fpg="man" data-u="${u}" data-a="${esc(a.id)}" title="The rubric with no level yet: click a square in each row and write a comment">✍️ Mark it yourself</button><button class="g" data-fpg="manx" data-u="${u}" data-a="${esc(a.id)}" title="Every row No evidence (0) and a comment asking them to hand it in again; you can change it before you save">❌ The link doesn't work</button></span>`:""),
     rub:fpMarked(u,a)?fpStuRub(u,a):""};
-  if(!R)return {bar:"",rub:""};const g=d.draft,rd=FPG_READ[(g.reading||{}).verdict]||FPG_READ.partly,N=fpRub(a),
+  if(!R)return {bar:"",rub:""};
+  if(d.manual)return fpManSide(u,a,R,d);
+  const g=d.draft,rd=FPG_READ[(g.reading||{}).verdict]||FPG_READ.partly,N=fpRub(a),
     redo=!d.approved&&fpMarked(u,a),done=!redo&&!!d.approved;   // redo: saved before, but this draft is not (🔄 Watch again, a level changed here)
   // the rubric without the ✔ ➜ 👀 notes (they are in the box), clickable to change a level as in the box
   const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{},tg=z.byYou?"you":"";if(z.level==null)return {L:-1,tag:tg};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:tg}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:tg}}):[];
@@ -1638,6 +1648,27 @@ function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.b
       +(v?`<button class="g gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:"")
       +(done?`<b class="gx">${my?"💾 Your marks saved":"✅ Approved"}${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="${my?"Saves your levels, the mark and the comment for the student (Gemini learns from your changes), then shows the next student":"Saves the levels, the mark and Gemini's comment for the student, then shows the next student to approve"}">${my?`💾 Save my marks · next student${redo?` <small>(saved now: ${x.max?x.score+"/"+x.max:"your levels"})</small>`:""}`:redo?`✅ Approve this draft <small>(saved now: ${x.max?x.score+"/"+x.max:"your levels"})</small>`:"✅ Approve · next student"}</button>`),
     rub:N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Gemini's level in each row is shaded (blue). Click a square to change it.</p>${rubH(N,sel,"Gemini",{u,a:a.id})}`:""}}
+// why Gemini cannot watch it: the last 📥 Classroom report put them in "handed in but cannot be opened" and no video has been found since
+function fpgUnreach(u,a){if(fpgVideo(u,a))return "";const s=S.P[u],cr=s&&(FPG.d[a.id]||{})["_r_"+s.group],z=cr&&(cr.unreach||[]).find(z=>z.u===u);return z?(z.why||"the link doesn't work"):""}
+const FPG_NOLINK="I couldn't open your final product: the link doesn't work. Please hand it in again on Classroom (upload the video file or share it with me) so I can mark it. Until then, your mark is 0.";
+// a draft of your own (manual: no Gemini, nothing learnt from it), in this page's memory until you click a square or 💾 Save
+function fpgManual(u,a,why){const R=fpgRubric(a);if(!R)return;const D=FPG.d[a.id]=FPG.d[a.id]||{},old=D[u]||{},no=why!=null;
+  D[u]=Object.assign({},old,{manual:true,why:no?why:"",at:new Date().toISOString(),model:"",approved:null,error:null,
+    draft:{rows:R.rows.map(()=>no?{level:0,mark:R.kind==="mark"?0:null,byYou:true}:{level:null,mark:null}),top:no?FPG_NOLINK:""}})}
+function fpManSide(u,a,R,d){const g=d.draft,N=fpRub(a),x=res(u,a.id),mk=R.kind==="mark"?fpgMark(R,g):null,done=!!d.approved&&fpMarked(u,a);
+  const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{};if(z.level==null)return {L:-1,tag:"you"};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:"you"}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:"you"}}):[];
+  return {bar:`<span><b>✍️ Your marks</b> <small class="muted">(no video Gemini could watch${d.why?": "+esc(d.why):""})</small>${mk!=null?` · <b>Mark: ${mk}/10</b>`:""}</span>`
+      +(done?`<b class="gx">💾 Your marks saved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves your levels, the mark and the comment for the student, then shows the next student">💾 Save · next student</button>`)
+      +(done?"":`<button class="g mini" data-fpg="mandel" data-u="${u}" data-a="${esc(a.id)}" title="Throw this away: nothing is saved for the student">✖ Discard</button>`),
+    rub:`<label style="display:block;margin:8px 0 2px"><b>Comment for the student</b> <small class="muted">(the rows' levels are added under it)</small></label><textarea id="fpscm" rows="3" data-u="${u}" data-a="${esc(a.id)}" style="width:100%;box-sizing:border-box">${esc(fpgTop(g))}</textarea>`
+      +(N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Click a square in each row (No evidence is under the row).</p>${rubH(N,sel,"you",{u,a:a.id})}`:"")}}
+document.addEventListener("input",e=>{const t=e.target;if(t.id!=="fpscm")return;const d=(FPG.d[t.dataset.a]||{})[t.dataset.u];if(!d||!d.draft)return;d.draft.top=t.value;
+  if(d.approved){d.approved=null;const b=$("#fpsb");if(b&&!b.querySelector('[data-fpg="okside"]')){const a=cat.find(x=>x.id===t.dataset.a);if(a){const dr=fpSideDraft(t.dataset.u,a);b.innerHTML=dr.bar}}}});
+document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="man"],[data-fpg="manx"],[data-fpg="mandel"]');if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a);if(!a)return;
+  if(k.fpg==="mandel"){const D=FPG.d[a.id]||{},o=Object.assign({},D[k.u]||{});["draft","manual","why","approved"].forEach(f=>delete o[f]);D[k.u]=o;FPG.noMan[k.u+"|"+a.id]=true;
+    Promise.resolve().then(()=>fpgSave(a,k.u,o)).catch(e=>console.warn("fp manual discard",e))}
+  else fpgManual(k.u,a,k.fpg==="manx"?"the link doesn't work":null);
+  fpSide(k.u,a)});
 function fpSideH(u,a){if(!u)return `<p class="muted">Click a student to see their video and Gemini's rubric here.</p>`;const s=S.P[u]||{uid:u,name:u},vd=fpSideVid(u,a,fpgVideo(u,a)),dr=fpSideDraft(u,a);
   return `<div class="fpsh"><h3>${name(s)}</h3><button class="g mini gx" data-do="cell" data-u="${u}" data-a="${esc(a.id)}" title="Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">🔎 All the details</button></div>`
     +`<div id="fpsb" class="fpsok">${dr.bar}</div><div id="fpsv" data-k="${esc(vd.k)}">${vd.h}</div><div id="fpsd">${dr.rub}</div>`}
@@ -1841,7 +1872,7 @@ const corrFpActs=()=>[...new Set([...Object.values(window.EL_GRADING||{}).map(g=
   .map(byId).filter(a=>a&&a.manual&&GR.some(g=>a.ls.startsWith(g.course+"-")));
 function corrFpGem(){const out=[];corrFpActs().forEach(a=>{const d=FPG.d[a.id];
   if(!d){if(!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g==="corr")render()}).catch(()=>{})}return}
-  Object.entries(d).forEach(([u,x])=>{const s=S.P[u],g=s&&GR.find(z=>z.id===s.group);if(!g||s.tester||!x||!x.draft||!a.ls.startsWith(g.course+"-"))return;
+  Object.entries(d).forEach(([u,x])=>{const s=S.P[u],g=s&&GR.find(z=>z.id===s.group);if(!g||s.tester||!x||!x.draft||x.manual||!a.ls.startsWith(g.course+"-"))return;
     out.push(Object.assign({u,gid:g.id,ls:a.ls,aid:a.id,step:"fp",k:"gfp",name:a.title,at:tms(x.at),note:(x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve")+(x.n>1?" · watched "+x.n+" times":"")},corrEur("video",x)))})});return out}
 // 💶 what each Gemini correction cost (Roger, 14 Nov 2026: "and on each video the money it cost"): since school script v22 every answer says
 // what that call cost (Google's token count × the price, as the month total in 💶 Gemini this month) and it is kept with the recording
@@ -4176,7 +4207,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{},auto:{}};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{},auto:{},noMan:{}};
 // Roger, 14 Nov 2026: "it says Gemini is watching the video, but I don't know if it's true or not, so I need a progress bar or that the clock
 // moves": a clock that counts the seconds since the video was sent and a bar that fills towards the usual minute (it never reaches the end
 // until the draft is back). Every [data-fpgt0] on the page is updated once a second.
@@ -4329,7 +4360,7 @@ const fpgLesSave=()=>{setTimeout(fpgAutoResend);return put(["settings","fp__less
 function fpgNoNames(t,s){let o=String(t||"");const n=s&&nameOf(s),w=(n?[n.first,n.surname1,n.surname2].join(" "):String(s&&s.name||"")).split(/[\s,]+/).filter(x=>x&&x.length>1);
   w.forEach(x=>{o=o.replace(new RegExp("(^|[^\\p{L}])"+x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\p{L}])","giu"),"$1…")});return o}
 const fpgSame=(p,q)=>String(p||"").replace(/\s+/g," ").trim()===String(q||"").replace(/\s+/g," ").trim();
-async function fpgLearn(u,a,R,d){const x=d&&d.draft,g0=fpgBase(d),s=S.P[u];if(!R||!x)return;const list=await fpgLesLoad();if(!list)return;
+async function fpgLearn(u,a,R,d){const x=d&&d.draft,g0=fpgBase(d),s=S.P[u];if(!R||!x||d.manual)return;const list=await fpgLesLoad();if(!list)return;
   const mk=R.kind==="mark",rows=[];
   R.rows.forEach((r,i)=>{const b=g0.rows[i],z=(x.rows||[])[i]||{};if(!b)return;const bl=b.level??null,zl=z.level??null,bm=mk&&bl!=null?fpgRow(b):null,zm=mk&&zl!=null?fpgRow(z):null;
     if(bl!==zl||bm!==zm)rows.push({r:String(r.name||"").slice(0,60),g:bl,gm:bm,t:zl,tm:zm})});
