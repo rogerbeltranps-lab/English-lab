@@ -64,12 +64,16 @@ const SHOTS = [
   { id: 'notes', url: `${C.dir}/index.html#notes`, run: toTop('.ncard:nth-of-type(2), .ncard + .ncard', 30) },
   { id: 'marks', url: 'today.html#marks' },
   { id: 'marks-lps', url: 'today.html#marks', run: toTop('#ptbox + *', 30) },
-  { id: 'marks-exam', url: 'today.html#marks', click: `[data-do="ls"][data-ls="${C.ls1}"]`, click2: '[data-do="tab"][data-t="exam"]', run: toTop('#ptbox + *', 30) },
+  { id: 'marks-exam', url: 'today.html#marks', click: `[data-do="ls"][data-ls="${C.ls1}"]`, click2: '[data-do="tab"][data-t="exam"]', run: toTop('.tabbody', 30) },   // 📋 My activities and 🏆 My points are only on 📈 now
   { id: 'practise', url: 'lab/practice.html' },
   { id: 'games', url: 'lab/' },
   // previews of the guide itself (only when named: node capture.mjs en help,help-open → PNG in $PREVIEW_DIR or the system temp folder)
   { id: 'help', url: 'today.html#help', preview: true, full: true },
   { id: 'help-phone', url: 'today.html#help', preview: true, full: true, w: 390, h: 844, run: `document.querySelectorAll('details.hgp')[0].open=true` },
+  // each My marks tab on its own (Roger, 14 Nov 2026: 📋 My activities and 🏆 My points only on 📈 My formative assessment)
+  { id: 'marks-form', url: 'today.html#marks', preview: true, full: true },
+  { id: 'marks-fp', url: 'today.html#marks', preview: true, full: true, click: '[data-do="tab"][data-t="fp"]' },
+  { id: 'marks-exams', url: 'today.html#marks', preview: true, full: true, click: '[data-do="tab"][data-t="exam"]' },
   { id: 'help-open', url: 'today.html#help', preview: true, full: true, run: `document.querySelectorAll('details.hgp')[3].open=true` },
 ];
 

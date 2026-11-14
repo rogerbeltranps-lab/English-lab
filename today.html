@@ -659,7 +659,9 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="me")return meBox(lss,ls);
   if(place==="progress")return progressPlace(lss,ls);
   // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
-  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+marksHead(lss,ls)+workBox(lss)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
+  // only on 📈 My formative assessment (Roger, 14 Nov 2026: "in my final product and exams, students only need to see that, not my activities,
+  // since it's shown in My formative assessment"): 🎯 checkpoints, 🎬 final product and 📝 exams show only their own content
+  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";const wb=workBox(lss),fm=tabOf(ls)==="form";return pend+marksHead(lss,ls)+(fm?wb+`<div id="ptbox">${pointsBox()}</div>`:"")+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
   if(place==="units")return unitsBox(lss,ls,st,stTag)+(bookCard(ls)?`<div class="rcards one" style="margin:0 0 14px">${bookCard(ls)}</div>`:"")+studyBox(ls)+practiceBox(ls);   // the book here too: phones have no side menu
   if(place==="phone")return phoneBox();
   // 🔤 every LS of the student, the newest on top (Roger, 7 Nov 2026: "They see on top the LS2 and then below the LS1 with the same")
