@@ -1574,11 +1574,12 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   const cr=d["_r_"+grp.id],inR=(k,u)=>!!cr&&(cr[k]||[]).some(z=>(z&&z.u||z)===u),
     // a mark above 0 saved by hand (4 ESO LS1, marked before the videos came to the site: "we don't need the videos") also counts
     hin=u=>fpHin(u,a)?1:0,
-    hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
+    hinH=u=>{if(hin(u)){if(fpgNoVoice(d[u])||((d[u]||{}).manual&&d[u].why===FPG_NOVOICE))return `<span title="Slides only: no recording of the student speaking">✅ Handed in ⚠️</span>`;const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
       return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
   const dr=u=>{const x=d[u],au=fpgAutoSt(u,a);if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(au&&!(x&&x.draft&&(x.approved||fpgMine(x))))return au;if(!x)return `<span class="muted">–</span>`;if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     const my=fpgMine(x);
+    if(fpgNoVoice(x))return `<span style="color:#b91c1c" title="Gemini only got the slides (a PDF): no recording of the student speaking, so it is 0 like a video that was not handed in">📄 slides only</span>`;
     if(x.draft&&x.manual)return x.approved||fpMarked(u,a)?"💾 your marks":`✍️ not saved <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student">💾 Save</button>`;
     return x.draft?(x.approved||fpMarked(u,a)?(x.approved&&my?"💾 your marks":"✅ approved"):my?`✏️ changed <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student; Gemini learns from your changes">💾 Save my marks</button>`
       :`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
@@ -1586,7 +1587,7 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
     +`<p class="muted">${(n=>`<b>${n} of ${on.length} handed in</b> · `)(on.filter(s=>hin(s.uid)).length)}${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
     +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
     +fpgAutoH(a,on)
-    +(zs.length?`<p style="margin:6px 0"><button class="g" data-fpg="zeroall" data-a="${esc(a.id)}" data-us="${zs.join(",")}" title="Saves 0 (every row No evidence) for them, with a comment asking them to hand it in (again). A comment you already wrote is kept; you can change any of them later">💾 Save 0 for the ${zs.length} with nothing to mark</button> <small class="muted">(not handed in, or the link doesn't work: 0 by default, red in the table)</small></p>`:"")
+    +(zs.length?`<p style="margin:6px 0"><button class="g" data-fpg="zeroall" data-a="${esc(a.id)}" data-us="${zs.join(",")}" title="Saves 0 (every row No evidence) for them, with a comment asking them to hand it in (again). A comment you already wrote is kept; you can change any of them later">💾 Save 0 for the ${zs.length} with nothing to mark</button> <small class="muted">(not handed in, the link doesn't work, or slides with no video: 0 by default, red in the table)</small></p>`:"")
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button> ${fpgLesB()}</p>`
     // no video and no Gemini draft in the group (4 ESO LS1, marked by hand: "in here we don't need the gemini's column or the video one"): no such columns
@@ -1624,6 +1625,8 @@ document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="watch
 function fpgUnreach(u,a){if(fpgVideo(u,a))return "";const s=S.P[u],cr=s&&(FPG.d[a.id]||{})["_r_"+s.group],z=cr&&(cr.unreach||[]).find(z=>z.u===u);return z?(z.why||"the link doesn't work"):""}
 const FPG_NOLINK="I couldn't open your final product: the link doesn't work. Please hand it in again on Classroom (upload the video file or share it with me) so I can mark it. Until then, your mark is 0.";
 const FPG_NOHAND="I haven't received your final product. Please hand it in on Classroom so I can mark it. Until then, your mark is 0.";
+const FPG_NOVID="I only received your slides, without a video of you speaking. The final product is a video presentation, so please record yourself presenting and hand in the video on Classroom so I can mark it. Until then, your mark is 0.";
+const fpgWhyTop=why=>why==="not handed in"?FPG_NOHAND:why===FPG_NOVOICE?FPG_NOVID:FPG_NOLINK;
 // 📥 handed in: a video found, a Gemini draft, the final product submitted on the site, a mark above 0, or the last 📥 Classroom report
 // saying they handed something in (a draft of your own is not a hand-in)
 function fpHin(u,a){const d=FPG.d[a.id]||{},x=d[u]||{},s=S.P[u],cr=s&&d["_r_"+s.group],r=res(u,a.id);
@@ -1633,20 +1636,27 @@ function fpHin(u,a){const d=FPG.d[a.id]||{},x=d[u]||{},s=S.P[u],cr=s&&d["_r_"+s.
 // Only once the hand-in is over: a 📥 Classroom report was made for the group (LS1), or its day on the Time plan has passed (an LS still
 // running stays "–" for those who have not uploaded yet).
 function fpClosed(a,g){if((FPG.d[a.id]||{})["_r_"+g])return true;const o=S.ls;S.ls=a.ls;try{const x=dueOf(a.id,g);return !!x&&x<ELWeek.today()}catch(e){return false}finally{S.ls=o}}
-function fpNoWork(u,a){const s=S.P[u];if(!s||fpMarked(u,a)||fpgVideo(u,a)||!fpClosed(a,s.group))return "";const x=(FPG.d[a.id]||{})[u]||{};if(x.draft&&!x.manual)return "";
+// 📄 Slides only (Roger, 14 Nov 2026, a 2 ESO B draft of 4.1/10 for slides with no recording: "this should be a video and therefore the
+// student needs to fail … that's an important mistake"): a Gemini draft not saved yet of a hand-in with no recording of the student speaking
+// (a PDF only: the school script tells Gemini to say "there is no recording to hear" and leave the speaking rows empty, so the other rows
+// gave a mark) is nothing to mark: 0 by default like the rest.
+const FPG_NOVOICE="slides only, no video of you speaking";
+const fpgNoVoice=x=>!!(x&&x.draft&&!x.manual&&!x.approved&&/no (video )?recording to (hear|see)|no recording/i.test(((x.draft.reading||{}).note||"")));
+function fpNoWork(u,a){const s=S.P[u];if(!s||fpMarked(u,a)||!fpClosed(a,s.group))return "";const x=(FPG.d[a.id]||{})[u]||{};if(fpgNoVoice(x)||(x.manual&&x.why===FPG_NOVOICE))return FPG_NOVOICE;
+  if(fpgVideo(u,a)||(x.draft&&!x.manual))return "";
   return fpHin(u,a)?fpgUnreach(u,a):"not handed in"}
 // a draft of your own (manual: no Gemini, nothing learnt from it), in this page's memory until you click a square or 💾 Save
 // Every row starts at No evidence (0 by default); the comment: not handed in, the link doesn't work, or empty (✍️ Mark it yourself).
 const fpgNE=R=>({level:0,mark:R.kind==="mark"?0:null,byYou:true});
 function fpgManual(u,a,why){const R=fpgRubric(a);if(!R)return;const D=FPG.d[a.id]=FPG.d[a.id]||{},old=D[u]||{},no=why!=null;
   D[u]=Object.assign({},old,{manual:true,why:no?why:"",at:new Date().toISOString(),model:"",approved:null,error:null,
-    draft:{rows:R.rows.map(()=>fpgNE(R)),top:!no?"":why==="not handed in"?FPG_NOHAND:FPG_NOLINK}})}
+    draft:{rows:R.rows.map(()=>fpgNE(R)),top:!no?"":fpgWhyTop(why)}})}
 // 💾 Save 0 for everyone with nothing to mark (one click above the table): a draft of your own each (a comment you wrote is kept,
 // rows with no level become No evidence), saved as 💾 Save does
 function fpgZeroAll(a,us){const R=fpgRubric(a);if(!R)return;const ps=[];
   us.forEach(u=>{const why=fpNoWork(u,a);if(!why||FPG.busy[u+"|"+a.id])return;let d=(FPG.d[a.id]||{})[u];
     if(!(d&&d.manual&&d.draft)){fpgManual(u,a,why);d=FPG.d[a.id][u]}
-    const x=d.draft;x.rows=R.rows.map((r,i)=>{const z=(x.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});if(!String(fpgTop(x)||"").trim())x.top=why==="not handed in"?FPG_NOHAND:FPG_NOLINK;
+    const x=d.draft;x.rows=R.rows.map((r,i)=>{const z=(x.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});if(!String(fpgTop(x)||"").trim())x.top=fpgWhyTop(why);
     const o={feedback:fpgText(R,x)};if(R.kind==="mark"){const m=fpgMark(R,x);o.score=m==null?0:m;o.max=10}
     d.approved=new Date().toISOString();ps.push(...fpgLevelPatches(u,a,R,x),fpgSave(a,u,d),api.result(u,a,o))});
   if(ps.length)act(Promise.all(ps))}
@@ -1654,7 +1664,7 @@ document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="zeroa
   b.disabled=true;fpgZeroAll(a,b.dataset.us.split(","))});
 function fpManSide(u,a,R,d){const g=d.draft;g.rows=R.rows.map((r,i)=>{const z=(g.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});const N=fpRub(a),x=res(u,a.id),mk=R.kind==="mark"?fpgMark(R,g):null,done=!!d.approved&&fpMarked(u,a);
   const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{};if(z.level==null)return {L:-1,tag:"you"};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:"you"}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:"you"}}):[];
-  return {bar:`<span><b>✍️ Your marks</b> <small class="muted">(${d.why==="not handed in"?"not handed in":"no video Gemini could watch"+(d.why?": "+esc(d.why):"")})</small>${mk!=null?` · <b>Mark: ${mk}/10</b>`:""}</span>`
+  return {bar:`<span><b>✍️ Your marks</b> <small class="muted">(${d.why==="not handed in"||d.why===FPG_NOVOICE?esc(d.why):"no video Gemini could watch"+(d.why?": "+esc(d.why):"")})</small>${mk!=null?` · <b>Mark: ${mk}/10</b>`:""}</span>`
       +(done?`<b class="gx">💾 Your marks saved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves your levels, the mark and the comment for the student, then shows the next student">💾 Save · next student</button>`)
       +(done?"":`<button class="g mini" data-fpg="mandel" data-u="${u}" data-a="${esc(a.id)}" title="Throw this away: nothing is saved for the student">✖ Discard</button>`),
     rub:`<label style="display:block;margin:8px 0 2px"><b>Comment for the student</b> <small class="muted">(the rows' levels are added under it)</small></label><textarea id="fpscm" rows="4" data-u="${u}" data-a="${esc(a.id)}" style="width:100%;box-sizing:border-box;font:inherit;font-size:14px">${esc(fpgTop(g))}</textarea>`
@@ -1675,7 +1685,7 @@ function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.b
   // your own, ready made: every row No evidence (0) and a comment saying the link doesn't work; change anything, then 💾 Save. Any other
   // student with no draft: ✍️ Mark it yourself (an empty rubric) or ❌ The link doesn't work.
   const un=R&&!FPG.noMan[u+"|"+a.id]?fpNoWork(u,a):"";
-  if((!d||!d.draft)&&un){fpgManual(u,a,un);return fpSideDraft(u,a)}
+  if(un&&(!d||!d.draft||fpgNoVoice(d))){fpgManual(u,a,un);return fpSideDraft(u,a)}
   if(!d||!d.draft)return {bar:(d&&d.error?`<p style="color:#b91c1c;margin:0 0 4px">⚠️ ${esc(d.error)}</p>`:"")
     +(fpMarked(u,a)?`<b>✅ Marked${x.max?": "+x.score+"/"+x.max:""}</b>${v?' <span class="muted">(no Gemini draft)</span>':""}`:R&&v?`<span class="muted">No Gemini draft yet.</span>`:`<span class="muted">No Gemini draft.</span>`)
     +(R&&v?` <button class="gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:"")
@@ -4562,6 +4572,9 @@ async function fpgFolder(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
 // Google Vids, slides, a link to a private file) is listed for Roger to watch himself.
 const fpgClsOf=u=>{const s=S.P[u],c=s&&FPG.cls[s.group];if(!c)return null;const e=String(s.email||"").toLowerCase();return c.by[e]||null};
 function fpgClsPick(x){const items=x.items||[],vid=items.find(i=>i.kind==="drive"&&/^video\//.test(i.mime||""))||items.find(i=>i.kind==="drive"&&(/^audio\//.test(i.mime||"")||i.mime==="application/pdf")),yt=items.find(i=>i.kind==="youtube");
+  // a PDF alone is not sent (slides with no voice: 0, Roger 14 Nov 2026); a PDF with an audio file is
+  const pdfOnly=vid&&vid.mime==="application/pdf"&&!items.some(i=>i.kind==="drive"&&/^audio\//.test(i.mime||""));
+  if(pdfOnly)return {items,watch:null,conv:[],why:FPG_NOVOICE+(items.some(i=>i.mime==="no access"||/vnd\.google-apps\.vid/.test(i.mime||""))?" (it has a recording Gemini cannot open: watch it yourself)":""),name:x.name,state:x.state};
   const watch=vid?{id:vid.id,name:vid.title||"Classroom video"}:yt?{youtube:yt.url,name:yt.title||"YouTube video"}:null;
   const why=watch?"":!items.length?"nothing attached":items.some(i=>i.mime==="no access")?"a file the school account cannot open (ask the student to share it)"
     :items.some(i=>/vnd\.google-apps\.vid/.test(i.mime||""))?"a Google Vids video (open it and download it as mp4)":items.some(i=>i.kind==="link")?"a link Gemini cannot open (e.g. Canva)":"no video file (slides or a document only)";
@@ -4581,9 +4594,12 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
   for(const s of studs){i++;const x=fpgClsOf(s.uid),old=(FPG.d[a.id]||{})[s.uid];
     if(!x||!x.items.length){rep.none.push(s);continue}
     if(old&&old.draft&&(x.watch||(x.conv||[]).length)){rep.had.push(s);continue}
-    if(!x.watch&&(x.conv||[]).length){const ids=[];let err="";
+    if(!x.watch&&(x.conv||[]).length){const ids=[];let err="",okVid=false;
       for(const it of x.conv){FPG.bulk.note=`Converting ${i} of ${studs.length}: ${fullName(s)} · ${it.title||"file"} (Google Vids → mp4, slides → PDF; keep this page open)`;fpgRefresh(a);
-        try{const j=await fpgCall({action:"fp_convert",fileId:it.id,student:fullName(s)});ids.push(j.id)}catch(e){err=e.message}}
+        try{const j=await fpgCall({action:"fp_convert",fileId:it.id,student:fullName(s)});ids.push(j.id);if(/\.vid/.test(it.mime||""))okVid=true}catch(e){err=e.message}}
+      // the recording (Google Vids) could not be turned into an mp4: never mark the slides alone (Roger, 14 Nov 2026: 2 ESO B, "Gravació …"
+      // + slides, Gemini got only the slides)
+      if(!okVid){const nv=x.conv.some(it=>/\.vid/.test(it.mime||""));rep.unreach.push({s,x:Object.assign({},x,{why:nv?"the recording (Google Vids) could not be converted"+(err?": "+err:"")+": watch it yourself":FPG_NOVOICE})});continue}
       if(!ids.length){rep.unreach.push({s,x:Object.assign({},x,{why:"could not be converted: "+err})});continue}
       x.watch={id:ids[0],ids:ids.slice(1),name:x.conv.map(it=>it.title||"file").join(" + ")+" (converted)"};}
     if(!x.watch){rep.unreach.push({s,x});continue}
