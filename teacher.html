@@ -122,7 +122,7 @@ a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-si
 .cov .cvt{width:100%}.cov .cvt td,.cov .cvt th{text-align:left;vertical-align:top}.cov .cvt th.cvc,.cov .cvt td.cvc{text-align:center;min-width:58px}.cov td.cvc small{display:block;font-size:11px;color:#475569;line-height:1.2}.cov td.cvk small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#64748b;font-size:12px;max-width:380px;white-space:normal;line-height:1.3}.cov .cvw{overflow-x:auto}.cve .t1{color:#166534;font-weight:600}.cve .t0{color:#64748b}.cov td.cvk{white-space:normal;min-width:220px}.cov tr.cvsec td{background:#f1f5f9;font-weight:700}.cov .cdot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:0}.cvb{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600;white-space:nowrap}.cvsum{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.cve{display:inline-block;font-size:13px;line-height:1.35;border:1px solid #cbd5e1;border-radius:8px;padding:1px 7px;margin:1px;background:#fff}.cve.ok{background:#dcfce7;border-color:#86efac}.cve.dr{background:#fff7ed;border-color:#fdba74;text-decoration:line-through}.cve a{color:inherit;text-decoration:none}.cve a:hover{text-decoration:underline}.cov td.cvy{white-space:nowrap;font-size:13px}.cvn{display:inline-block;margin-left:6px;background:#dc2626;color:#fff;border-radius:999px;padding:0 7px;font-size:12px;font-weight:700}.chip.on .cvn{background:#fff;color:#b91c1c}.cvalert{border:2px solid #fca5a5;background:#fef2f2;border-radius:12px;padding:10px 14px;margin:6px 0 12px}.cvalert h3{margin:0 0 2px;color:#991b1b;font-size:16px}.cvalert p{margin:2px 0 6px}.cvalert ul{list-style:none;margin:0;padding:0}.cvalert li{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0}.cvalert li .cvt2{font-size:12px;font-weight:700;color:#991b1b;background:#fee2e2;border-radius:6px;padding:1px 7px}.cvalert button{font-size:13px;padding:2px 10px}.cov tr.cvbad td{background:#fef2f2}.cov tr.cvbad td:first-child{box-shadow:inset 4px 0 0 #dc2626}.cov tr.cvflash td{animation:cvfl 2.4s ease-out}@keyframes cvfl{0%,40%{background:#fecaca}100%{background:#fef2f2}}
 .lsn{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:40px;padding:0 8px;box-sizing:border-box;border-radius:12px;background:#eef2ff;color:#3157d5;font-weight:800;font-size:18px;vertical-align:middle}a.tile b.lsc{font-size:24px}a.tile .ti .badge{font-size:13px}table.lsps td,table.lsps th{text-align:left}table.lsps .lsop{text-align:center;white-space:nowrap}table.lsps .lsyes{color:#15803d}
 .tiles.wide{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:1180px){.tiles.wide{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.tiles.wide{grid-template-columns:repeat(2,minmax(0,1fr))}}.gal{display:flex;flex-direction:column;gap:12px;margin:0 0 16px}.gal:empty{display:none}
-table.fpt td,table.fpt th{text-align:left;vertical-align:middle}table.fpt td.n{white-space:nowrap}
+table.fpt td,table.fpt th{text-align:left;vertical-align:middle}table.fpt td.n{white-space:nowrap}table.fpt tbody tr[data-fpsel]{cursor:pointer}table.fpt tbody tr[data-fpsel]:hover td{background:#f8fafc}table.fpt tbody tr.on td{background:#eff6ff}table.fpt tbody tr.on td.n{box-shadow:inset 4px 0 0 #2563eb}.fpwrap{display:grid;grid-template-columns:minmax(0,max-content) minmax(360px,1fr);gap:16px;align-items:start}.fpwrap>.wrap{max-height:calc(100vh - 40px)}.fpside{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;box-sizing:border-box}.fpside h3{margin:0;font-size:17px}.fpside .fpsh{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px}.fpside .fpsh .gx{margin-left:auto}.fpside .rbrow{padding:6px 8px;margin:6px 0}.fpside .rbc{font-size:.75rem;padding:4px 6px;line-height:1.3}.fpside .fpsok{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 8px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}.fpside .fpsok .gx{margin-left:auto}@media(max-width:1000px){.fpwrap{display:block}.fpside{display:none}}
 a.tile.c2eso{border-left:6px solid #16a34a}a.tile.c4eso{border-left:6px solid #2563eb}a.tile.c2eso .ti b,a.tile.c4eso .ti b{font-size:20px}
 details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;font-size:14px;cursor:pointer}
 @media (max-width:980px){.tshell{grid-template-columns:1fr;gap:6px}.tside{position:sticky;top:0;z-index:20;flex-direction:row;overflow-x:auto;max-height:none;padding:8px 0;background:rgba(248,250,252,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}
@@ -1549,26 +1549,70 @@ const fpAct=(ls,list)=>{const g=(window.EL_GRADING||{})[ls]||{};return (g.fp&&by
 const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};if(x.max)return true;
   return !!(g.fp&&g.fp.a===a.id&&!g.fp.mark&&g.fp.rows.length&&g.fp.rows.every(r=>lvOf(u,a.id,r.step,r.c)))};
 // Gemini drafts not approved yet (0 until the drafts doc is read; reading it re-draws the page once)
-function fpWaiting(a,studs){if(!FPG.d[a.id]){if(!DEMO&&!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g&&GR.some(g=>g.id===S.g))render()}).catch(()=>{})}return 0}
+function fpWaiting(a,studs){if(!FPG.d[a.id]&&DEMO&&DEMO.fpg)FPG.d[a.id]=DEMO.fpg[a.id]||{};   // previews: sample drafts
+  if(!FPG.d[a.id]){if(!DEMO&&!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g&&GR.some(g=>g.id===S.g))render()}).catch(()=>{})}return 0}
   const d=FPG.d[a.id];return studs.filter(s=>d[s.uid]&&d[s.uid].draft&&!d[s.uid].approved&&!fpMarked(s.uid,a)).length}
 const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button>${fpgLastB(a,u)} <button class="g" data-fpg="folder" data-u="${u}" data-a="${esc(a.id)}">📁 Draft from a Drive folder</button> <span class="muted">Gemini watches every video handed in on Classroom, one after another (keep this page open), and lists the ones it couldn't reach.</span>`;
 function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().sort(byName);
   if(!a)return `<div class="box"><p class="muted">This LS has no final product on the site yet.</p></div>`;
-  fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
+  fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),sel=fpSelOf(a,studs),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
   const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
   const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
   const dr=u=>{const x=d[u];if(!x)return `<span class="muted">–</span>`;if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
-    return x.draft?(x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve"):`<span class="muted">–</span>`};
+    return x.draft?(x.approved||fpMarked(u,a)?"✅ approved":`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
     +`<p class="muted">${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
     +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button></p>`
-    +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
-    +studs.map(s=>s.uid?`<tr><td class="n"><a href="#" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
+    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
+    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
       :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+3:4}"><small>not signed in yet</small></td></tr>`).join("")
-    +`</tbody></table></div></div>`}
+    +`</tbody></table></div><aside class="fpside" id="fpside" data-a="${esc(a.id)}" data-u="${sel||""}">${fpSideH(sel,a)}</aside></div></div>`}
+// ---- 🎬 Side panel beside the final product table (Roger, 14 Nov 2026: "I want a button to approve Gemini's feedback here and I want to see
+// the video and the rubric on the right since I have enough space. I want further details when I open the box"): a click on a student's
+// row shows their video and Gemini's levels shaded on the rubric (click a square to change a level) with ✅ Approve, which saves and goes
+// on to the next student to approve. The comment, ✔ ➜ notes, words said wrong, Watch again and "ask Gemini to change it" stay in the box
+// (Open / Mark). Nothing more is read from Firestore: the drafts doc is the one the table already read.
+const fpToDo=(u,a)=>{const x=(FPG.d[a.id]||{})[u];return !!(x&&x.draft&&!x.approved&&!fpMarked(u,a))};
+function fpSelOf(a,studs){const ok=u=>studs.some(s=>s.uid===u),cur=(FPG.sel||{})[a.id];if(cur&&ok(cur))return cur;const d=FPG.d[a.id]||{},on=studs.filter(s=>s.uid);
+  const f=on.find(s=>fpToDo(s.uid,a))||on.find(s=>(d[s.uid]||{}).draft)||on.find(s=>fpgVideo(s.uid,a));return f?f.uid:null}
+function fpNext(u,a){const on=Object.values(S.P).filter(s=>s.uid&&s.group===(S.P[u]||{}).group&&!s.away&&!s.tester).sort(byName),i=on.findIndex(s=>s.uid===u);
+  const n=on.slice(i+1).concat(on.slice(0,i)).find(s=>s.uid!==u&&fpToDo(s.uid,a));return n?n.uid:u}
+function fpSideVid(u,a,v){if(!v)return {k:"none",h:`<p class="muted">No video found yet. <button class="g mini" data-do="cell" data-u="${u}" data-a="${esc(a.id)}">Open the box</button> to look on Classroom or paste a Drive link.</p>`};
+  const yid=v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],pl=!yid?fpgPlay(u,a,v):{},pid=pl.id||v.id,au=v.link&&!pl.id?"?authuser="+encodeURIComponent(FPG_SCHOOL):"";
+  if(pl.busy)return {k:"busy",h:`<p class="muted">⏳ Making a copy in your Final product videos folder so you can play it here (a few seconds)…</p>`};
+  const src=yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(pid)}/preview${au}`;
+  return {k:src,h:`<div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`
+    +`<p class="muted" style="margin:4px 0 0;font-size:12px">${esc(v.name||"Video")}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(yid?v.youtube:`https://drive.google.com/file/d/${pid}/view${au}`)}" target="_blank" rel="noopener">${yid?"YouTube":"Drive"} ↗</a>${pl.err?` · ⚠️ no copy to play here, it opens with the school account`:""}</p>`}}
+// {bar: the verdict, the mark and ✅ Approve (at the top, always in sight), rub: the rubric below the video}
+function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.busy[u+"|"+a.id],v=fpgVideo(u,a),x=res(u,a.id);
+  if(busy)return {bar:`<p class="muted" style="margin:0">⏳ Gemini is watching the video ${fpgClock(u+"|"+a.id)}</p>`,rub:""};
+  if(!d||!d.draft)return {bar:(d&&d.error?`<p style="color:#b91c1c;margin:0 0 4px">⚠️ ${esc(d.error)}</p>`:"")
+    +(fpMarked(u,a)?`<b>✅ Marked${x.max?": "+x.score+"/"+x.max:""}</b> <span class="muted">(no Gemini draft)</span>`:R&&v?`<span class="muted">No Gemini draft yet.</span> <button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}">🎬 Gemini, watch it</button>`:`<span class="muted">No Gemini draft.</span>`),
+    rub:fpMarked(u,a)?fpStuRub(u,a):""};
+  if(!R)return {bar:"",rub:""};const g=d.draft,rd=FPG_READ[(g.reading||{}).verdict]||FPG_READ.partly,N=fpRub(a),
+    redo=!d.approved&&fpMarked(u,a)&&(g.rows||[]).some(r=>r.byYou),done=!redo&&(d.approved||fpMarked(u,a));   // redo: a level changed here after it was saved
+  // the rubric without the ✔ ➜ 👀 notes (they are in the box), clickable to change a level as in the box
+  const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{},tg=z.byYou?"you":"";if(z.level==null)return {L:-1,tag:tg};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:tg}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:tg}}):[];
+  return {bar:`<span><b>${rd[0]} ${rd[1]}</b>${R.kind==="mark"?` · <b>Gemini's mark: ${fpgMark(R,g)??"–"}/10</b>`:""}</span>`
+      +(done?`<b class="gx">✅ Approved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves the levels, the mark and Gemini's comment for the student, then shows the next student to approve">${redo?"✅ Save your changes":"✅ Approve · next student"}</button>`),
+    rub:N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Gemini's level in each row is shaded (blue). Click a square to change it.</p>${rubH(N,sel,"Gemini",{u,a:a.id})}`:""}}
+function fpSideH(u,a){if(!u)return `<p class="muted">Click a student to see their video and Gemini's rubric here.</p>`;const s=S.P[u]||{uid:u,name:u},vd=fpSideVid(u,a,fpgVideo(u,a)),dr=fpSideDraft(u,a);
+  return `<div class="fpsh"><h3>${name(s)}</h3><button class="g mini gx" data-do="cell" data-u="${u}" data-a="${esc(a.id)}" title="Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">🔎 All the details</button></div>`
+    +`<div id="fpsb" class="fpsok">${dr.bar}</div><div id="fpsv" data-k="${esc(vd.k)}">${vd.h}</div><div id="fpsd">${dr.rub}</div>`}
+// refresh the panel without reloading the video when it is the same one (a level clicked, Gemini's draft back)
+function fpSide(u,a){const b=$("#fpside");if(!b||!a||b.dataset.a!==a.id||(u&&b.dataset.u!==u))return;u=b.dataset.u;if(!u)return;
+  const sv=$("#fpsv"),vd=fpSideVid(u,a,fpgVideo(u,a));if(!sv||sv.dataset.k!==vd.k){b.innerHTML=fpSideH(u,a);return}const dr=fpSideDraft(u,a);$("#fpsb").innerHTML=dr.bar;$("#fpsd").innerHTML=dr.rub}
+function fpPick(u,a){FPG.sel=FPG.sel||{};FPG.sel[a.id]=u;const b=$("#fpside");if(!b||b.offsetParent===null)return false;
+  document.querySelectorAll("table.fpt tbody tr[data-fpsel]").forEach(r=>r.classList.toggle("on",r.dataset.fpsel===u));b.dataset.u=u;b.innerHTML=fpSideH(u,a);return true}
+// ✅ Approve without the box: the same as the box's Approve + Save (levels, the mark, Gemini's comment with the ✔ ➜ lines)
+function fpgApproveNow(u,a,next){const R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],x=d&&d.draft;if(!R||!x||FPG.busy[u+"|"+a.id])return;
+  const ps=fpgLevelPatches(u,a,R,x),o={feedback:fpgText(R,x)};if(R.kind==="mark"){const m=fpgMark(R,x);if(m!=null){o.score=m;o.max=10}}
+  d.approved=new Date().toISOString();ps.push(fpgSave(a,u,d));ps.push(api.result(u,a,o));
+  if(next||(FPG.sel||{})[a.id]===u)(FPG.sel=FPG.sel||{})[a.id]=fpNext(u,a);
+  act(Promise.all(ps))}
 // ---- 🎯 Coverage (Roger, 6 Nov 2026: "another section where we can see if we have worked all the assessment criteria and competences
 // planned for each LS and the year plan. Also, the grammar and the lexicon … so we can add some grammar in other LS if necessary"). A tile
 // on the group page. Planned = the annual programme (EL_REF.prog: criteria per LS) and the Drive grammar and lexicon maps (EL_REF.grammar /
@@ -4102,7 +4146,7 @@ function fpgPlay(u,a,v){if(!v||!v.link||!v.id||(DEMO&&!window.EL_DEMO_FPCOPY))re
   if(!x){FPG.view[k]={busy:1};fpgCall({action:"fp_copy",fileId:v.id}).then(j=>{FPG.view[k]={id:j.id};const o=Object.assign({},(FPG.d[a.id]||{})[u]||{},{viewId:j.id,viewOf:v.id});
     return fpgSave(a,u,o)},e=>{FPG.view[k]={err:e.message}}).catch(e=>console.warn("fp copy",e)).then(()=>fpgFill(u,a))}
   return {busy:1}}
-function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
+function fpgFill(u,a){fpSide(u,a);const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
   let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
   const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],pl=v&&!yid?fpgPlay(u,a,v):{},
     pid=pl.id||(v&&v.id),au=v&&v.link&&!pl.id?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(pid)}/view${au}`):"";
@@ -4292,17 +4336,19 @@ function fpgReport(c,rep,a){const li=(arr,f)=>arr.length?`<ul>${arr.map(f).join(
     +(rep.done.length||rep.had.length?`<p><button class="g" data-fpg="sounds" data-u="${(rep.done[0]||{s:rep.had[0]}).s.uid}" data-a="${esc(a.id)}">🗣️ Words said wrong in the whole group</button></p>`:""),true)}
 // Approve: LS2 levels on the rows (group rows on every member of the final product group, as the dialog's group buttons do), LS1 the mark;
 // the feedback box gets the draft (or what the teacher wrote there already, if it differs), then the dialog's own Save
+function fpgLevelPatches(u,a,R,x){const ps=[];if(R.kind!=="levels")return ps;const s=S.P[u],ms=[s,...teamMates(a.id,teamOf(u,a.id),s.group).filter(m=>m.uid!==u)];
+  R.rows.forEach((r,i)=>{const l=((x.rows||[])[i]||{}).level;if(!l)return;const deg=EL_DEGREES[l-1];
+    if(r.step==="group")ms.forEach(m=>ps.push(patch(m.uid,a.id,{levels:{group:{[r.c]:deg}}})));else ps.push(patch(u,a.id,{levels:{[r.step]:{[r.c]:deg}}}))});return ps}
 function fpgApprove(u,a){const R=fpgRubric(a),d=((FPG.d[a.id]||{})[u]||{}),x=d.draft;if(!R||!x)return;
-  if(R.kind==="levels"){const s=S.P[u],ms=[s,...teamMates(a.id,teamOf(u,a.id),s.group).filter(m=>m.uid!==u)],ps=[];
-    R.rows.forEach((r,i)=>{const l=((x.rows||[])[i]||{}).level;if(!l)return;const deg=EL_DEGREES[l-1];
-      if(r.step==="group")ms.forEach(m=>ps.push(patch(m.uid,a.id,{levels:{group:{[r.c]:deg}}})));else ps.push(patch(u,a.id,{levels:{[r.step]:{[r.c]:deg}}}))});
-    Promise.all(ps).catch(e=>alert("Could not save the levels: "+e.message))}
+  if(R.kind==="levels")Promise.all(fpgLevelPatches(u,a,R,x)).catch(e=>alert("Could not save the levels: "+e.message));
   else{const m=fpgMark(R,x);if(m!=null&&$("#fsc")){$("#fsc").value=m;$("#fmx").value=10}}
   const t=$("#fpgfb");if(t)x.top=t.value.trim();const fb=$("#ffb");if(fb)fb.value=fpgText(R,x);
   d.approved=new Date().toISOString();fpgSave(a,u,d).catch(()=>{});
   const sv=$('#dlgc button[data-do="save"]');if(sv)sv.click()}
 document.addEventListener("click",e=>{const c=e.target.closest("[data-fpgl]");if(!c)return;const [i,k]=c.dataset.fpgl.split(":").map(Number);fpgPick(c.dataset.u,cat.find(x=>x.id===c.dataset.a),i,k)});
 document.addEventListener("change",e=>{const t=e.target;if(t.id!=="fpgfb")return;const a=cat.find(x=>x.id===t.dataset.a),d=a&&(FPG.d[a.id]||{})[t.dataset.u];if(!d||!d.draft)return;d.draft.top=t.value.trim();Promise.resolve().then(()=>fpgSave(a,t.dataset.u,d)).catch(()=>{})});
+// a click anywhere on a student's row of the final product table (not on a button or link) shows them in the side panel
+document.addEventListener("click",e=>{const r=e.target.closest("tr[data-fpsel]");if(!r||e.target.closest("button,a,input,textarea"))return;const a=cat.find(x=>x.id===r.dataset.a);if(a)fpPick(r.dataset.fpsel,a)});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a);
   if(k.fpg==="watch")fpgWatch(k.u,a,"");
   else if(k.fpg==="bulk")fpgBulk(k.u,a);
@@ -4311,6 +4357,9 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(
     fpgClsLoad(g).then(()=>fpgFill(k.u,a),e=>{alert("Classroom could not be read: "+e.message);fpgFill(k.u,a)})}
   else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c).then(()=>{const st=$("#fpgst");if(st)st.scrollIntoView({block:"nearest"})});setTimeout(()=>{const st=$("#fpgst");if(st)st.scrollIntoView({block:"nearest"})},50)}
   else if(k.fpg==="ok")fpgApprove(k.u,a);
+  else if(k.fpg==="okrow")fpgApproveNow(k.u,a,false);
+  else if(k.fpg==="okside")fpgApproveNow(k.u,a,true);
+  else if(k.fpg==="side"){e.preventDefault();if(!fpPick(k.u,a))cellPanel(k.u,a.id)}
   else if(k.fpg==="cost")fpgCost();
   else if(k.fpg==="sounds")fpgSounds(k.u,a);
   else if(k.fpg==="last")fpgLast(a,(S.P[k.u]||{}).group)});
