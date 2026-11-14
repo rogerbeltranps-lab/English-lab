@@ -1526,6 +1526,14 @@ window.ELNotebook = (function () {
     setTimeout(() => tip.remove(), 4000);
   }
   const LOCKED = '.nb-wlock,[data-nb-lock]';
+  // 🔒 an activity done in class that the student hasn't done (Roger, 14 Nov 2026: "when they press them they go to the SLP to do them"):
+  // a tap anywhere on it opens that step of the learning path, as its "To do ➜" does (through the student's board in 👁 student view);
+  // a part locked for another reason (window.elNbWriteLock) only says why
+  function toDo(el, x, y) {
+    const b = el.closest('.nb-blk[data-b]') || el, ci = ciOf(b), a = (b.dataset.b ? blkEls(b.dataset.b, ci) : [b]).map(p => p.querySelector('a.nb-tdgo[href]')).find(Boolean);
+    if (a) { a.click(); return; }
+    lockTip(x, y);
+  }
   document.addEventListener('click', e => {
     if (!H || !H.own || ED || Date.now() < tapOff || Date.now() < noClick || e.defaultPrevented || e.button) return;
     const t0 = e.target; if (!t0 || !t0.closest) return;
@@ -1534,13 +1542,13 @@ window.ELNotebook = (function () {
     const sl = getSelection(); if (sl && String(sl).trim()) return;
     const ci = +(pgEl.dataset.ci || 0); use(ci);
     const s = secs[+pgEl.dataset.s]; if (!s || s.fixed || !Array.isArray(s.blocks) || (s.ci || 0) !== ci) return;
-    if (t0.closest(LOCKED)) return lockTip(e.clientX, e.clientY);
+    if (t0.closest(LOCKED)) return toDo(t0.closest(LOCKED), e.clientX, e.clientY);
     const paper = pgEl.querySelector('.nb-paper'), y = e.clientY, x = e.clientX, tops = [...paper.querySelectorAll(':scope > .nb-blk[data-b]')];
     // the part tapped (or the part at that height, tapped in the margin)
     let pc = t0.closest('.nb-blk[data-b]');
     if (!pc) pc = tops.find(b => { const r = b.getBoundingClientRect(); return y >= r.top && y <= r.bottom; }) || null;
     if (pc && pc.classList.contains('nb-note')) { const sid = pc.dataset.b, blk = s.blocks.find(b => b.id === sid); if (blk && blk.note) editor({ kind: 'note', id: sid, sec: s }); return; }
-    if (pc && pc.matches(LOCKED)) return lockTip(x, y);
+    if (pc && pc.matches(LOCKED)) return toDo(pc, x, y);
     const before = id => { const l = s.blocks.filter(b => !b.at), i = l.findIndex(b => b.id === id); return i > 0 ? l[i - 1].id : null; };
     if (pc) {
       // the line just above the tap: the last word whose top is above it (the nearest one sideways on that line)
