@@ -179,40 +179,30 @@ window.LP = (function () {
                 card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
                 card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
               row(card('teal', '🔁 Sense preposició', ex('We celebrate it <b>every year</b>.', 'cada any') + ex('It happens <b>once a year</b>.', 'un cop l’any') + ex('We prepare <b>the night before</b>.', 'la nit abans'))) +
-              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: sense preposició)')) +
-              together(true, ['Thanksgiving is ___ November. The Castanyada is ___ 31 October. We eat turrón ___ Christmas.', 'in · on · at']) +
-              turn('Ara tu:', 'quan és la teva festa preferida? Digues-ho amb <em>in, on</em> o <em>at</em>.'),
+              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: sense preposició)')),
             en: head('📆', 'Dates: <em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
               scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'night · clock time · holiday time']]) +
               row(card('blue', 'IN', ex('Thanksgiving is <b>in</b> November.') + ex('Diwali is <b>in</b> autumn.'), 180),
                 card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
                 card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
               row(card('teal', '🔁 No preposition', ex('We celebrate it <b>every year</b>.') + ex('It happens <b>once a year</b>.') + ex('We prepare <b>the night before</b>.'))) +
-              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: no preposition)')) +
-              together(false, ['Thanksgiving is ___ November. The Castanyada is ___ 31 October. We eat turrón ___ Christmas.', 'in · on · at']) +
-              turn('Your turn:', 'when is your favourite celebration? Say it with <em>in, on</em> or <em>at</em>.') },
+              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: no preposition)')) },
           { p: 'prepB', only: ['beginners', 'insecure'],
             ca: head('🔗', 'Paraules que van amb preposició', 'La preposició va enganxada a la paraula: aprèn-les juntes, com un bloc. Sovint no és la mateixa que en català!') +
               row(card('blue', 'come <b>from</b> · venir de', ex('Halloween <b>comes from</b> Ireland.') + ex('Where do the pumpkins <b>come from</b>?'), 200),
                 card('green', 'be famous <b>for</b> · ser famós per', ex('Leicester <b>is famous for</b> its Diwali lights.') + ex('Rio <b>is famous for</b> its carnival.'), 200),
                 card('orange', 'be interested <b>in</b> · estar interessat en', ex('I’m <b>interested in</b> old traditions.') + ex('Are you <b>interested in</b> Diwali?'), 200),
                 card('purple', 'wait <b>for</b> · esperar', ex('We <b>wait for</b> the fireworks.', 'en català no hi ha preposició!') + ex('The children <b>wait for</b> the Three Kings.'), 200)) +
-              mistakes('Compte!', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.'), bad('famous by', 'famous <b>for</b>')) +
-              together(true, ['Halloween comes ___ Ireland.', 'from'], ['I’m interested ___ old traditions.', 'in']) +
-              turn('Ara tu:', 'd’on ve la teva festa preferida? Digues-ho amb <em>It comes from…</em>'),
+              mistakes('Compte!', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.'), bad('famous by', 'famous <b>for</b>')),
             en: head('🔗', 'Words that go with a preposition', 'Learn the word and its preposition together, like one block.') +
               row(card('blue', 'come <b>from</b>', ex('Halloween <b>comes from</b> Ireland.'), 200), card('green', 'be famous <b>for</b>', ex('Leicester <b>is famous for</b> its Diwali lights.'), 200),
                 card('orange', 'be interested <b>in</b>', ex('I’m <b>interested in</b> old traditions.'), 200), card('purple', 'wait <b>for</b>', ex('We <b>wait for</b> the fireworks.'), 200)) +
-              mistakes('Watch out', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.')) +
-              together(false, ['Halloween comes ___ Ireland.', 'from'], ['I’m interested ___ old traditions.', 'in']) +
-              turn('Your turn:', 'where does your favourite celebration come from? <em>It comes from…</em>') },
+              mistakes('Watch out', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.')) },
           { p: 'prep', r: 'safe', en: head('🔗', 'Words that go with a preposition', 'The preposition is fixed: learn it together with the word, like one block.') +
               row(card('blue', 'Verb + preposition', table([['Word', 'Example'], ['come <b>from</b>', 'Halloween <b>comes from</b> Samhain.'], ['depend <b>on</b>', 'The date of Diwali <b>depends on</b> the moon.'], ['contribute <b>to</b>', 'Everyone <b>contributes to</b> the party.'], ['be known <b>for</b>', 'Leicester <b>is known for</b> its Diwali lights.'], ['be associated <b>with</b>', 'Pumpkins <b>are associated with</b> Halloween.']]), 300),
                 card('orange', 'Adjective + preposition', table([['Word', 'Example'], ['interested <b>in</b>', 'I’m <b>interested in</b> old traditions.'], ['famous <b>for</b>', 'Rio is <b>famous for</b> its carnival.'], ['grateful <b>for</b>', 'People say what they are <b>grateful for</b>.'], ['excited <b>about</b>', 'The children are <b>excited about</b> the fireworks.'], ['proud <b>of</b>', 'We’re <b>proud of</b> our festa major.']]), 300)) +
               tip('Comparing?', '<em>similar to, different from, both … and, unlike</em> are in <b>Grammar · Comparing</b>.') +
-              mistakes('Watch out', bad('It depends of the moon.', 'It depends <b>on</b> the moon.'), bad('known by its lights', 'known <b>for</b> its lights'), bad('interested on', 'interested <b>in</b>'), bad('associated to', 'associated <b>with</b>')) +
-              together(false, ['It depends ___ the weather.', 'on'], ['Halloween comes ___ Samhain.', 'from'], ['I’m very interested ___ Diwali.', 'in']) +
-              turn('Your turn:', 'one sentence with <em>comes from</em> and one with <em>is known for</em> about a celebration you know.') }
+              mistakes('Watch out', bad('It depends of the moon.', 'It depends <b>on</b> the moon.'), bad('known by its lights', 'known <b>for</b> its lights'), bad('interested on', 'interested <b>in</b>'), bad('associated to', 'associated <b>with</b>')) }
         ];
         // a section's boxes in the order asked, without the old block key (each section is one block: no number on its boxes)
         return (...ps) => all.filter(b => ps.includes(b.p)).sort((a, b) => ps.indexOf(a.p) - ps.indexOf(b.p)).map(b => { const o = Object.assign({}, b); delete o.p; return o; });
