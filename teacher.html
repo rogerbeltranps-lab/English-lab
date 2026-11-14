@@ -551,10 +551,14 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     if(p==="settings/marking")return x=>{D.mk=x||null};
     if(p==="site/maintenance")return x=>{D.mt=x||{}};
     if(k[0]==="ls"&&k.length===2)return "ls";
+    // Gemini's final product drafts (settings/fp__…) live in FPG.d, which already has what was written: nothing to read back. Before this,
+    // a draft save made the next save (✅ Approve) reload the whole dashboard (Roger, 14 Nov 2026: "sometimes the approve button doesn't work
+    // and I need to hard reload it … and it takes a bit to see the mark on the table")
+    if(k[0]==="settings"&&/^fp__/.test(k[1]||"")&&k.length===2)return "skip";
     return null};
   const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300||fs.some(f=>!f))return load();
   const stu=new Set();
-  await Promise.all(ps.map(async(p,i)=>{if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
+  await Promise.all(ps.map(async(p,i)=>{if(fs[i]==="skip")return;if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
     if(fs[i]==="stu"){stu.add(p.split("/")[1]);return}
     const d=await F.getDoc(F.doc(db(),...p.split("/")));fs[i](d.exists()?d.data():null)}));
   saveCache();if(!stu.size)return D;
