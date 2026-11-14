@@ -86,13 +86,13 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
    lined paper with the red margin, a 📚 Vocabulary / 🧩 Grammar post-it, the title in pencil, the explanation on a taped slip in the
    teacher's handwriting (Kalam), the key words in blue ink, tables drawn in pen, ⚠️ on a yellow sticky band */
 .card.nbk{background:linear-gradient(90deg,transparent 3.2em,var(--nb-margin) 3.2em calc(3.2em + 2px),transparent calc(3.2em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line) 1.6em calc(1.6em + 1px)) var(--nb-paper);background-attachment:local;border-radius:6px;color:var(--nb-black)}
-.theory.nbk{grid-template-columns:auto 1fr;grid-template-areas:"top top" "pic tx";grid-template-rows:auto 1fr;align-items:start;row-gap:.2em;padding:.6em 1.6em 1.2em 4.4em;align-self:center;max-width:66em}
-.theory.nbk.wide{max-width:80em}
-.nbk .nbtop{grid-area:top}.theory.nbk .pic{grid-area:pic;font-size:4.6em;align-self:center}.theory.nbk.wide .pic{font-size:3.4em}.theory.nbk .tx{grid-area:tx}
+.theory.nbk{grid-template-columns:auto 1fr;grid-template-areas:"top top" "pic tx";grid-template-rows:auto 1fr;align-items:start;row-gap:.1em;column-gap:.8em;padding:.4em 1.4em 1em 4em;align-self:center;max-width:none}
+.theory.nbk.wide{max-width:none}.theory.nbk{min-height:0;overflow:auto}.theory.nbk .tx{max-height:none;overflow:visible}
+.nbk .nbtop{grid-area:top}.theory.nbk .pic{grid-area:pic;font-size:4em;align-self:center}.theory.nbk.wide .pic{font-size:3em}.theory.nbk .tx{grid-area:tx}
 .nbk .nb-postit{font-size:1.25em;line-height:1.35;margin:.3em 0 .1em -.4em}.nbk .nb-postit small{font-size:.75em}
-.theory.nbk h2.nb-h3{font:700 1.75em/1.25 var(--nb-hand);color:var(--nb-pencil);margin:.1em 0 .1em}
+.theory.nbk h2.nb-h3{font:700 2.1em/1.2 var(--nb-hand);color:var(--nb-pencil);margin:.1em 0 .1em}
 .nbk .nb-slip{margin:.9em .2em .6em;padding:.7em 1.1em .6em;font:400 1em/1.5 var(--nb-teacher);color:#222}
-.theory.nbk .nb-slip p{font-size:1.2em;margin:.35em 0}
+.theory.nbk .nb-slip p{font-size:1.5em;margin:.3em 0}.theory.nbk table.tt{font-size:1.2em}.theory.nbk .ca p{font-size:1.3em}
 .nbk b.k{color:var(--nb-ink);font-weight:700}
 .nbk s.no{color:var(--nb-red)}
 .nbk .gap{border-bottom-color:#222}
@@ -104,7 +104,7 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
 .notes.nbk{padding:.8em 1.4em 1em 4.4em}
 .notes.nbk .nhead h2{font:700 2em/1.2 var(--nb-hand);color:var(--nb-pencil)}.notes.nbk .nhead p{font-family:var(--nb-sans)}
 .notes.nbk .stat{font-family:var(--nb-sans)}
-.notes.nbk .recap{border-top:0;font-size:.9em;columns:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24em),1fr));column-gap:1.2em;align-items:start;align-content:start}.notes.nbk .recap section.nb-slip{margin:.9em .3em 1.1em;padding:.5em .9em .4em;display:block}
+.notes.nbk .recap{border-top:0;font-size:1.05em;columns:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24em),1fr));column-gap:1.2em;align-items:start;align-content:start}.notes.nbk .recap section.nb-slip{margin:.9em .3em 1.1em;padding:.5em .9em .4em;display:block}
 .notes.nbk .recap h3{font:700 1.15em/1.3 var(--nb-teacher);color:#222}
 @media (max-width:700px){.theory.nbk{grid-template-areas:"top" "pic" "tx";grid-template-columns:1fr;padding-left:1.4em}.card.nbk{background:var(--nb-paper)}.notes.nbk{padding-left:1.2em}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:1em;height:46vh;margin-top:1em}

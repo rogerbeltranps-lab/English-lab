@@ -370,7 +370,7 @@ html.nb-touring .nb-bt{opacity:1}
 .nb .nb-gned:hover{background:#e8eefc}
 .nb .nb-gned:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 /* 📝 Exams section (el-notebook.js examBlocks) */
-.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
+.nb-postit.k-cp,.nb-stab.k-cp{background:#fff59d}.nb-postit.k-cp .nb-stamp{font-size:19px;line-height:24px;margin-left:10px}.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
 .nb-xparts{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font:20px/32px var(--nb-hand)}
 .nb-xparts .ok{color:var(--nb-green);font-weight:700}.nb-xparts .ko{color:var(--nb-red);font-weight:700}
 .nb-why{display:block;font:15px/24px var(--nb-hand);color:var(--nb-pencil)}
@@ -648,3 +648,24 @@ html.el-nb-plain .nb-fpi textarea,html.el-nb-plain .nb-fpi-t{font-size:15px;line
 .nb-fpi textarea{padding-bottom:14px}
 .nb-fpfull{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:40;background:#fff3cd;border:1px solid #e6c46b;border-radius:10px;padding:8px 12px;font:600 14px/1.35 var(--nb-sans);color:#5c4400;box-shadow:0 6px 16px rgba(0,0,0,.15);max-width:80%;text-align:center}
 @media print{.nb-fpi-rs,.nb-fpfull{display:none}}
+
+/* ✍ writing on the page itself (Roger, 14 Nov 2026): a tap anywhere opens the pen there; the notes start on a line of the paper */
+.nb.nb-own .nb-spread .nb-page:not(.nb-cvp) .nb-paper{cursor:text}
+.nb.nb-own .nb-spread .nb-wlock,.nb.nb-own .nb-spread .nb-wlock *{cursor:not-allowed}
+.nb .nb-blk.nb-note{margin:0}
+.nb-inl{display:block;list-style:none;margin:0;padding:0;break-inside:avoid}
+.nb-ied{position:relative}
+.nb-ied .pad-notes{width:auto}
+.nb-ied .pad-ed{min-height:32px;background:none}
+.nb-ied .pad-ed:empty::before{color:#8fa0b8}
+.nb-editing{background:rgba(31,79,181,.05);border-radius:6px;box-shadow:-10px 0 0 rgba(31,79,181,.05),10px 0 0 rgba(31,79,181,.05)}
+.nb-editing:hover{background:rgba(31,79,181,.05)}
+.nb-ifl{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:6px;max-width:calc(100vw - 16px);background:#fff;border:1px solid #d5dce5;border-radius:14px;box-shadow:0 8px 24px rgba(20,30,50,.22);padding:4px 6px}
+.nb-ifl .pad-tools{position:static;margin:0!important;border:0!important;border-radius:0;padding:0;background:none;flex-wrap:nowrap}
+.nb-ifl .nb-ifl-t{display:flex;min-width:0}
+.nb-ifl .nb-tool{margin:0;white-space:nowrap}
+.nb-ifl .nb-ed-del[data-sure]{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+@media (max-width:899px){.nb-ifl{top:auto;bottom:8px;flex-wrap:wrap;justify-content:center}.nb-ifl .pad-tools{flex-wrap:wrap;justify-content:center}}
+@media print{.nb-ifl{display:none!important}}
+.nb-edit>.nb-notes,.nb-edit .nb-ied{min-height:32px}
+@media (max-width:899px){.nb-ifl{padding:3px 4px;gap:4px}.nb-ifl .pad-tb{min-width:28px;height:30px;padding:0 3px}.nb-ifl .pad-g{padding-right:2px}}

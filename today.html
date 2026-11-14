@@ -680,7 +680,7 @@ function marksHead(lss,ls){if(EL_CATALOG.some(a=>a.ls===ls.id&&a.checkpoint))cpL
     +`<div class="btabs" role="tablist">`+tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
     +(cpList(ls).length?tb("cp","🎯","Els meus checkpoints","My checkpoints",cpSub(ls)):"")
     +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")+tb("exam","📝","Els meus exàmens","My exams",examSub(ls))
-    +`<a class="btab b-prog" href="#progress"><span class="bi">🎓</span><span><b>${t("El meu progrés","My progress")}</b><small>${t("totes les LS, per trimestres i l'any","all your LSs, by term and year")}</small></span></a>`+`</div></div>`}   // 🎓 My progress as the fourth tile (Roger, 9 Nov 2026: "put this here", no separate banner)
+    +`</div></div>`}   // no 🎓 My progress tile here any more (Roger, 14 Nov 2026: "I said I don't want My progress here"): it is in the side menu and on the board
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
   return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`

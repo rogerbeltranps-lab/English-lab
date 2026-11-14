@@ -1167,6 +1167,12 @@ function nbFab(){
 // notebook from an SLP, I want the notebook to open there too"). el-notebook.js reads el_nb_at once, if it is less than 2 minutes old.
 document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href*="#notes"]');if(!a||!lsId||!m||/\/(index\.html)?$/.test(location.pathname))return;
   const tab=document.querySelector(".tab.active[data-panel]");try{localStorage.setItem("el_nb_at",JSON.stringify({ls:lsId,page:location.pathname.split("/").pop(),panel:tab?tab.dataset.panel:"",t:Date.now()}))}catch(x){}},true);
+// ↩ the notebook's Back button goes to the page it was opened from (Roger, 14 Nov 2026: "go back where they were, so if they were on
+// the dashboard they go there, but if they were somewhere else…"): any 📓 link (the floating button, the board's card, an LS page's tile)
+// keeps this page in el_nb_from (a learning path with the step on screen, #panel). Not from the notebook itself. No reads.
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href*="#notes"]');if(!a||document.documentElement.classList.contains("el-nb-full"))return;
+  const tab=document.querySelector(".tab.active[data-panel]"),u=new URL(location.href);if(tab)u.hash=tab.dataset.panel;else if(u.hash==="#notes")return;
+  try{localStorage.setItem("el_nb_from",JSON.stringify({u:u.href,n:document.title,t:Date.now()}))}catch(x){}},true);
 setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
 /* ✍ A quick note from any page (Roger, 13 Nov 2026: "is the floating icon of the notebook always available, so that students can note
    what they need when they need it?"): for a signed-in student the 📓 button opens a small handwriting page (el-pad.js: pens, highlighters,

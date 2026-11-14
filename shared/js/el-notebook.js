@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113j', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261114w', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -62,6 +62,7 @@ window.ELNotebook = (function () {
   }
 
   let H = null, secs = [], pages = [], pg = 0, LSKEY = '', order = [], last = null, saveT = 0, laid = '', gamesById = {};
+  let LOC = null, ANCHOR = null, SPOTK = '', LAYING = false;
   // 📓 one notebook for every LS of the course (Roger, 13 Nov 2026: "make LS1 and LS2 and the following ones part of the same notebook … one
   // Index per LS is okay, but the summary I want it of everything"): CH = the chapters, one per LS, each with its own helpers (H: LS, nb =
   // its notes/nb-<LS> doc, save) and its own order of sections. H and order are the chapter in use: a tap on a page uses that page's
@@ -233,6 +234,24 @@ window.ELNotebook = (function () {
       return out.join(' ').split(/ ?\n ?/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
     };
     const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
+    // 🎯 the recall checkpoints (Roger, 14 Nov 2026: "checkpoints should also appear in their notebook in a section like exams and final
+    // product"): the same as 🎯 My checkpoints on My marks (today.html cpView). The score first; the questions, the student's answers and the
+    // corrections once the teacher shows them or the whole class has done it (fb). Only the ones the student has done, in order. H.cp:
+    // students/{uid}/checkpoints, read by el-notes.js.
+    const CP = H.cp || {};
+    (window.EL_CATALOG || []).filter(a => a.ls === H.LS && a.checkpoint && a.keys && a.keys[0]).forEach((a, i) => {
+      const d = CP[a.keys[0]]; if (!d || d.redo) return;
+      const fb = d.fb, sc = fb || d.sc, num = (String(a.title || '').match(/\d+/) || [i + 1])[0], nm = 'Checkpoint ' + num;
+      const pc = sc && sc.max ? sc.score / sc.max : null;
+      let h = `<div class="nb-postit k-cp">🎯 ${esc(nm)}${sc && sc.max ? ` <span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${esc(sc.score)} / ${esc(sc.max)}</span>` : ''}</div>`;
+      if (!sc) h += `<p class="nb-pencil">✓ ${t('Enviat. Aviat hi veuràs la teva puntuació.', 'Sent. Your score will appear here soon.')}</p>`;
+      else if (!fb) h += `<p class="nb-pencil">⏳ ${t('Les preguntes, les teves respostes i la correcció apareixeran aquí quan tota la classe l\'hagi fet o quan el professor les mostri.', 'The questions, your answers and the corrections will appear here when the whole class has done it or when your teacher shows them.')}</p>`;
+      else h += `<div class="nb-work"><ol class="nb-ans">${(d.ids || []).map((id, j) => {
+          const ok = (fb.ok || [])[j], w = (fb.why || [])[j] || {}, why = H.ca ? (w.ca || w.en || '') : (w.en || w.ca || ''), q = (fb.q || [])[j], mine = String((d.answers || [])[j] || '').trim();
+          return `<li>${q ? esc(q) : t('Pregunta', 'Question') + ' ' + (j + 1)} <span class="nb-arrow">→</span> ${ok ? `<span class="nb-giv">${esc(mine)}</span> <i class="nb-tick">✓</i>` : `${fix(mine, (fb.right || [])[j])} <i class="nb-cross">✗</i>`}`
+            + (!ok && why ? `<small class="nb-why">💡 ${esc(why)}</small>` : '') + `</li>`; }).join('')}</ol></div>`;
+      out.push({ id: 'x-cp' + num, l: '🎯 ' + nm, side: nm, kind: 'cp', html: h });
+    });
     // 🎯 the exam
     if (G.exam) {
       const e = G.exam, x = rs[H.LS + '/assessment'] || {}, sc = x.sections || {}, r = x.report || {};
@@ -480,7 +499,7 @@ window.ELNotebook = (function () {
     const out = [], LS = H.LS, ls = (window.EL_LS || []).find(l => l.id === LS) || {};
     const course = String(ls.course || '').replace(/^(\d)eso$/, '$1 ESO'), name = String(ls.title || '').replace(/^[^·]*·\s*/, '');
     games.forEach(g => { gamesById[fk('g-' + g.id)] = g; });
-    const notesOf = key => Object.entries(NT()).filter(([, v]) => v && !v.fl && v.sec === key).sort((a, b) => a[0].localeCompare(b[0])).map(([id, v]) => ({ id, note: true, html: noteHtml(v) }));
+    const notesOf = key => Object.entries(NT()).filter(([, v]) => v && !v.fl && v.sec === key).sort((a, b) => a[0].localeCompare(b[0])).map(([id, v]) => ({ id, note: true, at: v.at && v.at.b ? v.at : null, ts: id, html: noteHtml(v) }));
     const addBtn = key => H.own ? `<div class="nb-links nb-ui"><button type="button" class="nb-addnote" data-sec="${key}">✍ ${t('Afegeix una nota', 'Add a note')}</button><button type="button" class="nb-addnote" data-sec="${key}" data-pi="y">🟨 ${t('Enganxa-hi un post-it', 'Stick a post-it')}</button></div>` : '';
     // the cover
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
@@ -494,7 +513,7 @@ window.ELNotebook = (function () {
       <div class="nb-sticky">${ex.exam ? `🎯 ${t('EXAMEN', 'EXAM')}: ${esc(H.exDay(ex.exam))}${when ? ' · ' + when : ''}` : '🎯 ' + t('Què entra a l\'examen', 'What\'s in the exam')}<small>${t('Tot el que hi ha en aquesta llibreta és el que hem fet a classe: és el que entra a l\'examen. Cada vegada que fem alguna cosa nova, apareix aquí.', 'Everything in this notebook is what we did in class: it\'s what goes in the exam. Each time we do something new, it appears here.')}</small></div>
       ${ex.dropped.length ? `<p class="nb-pencil">✂️ ${t('No entra a l\'examen', 'Not in your exam')}: ${ex.dropped.map(a => `LP${esc(a.n)} ${esc(a.title)}`).join(' · ')}</p>` : ''}`;
     const legend = `<div class="nb-legend"><b>${t('Com es llegeix', 'How to read it')}</b><br>📎 ${t('paper enganxat = del professor', 'glued slip = from your teacher')} · <span class="nb-swp"></span> ${t('nota rosa = estudia-ho', 'pink note = study it again')}<br><span style="color:var(--nb-ink)">${t('boli blau', 'blue pen')}</span> = ${t('els teus apunts', 'your own notes')} · <span style="color:var(--nb-green)">${t('verd', 'green')}</span> = ${t('la correcció', 'the correction')} · <span style="color:var(--nb-red)">${t('cercle', 'circle')}</span> = ${t('la teva nota', 'your score')}</div>
-      ${H.own ? `<div class="nb-legend"><b>${t('És la teva llibreta', 'It\'s your notebook')}</b><br>🖍 ${t('Tria unes paraules per subratllar-les o encerclar-les.', 'Select some words to highlight, underline or circle them.')}<br>✍ ${t('Afegeix notes i post-its amb ✍ 🟨. ↶ desfà el darrer canvi.', 'Add notes and post-its with ✍ 🟨. ↶ undoes your last change.')}<br>👉 ${t('Arrossega la pàgina per passar-la.', 'Drag a page to turn it.')}</div>` : ''}
+      ${H.own ? `<div class="nb-legend"><b>${t('És la teva llibreta', 'It\'s your notebook')}</b><br>🖍 ${t('Tria unes paraules per subratllar-les o encerclar-les.', 'Select some words to highlight, underline or circle them.')}<br>✍ ${t('Toca on vulguis d\'una pàgina i escriu-hi. 🟨 hi enganxa un post-it. ↶ desfà el darrer canvi.', 'Tap anywhere on a page and write there. 🟨 sticks a post-it. ↶ undoes your last change.')}<br>👉 ${t('Arrossega la pàgina per passar-la.', 'Drag a page to turn it.')}</div>` : ''}
 `;
     const chTitle = `<div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>`;
     if (mode === 'cover') return [{ key: 'cover', fixed: true, blocks: [], head: front(st) + eng + `<div class="nb-links"><button type="button" class="nb-printbtn">🖨 ${t('Imprimeix la llibreta', 'Print my notebook')}</button></div>` + legend }];
@@ -522,7 +541,7 @@ window.ELNotebook = (function () {
         if (pt.work) h += work(pt.work);
         else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '');
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
-        blocks.push({ id: key + '-p-' + fk(pt.id), l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm">${t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
+        blocks.push({ id: key + '-p-' + fk(pt.id), lock: !!pt.todo, l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm">${t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
       });
       // the class games and the whiteboard notes go after the part they belong to (vocabulary / grammar / reading), else at the end
       const after = (k, list) => { const at = blocks.map(b => b.kind).lastIndexOf(k); blocks.splice(at < 0 ? blocks.length : at + 1, 0, ...list); };
@@ -545,7 +564,12 @@ window.ELNotebook = (function () {
     // on paper (the questions to review, the writing's mistakes, what to review) and the final product's mark and feedback. From the
     // student's results (results/{ls}/assessment and the final product's activity), which el-cloud.js already keeps on the device.
     // (the final product has its own 🎬 Final products tab, fpSection)
-    const xb = examBlocks(ex).filter(b => b.kind !== 'fp');
+    const xall = examBlocks(ex), xb = xall.filter(b => b.kind !== 'fp' && b.kind !== 'cp'), cpb = xall.filter(b => b.kind === 'cp');
+    // 🎯 Checkpoints (Roger, 14 Nov 2026), a section of their own before 📝 Exams, when the LS has recall checkpoints
+    if ((window.EL_CATALOG || []).some(a => a.ls === H.LS && a.checkpoint))
+      out.push({ key: 'cps', tab: 'Checkpoints', l: '🎯 Checkpoints', head: `<p class="nb-h1"><u>🎯 Checkpoints</u></p>`
+        + (cpb.length ? '' : `<p class="nb-pencil">${t('Quan facis un checkpoint, aquí hi tindràs la puntuació i, després, les preguntes amb la correcció.', 'Once you do a checkpoint, you\'ll find your score here and, later, the questions with the corrections.')}</p>`),
+        blocks: ordered('cps', cpb.concat(notesOf('cps'))), foot: addBtn('cps') });
     out.push({ key: 'exams', tab: t('Exàmens', 'Exams'), l: '📝 ' + t('Exàmens', 'Exams'), head: `<p class="nb-h1"><u>📝 ${t('Exàmens', 'Exams')}</u></p>`, blocks: ordered('exams', xb.concat(notesOf('exams'))), foot: addBtn('exams') });
     // ✍ the student's own sections (Roger, 13 Nov 2026: "sections in between like their notes, just in case they need to add info, but they
     // can't move the ones that come from the web"): each one goes after the section the student chose (after: its key), never moved
@@ -593,7 +617,7 @@ window.ELNotebook = (function () {
   }
 
   // ---------- marks on the teacher's text ----------
-  const tnodes = el => { const out = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest('.nb-ui,.nb-stamp') ? 2 : 1 }); while (w.nextNode()) out.push(w.currentNode); return out; };
+  const tnodes = el => { const out = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest('.nb-ui,.nb-stamp,.nb-inl') ? 2 : 1 }); while (w.nextNode()) out.push(w.currentNode); return out; };   // a note written inside a part (.nb-inl) is not the part's text
   function paintMarks(el, list) {
     if (!Array.isArray(list) || !list.length) return;
     const ns = tnodes(el), text = ns.map(n => n.nodeValue).join('');
@@ -659,7 +683,7 @@ window.ELNotebook = (function () {
       const s = getSelection(); if (!s.rangeCount || s.isCollapsed) return hideSel();
       const r = s.getRangeAt(0), el = n => n && (n.nodeType === 1 ? n : n.parentElement);
       const a = el(r.startContainer), z = el(r.endContainer);
-      const inBlk = x => x && x.closest('.nb-spread .nb-page .nb-blk[data-b]:not(.nb-note)') && !x.closest('.nb-ui,input,textarea');
+      const inBlk = x => x && x.closest('.nb-spread .nb-page .nb-blk[data-b]:not(.nb-note)') && !x.closest('.nb-ui,input,textarea,.nb-note');
       if (!inBlk(a) && !inBlk(z)) return hideSel();
       const rc = r.getBoundingClientRect(); if (!rc.width && !rc.height) return hideSel();
       b.hidden = false; const w = b.offsetWidth, hgt = b.offsetHeight;
@@ -708,12 +732,19 @@ window.ELNotebook = (function () {
       n.forEach(k => { const at = chain[Math.min(k.lvl, chain.length - 1)]; at.insertBefore(k.e, chain[k.lvl + 1] && chain[k.lvl + 1].parentNode === at ? chain[k.lvl + 1] : null); leaves++; });
     };
     const counts = n => n.nodeType === 1 ? !n.matches(SKIP) : !!n.nodeValue.trim();
+    // ✍ a note starts on a line of the paper (32 px lines), so the handwriting sits on the lines
+    const onLine = node => {
+      if (node.nodeType !== 1) return;
+      (node.classList.contains('nb-note') ? [node] : []).concat([...node.querySelectorAll('.nb-note')]).forEach(n => {
+        n.style.marginTop = ''; const d = Math.round(n.getBoundingClientRect().top - paper.getBoundingClientRect().top) % 32; if (d > 0) n.style.marginTop = (32 - d) + 'px';
+      });
+    };
     const place = node => {
       if (node.nodeType === 1 && node.classList.contains('nb-break')) { if (leaves) newPage(); return; }
-      cur.append(node);
+      cur.append(node); onLine(node);
       if (fits()) { if (counts(node)) leaves++; return; }
       node.remove();
-      if (node.nodeType === 1 && node.matches(SPLIT) && (node.childNodes.length > 1 || (node.firstChild && node.firstChild.nodeType === 1))) {
+      if (node.nodeType === 1 && node.matches(SPLIT) && !node.classList.contains('nb-edit') && (node.childNodes.length > 1 || (node.firstChild && node.firstChild.nodeType === 1))) {
         const shell = node.cloneNode(false), c = shell.cloneNode(false); cur.append(c);
         if (!fits() && leaves) { c.remove(); breakBefore(true); return place(node); }
         stack.push(shell); cur = c;
@@ -722,8 +753,8 @@ window.ELNotebook = (function () {
       }
       if (leaves && breakBefore() !== false) return place(node);
       // alone on a new page and still too tall: a bit smaller, so it fits
-      cur.append(node); leaves++;
-      if (node.nodeType === 1) { const h = node.getBoundingClientRect().height, over = paper.scrollHeight - paper.clientHeight; if (h > 0 && over > 0) node.style.zoom = String(Math.max(.35, (h - over - 4) / h)); }
+      cur.append(node); onLine(node); leaves++;
+      if (node.nodeType === 1 && !node.classList.contains('nb-edit')) { const h = node.getBoundingClientRect().height, over = paper.scrollHeight - paper.clientHeight; if (h > 0 && over > 0) node.style.zoom = String(Math.max(.35, (h - over - 4) / h)); }
     };
     newPage(); [...frag.childNodes].forEach(place); page.classList.remove('nb-meas');
     // the cover's pages look like a notebook's hard cover (Roger, 13 Nov 2026: "The cover should look like a real notebook cover")
@@ -735,20 +766,31 @@ window.ELNotebook = (function () {
   function layout(keep, force) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || (printing() && !force)) return false;
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
-    if (keep == null) keep = atLP() || here();
+    // (ANCHOR: the place the student is at, kept as a part and not as a page number, so it stays exact when the pages flow again: fonts
+    // loaded, a chapter loaded later, a note added)
+    if (keep == null) keep = atLP() || ANCHOR || here();
     cvSet(root);
+    // 🟨 a post-it being written on stays open and keeps its cursor: the pages are made again when the book's size changes (the top bar
+    // wraps when "Saving…" shows on a Chromebook) or a font arrives, which took the new, still empty post-it away (Roger, 14 Nov 2026:
+    // "it appears and disappears")
+    const fa = document.activeElement, fd = fa && fa.closest && fa.closest('.nb-spread .nb-fpi'), fk = fd && fa.tagName === 'TEXTAREA' ? { n: fd.dataset.n, ci: fd.dataset.ci, s: fa.selectionStart, e: fa.selectionEnd } : null;
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
     secs.forEach((s, si) => {
       use(s.ci || 0); const M = MK(), n0 = pages.length;
       tpl.innerHTML = s.head + s.blocks.map(b => `<div class="nb-blk${b.note || b.own ? ' nb-note' : ''}" data-b="${b.id}">${b.html}</div>`).join('') + (s.foot || '');
       tpl.content.querySelectorAll('.nb-blk[data-b]:not(.nb-note)').forEach(el => paintMarks(el, M[el.dataset.b]));
+      const top = id => [...tpl.content.children].find(e => e.classList.contains('nb-blk') && e.dataset.b === id);
+      s.blocks.filter(b => b.at).sort((x, y) => String(x.ts).localeCompare(String(y.ts))).forEach(b => inlinePut(top(b.id), top(b.at.b), b.at));
+      s.blocks.forEach(b => { if (b.lock || wlock(b.id)) { const e = top(b.id); if (e) e.classList.add('nb-wlock'); } });
+      if (EDN && (s.ci || 0) === EDN.ci) { const e = tpl.content.querySelector(`.nb-blk[data-b="${EDN.id}"]`); if (e) e.classList.add('nb-edit'); }
       flow(sp, tpl.content, si);
       for (let i = n0; i < pages.length; i++) pages[i].el.dataset.ci = s.ci || 0;
     });
     use(keepCi);
     // empty pieces left behind when a part moved on to the next page
-    sp.querySelectorAll('.nb-cont,.nb-blk,.nb-slip,.nb-game,ul,.nb-notes,.nb-mine').forEach(e => { if (!e.textContent.trim() && !e.querySelector('svg,table,img,input,button')) e.remove(); });
+    sp.querySelectorAll('.nb-cont,.nb-blk,.nb-slip,.nb-game,ul,.nb-notes,.nb-mine').forEach(e => { if (!e.textContent.trim() && !e.querySelector('svg,table,img,input,button,.nb-edit') && !e.closest('.nb-edit')) e.remove(); });
+    root.classList.toggle('nb-own', !!H.own);
     // where each piece of a part starts in its text (for marks), and the tools of each part on its first page
     const seen = {};
     sp.querySelectorAll('.nb-blk[data-b]').forEach(pc => {
@@ -768,27 +810,61 @@ window.ELNotebook = (function () {
     const pl = root.querySelector('.nb-plist'); if (pl) pl.innerHTML = pages.map((p, i) => `<label><input type="checkbox" value="${i}"> <b>${i + 1}</b> ${esc(pname(p))}</label>`).join('');
     const pa = root.querySelector('[data-nbpr="all"]'); if (pa) pa.textContent = t('Tota la llibreta', 'The whole notebook') + ` (${pages.length})`;
     laid = W + 'x' + Hh + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
+    LOC = { secStart, blkPage, keepCi };
     // back to the same place
     if (typeof keep === 'number') pg = keep;
-    else if (keep) {
-      const [k0, c0] = String(keep).split('|'), ci = c0 == null || c0 === '' ? keepCi : +c0, [k, rest] = [k0.slice(0, 1), k0.slice(2)];
-      if (k === 's') { const [key, n] = rest.split('@'), i = secStart[ci + ':' + key]; if (i != null) { let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; pg = j; } }
-      else { const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop(); if (hit) pg = +hit.closest('.nb-page').dataset.i; else if (blkPage[ci + ':' + id] != null) pg = blkPage[ci + ':' + id]; }
-    }
-    show(); tourSoon(); return true;
+    else if (keep) { const i = locate(keep); if (i != null) pg = i; }
+    if (typeof keep === 'string') ANCHOR = keep.replace(/\|(\d+)$/, (m, c) => '|' + ((CH[+c] || {}).LS || c)); else if (typeof keep === 'number') ANCHOR = null;
+    if (fk) { use(+fk.ci || 0); const v = NT()[fk.n], at = v && fpiAt(v, +fk.ci || 0); if (at && at.pgEl) { pg = +at.pgEl.dataset.i; ANCHOR = null; } use(keepCi); }   // on the page where that post-it is now
+    LAYING = true; try { show(); } finally { LAYING = false; } if (!ANCHOR) ANCHOR = spot(); tourSoon();
+    if (fk) { const ta = document.querySelector(`.nb-spread .nb-fpi[data-n="${fk.n}"][data-ci="${fk.ci}"] textarea`); if (ta) { ta.dataset.snap = '1'; ta.focus({ preventScroll: true }); try { ta.setSelectionRange(fk.s, fk.e); } catch (x) {} } }
+    return true;
   }
+  // the page of a place kept by here() ('b:part@where in its text|chapter' or 's:section@page in it|chapter'), on the pages laid out now
+  function locate(keep) {
+    if (!LOC || !keep) return null;
+    const { secStart, blkPage, keepCi } = LOC, [k0, c0] = String(keep).split('|'), [k, rest] = [k0.slice(0, 1), k0.slice(2)];
+    const ci = c0 == null || c0 === '' ? keepCi : /^\d+$/.test(c0) ? +c0 : CH.findIndex(c => c.LS === c0); if (ci < 0) return null;
+    if (k === 's') { const [key, n] = rest.split('@'), i = secStart[ci + ':' + key]; if (i == null) return null; let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; return j; }
+    const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop();
+    return hit ? +hit.closest('.nb-page').dataset.i : blkPage[ci + ':' + id] != null ? blkPage[ci + ':' + id] : null;
+  }
+  // 📍 the notebook opens where the student left off (Roger, 14 Nov 2026: "they should have a button to go exactly where they were
+  // before"): the part on the page they are reading (here(), not a page number: new pages come after each class and move the numbers),
+  // one per student and notebook on this device (localStorage el-nb-spot|<uid>|<book>, no Firestore).
+  // here() with the chapter's LS instead of its number (the chapters can be fewer while the notebook is still loading)
+  const spot = () => { const h = here(); return h && h.replace(/\|(\d+)$/, (m, c) => '|' + ((CH[+c] || {}).LS || c)); };
   const relayout = keep => { if (!layout(keep)) laid = ''; };
   function tools(pc) {
     const id = pc.dataset.b, s = secs[+pc.closest('.nb-page').dataset.s] || {}, list = s.blocks || [], i = list.findIndex(b => b.id === id), b = list[i] || {};
     const ed = b.note || b.own || b.gt;
     // a note: no buttons (tapping it opens it); nothing moves any more (Roger, 13 Nov 2026)
-    if (b.note) return '';
+    if (b.note || b.lock || wlock(id)) return '';   // 🔒 not done and corrected yet: nothing written on it
     return `<span class="nb-ui nb-bt"><button type="button" data-nbadd="${id}" title="${t('Afegeix una nota aquí sota', 'Add a note below this')}">✍</button><button type="button" data-nbadd="${id}" data-pi="y" title="${t('Enganxa-hi un post-it a sota', 'Stick a post-it below this')}">🟨</button>${ed ? `<button type="button" data-nbed="${id}" title="${t('Edita', 'Edit')}">✏️</button>` : ''}</span>`;
   }
   const pname = p => { const s = secs[p.s] || {}, ls = CH.length > 1 && CH[s.ci || 0] ? ' · ' + plainOf((window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === CH[s.ci || 0].LS) || {}) : '')) : '';
     return s.key === 'cover' ? t('Portada', 'Cover') : s.key === 'index' ? t('Índex', 'Index') + ls : plainOf(s.l); };
 
   const wide = () => matchMedia('(min-width:900px)').matches;
+  // ↩ where the student opened the notebook from: el-cloud.js keeps el_nb_from {u: that page (a learning path with the step on screen),
+  // n: its title, t} when a 📓 link is pressed. Older than 12 hours, another site or none: the board.
+  function fromPage() {
+    let f = null; try { f = JSON.parse(store.get('el_nb_from') || 'null'); } catch (e) {}
+    let u = null; try { u = f && f.u && Date.now() - f.t < 12 * 3600e3 ? new URL(f.u, location.href) : null; } catch (e) {}
+    if (u && (u.origin !== location.origin || (u.pathname === location.pathname && u.hash === '#notes'))) u = null;
+    const board = !u || /\/today\.html$/.test(u.pathname), n = String((f && f.n) || '');
+    const first = n.split(' · ')[0], lp = first.match(/^Learning Path (\d+)/), ls = n.match(/\bLS\d+\b/);
+    const name = board ? '' : lp ? 'LP' + lp[1] : /^\d ESO$/.test(first) ? (ls ? ls[0] : '') : first.length > 22 ? first.slice(0, 21) + '…' : first;
+    const lab = board ? t('Torna al meu tauler', 'Back to my board') : name ? t('Torna a ', 'Back to ') + name : t('Torna on era', 'Back to where I was');
+    return { u: board && !u ? rel('today.html') : u.href, lab, tip: lab + (n && !board ? ' · ' + n : '') };
+  }
+  // the same page (the LS page opened its own notebook): only its place changes. Another page opens at the step it was on (#panel:
+  // el-cloud.js openHashTab), not with history.back(): the page before can be another one, or come back on its first step.
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('.nb .nb-from'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+    const u = new URL(a.href, location.href);
+    if (u.pathname === location.pathname && u.search === location.search) { e.preventDefault(); location.hash = u.hash; }
+  });
   function show() {
     const root = document.querySelector('.nb'); if (!root || !pages.length) return;
     pg = Math.max(0, Math.min(pages.length - 1, pg));
@@ -803,7 +879,8 @@ window.ELNotebook = (function () {
     let cur = null; root.querySelectorAll('.nb-tab:not(.nb-ctab)').forEach(b => { if (!b.hidden && b.dataset.nbgo != null && +b.dataset.nbgo <= z) cur = b; });
     const onSum = cur && (cur.classList.contains('nb-sumtab') || cur.classList.contains('nb-fptab'));
     root.querySelectorAll('.nb-tab').forEach(b => b.setAttribute('aria-current', String(b === cur || (b.classList.contains('nb-ctab') && !onSum && +b.dataset.chap === cz && +b.dataset.nbgo <= z))));
-    store.set('el-nb-pg|' + LSKEY, String(pg)); hideSel(); side(a, z); fpiPlace();
+    store.set('el-nb-pg|' + LSKEY, String(pg)); if (!LAYING && !TOUR && !printing()) ANCHOR = spot(); if (SPOTK && ANCHOR && !TOUR && !printing()) store.set(SPOTK, ANCHOR);
+    hideSel(); side(a, z); fpiPlace();
   }
   // 📌 the sections of the learning path open on the screen, as post-its sticking out of the book's edge: a tap goes to that section
   function side(a, z) {
@@ -889,6 +966,10 @@ window.ELNotebook = (function () {
     CH.forEach((c, i) => { c.ci = i; c.order = null; });
     const rootCi = CH.indexOf(helpers);
     if (LSKEY !== (chs ? 'all|' : '') + H.LS) { LSKEY = (chs ? 'all|' : '') + H.LS; pg = +store.get('el-nb-pg|' + LSKEY) || 0; }
+    // the place kept for this student's notebook (one notebook for the whole course, opened from any of its LS pages)
+    const crs = ((window.EL_LS || []).find(l => l.id === H.LS) || {}).course || String(H.LS).split('-')[0];
+    const sk = 'el-nb-spot|' + (H.uid || '') + '|' + (chs ? 'all|' + crs : H.LS);
+    if (sk !== SPOTK) { SPOTK = sk; ANCHOR = store.get(sk) || null; }
     secs = []; gamesById = {};
     if (!chs) { use(0); secs = build(ex, games, 'one'); secs.forEach(x => { x.ci = 0; }); CH[0].order = order; }
     else {
@@ -916,8 +997,9 @@ window.ELNotebook = (function () {
       + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
-      // 🏠 to the student's board (Roger, 13 Nov 2026: "add a button to go to the students dashboard")
-      + (H.own ? `<a class="nb-tool nb-home" href="${rel('today.html')}" title="${t('El meu tauler', 'My board')}">🏠<span class="nb-hlab"> ${t('El meu tauler', 'My board')}</span></a>` : '')
+      // ↩ Back (Roger, 14 Nov 2026: "the best thing is to go back where they were, so if they were on the dashboard they go there, but if
+      // they were somewhere else…", "So no My board button"): back to the page the notebook was opened from (el-cloud.js el_nb_from)
+      + (H.own ? (f => `<a class="nb-tool nb-home nb-from" href="${esc(f.u)}" title="${esc(f.tip)}">↩<span class="nb-hlab"> ${esc(f.lab)}</span></a>`)(fromPage()) : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav>${chs ? `<nav class="nb-lside${CH.length > 4 ? ' nb-many' : ''}" aria-label="${t('Situacions d\'aprenentatge', 'Learning situations')}">${CH.map((c, i) => { const L = (window.EL_LS || []).find(l => l.id === c.LS) || {}; return `<button type="button" class="nb-tab nb-ctab nb-lt" data-chap="${i}" data-nbto="s:chap|${i}" style="--i:${i}" title="${esc(chapName(L))}"><b>${lsNum(c)}</b><span> ${esc(chapName(L).replace(/^\S+\s*/, '').replace(/^\((.*)\)$/, '$1'))}</span></button>`; }).join('')}</nav>` : ''}</div>`
@@ -962,7 +1044,7 @@ window.ELNotebook = (function () {
       if (!on || !sp.clientWidth || !sp.clientHeight) return;
       const k = sp.clientWidth + 'x' + sp.clientHeight + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
       if (k === laid) return;
-      const a = document.activeElement; if (a && a.closest && a.closest('.nb-ed,.nb-stitle,.nb-add')) return;
+      const a = document.activeElement; if (a && a.closest && a.closest('.nb-ed,.nb-ied,.nb-stitle,.nb-add')) return;
       clearTimeout(RO.t); RO.t = setTimeout(() => { if (!printing()) layout(); }, laid ? 120 : 0);
     });
     RO.observe(sp);
@@ -988,10 +1070,10 @@ window.ELNotebook = (function () {
       { el: '.nb-side .nb-stab', all: '.nb-side', at: '.nb-work', wide: 1, ic: '🏷', h: t('Els post-its de les seccions', 'The section post-its'), p: t('Cada LP està dividit en seccions: Vocabulary, Reading, Grammar… Toca un post-it del costat per saltar-hi.', 'Each LP is split into sections: Vocabulary, Reading, Grammar… Tap a post-it on the edge to jump there.') },
       { el: '.nb-work', at: '.nb-work', ic: '✏️', h: t('Les teves respostes, corregides', 'Your answers, corrected'), p: t('Després de cada activitat hi veuràs el teu primer intent, corregit en vermell: el que està malament ratllat i la resposta bona a sobre. Estudia sobretot això!', 'After each activity you\'ll see your first try, corrected in red: the wrong word crossed out and the right answer above it. Study those most!'), pad: 4 },
       { el: '.nb-spread', at: '.nb-work', ic: '🖍', h: t('Subratlla i encercla', 'Highlight and circle'), p: t('Tria unes paraules amb el ratolí o el dit i apareixeran els subratlladors: groc, verd, rosa, subratllar, ondulat, encerclar. 🧽 ho treu.', 'Select some words with the mouse or your finger and the highlighters appear: yellow, green, pink, underline, wavy, circle. 🧽 takes it off.'), pad: -30 },
-      { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota i 🟨 hi enganxa un post-it (tria el color). Toca una nota per canviar-la. Si t\'equivoques, ↶ Desfés.', 'In the margin of each part: ✍ adds a note below it and 🟨 sticks a post-it (choose its colour). Tap a note to change it. Made a mistake? ↶ Undo.') },
+      { el: '.nb-bt', at: '.nb-bt', ic: '✍', h: t('Escriu a la llibreta', 'Write in your notebook'), p: t('Toca on vulguis d\'una pàgina i escriu-hi: el que hi ha a sota baixa una línia. Toca una nota teva per canviar-la. Al marge, 🟨 hi enganxa un post-it. Si t\'equivoques, ↶ Desfés.', 'Tap anywhere on a page and write there: what is below moves down a line. Tap a note of yours to change it. In the margin, 🟨 sticks a post-it. Made a mistake? ↶ Undo.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
       { el: '.nb-printbtn', ic: '🖨', h: t('Imprimeix', 'Print'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta.', '🖨 prints these pages, the ones you choose or the whole notebook.') },
-      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i 🏠 et porta al teu tauler. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and 🏠 takes you to your board. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
+      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i ↩ et torna on eres abans. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and ↩ takes you back to where you were. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
     ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
   }
   function tour() {
@@ -1067,8 +1149,8 @@ window.ELNotebook = (function () {
   // ✍ a note after a part; ✏️ edit a note
   const secOf = id => secs.find(s => (s.ci || 0) === (H ? H.ci || 0 : 0) && (s.blocks || []).some(b => b.id === id));
   document.addEventListener('click', e => {
-    const b = e.target.closest && e.target.closest('.nb [data-nbadd],.nb [data-nbed],.nb .nb-addnote,.nb .nb-note'); if (!b || !H || !H.own) return;
-    if (b.classList.contains('nb-note') && (e.target.closest('.nb-ui') || getSelection().toString())) return;
+    const b = e.target.closest && e.target.closest('.nb [data-nbadd],.nb [data-nbed],.nb .nb-addnote,.nb .nb-note'); if (!b || !H || !H.own || e.target.closest('.nb-ied')) return;
+    if (b.classList.contains('nb-note') && (e.target.closest('.nb-ui') || getSelection().toString() || Date.now() < tapOff)) return;
     e.preventDefault();
     if (b.dataset.pi && (b.dataset.nbadd || b.classList.contains('nb-addnote'))) {   // 🟨 a real post-it, stuck beside this part (fpiNew)
       const pgEl = b.closest('.nb-page'), pr = pgEl.getBoundingClientRect(), br = (b.closest('.nb-blk') || b).getBoundingClientRect();
@@ -1076,10 +1158,8 @@ window.ELNotebook = (function () {
     }
     if (b.dataset.nbadd || b.classList.contains('nb-addnote')) {
       const after = b.dataset.nbadd, s = after ? secOf(after) : secs.find(x => x.key === b.dataset.sec && (x.ci || 0) === (H.ci || 0)); if (!s) return;
-      const id = nid(), ids = s.blocks.map(x => x.id), at = after ? ids.indexOf(after) + 1 : ids.length;
-      snap();
-      NT()[id] = { sec: s.key, html: '', text: '', dr: [], day: today(), pi: b.dataset.pi || '' }; ids.splice(at, 0, id); O().b[s.key] = ids;
-      return editor({ kind: 'note', id, sec: s, fresh: true });
+      const last = s.blocks.filter(x => !x.at).pop();
+      return noteAt(s, after || (last ? last.id : null));
     }
     const id = b.dataset.nbed || b.dataset.b; const s = secOf(id); if (!s) return; const blk = s.blocks.find(x => x.id === id);
     if (blk.note) editor({ kind: 'note', id, sec: s }); else if (blk.own) editor({ kind: 'own', id, sec: s, k: blk.own }); else if (blk.gt && gamesById[id]) editor({ kind: 'gt', id, sec: s, g: gamesById[id] });
@@ -1208,7 +1288,10 @@ window.ELNotebook = (function () {
   document.addEventListener('focusout', e => {
     const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (!ta) return; delete ta.dataset.snap;
     const d = ta.closest('.nb-fpi'), v = fpiNote(d);   // an empty post-it left behind goes away
-    if (v && !String(v.text || '').trim() && !d.classList.contains('drag')) setTimeout(() => { if (d.contains(document.activeElement)) return; delete NT()[d.dataset.n]; save(); d.remove(); }, 150);
+    if (v && !String(v.text || '').trim() && !d.classList.contains('drag')) setTimeout(() => {
+      // taken off the page because the pages were made again (layout): the same post-it is back there, so the note stays
+      if (!d.isConnected || d.contains(document.activeElement)) return;
+      const v2 = fpiNote(d); if (!v2 || String(v2.text || '').trim()) return; delete NT()[d.dataset.n]; save(); d.remove(); }, 150);
   });
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.nb .nb-fpi button'); if (!b || !H || !H.own) return; e.preventDefault();
@@ -1255,8 +1338,7 @@ window.ELNotebook = (function () {
     const name = f.querySelector('input').value.trim().slice(0, 60); if (!name) { f.querySelector('input').focus(); return; }
     const sl = f.querySelector('select'), k = 's' + Date.now().toString(36);
     snap(); PT()[k] = { topic: name, html: '', text: '', dr: [], day: today(), after: sl ? sl.value : null }; save(); redraw('s:' + k);
-    const s = secs.find(x => x.key === k && (x.ci || 0) === (H.ci || 0)); const id = nid();
-    if (s) { NT()[id] = { sec: k, html: '', text: '', dr: [], day: today() }; O().b[k] = [id]; editor({ kind: 'note', id, sec: s, fresh: true }); }
+    const s = secs.find(x => x.key === k && (x.ci || 0) === (H.ci || 0)); if (s) noteAt(s, null, null, true);
   });
   document.addEventListener('change', e => {
     const x = e.target.closest && e.target.closest('.nb .nb-stitle'); if (!x || !H || !H.own) return;
@@ -1275,6 +1357,7 @@ window.ELNotebook = (function () {
     if (!v) return;
     if (o.kind === 'gn' || o.kind === 'gt') snap({ g: o.g, k: o.kind === 'gn' ? o.k : '', v: JSON.stringify(v) });
     else if (!o.fresh) snap();
+    if ((o.kind === 'note' || o.kind === 'own') && inlineEd(o, v)) return;   // ✍ on the page itself (below)
     const w = document.createElement('div'); w.className = 'nb-ed'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', plainOf(title));
     const PI = [['', t('Al full', 'On the page')], ['y', t('Post-it groc', 'Yellow post-it')], ['p', t('Post-it rosa', 'Pink post-it')], ['g', t('Post-it verd', 'Green post-it')], ['b', t('Post-it blau', 'Blue post-it')]];
     const pis = o.kind === 'note' ? `<span class="nb-pis" role="group" aria-label="${t('Com és la nota', 'What the note looks like')}">${PI.map(([k, l]) => `<button type="button" class="nb-pib pi-${k || 'n'}" data-pi="${k}" title="${l}" aria-label="${l}" aria-pressed="${(v.pi || '') === k}"></button>`).join('')}</span>` : '';
@@ -1309,12 +1392,180 @@ window.ELNotebook = (function () {
     const E = ED; if (!E) return; ED = null;
     if (E.p) Object.assign(E.v, E.p.get());
     const o = E.o;
+    if (E.inl) {   // ✍ written on the page: the page is made again with the note as it is now (an empty note goes away)
+      if (E.p) E.p.destroy(); E.w.remove(); EDN = null;
+      if (o.kind === 'note' && !hasInk(E.v)) { delete NT()[o.id]; const L = O().b[o.sec.key]; if (L) O().b[o.sec.key] = L.filter(x => x !== o.id); o.sec.blocks = o.sec.blocks.filter(b => b.id !== o.id); }
+      else blkSync(E);
+      save(); relayout(pg); undoBtn(); return;
+    }
     if (o.kind === 'note' && !hasInk(E.v)) { delete NT()[o.id]; const L = O().b[o.sec.key]; if (L) O().b[o.sec.key] = L.filter(x => x !== o.id); save(); }
     else if (o.kind === 'gt') { clearTimeout(E.gtT); gtSave(o.g); }
     else if (o.kind === 'gn') { clearTimeout(E.gtT); gnSave(o.g, o.k); }
     else save();
     E.w.remove(); if (!quiet) redraw(o.kind === 'note' && NT()[o.id] ? 'b:' + o.id : o.kind === 'gn' && o.blk ? 'b:' + o.blk : 's:' + o.sec.key);
   }
+
+  // ---------- ✍ Writing on the page itself (Roger, 14 Nov 2026: "have the feeling that u are writing on the notebook and not on this pop up",
+  // "by pressing wherever, we should be able to write", "and the rest would move down a line; and later line by line"): a tap anywhere on
+  // a page of a learning path, the exams or a section of their own opens the pen right there, on the lines. Tapped inside a part (the
+  // vocabulary, their answers, a grammar slip), the note goes under the line that was tapped and is kept there by that line's first letters
+  // (n.<id>.at = {b: the part, o: where that line's word starts in the part's text, x: its first letters}, like the post-its; the part's own
+  // text and marks never count it, tnodes). Tapped on an empty bit of the page, it goes between the parts (o.b, as before). While the note is
+  // written, what comes after it moves down with every new line; when the page is full the pages are made again and the note goes on to the
+  // next page in one piece (EDN), with the cursor where it was. The pens and marks (el-pad.js) float in a small strip over the top bar.
+  // 🔒 Nothing is written on an activity that is not done and corrected yet (Roger, 14 Nov 2026: "if it's an activity that had been pulled
+  // up or an activity that's being done on the notebook … they can't write anything until it's handed in and corrected"): the "To do" parts
+  // (pt.todo) and any part a page marks with window.elNbWriteLock(partId, LS) → true (for activities done in the notebook later) or with
+  // .nb-wlock / [data-nb-lock] in its html. A pulled-up student is kept on the learning path by el-cloud.js, so the notebook isn't open then.
+  let EDN = null, tapOff = 0, fitT = 0;
+  const wlock = id => { try { return !!(window.elNbWriteLock && H && window.elNbWriteLock(id, H.LS)); } catch (e) { return false; } };
+  const INL = /^(SPAN|B|I|EM|STRONG|A|MARK|SMALL|SUP|SUB|U|S|LABEL|CODE|ABBR|DEL|INS|Q|FONT|BDI|TIME|BR|IMG)$/;
+  // a note written inside a part: after the line (the paragraph, list item, slip heading…) holding its word; a vocabulary list or a table
+  // stays whole (the note goes after it)
+  function inlinePut(nEl, pEl, at) {
+    if (!nEl || !pEl || pEl.classList.contains('nb-note')) return;
+    const ns = tnodes(pEl); if (!ns.length) return;
+    const full = ns.map(n => n.nodeValue).join(''); let o = Math.max(0, Math.min(full.length - 1, +at.o || 0));
+    if (at.x && full.slice(o, o + at.x.length) !== at.x) { let best = -1, i = full.indexOf(at.x); while (i >= 0) { if (best < 0 || Math.abs(i - o) < Math.abs(best - o)) best = i; i = full.indexOf(at.x, i + 1); } if (best >= 0) o = best; }
+    let acc = 0, tn = ns[ns.length - 1]; for (const n of ns) { if (o < acc + n.nodeValue.length) { tn = n; break; } acc += n.nodeValue.length; }
+    let e = tn.parentElement; while (e && e !== pEl && INL.test(e.tagName)) e = e.parentElement;
+    const whole = e && e !== pEl && e.closest('table,.nb-voc,.nb-opts'); if (whole && pEl.contains(whole)) e = whole;
+    nEl.classList.add('nb-inl');
+    if (!e || e === pEl) { pEl.append(nEl); return; }
+    let ref = e; while (ref.nextElementSibling && ref.nextElementSibling.classList.contains('nb-inl')) ref = ref.nextElementSibling;
+    ref.after(nEl);
+  }
+  // the html the pages are made from, as the note is now
+  function blkSync(E) {
+    const o = E.o, id = o.kind === 'own' ? o.k + '~' : o.id, b = (o.sec.blocks || []).find(x => x.id === id);
+    if (b) b.html = noteHtml(E.v); else if (o.kind === 'own' && hasInk(E.v)) o.sec.blocks.unshift({ id, own: o.k, html: noteHtml(E.v) });
+  }
+  // a new note of section s, after the part `after` (null: at the start) or inside a part (at), written on at once
+  function noteAt(s, after, at, quiet) {
+    if (!s || !H || !H.own) return; use(s.ci || 0);
+    const id = nid(), v = { sec: s.key, html: '', text: '', dr: [], day: today() }; if (at) v.at = at;
+    if (!quiet) snap();
+    NT()[id] = v; const b = { id, note: true, at: at || null, ts: id, html: noteHtml(v) };
+    if (at) s.blocks.push(b);
+    else { const ids = s.blocks.map(x => x.id), i = after == null ? 0 : ids.indexOf(after) + 1; s.blocks.splice(i < 0 ? s.blocks.length : i, 0, b); O().b[s.key] = s.blocks.map(x => x.id); }
+    EDN = { id, ci: s.ci || 0 }; relayout('b:' + id + '@0|' + (s.ci || 0));
+    editor({ kind: 'note', id, sec: s, fresh: true });
+  }
+  // where the cursor is in the note (its line and how far along it), to put it back after the pages are made again
+  function caretGet(ed) {
+    const s = getSelection(); if (!s.rangeCount || !ed.contains(s.focusNode)) return null;
+    let n = s.focusNode; if (n === ed) return { i: s.focusOffset, edge: true };
+    while (n.parentNode !== ed) n = n.parentNode;
+    const r = document.createRange(); r.selectNodeContents(n); r.setEnd(s.focusNode, s.focusOffset);
+    return { i: [...ed.childNodes].indexOf(n), k: r.toString().length };
+  }
+  function caretSet(ed, c) {
+    const s = getSelection(), r = document.createRange(), top = c && !c.edge ? ed.childNodes[c.i] : null;
+    if (c && c.edge) r.setStart(ed, Math.min(c.i, ed.childNodes.length));
+    else if (!top) { r.selectNodeContents(ed); r.collapse(false); }
+    else {
+      let k = c.k, ok = false; const w = document.createTreeWalker(top, NodeFilter.SHOW_TEXT); let tn = top.nodeType === 3 ? top : w.nextNode();
+      while (tn) { if (k <= tn.nodeValue.length) { r.setStart(tn, k); ok = true; break; } k -= tn.nodeValue.length; tn = w.nextNode(); }
+      if (!ok) { r.selectNodeContents(top); r.collapse(!top.textContent); }
+    }
+    r.collapse(true); s.removeAllRanges(); s.addRange(r);
+  }
+  function inlineEd(o, v, caret) {
+    if (!me || !document.querySelector('.nb')) return false;
+    const id = o.kind === 'own' ? o.k + '~' : o.id, ci = o.sec.ci || 0;
+    if (!EDN || EDN.id !== id) { EDN = { id, ci }; relayout('b:' + id + '@0|' + ci); }
+    const els = blkEls(id, ci); if (!els.length) { EDN = null; return false; }
+    const el = els[0]; els.slice(1).forEach(x => x.remove());
+    const pgEl = el.closest('.nb-page'); if (!pgEl.classList.contains('l') && !pgEl.classList.contains('r')) go(+pgEl.dataset.i);
+    const old = el.querySelector('.nb-notes'), host = document.createElement('div');
+    host.className = 'nb-ied ' + (old ? [...old.classList].filter(c => c === 'nb-pi' || /^pi-/.test(c)).join(' ') : '');
+    if (old) old.replaceWith(host); else el.append(host);
+    el.classList.add('nb-editing');
+    const w = document.createElement('div'); w.className = 'nb-ifl nb-ui'; w.setAttribute('role', 'toolbar'); w.setAttribute('aria-label', t('Bolis i marques', 'Pens and marks'));
+    w.innerHTML = `<span class="nb-ifl-t"></span>${o.kind === 'note' ? `<button type="button" class="nb-tool nb-ed-del" title="${t('Esborra la nota', 'Delete the note')}" aria-label="${t('Esborra la nota', 'Delete the note')}">🗑</button>` : ''}<button type="button" class="nb-tool nb-ed-ok">✓ ${t('Fet', 'Done')}</button>`;
+    document.querySelector('.nb').append(w);
+    const E = ED = { o, w, v, inl: el, id, ci, gtT: 0 };
+    w.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); });
+    w.querySelector('.nb-ed-ok').addEventListener('click', () => closeEditor());
+    const db = w.querySelector('.nb-ed-del'); if (db) db.addEventListener('click', () => {
+      if (!db.dataset.sure) { db.dataset.sure = '1'; db.textContent = '🗑 ' + t('Segur?', 'Sure?'); setTimeout(() => { if (db.isConnected) { delete db.dataset.sure; db.textContent = '🗑'; } }, 4000); return; }
+      if (E.p) E.p.destroy(); E.v.html = ''; E.v.text = ''; E.v.dr = []; E.p = null; closeEditor();
+    });
+    import(new URL('./el-pad.js', me).href).then(P => {
+      if (ED !== E) return;
+      E.p = P.pad(host, { html: v.html, text: v.text, dr: v.dr, ca: H.ca, ph: t('Escriu aquí…', 'Write here…'), onChange: x => { if (ED !== E) return; Object.assign(v, x); save(); } });
+      const tl = host.querySelector('.pad-tools'); if (tl) w.querySelector('.nb-ifl-t').append(tl);
+      E.p.ed.addEventListener('input', () => fitCheck(E));
+      E.p.ed.focus({ preventScroll: true }); caretSet(E.p.ed, caret); fitCheck(E);
+    }).catch(e => { console.warn('notebook pad', e); });
+    return true;
+  }
+  // the page is full: made again, the note on to the next page in one piece (not when it already starts a page: it can't go further)
+  function fitCheck(E) {
+    if (ED !== E || !E.p || !E.inl.isConnected) return;
+    const paper = E.inl.closest('.nb-paper'); if (!paper || paper.scrollHeight <= paper.clientHeight + 1) return;
+    if (E.inl.getBoundingClientRect().top - paper.getBoundingClientRect().top < 48) return;
+    const now = performance.now(); if (now - fitT < 300) return; fitT = now;   // never round and round
+    const c = caretGet(E.p.ed); Object.assign(E.v, E.p.get()); E.p.destroy(); E.w.remove(); ED = null;
+    blkSync(E); relayout('b:' + E.id + '@0|' + E.ci); inlineEd(E.o, E.v, c);
+  }
+  // a tap on the page, outside the note being written: that note is finished (the same tap doesn't start another one)
+  document.addEventListener('pointerdown', e => {
+    // a tap that only takes the cursor out of a post-it, a title or a box doesn't start a note either
+    const a = document.activeElement; if (a && a !== document.body && a.closest && a.closest('.nb input,.nb textarea,.nb select') && !(e.target.closest && e.target.closest('input,textarea,select'))) tapOff = Date.now() + 600;
+    if (!ED || !ED.inl || !e.target.closest || e.target.closest('.nb-ied,.nb-ifl,#pad-hint')) return;
+    tapOff = Date.now() + 600; closeEditor();
+  }, true);
+  // 🔒 a short note where a locked activity was tapped
+  function lockTip(x, y) {
+    document.querySelectorAll('.nb-tipb').forEach(q => q.remove());
+    const tip = document.createElement('div'); tip.className = 'nb-tipb'; tip.setAttribute('role', 'status');
+    tip.textContent = '🔒 ' + t('Aquí encara no hi pots escriure: primer fes l\'activitat i corregeix-la al learning path.', 'You can\'t write here yet: first do the activity and check it on the learning path.');
+    document.querySelector('.nb').append(tip);
+    tip.style.left = Math.max(12, Math.min(innerWidth - tip.offsetWidth - 12, x - tip.offsetWidth / 2)) + 'px'; tip.style.top = Math.max(12, Math.min(innerHeight - tip.offsetHeight - 12, y + 14)) + 'px';
+    setTimeout(() => tip.remove(), 4000);
+  }
+  const LOCKED = '.nb-wlock,[data-nb-lock]';
+  document.addEventListener('click', e => {
+    if (!H || !H.own || ED || Date.now() < tapOff || Date.now() < noClick || e.defaultPrevented || e.button) return;
+    const t0 = e.target; if (!t0 || !t0.closest) return;
+    const pgEl = t0.closest('.nb-spread .nb-page'); if (!pgEl || pgEl.closest('.nb-leaf')) return;
+    if (t0.closest('a,button,input,textarea,select,label,summary,details,[contenteditable],.nb-ui,.nb-fpi,.nb-note,.nb-tipb,.nb-fpfull')) return;
+    const sl = getSelection(); if (sl && String(sl).trim()) return;
+    const ci = +(pgEl.dataset.ci || 0); use(ci);
+    const s = secs[+pgEl.dataset.s]; if (!s || s.fixed || !Array.isArray(s.blocks) || (s.ci || 0) !== ci) return;
+    if (t0.closest(LOCKED)) return lockTip(e.clientX, e.clientY);
+    const paper = pgEl.querySelector('.nb-paper'), y = e.clientY, x = e.clientX, tops = [...paper.querySelectorAll(':scope > .nb-blk[data-b]')];
+    // the part tapped (or the part at that height, tapped in the margin)
+    let pc = t0.closest('.nb-blk[data-b]');
+    if (!pc) pc = tops.find(b => { const r = b.getBoundingClientRect(); return y >= r.top && y <= r.bottom; }) || null;
+    if (pc && pc.classList.contains('nb-note')) { const sid = pc.dataset.b, blk = s.blocks.find(b => b.id === sid); if (blk && blk.note) editor({ kind: 'note', id: sid, sec: s }); return; }
+    if (pc && pc.matches(LOCKED)) return lockTip(x, y);
+    const before = id => { const l = s.blocks.filter(b => !b.at), i = l.findIndex(b => b.id === id); return i > 0 ? l[i - 1].id : null; };
+    if (pc) {
+      // the line just above the tap: the last word whose top is above it (the nearest one sideways on that line)
+      let best = null, acc = +pc.dataset.off || 0;
+      tnodes(pc).forEach(tn => {
+        const v = tn.nodeValue, re = /\S+/g; let m;
+        while ((m = re.exec(v))) {
+          const r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length); const q = r.getClientRects()[0];
+          if (!q || !q.width || q.top > y) continue;
+          const sc = [Math.round(q.top / 8), -Math.abs(q.left + q.width / 2 - x)];
+          if (!best || sc[0] > best.sc[0] || (sc[0] === best.sc[0] && sc[1] >= best.sc[1])) best = { sc, o: acc + m.index, x: v.slice(m.index, m.index + 24) };
+        }
+        acc += v.length;
+      });
+      if (best) return noteAt(s, null, { b: pc.dataset.b, o: best.o, x: best.x });
+      if (+pc.dataset.off > 0) return noteAt(s, null, { b: pc.dataset.b, o: +pc.dataset.off - 1, x: '' });
+      return noteAt(s, before(pc.dataset.b));
+    }
+    // an empty bit of the page: after the last part above the tap, else before the first one on the page (or at the section's start)
+    const above = tops.filter(b => b.getBoundingClientRect().top < y).pop();
+    if (above) return noteAt(s, above.dataset.b);
+    if (tops[0]) return noteAt(s, before(tops[0].dataset.b));
+    const first = pages.findIndex(p => p.s === +pgEl.dataset.s) === +pgEl.dataset.i, l = s.blocks.filter(b => !b.at).pop();
+    return noteAt(s, first ? null : l ? l.id : null);
+  });
 
   // 📖 Turning the pages (Roger, 13 Nov 2026: "I want them to be able to drag the pages to turn them"): ◀ ▶, the arrow keys and dragging a
   // page with a finger (or with the mouse from a margin or the folded corner, so words can still be selected) turn a paper leaf, the same
