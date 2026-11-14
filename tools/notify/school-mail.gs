@@ -42,6 +42,9 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  12. v23 (Roger, 14 Nov 2026: "I want gemini see my changes and learn from them"): "fp_watch" also takes ask.lessons, Roger's latest
+//      corrections of Gemini's final product drafts (up to 6 short texts from the dashboard, no names), and puts them in the prompt.
+//      Nothing else changes; a dashboard that sends none gets the same prompt as v22.
 //  11. v22 (Roger, 14 Nov 2026: "and on each video the money that costed"): each Gemini answer also says what that one call cost
 //      (eur, from Google's token count, as the month total): "audio" → {…, eur}, "fp_watch" → {…, eur}. The pages keep it with the
 //      recording (audio.eur) and the draft (eur), and the dashboard's ✏️ Corrections shows it on each row. Nothing else changes.
@@ -484,6 +487,14 @@ function fpPrompt(ask, rows, prev, change) {
     "well_done: one specific thing they did well; next_time: one small, concrete tip; seconds: the length of the video in seconds;",
     "sounds: for Roger only, NOT for the student (he collects them from the whole class to make a listen-and-repeat video): a list of up to 12 English words the student mispronounced in a way that matters, typical of Catalan and Spanish speakers, e.g. 'walk' with the L sounded, 'vegetables' with 4 syllables, 'clothes' as 2 syllables, a silent -ed sounded ('watched' as 'watch-ed'), 'v' and 'b' the same. Each item: {word: the word as written, heard: how the student said it in IPA, e.g. '/wɔːlk/', tip: the correct British pronunciation in IPA and a very short note, e.g. '/wɔːk/ (the L is silent)'}. Only words you clearly heard; an empty list if there are none. Do not mention these in the feedback."
   );
+  // v23 (Roger, 14 Nov 2026: "I want gemini see my changes and learn from them", final product videos only): Gemini keeps nothing between
+  // two videos, so the dashboard sends Roger's latest corrections of earlier drafts (ask.lessons: up to 6 short texts, no names) and they go here
+  const les = [].concat(ask.lessons || []).map(x => String(x || "").replace(/\s+/g, " ").trim().slice(0, 700)).filter(Boolean).slice(0, 6);
+  if (les.length) {
+    let room = 3500;
+    lines.push("", "HOW ROGER CORRECTED YOUR RECENT DRAFTS (other students' videos). Learn his standard from them: where he moved a level or a mark up or down, mark the same kind of performance the same way; where he rewrote your comment, write like him. Do not copy anything from these examples into this answer: judge THIS video only.");
+    les.forEach((x, i) => { if (x.length <= room) { lines.push("Correction " + (i + 1) + ": " + x); room -= x.length; } });
+  }
   if (change) lines.push("", "You already gave this draft: " + JSON.stringify(prev || {}).slice(0, 6000), "Roger disagrees and says: \"" + String(change).slice(0, 1500) + "\". Watch again and give the whole draft again following his instruction exactly.");
   return lines.join("\n");
 }
