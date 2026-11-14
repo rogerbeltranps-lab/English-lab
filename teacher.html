@@ -1621,10 +1621,12 @@ function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.b
   if(busy)return {bar:`<span>⏳ <b>Gemini is watching the video again</b> ${fpgClock(u+"|"+a.id)}<br><small style="color:#b45309">The levels below are the OLD ones; the new draft replaces them in about a minute.</small><br><small class="muted">💶 What this watch cost appears here when Gemini finishes.</small></span>`,
     rub:N?`<div style="opacity:.4;pointer-events:none">${rubH(N,sel,"Gemini")}</div>`:""};
   const c1=fpgCost1(u,a);
+  // 🗣️ words said wrong (Roger, 14 Nov 2026: "where are the mispronounced words?"): here too, under the mark; only for the teacher
+  const snd=g.sounds&&g.sounds.length?`<br><small>🗣️ <b>Words said wrong</b> <span class="muted">(only for you)</span>: ${g.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?` <span class="muted">(said “${esc(w.heard)}”)</span>`:""}`).join(" · ")} <button class="g mini" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}">Whole group</button></small>`:`<br><small class="muted">🗣️ No words said wrong in Gemini's draft.</small>`;
   // 👁 when Gemini last watched it and with which model (Roger, 14 Nov 2026: "I need to see when was the last time Gemini read this")
   const MOD={"gemini-4-argon":"Gemini 4 Argon","gemini-pro-latest":"Gemini 3.1 Pro (the older model)","gemini-flash-latest":"Gemini Flash"},
     seen=d.at?`👁 Gemini watched it <b>${esc(new Date(d.at).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</b>${d.model?" · "+esc(MOD[d.model]||d.model):""}`:"";
-  return {bar:`<span><b>${rd[0]} ${rd[1]}</b>${R.kind==="mark"?` · <b>Gemini's mark: ${fpgMark(R,g)??"–"}/10</b>`:""}${seen?`<br><small>${seen}</small>`:""}${c1?`<br><small>${c1}</small>`:""}</span>`
+  return {bar:`<span><b>${rd[0]} ${rd[1]}</b>${R.kind==="mark"?` · <b>Gemini's mark: ${fpgMark(R,g)??"–"}/10</b>`:""}${seen?`<br><small>${seen}</small>`:""}${c1?`<br><small>${c1}</small>`:""}${snd}</span>`
       +(v?`<button class="g gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:"")
       +(done?`<b class="gx">✅ Approved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves the levels, the mark and Gemini's comment for the student, then shows the next student to approve">${redo?`✅ Approve this draft <small>(saved now: ${x.max?x.score+"/"+x.max:"your levels"})</small>`:"✅ Approve · next student"}</button>`),
     rub:N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Gemini's level in each row is shaded (blue). Click a square to change it.</p>${rubH(N,sel,"Gemini",{u,a:a.id})}`:""}}
