@@ -4145,7 +4145,7 @@ function fpRub(a){const R=(window.EL_FP_RUBRICS||{})[a.id],g=gradingFor(a.ls,S.g
 // the feedback text cut into its parts, as fbBox in today.html does
 function fbParts(txt){const H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/,parts=[];let cur=null;
   String(txt||"").split("\n").forEach(l=>{const t=l.trim();if(!t||/^Final mark:/i.test(t))return;const h=t.match(H);
-    if(h){cur={m:parseFloat(h[3].replace(",",".")),ok:[],todo:[]};parts.push(cur);return}
+    if(h){cur={n:h[1],m:parseFloat(h[3].replace(",",".")),ok:[],todo:[]};parts.push(cur);return}
     if(cur&&/^✔/.test(t)){cur.ok.push(t.replace(/^✔\s*/,""));return}if(cur&&/^➜/.test(t)){cur.todo.push(t.replace(/^➜\s*/,""));return}
     if(cur)(cur.todo.length?cur.todo:cur.ok).push(t)});return parts}
 const rbIdx=m=>4-Math.max(0,Math.min(4,Math.round(m/2.5)));   // mark /10 → index in the levels (0 = top, 4 = No evidence)
@@ -4160,9 +4160,11 @@ function rubH(N,sel,tag,ck){const last=N.levels.length-1,gm=tag!=="you",
       +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)||x.why?`<div class="rbn">${x.why?`<div class="muted">👀 ${esc(x.why)} <small>(only for you)</small></div>`:""}${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
 // the student's rubric, as they see it (LS1 from the saved feedback; LS2 from your levels)
 function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,lead;
-  if(N.kind==="mark"){const P=fbParts(x.feedback);if(!x.feedback)return "";
-    if(P.length!==N.rows.length)return `<details class="rbbox"><summary>📋 Their rubric, as they see it</summary><p class="muted">The saved feedback has no part marks (“Speaking (30%) · 7.5/10” lines), so they see it as plain text, with no rubric shaded.</p></details>`;
-    sel=P.map(p=>({L:rbIdx(p.m),m:p.m,ok:p.ok,todo:p.todo}));lead=`What they see in 📊 My marks under your feedback: their level in each part shaded. ${esc(N.note)}`}
+  if(N.kind==="mark"){if(!x.feedback)return "";const Q=fbParts(x.feedback),nm=z=>String(z||"").trim().toLowerCase();
+    // parts matched to the rubric rows by name, so a part left out (Gemini's "no evidence", e.g. no slides) still shows the rest (as today.html)
+    let P=N.rows.map(r=>Q.find(p=>nm(p.n)===nm(r.name))||null);if(!Q.length||!Q.every(p=>P.includes(p)))P=Q.length===N.rows.length?Q:[];
+    if(!P.length)return `<details class="rbbox"><summary>📋 Their rubric, as they see it</summary><p class="muted">The saved feedback has no part marks (“Speaking (30%) · 7.5/10” lines), so they see it as plain text, with no rubric shaded.</p></details>`;
+    sel=P.map(p=>p?{L:rbIdx(p.m),m:p.m,ok:p.ok,todo:p.todo}:{L:-1,m:null,ok:[],todo:[]});lead=`What they see in 📊 My marks under your feedback: their level in each part shaded. ${esc(N.note)}`}
   else{sel=N.rows.map(r=>{const l=lvOf(u,a.id,r.step,r.c),L=N.levels.indexOf(l);return {L:L>=0?L:-1,m:l?lvMark(l):null}});
     if(!sel.some(z=>z.L>=0))return "";lead="Your level on each row of the rubric (NA · AS · AN · AE), with its indicators."}
   return `<details class="rbbox" open><summary>📋 Their rubric, as they see it</summary><p class="muted" style="margin:4px 0">${lead}</p>${rubH(N,sel,"you")}</details>`}
