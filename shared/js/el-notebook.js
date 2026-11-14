@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261114a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113j', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -62,7 +62,7 @@ window.ELNotebook = (function () {
   }
 
   let H = null, secs = [], pages = [], pg = 0, LSKEY = '', order = [], last = null, saveT = 0, laid = '', gamesById = {};
-  let LOC = null, BACK = null, ANCHOR = null, SAVED = null, SPOTK = '', LAYING = false;
+  let LOC = null, ANCHOR = null, SPOTK = '', LAYING = false;
   // 📓 one notebook for every LS of the course (Roger, 13 Nov 2026: "make LS1 and LS2 and the following ones part of the same notebook … one
   // Index per LS is okay, but the summary I want it of everything"): CH = the chapters, one per LS, each with its own helpers (H: LS, nb =
   // its notes/nb-<LS> doc, save) and its own order of sections. H and order are the chapter in use: a tap on a page uses that page's
@@ -736,10 +736,9 @@ window.ELNotebook = (function () {
   function layout(keep, force) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || (printing() && !force)) return false;
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
-    // (opened from a learning path: ↩ goes back to where the student was in the notebook)
     // (ANCHOR: the place the student is at, kept as a part and not as a page number, so it stays exact when the pages flow again: fonts
-    // loaded, a chapter loaded later, a note added; opened from a learning path: ↩ goes back to where the student was in the notebook)
-    if (keep == null) { const lp = atLP(); if (lp) { BACK = ANCHOR || spot() || SAVED || BACK; keep = lp; } else keep = ANCHOR || here(); }
+    // loaded, a chapter loaded later, a note added)
+    if (keep == null) keep = atLP() || ANCHOR || here();
     cvSet(root);
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
@@ -788,26 +787,11 @@ window.ELNotebook = (function () {
     const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop();
     return hit ? +hit.closest('.nb-page').dataset.i : blkPage[ci + ':' + id] != null ? blkPage[ci + ':' + id] : null;
   }
-  // ↩ Back to where I was (Roger, 14 Nov 2026: "they should have a button to go exactly where they were before"): the notebook keeps the
-  // part on the page the student is reading (here(), not a page number: new pages come after each class and move the numbers), one per
-  // student and notebook on this device (localStorage el-nb-spot|<uid>|<book>, no Firestore). It opens there again; and after a jump
-  // (a tab, the index, a side post-it, 📓 from a learning path) ↩ takes them back to the exact place they jumped from. Pressed again, it
-  // goes back to where ↩ was pressed, so they can look something up and come back. Turning the pages one by one is not a jump.
-  const spread = i => wide() ? i - i % 2 : i;
+  // 📍 the notebook opens where the student left off (Roger, 14 Nov 2026: "they should have a button to go exactly where they were
+  // before"): the part on the page they are reading (here(), not a page number: new pages come after each class and move the numbers),
+  // one per student and notebook on this device (localStorage el-nb-spot|<uid>|<book>, no Firestore).
   // here() with the chapter's LS instead of its number (the chapters can be fewer while the notebook is still loading)
   const spot = () => { const h = here(); return h && h.replace(/\|(\d+)$/, (m, c) => '|' + ((CH[+c] || {}).LS || c)); };
-  function jump(i) {
-    const was = ANCHOR || spot(); if (spread(Math.max(0, Math.min(pages.length - 1, i))) !== spread(pg) && was) BACK = was;
-    go(i);
-  }
-  function backBtn(a, z) {
-    const b = document.querySelector('.nb .nb-back'); if (!b) return;
-    const i = BACK ? locate(BACK) : null;
-    if (i == null || spread(i) === a) { b.hidden = true; return; }
-    const p = spread(i), q = wide() ? Math.min(p + 1, pages.length - 1) : p;
-    b.hidden = false; b.dataset.to = i;
-    b.querySelector('small').textContent = p === q ? t(`pàg. ${p + 1}`, `p. ${p + 1}`) : t(`pàg. ${p + 1}–${q + 1}`, `pp. ${p + 1}–${q + 1}`);
-  }
   const relayout = keep => { if (!layout(keep)) laid = ''; };
   function tools(pc) {
     const id = pc.dataset.b, s = secs[+pc.closest('.nb-page').dataset.s] || {}, list = s.blocks || [], i = list.findIndex(b => b.id === id), b = list[i] || {};
@@ -820,6 +804,25 @@ window.ELNotebook = (function () {
     return s.key === 'cover' ? t('Portada', 'Cover') : s.key === 'index' ? t('Índex', 'Index') + ls : plainOf(s.l); };
 
   const wide = () => matchMedia('(min-width:900px)').matches;
+  // ↩ where the student opened the notebook from: el-cloud.js keeps el_nb_from {u: that page (a learning path with the step on screen),
+  // n: its title, t} when a 📓 link is pressed. Older than 12 hours, another site or none: the board.
+  function fromPage() {
+    let f = null; try { f = JSON.parse(store.get('el_nb_from') || 'null'); } catch (e) {}
+    let u = null; try { u = f && f.u && Date.now() - f.t < 12 * 3600e3 ? new URL(f.u, location.href) : null; } catch (e) {}
+    if (u && (u.origin !== location.origin || (u.pathname === location.pathname && u.hash === '#notes'))) u = null;
+    const board = !u || /\/today\.html$/.test(u.pathname), n = String((f && f.n) || '');
+    const first = n.split(' · ')[0], lp = first.match(/^Learning Path (\d+)/), ls = n.match(/\bLS\d+\b/);
+    const name = board ? '' : lp ? 'LP' + lp[1] : /^\d ESO$/.test(first) ? (ls ? ls[0] : '') : first.length > 22 ? first.slice(0, 21) + '…' : first;
+    const lab = board ? t('Torna al meu tauler', 'Back to my board') : name ? t('Torna a ', 'Back to ') + name : t('Torna on era', 'Back to where I was');
+    return { u: board && !u ? rel('today.html') : u.href, lab, tip: lab + (n && !board ? ' · ' + n : '') };
+  }
+  // the same page (the LS page opened its own notebook): only its place changes. Another page opens at the step it was on (#panel:
+  // el-cloud.js openHashTab), not with history.back(): the page before can be another one, or come back on its first step.
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('.nb .nb-from'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+    const u = new URL(a.href, location.href);
+    if (u.pathname === location.pathname && u.search === location.search) { e.preventDefault(); location.hash = u.hash; }
+  });
   function show() {
     const root = document.querySelector('.nb'); if (!root || !pages.length) return;
     pg = Math.max(0, Math.min(pages.length - 1, pg));
@@ -835,7 +838,7 @@ window.ELNotebook = (function () {
     const onSum = cur && (cur.classList.contains('nb-sumtab') || cur.classList.contains('nb-fptab'));
     root.querySelectorAll('.nb-tab').forEach(b => b.setAttribute('aria-current', String(b === cur || (b.classList.contains('nb-ctab') && !onSum && +b.dataset.chap === cz && +b.dataset.nbgo <= z))));
     store.set('el-nb-pg|' + LSKEY, String(pg)); if (!LAYING && !TOUR && !printing()) ANCHOR = spot(); if (SPOTK && ANCHOR && !TOUR && !printing()) store.set(SPOTK, ANCHOR);
-    hideSel(); side(a, z); fpiPlace(); backBtn(a, z);
+    hideSel(); side(a, z); fpiPlace();
   }
   // 📌 the sections of the learning path open on the screen, as post-its sticking out of the book's edge: a tap goes to that section
   function side(a, z) {
@@ -924,7 +927,7 @@ window.ELNotebook = (function () {
     // the place kept for this student's notebook (one notebook for the whole course, opened from any of its LS pages)
     const crs = ((window.EL_LS || []).find(l => l.id === H.LS) || {}).course || String(H.LS).split('-')[0];
     const sk = 'el-nb-spot|' + (H.uid || '') + '|' + (chs ? 'all|' + crs : H.LS);
-    if (sk !== SPOTK) { SPOTK = sk; ANCHOR = SAVED = store.get(sk) || null; BACK = null; }
+    if (sk !== SPOTK) { SPOTK = sk; ANCHOR = store.get(sk) || null; }
     secs = []; gamesById = {};
     if (!chs) { use(0); secs = build(ex, games, 'one'); secs.forEach(x => { x.ci = 0; }); CH[0].order = order; }
     else {
@@ -952,16 +955,16 @@ window.ELNotebook = (function () {
       + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
       + `<button type="button" data-nbpr="cur" class="nb-pcur"></button><button type="button" data-nbpr="all"></button>`
       + `<details><summary>${t('Tria les pàgines…', 'Choose pages…')}</summary><div class="nb-plist"></div><button type="button" data-nbpr="sel">${t('Imprimeix les pàgines triades', 'Print the pages I chose')}</button></details></div></span>`
-      // 🏠 to the student's board (Roger, 13 Nov 2026: "add a button to go to the students dashboard")
-      + (H.own ? `<a class="nb-tool nb-home" href="${rel('today.html')}" title="${t('El meu tauler', 'My board')}">🏠<span class="nb-hlab"> ${t('El meu tauler', 'My board')}</span></a>` : '')
+      // ↩ Back (Roger, 14 Nov 2026: "the best thing is to go back where they were, so if they were on the dashboard they go there, but if
+      // they were somewhere else…", "So no My board button"): back to the page the notebook was opened from (el-cloud.js el_nb_from)
+      + (H.own ? (f => `<a class="nb-tool nb-home nb-from" href="${esc(f.u)}" title="${esc(f.tip)}">↩<span class="nb-hlab"> ${esc(f.lab)}</span></a>`)(fromPage()) : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav>${chs ? `<nav class="nb-lside${CH.length > 4 ? ' nb-many' : ''}" aria-label="${t('Situacions d\'aprenentatge', 'Learning situations')}">${CH.map((c, i) => { const L = (window.EL_LS || []).find(l => l.id === c.LS) || {}; return `<button type="button" class="nb-tab nb-ctab nb-lt" data-chap="${i}" data-nbto="s:chap|${i}" style="--i:${i}" title="${esc(chapName(L))}"><b>${lsNum(c)}</b><span> ${esc(chapName(L).replace(/^\S+\s*/, '').replace(/^\((.*)\)$/, '$1'))}</span></button>`; }).join('')}</nav>` : ''}</div>`
       + (!chs && chapters().length > 1 ? `<nav class="nb-chaps" aria-label="${t('Capítols', 'Chapters')}"><span class="nb-chl">📚</span>${chapters().map(l => l.id === H.LS
         ? `<span class="nb-ch on" aria-current="page" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></span>`
         : `<a class="nb-ch" href="${rel(l.id.replace(/^(\d+eso)-/, '$1/') + '/index.html#notes')}" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></a>`).join('')}</nav>` : '')
-      + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button>`
-      + `<button type="button" class="nb-back" hidden title="${t('Torna exactament on eres abans', 'Go back exactly to where you were before')}">↩<span class="nb-blab"> ${t('Torna on era', 'Back to where I was')}</span> <small></small></button></nav>`
+      + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button></nav>`
       + (H.own ? `<div class="nb-selbar" role="toolbar" aria-label="${t('Marca les paraules triades', 'Mark the words you selected')}" hidden>${MKS.map(([k, h, ca, en]) => `<button type="button" data-nbmk="${k}" title="${t(ca, en)}" aria-label="${t(ca, en)}">${h}</button>`).join('')}</div>` : '')
       + `</div>`;
     pages = []; laid = '';
@@ -1028,7 +1031,7 @@ window.ELNotebook = (function () {
       { el: '.nb-bt', at: '.nb-bt', ic: '🟨', h: t('Les teves notes i post-its', 'Your notes and post-its'), p: t('Al marge de cada part: ✍ afegeix una nota a sota i 🟨 hi enganxa un post-it (tria el color). Toca una nota per canviar-la. Si t\'equivoques, ↶ Desfés.', 'In the margin of each part: ✍ adds a note below it and 🟨 sticks a post-it (choose its colour). Tap a note to change it. Made a mistake? ↶ Undo.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },
       { el: '.nb-printbtn', ic: '🖨', h: t('Imprimeix', 'Print'), p: t('🖨 imprimeix aquestes pàgines, les que triïs o tota la llibreta.', '🖨 prints these pages, the ones you choose or the whole notebook.') },
-      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i 🏠 et porta al teu tauler. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and 🏠 takes you to your board. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
+      { el: '.nb-close', all: '.nb-close,.nb-help,.nb-home', ic: '📓', h: t('Tanca i torna', 'Close and come back'), p: t('✕ tanca la llibreta i ↩ et torna on eres abans. El botó 📓 de baix a l\'esquerra de cada pàgina la torna a obrir. ❓ et torna a ensenyar això.', '✕ closes the notebook and ↩ takes you back to where you were. The 📓 button at the bottom left of every page opens it again. ❓ shows you this again.') }
     ].filter(x => (!x.opt || vis(x.el)) && (!x.wide || wide()) && (!x.at || document.querySelector('.nb-spread .nb-page ' + x.at)));
   }
   function tour() {
@@ -1092,9 +1095,8 @@ window.ELNotebook = (function () {
 
   // ---------- one set of listeners for every redraw ----------
   document.addEventListener('click', e => {
-    const el = e.target.closest && e.target.closest('.nb [data-nbgo],.nb-prev,.nb-next,.nb-plain,.nb-close,.nb-back'); if (!el || !H) return;
-    if (el.classList.contains('nb-back')) { e.preventDefault(); const i = el.dataset.to != null ? +el.dataset.to : null; if (i != null) { BACK = ANCHOR || spot() || BACK; go(i); } return; }
-    if (el.dataset.nbgo != null) { e.preventDefault(); return jump(+el.dataset.nbgo); }
+    const el = e.target.closest && e.target.closest('.nb [data-nbgo],.nb-prev,.nb-next,.nb-plain,.nb-close'); if (!el || !H) return;
+    if (el.dataset.nbgo != null) { e.preventDefault(); return go(+el.dataset.nbgo); }
     if (el.classList.contains('nb-close')) { if (history.length > 1 && document.referrer) history.back(); else location.hash = ''; return; }
     if (el.classList.contains('nb-plain')) {
       const on = document.documentElement.classList.toggle(PLAIN); store.set(PLAIN, on ? '1' : '0');
