@@ -659,7 +659,9 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="me")return meBox(lss,ls);
   if(place==="progress")return progressPlace(lss,ls);
   // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
-  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+marksHead(lss,ls)+workBox(lss)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
+  // only on 📈 My formative assessment (Roger, 14 Nov 2026: "in my final product and exams, students only need to see that, not my activities,
+  // since it's shown in My formative assessment"): 🎯 checkpoints, 🎬 final product and 📝 exams show only their own content
+  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";const wb=workBox(lss),fm=tabOf(ls)==="form";return pend+marksHead(lss,ls)+(fm?wb+`<div id="ptbox">${pointsBox()}</div>`:"")+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
   if(place==="units")return unitsBox(lss,ls,st,stTag)+(bookCard(ls)?`<div class="rcards one" style="margin:0 0 14px">${bookCard(ls)}</div>`:"")+studyBox(ls)+practiceBox(ls);   // the book here too: phones have no side menu
   if(place==="phone")return phoneBox();
   // 🔤 every LS of the student, the newest on top (Roger, 7 Nov 2026: "They see on top the LS2 and then below the LS1 with the same")
@@ -678,7 +680,7 @@ function marksHead(lss,ls){if(EL_CATALOG.some(a=>a.ls===ls.id&&a.checkpoint))cpL
     +`<div class="btabs" role="tablist">`+tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
     +(cpList(ls).length?tb("cp","🎯","Els meus checkpoints","My checkpoints",cpSub(ls)):"")
     +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")+tb("exam","📝","Els meus exàmens","My exams",examSub(ls))
-    +`<a class="btab b-prog" href="#progress"><span class="bi">🎓</span><span><b>${t("El meu progrés","My progress")}</b><small>${t("totes les LS, per trimestres i l'any","all your LSs, by term and year")}</small></span></a>`+`</div></div>`}   // 🎓 My progress as the fourth tile (Roger, 9 Nov 2026: "put this here", no separate banner)
+    +`</div></div>`}   // no 🎓 My progress tile here any more (Roger, 14 Nov 2026: "I said I don't want My progress here"): it is in the side menu and on the board
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
   return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`

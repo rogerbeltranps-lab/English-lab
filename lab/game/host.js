@@ -74,6 +74,7 @@ const isW=s=>!!(s&&s.q&&s.write);   // a written question
 const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
 // what the 2 sentences use (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever
 // they need to remember better the theory explained"): the game's kind (decks/index.js), or the end of its id
+const kindOf=()=>meta().kind||(/-vocab$/.test(H.deckId||"")?"vocab":/-grammar$/.test(H.deckId||"")?"grammar":"");
 const noteWhat=(kind,id)=>{kind=kind||(/-vocab$/.test(id||"")?"vocab":/-grammar$/.test(id||"")?"grammar":"");
   return kind==="vocab"?"<b>the new words</b>":kind==="grammar"?"<b>the grammar structures</b> you have learnt":"<b>the new words or grammar</b>"};
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
@@ -371,13 +372,18 @@ function draw(){
   if(!isQ(s)&&!isN(s)){
     const bl=blocks(s),n=s.step?Math.max(1,H.step):bl.length,ca=[].concat(s.ca||[]);
     const block=(l,k)=>blockHtml(l,k>=n?' style="visibility:hidden"':"",s.step&&k===n-1&&k>0?" pop":"");
-    app$.innerHTML=top()+`<div class="main"><div class="card theory slidein${s.wide?" wide":""}"><div class="pic">${pic(s.img)}</div><div class="tx"><h2>${md(s.theory)}</h2>${bl.map(block).join("")}
-      ${ca.length&&caOn()?`<div class="ca pop"><b>En català</b>${ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div></div>
+    // 📓 drawn like the student's notebook (Roger, 14 Nov 2026: "when doing the grammar, the vocab, and the reading together, and I present
+    // information, I want the slide have this style"): lined paper, a 📚 Vocabulary / 🧩 Grammar post-it with the learning path, the title
+    // in pencil and the explanation on a taped slip in the teacher's handwriting (el-notebook.css, .nbk in host.html)
+    const kd=kindOf(),lp=String(meta().lp||"").split(" · ")[0];
+    app$.innerHTML=top()+`<div class="main"><div class="card theory nbk slidein${s.wide?" wide":""}"><div class="nbtop"><span class="nb-postit k-${kd==="vocab"?"vocab":kd==="grammar"?"grammar":"other"}">${kd==="vocab"?"📚 Vocabulary":kd==="grammar"?"🧩 Grammar":"📘 Theory"}${lp?`<small>${esc(lp)}</small>`:""}</span></div>
+      <div class="pic">${pic(s.img)}</div><div class="tx"><h2 class="nb-h3">${md(s.theory)}</h2><div class="nb-slip">${bl.map(block).join("")}
+      ${ca.length&&caOn()?`<div class="ca pop"><b>En català</b>${ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div></div></div>
       <div style="text-align:right">${skipBtn()}${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
   const rev=H.phase==="reveal",n=answered(H.i).length;
   if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
-    const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
-    app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
+    const recap=s.from.map(i=>slides()[i]).map(t=>`<section class="nb-slip"><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
+    app$.innerHTML=top()+`<div class="main"><div class="card notes nbk slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
       <p>On your Chromebook: write <b>2 sentences</b> of your own using ${noteWhat(meta().kind,H.deckId)}, and <b>anything that helps you remember</b> the theory. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
       <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
       <div style="text-align:right">${skipBtn()}<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}

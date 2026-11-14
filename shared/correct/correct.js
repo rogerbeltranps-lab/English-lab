@@ -252,7 +252,11 @@ function steps(B){const out=[];B.list.forEach((h,b)=>{if(B.chat){out.push({b,h})
 function readAll(){
   const B=blocks(),st=steps(B);
   return `<div class="chips"><span class="chip all">📖 Read together</span>${ROUTES.map(r=>`<button class="chip lvb ${r===RL?"on":""}" data-rl="${r}" title="Read the ${NAME[r]} version together">${NAME[r]}</button>`).join("")}</div>`+
-    `<div class="rt ${RP>=0?"focus":""}">`+B.list.map((h,b)=>`<p class="${RP>=0&&st[RP]&&st[RP].b===b?"cur":""}">`+
+    // 📓 drawn like the notebook too (Roger, 14 Nov 2026: "when doing the grammar, the vocab, and the reading together, and I present
+    // information, I want the slide have this style"): a 📖 Reading post-it, the title in pencil and the text on a taped slip in the
+    // teacher's handwriting; the sentence being read marked with a highlighter (.nbx, index.html)
+    `<div class="nb-postit k-read">📖 Reading</div><h1 class="gt nb-h3">${esc(tx(LP.panels.find(p=>p.id==="read").title)||"Read together")}</h1>`+
+    `<div class="rt nb-slip ${RP>=0?"focus":""}">`+B.list.map((h,b)=>`<p class="${RP>=0&&st[RP]&&st[RP].b===b?"cur":""}">`+
       st.map((x,i)=>x.b!==b?"":(x.br?"<br>":(x.h||i===0||st[i-1].b!==b?"":" "))+`<span data-rp="${i}" class="${i===RP?"now":""}">${x.h||esc(x.s)}</span>`).join("")+`</p>`).join("")+`</div>`+
     `<p class="hint">Everyone reads the ${NAME[RL]} version now.${G?" Every Chromebook shows this same text now and follows the yellow paragraph; their own level's text comes back for ⏱ Your turn, with the words the ${NAME[RL]} text doesn't have in green. Space, → or a click: next sentence.":""}</p>`;
 }
@@ -314,7 +318,7 @@ function timer(k){if(k==="tgo"){TM.on=!TM.on&&TM.left>0;clearInterval(TM.iv);if(
 const label=s=>s.kind==="explain"?"📘":s.kind==="readall"?"📖":s.kind==="turn"?"⏱":s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&/shared|own/.test(x.kind)&&x.panel===s.panel).indexOf(s)+1);
 function draw(){
   const s=slides[at],open=shown.has(at);
-  $("out").outerHTML=`<div class="card${s&&s.kind==="explain"?" nbx":""}" id="out">${!s?"":s.kind==="explain"?explainAll():s.gram?gram(s,open):s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
+  $("out").outerHTML=`<div class="card${s&&(s.kind==="explain"||s.kind==="readall")?" nbx":""}" id="out">${!s?"":s.kind==="explain"?explainAll():s.gram?gram(s,open):s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
   const m=$("tmini");if(m)m.textContent=(TM.on||TM.left<TM.len)&&s&&s.kind!=="turn"?"⏱ "+(TM.left?mmss(TM.left):"Time!"):"";
   let lastPanel=null;
   $("dots").innerHTML=slides.map((x,i)=>{const pk=x.panel+(x.pro?"p":"")+(x.gram?"|"+(x.all?"all":x.on[0]):""),gap=lastPanel&&lastPanel!==pk?'<span class="gap"></span>':"";lastPanel=pk;   // grammar: a gap between Everyone, Base, Core+ and Plus
