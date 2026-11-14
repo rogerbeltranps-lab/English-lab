@@ -1790,7 +1790,7 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
       Object.entries(x.answers||{}).forEach(([step,o])=>{if(o&&o.t&&o.at)done.push(Object.assign({step,k:"answer",name:((a.steps||[]).find(z=>z[0]===step)||[])[1]||corrNm(a.id,step),at:tms(o.at)},base))});
       // Gemini: a recording it transcribed, with its notes on the task and pronunciation (the fields marked rec, el-mic.js upload)
       Object.entries(steps).forEach(([step,h])=>{const rec=((h&&h.f)||[]).filter(f=>f&&f.rec&&String(f.v||"").trim());if(!h||!h.audio||!rec.length)return;
-        gem.push(Object.assign({step,k:"gspeak",name:h.title||corrNm(a.id,step),at:tms(h.date),note:rec.some(f=>/^Notes/.test(f.l||""))?"transcript and notes":"transcript"},base))})})});
+        gem.push(Object.assign({step,k:"gspeak",name:h.title||corrNm(a.id,step),at:tms(h.date),note:rec.some(f=>/^Notes/.test(f.l||""))?"transcript and notes":"transcript"},corrEur("audio",h.audio),base))})})});
   done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done,gem};return CORR.v}
 // ---- Last corrections by student (Roger, 14 Nov 2026: "To me the most important thing is the student, then the task and then the day.
 // On the other hand, I want a table with Gemini's corrections and a table with Claude's correction"; "The blue box is not needed … and add
@@ -1805,7 +1805,16 @@ const corrFpActs=()=>[...new Set([...Object.values(window.EL_GRADING||{}).map(g=
 function corrFpGem(){const out=[];corrFpActs().forEach(a=>{const d=FPG.d[a.id];
   if(!d){if(!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g==="corr")render()}).catch(()=>{})}return}
   Object.entries(d).forEach(([u,x])=>{const s=S.P[u],g=s&&GR.find(z=>z.id===s.group);if(!g||s.tester||!x||!x.draft||!a.ls.startsWith(g.course+"-"))return;
-    out.push({u,gid:g.id,ls:a.ls,aid:a.id,step:"fp",k:"gfp",name:a.title,at:tms(x.at),note:x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve"})})});return out}
+    out.push(Object.assign({u,gid:g.id,ls:a.ls,aid:a.id,step:"fp",k:"gfp",name:a.title,at:tms(x.at),note:(x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve")+(x.n>1?" · watched "+x.n+" times":"")},corrEur("video",x)))})});return out}
+// 💶 what each Gemini correction cost (Roger, 14 Nov 2026: "and on each video the money it cost"): since school script v22 every answer says
+// what that call cost (Google's token count × the price, as the month total in 💶 Gemini this month) and it is kept with the recording
+// (steps[step].audio.eur) or the draft (eur = every watch of that video added up, n = how many). Older ones: an estimate (≈) from the length,
+// the way Google counts (about 32 tokens a second of audio, about 300 a second of video at high resolution) plus the question and the answer.
+const corrEurP={"gemini-flash-latest":[0.5,1,3],"gemini-pro-latest":[2,2,12],"gemini-4-argon":[2,2,10]};
+function corrEur(kind,x){x=x||{};if(typeof x.eur==="number")return {eur:x.eur};
+  if(kind==="audio"){const t=Number(x.s);if(!t)return {};const p=corrEurP["gemini-flash-latest"];return {eur:(t*32*p[1]+700*p[0]+1000*p[2])/1e6*0.87,est:true}}
+  const t=Number((x.draft||{}).secs);if(!t)return {};const p=corrEurP[x.model]||corrEurP["gemini-pro-latest"];return {eur:(t*300*p[1]+3000*p[0]+2500*p[2])/1e6*0.87*Math.max(1,(x.changes||[]).length+1),est:true}}
+const eurTx=(v,est)=>(est?"≈ ":"")+"€"+(v<0.01?v.toFixed(3):v.toFixed(2));
 const corrFold=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 function corrFind(){const q=corrFold(S.corrQ).trim();document.querySelectorAll("table.ctab tbody[data-cn]").forEach(b=>{b.hidden=!!q&&!b.dataset.cn.includes(q)})}
 document.addEventListener("input",e=>{if(e.target.id==="corrfind"){S.corrQ=e.target.value;corrFind()}});
@@ -1818,9 +1827,10 @@ function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;
     return `<tbody data-cn="${esc(corrFold(s?fullName(s)+" "+name(s):""))}">`+ts.map((t,n)=>{t.sort((p,q)=>q.at-p.at);const i=t[0],ic=ckI(i.k);
       return `<tr>${n?"":`<td class="ctn" rowspan="${ts.length}"><b>${s?name(s):"?"}</b>${is.length>1?`<br><small class="muted">${plural(is.length,"correction")}</small>`:""}</td><td class="ctg" rowspan="${ts.length}">${esc(g?g.name:"")}</td>`}`
         +`<td>${ic[0]} <b>${esc(i.k==="answer"?"Comment on "+(i.name||""):i.name||ic[1])}</b><br><small class="muted">${esc(ic[1])}${i.note?" · "+esc(i.note):""} · ${esc(actTitle(i.aid))}</small></td>`
-        +`<td class="ctd">${t.map(x=>`<button class="chip mini cchip" data-do="corropen" data-u="${x.u}" data-a="${esc(x.aid)}" data-s="${esc(x.step)}" data-k="${x.k}" title="Open what the student got">${x.at?esc(new Date(x.at).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))+(x.approx?"":" · "+hm(x.at)):"?"}</button>`).join("")}</td></tr>`}).join("")+`</tbody>`}).join("");
+        +`<td class="ctd">${t.map(x=>`<button class="chip mini cchip" data-do="corropen" data-u="${x.u}" data-a="${esc(x.aid)}" data-s="${esc(x.step)}" data-k="${x.k}" title="Open what the student got${x.est?" (💶 an estimate: this was before the cost was saved)":""}">${x.at?esc(new Date(x.at).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))+(x.approx?"":" · "+hm(x.at)):"?"}${x.eur!=null?` · 💶 ${eurTx(x.eur,x.est)}`:""}</button>`).join("")}</td></tr>`}).join("")+`</tbody>`}).join("");
   return `<div class="wrap ctw"><table class="ctab"><thead><tr><th>Student</th><th>Course</th><th>Task</th><th>Day</th></tr></thead>${body}</table></div>`}
-const corrHead=(t,L)=>`<div class="chead"><h2 style="margin:0">${t}</h2><span class="muted">${L.length?plural(new Set(L.map(i=>i.u)).size,"student")+" · "+plural(L.length,"correction"):""}</span></div>`;
+const corrHead=(t,L)=>{const E=L.filter(i=>i.eur!=null),sum=E.reduce((a,i)=>a+i.eur,0);
+  return `<div class="chead"><h2 style="margin:0">${t}</h2><span class="muted">${L.length?plural(new Set(L.map(i=>i.u)).size,"student")+" · "+plural(L.length,"correction"):""}${E.length?` · 💶 <b>${eurTx(sum,E.some(i=>i.est))}</b> in all`:""}</span></div>`};
 // the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
 // what the asked card says: started at once by the school script (fd), or why not and what to do
 function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).request||{}).err,why=e==="no task token"?"the task's token is not in your school script yet"
@@ -1883,7 +1893,7 @@ function corrPage(){
     +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`);
   // the two tables: Gemini's corrections and Claude's, by student › task › day
   const Gm=corrScan().gem.concat(corrFpGem()).filter(gf);setTimeout(corrFind);
-  const gemB=`<div class="box">${corrHead("🔷 Gemini's corrections",Gm)}<p class="muted">Speaking recordings Gemini transcribed, with its notes on the task and pronunciation, and final product videos it drafted on the rubric. Click a day to open it.</p>`
+  const gemB=`<div class="box">${corrHead("🔷 Gemini's corrections",Gm)}<p class="muted">Speaking recordings Gemini transcribed, with its notes on the task and pronunciation, and final product videos it drafted on the rubric. 💶 is what each one cost (≈ an estimate for the older ones). Click a day to open it.</p>`
     +corrTable(Gm,`Nothing from Gemini yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
   const claB=`<div class="box">${corrHead("✏️ Claude's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected on Wednesdays (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got.</p>`
     +corrTable(Dn,`No corrections yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
@@ -4274,7 +4284,9 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
   FPG.busy[k]=true;FPG.t0[k]=Date.now();fpgFill(u,a);
   const keep={fileId:v.link&&v.id?v.id:(old.fileId||null),fileIds:v.link&&v.id?(v.ids||[]):(old.fileIds||[]),youtube:v.youtube||old.youtube||null,fileName:v.link&&v.name?v.name:(old.fileName||null)};
   let d;try{const j=await fpgCall({action:"fp_watch",fileId:v.id||"",fileIds:v.ids||[],youtube:v.youtube||"",ask,prev:change?old.draft:null,change:change||""});
-    d=Object.assign({at:new Date().toISOString(),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]},keep)}
+    // 💶 eur = every watch of this video added up (school script v22 says what each call cost), n = how many watches
+    const was=typeof old.eur==="number"?old.eur:0;
+    d=Object.assign({at:new Date().toISOString(),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]},typeof j.eur==="number"?{eur:Math.round((was+j.eur)*1e5)/1e5,n:(old.n||(old.draft?1:0))+1}:{},keep)}
   catch(e){d=Object.assign({},old,keep,{error:"Gemini could not watch it: "+e.message+".",at:old.at||new Date().toISOString()})}
   if(!d.error)delete d.error;FPG.busy[k]=false;FPG.cost=null;
   try{await fpgSave(a,u,d)}catch(e){console.warn("fp draft save",e)}

@@ -1190,7 +1190,7 @@ var LS2 = (function () {
       const h = (state.steps || {})[id]; if (!r || !h) return;
       if (!r.ok && !/^too /.test(r.error || '')) return;   // the school script not updated yet, no folder access…: nothing to tell the student
       if (!r.ok) { msg.textContent += ' ' + (ca() ? '(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)' : '(The recording could not be saved: your transcript was handed in.)'); return; }
-      h.audio = { id: r.id, s: r.secs || null };
+      h.audio = { id: r.id, s: r.secs || null }; if (r.eur != null) h.audio.eur = r.eur;   // what Gemini cost (school script v22), for the dashboard
       h.f = (h.f || []).filter(x => !x.rec); if (r.tr) h.f.push({ l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 });
       if (r.notes) h.f.push({ l: 'Notes from the recording (task and pronunciation)', v: String(r.notes).slice(0, 3000), rec: 1 });
       save(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');

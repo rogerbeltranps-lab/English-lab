@@ -125,7 +125,7 @@ D.fpg = {};
     const c = gid.startsWith('2') ? '2eso' : '4eso', gs = CAT.find((a) => a.id === c + '/ls2-getting-started'), fp = global.EL_GRADING[LS2[c]].fp.a;
     Object.values(D.st).filter((s) => s.group === gid).slice(0, k).forEach((s, i) => {
       const pg = D.pg[s.uid][LS2[c]], st = JSON.parse(pg[gs.keys[0]] || '{}'); st.steps = st.steps || {};
-      st.steps.speak = { title: 'Speaking: my free time', date: day(6 + (i % 3), 9 + i), audio: { id: 'demo', s: 35 + i * 4 },
+      st.steps.speak = { title: 'Speaking: my free time', date: day(6 + (i % 3), 9 + i), audio: Object.assign({ id: 'demo', s: 35 + i * 4 }, i % 2 ? {} : { eur: 0.0036 + i * 0.0002 }),
         f: [{ l: 'Transcript', v: 'In my free time I play football and I listen music.' }, { l: 'Transcript of the recording', v: 'In my free time I play football with my friends and I listen to music.', rec: 1 },
           { l: 'Notes from the recording (task and pronunciation)', v: 'Answers the task. Says "music" as "mu-SIC": stress on the first syllable.', rec: 1 }] };
       pg[gs.keys[0]] = JSON.stringify(st);
@@ -133,7 +133,7 @@ D.fpg = {};
       if (i % 4 !== 3) Object.assign(r, { fbSig: { speak: 'demo' + i }, fbAt: { speak: day(11, 13) }, replies: { speak: 'Well done! "listen TO music".' } });
       if (i % 3 === 0) r.answers = { speak: { t: 'Yes, "listen to" always takes "to".', at: day(12 + (i % 2), 11) } };
       if (i === 1) r.flags = { read: { auto: true, done: 'redo', at: day(7, 17) } };
-      if (i < 4) (D.fpg[fp] = D.fpg[fp] || {})[s.uid] = { at: day(13 - i, 18), draft: { rows: [] }, approved: i % 2 === 0 };
+      if (i < 4) (D.fpg[fp] = D.fpg[fp] || {})[s.uid] = Object.assign({ at: day(13 - i, 18), draft: { rows: [], secs: 95 + i * 25 }, model: 'gemini-4-argon', approved: i % 2 === 0 }, i < 2 ? { eur: 0.0712 + i * 0.03, n: 1 + i } : {});
     });
   }
 }
