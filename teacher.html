@@ -146,6 +146,8 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .agc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.35;border:1px solid #c7d4ff;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:2px 8px;cursor:grab;user-select:none}
 .agc small{color:#64748b;font-size:11px}.agpl{font-size:10.5px;font-weight:700;border-radius:999px;padding:0 6px;white-space:nowrap}.agpl.y{background:#dcfce7;color:#166534}.agpl.n{background:#fee2e2;color:#991b1b}.agtg{display:inline-flex;gap:2px;margin-left:2px}.agtg i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.aglh .agtg{margin-left:6px;vertical-align:1px}.agkey{font-size:11.5px;color:#64748b;margin:4px 0 8px}.agkey i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
+.agwu{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:4px 0 6px;padding:4px 10px;border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:10px;font-size:12.5px;line-height:1.35}.agwu b{font-weight:700}.agwus{font-style:italic;color:#7c2d12}.agwu small{color:#c2410c}
+.aghwd{font-size:11px;color:#0e7490;white-space:nowrap}.agc.hw small{white-space:nowrap}
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#fef08a;border-color:#eab308;color:#713f12;font-weight:600;border-radius:10px;box-shadow:0 1px 2px #a1620726}.agc.nt.dl{background:#ffedd5;border-color:#f97316;color:#9a3412}
 .agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
@@ -866,13 +868,14 @@ const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
   const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?p.due[id][i]:null}
-// 1 done by the end of its session day, 0 late, null not done, undefined no deadline (not counted)
+// 1 done by the end of its session day, LATE done after it, null not done, undefined no deadline (not counted)
 // stepDue (el-plan.js, same shape as due but per step): a step whose deadline is earlier than its activity's (2 ESO LP6: Speaking
 // and Talk after the exam, practice and grammar still by the session day) is counted on time against its own date.
 function stepDueOf(id,step,g){const p=(window.EL_PLAN||{})[S.ls],sd=p&&p.stepDue&&p.stepDue[id]&&p.stepDue[id][step],gr=GR.find(x=>x.id===g);if(!sd||!gr)return null;
   const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?sd[i]:null}
-// done late counts half (Roger, 10 Nov 2026: "if they did them late it must count sth, no 0. Maybe half of it"); not done at all stays 0 (missZ)
-const LATE=0.5;
+// done late counts the same as on time (Roger, 14 Nov 2026: "ni que les facin tard compta el mateix"; from 10 Nov it was half, LATE_W 0.5):
+// LATE only marks it as late on the dashboard; LATE_W is what it counts. Not done at all stays 0 once its day has passed (missZ).
+const LATE="late",LATE_W=1;
 // 📖 the Book: a chapter is due only on its own Book day (chapter n on the n-th day the Book is on the agenda), never on the path's last day
 const dueStep=(id,step,g)=>stepDueOf(id,step,g)||(elBookPath(id)?null:dueOf(id,g));
 function onTime(u,id,step,g){const due=dueStep(id,step,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:LATE}
@@ -884,7 +887,7 @@ const avg=vs=>{vs=vs.filter(v=>v!==undefined).map(v=>v==null?(S.zero?0:null):v).
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
 const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+esc(tabName(byId(id),k));
 // Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
-// warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10 (done late = half, LATE; Roger, 10 Nov 2026).
+// warm-ups: delayed retrieval); time: the share of those steps done, out of 10; a step not done counts 0 once its session deadline (teaching plan) has passed, and done late counts the same as on time (LATE_W; Roger, 14 Nov 2026).
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
 // daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
 // Only what was done in class counts 0 (problem report, 2ESOB, 10 Nov 2026: a recall checkpoint still locked for the group counted 0 and
@@ -909,7 +912,7 @@ function stuGames(u){loadGames();const s=S.P[u],gl=GAMES[S.g];if(!s||!s.email||!
   const keep=new Set(elLatestGames(list.filter(x=>!x.out)));list.forEach(x=>{if(!x.out&&!keep.has(x))x.old=true});
   const inn=[...keep],of=inn.reduce((n,x)=>n+x.of,0);return {v:of?inn.reduce((n,x)=>n+x.r,0)/of*10:null,list}}
 function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.games?stuGames(u).v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
-    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:o*10,id,k)}).filter(x=>x!==undefined))}));
+    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:(o===LATE?LATE_W:1)*10,id,k)}).filter(x=>x!==undefined))}));
   // a part made only of checkpoints, none done (ill on every one): left out too, never 0
   return {mark:wavg(parts.filter(p=>(!p.games||p.v!=null)&&!(p.v==null&&p.first&&p.first.every(([id,k])=>isCpStep(id,k)))).map(p=>[p.v,p.w])),parts}}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
@@ -3317,8 +3320,9 @@ function agOpenSync(x,its,to){const info=S.D.ls[x.ls]||{},ag=agOf(x)||{days:{}},
     if(!DEMO){const i=S.D.ls[x.ls]=S.D.ls[x.ls]||{status:"hidden",enabled:[]},L=elLpLocks(x.ls,open);i.open=Object.assign({},i.open,{[gid]:open});i.locked=Object.assign({},i.locked,{[gid]:L.locked})}}   // on screen at once
   if(ps.length)quick(ps)}
 // ---- what the agenda shows
-const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
-  Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>s.add(id+"#"+p));if(!secOf(a).length)s.add(id+"#")})});return s};
+// the tabs that are homework (set in the last 14 days or due later): a Map tab → its homework (the one due last), used with .has like a set
+const hwItems=x=>{const s=new Map(),t=ELWeek.today(),put=(k,h)=>{const o=s.get(k);if(!o||h.by>o.by)s.set(k,h)};Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
+  Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>put(id+"#"+p,h));if(!secOf(a).length)put(id+"#",h)})});return s};
 const itName=(it)=>{if(it==="exam")return "📝 Exam";if(/^note:/.test(it))return it.slice(5);const [id,p]=[it.slice(0,it.indexOf("#")),it.slice(it.indexOf("#")+1)],a=byId(id);
   if(!a)return it;if(!p)return shortTi(a);const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:p};
 const dayLab=d=>ELWeek.date(d);
@@ -3328,6 +3332,12 @@ const dayLab=d=>ELWeek.date(d);
 // only. Stored in the agenda as wk: {"day|item": "p"|"g"|"c"|"i"}; only a choice that is not the default is saved (default: individual,
 // a class game whole class), so old saved "g" (group work) stays groups. It goes with the item when it moves to another day. Teacher only:
 // the students' plan lines ignore it. Click the icon: a small menu with the four; one write per choice, no reads.
+// 🏠 on a blue homework chip in the list on the left (Roger, 14 Nov 2026: "I should be able to unmark homework here"): the same switch
+// as on a class day (aghw1 with no day): one click takes the tab off its homework (the homework keeps its other tabs, or goes)
+// 🏠 on a tab on a class day says when (Roger, 14 Nov 2026: "here I want to say it's homework but from friday on"): "from Fri 20" while
+// students can't see it yet (it shows on their board that day), then "due Mon 23"
+const hwWhen=h=>{if(!h||!h.by)return "";const t=ELWeek.today(),sm=d=>ELWeek.date(d).replace(/ \w+$/,"");
+  return `<small class="aghwd" title="${h.set&&h.set>t?"Students see this homework from "+esc(ELWeek.date(h.set))+", not before":"Students see it as homework"} · due ${esc(ELWeek.date(h.by))}">${h.set&&h.set>t?"from "+esc(sm(h.set))+" · ":""}due ${esc(sm(h.by))}</small>`};
 // the homework made with a tab's 🏠 switch on day d (set that day, only that tab): [id, homework] or null
 const hwNext=(x,d,it)=>{const i=it.indexOf("#"),aid=it.slice(0,i),p=it.slice(i+1);return Object.entries(hwOf(x)||{}).find(([,h])=>h&&h.next&&h.set===d&&h.tabs&&Object.keys(h.tabs).length===1&&String((h.tabs[aid]||[]).join())===p)||null};
 const WKS={i:["Individually","M12 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"],
@@ -3413,6 +3423,22 @@ function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)retur
 const agPl=(x,p,sh)=>{if(!isGame(p)||isCb(p))return "";const ms=(((S.D.ls[x.ls]||{}).played||{})[x.gid]||{})[p.slice(5)];
   return ms?`<b class="agpl y" title="Played on the game board with this group">✓ ${sh?"":"played "}${esc(new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</b>`:`<b class="agpl n" title="Not played on the game board with this group yet">✗ ${sh?"not yet":"not played yet"}</b>`};
 // one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
+// 🔥 The warm-up first on every class day (Roger, 14 Nov 2026: "the games that we do now should appear at the beginning of each day"): class
+// mode opens each class with it (el-warmup.js, since 13 Nov): 💬 the saying of the day, then a game (Hangman, Word order, Spot the mistake
+// or No vowels, taking turns) with the words of the day's class games (el-cm-agenda.js warmDecks; with none that day, the last class day's).
+// Display only, nothing saved: the saying shown is the one class mode will show that day for the group (el-warmup.js sayFor).
+const WU_FROM="2026-11-13";
+const wuDecks=(x,d)=>{const ag=agOf(x),G=(window.EL_GAMES||[]).filter(g=>g.kind==="vocab"||g.kind==="grammar"),ids=[],add=id=>{if(!ids.includes(id)&&G.some(g=>g.id===id))ids.push(id)};
+  const on=dd=>((ag.days||{})[dd]||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0||/^note:/.test(it))return;const a=byId(it.slice(0,i)),p=it.slice(i+1);
+    if(/^game:(?!cb-)/.test(p))add(p.slice(5));else if(a&&!/\/book\.html$/.test(a.path||""))gamesOf(a).forEach(z=>{if(!isCb(z[0]))add(z[2].id)})});
+  on(d);if(!ids.length)Object.keys(ag.days||{}).filter(z=>z<d).sort().reverse().some(z=>{on(z);return ids.length});return ids};
+let wuLoad=null;
+function wuRow(x,d){if(d<WU_FROM||!((agOf(x).days||{})[d]||[]).some(it=>it!=="self"&&it!=="exam"&&!/^note:⏰/.test(it)))return "";
+  if(!window.ELWu){if(!wuLoad)wuLoad=import("./shared/js/el-warmup.js?v=20261114").then(m=>{window.ELWu=m;render()}).catch(e=>console.warn("warm-up",e));return ""}
+  const ds=wuDecks(x,d),G=window.EL_GAMES||[],lps=[...new Set(ds.map(id=>String((G.find(g=>g.id===id)||{}).lp||"").split(" · ")[0]).filter(Boolean))];
+  const pre=ds.length?ds:acts(x.ls).flatMap(a=>gamesOf(a).filter(z=>!isCb(z[0])).map(z=>z[2].id)),say=ELWu.sayFor(x.gid,pre,d)||[];
+  return `<div class="agwu" title="Class mode opens with it, before anything else: the saying of the day, then a quick whole-class game (Hangman, Word order, Spot the mistake or No vowels, a different one each class)${lps.length?" with the words of "+esc(lps.join(" + ")):""}">`
+    +`<b>🔥 Warm-up</b>${say[0]?` <span class="agwus" title="${esc(say[1]||"")}${say[2]?" · "+esc(say[2]):""}">💬 “${esc(say[0])}”</span>`:""}<small>🎲 game${lps.length?" · "+esc(lps.join(" + "))+" words":""}</small></div>`}
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
@@ -3421,7 +3447,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
     return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${/^note:⏰/.test(it)?"dl":""} ${it===SHD?"shd":""} ${a&&p?{g:"grp",p:"prs",c:"wcl"}[agWkX(x,agOf(x),d,it,hwS)]||"":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":it===SHD?"Drag it to another day to copy it there (it stays here too) · up or down to change the order · ✕ or back to the list takes it off":isTab(it)&&solo?"Drag it up or down, to another day, or back to the list on the left · ⤺ puts it back in its learning path's box":isTab(it)?"Drag it up or down to take it out of its learning path's box, to another day, or back to the list on the left":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"||/^note:⏰/.test(it)?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${solo?`<span><span class="agsl">${esc(solo)} ·</span> ${esc(label)}</span>`:esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
       +(it===SHD?`<span class="agiw c fix" title="Whole class">${wkIco("c")}</span>`:"")+(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" data-elvid="1" title="Play the unit's shadowing video here (the list of who left stays on top)">▶</a>`:"")
-      +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
+      +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`+(o?hwWhen(h?h[1]:hwS.get(it)):"")})():"")
       +(a&&p?wkBtn(x,d,[it],false,hwS):"")+(a&&p?secSw(x,a,p):"")+(solo?`<button type="button" class="agcp" data-do="agunsolo" data-d="${d}" data-it="${esc(it)}" ${D} title="Put it back in its learning path's box">⤺</button>`:"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
   const body=agRuns(ag,d).map(g=>{if(g.solo){const a=byId(g.solo);if(!a)return "";const it=g.its[0],lp=((ag.lab||{})[a.id]||agLab(x,a)).match(/^(LP\d+|Final product)/);
       return `<div class="agg agsolo" data-og="${esc(it)}">${chip(it,itName(it),a,lp?lp[1]:shortTi(a))}</div>`}
@@ -3438,7 +3464,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
     +`<div class="agdh"><b>${esc(dayLab(d))}</b><small>${esc(slotOf(x.gid,d))}</small>${d===t?`<span class="agt">Today</span>`:""}${done?`<span class="agok">✓ Done</span>`:late?`<span class="agwarn">⚠ not ticked</span>`:""}</div>`
     +(m=>{if(!m)return "";const L=+((window.EL_TIMETABLE||{}).len)||60;return `<div class="agtot agtotd ${m>L?"over":""}" title="Minutes you set on this day's items · the class lasts ${L} min">⏱ ${m} of ${L} min planned${m>L?` · ${m-L} too many`:m<L?` · ${L-m} free`:""}</div>`})(its.reduce((t,it)=>t+agMin(ag,d,it),0))
     +(self?`<div class="agself">📚 Self-study (you are away) <button type="button" class="agx" data-do="agself" data-d="${d}" ${D} title="You teach this class yourself">✕</button></div>`:"")
-    +(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
+    +(self?"":wuRow(x,d))+(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
     +(!its.length&&!isEx?`<p class="agempty">Drop a learning path or a tab here</p>`:"")
     +`<div class="agf">${hwOk&&l&&ri>=0?`<button type="button" class="g mini" data-do="sethw" data-i="${ri}" data-line="${esc(l[0])}" ${D} title="Students see it as homework (with a ready message)">🏠 Homework</button>`:""}`
     +(tkb.some(it=>it!=="exam"&&!tkOf(x)[x.ls+"|"+itKey(d,it)])?`<button type="button" class="g mini" data-do="agnext" data-d="${d}" ${D} title="Send what is not ticked to the next class">⏭ Next class</button>`:"")
@@ -3471,13 +3497,13 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
       +`<small>${ds.length?ds.map(sm).join(" · "):"not on the agenda"}${!nos&&ds.length&&left?` · ${left} tab${left===1?"":"s"} not planned`:""}${open?"":" · 🔒 locked"}${nd!=null?` · ${nd}/${studs.length} done`:""}</small></span>`
       +(isLpA(a)&&!/-my-real-routine$/.test(x.ls)?`<button type="button" class="agx" data-do="lpdrop" data-a="${esc(a.id)}" data-v="${drop?0:1}" ${D} title="${drop?"Count it again":"Drop it for this group: not counted, not in the exam"}">${drop?"↩":"✂"}</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${itemsOf(a).map(([p,nm])=>{const it=a.id+"#"+p,w=where[it]||[],s=st(it,w);
-        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}${agPl(x,p)}</span>`}).join("")}</div>`)+`</div>`}});
+        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Homework (🏠) due "+esc(ELWeek.date(hw.get(it).by))+", on no class day of the Time plan: drag it to a day if you also do it in class, or click 🏠 to take it off the homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?`<button type="button" class="aghw on" data-do="aghw1" data-it="${esc(it)}" ${D} aria-pressed="true" title="Homework due ${esc(ELWeek.date(hw.get(it).by))} · click to take this tab off the homework">🏠</button>`:""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:s==="hw"?`<small>due ${esc(sm(hw.get(it).by))}</small>`:""}${agTags(it)}${agPl(x,p)}</span>`}).join("")}</div>`)+`</div>`}});
   // only the learning paths opened for the group (Roger, 6 Nov 2026: "here I only want the SLPs I opened since they are the only ones done
   // so far"); the ones not opened yet fold into "Not opened yet", still there to drag to a day
   const shut=rows.filter(r=>!r.open),k="agshut"+x.ls+x.gid;
   const rowsH=rows.filter(r=>r.open).map(r=>r.h).join("")+(shut.length?`<details class="agpast agshut" data-k="${esc(k)}" ${S.open.has(k)?"open":""}><summary>🔒 Not opened yet (${shut.length})</summary>${shut.map(r=>r.h).join("")}</details>`:"");
   const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
-  return `<aside class="agl" data-agdrop="" ${D}><h2>${(()=>{const l=EL_LS.find(l=>l.id===x.ls);return l?lsLabel(l):esc(x.ls)})()}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code<p class="agkey">On the class days: ${["i","p","g","c"].map(v=>`<span class="agiw ${v}" style="cursor:default">${wkIco(v)}</span> ${WKS[v][0].toLowerCase()}`).join(" · ")} (class games: whole class unless you change it). Click it to choose for a tab, or the one next to the learning path for all its tabs that day. <b class="aghw on" style="cursor:default">🏠</b> homework: click it on a tab to make it homework for the next class (click again to undo).</p>`
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${(()=>{const l=EL_LS.find(l=>l.id===x.ls);return l?lsLabel(l):esc(x.ls)})()}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">In this list: <span class="agc on" style="cursor:default">✓ done</span> <span class="agc" style="cursor:default">on a class day</span> <span class="agc hw" style="cursor:default">🏠 homework</span> (on no class day) <span class="agc np" style="cursor:default">not planned</span></p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code<p class="agkey">On the class days: ${["i","p","g","c"].map(v=>`<span class="agiw ${v}" style="cursor:default">${wkIco(v)}</span> ${WKS[v][0].toLowerCase()}`).join(" · ")} (class games: whole class unless you change it). Click it to choose for a tab, or the one next to the learning path for all its tabs that day. <b class="aghw on" style="cursor:default">🏠</b> homework: click it on a tab to make it homework for the next class (click again to undo).</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
     +(shdUrl(x.ls)?(()=>{const sd=Object.keys(ag.days).filter(d=>ag.days[d].includes(SHD)).sort();return `<div class="agla shd"><div class="aglh" draggable="true" data-ag="shd" data-from="" ${D} title="Drag it to a class day (as many days as you like)"><span class="agdot">⠿</span><span class="agln"><b>🎬 Shadowing · whole class</b><small>the unit's video${sd.length?" · "+sd.map(d=>ELWeek.date(d).replace(/ \w+$/,"")).join(" · "):" · not on the agenda"}</small></span><a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the video">▶</a></div></div>`})():"")
     +rowsH+`</aside>`}
@@ -4088,7 +4114,7 @@ function gradePanel(u){redraw=()=>gradePanel(u);
   const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
   const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
   const gvRows=!g.gv?"":g.gv.parts.map(p=>`<tr><th colspan="3" style="text-align:left">${esc(p.name)} · ${p.w} % · <b>${f1((B.gv.parts.find(x=>x.id===p.id)||{}).v)}</b></th></tr>`+(p.games?gameRows(u,row):(p.first||p.time).map(([a,k])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
-    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===LATE?" late (counts half)":""):""))}).join(""))).join("");
+    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===LATE?" done late (counts the same)":""):""))}).join(""))).join("");
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b data-live="${id}">${f1(mark)}</b></summary>${body}</details>`;
   const otherTable=cs=>`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${cs.map(c=>{const o=otherCrit(u,c);
       const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
@@ -4258,7 +4284,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
     state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
-    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===LATE?"late (½)":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===LATE?"✔ late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.checkpoint?cpPanel(u,a):"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
