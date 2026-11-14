@@ -1226,7 +1226,10 @@ async function autoGroup(){const gid=S.g;
   if(DEMO||!RAW||!S.D||!gid||!GR.some(g=>g.id===gid)||document.hidden||AUTO.busy||LIVE.busy||liveOn())return;
   const at=AT.g[gid]||0;if(FRESH.has(gid)&&Date.now()-at<AUTO.ms||Date.now()<(AUTO.wait[gid]||0))return;
   AUTO.busy=true;const t0=Date.now();
-  try{if(!at)await loadGroup(gid);   // never fetched on this computer: the whole group
+  // never fetched on this computer, or the copy has none of its students (Roger, 14 Nov 2026: 4ESO A showed "0/0" and an empty final
+  // product table "as of 17:40": this update only asks for changes of the students already in the copy, so it fetched nothing): the whole group
+  const known=Object.values(RAW.st).some(s=>s.group===gid&&s.uid);
+  try{if(!at||!known)await loadGroup(gid);
     else{const base=at-180e3,ms=x=>x&&typeof x.toMillis==="function"?x.toMillis():0,
         q=(u,n,f)=>F.getDocs(F.query(F.collection(db(),"students",u,n),F.where(f,">",F.Timestamp.fromMillis(base))));
       const uids=Object.values(RAW.st).filter(s=>s.group===gid&&s.uid).map(s=>s.uid);
@@ -1565,7 +1568,8 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
   // reads) saying they handed something in. Not handed in: that report found nothing from them, or (no report, e.g. LS2 on the site) no video.
   const cr=d["_r_"+grp.id],inR=(k,u)=>!!cr&&(cr[k]||[]).some(z=>(z&&z.u||z)===u),
-    hin=u=>{const x=d[u]||{};if(fpgVideo(u,a)||x.draft||x.fileId||res(u,a.id).locked||["done","had","failed","unreach"].some(k=>inR(k,u)))return 1;return 0},
+    // a mark above 0 saved by hand (4 ESO LS1, marked before the videos came to the site: "we don't need the videos") also counts
+    hin=u=>{const x=d[u]||{},r=res(u,a.id);if(fpgVideo(u,a)||x.draft||x.fileId||r.locked||(r.max&&r.score>0)||["done","had","failed","unreach"].some(k=>inR(k,u)))return 1;return 0},
     hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
       return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
@@ -4210,7 +4214,7 @@ const FPG_READ={speaks:["🟢","Speaks freely"],partly:["🟡","Reads in parts"]
 const fpgLv=n=>n==null?"–":n===0?"No evidence":"Level "+n;
 // a row's mark out of 10: Gemini's own (in steps of 0.5, kept inside the level by the school script) or, in older drafts, level × 2.5;
 // "3+" = the top of level 3 (8 or 8.5), as in Roger's model draft for Martín
-const fpgRow=g=>g.level==null?null:g.mark!=null?g.mark:g.level*2.5;
+const fpgRow=g=>g.level==null?null:g.level===4?10:g.mark!=null?g.mark:g.level*2.5;   // Very good (4/4) is always 10/10 (Roger, 14 Nov 2026: "4/4 is 10/10")
 const fpgPlus=g=>{const m=fpgRow(g);return g.level==null?"–":g.level===0?"No evidence":"Level "+g.level+(g.mark!=null&&g.level<4&&m>=[0,3,5.5,8][g.level]?"+":"")};
 // the box in the final product dialog (filled once the drafts are read)
 function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>fpgFill(u,a)));return `<div id="fpg" class="fpg" data-u="${u}"><p class="muted">🎬 Loading the video and Gemini's draft…</p></div>`}
@@ -4299,9 +4303,11 @@ function fpGemRub(a,x,u){const N=fpRub(a);if(!N||!x)return "";
     return Object.assign({L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null},nt)});
   // Roger, 9 Nov 2026: "I need to see the feedback like this" (the student's shaded rubric): it replaces the table, open, with the 👀 notes
   return `<div class="rbbox"><p class="muted" style="margin:4px 0">📋 Gemini's draft on the rubric: the level it proposes in each row (blue), 👀 why (only for you), ✔ ➜ what the student will read. Click a square to change a level. Nothing is saved for the student until you ✅ Approve.</p>${rubH(N,sel,"Gemini",u?{u,a:a.id}:null)}</div>`}
-const FPG_MID=[0,2.5,5,7.5,9.5];   // a level picked by hand: the middle of its band (FP_BAND in the school script)
+// a level picked by hand = level × 2.5: Very good 10, Good 7.5, Fair 5, Developing 2.5, No evidence 0 (Roger, 14 Nov 2026: "4/4 is 10/10";
+// before, Very good gave 9.5, the middle of Gemini's 9–10 band). Gemini's own marks still move inside its bands (FP_BAND in the school script).
+const FPG_MID=[0,2.5,5,7.5,10];
 function fpgPick(u,a,i,k){const d=(FPG.d[a.id]||{})[u];if(!d||!d.draft)return;const N=fpRub(a),rows=d.draft.rows=d.draft.rows||[],g=rows[i]=rows[i]||{};
-  const lv=Math.max(0,Math.min(4,4-k));if(g.level===lv&&g.byYou)return;
+  const lv=Math.max(0,Math.min(4,4-k)),nm=N&&N.kind==="mark"?FPG_MID[lv]:null;if(g.level===lv&&g.byYou&&(g.mark??null)===nm)return;   // a 9.5 clicked before becomes 10 on a new click
   if(!g.byYou&&!g.g0)g.g0={level:g.level??null,mark:g.mark??null};   // 🧠 Gemini's own level, for drafts made before gem0
   g.level=lv;g.mark=N&&N.kind==="mark"?FPG_MID[lv]:null;g.byYou=true;
   d.approved=null;fpgFill(u,a);Promise.resolve().then(()=>fpgSave(a,u,d)).catch(e=>console.warn("fp pick",e))}
