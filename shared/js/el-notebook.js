@@ -233,6 +233,24 @@ window.ELNotebook = (function () {
       return out.join(' ').split(/ ?\n ?/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
     };
     const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
+    // 🎯 the recall checkpoints (Roger, 14 Nov 2026: "checkpoints should also appear in their notebook in a section like exams and final
+    // product"): the same as 🎯 My checkpoints on My marks (today.html cpView). The score first; the questions, the student's answers and the
+    // corrections once the teacher shows them or the whole class has done it (fb). Only the ones the student has done, in order. H.cp:
+    // students/{uid}/checkpoints, read by el-notes.js.
+    const CP = H.cp || {};
+    (window.EL_CATALOG || []).filter(a => a.ls === H.LS && a.checkpoint && a.keys && a.keys[0]).forEach((a, i) => {
+      const d = CP[a.keys[0]]; if (!d || d.redo) return;
+      const fb = d.fb, sc = fb || d.sc, num = (String(a.title || '').match(/\d+/) || [i + 1])[0], nm = 'Checkpoint ' + num;
+      const pc = sc && sc.max ? sc.score / sc.max : null;
+      let h = `<div class="nb-postit k-cp">🎯 ${esc(nm)}${sc && sc.max ? ` <span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${esc(sc.score)} / ${esc(sc.max)}</span>` : ''}</div>`;
+      if (!sc) h += `<p class="nb-pencil">✓ ${t('Enviat. Aviat hi veuràs la teva puntuació.', 'Sent. Your score will appear here soon.')}</p>`;
+      else if (!fb) h += `<p class="nb-pencil">⏳ ${t('Les preguntes, les teves respostes i la correcció apareixeran aquí quan tota la classe l\'hagi fet o quan el professor les mostri.', 'The questions, your answers and the corrections will appear here when the whole class has done it or when your teacher shows them.')}</p>`;
+      else h += `<div class="nb-work"><ol class="nb-ans">${(d.ids || []).map((id, j) => {
+          const ok = (fb.ok || [])[j], w = (fb.why || [])[j] || {}, why = H.ca ? (w.ca || w.en || '') : (w.en || w.ca || ''), q = (fb.q || [])[j], mine = String((d.answers || [])[j] || '').trim();
+          return `<li>${q ? esc(q) : t('Pregunta', 'Question') + ' ' + (j + 1)} <span class="nb-arrow">→</span> ${ok ? `<span class="nb-giv">${esc(mine)}</span> <i class="nb-tick">✓</i>` : `${fix(mine, (fb.right || [])[j])} <i class="nb-cross">✗</i>`}`
+            + (!ok && why ? `<small class="nb-why">💡 ${esc(why)}</small>` : '') + `</li>`; }).join('')}</ol></div>`;
+      out.push({ id: 'x-cp' + num, l: '🎯 ' + nm, side: nm, kind: 'cp', html: h });
+    });
     // 🎯 the exam
     if (G.exam) {
       const e = G.exam, x = rs[H.LS + '/assessment'] || {}, sc = x.sections || {}, r = x.report || {};
@@ -545,7 +563,12 @@ window.ELNotebook = (function () {
     // on paper (the questions to review, the writing's mistakes, what to review) and the final product's mark and feedback. From the
     // student's results (results/{ls}/assessment and the final product's activity), which el-cloud.js already keeps on the device.
     // (the final product has its own 🎬 Final products tab, fpSection)
-    const xb = examBlocks(ex).filter(b => b.kind !== 'fp');
+    const xall = examBlocks(ex), xb = xall.filter(b => b.kind !== 'fp' && b.kind !== 'cp'), cpb = xall.filter(b => b.kind === 'cp');
+    // 🎯 Checkpoints (Roger, 14 Nov 2026), a section of their own before 📝 Exams, when the LS has recall checkpoints
+    if ((window.EL_CATALOG || []).some(a => a.ls === H.LS && a.checkpoint))
+      out.push({ key: 'cps', tab: 'Checkpoints', l: '🎯 Checkpoints', head: `<p class="nb-h1"><u>🎯 Checkpoints</u></p>`
+        + (cpb.length ? '' : `<p class="nb-pencil">${t('Quan facis un checkpoint, aquí hi tindràs la puntuació i, després, les preguntes amb la correcció.', 'Once you do a checkpoint, you\'ll find your score here and, later, the questions with the corrections.')}</p>`),
+        blocks: ordered('cps', cpb.concat(notesOf('cps'))), foot: addBtn('cps') });
     out.push({ key: 'exams', tab: t('Exàmens', 'Exams'), l: '📝 ' + t('Exàmens', 'Exams'), head: `<p class="nb-h1"><u>📝 ${t('Exàmens', 'Exams')}</u></p>`, blocks: ordered('exams', xb.concat(notesOf('exams'))), foot: addBtn('exams') });
     // ✍ the student's own sections (Roger, 13 Nov 2026: "sections in between like their notes, just in case they need to add info, but they
     // can't move the ones that come from the web"): each one goes after the section the student chose (after: its key), never moved

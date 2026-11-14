@@ -370,7 +370,7 @@ html.nb-touring .nb-bt{opacity:1}
 .nb .nb-gned:hover{background:#e8eefc}
 .nb .nb-gned:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 /* 📝 Exams section (el-notebook.js examBlocks) */
-.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
+.nb-postit.k-cp,.nb-stab.k-cp{background:#fff59d}.nb-postit.k-cp .nb-stamp{font-size:19px;line-height:24px;margin-left:10px}.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
 .nb-xparts{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font:20px/32px var(--nb-hand)}
 .nb-xparts .ok{color:var(--nb-green);font-weight:700}.nb-xparts .ko{color:var(--nb-red);font-weight:700}
 .nb-why{display:block;font:15px/24px var(--nb-hand);color:var(--nb-pencil)}
