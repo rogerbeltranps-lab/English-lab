@@ -49,11 +49,13 @@ window.ELExam = (function () {
     return { exam: x ? W.exam(x.p, x.gi) : null, dropped: x ? ((x.p._dropped || {})[x.gi] || []) : [] };
   }
   // done: {"activity#panel": day} · level: a route id · ca: Catalan for Starter/Base · games: {lpNumber: true} played
-  async function build({ LS, gid, done, level, ca, played, base }) {
+  async function build({ LS, gid, done, level, ca, played, base, rs }) {
     level = ROUTES.includes(level) ? level : 'insecure';
     const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
     if (base) await sections();
     const pl = plan(LS, gid), out = [], dropped = [], doc = base ? await home(base) : document;
+    // the tabs the teacher excused (elExcused: work lost by the old Submit lock): shown as optional, never as to do (Roger, 14 Nov 2026)
+    const RS = {}; try { const o = rs || (window.ELCloud && ELCloud.results ? await ELCloud.results() : null); Object.entries(o || {}).forEach(([k, r]) => { if (r) RS[r.activity || k] = r; }); } catch (e) { }
     if (!doc) return { lps: [], dropped: [], exam: pl.exam, sample: null };
     for (const a0 of lps(doc)) {
       const a = base ? Object.assign({}, a0, { href: base + a0.href }) : a0;
@@ -81,8 +83,9 @@ window.ELExam = (function () {
         // shows its questions, unanswered, under a "To do" note; its theory shows anyway
         const sd = (st && st.done) || {}, did = p.type === 'vocab' ? !!sd.practice : !!sd[p.id];
         const todo = work || did || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
+        const exk = window.elExcused ? elExcused(a, RS[a.id]) : [], stp = window.elSecSteps ? elSecSteps(a, p.id) : [], opt = !!todo && stp.length > 0 && stp.every(k => exk.includes(k));
         parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
-          terms: termsOf(p), grammar: gramOf(p), work, todo });
+          terms: termsOf(p), grammar: gramOf(p), work, todo, opt });
       });
       out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
