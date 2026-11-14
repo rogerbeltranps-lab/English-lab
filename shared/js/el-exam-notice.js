@@ -4,7 +4,7 @@
 // been told about are saved as students/{uid}.examSeen[ls] = the marks in one string, so new marks (for example corrected ones) bring
 // the card back as "updated". "Later" hides it until the browser is closed. Nothing is shown for an LS the student's board does not list
 // (hidden, or not assigned to the group), nor for an exam with a section still empty (the teacher may be typing the marks).
-const sig=(e,sc)=>e.sections.map(([k,,mx])=>{const s=sc[k];return s&&s.score!=null&&s.score!==""?k+":"+s.score+"/"+(s.max||mx||e.max):null});
+const sig=(e,sc)=>e.sections.map(([k,,mx])=>{const s=sc[k];return s&&s.score!=null&&s.score!==""?k+":"+s.score+"/"+(s.max||mx||e.max):s&&s.excused?k+":-":null});   // excused = a part the student could not do (late exam without the listening): left out, so it does not hold the card back
 
 // get(ls) → the assessment record or null, seen() → students/{uid}.examSeen or {}, save(ls,sig), visible(ls) → the board lists the LS.
 export async function examNotice({get,seen,save,visible,course,en,board}){
