@@ -110,6 +110,8 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .bexs{display:flex;flex-direction:column;gap:3px;font-size:14px}.bex small{color:#64748b}
 .tside .nv.on.off{background:none;color:inherit}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
+.cbar2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:14px}.cbar2 .cbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.cbar2 button{margin:0}
+.ctw{max-height:62vh}table.ctab{width:100%}table.ctab td,table.ctab th{text-align:left;vertical-align:top;font-size:13.5px}table.ctab td.ctn{min-width:150px}table.ctab td.ctg{white-space:nowrap;font-weight:600}table.ctab td.ctd{min-width:150px;width:1%}table.ctab td.ctd .cchip{display:block;margin:0 0 3px;white-space:nowrap}table.ctab tbody+tbody tr:first-child td{border-top:2px solid #cbd5e1}.cfind{flex:1 1 200px;max-width:280px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;font:inherit;font-size:14px}
 .cline{padding:7px 0;border-top:1px solid #eef2f7}.cwho{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}details.cgrp details.cgrp,details.cday details.cgrp{margin-left:14px}
 .chip.cchip{font-size:13px;padding:2px 10px;cursor:pointer}.chip.cchip:hover{border-color:#3157d5;color:#2443ad}.chip.cchip.late{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
 .cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
@@ -1732,7 +1734,7 @@ const covGaps=(grp,ls)=>covIssues(grp,ls).length;
 const COVK={crit:"criteria and competences",gram:"grammar",lex:"lexicon"},COVT={crit:"Criterion",gram:"Grammar",lex:"Lexicon"};
 // ---- ✏️ Corrections (Roger, 6 Nov 2026: "another section called corrections where I can see when you correct the writings and listenings
 // and where I can order to correct everything that's waiting to be corrected"). One place for every group, in the side menu and on Home:
-//  • Last corrections, by day: what Claude corrected and when, from the dates saved with the work: results.fbAt[step] (marks.mjs fb-apply,
+//  • Last corrections (since 14 Nov 2026: two tables, Gemini's and Claude's, by student › task › day; see corrTable): what Claude corrected and when, from the dates saved with the work: results.fbAt[step] (marks.mjs fb-apply,
 //    since 6 Nov 2026; older corrections use the document's `updated`), marked[step] (levels), flags[step].at (possible copies, pieces
 //    sent back) and answers[step].at (students' comments answered on Fridays). Each name opens that correction (wrOpen / cpOpen / cellPanel).
 //  • Waiting: what the next run will correct, with the same rules as tools/marking/marks.mjs (fb-ready, and ready for the marked steps:
@@ -1767,10 +1769,10 @@ const corrOld=()=>{const t=corrRanAt();return DEMO||!t||!RAW||(AT.corr||0)>=t?[]
 async function corrFresh(){const old=corrOld();if(!old.length||CORR.busy||Date.now()-CORR.failT<5*60e3)return;CORR.busy=true;CORR.failT=0;const t=corrRanAt();
   try{if(old.length===GR.length)S.D=await load("all");else{await Promise.all(old.map(g=>loadGroup(g.id)));S.D=build(S.D)}AT.corr=t;saveCache();LIVE.since={}}
   catch(e){console.warn("corrections fetch",e);CORR.failT=Date.now()}
-  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
-document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.delete(g):S.corrShut.add(g)},true);
+  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();   // S.corrShut = the groups opened in Waiting (closed at first since 14 Nov 2026: the two tables come first)
+document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.add(g):S.corrShut.delete(g)},true);
 function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
-  const wait=[],done=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
+  const wait=[],done=[],gem=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
   Object.values(S.P).filter(s=>s.uid&&!s.tester&&GR.some(g=>g.id===s.group)).forEach(s=>{const grp=GR.find(g=>g.id===s.group),tk=(S.D.tk[grp.id]||{}).ticks;
     cat.forEach(a=>{if(!a.ls.startsWith(grp.course+"-")||!a.keys||!a.keys.length||a.manual)return;const g=(window.EL_GRADING||{})[a.ls]||{};if(g.only||(g.fp&&g.fp.a===a.id))return;
       const st=pstate(s.uid,a),x=res(s.uid,a.id),fl=x.flags||{},steps=st.steps||{},ms=(g.moments||[]).filter(m=>m.a===a.id&&!m.group),base={u:s.uid,gid:grp.id,ls:a.ls,aid:a.id};
@@ -1792,8 +1794,50 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
       Object.entries(x.marked||{}).forEach(([step,at])=>{if(ms.some(m=>m.step===step))done.push(Object.assign({step,k:"level",name:corrNm(a.id,step),at:tms(at)},base))});
       Object.entries(fl).forEach(([step,f])=>{if(!f||!f.at)return;if(f.auto&&f.done==="redo")done.push(Object.assign({step,k:"back",name:corrNm(a.id,step),at:tms(f.at)},base));
         else if(f.why&&!f.back&&!f.auto)done.push(Object.assign({step,k:"copy",name:corrNm(a.id,step),at:tms(f.at)},base))});
-      Object.entries(x.answers||{}).forEach(([step,o])=>{if(o&&o.t&&o.at)done.push(Object.assign({step,k:"answer",name:((a.steps||[]).find(z=>z[0]===step)||[])[1]||corrNm(a.id,step),at:tms(o.at)},base))})})});
-  done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done};return CORR.v}
+      Object.entries(x.answers||{}).forEach(([step,o])=>{if(o&&o.t&&o.at)done.push(Object.assign({step,k:"answer",name:((a.steps||[]).find(z=>z[0]===step)||[])[1]||corrNm(a.id,step),at:tms(o.at)},base))});
+      // Gemini: a recording it transcribed, with its notes on the task and pronunciation (the fields marked rec, el-mic.js upload)
+      Object.entries(steps).forEach(([step,h])=>{const rec=((h&&h.f)||[]).filter(f=>f&&f.rec&&String(f.v||"").trim());if(!h||!h.audio||!rec.length)return;
+        gem.push(Object.assign({step,k:"gspeak",name:h.title||corrNm(a.id,step),at:tms(h.date),note:rec.some(f=>/^Notes/.test(f.l||""))?"transcript and notes":"transcript"},corrEur("audio",h.audio),base))})})});
+  done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done,gem};return CORR.v}
+// ---- Last corrections by student (Roger, 14 Nov 2026: "To me the most important thing is the student, then the task and then the day.
+// On the other hand, I want a table with Gemini's corrections and a table with Claude's correction"; "The blue box is not needed … and add
+// the course too"): two tables, a few rows per student (sorted by surname) with their course, each task and the days it was corrected,
+// newest first; each day opens what the student got (corrOpen). 🔍 Find a student hides the other students (no new render).
+//  • Gemini: speaking recordings it transcribed with notes (corrScan: gem) and final product videos it drafted on the rubric
+//    (settings/fp__{activity}: one document per final product, read once when this page first opens and kept in FPG.d).
+//  • Claude: what corrScan lists as done (Wednesday corrections, marked steps, sent back to redo, possible copies, comments answered).
+const GK={gspeak:["🔊","Speaking recording"],gfp:["🎬","Final product video"]},ckI=k=>CK[k]||GK[k]||["📝",k];
+const corrFpActs=()=>[...new Set([...Object.values(window.EL_GRADING||{}).map(g=>g&&g.fp&&g.fp.a),...Object.keys(window.EL_FP_RUBRICS||{})].filter(Boolean))]
+  .map(byId).filter(a=>a&&a.manual&&GR.some(g=>a.ls.startsWith(g.course+"-")));
+function corrFpGem(){const out=[];corrFpActs().forEach(a=>{const d=FPG.d[a.id];
+  if(!d){if(!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g==="corr")render()}).catch(()=>{})}return}
+  Object.entries(d).forEach(([u,x])=>{const s=S.P[u],g=s&&GR.find(z=>z.id===s.group);if(!g||s.tester||!x||!x.draft||!a.ls.startsWith(g.course+"-"))return;
+    out.push(Object.assign({u,gid:g.id,ls:a.ls,aid:a.id,step:"fp",k:"gfp",name:a.title,at:tms(x.at),note:(x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve")+(x.n>1?" · watched "+x.n+" times":"")},corrEur("video",x)))})});return out}
+// 💶 what each Gemini correction cost (Roger, 14 Nov 2026: "and on each video the money it cost"): since school script v22 every answer says
+// what that call cost (Google's token count × the price, as the month total in 💶 Gemini this month) and it is kept with the recording
+// (steps[step].audio.eur) or the draft (eur = every watch of that video added up, n = how many). Older ones: an estimate (≈) from the length,
+// the way Google counts (about 32 tokens a second of audio, about 300 a second of video at high resolution) plus the question and the answer.
+const corrEurP={"gemini-flash-latest":[0.5,1,3],"gemini-pro-latest":[2,2,12],"gemini-4-argon":[2,2,10]};
+function corrEur(kind,x){x=x||{};if(typeof x.eur==="number")return {eur:x.eur};
+  if(kind==="audio"){const t=Number(x.s);if(!t)return {};const p=corrEurP["gemini-flash-latest"];return {eur:(t*32*p[1]+700*p[0]+1000*p[2])/1e6*0.87,est:true}}
+  const t=Number((x.draft||{}).secs);if(!t)return {};const p=corrEurP[x.model]||corrEurP["gemini-pro-latest"];return {eur:(t*300*p[1]+3000*p[0]+2500*p[2])/1e6*0.87*Math.max(1,(x.changes||[]).length+1),est:true}}
+const eurTx=(v,est)=>(est?"≈ ":"")+"€"+(v<0.01?v.toFixed(3):v.toFixed(2));
+const corrFold=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+function corrFind(){const q=corrFold(S.corrQ).trim();document.querySelectorAll("table.ctab tbody[data-cn]").forEach(b=>{b.hidden=!!q&&!b.dataset.cn.includes(q)})}
+document.addEventListener("input",e=>{if(e.target.id==="corrfind"){S.corrQ=e.target.value;corrFind()}});
+function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;
+  const by={},ord=id=>{const n=cat.findIndex(x=>x.id===id);return n<0?1e4:n},hm=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});
+  const body=Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],g=GR.find(x=>x.id===is[0].gid),tk={};
+    is.forEach(i=>{const key=i.k+"|"+i.aid+"|"+i.step;(tk[key]=tk[key]||[]).push(i)});
+    const ts=Object.values(tk).sort((p,q)=>ord(p[0].aid)-ord(q[0].aid)||String(p[0].name).localeCompare(String(q[0].name))||Object.keys(CK).indexOf(p[0].k)-Object.keys(CK).indexOf(q[0].k));
+    return `<tbody data-cn="${esc(corrFold(s?fullName(s)+" "+name(s):""))}">`+ts.map((t,n)=>{t.sort((p,q)=>q.at-p.at);const i=t[0],ic=ckI(i.k);
+      return `<tr>${n?"":`<td class="ctn" rowspan="${ts.length}"><b>${s?name(s):"?"}</b>${is.length>1?`<br><small class="muted">${plural(is.length,"correction")}</small>`:""}</td><td class="ctg" rowspan="${ts.length}">${esc(g?g.name:"")}</td>`}`
+        +`<td>${ic[0]} <b>${esc(i.k==="answer"?"Comment on "+(i.name||""):i.name||ic[1])}</b><br><small class="muted">${esc(ic[1])}${i.note?" · "+esc(i.note):""} · ${esc(actTitle(i.aid))}</small></td>`
+        +`<td class="ctd">${t.map(x=>`<button class="chip mini cchip" data-do="corropen" data-u="${x.u}" data-a="${esc(x.aid)}" data-s="${esc(x.step)}" data-k="${x.k}" title="Open what the student got${x.est?" (💶 an estimate: this was before the cost was saved)":""}">${x.at?esc(new Date(x.at).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))+(x.approx?"":" · "+hm(x.at)):"?"}${x.eur!=null?` · 💶 ${eurTx(x.eur,x.est)}`:""}</button>`).join("")}</td></tr>`}).join("")+`</tbody>`}).join("");
+  return `<div class="wrap ctw"><table class="ctab"><thead><tr><th>Student</th><th>Course</th><th>Task</th><th>Day</th></tr></thead>${body}</table></div>`}
+const corrHead=(t,L)=>{const E=L.filter(i=>i.eur!=null),sum=E.reduce((a,i)=>a+i.eur,0);
+  return `<div class="chead"><h2 style="margin:0">${t}</h2><span class="muted">${L.length?plural(new Set(L.map(i=>i.u)).size,"student")+" · "+plural(L.length,"correction"):""}${E.length?` · 💶 <b>${eurTx(sum,E.some(i=>i.est))}</b> in all`:""}</span></div>`};
 // the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
 // what the asked card says: started at once by the school script (fd), or why not and what to do
 function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).request||{}).err,why=e==="no task token"?"the task's token is not in your school script yet"
@@ -1823,20 +1867,21 @@ function corrPage(){
   const {wait,done}=corrScan(),gf=i=>S.corrG==="all"||i.gid===S.corrG,W=wait.filter(gf),Dn=done.filter(gf);
   const now=W.filter(i=>i.k!=="copy"&&i.ready),later=W.filter(i=>i.k==="level"&&!i.ready),you=W.filter(i=>i.k==="copy"),late=now.filter(i=>i.late);
   const allNow=wait.filter(i=>i.k!=="copy"&&i.ready).length,st=corrState(),nx=corrNext(),RUN=`<a href="https://claude.ai/code/routines" target="_blank" rel="noopener">scheduled tasks on claude.ai ↗</a>`;
-  // the big card
-  const card=chk&&st.s!=="running"&&st.s!=="asked"?`<div class="cont"><span class="ck">Checking</span><span class="ct">⏳ Fetching your students' latest work…</span><span class="cs">Claude corrected work on ${esc(corrWhen(corrRanAt()))}. The list below shows what is really waiting as soon as the work is in (a few seconds).</span></div>`
-    :st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
-    :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"Starting now"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${corrAskMsg(st,RUN)}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
-    :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
-      +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
-      +`<span class="cs">${st.st?`Last run: ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}. `:""}${allNow?"Don't want to wait until Wednesday? Claude can correct them now (every group).":"Everything students handed in is corrected."}</span>`
-      +(allNow?`<div class="cgo"><button data-do="corrask">✏️ Correct everything waiting now</button></div>`:"")+`<div class="cgo"><button class="g" data-fpg="cost" title="What Gemini cost this month: speaking recordings transcribed and final product videos watched">💶 Gemini this month</button></div>`+`</div>`;
+  // one line at the top instead of the big blue card (Roger, 14 Nov 2026: "The blue box is not needed"): when the next run is, what is
+  // waiting, ✏️ Correct everything waiting now and 💶 Gemini this month; while Claude is asked or correcting, that state and ↻ Check again
+  const card=`<div class="cbar2"><span>`+(chk&&st.s!=="running"&&st.s!=="asked"?`⏳ Fetching your students' latest work… <span class="muted">(Claude corrected work on ${esc(corrWhen(corrRanAt()))})</span>`
+    :st.s==="running"?`✏️ <b>Claude is correcting now</b> <span class="muted">· started ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":" (the Wednesday run)"} · usually 20 to 60 minutes</span>`
+    :st.s==="asked"?`<b>${st.slow?"⚠️ Not started yet":"⏳ Starting now"}</b> <span class="muted">· asked ${esc(corrWhen(st.rq))}.</span> ${corrAskMsg(st,RUN)}`
+    :`Next correction: <b>${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"}, about 15:00</b> · ${allNow?`<b>${plural(allNow,"piece")} waiting</b>`:"nothing waiting"}${st.st?` <span class="muted">· last run ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}</span>`:""}`)
+    +`</span><span class="cbtns">${st.s==="running"||st.s==="asked"?`<button class="mini" data-do="corrcheck">↻ Check again</button>`:""}${st.s==="asked"?`<button class="g mini" data-do="corrcancel">✕ Cancel the request</button>`:""}`
+    +`${allNow&&st.s!=="running"&&st.s!=="asked"&&!chk?`<button class="mini" data-do="corrask">✏️ Correct everything waiting now</button>`:""}<button class="g mini" data-fpg="cost" title="What Gemini cost this month: speaking recordings transcribed and final product videos watched">💶 Gemini this month</button></span></div>`;
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
   // you correct this?": the page showed Friday night's copy, after Claude's Saturday runs had corrected it all). When a run started after
   // a group's work was fetched, say so and offer to fetch it again (DEMO: never).
   const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO||chk?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
     stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> The page could not fetch the latest work by itself. Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
-  const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")+`</div>`;
+  const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")
+    +`<input id="corrfind" class="cfind" type="search" placeholder="🔍 Find a student" value="${esc(S.corrQ||"")}" autocomplete="off"></div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
   // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
   // wanna see, Pau is waiting for these corrections and a button to say correct it"): by student (default) or by activity
@@ -1851,16 +1896,14 @@ function corrPage(){
     +(chk?`<p class="muted">⏳ Fetching the latest work…</p></div>`:"")+(chk?"":(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
       ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
-      :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"":"open"} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
+      :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"open":""} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
     +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`);
-  // history by day
-  const days=[...new Set(Dn.map(i=>ymd(i.at)))].filter(d=>d&&d!=="1970-01-01"),shown=days.slice(0,S.corrN);
-  const histB=`<div class="box"><h2>Last corrections</h2><p class="muted">What Claude corrected and when. Click a name to see the correction the student got.</p>`
-    +(shown.length?shown.map((d,n)=>{const is=Dn.filter(i=>ymd(i.at)===d),t=Math.min(...is.map(i=>i.at)),t2=Math.max(...is.map(i=>i.at)),ap=is.some(i=>i.approx);
-      return `<details class="cday" ${n===0||S.open.has("cd"+d)?"open":""} data-k="cd${d}"><summary><b>${esc(corrDay(d+"T12:00"))}</b>${ap?"":` <span class="muted">· ${new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}${t2-t>10*60e3?"–"+new Date(t2).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):""}</span>`}<div>${corrCount(is)}</div></summary>`
-        +byG(is,(g,gs)=>`<details class="cgrp" data-k="cg${d}${g.id}" ${S.open.has("cg"+d+g.id)?"open":""}><summary><b>${esc(g.name)}</b> ${corrCount(gs)}</summary>${corrLines(gs)}</details>`)+`</details>`}).join("")
-      +(days.length>shown.length?`<div class="bar"><button class="g" data-do="corrmore">Show older days</button></div>`:"")
-      :`<p class="muted">No corrections yet${S.corrG==="all"?"":" in this group"}.</p>`)+`</div>`;
+  // the two tables: Gemini's corrections and Claude's, by student › task › day
+  const Gm=corrScan().gem.concat(corrFpGem()).filter(gf);setTimeout(corrFind);
+  const gemB=`<div class="box">${corrHead("🔷 Gemini's corrections",Gm)}<p class="muted">Speaking recordings Gemini transcribed, with its notes on the task and pronunciation, and final product videos it drafted on the rubric. 💶 is what each one cost (≈ an estimate for the older ones). Click a day to open it.</p>`
+    +corrTable(Gm,`Nothing from Gemini yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
+  const claB=`<div class="box">${corrHead("✏️ Claude's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected on Wednesdays (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got.</p>`
+    +corrTable(Dn,`No corrections yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
   const infoB=`<div class="box">${fold("corrinfo","ⓘ What runs on its own and what needs Claude",`
     <h3>Works on its own</h3><p>The whole site: sign-in, saving answers, every activity that marks itself, checkpoints, games, class mode and full screen, this dashboard, marks and levels, announcements, homework and the calendar feed. The emails (problem alerts, your Saturday summary, the students' Sunday email) are sent by a free GitHub Action through your school's Apps Script.</p>
     <h3>Needs Claude (scheduled tasks)</h3><ul>
@@ -1870,10 +1913,10 @@ function corrPage(){
       <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within a few minutes).</li>
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Claude stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
-  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">Writings, speaking and Talk transcripts, reflections and marked steps of every group · Claude corrects them every Wednesday</div></div>`
-    +`<div class="hgrid"><div class="hl">${stale}${card}${gchips}${waitB}</div><div class="hl">${infoB}${histB}</div></div>`}
+  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">What Gemini and Claude corrected, by student · Claude corrects every Wednesday</div></div>`
+    +`${stale}${card}${gchips}<div class="hl">${gemB}${claB}</div><div class="hgrid" style="margin-top:12px"><div class="hl">${waitB}</div><div class="hl">${infoB}</div></div>`}
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
-  if(k.k==="answer")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
+  if(k.k==="answer"||k.k==="gfp")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
 // the menu badge and the Home tile: pieces waiting for the next run (red when some are late), ✏️ while Claude is correcting
 const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:true};try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
 // 🎯 level change requests a student sent from their board or LS page (levels/{ls}.request, already loaded for every student: no new reads)
@@ -4248,7 +4291,9 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
   FPG.busy[k]=true;FPG.t0[k]=Date.now();fpgFill(u,a);
   const keep={fileId:v.link&&v.id?v.id:(old.fileId||null),fileIds:v.link&&v.id?(v.ids||[]):(old.fileIds||[]),youtube:v.youtube||old.youtube||null,fileName:v.link&&v.name?v.name:(old.fileName||null)};
   let d;try{const j=await fpgCall({action:"fp_watch",fileId:v.id||"",fileIds:v.ids||[],youtube:v.youtube||"",ask,prev:change?old.draft:null,change:change||""});
-    d=Object.assign({at:new Date().toISOString(),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]},keep)}
+    // 💶 eur = every watch of this video added up (school script v22 says what each call cost), n = how many watches
+    const was=typeof old.eur==="number"?old.eur:0;
+    d=Object.assign({at:new Date().toISOString(),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]},typeof j.eur==="number"?{eur:Math.round((was+j.eur)*1e5)/1e5,n:(old.n||(old.draft?1:0))+1}:{},keep)}
   catch(e){d=Object.assign({},old,keep,{error:"Gemini could not watch it: "+e.message+".",at:old.at||new Date().toISOString()})}
   if(!d.error)delete d.error;FPG.busy[k]=false;FPG.cost=null;
   try{await fpgSave(a,u,d)}catch(e){console.warn("fp draft save",e)}

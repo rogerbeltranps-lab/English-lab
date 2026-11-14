@@ -42,6 +42,9 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  11. v22 (Roger, 14 Nov 2026: "and on each video the money that costed"): each Gemini answer also says what that one call cost
+//      (eur, from Google's token count, as the month total): "audio" → {…, eur}, "fp_watch" → {…, eur}. The pages keep it with the
+//      recording (audio.eur) and the draft (eur), and the dashboard's ✏️ Corrections shows it on each row. Nothing else changes.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -202,7 +205,7 @@ function saveAudio(m) {
   const file = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data), mime, stamp + " · " + clean(name) + " · " + page + " · " + clean(meta.title || meta.step) + "." + ext));
   file.setDescription(JSON.stringify({email: who.email, group: meta.group || "", page: meta.page || "", step: meta.step || "", level: meta.level || "", secs: m.secs || null}));
   const g = transcribe(data, mime, meta);
-  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes};
+  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes, eur: g.eur || null};
 }
 
 // Gemini listens to the recording (Roger, 8 Nov 2026: "gemini can give feedback itself with a proper prompt per each activity, we need him
@@ -236,12 +239,12 @@ function transcribe(data, mime, meta) {
           generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
       if (r.getResponseCode() !== 200) continue;
       const j = JSON.parse(r.getContentText());
-      addUsage(GEMINI_MODEL, "audio", j);
+      const eur = addUsage(GEMINI_MODEL, "audio", j);
       const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
       const o = JSON.parse(t), s = v => String(v || "").trim();
       const notes = [["Task", o.task], ["Pronunciation", o.pronunciation], ["Well done", o.well_done], ["Next time", o.next_time]]
         .filter(x => s(x[1])).map(x => x[0] + ": " + s(x[1])).join("\n");
-      return {tr: s(o.transcript).slice(0, 6000), notes: notes.slice(0, 3000)};
+      return {tr: s(o.transcript).slice(0, 6000), notes: notes.slice(0, 3000), eur};
     } catch (x) {}
   }
   return none;
@@ -416,11 +419,11 @@ function fpAsk(m, ask, rows, fd, del) {
         generationConfig: {temperature: 1.0, mediaResolution: "MEDIA_RESOLUTION_HIGH", responseMimeType: "application/json"}})});
     if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + ([].concat(fd)[0].mime_type ? "" : ": the YouTube video may be private")};
     const j = JSON.parse(r.getContentText());
-    addUsage(FP_MODEL, "video", j);
+    const eur = addUsage(FP_MODEL, "video", j);
     const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
     const o = JSON.parse(t), str = v => String(v || "").trim(), lv = v => v === null || v === undefined || v === "" ? null : Math.max(0, Math.min(4, Math.round(Number(v)))) ;
     const verdict = ["speaks", "partly", "reads"].includes(o.reading && o.reading.verdict) ? o.reading.verdict : "partly";
-    return {ok: true, model: FP_MODEL, draft: {reading: {verdict, note: str(o.reading && o.reading.note).slice(0, 600)},
+    return {ok: true, model: FP_MODEL, eur, draft: {reading: {verdict, note: str(o.reading && o.reading.note).slice(0, 600)},
       rows: rows.map((x, i) => { const g = [].concat(o.rows || []).find(y => Number(y.n) === i + 1) || {}, l = isNaN(lv(g.level)) ? null : lv(g.level);
         return {level: l, mark: m.ask && m.ask.marks ? fpRowMark(l, g.mark) : null, why: str(g.why).slice(0, 700), good: str(g.good).slice(0, 400), improve: str(g.improve).slice(0, 400)}; }),
       feedback: str(o.feedback).slice(0, 2500), well_done: str(o.well_done).slice(0, 400), next_time: str(o.next_time).slice(0, 400), secs: Number(o.seconds) || null,
@@ -504,14 +507,15 @@ function addUsage(model, kind, j) {
     const det = [].concat(u.promptTokensDetails || []), audio = det.filter(d => d.modality === "AUDIO").reduce((a, d) => a + (d.tokenCount || 0), 0);
     const input = (u.promptTokenCount || 0) - audio, out = (u.candidatesTokenCount || 0) + (u.thoughtsTokenCount || 0);
     const eur = (input * p.text + audio * p.audio + out * p.out) / 1e6 * EUR_PER_USD;
-    const lock = LockService.getScriptLock(); if (!lock.tryLock(5000)) return;
+    const lock = LockService.getScriptLock(); if (!lock.tryLock(5000)) return eur;
     try {
       const P = PropertiesService.getScriptProperties(), k = "gemini:" + Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM");
       const c = JSON.parse(P.getProperty(k) || "{}");
       c.eur = (c.eur || 0) + eur; c.calls = (c.calls || 0) + 1; c[kind] = (c[kind] || 0) + 1;
       P.setProperty(k, JSON.stringify(c));
     } finally { lock.releaseLock(); }
-  } catch (x) {}
+    return Math.round(eur * 1e5) / 1e5;   // v22: this call's cost, for the row in the dashboard
+  } catch (x) { return null; }
 }
 function geminiUsage() {
   const all = PropertiesService.getScriptProperties().getProperties();
