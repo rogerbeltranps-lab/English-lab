@@ -42,6 +42,20 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  18. v29 (Roger, 14 Nov 2026: "que els alumnes no vegin la hora en que els envio els missatges"): emails to students sent between 21:00
+//      and 7:30 (Madrid) wait here until 7:30, so Gmail never shows a late hour. The dashboard asks the teacher first and sends at (the
+//      7:30 in ms: hold until then) or now: true ("Send now anyway"); anything else to a school address in those hours (a scheduled
+//      announcement, the GitHub Action) waits too. Answer {ok, later (ISO time)}. Kept in Script properties (late:…), sent by the
+//      trigger sendLate; lateStatus() in the editor logs what is waiting. Emails only to the teacher are never held. See "v29" below.
+//  17. v28 (Roger, 14 Nov 2026: "I see that some presentations have the link of the video, tell gemini to check that"): new action
+//      {idToken (teacher), action: "fp_slides_video", fileId, student} → {ok, video: {id | youtube, name}} or {ok: false, links, error}: it
+//      looks inside the student's slides or document (or the PDF copy made from them, by the [id] in its name) for a link to their video
+//      (Google Vids, a Drive video or audio file, YouTube); a Google Vids is turned into an mp4 first. Gemini then watches that video.
+//  16. v27 (Roger, 14 Nov 2026: "we need to tell gemini that if there's no video the mark is a 0"): in "fp_watch", a hand-in where the
+//      student cannot be heard speaking (slides or a PDF only, a silent video, only music, someone else talking) gets level 0 = mark 0 on
+//      EVERY row, and the comment asks for the video (it used to mark the slides and leave the speaking rows empty: 4.1/10 for slides only).
+//  15. v26 (Roger, 14 Nov 2026: "I want to receive a notification when students upload it"): every final product video a student finishes
+//      uploading on the site sends the teacher an email "English Lab: 🎬 new final product video · name (group)" (see "v26" below).
 //  14. v25 (Roger, 14 Nov 2026: "I will ask students to load it on the web"): Gemini drafts every final product video uploaded on the site
 //      by itself, right after the upload (actions fp_auto_setup / fp_auto_list / fp_auto_ack, see "v25" below). Students never see it.
 //  13. v24 (Roger, 14 Nov 2026: "4/4 is 10/10"): in "fp_watch", a rubric row at level 4 (Very good) is always 10/10 (it was 9 to 10).
@@ -51,6 +65,11 @@
 //  11. v22 (Roger, 14 Nov 2026: "and on each video the money that costed"): each Gemini answer also says what that one call cost
 //      (eur, from Google's token count, as the month total): "audio" → {…, eur}, "fp_watch" → {…, eur}. The pages keep it with the
 //      recording (audio.eur) and the draft (eur), and the dashboard's ✏️ Corrections shows it on each row. Nothing else changes.
+//  10. v20 (Roger, 13 Nov 2026: the email about the 📓 notebook "I need to add an image"): an email from the key holder can carry a
+//      formatted (html) version with up to 3 pictures inside; nothing else changes.
+//   9. v19 (Roger, 12 Nov 2026: "can you read the emails of the school account and tell me which need my reply"): READ ONLY.
+//      {key, action: "inbox", days (1-30, default 7), max (1-50, default 30)} → {ok, threads: [{id, subject, unread, starred, messages:
+//      [{from, to, cc, date, body}]}]}. It never sends, marks as read, labels, archives or deletes anything.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -91,6 +110,8 @@ function doPost(e) {
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_convert") return out(m.idToken && isTeacher(m.idToken) ? fpConvert(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_slides_video") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
+    try { return out(fpSlidesVideo(m)); } catch (x) { return out({ok: false, error: "slides: " + String(x && x.message || x).slice(0, 200)}); } }
   if (m.action === "fp_copy") return out(m.idToken && isTeacher(m.idToken) ? fpCopy(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_folder") return out(m.idToken && isTeacher(m.idToken) ? fpFolder(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
@@ -105,6 +126,7 @@ function doPost(e) {
   if (m.action === "problem") return out(keyOk || (m.idToken && isUser(m.idToken)) ? startProblems() : {ok: false, error: "not signed in"});
   if (!keyOk && !(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: m.idToken ? "not the teacher" : "wrong key"});
   if (m.action === "mark") return out(startMarking(m.at));
+  if (m.action === "inbox") return out(readInbox(m));
   const to = clean(m.to), bcc = clean(m.bcc);
   if ((!to.length && !bcc.length) || !m.subject || !m.body) return out({ok: false, error: "nothing to send"});
   if (to.length + bcc.length > 50) return out({ok: false, error: "too many people in one email (50 at most)"});
@@ -112,6 +134,17 @@ function doPost(e) {
   const mail = {to: to.length ? to.join(",") : Session.getEffectiveUser().getEmail(), subject: String(m.subject).slice(0, 200),
     body: String(m.body).slice(0, 20000), name: String(m.name || "English Lab").slice(0, 80)};
   if (bcc.length) mail.bcc = bcc.join(",");
+  // v20: an email can also carry a formatted version with pictures inside (html + images {cid: {data: base64, type}}, at most 3,
+  // shown with <img src="cid:name">); the plain text stays for email apps that do not show it
+  if (m.html) mail.htmlBody = String(m.html).slice(0, 60000);
+  if (m.images && typeof m.images === "object") { const im = {};
+    Object.keys(m.images).slice(0, 3).forEach(k => { const x = m.images[k] || {};
+      if (/^[a-z0-9_-]{1,30}$/i.test(k) && x.data && String(x.data).length < 2800000)
+        im[k] = Utilities.newBlob(Utilities.base64Decode(String(x.data)), /^image\/(png|jpeg|gif)$/.test(x.type) ? x.type : "image/jpeg", k); });
+    if (Object.keys(im).length) mail.inlineImages = im; }
+  // v29: late emails to students wait until 7:30 (an email with pictures inside goes at once: they are too big to keep)
+  const later = mail.inlineImages ? 0 : lateUntil(m, to.concat(bcc));
+  if (later) { lateQueue(mail, later); return out({ok: true, later: new Date(later).toISOString(), left: MailApp.getRemainingDailyQuota()}); }
   MailApp.sendEmail(mail);
   return out({ok: true, left: MailApp.getRemainingDailyQuota()});
 }
@@ -296,6 +329,18 @@ function testRecordingsFolder() {
   Logger.log("Recordings folder: " + DriveApp.getFolderById(AUDIO_FOLDER).getName() + (GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE" ? " · no Gemini key yet" : " · Gemini key set"));
 }
 
+// Run this once from the editor after pasting the Gemini key (v9): it asks Gemini one tiny question and logs the answer, or Google's error.
+function testGemini() {
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") { Logger.log("No Gemini key yet"); return; }
+  const r = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY,
+    {method: "post", contentType: "application/json", muteHttpExceptions: true,
+     payload: JSON.stringify({contents: [{parts: [{text: "Say hello to an English teacher in five words."}]}]})});
+  if (r.getResponseCode() !== 200) { Logger.log("Gemini said no ❌ (" + r.getResponseCode() + "): " + r.getContentText().slice(0, 400)); return; }
+  const j = JSON.parse(r.getContentText());
+  addUsage(GEMINI_MODEL, "audio", j);
+  Logger.log("Gemini works ✅ It says: " + ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join(""));
+}
+
 // ---- 6. Final product videos from the student's page, in pieces (a Drive resumable upload kept here: the page never sees a Drive link
 // or a token of this account, only a random upload token that works for this one file for 6 hours).
 const CHUNK = 8 * 1024 * 1024;   // a multiple of 256 KB, as Drive asks; 8 MB is ~11 MB of base64 per request
@@ -352,6 +397,7 @@ function upAnswer(r, token) {
     CacheService.getScriptCache().remove("up:" + token);
     const f = JSON.parse(r.getContentText() || "{}");
     try { fpAutoQueue(up, f.id); } catch (x) { console.warn("fpAutoQueue " + x); }   // v25: Gemini drafts it by itself
+    try { videoMail(up, f); } catch (x) { console.warn("videoMail " + x); }   // v26: an email to the teacher for every upload
     return {ok: true, done: true, id: f.id || "", name: f.name || ""};
   }
   return {ok: false, error: "Drive refused the piece (HTTP " + code + ")"};
@@ -468,7 +514,7 @@ function fpPrompt(ask, rows, prev, change) {
     "The task: " + String(ask.task || "a short video presentation in English with slides").slice(0, 1500),
     ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (only so you know who it is: never write their name, see below).",
     ask.media === "audio" ? "This hand-in is an AUDIO recording only (no picture, no slides). Listen to the whole recording. Rows about slides, pictures or anything visual get level null; say in the reading note that it is audio only and judge reading from how it sounds."
-      : ask.media === "pdf" ? "This hand-in is a PDF only (no sound, no video). Read the whole document. Rows about speaking, pronunciation, fluency or speaking without reading get level null; the reading verdict is \"partly\" and its note says there is no recording to hear. Do not list any sounds."
+      : ask.media === "pdf" ? "This hand-in is a PDF only: slides or a document with NO recording of the student speaking. The final product is a spoken video presentation, so this is a fail (see NO VIDEO = 0 below): every row level 0, reading verdict \"reads\", its note says \"No recording: slides only\". Do not list any sounds."
       : ask.media === "video+pdf" || ask.media === "audio+pdf" ? "This hand-in has two parts: the student's slides as a PDF and the student's " + (ask.media === "video+pdf" ? "video" : "voice recording (audio only)") + ". Look at the whole PDF and listen to the whole recording, and judge them together as one presentation."
       : "Watch and listen to the whole video.",
     "",
@@ -477,6 +523,8 @@ function fpPrompt(ask, rows, prev, change) {
     "- Most students this age read part of their presentation. That is expected. Say how much they read in the reading check, let it count only in the row about speaking without reading (Speaking), and do not lower other rows because of it. If they read, the feedback always gives a kind, practical tip to try not to read next time (e.g. use the slides only as prompts, rehearse a few times, look at the camera).",
     "- Judge the language at the course level: small slips are normal. Quote the student's real words in quotation marks, with the correct form, e.g. \"he also have breakfast\" → \"he also has breakfast\". Praise with real examples too (verbs, expressions, connectors they used).",
     "- A row that cannot be judged from the video (for example a written hand-in, notes, sources or process steps) gets level null.",
+    // v27 (Roger, 14 Nov 2026: "this should be a video and therefore the student needs to fail" … "if there's no video the mark is a 0")
+    "- NO VIDEO = 0: the final product is a presentation the student SPEAKS in English. If you cannot hear the student speaking (slides or a PDF only, a silent video, only music, a computer voice, or someone else talking), it is a fail: give EVERY row level 0" + (marks ? " and mark 0" : "") + " (never null), whatever the slides show, and say so in each row's why. The reading note starts \"No recording:\" and says what you got. The feedback thanks them kindly, says you only received the slides (or what you got) and asks them to record themselves presenting and hand in the video; no praise of the slides, no 'next time' tips.",
     // v21 (Roger, 14 Nov 2026: "Tell Gemini not to use names or surnames when giving feedback")
     "- NO NAMES: never write anyone's name or surname anywhere in your answer, not the student's and not a classmate's or the person they interviewed. Talk to the student as \"you\" and say \"your classmate\" or \"the person you interviewed\"; in the notes for Roger say \"the student\". When you quote the student's real words, replace any name with \"…\".",
     "",
@@ -601,6 +649,44 @@ function fpConvert(m) {
   } catch (x) { return {ok: false, error: "it could not be converted (" + String(x.message || x).slice(0, 120) + ")"}; }
   return {ok: false, error: "nothing to convert (" + mime + ")"};
 }
+// ---- v28: the video linked inside the slides (Roger, 14 Nov 2026: some students put the link to their video on a slide and handed in
+// only the slides). The links come from the Google Slides / Docs file itself (exported as pptx / html with the Drive scope this script
+// already has, so no new permission), visible URLs and hidden links alike. The first one that this account can open and that is a
+// video wins: Google Vids → an mp4 in "Classroom copies" (as fp_convert), a Drive video or audio file as it is, or a YouTube link.
+function fpSlidesVideo(m) {
+  let id = String(m.fileId || ""), f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
+  // the PDF copy made by fp_convert keeps the original's id in its name: "… [id].pdf"
+  if (f.getMimeType() === "application/pdf") { const t = (f.getName().match(/\[([\w-]{25,})\]/) || [])[1]; if (t) { try { f = DriveApp.getFileById(t); id = t; } catch (x) {} } }
+  const mime = f.getMimeType(), tok = ScriptApp.getOAuthToken(), H = {headers: {Authorization: "Bearer " + tok}, muteHttpExceptions: true};
+  const exp = /presentation$/.test(mime) ? "application/vnd.openxmlformats-officedocument.presentationml.presentation" : /document$/.test(mime) ? "text/html" : "";
+  if (!exp) return {ok: false, links: [], error: "only Google Slides or Docs can be searched for a video link (" + mime + ")"};
+  const r = UrlFetchApp.fetch("https://www.googleapis.com/drive/v3/files/" + id + "/export?mimeType=" + encodeURIComponent(exp), H);
+  if (r.getResponseCode() !== 200) return {ok: false, links: [], error: "the slides could not be read (HTTP " + r.getResponseCode() + ")"};
+  let texts = [];
+  if (/presentation/.test(exp)) Utilities.unzip(r.getBlob().setContentType("application/zip")).forEach(b => { if (/^ppt\/slides\//.test(b.getName())) texts.push(b.getDataAsString()); });
+  else texts.push(r.getContentText());
+  const raw = [];
+  texts.forEach(t => { (t.match(/https?:\/\/[^\s"'<>]+/g) || []).forEach(u => raw.push(u.replace(/&amp;/g, "&"))); });
+  const clean = u => { const q = (u.match(/[?&]q=([^&]+)/) || [])[1]; if (/google\.com\/url/.test(u) && q) u = decodeURIComponent(q); return u; };
+  const links = [], seen = {};
+  raw.map(clean).forEach(u => {
+    const v = (u.match(/docs\.google\.com\/videos\/(?:u\/\d+\/)?d\/([\w-]{25,})/) || [])[1], d = (u.match(/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([\w-]{25,})/) || [])[1],
+      y = /(?:youtube\.com\/(?:watch|shorts|live)|youtu\.be\/)/.test(u) ? u : "";
+    const k = v || d || y; if (!k || seen[k]) return; seen[k] = 1; links.push({url: u, id: v || d || "", youtube: y});
+  });
+  if (!links.length) return {ok: false, links: [], error: "no link to a video in the slides"};
+  const errs = [];
+  for (const L of links.slice(0, 5)) {
+    if (L.youtube) return {ok: true, links, video: {youtube: L.youtube, name: "YouTube video linked in the slides"}};
+    let g; try { g = DriveApp.getFileById(L.id); } catch (x) { errs.push("a linked video the school account cannot open (ask the student to share it)"); continue; }
+    const gm = g.getMimeType();
+    if (/^(video|audio)\//.test(gm)) return {ok: true, links, video: {id: L.id, name: g.getName()}};
+    if (/vnd\.google-apps\.vid/.test(gm)) { const c = fpConvert({fileId: L.id, student: m.student}); if (c.ok) return {ok: true, links, video: {id: c.id, name: g.getName() + " (converted)"}}; errs.push(c.error); continue; }
+    errs.push("a linked file that is not a video (" + gm + ")");
+  }
+  return {ok: false, links, error: errs[0] || "no video the school account can open"};
+}
 function fpFolder(m) {
   let f;
   try { f = DriveApp.getFolderById(String(m.folderId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that folder: share it with " + Session.getActiveUser().getEmail()}; }
@@ -650,6 +736,17 @@ function testClassroom() {
   const c = (Classroom.Courses.list({teacherId: "me", pageSize: 20}).courses || []).find(x => /2ESOA/.test(x.name.replace(/\s/g, "")));
   Logger.log(c.name + ": " + (Classroom.Courses.CourseWork.list(c.id, {pageSize: 20}).courseWork || []).map(x => x.title).join(" · "));
   Logger.log("Students: " + (Classroom.Courses.Students.list(c.id, {pageSize: 50}).students || []).length);
+}
+
+// 9. READ ONLY look at the inbox for Claude's "which emails need my reply" (v19). Plain text only, each message cut to 6000 characters,
+// attachments listed by name. getPlainBody() does not mark anything as read.
+function readInbox(m) {
+  const days = Math.min(30, Math.max(1, Number(m.days) || 7)), max = Math.min(50, Math.max(1, Number(m.max) || 30));
+  const threads = GmailApp.search("in:inbox newer_than:" + days + "d", 0, max);
+  return {ok: true, threads: threads.map(t => ({id: t.getId(), subject: t.getFirstMessageSubject(), unread: t.isUnread(),
+    starred: t.hasStarredMessages(), messages: t.getMessages().slice(-6).map(x => ({from: x.getFrom(), to: x.getTo(), cc: x.getCc(),
+      date: x.getDate().toISOString(), body: String(x.getPlainBody() || "").slice(0, 6000),
+      files: x.getAttachments().map(a => a.getName())}))}))};
 }
 
 // ---- v25 (Roger, 14 Nov 2026: "next final product, I will ask students to load it on the web" … "students don't have to see that I use
@@ -763,3 +860,85 @@ function fpaAck(m) {
 }
 // Run this once from the editor after pasting v25 (Allow if Google asks): it lists the automatic queue and the drafts not taken yet.
 function testAutoDrafts() { const r = fpaList({}); Logger.log("On: " + JSON.stringify(r.on) + " · queue " + r.queue.length + " · drafts waiting " + r.done.length + " · folder " + fpaFolder().getName()); }
+
+// ---- v26 (Roger, 14 Nov 2026: "I want to receive a notification when students upload it"): one email to the teacher per finished upload,
+// with the student's name, group, final product, time and links to the video in Drive and to the dashboard. Students never see it.
+function videoMail(up, f) {
+  if (!up) return;
+  const m = up.meta || {}, who = up.name || String(up.email || "").split("@")[0], group = m.group || "?";
+  const when = Utilities.formatDate(new Date(), "Europe/Madrid", "EEE d MMM, HH:mm");
+  const mb = up.size ? Math.round(up.size / 1048576) + " MB" : "";
+  MailApp.sendEmail({to: TEACHER, name: "English Lab",
+    subject: "English Lab: 🎬 new final product video · " + who + " (" + group + ")",
+    body: who + " (" + group + ", " + (up.email || "") + ") has just uploaded a final product video on the website.\n\n" +
+      "Final product: " + (m.activity || "?") + "\nWhen: " + when + (mb ? "\nSize: " + mb : "") + "\nFile: " + (f.name || "") + "\n\n" +
+      (f.id ? "Watch it in Drive: https://drive.google.com/file/d/" + f.id + "/view\n" : "") +
+      "Dashboard (🎬 Final product, the draft is ready in a few minutes): https://rogerbeltranps-lab.github.io/English-lab/teacher.html\n"});
+}
+
+// Run this once from the editor after pasting v26 (Allow if Google asks): you get one sample email like the ones uploads will send.
+function testVideoMail() {
+  videoMail({name: "Test Student", email: "test@ietramuntana.cat", size: 52428800, meta: {group: "2ESOB", activity: "2eso/final-product"}},
+    {id: "", name: "2026-11-14 19.40 · Test Student · Final product.mp4"});
+}
+
+// ---- v29: late emails wait until 7:30 (Roger, 14 Nov 2026: students should not see the time he sends them messages; "I want to have the
+// option to tell you send it anyway and you always ask me": the dashboard asks him and sends at or now). Each held email is kept in
+// Script properties as late:<time>_<id> (in pieces, like the automatic drafts) and one trigger, sendLate, sends the ones that are due.
+const LATE_TZ = "Europe/Madrid", LATE_FROM = 21 * 60, LATE_TO = 7 * 60 + 30;
+// the next 7:30 in Madrid when it is now between 21:00 and 7:30 there, otherwise 0
+function lateNext(now) {
+  const hm = Number(Utilities.formatDate(now, LATE_TZ, "H")) * 60 + Number(Utilities.formatDate(now, LATE_TZ, "m"));
+  if (hm >= LATE_TO && hm < LATE_FROM) return 0;
+  const base = new Date(now.getTime() + (hm >= LATE_FROM ? 12 : 6) * 3600e3);   // a moment on the morning in question (its date and UTC offset)
+  return Date.parse(Utilities.formatDate(base, LATE_TZ, "yyyy-MM-dd") + "T07:30:00" + Utilities.formatDate(base, LATE_TZ, "XXX")) || 0;
+}
+// when this email should go: 0 = now. Only emails to students (a school address other than this account) are ever held.
+function lateUntil(m, people) {
+  if (m.now === true) return 0;
+  const me = String(Session.getEffectiveUser().getEmail() || "").toLowerCase();
+  if (!people.some(a => ALLOWED.test(a) && a.toLowerCase() !== me)) return 0;
+  const at = Number(m.at) || 0, now = Date.now();
+  if (at > now + 60e3) return Math.min(at, now + 3 * 864e5);   // the dashboard's 🌙 7:30 (never more than 3 days away)
+  return lateNext(new Date(now));
+}
+function lateQueue(mail, at) {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try { fpaPut("late:" + at + "_" + Utilities.getUuid().slice(0, 8), {at, mail}); lateTrigger(60e3); } finally { lock.releaseLock(); }
+}
+function lateKeys() { return PropertiesService.getScriptProperties().getKeys().filter(k => /^late:[^#]+#n$/.test(k)).map(k => k.slice(0, -2)); }
+function lateDel(k) { const P = PropertiesService.getScriptProperties(), n = Number(P.getProperty(k + "#n") || 0);
+  for (let i = 0; i < n; i++) P.deleteProperty(k + "#" + i); P.deleteProperty(k + "#n"); }
+// one sendLate trigger, at the first email's time (and at least wait from now)
+function lateTrigger(wait) {
+  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === "sendLate").forEach(t => ScriptApp.deleteTrigger(t));
+  const ks = lateKeys(); if (!ks.length) return;
+  const first = Math.min.apply(null, ks.map(k => Number(k.slice(5).split("_")[0]) || 0));
+  ScriptApp.newTrigger("sendLate").timeBased().at(new Date(Math.max(first, Date.now() + wait))).create();
+}
+function sendLate() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) { ScriptApp.newTrigger("sendLate").timeBased().after(5 * 60e3).create(); return; }
+  try {
+    let short = false;
+    lateKeys().forEach(k => {
+      if (Number(k.slice(5).split("_")[0]) > Date.now() + 60e3) return;
+      const o = fpaGet(k), mail = o && o.mail;
+      if (mail) {
+        const n = String(mail.to || "").split(",").length + (mail.bcc ? String(mail.bcc).split(",").length : 0);
+        if (MailApp.getRemainingDailyQuota() < n) { short = true; return; }   // Google's daily limit: it stays and goes later
+        try { MailApp.sendEmail(mail); } catch (x) { console.warn("sendLate " + k + ": " + x); }
+      }
+      lateDel(k);
+    });
+    lateTrigger(short ? 60 * 60e3 : 60e3);
+  } finally { lock.releaseLock(); }
+}
+// Run from the editor to see what is waiting (nothing is sent).
+function lateStatus() {
+  const ks = lateKeys();
+  Logger.log(ks.length ? ks.map(k => { const o = fpaGet(k) || {}, m = o.mail || {};
+    return Utilities.formatDate(new Date(o.at || 0), LATE_TZ, "EEE d MMM HH:mm") + " · " + m.subject + " · " + (m.bcc ? String(m.bcc).split(",").length + " in Bcc" : m.to); }).join("\n")
+    : "Nothing waiting");
+  Logger.log("Now in Madrid: " + Utilities.formatDate(new Date(), LATE_TZ, "EEE d MMM HH:mm") + " · next 7:30 if late: " + (lateNext(new Date()) ? new Date(lateNext(new Date())).toISOString() : "not late now"));
+}
