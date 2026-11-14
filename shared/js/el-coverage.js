@@ -43,11 +43,11 @@ window.EL_COVER = {
       "will / going to": ["4eso/ls2-plan-the-day#grammar", "4eso/ls2-plan-the-day#mixed"],
       "Present Continuous amb valor de futur": ["4eso/ls2-plan-the-day#grammar", "4eso/ls2-plan-the-day#mixed"],
       "Peticions i ofertes": ["4eso/ls2-write-to-the-head-teacher#grammar"],
-      "Relative clauses (especificatives": ["4eso/ls2-where-traditions-come-from#grammar"],
+      "Relative clauses (especificatives": ["4eso/ls2-where-traditions-come-from#grammarRel"],
       "Passive voice": ["4eso/ls2-celebrations-around-the-world#grammar"],
-      "Connectors i cohesió": ["4eso/ls2-where-traditions-come-from#grammar", "4eso/ls2-write-to-the-head-teacher#grammar"],
-      "Progressió de connectors": ["4eso/ls2-where-traditions-come-from#grammar", "4eso/ls2-write-to-the-head-teacher#grammar"],
-      "Relatives no especificatives": ["4eso/ls2-where-traditions-come-from#grammar"]
+      "Connectors i cohesió": ["4eso/ls2-where-traditions-come-from#grammarComp", "4eso/ls2-write-to-the-head-teacher#grammar"],
+      "Progressió de connectors": ["4eso/ls2-where-traditions-come-from#grammarComp", "4eso/ls2-write-to-the-head-teacher#grammar"],
+      "Relatives no especificatives": ["4eso/ls2-where-traditions-come-from#grammarRel"]
     },
     lex: {
       "Llocs, mobilitat i viatges": ["4eso/ls2-where-traditions-come-from#vocab"],

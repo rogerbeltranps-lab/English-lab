@@ -24,7 +24,8 @@ const TM={len:600,left:600,on:false,iv:null};
    following the yellow one), ⏱ Your turn (each student does their own level's exercise, with the boxes of their level that were not
    seen together in green), then the sentences one by one: the answer in its gap, the levels that have it with their own number, the
    rule, and what the class wrote. GV: the boxes shown together, "all" (every level's, each with its level) or one level's. */
-const GRAM=TAB==="grammar",GV_K="el_gx_view_"+course;let GV="all";try{const v=localStorage.getItem(GV_K);if(v==="all"||ROUTES.includes(v))GV=v}catch(e){}
+// GP: the grammar step (tab=grammar, or one of the steps a Grammar tab was split into: tab=grammarRel…, 4 ESO LS2 LP3, 14 Nov 2026)
+const GRAM=window.elIsGrammar?elIsGrammar(TAB):TAB==="grammar",GP=GRAM?TAB:"grammar",GV_K="el_gx_view_"+course;let GV="all";try{const v=localStorage.getItem(GV_K);if(v==="all"||ROUTES.includes(v))GV=v}catch(e){}
 let PRO_ON=false;
 
 async function build(){
@@ -48,26 +49,26 @@ async function build(){
 }
 
 async function buildGrammar(){
-  const g=LP.panels.find(p=>p.id==="grammar");
+  const g=LP.panels.find(p=>p.id===GP);
   if(!g||!Array.isArray(g.items))throw new Error("This learning path has no grammar step to correct together.");
   CTX={LP,key:LS+"/"+LPF,routes:ROUTES,chat:null,notes:{},textPanel:g};
-  slides=[{kind:"explain",panel:"grammar"},{kind:"turn",panel:"grammar"}].concat(X.slidesFor(CTX,g,false).map(s=>Object.assign(s,{gram:true})));
+  slides=[{kind:"explain",panel:GP},{kind:"turn",panel:GP}].concat(X.slidesFor(CTX,g,false).map(s=>Object.assign(s,{gram:true})));
   // Pro (4 ESO): its own grammar (data/native/<lp>.js), last; only when the group has a Pro student (or no group is given)
-  if(course==="4eso"){try{await load(base+"data/native/"+LPF+".js")}catch(e){}
+  if(course==="4eso"&&GP==="grammar"){try{await load(base+"data/native/"+LPF+".js")}catch(e){}
     const N=LP.native&&LP.native.grammar;
-    if(N&&Array.isArray(N.items)){const pr=Object.assign({},N,{id:"grammar"});slides.pro=X.slidesFor({LP,key:CTX.key,routes:["native"],chat:null,notes:{},textPanel:pr},pr,true).map(s=>Object.assign(s,{gram:true}))}}
+    if(N&&Array.isArray(N.items)){const pr=Object.assign({},N,{id:GP});slides.pro=X.slidesFor({LP,key:CTX.key,routes:["native"],chat:null,notes:{},textPanel:pr},pr,true).map(s=>Object.assign(s,{gram:true}))}}
 }
 // the boxes on the projector for the view GV, Pro's last (only in "all", when the group has a Pro student)
 function gBoxes(){
-  const g=LP.panels.find(p=>p.id==="grammar"),all=X.boxesFor(g.explain,ROUTES).map(b=>Object.assign(b,{lab:X.boxLabel(b,ROUTES)}));
+  const g=LP.panels.find(p=>p.id===GP),all=X.boxesFor(g.explain,ROUTES).map(b=>Object.assign(b,{lab:X.boxLabel(b,ROUTES)}));
   let out=GV==="all"?all:all.filter(b=>b.on.includes(GV));
-  const N=LP.native&&LP.native.grammar;
+  const N=GP==="grammar"&&LP.native&&LP.native.grammar;
   if(GV==="all"&&PRO_ON&&N&&N.explain)out=out.concat(X.boxesFor(N.explain,["native"]).map(b=>Object.assign(b,{lab:"Pro",pro:true})));
   return out;
 }
 const lvCls=b=>b.pro?"pro":b.all?"all":"on";
 function explainAll(){
-  const B=gBoxes(),g=LP.panels.find(p=>p.id==="grammar");
+  const B=gBoxes(),g=LP.panels.find(p=>p.id===GP);
   return `<div class="chips"><span class="chip all">📘 How it works · together</span>`+
     ["all"].concat(ROUTES).map(v=>`<button class="chip lvb ${v===GV?"on":""}" data-gv="${v}" title="${v==="all"?"Every level's boxes, each with its level":"Only the "+NAME[v]+" boxes"}">${v==="all"?"All levels":NAME[v]}</button>`).join("")+`</div>`+
     // 📓 drawn like the student's notebook (Roger, 13 Nov 2026: "when I explain the theory, I want the slide look like this"): lined paper,
@@ -86,9 +87,9 @@ const textOf=h=>{const d=document.createElement("div");d.innerHTML=h||"";return 
 function gSend(){
   const s=slides[at],on=s&&s.kind==="explain",ei=slides.findIndex(x=>x.kind==="explain"),after=s&&ei>=0&&at>ei,u=LS+"/"+LPF+".html";
   let v=null,key="";
-  if(on){const B=gBoxes();v={u,p:"grammar",k:RP<B.length?RP:-1,n:B.length,l:GV,h:gHtml(B,false),hc:gHtml(B,true),at:Date.now()};key=u+"|g|"+v.k+"|"+v.n+"|"+GV}
+  if(on){const B=gBoxes();v={u,p:GP,k:RP<B.length?RP:-1,n:B.length,l:GV,h:gHtml(B,false),hc:gHtml(B,true),at:Date.now()};key=u+"|g|"+v.k+"|"+v.n+"|"+GV}
   else if(after){const B=gBoxes(),hs=[...new Set(B.flatMap(b=>[X.norm(textOf(b.en)),b.ca?X.norm(textOf(b.ca)):""]).filter(Boolean))];
-    v={u,p:"grammar",k:-1,x:1,l:GV,hs,at:Date.now()};key=u+"|gx|"+GV+"|"+hs.length}
+    v={u,p:GP,k:-1,x:1,l:GV,hs,at:Date.now()};key=u+"|gx|"+GV+"|"+hs.length}
   if(key===rtLast)return Promise.resolve();rtLast=key;
   return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("grammar together",e));
 }
@@ -107,7 +108,7 @@ function gram(s,open){
    group with what they did (✅ checked: right on their first check and %, ✏ working: answers typed but not checked yet, — not started) and
    the class %, read again every 30 s while that slide is on screen (one read per student; the group's list is read once). From ⏱ Your turn
    on, each read is also saved in classResults/{group}_{ls}_{lp}_{tab}_{day} (teacher only), which the dashboard shows in 📊 Class results. */
-const PID=GRAM?"grammar":"read";
+const PID=GRAM?GP:"read";
 let ST=null,CLASS_AT=0,STARTED=0,savedSig="";
 const norm=s=>String(s==null?"":s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
 const ymd=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};

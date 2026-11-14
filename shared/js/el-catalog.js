@@ -361,6 +361,9 @@ window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.s
       const tabs=secs.filter(([id])=>!off.includes(id)&&dueT(a,id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
       if(secs.length&&!tabs.length)return null;   // what is open and due is done; the rest is still locked or for a later class
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
+// A grammar step: "grammar", or one of the steps a Grammar tab was split into, "grammarRel"… (4 ESO LS2 LP3 in four steps: Roger, 14 Nov 2026:
+// "This grammar section is too long, I need to break it down into 4 sections"). Used by 📘 Grammar together, class mode and the notebook.
+window.elIsGrammar=k=>/^grammar([A-Z]\w*)?$/.test(String(k||""));
 // 📘 Grammar together (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section. Start with the grammar of the
 // LP3, LS2"): the learning paths ("<course>/<ls folder>/<page>") whose Grammar tab gets ✅ Correct (shared/correct/, tab=grammar).
 // Another one: add it here (its grammar step: type typed, explain boxes and items with r: tags, like LP3).
@@ -548,7 +551,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
     "4eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"read","log","listen","grammar","mixed","write","speak"],
-    "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
+    "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","shadow","grammar","grammarRel","grammarComp","grammarFeel","mixed","write","speak","talk"],   // Grammar in four steps (Roger, 14 Nov 2026)
     "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
     "4eso/ls2-plan-the-day":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
     "4eso/ls2-write-to-the-head-teacher":[...LP,"read","register","again","shadow","grammar","write","speak","talk"],
@@ -565,7 +568,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
     "4eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "4eso/ls2-celebrations-around-the-world":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
-    "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
+    "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,grammarRel:LW,grammarComp:LW,grammarFeel:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
     "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
     "4eso/ls2-plan-the-day":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
     "4eso/ls2-write-to-the-head-teacher":{shadow:SH,cards:RS,read:["4.1"],register:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
@@ -609,7 +612,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
 // since they read and then practise by writing, completing sentences or choosing an option"): in every activity with step criteria, a
 // vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
 (function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
-  Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();
+  Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if((UOE.includes(k)||elIsGrammar(k))&&!sc[k])sc[k]=["4.1","5.1"]})})})();
 
 // 🧩 📚 Class game circles (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory,
 // click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the

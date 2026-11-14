@@ -375,6 +375,8 @@ var LS2 = (function () {
      Answers saved before this (no q) are placed with the route of their check (last / tries .level); with no route known, they are only
      shown when the list has the same length. Answers not checked yet (state.typing[id_route]) are carried in the same way. */
   const qid = it => String(it && (it.id || it.q) || '');
+  // a try key of this step: its prefix + the question's number ('grammar3', never 'grammarRel3': steps whose ids start alike, 14 Nov 2026)
+  const mine = (k, prefix) => k.startsWith(prefix) && /^\d/.test(k.slice(prefix.length));
   const atLevel = (L, fn) => { const was = level; level = L; try { return fn(); } finally { level = was; } };
   function checkLevel(id) {   // the route of the latest check of a step, for answers saved without one
     const L = state.last || {}, T = state.tries || {}, k = id === 'vocab' ? 'practice' : id, x = L[k] || T[k];
@@ -391,7 +393,7 @@ var LS2 = (function () {
     return out;
   }
   const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
-  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; state.nb = state.nb || {}; if (!state.nb[id]) state.nb[id] = state.ans[id]; save(); }
+  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => mine(k, prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; state.nb = state.nb || {}; if (!state.nb[id]) state.nb[id] = state.ans[id]; save(); }
   // the answers to show on this route ({v, moved}), with their tries, or null
   function kept(id, prefix, items, src, rec) {
     const a = rec || (!fresh[id] && state.ans && state.ans[id]); if (!a || !Array.isArray(a.v)) return null;
@@ -429,7 +431,7 @@ var LS2 = (function () {
   /* ↺ Practise again (Roger, 6 Nov 2026: "if they don't finish and leave the page without checking, next time they come back they see the
      old results"): the boxes empty for a new try, but the last checked answers stay saved (state.ans) until the new try is checked. */
   const fresh = {};
-  function forget(id, prefix) { fresh[id] = true; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
+  function forget(id, prefix) { fresh[id] = true; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
      the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
      practice, the micro-dictation), which clears only that activity. There is no button that clears a whole section. */
@@ -446,10 +448,10 @@ var LS2 = (function () {
     $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
-    if (state.ans && state.ans[id] && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }
+    if (state.ans && state.ans[id] && !state.ans[id].from && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }   // answers brought from a split step (splitOld) are not a first try here: the step stays open to finish
     NBS[id] = { id, prefix, listId, items, check, src };
     if (nbFrozen(id)) return nbShow(NBS[id]);
-    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } else if (t) fill(items, prefix, t);
     nbSaved(id, !!k);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
@@ -467,10 +469,10 @@ var LS2 = (function () {
   function nbShow(S) {
     const { id, prefix, listId, items, check, src } = S, on = nbFrozen(id);
     if (!$('#' + listId)) return;
-    Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; });
+    Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; });
     clearStep(id, listId);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src);
-    if (k) { fill(items, prefix, k.v); check(false); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false); if (!on) splitNote(id); } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k);
   }
   /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
@@ -1759,6 +1761,41 @@ var LS2 = (function () {
   // Native: LP.native = { panelId: panel } replaces that panel (same id, so progress, checkpoints and locks work as for every route).
   // A native panel whose id is not in the page and has after: '<panel id>' is added after that panel (Pro extras such as the real video;
   // not in EL_ACTIONS, so it never changes the dashboard's progress).
+  /* One step split into several (Roger, 14 Nov 2026: "This grammar section is too long, I need to break it down into 4 sections"; the data's
+     LP.split = {from, ids, old}): once per student, the answers checked in the old step (state.ans[from], kept with their questions) go to
+     each new step that holds some of those questions, at the route they were checked at. The step that keeps the old id keeps its done and
+     first try; the new ones are done once the student completes and checks them (Roger chose "Carry answers, finish the rest"). Answers typed
+     but not checked (state.typing[from_route], by place in the old list: old[route] = each one's place in the new steps' items) move too. */
+  function splitOld() {
+    const S = LP.split; if (!S || (state.split || {})[S.from]) return;
+    const P = S.ids.map(id => LP.base.find(p => p.id === id)); if (P.some(p => !p)) return;
+    const U = P.flatMap(p => p.items).map(qid), listAt = (p, r) => atLevel(r, () => p.parts ? arrange(forLevel(p.items), p.req).items : forLevel(p.items));
+    const a = state.ans && state.ans[S.from];
+    if (a && Array.isArray(a.v) && Array.isArray(a.q) && S.old[a.l]) P.forEach(p => {
+      if (p.id === S.from || state.ans[p.id]) return;
+      const items = listAt(p, a.l), v = items.map(it => { const j = a.q.indexOf(qid(it)); return j < 0 ? null : a.v[j]; });
+      if (v.some(x => x != null && x !== '')) state.ans[p.id] = { v, tries: {}, l: a.l, q: items.map(qid), from: S.from };
+    });
+    const T = state.typing || {};
+    Object.keys(S.old).forEach(r => {
+      const t = T[S.from + '_' + r], o = S.old[r]; if (!Array.isArray(t)) return;
+      if (t.length !== o.length) { delete T[S.from + '_' + r]; return; }   // not the old list: never put answers on the wrong questions
+      const by = {}; t.forEach((x, i) => { if (x != null && x !== '') by[U[o[i]]] = x; });
+      P.forEach(p => { const v = listAt(p, r).map(it => by[qid(it)] != null ? by[qid(it)] : ''); if (p.id === S.from || v.some(x => x !== '')) T[p.id + '_' + r] = v; });
+    });
+    state.typing = T;
+    state.split = Object.assign({}, state.split, { [S.from]: 1 });
+    localStorage.setItem(LP.key, JSON.stringify(state));
+    setTimeout(() => { try { save(); } catch (e) {} }, 4000);   // the cloud copy, once the page has pulled the student's progress
+  }
+  // under a step whose answers came from the old one, until it is done: what to do now
+  function splitNote(id) {
+    const a = state.ans && state.ans[id], el = $('#' + id + 'Result'); if (!a || !a.from || state.done[id] || !el) return false;
+    const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
+    p.textContent = ca() ? '✨ Aquesta part de la gramàtica ara és una activitat a part. Les respostes que ja havies fet hi són: respon les preguntes obligatòries que falten i prem Comprova per entregar-la.'
+      : '✨ This part of the grammar is now an activity of its own. The answers you had already given are here: answer the compulsory questions still empty and press Check to hand it in.';
+    el.appendChild(p); el.classList.add('show'); return true;
+  }
   function usePanels() {
     if (level !== 'native' || !LP.native) { LP.panels = LP.base; return; }
     const N = LP.native, extra = Object.keys(N).filter(k => N[k].after && !LP.base.some(p => p.id === k)), as = (k, p) => Object.assign({}, N[k], { id: k });
@@ -1790,6 +1827,7 @@ var LS2 = (function () {
       // the cloud copy gets it with a normal save once the page has pulled the student's progress (el-cloud.js loads after this)
       setTimeout(() => { try { save(); } catch (e) {} }, 4000);
     });
+    splitOld();
     const sel = $('#sessionJump');
     if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
     $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; usePanels(); $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });

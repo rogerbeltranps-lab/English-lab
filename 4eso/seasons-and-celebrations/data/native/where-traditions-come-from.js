@@ -77,11 +77,17 @@ window.LP.native = {
     ],
     rate: ['I went beyond what the speakers say directly', 'I named a technique, with a quote', 'My comparison is about meaning, not just facts'] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+  grammar: { type: 'typed', tab: 'Grammar · The past at C2', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4). Complete the second sentence with 3–8 words, including the word in CAPITALS.',
     explain: [
       '<strong>Impersonal reporting</strong> for uncertain history: <em>It is believed that… · Halloween is thought to have originated in… · The custom is said to date back to…</em> (perfect infinitive for the past).',
       '<strong>would</strong> for repeated past actions (not states): <em>On that night, people would light bonfires.</em> <strong>used to</strong> for both.',
+      /* would or used to? (Roger, 14 Nov 2026: a native student asked about "Every year they would have a feast"; 4 ESO only) */
+      '<strong>would or used to? When <em>would</em> doesn’t work.</strong> You are right: <em>Every year they would have a feast</em> is perfectly correct, and natives use <em>would</em> for repeated past habits all the time, especially in stories. The real question is when you <u>can’t</u> use it:<br>' +
+        '1. <strong>States, not actions.</strong> <em>would</em> only works for repeated actions. With states (<em>be, have</em> = own, <em>live, like, know, believe</em>) you need <em>used to</em>: <em>They used to live in tents</em> ✅ · <em>They would live in tents</em> ❌ · <em>She used to have long hair</em> ✅ · <em>She would have long hair</em> ❌.<br>' +
+        '2. <strong>It needs a time frame first.</strong> Out of the blue, <em>would</em> sounds like a conditional. Natives usually open with <em>used to</em> (or a time phrase) and then switch to <em>would</em>: <em>When I was a kid, we used to go to my grandma’s every summer. We’d swim all day and she’d make us pancakes.</em><br>' +
+        '3. <strong>The “not true now” meaning is weaker.</strong> <em>used to</em> clearly says the habit has stopped; <em>would</em> just describes the habit and doesn’t stress the contrast with now.<br>' +
+        '💡 In 4 ESO we learn <em>used to</em> first because it always works; <em>would</em> is your extension.',
       '<strong>Participle clauses</strong> to compress: <em>Having moved to America, Irish families… · Carved from turnips, the first lanterns…</em>',
       '<strong>Exam tip:</strong> reporting transformations almost always need the perfect infinitive (<em>to have + past participle</em>) when the action is in the past.'
     ],
