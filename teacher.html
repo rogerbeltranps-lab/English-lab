@@ -1566,7 +1566,7 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft&&!(d[s.uid]||{}).manual).length,gv=nv+nd>0;
   // nothing to mark (not handed in, or the link doesn't work) and no mark saved: 0 by default, in red, until you save one
   const z0=u=>{const w=fpNoWork(u,a);return w?` style="color:#b91c1c" title="0 by default (${esc(w)}). 💾 Save 0 above the table, or click the student to change it"`:""};
-  const mark=u=>{const x=res(u,a.id),z=z0(u);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:z?`<small${z}>No evidence</small>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:z?`<b${z}>0/10</b>`:`<span class="muted">–</span>`}</td>`};
+  const mark=u=>{const x=res(u,a.id),z=z0(u);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:z?`<small${z}>No evidence</small>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>${fpRe0(d[u])?` <small style="color:#b45309" title="A new video came after this 0: approve its draft (Gemini column) and its mark replaces the 0">🆕 new video</small>`:""}`:z?`<b${z}>0/10</b>`:`<span class="muted">–</span>`}</td>`};
   const zs=R?on.filter(s=>fpNoWork(s.uid,a)).map(s=>s.uid):[];
   // 📥 Handed in (Roger, 14 Nov 2026: "I need a column with handed in and not handed in"): a video found (site, Classroom, a link or a Drive
   // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
@@ -1577,10 +1577,10 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
     hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
       return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
-  const dr=u=>{const x=d[u],au=fpgAutoSt(u,a);if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(au&&!(x&&x.draft&&(x.approved||fpgMine(x))))return au;if(!x)return `<span class="muted">–</span>`;if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
+  const dr=u=>{const x=d[u],au=fpgAutoSt(u,a);if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(au&&!(x&&x.draft&&!(x.manual&&x.why)&&(x.approved||fpgMine(x))))return au;if(!x)return `<span class="muted">–</span>`;if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     const my=fpgMine(x);
     if(x.draft&&x.manual)return x.approved||fpMarked(u,a)?"💾 your marks":`✍️ not saved <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student">💾 Save</button>`;
-    return x.draft?(x.approved||fpMarked(u,a)?(x.approved&&my?"💾 your marks":"✅ approved"):my?`✏️ changed <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student; Gemini learns from your changes">💾 Save my marks</button>`
+    return x.draft?((x.approved||fpMarked(u,a))&&!fpRe0(x)?(x.approved&&my?"💾 your marks":"✅ approved"):my?`✏️ changed <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student; Gemini learns from your changes">💾 Save my marks</button>`
       :`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
     +`<p class="muted">${(n=>`<b>${n} of ${on.length} handed in</b> · `)(on.filter(s=>hin(s.uid)).length)}${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
@@ -1599,7 +1599,7 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
 // row shows their video and Gemini's levels shaded on the rubric (click a square to change a level) with ✅ Approve, which saves and goes
 // on to the next student to approve. The comment, ✔ ➜ notes, words said wrong, Watch again and "ask Gemini to change it" stay in the box
 // (Open / Mark). Nothing more is read from Firestore: the drafts doc is the one the table already read.
-const fpToDo=(u,a)=>{const x=(FPG.d[a.id]||{})[u];return !!(x&&x.draft&&!x.approved&&!fpMarked(u,a))};
+const fpToDo=(u,a)=>{const x=(FPG.d[a.id]||{})[u];return !!(x&&x.draft&&!x.approved&&(!fpMarked(u,a)||fpRe0(x)))};   // fpRe0: a new video over a 0 for nothing to mark
 function fpSelOf(a,studs){const ok=u=>studs.some(s=>s.uid===u),cur=(FPG.sel||{})[a.id];if(cur&&ok(cur))return cur;const d=FPG.d[a.id]||{},on=studs.filter(s=>s.uid);
   const f=on.find(s=>fpToDo(s.uid,a))||on.find(s=>(d[s.uid]||{}).draft)||on.find(s=>fpgVideo(s.uid,a))||on.find(s=>fpMarked(s.uid,a));return f?f.uid:null}
 function fpNext(u,a){const on=Object.values(S.P).filter(s=>s.uid&&s.group===(S.P[u]||{}).group&&!s.away&&!s.tester).sort(byName),i=on.findIndex(s=>s.uid===u);
@@ -1624,6 +1624,10 @@ document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="watch
 function fpgUnreach(u,a){if(fpgVideo(u,a))return "";const s=S.P[u],cr=s&&(FPG.d[a.id]||{})["_r_"+s.group],z=cr&&(cr.unreach||[]).find(z=>z.u===u);return z?(z.why||"the link doesn't work"):""}
 const FPG_NOLINK="I couldn't open your final product: the link doesn't work. Please hand it in again on Classroom (upload the video file or share it with me) so I can mark it. Until then, your mark is 0.";
 const FPG_NOHAND="I haven't received your final product. Please hand it in on Classroom so I can mark it. Until then, your mark is 0.";
+// a final product that can also be uploaded on the site (reup, LS1 2 ESO): the comment sends them to its 7 Submit tab instead of Classroom
+const FPG_UPLINK="I couldn't open your final product: the link doesn't work. Please upload the video file on the Final product page of the website (step 7 Submit) so I can mark it. Until then, your mark is 0.";
+const FPG_UPHAND="I haven't received your final product. Please upload the video file on the Final product page of the website (step 7 Submit) so I can mark it. Until then, your mark is 0.";
+const fpgNoTop=(a,why)=>why==="not handed in"?(a.reup?FPG_UPHAND:FPG_NOHAND):(a.reup?FPG_UPLINK:FPG_NOLINK);
 // 📥 handed in: a video found, a Gemini draft, the final product submitted on the site, a mark above 0, or the last 📥 Classroom report
 // saying they handed something in (a draft of your own is not a hand-in)
 function fpHin(u,a){const d=FPG.d[a.id]||{},x=d[u]||{},s=S.P[u],cr=s&&d["_r_"+s.group],r=res(u,a.id);
@@ -1640,13 +1644,13 @@ function fpNoWork(u,a){const s=S.P[u];if(!s||fpMarked(u,a)||fpgVideo(u,a)||!fpCl
 const fpgNE=R=>({level:0,mark:R.kind==="mark"?0:null,byYou:true});
 function fpgManual(u,a,why){const R=fpgRubric(a);if(!R)return;const D=FPG.d[a.id]=FPG.d[a.id]||{},old=D[u]||{},no=why!=null;
   D[u]=Object.assign({},old,{manual:true,why:no?why:"",at:new Date().toISOString(),model:"",approved:null,error:null,
-    draft:{rows:R.rows.map(()=>fpgNE(R)),top:!no?"":why==="not handed in"?FPG_NOHAND:FPG_NOLINK}})}
+    draft:{rows:R.rows.map(()=>fpgNE(R)),top:!no?"":fpgNoTop(a,why)}})}
 // 💾 Save 0 for everyone with nothing to mark (one click above the table): a draft of your own each (a comment you wrote is kept,
 // rows with no level become No evidence), saved as 💾 Save does
 function fpgZeroAll(a,us){const R=fpgRubric(a);if(!R)return;const ps=[];
   us.forEach(u=>{const why=fpNoWork(u,a);if(!why||FPG.busy[u+"|"+a.id])return;let d=(FPG.d[a.id]||{})[u];
     if(!(d&&d.manual&&d.draft)){fpgManual(u,a,why);d=FPG.d[a.id][u]}
-    const x=d.draft;x.rows=R.rows.map((r,i)=>{const z=(x.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});if(!String(fpgTop(x)||"").trim())x.top=why==="not handed in"?FPG_NOHAND:FPG_NOLINK;
+    const x=d.draft;x.rows=R.rows.map((r,i)=>{const z=(x.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});if(!String(fpgTop(x)||"").trim())x.top=fpgNoTop(a,why);
     const o={feedback:fpgText(R,x)};if(R.kind==="mark"){const m=fpgMark(R,x);o.score=m==null?0:m;o.max=10}
     d.approved=new Date().toISOString();ps.push(...fpgLevelPatches(u,a,R,x),fpgSave(a,u,d),api.result(u,a,o))});
   if(ps.length)act(Promise.all(ps))}
@@ -4490,9 +4494,14 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
 // task and Roger's latest corrections, no names; again when a correction is kept) and, when a group page opens, takes the drafts that are
 // ready (fp_auto_list) into the usual drafts doc, as if 🎬 had been pressed, then marks them taken (fp_auto_ack). A draft Roger approved or
 // changed is never replaced. 🤖 in the 🎬 Final product table switches it off or on per final product. Previews: DEMO.fpauto.
-const fpgAutoOk=a=>!!a&&!!a.video&&!!fpgRubric(a);
+const fpgAutoOk=a=>!!a&&!!(a.video||a.reup)&&!!fpgRubric(a);
+// Roger, 14 Nov 2026 ("all the links that didn't work … hand it through the app"): a student with a 0 for nothing to mark (a draft of your own
+// saying not handed in / the link doesn't work, all No evidence) uploads the video on the site: Gemini's draft of it takes that draft's place,
+// and the saved 0 waits in the table as 🟡 to approve (re0) until you ✅ Approve or 💾 Save. A draft of your own with real marks stays.
+function fpgWas0(u,a,x){if(!x||!x.manual||!x.why||!x.draft)return false;const r=res(u,a.id);return !(r.max&&r.score>0)}
+function fpRe0(x){return !!(x&&x.re0&&x.draft&&!x.approved)}   // reup: an LS1 final product whose video can also be uploaded on its page (el-catalog.js)
 function fpgTpl(a){const R=fpgRubric(a);if(!R)return null;const cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO";
-  return {course:cs,level:"A2+",task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",group:/proposal/.test(a.id),
+  return {course:cs,level:/my-real-routine/.test(a.ls)&&cs==="2 ESO"?"A1":"A2+",task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",group:/proposal/.test(a.id),
     rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d})),lessons:fpgLesLines("",a)}}
 const fpgUidOf=x=>{if(x.uid&&S.P[x.uid])return x.uid;const e=String(x.email||"").toLowerCase(),s=e&&Object.values(S.P).find(p=>String(p.email||"").toLowerCase()===e);return s?s.uid:""};
 const fpgAutoOf=a=>{if(DEMO&&DEMO.fpauto&&!FPG.auto[a.id])FPG.auto[a.id]=Object.assign({q:{}},DEMO.fpauto[a.id]||{});return FPG.auto[a.id]||null};
@@ -4503,10 +4512,13 @@ async function fpgAuto(a,set){if(DEMO||!fpgAutoOk(a))return;const A=FPG.auto[a.i
     const L=await fpgCall({action:"fp_auto_list",act:a.id}),q={},rids=[];A.on=(L.on||{})[a.id]!==false;A.old=0;
     (L.queue||[]).forEach(x=>{const u=fpgUidOf(x);if(u)q[u]=x.state});A.q=q;
     for(const r of (L.done||[]).sort((x,y)=>x.watched<y.watched?-1:1)){const u=fpgUidOf(r);if(!u)continue;rids.push(r.rid);
-      const old=(FPG.d[a.id]||{})[u]||{};if(old.vid===r.fileId&&old.draft)continue;   // taken already
-      if(old.draft&&(old.approved||fpMarked(u,a)||fpgMine(old)))continue;              // Roger's work stays: 🔄 Watch again for the new version
-      if(!r.ok){if(!old.draft){await fpgSave(a,u,Object.assign({},old,{error:"Gemini could not watch it by itself: "+(r.error||"try again")+". Press 🎬 to try again.",at:r.watched||new Date().toISOString(),vid:r.fileId}));news++}continue}
-      await fpgSave(a,u,Object.assign({at:r.watched||new Date().toISOString(),draft:r.draft,model:r.model||"",changes:[],gem0:fpgSnap(r.draft),auto:true,vid:r.fileId},
+      const old=(FPG.d[a.id]||{})[u]||{};if(old.vid===r.fileId&&(old.draft||old.re0))continue;   // taken already
+      const z=fpgWas0(u,a,old);   // the 0 for nothing to mark (not handed in / the link doesn't work): the new video's draft replaces it
+      if(old.draft&&!z&&(old.approved||fpMarked(u,a)||fpgMine(old)))continue;          // Roger's work stays: 🔄 Watch again for the new version
+      // setDoc merges maps: the fields of the old draft of your own are cleared (null), the saved 0 stays until you approve the new draft
+      const clr=z?{manual:null,why:null,approved:null,error:null,re0:fpMarked(u,a)?{why:old.why||"",at:old.approved||old.at||""}:null}:{};
+      if(!r.ok){if(!old.draft||z){await fpgSave(a,u,Object.assign({},z?{}:old,clr,{error:"Gemini could not watch it by itself: "+(r.error||"try again")+". Press 🎬 to try again.",at:r.watched||new Date().toISOString(),vid:r.fileId},z?{draft:null}:{}));news++}continue}
+      await fpgSave(a,u,Object.assign(clr,{at:r.watched||new Date().toISOString(),draft:r.draft,model:r.model||"",changes:[],gem0:fpgSnap(r.draft),auto:true,vid:r.fileId},
         typeof r.eur==="number"?{eur:r.eur,n:1}:{}));news++}
     if(rids.length)fpgCall({action:"fp_auto_ack",rids}).catch(e=>console.warn("fp auto ack",e));
   }catch(e){if(/old version/.test(e.message))A.old=1;else console.warn("fp auto",e)}
@@ -4516,7 +4528,7 @@ async function fpgAuto(a,set){if(DEMO||!fpgAutoOk(a))return;const A=FPG.auto[a.i
 // a correction Roger kept (🧠): the scripts' copies of the final products seen this session get the new lessons
 const fpgAutoResend=()=>Object.keys(FPG.auto).forEach(id=>{const a=byId(id),A=FPG.auto[id];if(a&&A.sent&&!A.busy)fpgCall({action:"fp_auto_setup",tpls:{[id]:fpgTpl(a)}}).catch(()=>{})});
 const fpgAutoSt=(u,a)=>{const A=fpgAutoOf(a),s=A&&A.q&&A.q[u];return s==="watching"?"⏳ watching by itself":s==="queued"?"🕒 next in line":s==="waiting"?"🕒 waiting (🤖 off)":""};
-function fpgAutoH(a,studs){if(!a.video)return "";const A=fpgAutoOf(a);if(!fpgRubric(a))return "";
+function fpgAutoH(a,studs){if(!a.video&&!a.reup)return "";const A=fpgAutoOf(a);if(!fpgRubric(a))return "";
   const n=A?studs.filter(s=>s.uid&&A.q&&A.q[s.uid]).length:0;
   if(A&&A.old)return `<p class="fpauto" style="margin:6px 0;padding:8px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa">🤖 <b>Automatic drafts</b> start once you paste and deploy the school script <b>v25</b> (project files › school-script › school-mail-v25.gs). Until then, press 🎬 in each student's box.</p>`;
   const on=!A||A.on!==false;
