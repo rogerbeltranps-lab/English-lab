@@ -17,9 +17,15 @@ export function startVisits({ db, fs, user, name, group, tester, root }) {
   const { doc, setDoc, serverTimestamp } = fs;
   const K = "el_vis_" + user.uid;
   const base = new URL(root).pathname;
-  const path = (location.pathname.startsWith(base) ? location.pathname.slice(base.length) : location.pathname.replace(/^\//, "")) || "index.html";
-  const title = (path === "today.html" ? "🏠 Board" : (document.title || path).replace(/\s*·\s*English Lab\s*$/, "")).slice(0, 190);
-  const pk = keyOf(path);
+  const page = (location.pathname.startsWith(base) ? location.pathname.slice(base.length) : location.pathname.replace(/^\//, "")) || "index.html";
+  const pageTitle = (page === "today.html" ? "🏠 Board" : (document.title || page).replace(/\s*·\s*English Lab\s*$/, "")).slice(0, 190);
+  // 📓 My notebook is the LS page with #notes (el-notebook.js), not a page of its own: it gets its own row (Roger, 14 Nov 2026:
+  // "how do I know if she has checked the notebook?"), "📓 My notebook · <the LS>", and the time on it is counted apart
+  let path, title, pk;
+  const where = () => { const nb = location.hash === "#notes";
+    path = nb ? page + "#notes" : page; pk = keyOf(page) + (nb ? "~notebook" : "");
+    title = nb ? ("📓 My notebook · " + pageTitle.replace(/^\d+\s*ESO\s*·\s*/i, "")).slice(0, 190) : pageTitle };
+  where();
   const load = () => { try { return JSON.parse(localStorage.getItem(K) || "null") } catch (e) { return null } };
   const save = (v) => { try { localStorage.setItem(K, JSON.stringify(v)) } catch (e) { } };
   let V = load(), lastTick = Date.now(), timer = null;
@@ -64,6 +70,10 @@ export function startVisits({ db, fs, user, name, group, tester, root }) {
   }
   if (document.visibilityState === "visible") open();
   setInterval(count, TICK);
+  // into or out of the notebook: the time so far goes to where they were, and a beat says where they are now (at most one a minute)
+  addEventListener("hashchange", () => { const was = pk;
+    if (document.visibilityState === "visible") count(true);   // pk is still where they were
+    where(); if (pk !== was && document.visibilityState === "visible") open() });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") { lastTick = Date.now(); open() }
     else count(true)

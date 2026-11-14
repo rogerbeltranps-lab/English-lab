@@ -60,7 +60,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .vdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #bbf7d0;margin-right:8px;vertical-align:middle}.vdot.idle{background:#facc15;box-shadow:0 0 0 3px #fef9c3}.vnow{color:#16a34a;font-weight:700}
 .vearly{margin:10px 0 0;font-size:13px;color:#475569;line-height:2}.vearly .chip small{color:#64748b;margin-left:4px}.vrow{cursor:pointer}.vrow:hover td{background:#f8fafc}.vrow.on td{background:#f0fdfa}.vtop{color:#475569;font-size:13px}
 .vdet td{background:#f8fafc}.vvis{margin:4px 0 10px}.vvis ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:3px}.vvis li{display:flex;justify-content:space-between;gap:12px;max-width:640px;padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font-size:13px}.vvis li small{color:#64748b;white-space:nowrap}
-.vnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.vnav>button{border:1.5px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer}.vnav>button:disabled{opacity:.4;cursor:default}.vnav input{font:inherit;padding:4px 6px;border:1.5px solid #cbd5e1;border-radius:8px}.vnote{font-size:12px}
+.vnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.vnav>button{border:1.5px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer}.vnav>button:disabled{opacity:.4;cursor:default}.vnav input{font:inherit;padding:4px 6px;border:1.5px solid #cbd5e1;border-radius:8px}.vnote{font-size:12px}.vnb{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;white-space:nowrap}
 @media (max-width:640px){.vt th:nth-child(3),.vt td:nth-child(3){display:none}.vtop{display:none}.vt{font-size:13px}.vt td.nw{white-space:normal}}
 .crg{display:flex;flex-wrap:wrap;gap:10px}.crgc{display:grid;gap:2px;text-align:left;min-width:170px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;font:inherit;color:#0f172a;flex:0 1 170px}
 .crgc.on{border-color:#2563eb;box-shadow:0 0 0 2px #bfdbfe}.crgc.all{place-content:center;color:#2563eb;font-weight:600}.crgc small{color:#64748b}.crbig{font-size:26px;font-weight:800;line-height:1.1}
@@ -1968,8 +1968,8 @@ function visSum(x){const t=x.t||{},vs=Object.values(x.s||{}).filter(v=>v&&v.a).s
     const p=Object.entries(v.p||{}).map(([k,s])=>({k,s:+s||0,n:(t[k]||{}).n||k,u:(t[k]||{}).u||""})).sort((a,b)=>b.s-a.s);
     return {a:v.a,b:Math.max(v.b||v.a,v.a),p,sec:p.reduce((n,q)=>n+q.s,0)}});
   const last=visMs(x.last);if(vs.length&&last>vs[vs.length-1].b&&last-vs[vs.length-1].b<ON_MS)vs[vs.length-1].b=last;
-  const pages={};vs.forEach(v=>v.p.forEach(q=>{const o=pages[q.k]||(pages[q.k]={n:q.n,u:q.u,s:0});o.s+=q.s}));
-  return {vs,sec:vs.reduce((n,v)=>n+v.sec,0),first:vs.length?vs[0].a:last,lastSeen:Math.max(last,vs.length?vs[vs.length-1].b:0),pages:Object.values(pages).sort((a,b)=>b.s-a.s)}}
+  const pages={};vs.forEach(v=>v.p.forEach(q=>{const o=pages[q.k]||(pages[q.k]={k:q.k,n:q.n,u:q.u,s:0});o.s+=q.s}));
+  return {vs,nb:Object.values(pages).filter(p=>/~notebook$/.test(p.k)).reduce((n,p)=>n+p.s,0),nbIn:Object.values(pages).some(p=>/~notebook$/.test(p.k)),sec:vs.reduce((n,v)=>n+v.sec,0),first:vs.length?vs[0].a:last,lastSeen:Math.max(last,vs.length?vs[vs.length-1].b:0),pages:Object.values(pages).sort((a,b)=>b.s-a.s)}}
 const visT=ms=>new Date(ms).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Madrid"});
 const visDur=s=>{const m=Math.round(s/60);return m<1?"<1 min":m<60?m+" min":Math.floor(m/60)+" h "+String(m%60).padStart(2,"0")+" min"};
 const visAgo=ms=>{const m=Math.floor((Date.now()-ms)/60e3);return m<1?"now":m+" min ago"};
@@ -2009,13 +2009,15 @@ function visHist(gsel){const today=visDay(Date.now()),day=S.on.day||today;visDay
   const box=g=>{const mine=L.filter(o=>visGroup(o.x)===g.id).sort((a,b)=>a.sum.first-b.sum.first),here=new Set(mine.map(o=>o.x.uid));
     const away=g.id==="test"||g.id==="none"?[]:Object.values(S.P||{}).filter(s=>!s.tester&&s.group===g.id&&!here.has(s.uid)).sort(byName);
     const row=o=>{const open=S.on.open===o.x.id,top=o.sum.pages.slice(0,3);
-      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><button class="lnk" data-do="vstu" data-u="${esc(o.x.uid)}" title="Every day of ${esc(visName(o.x))}">${esc(visName(o.x))}</button></td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="vtop">${top.map(p=>esc(p.n)).join(" · ")}${o.sum.pages.length>3?` <small class="muted">+${o.sum.pages.length-3}</small>`:""}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
+      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><button class="lnk" data-do="vstu" data-u="${esc(o.x.uid)}" title="Every day of ${esc(visName(o.x))}">${esc(visName(o.x))}</button>${visNb(o.sum)}</td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="vtop">${top.map(p=>esc(p.n)).join(" · ")}${o.sum.pages.length>3?` <small class="muted">+${o.sum.pages.length-3}</small>`:""}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
         +(open?`<tr class="vdet"><td colspan="6">${visDetail(o.sum)}</td></tr>`:"")};
     return `<div class="box vbox"><h2>${esc(g.name)} <small class="vcount">${mine.length} on the site</small></h2>`
       +(mine.length?`<div class="qwrap"><table class="vt"><thead><tr><th>Student</th><th>From – to</th><th>Time</th><th>Visits</th><th>Pages most used</th><th></th></tr></thead><tbody>${mine.map(row).join("")}</tbody></table></div>`:`<p class="muted">Nobody this day.</p>`)
       +(away.length&&mine.length?`<p class="vearly"><b>Not on the site:</b> ${away.map(s=>esc(fullName(s))).join(" · ")}</p>`:"")+`</div>`};
   return nav+visChips(gsel)+(list.err?`<div class="box"><p class="muted">Could not read this day.</p></div>`:"")+gs.map(box).join("")
     +`<p class="muted vnote">Saved from 13 Nov 2026 on. The time counts only while a page is on screen; a visit ends after 10 minutes away.</p>`}
+// 📓 opened the notebook that day (Roger, 14 Nov 2026: "how do I know if she has checked the notebook?"): saved from 14 Nov 2026 on
+const visNb=sum=>sum.nbIn?` <span class="vnb" title="Time in 📓 My notebook">📓 ${visDur(sum.nb)}</span>`:"";
 const visDetail=sum=>sum.vs.map(v=>`<div class="vvis"><b>${visT(v.a)}–${visT(v.b)}</b> <small class="muted">${visDur(v.sec)}</small><ul>${v.p.map(p=>`<li><span>${visLink(p.u,p.n)}</span><small>${visDur(p.s)}</small></li>`).join("")}</ul></div>`).join("");
 function visStu(uid){visStuLoad(uid);const list=VIS.stu[uid],s=(S.P||{})[uid];
   const back=`<p class="crumb"><a class="back" href="#" data-do="vstu" data-u="">‹ Back to ${S.on.day?esc(new Date(S.on.day+"T12:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"})):"the day"}</a></p>`;
@@ -2024,7 +2026,7 @@ function visStu(uid){visStuLoad(uid);const list=VIS.stu[uid],s=(S.P||{})[uid];
   const tot=L.reduce((n,o)=>n+o.sum.sec,0);
   return back+`<div class="box vbox"><h2>${esc(nm)} <small class="vcount">${plural(L.length,"day")} · ${visDur(tot)} in all</small></h2>`
     +(L.length?`<table class="vt"><thead><tr><th>Day</th><th>From – to</th><th>Time</th><th>Visits</th><th></th></tr></thead><tbody>${L.map(o=>{const open=S.on.open===o.x.id;
-      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><b>${esc(new Date(o.x.day+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))}</b></td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
+      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><b>${esc(new Date(o.x.day+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))}</b>${visNb(o.sum)}</td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
         +(open?`<tr class="vdet"><td colspan="5">${visDetail(o.sum)}</td></tr>`:"")}).join("")}</tbody></table>`:`<p class="muted">No visits saved yet.</p>`)+`</div>`}
 function qaTab(){
   const lss=EL_LS.filter(l=>!((window.EL_GRADING||{})[l.id]||{}).only);
@@ -3890,8 +3892,10 @@ function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
   const info=[s.email?esc(s.email):"<b>No email yet</b>: cannot sign in",s.ro&&s.ro.tutor?"Tutor: "+esc(s.ro.tutor):"",s.away?"not signed in yet":"",s.tester?"tester account":"",listed()&&!s.ro&&!s.tester?"<b>not on the student list</b>: cannot sign in":""].filter(Boolean).join(" · ");
   const entry=s.tester?"":`<details data-k="roform" ${s.ro&&s.email?"":"open"}><summary style="font-size:1rem">${s.ro?"Edit the list entry":"Add to the student list"}</summary>${roForm(s)}</details>`;
-  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+msgLine(u)+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
-  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>${msgLine(u)}
+  // 🕘 their visit history, day by day (Roger, 14 Nov 2026: "I want this kind of history student by student")
+  const vh=s.away?"":`<p class="vhl"><button class="g" data-do="vhist" data-u="${u}" title="When ${esc(fullName(s))} was on English Lab, for how long and on which pages (📓 notebook included), day by day">🕘 Visit history</button></p>`;
+  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+vh+msgLine(u)+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
+  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>${vh}${msgLine(u)}
     <label>Group</label>${groupSel(u,s.group)}
     <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>${toldLine(u,ls)}
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
@@ -4610,6 +4614,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";S.place="home";render();scrollTo(0,0)},
     crg:()=>{S.cr.g=k.g;render()},
+    vhist:()=>{const d=$("#dlg");if(d&&d.open)d.close();S.g="online";S.place="home";S.on.v="hist";S.on.stu=k.u;S.on.open=null;render();scrollTo(0,0)},
     vv:()=>{S.on.v=k.v;S.on.stu=null;S.on.open=null;render()},vg:()=>{S.on.g=k.g;render()},vday:()=>{S.on.day=k.d;S.on.open=null;render()},
     vopen:()=>{if(e.target.closest("a[href]:not([data-do])"))return;S.on.open=S.on.open===k.id?null:k.id;render()},vstu:()=>{e.preventDefault();S.on.stu=k.u||null;S.on.open=null;if(k.u)S.on.v="hist";render();scrollTo(0,0)},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
