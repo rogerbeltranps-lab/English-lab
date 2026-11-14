@@ -1174,12 +1174,18 @@ var LS2 = (function () {
     };
     launch();
   }
-  /* Typing instead (Roger, 8 Nov 2026, Aina 2ESO B: "em diu que no s'ha fet el Transcript, i no m'ho deixa enviar"): the transcript boxes are
-     read-only, so when Chrome's automatic transcript can't work (no speech recognition, a blocked speech service, no transcript at all
-     after a recording) the student was told to type but couldn't, and couldn't hand in. Then the box opens for typing (el-mic.js
-     typeInstead) and stays open after a reload (sp.typed); the hand-in says typed: true. */
+  /* No automatic transcript (Roger, 14 Nov 2026: "let's take the transcript option off since Gemini can understand well what they say"):
+     the transcript boxes are always read-only (the typing instead of 8 Nov 2026 is gone). When Chrome's automatic transcript can't work
+     here (no speech recognition, a blocked speech service, no transcript at all after a recording), the recording itself is handed in:
+     handRec waits until el-mic.js has uploaded it to the teacher's Drive and keeps Gemini's transcript and notes as the step's fields.
+     A microphone that doesn't work at all: 🎙️ I can't record (el-mic.js cant), which the teacher sees when class mode starts. */
   const srOff = () => !SRC() || !!(window.elMic && elMic.srBroken && elMic.srBroken());
-  const typeIn = (ta, sp) => { if (!ta) return; if (sp && !sp.typed) { sp.typed = 1; save(); } if (window.elMic && elMic.typeInstead) elMic.typeInstead(ta); else ta.readOnly = false; };
+  const recFields = r => [r.tr ? { l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 } : null,
+    r.notes ? { l: 'Notes from the recording (task and pronunciation)', v: String(r.notes).slice(0, 3000), rec: 1 } : null].filter(Boolean);
+  const handRec = (btn, id, title, task) => !window.elMic || !elMic.upload ? Promise.resolve(null)
+    : elMic.upload({ btn, step: id, title, level, task }).then(r => r && r.ok ? { audio: Object.assign({ id: r.id, s: r.secs || null }, r.eur != null ? { eur: r.eur } : {}), f: recFields(r) } : null, () => null);
+  const recSecs = btn => window.elMic && elMic.recSecs ? elMic.recSecs(btn) : 0;
+  const cantRow = (host, id, title) => { if (host && window.elMic && elMic.cant) host.append(elMic.cant({ step: id, title })); };
   /* The recording goes to the teacher too (Roger, 8 Nov 2026: "I want you to save audios … an audio emoji which I can listen"): after a
      hand-in, el-mic.js uploads the last recording made with this step's Record button to the teacher's Drive (school Apps Script). The
      step then keeps audio = {id (Drive file), s (seconds)}, and a transcript made from the audio (Gemini, when the script has a key) is
@@ -1191,8 +1197,7 @@ var LS2 = (function () {
       if (!r.ok && !/^too /.test(r.error || '')) return;   // the school script not updated yet, no folder access…: nothing to tell the student
       if (!r.ok) { msg.textContent += ' ' + (ca() ? '(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)' : '(The recording could not be saved: your transcript was handed in.)'); return; }
       h.audio = { id: r.id, s: r.secs || null }; if (r.eur != null) h.audio.eur = r.eur;   // what Gemini cost (school script v22), for the dashboard
-      h.f = (h.f || []).filter(x => !x.rec); if (r.tr) h.f.push({ l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 });
-      if (r.notes) h.f.push({ l: 'Notes from the recording (task and pronunciation)', v: String(r.notes).slice(0, 3000), rec: 1 });
+      h.f = (h.f || []).filter(x => !x.rec).concat(recFields(r));
       save(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
     }).catch(() => {});
   };
@@ -1237,7 +1242,7 @@ var LS2 = (function () {
   R.speaking = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'La tasca' : 'Your task') + '</h3><p class="instruction" id="spTask"></p><div class="speak-support"><div class="mini-card"><strong>Model</strong><div class="model" id="spModel"></div></div><div class="mini-card"><strong>' + (ca() ? 'Prepara què diràs' : 'Prepare') + '</strong><textarea id="spPlan" placeholder="Key words or short sentences…"></textarea></div></div></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Grava i escolta’t' : 'Record') + '</h3><div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="startRecord">● ' + (ca() ? 'Grava' : 'Record') + '</button><button class="btn secondary" type="button" id="stopRecord" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button><button class="btn secondary" type="button" id="downloadWav" disabled>' + (ca() ? 'Descarrega el WAV' : 'Download WAV') + '</button></div><div class="record-status" id="recordStatus">' + (ca() ? 'A punt per gravar.' : 'Ready to record.') + '</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div>' +
-      '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, la transcripció es crea mentre graves. No s’hi pot escriure: si no diu el que volies, torna’t a gravar.' : 'With Chrome, a transcript is written while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.') + '</p><textarea id="speechTranscript" data-sr-box readonly placeholder="Your transcript will appear here while you speak."></textarea></div>' +
+      '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, la transcripció es crea mentre graves. No s’hi pot escriure: si no diu el que volies, torna’t a gravar. Si no surt cap transcripció, no passa res: el professor rebrà la teva gravació.' : 'With Chrome, a transcript is written while you record. You can’t type in it: if it is not what you wanted to say, record yourself again. If no transcript appears, that’s fine: your teacher gets your recording.') + '</p><textarea id="speechTranscript" data-sr-box readonly placeholder="Your transcript will appear here while you speak."></textarea></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Entrega-ho al professor' : 'Hand it in') + '</h3><p class="instruction">' + (ca() ? 'Quan la transcripció digui el que has dit, prem <strong>Entrega al professor</strong>. El professor et tornarà la correcció aquí mateix. Si després et tornes a gravar millor, torna-la a entregar.' : 'When the transcript says what you said, press <strong>Hand it in to my teacher</strong>. Your teacher’s correction will appear right here. If you record a better version later, hand it in again.') + '</p><div class="actions"><button class="btn" type="button" id="spSend">' + teacherBtn() + '</button></div><p class="feedback" id="spMsg"></p></div>',
     bind() {
       $('#spTask').innerHTML = byLevel(p.task); $('#spModel').innerHTML = byLevel(p.model);
@@ -1245,7 +1250,8 @@ var LS2 = (function () {
       // the plan and the transcript stay too (state.speak[key]); a recording itself is never saved
       state.speak = state.speak || {}; const sp = state.speak[spKey] = state.speak[spKey] || {};
       const keepSp = () => { sp.plan = $('#spPlan').value; sp.tr = $('#speechTranscript').value; save(); };
-      $('#spPlan').value = sp.plan || ''; $('#speechTranscript').value = sp.tr || ''; if (sp.typed || srOff()) typeIn($('#speechTranscript'), sp);
+      $('#spPlan').value = sp.plan || ''; $('#speechTranscript').value = sp.tr || '';
+      cantRow($('#startRecord').closest('.section-card'), p.id, tx(p.title));
       $('#spPlan').oninput = keepSp; $('#speechTranscript').oninput = keepSp;
       $('#startRecord').onclick = async () => {
         if (processor) return; $('#startRecord').disabled = true;
@@ -1266,19 +1272,32 @@ var LS2 = (function () {
         $('#recordedAudio').src = recUrl; $('#recordedAudio').style.display = 'block';
         $('#downloadWav').disabled = false; $('#startRecord').disabled = false; $('#stopRecord').disabled = true; processor = null;
         $('#recordStatus').textContent = ca() ? 'Gravació a punt. Escolta-la, revisa la transcripció i entrega-la al professor.' : 'Recording ready. Listen to it, check the transcript and hand it in to your teacher.';
-        setTimeout(() => { keepSp(); if (!$('#speechTranscript').value.trim()) { $('#recordStatus').textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció: escolta la gravació i escriu a la casella el que has dit.' : 'No transcript was made: listen to your recording and type what you said in the box.'); typeIn($('#speechTranscript'), sp); } }, 1500);   // the last words of the automatic transcript arrive after Stop
+        setTimeout(() => { keepSp(); if (!$('#speechTranscript').value.trim()) $('#recordStatus').textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció en aquest ordinador: no passa res, entrega la gravació i el professor l’escoltarà.' : 'No transcript was made on this computer: that’s fine, hand in your recording and your teacher will listen to it.'); }, 1500);   // the last words of the automatic transcript arrive after Stop
       };
       $('#downloadWav').onclick = downloadWav;
       const msg = $('#spMsg');
       const handed = () => { const h = (state.steps || {})[p.id]; if (!h) return; msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregada el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà la correcció aquí mateix. Si et tornes a gravar millor, torna-la a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s correction will appear right here. If you record a better version, hand it in again.'); };
       handed();
-      $('#spSend').onclick = () => {
+      let sending = false;
+      $('#spSend').onclick = async () => {
         if (processor) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Atura la gravació primer.' : 'Stop the recording first.'; return; }
+        if (sending) return;
         const tr = $('#speechTranscript').value.trim(), n = realWords(tr), min = (p.speakMin || { beginners: 10, insecure: 15, safe: 25, daring: 35 })[level] || 15;
-        if (n < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La transcripció té ' + n + ' paraules: grava’t fent tota la tasca (almenys ' + min + ' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.' : 'Your transcript has ' + n + ' words: record yourself doing the whole task (at least ' + min + ' words). The transcript is written by itself while you speak: record yourself again.'; return; }
+        // no automatic transcript here: the recording itself, if it is long enough for the task (about 0.6 s a word)
+        const noSR = srOff() || !n, recMin = Math.max(8, Math.round(min * 0.6)), byRec = n < min && noSR && recSecs('startRecord') >= recMin;
+        if (n < min && !byRec) { msg.className = 'feedback no'; msg.textContent = noSR
+          ? (ca() ? 'En aquest ordinador no hi ha transcripció automàtica: grava’t fent tota la tasca (almenys ' + recMin + ' segons) i entrega la gravació. Si el micròfon no funciona, prem 🎙️ No puc gravar.' : 'There is no automatic transcript on this computer: record yourself doing the whole task (at least ' + recMin + ' seconds) and hand in the recording. If the microphone doesn’t work, press 🎙️ I can’t record.')
+          : (ca() ? 'La transcripció té ' + n + ' paraules: grava’t fent tota la tasca (almenys ' + min + ' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.' : 'Your transcript has ' + n + ' words: record yourself doing the whole task (at least ' + min + ' words). The transcript is written by itself while you speak: record yourself again.'); return; }
         state.steps = state.steps || {};
-        state.steps[p.id] = { level, title: tx(p.title), typed: sp.typed ? true : undefined, ty: window.elTyping ? elTyping.sum($('#speechTranscript').parentElement) : null, f: [{ l: ca() ? 'Transcripció' : 'Transcript', v: tr }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
-        keepSp(); complete(p.id); save(); handed(); keepAudio(p.id, 'startRecord', msg, $('#spTask').textContent);
+        const h = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#speechTranscript').parentElement) : null, f: [{ l: ca() ? 'Transcripció' : 'Transcript', v: tr }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+        if (byRec) {   // handed in only once the recording has reached the teacher
+          sending = true; msg.className = 'feedback'; msg.textContent = ca() ? 'Enviant la gravació al professor…' : 'Sending your recording to your teacher…';
+          const r = await handRec('startRecord', p.id, h.title, $('#spTask').textContent); sending = false;
+          if (!r) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.' : 'Your recording could not be sent. Try again in a moment.'; return; }
+          h.audio = r.audio; if (r.f.length) h.f = r.f;
+          state.steps[p.id] = h; keepSp(); complete(p.id); save(); handed(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.'); return;
+        }
+        state.steps[p.id] = h; keepSp(); complete(p.id); save(); handed(); keepAudio(p.id, 'startRecord', msg, $('#spTask').textContent);
       };
     }
   });
@@ -1298,7 +1317,7 @@ var LS2 = (function () {
           : '<div class="section-card"><h3>' + (ca() ? 'Parla' : 'Talk') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Comença</strong>: es grava la conversa i l’ordinador et fa les preguntes una a una, amb temps per respondre. Respon en veu alta amb frases completes i afegeix-hi algun detall. Millor amb auriculars.' : 'Press <strong>Start</strong>: the recording starts and the computer asks you the questions one by one, with time to answer. Answer out loud in full sentences and add a detail. Headphones help.') + '</p>' +
           '<div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + id + 'Start">● ' + (ca() ? 'Comença' : 'Start') + '</button><button class="btn secondary" type="button" id="' + id + 'Stop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button><button class="btn secondary" type="button" id="' + id + 'Wav" disabled>' + (ca() ? 'Descarrega el WAV' : 'Download WAV') + '</button></div>' +
           '<div class="record-status" id="' + id + 'Status">' + (ca() ? 'A punt.' : 'Ready.') + '</div><audio id="' + id + 'Audio" controls style="width:100%;display:none"></audio></div>' +
-          '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, les teves respostes s’escriuen mentre parles (una línia per pregunta). No s’hi pot escriure: si una resposta no diu el que volies, prem ↺ amb el seu número i torna-la a dir. Parla clar i no gaire de pressa.' : 'With Chrome, your answers are written down while you speak (one line per question). You can’t type in them: if an answer is not what you wanted to say, press ↺ with its number and say it again. Speak clearly and not too fast.') + '</p><textarea id="' + id + 'Tr" data-sr-box readonly rows="7" placeholder="Your answers will appear here while you speak."></textarea><div class="actions" id="' + id + 'Redo" style="justify-content:flex-start;flex-wrap:wrap;align-items:center;gap:6px"></div>' +
+          '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, les teves respostes s’escriuen mentre parles (una línia per pregunta). No s’hi pot escriure: si una resposta no diu el que volies, prem ↺ amb el seu número i torna-la a dir. Parla clar i no gaire de pressa. Si no surt cap transcripció, no passa res: el professor rebrà la teva gravació.' : 'With Chrome, your answers are written down while you speak (one line per question). You can’t type in them: if an answer is not what you wanted to say, press ↺ with its number and say it again. Speak clearly and not too fast. If no transcript appears, that’s fine: your teacher gets your recording.') + '</p><textarea id="' + id + 'Tr" data-sr-box readonly rows="7" placeholder="Your answers will appear here while you speak."></textarea><div class="actions" id="' + id + 'Redo" style="justify-content:flex-start;flex-wrap:wrap;align-items:center;gap:6px"></div>' +
           '</div>') +
         '<div class="section-card"><h3>' + (ca() ? 'Entrega-la al professor' : 'Hand it in') + '</h3><p class="instruction">' + (nat ? 'When your notes are ready, hand them in. Your teacher’s reply will appear right here.' : ca() ? 'Quan la transcripció digui el que has dit, entrega la conversa. El professor et tornarà la correcció aquí mateix.' : 'When the transcript says what you said, hand in the conversation. Your teacher’s correction will appear right here.') + '</p><div class="actions"><button class="btn" type="button" id="' + id + 'Send">' + (ca() ? 'Entrega la conversa' : 'Hand in the conversation') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
       bind() {
@@ -1354,8 +1373,7 @@ var LS2 = (function () {
               setTimeout(() => { if (!ans[k] && before) { ans[k] = before; render(); st.textContent = ca() ? 'No t’he sentit: es queda la resposta d’abans.' : 'I didn’t hear you: your answer from before stays.'; } }, 1500);
             }); });
           };
-          tr.addEventListener('input', () => { if (tr.readOnly) return; ans.length = 0; sp.tr = tr.value; save(); });   // typed instead (see typeIn)
-          render(); if (sp.typed || srOff()) typeIn(tr, sp);
+          render(); cantRow(btn('Start').closest('.section-card'), id, tx(p.title));
           const stop = async () => {
             run++; clearTimeout(timer); stopSay(); listen(-1);
             if (busy) { busy = false; render(); st.textContent = ca() ? 'Aturat.' : 'Stopped.'; }
@@ -1365,7 +1383,7 @@ var LS2 = (function () {
             const a = $('#' + id + 'Audio'); a.src = recUrl; a.style.display = 'block';
             btn('Start').disabled = false; btn('Stop').disabled = true; btn('Wav').disabled = false; render();
             st.textContent = ca() ? 'Gravació a punt. Escolta-la, revisa la transcripció i entrega la conversa.' : 'Recording ready. Listen to it, check the transcript and hand in the conversation.';
-            setTimeout(() => { if (!ans.some(x => x)) { st.textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció: escolta la gravació i escriu a la casella el que has respost a cada pregunta.' : 'No transcript was made: listen to your recording and type in the box what you answered to each question.'); typeIn(tr, sp); } }, 1500);
+            setTimeout(() => { if (!ans.some(x => x)) st.textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció en aquest ordinador: no passa res, entrega la conversa i el professor escoltarà la gravació.' : 'No transcript was made on this computer: that’s fine, hand in the conversation and your teacher will listen to the recording.'); }, 1500);
           };
           btn('Start').onclick = async () => {
             if (processor) return; run++; clearTimeout(timer); stopSay(); listen(-1); busy = false; btn('Start').disabled = true;
@@ -1391,14 +1409,27 @@ var LS2 = (function () {
           btn('Wav').onclick = downloadWav;
         }
         if (state.steps[id] && state.done[id]) { msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregada el ' : 'Handed in on ') + new Date(state.steps[id].date).toLocaleDateString() + (ca() ? '. El professor et tornarà la correcció aquí mateix. Si la tornes a fer, entrega-la una altra vegada.' : '. Your teacher’s correction will appear right here. If you do it again, hand it in again.'); }
-        $('#' + id + 'Send').onclick = () => {
+        let sending = false;
+        $('#' + id + 'Send').onclick = async () => {
           if (!nat && processor) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Atura la gravació primer.' : 'Stop the recording first.'; return; }
+          if (sending) return;
           const n = nat ? words((sp.notes || []).join(' ')) : words(Array.isArray(sp.ans) && sp.ans.some(x => x) ? sp.ans.join(' ') : sp.tr || '');
-          if (n < min) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).' : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). The transcript is written by itself while you speak: record yourself again.'; return; }
-          state.steps[id] = { level, title: tx(p.title), typed: !nat && sp.typed ? true : undefined, ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
-          complete(id); save();
-          msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor et tornarà la correcció aquí mateix.' : 'Handed in ✓ Your teacher’s correction will appear right here.';
-          if (!nat) keepAudio(id, id + 'Start', msg, $('#' + id + 'Task').textContent + ' Questions: ' + qs.map(q => spoken(q.q)).join(' / '));
+          // no automatic transcript here: the recording of the conversation itself, if it is long enough
+          const noSR = !nat && (srOff() || !n), recMin = Math.max(15, Math.round(min * 0.6)), byRec = n < min && noSR && recSecs(id + 'Start') >= recMin;
+          const task = $('#' + id + 'Task').textContent + ' Questions: ' + qs.map(q => spoken(q.q)).join(' / ');
+          if (n < min && !byRec) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).'
+            : noSR ? (ca() ? 'En aquest ordinador no hi ha transcripció automàtica: prem Comença i respon totes les preguntes (almenys ' + recMin + ' segons de gravació); després entrega la conversa. Si el micròfon no funciona, prem 🎙️ No puc gravar.' : 'There is no automatic transcript on this computer: press Start and answer every question (at least ' + recMin + ' seconds of recording), then hand in the conversation. If the microphone doesn’t work, press 🎙️ I can’t record.')
+            : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). The transcript is written by itself while you speak: record yourself again.'; return; }
+          const h = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+          if (byRec) {   // handed in only once the recording has reached the teacher
+            sending = true; msg.className = 'feedback'; msg.textContent = ca() ? 'Enviant la gravació al professor…' : 'Sending your recording to your teacher…';
+            const r = await handRec(id + 'Start', id, h.title, task); sending = false;
+            if (!r) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.' : 'Your recording could not be sent. Try again in a moment.'; return; }
+            h.audio = r.audio; if (r.f.length) h.f = r.f;
+          }
+          state.steps[id] = h; complete(id); save();
+          msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregada ✓ El professor et tornarà la correcció aquí mateix.' : 'Handed in ✓ Your teacher’s correction will appear right here.') + (byRec ? ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.') : '');
+          if (!nat && !byRec) keepAudio(id, id + 'Start', msg, task);
         };
       }
     };

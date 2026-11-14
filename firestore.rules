@@ -221,6 +221,19 @@ service cloud.firestore {
         && request.resource.data.name is string && request.resource.data.name.size() <= 120
         && request.resource.data.seen == request.time && request.resource.data.off is bool && request.resource.data.get('fs', true) is bool;
     }
+    // 🎙️ I can't record (Roger, 14 Nov 2026: "If they can't record, ask them to notify it so that, when I start a class with that group I get
+    // a message on the screen"): live/{group}/micHelp/{email} = {name, page, step, title, at}, written by a student of the group from a
+    // Speaking or Talk step (shared/js/el-mic.js cant) and removed by them when a recording gets through; only the teacher reads them
+    // (the class tab when class mode starts, shared/js/el-mic-help.js) and removes them (✓ Sorted).
+    match /live/{group}/micHelp/{email} {
+      allow read, delete: if isTeacher();
+      allow delete: if school() && email == myEmail();
+      allow create, update: if inGroup(group) && email == myEmail()
+        && request.resource.data.keys().hasOnly(['name', 'page', 'step', 'title', 'at'])
+        && shortText(request.resource.data.get('name', null), 120) && shortText(request.resource.data.get('page', null), 300)
+        && shortText(request.resource.data.get('step', null), 80) && shortText(request.resource.data.get('title', null), 200)
+        && request.resource.data.at == request.time;
+    }
     // 🟢 Online now + 🕘 Visit history (Roger, 13 Nov 2026: "Is it possible to see who is conected on the website? … And I want to have a historial"):
     // visits/{day}_{uid} = {uid, email, name, group, day, tester?, last, page, title, s: visits of that day with seconds per page, t: page titles},
     // written by the student's own pages (shared/js/el-visits.js: a beat when a page opens, at most one a minute, and every 4 minutes on screen).
