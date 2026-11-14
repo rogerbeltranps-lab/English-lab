@@ -737,6 +737,10 @@ window.ELNotebook = (function () {
     const W = sp.clientWidth, Hh = sp.clientHeight; if (!W || !Hh) return false;
     if (keep == null) keep = atLP() || here();
     cvSet(root);
+    // 🟨 a post-it being written on stays open and keeps its cursor: the pages are made again when the book's size changes (the top bar
+    // wraps when "Saving…" shows on a Chromebook) or a font arrives, which took the new, still empty post-it away (Roger, 14 Nov 2026:
+    // "it appears and disappears")
+    const fa = document.activeElement, fd = fa && fa.closest && fa.closest('.nb-spread .nb-fpi'), fk = fd && fa.tagName === 'TEXTAREA' ? { n: fd.dataset.n, ci: fd.dataset.ci, s: fa.selectionStart, e: fa.selectionEnd } : null;
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
     secs.forEach((s, si) => {
@@ -775,7 +779,10 @@ window.ELNotebook = (function () {
       if (k === 's') { const [key, n] = rest.split('@'), i = secStart[ci + ':' + key]; if (i != null) { let j = i + (+n || 0); while (j > i && (!pages[j] || pages[j].s !== pages[i].s)) j--; pg = j; } }
       else { const [id, off] = rest.split('@'); const hit = blkEls(id, ci).filter(b => +b.dataset.off <= +(off || 0)).pop(); if (hit) pg = +hit.closest('.nb-page').dataset.i; else if (blkPage[ci + ':' + id] != null) pg = blkPage[ci + ':' + id]; }
     }
-    show(); tourSoon(); return true;
+    if (fk) { use(+fk.ci || 0); const v = NT()[fk.n], at = v && fpiAt(v, +fk.ci || 0); if (at && at.pgEl) pg = +at.pgEl.dataset.i; use(keepCi); }   // on the page where that post-it is now
+    show(); tourSoon();
+    if (fk) { const ta = document.querySelector(`.nb-spread .nb-fpi[data-n="${fk.n}"][data-ci="${fk.ci}"] textarea`); if (ta) { ta.dataset.snap = '1'; ta.focus({ preventScroll: true }); try { ta.setSelectionRange(fk.s, fk.e); } catch (x) {} } }
+    return true;
   }
   const relayout = keep => { if (!layout(keep)) laid = ''; };
   function tools(pc) {
@@ -1208,7 +1215,10 @@ window.ELNotebook = (function () {
   document.addEventListener('focusout', e => {
     const ta = e.target.closest && e.target.closest('.nb .nb-fpi textarea'); if (!ta) return; delete ta.dataset.snap;
     const d = ta.closest('.nb-fpi'), v = fpiNote(d);   // an empty post-it left behind goes away
-    if (v && !String(v.text || '').trim() && !d.classList.contains('drag')) setTimeout(() => { if (d.contains(document.activeElement)) return; delete NT()[d.dataset.n]; save(); d.remove(); }, 150);
+    if (v && !String(v.text || '').trim() && !d.classList.contains('drag')) setTimeout(() => {
+      // taken off the page because the pages were made again (layout): the same post-it is back there, so the note stays
+      if (!d.isConnected || d.contains(document.activeElement)) return;
+      const v2 = fpiNote(d); if (!v2 || String(v2.text || '').trim()) return; delete NT()[d.dataset.n]; save(); d.remove(); }, 150);
   });
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('.nb .nb-fpi button'); if (!b || !H || !H.own) return; e.preventDefault();
