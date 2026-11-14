@@ -3,7 +3,9 @@
    8 MB pieces to the school Apps Script (tools/notify/school-mail.gs, actions video_start / video_chunk / video_status), which writes it into
    the teacher's Drive (Teacher Studio › 04_Students (private) › Final product videos › group). Heavy videos work (up to 2 GB); a lost
    connection goes on from the last piece Drive has. onDone({id, name, size, at}) is called once the whole file is in Drive; the page then
-   saves it with the hand-in (state.steps.video) so the dashboard can play it and Gemini can watch it. saved = that earlier upload. */
+   saves it with the hand-in (state.steps.video) so the dashboard can play it and Gemini can watch it. saved = that earlier upload.
+   v25 of the school script (Roger, 14 Nov 2026): with meta.activity, the teacher's draft is ready by itself soon after the upload; nothing on
+   this card says how it is marked (Roger: "students don't have to see that I use Gemini"). */
 (function () {
   const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
   const MAX = 2e9;
@@ -44,7 +46,7 @@
       const C = window.ELCloud, u = C && C.auth && C.auth.currentUser;
       if (!u) return say(T('Primer entra amb el teu compte de l’institut.', 'Sign in with your school account first.'), 'no');
       busy = true; draw(T('Preparant…', 'Getting ready…'));
-      const meta = Object.assign({ page: location.pathname, group: (C.group && C.group()) || '' }, o.meta || {});
+      const meta = Object.assign({ page: location.pathname, group: (C.group && C.group()) || '', uid: u.uid }, o.meta || {});   // uid: the dashboard puts the draft on this student
       const leave = e => { e.preventDefault(); e.returnValue = ''; };
       addEventListener('beforeunload', leave);
       try {
