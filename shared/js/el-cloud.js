@@ -1561,7 +1561,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
   let crM=null;const crLoad=()=>crM?Promise.resolve(crM):import(new URL("shared/correct/open.js",ROOT).href).then(m=>crM=m);
   const crRe=/^[24]eso\/(?!my-real-routine\/)[a-z0-9-]+\/[a-z0-9-]+\.html$/;
-  const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log"||x.p==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(x.u.replace(/\.html$/,"")))};   // 📘 grammar: LS2 LP3 first
+  const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log"||(window.elIsGrammar?elIsGrammar(x.p):x.p==="grammar")&&(window.EL_CORRECT_GRAMMAR||[]).includes(x.u.replace(/\.html$/,"")))};   // 📘 grammar: LS2 LP3 first
   const crOpen=()=>crLoad().then(m=>{const x=state(),r=m.readingOf(x.u,x.p);if(r)m.openCorrect(ROOT,Object.assign({tab:x.p,g:o.g},r))}).catch(e=>console.warn("correct",e));
   // 👥 who is in the class, on every page this tab goes to and over ✅ Correct together (fsPanel; Roger, 13 Nov 2026)
   const FPc=fsPanel(()=>o.g,()=>FPc.float(),()=>cmOn);FPc.watch();

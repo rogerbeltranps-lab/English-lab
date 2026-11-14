@@ -4,7 +4,7 @@
 // readingOf(path, tab): {ls, lp} when the page is an LS2-on learning path and the tab a Reading or a Reading log, or its Grammar tab
 // when the page is in EL_CORRECT_GRAMMAR (el-catalog.js; 📘 grammar together, LS2 LP3 first), else null.
 export function readingOf(path,tab){const m=/^([24]eso\/(?!my-real-routine\/)[a-z0-9-]+)\/([a-z0-9-]+)\.html$/.exec(path||"");
-  return m&&(tab==="read"||tab==="log"||tab==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(m[1]+"/"+m[2]))?{ls:m[1],lp:m[2]}:null}
+  return m&&(tab==="read"||tab==="log"||(window.elIsGrammar?elIsGrammar(tab):tab==="grammar")&&(window.EL_CORRECT_GRAMMAR||[]).includes(m[1]+"/"+m[2]))?{ls:m[1],lp:m[2]}:null}
 let fr=null;
 export function openCorrect(root,{ls,lp,tab,g}){
   if(fr)fr.remove();

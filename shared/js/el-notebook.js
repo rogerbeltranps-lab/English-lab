@@ -340,7 +340,7 @@ window.ELNotebook = (function () {
     return out;
   }
   // which skill an activity practises, by its tab: the first tries of the cover's rings (recall and checkpoints mix them: left out)
-  const SKILL = id => /^(grammar|mixed)$/.test(id) ? 'grammar' : /^(vocab|words|cards)$/.test(id) ? 'vocab' : /^(read|log|sources|ch\d+)$/.test(id) ? 'read' : /^(listen|again|chart)$/.test(id) ? 'listen' : null;
+  const SKILL = id => /^(grammar([A-Z]\w*)?|mixed)$/.test(id) ? 'grammar' : /^(vocab|words|cards)$/.test(id) ? 'vocab' : /^(read|log|sources|ch\d+)$/.test(id) ? 'read' : /^(listen|again|chart)$/.test(id) ? 'listen' : null;
   const lsSum = L => {
     const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {}, skill = {}, act = { n: 0, ok: 0 };
     (window.EL_CATALOG || []).filter(a => a.ls === L.id && a.keys && a.keys[0]).forEach(a => {
