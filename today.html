@@ -1454,17 +1454,24 @@ function fbBox(txt,act){const L=String(txt||"").split("\n"),parts=[],com=[],H=/^
     if(cur&&/^✔/.test(s)){cur.ok.push(s.replace(/^✔\s*/,""));return}if(cur&&/^➜/.test(s)){cur.todo.push(s.replace(/^➜\s*/,""));return}
     if(cur)(cur.todo.length?cur.todo:cur.ok).push(s);else com.push(s)});
   if(!parts.length)return `<div class="fb">${esc(txt)}</div>`;
-  const R=(window.EL_FP_RUBRICS||{})[act];if(R&&R.rows.length===parts.length)return fbRubric(R,parts,com);
+  // each part is matched to its rubric row by name (Roger, 14 Nov 2026: a final product with a part the teacher left out, e.g. no slides,
+  // showed no rubric at all because the counts differed); same count and other names: by order, as before
+  const R=(window.EL_FP_RUBRICS||{})[act],byRow=R&&fbRows(R,parts);if(byRow)return fbRubric(R,byRow,com);
   return (com.length?`<div class="fb">${esc(com.join("\n"))}</div>`:"")
     +`<div class="wrap" style="margin-top:8px"><table class="xt fbr"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes","Weight")}</th><th>${t("Nota","Mark")}</th><th>✔ ${t("Ha anat bé","What went well")}</th><th>➜ ${t("Per millorar","Keep in mind")}</th></tr></thead><tbody>`
     +parts.map(p=>{const v=parseFloat(p.m.replace(",","."));return `<tr><td class="l"><b>${esc(p.n)}</b></td><td>${esc(p.w)} %</td><td><b style="color:${col(v*10)}">${esc(p.m)}</b><small class="muted">/10</small></td><td class="l">${esc(p.ok.join(" "))||"–"}</td><td class="l">${esc(p.todo.join(" "))||"–"}</td></tr>`}).join("")
     +`</tbody></table></div>`}
 // The rubric the teacher marked with (EL_FP_RUBRICS), each row with the student's level shaded and the teacher's notes under it
 // (Roger, 4 Nov 2026: "students need to see that and their level shadowed"). Level = mark out of 10 ÷ 2.5, rounded (4 = 10, 3 = 7.5, 2 = 5, 1 = 2.5).
+function fbRows(R,parts){const nm=x=>String(x||"").trim().toLowerCase(),rows=R.rows.map(r=>parts.find(p=>nm(p.n)===nm(r.name))||null);
+  if(parts.every(p=>rows.includes(p)))return rows;return R.rows.length===parts.length?parts:null}
 function fbRubric(R,parts,com){const lv=m=>Math.max(0,Math.min(4,Math.round(m/2.5))),last=R.levels.length-1;
   return (com.length?`<div class="fb">${esc(com.join("\n"))}</div>`:"")
     +`<p class="muted" style="margin:10px 0 4px">${t("La rúbrica del producte final: el teu nivell a cada part està ombrejat.","The final product rubric: your level in each part is shaded.")} ${esc(R.note||"")}</p>`
-    +parts.map((p,i)=>{const r=R.rows[i],v=parseFloat(p.m.replace(",",".")),L=4-lv(v);   // L: index in levels (0 = top)
+    +parts.map((p,i)=>{const r=R.rows[i];
+      if(!p)return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)} · ${r.w} %</small><span class="rbm"><small class="muted">${t("no avaluat","not assessed")}</small></span></div>`
+        +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc"><b>${esc(R.levels[k])}</b> <small class="muted">${r.pts[k]} ${t("punts","pts")}</small><div>${esc(d)}</div></div>`).join("")}</div></div>`;
+      const v=parseFloat(p.m.replace(",",".")),L=4-lv(v);   // L: index in levels (0 = top)
       return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)} · ${r.w} %</small><span class="rbm"><b style="color:${col(v*10)}">${esc(p.m)}</b><small class="muted">/10 · ${esc(R.levels[L])}</small></span></div>`
         +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on":""}"><b>${esc(R.levels[k])}</b> <small class="muted">${r.pts[k]} ${t("punts","pts")}</small>${k===L?` <span class="rby">◀ ${t("tu","you")}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
         +(L===last?`<div class="rbc on" style="margin-top:6px"><b>${esc(R.levels[last])}</b> <span class="rby">◀ ${t("tu","you")}</span></div>`:"")
