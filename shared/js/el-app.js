@@ -44,7 +44,16 @@
     if (mode === "home") known = true;   // the home page is the same for a signed-out visitor: it shows at once
     h.classList.add(known ? "elready" : "elwait"); };
   if (!mode) { ready(); return; }
-  if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
+  // el-app.css did not reach the page (Roger, 14 Nov 2026: a learning path with no side column and its notebook page squashed to a narrow
+  // strip, the old top bar back: the file failed while the site was being updated, so the page kept only its old layout). A page's own
+  // <link> has loaded or failed by the time this script runs; without the file's mark (--el-app-css) it is loaded once more, fresh.
+  const appCss = document.querySelector('link[href*="shared/css/el-app.css"]');
+  const cssOk = () => !!getComputedStyle(document.documentElement).getPropertyValue("--el-app-css").trim();
+  if (!appCss || !cssOk()) {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css" + (appCss ? "?r=" + Date.now() : "");
+    if (!appCss) css.addEventListener("error", () => { if (cssOk()) return; const c2 = document.createElement("link"); c2.rel = "stylesheet"; c2.href = ROOT + "shared/css/el-app.css?r=" + Date.now(); document.head.append(c2); }, { once: true });
+    document.head.append(css);
+  }
   const course0 = (path.match(/\/((?:2|4)eso)\//) || [])[1] || null;
 
   // Who is signed in is known only once Firebase has loaded: until then the menu is drawn for who was signed in on this browser last
