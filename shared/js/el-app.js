@@ -430,11 +430,37 @@
     // a step chosen any other way (the engine's Next step button, the teacher's class tab): the bar follows
     document.addEventListener("click", e => { if (e.target.closest(".tab[data-panel],.section-next button") && document.body.classList.contains("elslpfs")) setTimeout(() => { slpDraw(); scrollTo(0, 0); }, 0); });
   }
+  // ---- 📓 the step drawn like the student's notebook (Roger, 14 Nov 2026: "when doing a LP, or a SLP I want students to have a button
+  // to go notebook-like, meaning they have a feeling they are working on their notebook"): lined paper with the red margin, the step's
+  // title in pencil, its boxes as taped slips in the teacher's handwriting and the student's answers in blue pen (shared/css/el-lpnb.css,
+  // html.el-lpnb). On by default; the 📓 button in each step's heading switches it off and on, remembered on this device (el_lpnb).
+  // A checked activity keeps its first try in the notebook; ↺ Practise again moves to the laptop look, where the new try and its results stay.
+  // LS2 on, the same pages as ⛶ Full screen (not a recall checkpoint or the sample exam), and not the 📖 Book (it has its own pages).
+  const NBOK = FSOK && !/\/book\.html$/.test(path), NBKEY = "el_lpnb", NBDEF = true;
+  const nbOn = () => { let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
+  function nbSet(on) { try { localStorage.setItem(NBKEY, on ? "1" : "0"); } catch (e) {} nbDraw(); }
+  if (NBOK) window.elLpNb = on => nbSet(!!on);   // ↺ Practise again in the notebook look takes the page back to the laptop look (ls2-engine.js)
+  function nbDraw() {
+    if (!NBOK) return;
+    const on = nbOn(), H = document.documentElement;
+    if (on && !document.getElementById("el-lpnb-css") && !document.querySelector('link[href*="shared/css/el-lpnb.css"]')) {
+      const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114a"; document.head.append(l); }
+    // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
+    if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
+    const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
+    const tip = on ? t("Torna a veure aquest pas com una pàgina web normal", "Show this step as a normal web page again") : t("Mostra aquest pas com la teva llibreta", "Show this step like your notebook");
+    $$(".lp-panels>.panel>.panel-head").forEach(h => {
+      let b = h.querySelector(":scope>.ellpnb");
+      if (!b) { b = document.createElement("button"); b.type = "button"; b.className = "ellpnb"; b.addEventListener("click", () => nbSet(!nbOn())); h.append(b); }
+      if (b.textContent !== lab) { b.textContent = lab; b.title = tip; b.setAttribute("aria-pressed", on ? "true" : "false"); }
+    });
+  }
+  nbDraw();
   if (mode === "home") addEventListener("hashchange", () => draw());   // Home · Courses · Learning Situations: the button that is on
   if (mode === "lp") {
     WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
     let busy = false;
-    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); slpDraw(); } finally { busy = false; } })
+    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); slpDraw(); nbDraw(); } finally { busy = false; } })
       .observe(document.getElementById("lp") || document.body, { childList: true });
   }
 
@@ -451,6 +477,7 @@
     curLs = pickLs();
     lpPhone();
     slpDraw();
+    nbDraw();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
     bar(L);
