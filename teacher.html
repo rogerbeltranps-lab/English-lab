@@ -1560,17 +1560,24 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),sel=fpSelOf(a,studs),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
   const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
   const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
+  // 📥 Handed in (Roger, 14 Nov 2026: "I need a column with handed in and not handed in"): a video found (site, Classroom, a link or a Drive
+  // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
+  // reads) saying they handed something in. Not handed in: that report found nothing from them, or (no report, e.g. LS2 on the site) no video.
+  const cr=d["_r_"+grp.id],inR=(k,u)=>!!cr&&(cr[k]||[]).some(z=>(z&&z.u||z)===u),
+    hin=u=>{const x=d[u]||{};if(fpgVideo(u,a)||x.draft||x.fileId||res(u,a.id).locked||["done","had","failed","unreach"].some(k=>inR(k,u)))return 1;return 0},
+    hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
+      return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
   const dr=u=>{const x=d[u];if(!x)return `<span class="muted">–</span>`;if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     return x.draft?(x.approved||fpMarked(u,a)?"✅ approved":`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
-    +`<p class="muted">${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
+    +`<p class="muted">${(n=>`<b>${n} of ${on.length} handed in</b> · `)(on.filter(s=>hin(s.uid)).length)}${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
     +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button></p>`
-    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
-    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
-      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+3:4}"><small>not signed in yet</small></td></tr>`).join("")
+    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Handed in</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
+    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${hinH(s.uid)}</td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
+      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+4:5}"><small>not signed in yet</small></td></tr>`).join("")
     +`</tbody></table></div><aside class="fpside" id="fpside" data-a="${esc(a.id)}" data-u="${sel||""}">${fpSideH(sel,a)}</aside></div></div>`}
 // ---- 🎬 Side panel beside the final product table (Roger, 14 Nov 2026: "I want a button to approve Gemini's feedback here and I want to see
 // the video and the rubric on the right since I have enough space. I want further details when I open the box"): a click on a student's
