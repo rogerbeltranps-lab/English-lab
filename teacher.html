@@ -4105,18 +4105,22 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   else{const c=fpgClsOf(u);h+=c?`<p class="muted">On Classroom: ${c.items.length?c.items.map(i=>i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title||i.kind)}</a>`:esc(i.title||i.kind)).join(" · ")+" — "+esc(c.why):"nothing handed in"}.</p>`
     :`<p class="muted">No video uploaded on the site yet. <button class="g" data-fpg="cls" data-u="${u}" data-a="${esc(a.id)}">📥 Look on Classroom</button> or paste a Drive link:</p>`}
   h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`
-    +(R?`<button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"}</button>`:`<span class="muted">This final product has no rubric on the site yet, so Gemini cannot mark it.</span>`)+`</div>`
+    +(R?`<button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching… (about 1 minute)":d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"}</button>`:`<span class="muted">This final product has no rubric on the site yet, so Gemini cannot mark it.</span>`)+`</div>`
     +(R&&a.manual&&!a.video?`<p class="muted" style="margin:6px 0 0">${FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button class="g" data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button>${fpgLastB(a,u)} <button class="g" data-fpg="folder" data-u="${u}" data-a="${esc(a.id)}">📁 Draft from a Drive folder</button> Gemini watches every video handed in on Classroom, one after another, and lists the ones it couldn't reach.`}</p>`:"");
   if(busy)h+=`<p class="muted">⏳ Gemini is watching the video (about 1–3 minutes; you can close this window, the draft is kept).</p>`;
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
-    h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
+    // Roger, 14 Nov 2026: "the button rewatch it's not always working": it was, but the old draft stayed on screen for the minute Gemini
+    // takes, so it looked as if nothing happened. While Gemini watches again, the old draft is greyed out and says so.
+    h+=(busy?`<p style="margin:10px 0 4px;color:#b45309"><b>⏳ Gemini is watching the video again. The draft below is the OLD one; the new one replaces it in about a minute.</b></p>`:"")
+      +`<div style="${busy?"opacity:.4;pointer-events:none":""}">`
+      +`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
       +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x,u)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Comment for the student <small class="muted">(you can change it; the ✔ ➜ of each row above are added under it)</small></label><textarea id="fpgfb" rows="4" data-u="${u}" data-a="${esc(a.id)}">${esc(fpgTop(x))}</textarea>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
       +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
-      +`<label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
+      +`</div><label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching it again…":"✏️ Ask Gemini to change it"}</button></div>`
       // Roger, 9 Nov 2026: "I can't send this to Gemini" — the progress and any error were only at the top of the box, out of sight: shown here too
       +(busy?`<p class="muted" id="fpgst">⏳ Sent. Gemini is watching the video again with your words (about 1–3 minutes). The new draft appears above when it is done; you can close this window.</p>`:"")
