@@ -1561,17 +1561,24 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
   fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),sel=fpSelOf(a,studs),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
   const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
   const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
+  // 📥 Handed in (Roger, 14 Nov 2026: "I need a column with handed in and not handed in"): a video found (site, Classroom, a link or a Drive
+  // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
+  // reads) saying they handed something in. Not handed in: that report found nothing from them, or (no report, e.g. LS2 on the site) no video.
+  const cr=d["_r_"+grp.id],inR=(k,u)=>!!cr&&(cr[k]||[]).some(z=>(z&&z.u||z)===u),
+    hin=u=>{const x=d[u]||{};if(fpgVideo(u,a)||x.draft||x.fileId||res(u,a.id).locked||["done","had","failed","unreach"].some(k=>inR(k,u)))return 1;return 0},
+    hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
+      return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
   const dr=u=>{const x=d[u];if(!x)return `<span class="muted">–</span>`;if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     return x.draft?(x.approved||fpMarked(u,a)?"✅ approved":`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
-    +`<p class="muted">${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
+    +`<p class="muted">${(n=>`<b>${n} of ${on.length} handed in</b> · `)(on.filter(s=>hin(s.uid)).length)}${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
     +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button> ${fpgLesB()}</p>`
-    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
-    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
-      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+3:4}"><small>not signed in yet</small></td></tr>`).join("")
+    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Handed in</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
+    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${hinH(s.uid)}</td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
+      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+4:5}"><small>not signed in yet</small></td></tr>`).join("")
     +`</tbody></table></div><aside class="fpside" id="fpside" data-a="${esc(a.id)}" data-u="${sel||""}">${fpSideH(sel,a)}</aside></div></div>`}
 // ---- 🎬 Side panel beside the final product table (Roger, 14 Nov 2026: "I want a button to approve Gemini's feedback here and I want to see
 // the video and the rubric on the right since I have enough space. I want further details when I open the box"): a click on a student's
@@ -1589,6 +1596,15 @@ function fpSideVid(u,a,v){if(!v)return {k:"none",h:`<p class="muted">No video fo
   const src=yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(pid)}/preview${au}`;
   return {k:src,h:`<div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`
     +`<p class="muted" style="margin:4px 0 0;font-size:12px">${esc(v.name||"Video")}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(yid?v.youtube:`https://drive.google.com/file/d/${pid}/view${au}`)}" target="_blank" rel="noopener">${yid?"YouTube":"Drive"} ↗</a>${pl.err?` · ⚠️ no copy to play here, it opens with the school account`:""}</p>`}}
+// 💶 what Gemini cost (Roger, 14 Nov 2026: "when it finishes I want to see the money that it costs"): school script v22 says what each
+// watch cost and the draft keeps eur = every watch of that video added up, n = how many (fpgWatch, ✏️ Corrections). A watch started on
+// this page notes the total before it (FPG.eur0), so when it finishes the difference is that watch's cost. Drafts saved before v22: nothing.
+const fpgEurTx=v=>"€"+(v<0.01?v.toFixed(3):v.toFixed(2));
+function fpgCost1(u,a){const d=(FPG.d[a.id]||{})[u]||{},k=u+"|"+a.id,e0=FPG.eur0[k];if(typeof d.eur!=="number"||FPG.busy[k])return "";const n=d.n||1;
+  const one=e0!=null&&d.eur>e0?d.eur-e0:null;
+  return `💶 ${one!=null?`This watch: <b>${fpgEurTx(one)}</b>${n>1?` · ${fpgEurTx(d.eur)} for all ${n} watches of this video`:""}`:`<b>${fpgEurTx(d.eur)}</b> ${n>1?`for all ${n} watches of this video`:"for Gemini's watch"}`}`}
+document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="watch"],[data-fpg="change"]');if(!b)return;const k=b.dataset.u+"|"+b.dataset.a;if(FPG.busy[k])return;
+  const d=(FPG.d[b.dataset.a]||{})[b.dataset.u]||{};FPG.eur0[k]=typeof d.eur==="number"?d.eur:0},true);   // capture: before fpgWatch starts
 // {bar: the verdict, the mark and ✅ Approve (at the top, always in sight), rub: the rubric below the video}
 function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.busy[u+"|"+a.id],v=fpgVideo(u,a),x=res(u,a.id);
   const wb=(d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"),wt=` title="Gemini watches the video again and writes a new draft (about 1 minute; the old one stays until the new one is back)"`;
@@ -1603,9 +1619,15 @@ function fpSideDraft(u,a){const d=(FPG.d[a.id]||{})[u],R=fpgRubric(a),busy=FPG.b
   const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{},tg=z.byYou?"you":"";if(z.level==null)return {L:-1,tag:tg};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:tg}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:tg}}):[];
   // Roger, 14 Nov 2026: "we need the redo button for gemini": 🔄 Watch again here too; while Gemini watches, the clock of #598 runs and the
   // old levels stay greyed out below until the new draft replaces them
-  if(busy)return {bar:`<span>⏳ <b>Gemini is watching the video again</b> ${fpgClock(u+"|"+a.id)}<br><small style="color:#b45309">The levels below are the OLD ones; the new draft replaces them in about a minute.</small></span>`,
+  if(busy)return {bar:`<span>⏳ <b>Gemini is watching the video again</b> ${fpgClock(u+"|"+a.id)}<br><small style="color:#b45309">The levels below are the OLD ones; the new draft replaces them in about a minute.</small><br><small class="muted">💶 What this watch cost appears here when Gemini finishes.</small></span>`,
     rub:N?`<div style="opacity:.4;pointer-events:none">${rubH(N,sel,"Gemini")}</div>`:""};
-  return {bar:`<span><b>${rd[0]} ${rd[1]}</b>${R.kind==="mark"?` · <b>Gemini's mark: ${fpgMark(R,g)??"–"}/10</b>`:""}</span>`
+  const c1=fpgCost1(u,a);
+  // 🗣️ words said wrong (Roger, 14 Nov 2026: "where are the mispronounced words?"): here too, under the mark; only for the teacher
+  const snd=g.sounds&&g.sounds.length?`<br><small>🗣️ <b>Words said wrong</b> <span class="muted">(only for you)</span>: ${g.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?` <span class="muted">(said “${esc(w.heard)}”)</span>`:""}`).join(" · ")} <button class="g mini" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}">Whole group</button></small>`:`<br><small class="muted">🗣️ No words said wrong in Gemini's draft.</small>`;
+  // 👁 when Gemini last watched it and with which model (Roger, 14 Nov 2026: "I need to see when was the last time Gemini read this")
+  const MOD={"gemini-4-argon":"Gemini 4 Argon","gemini-pro-latest":"Gemini 3.1 Pro (the older model)","gemini-flash-latest":"Gemini Flash"},
+    seen=d.at?`👁 Gemini watched it <b>${esc(new Date(d.at).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</b>${d.model?" · "+esc(MOD[d.model]||d.model):""}`:"";
+  return {bar:`<span><b>${rd[0]} ${rd[1]}</b>${R.kind==="mark"?` · <b>Gemini's mark: ${fpgMark(R,g)??"–"}/10</b>`:""}${seen?`<br><small>${seen}</small>`:""}${c1?`<br><small>${c1}</small>`:""}${snd}</span>`
       +(v?`<button class="g gx" data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}"${wt}>${wb}</button>`:"")
       +(done?`<b class="gx">✅ Approved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves the levels, the mark and Gemini's comment for the student, then shows the next student to approve">${redo?`✅ Approve this draft <small>(saved now: ${x.max?x.score+"/"+x.max:"your levels"})</small>`:"✅ Approve · next student"}</button>`),
     rub:N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Gemini's level in each row is shaded (blue). Click a square to change it.</p>${rubH(N,sel,"Gemini",{u,a:a.id})}`:""}}
@@ -4147,7 +4169,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{}};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{}};
 // Roger, 14 Nov 2026: "it says Gemini is watching the video, but I don't know if it's true or not, so I need a progress bar or that the clock
 // moves": a clock that counts the seconds since the video was sent and a bar that fills towards the usual minute (it never reaches the end
 // until the draft is back). Every [data-fpgt0] on the page is updated once a second.
@@ -4219,7 +4241,7 @@ function fpgFill(u,a){fpSide(u,a);const box=$("#fpg");if(!box||box.dataset.u!==u
       +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x,u)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Comment for the student <small class="muted">(you can change it; the ✔ ➜ of each row above are added under it)</small></label><textarea id="fpgfb" rows="4" data-u="${u}" data-a="${esc(a.id)}">${esc(fpgTop(x))}</textarea>`
-      +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
+      +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${(c=>c?" · "+c:"")(fpgCost1(u,a))}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
       +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
       +`</div><label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching it again…":"✏️ Ask Gemini to change it"}</button></div>`
