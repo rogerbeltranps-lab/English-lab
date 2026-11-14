@@ -4052,7 +4052,13 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{}};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{}};
+// Roger, 14 Nov 2026: "it says Gemini is watching the video, but I don't know if it's true or not, so I need a progress bar or that the clock
+// moves": a clock that counts the seconds since the video was sent and a bar that fills towards the usual minute (it never reaches the end
+// until the draft is back). Every [data-fpgt0] on the page is updated once a second.
+const fpgClock=k=>{const t=FPG.t0[k]||Date.now();return `<span style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle"><span style="display:inline-block;width:140px;height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden"><span data-fpgt0="${t}" data-fpgw="1" style="display:block;height:100%;width:2%;background:#0f766e;transition:width 1s linear"></span></span><b data-fpgt0="${t}" style="font-variant-numeric:tabular-nums">0:00</b></span>`};
+setInterval(()=>{document.querySelectorAll("[data-fpgt0]").forEach(el=>{const s=Math.max(0,Math.floor((Date.now()-Number(el.dataset.fpgt0))/1000));
+  if(el.dataset.fpgw)el.style.width=Math.min(97,Math.round(100*(1-Math.exp(-s/40))))+"%";else el.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0")})},1000);
 const fpgDoc=id=>"fp__"+id.replace(/[^\w-]/g,"_");
 const fpgIs=a=>!!a&&a.manual&&a.graded&&(((G()||{}).fp||{}).a===a.id||!!(window.EL_FP_RUBRICS||{})[a.id]);
 const fpgFile=v=>{const m=String(v||"").match(/(?:\/d\/|[?&]id=|^)([\w-]{25,})/);return m?m[1]:""};
@@ -4107,12 +4113,12 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`
     +(R?`<button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching… (about 1 minute)":d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"}</button>`:`<span class="muted">This final product has no rubric on the site yet, so Gemini cannot mark it.</span>`)+`</div>`
     +(R&&a.manual&&!a.video?`<p class="muted" style="margin:6px 0 0">${FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button class="g" data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button>${fpgLastB(a,u)} <button class="g" data-fpg="folder" data-u="${u}" data-a="${esc(a.id)}">📁 Draft from a Drive folder</button> Gemini watches every video handed in on Classroom, one after another, and lists the ones it couldn't reach.`}</p>`:"");
-  if(busy)h+=`<p class="muted">⏳ Gemini is watching the video (about 1–3 minutes; you can close this window, the draft is kept).</p>`;
+  if(busy)h+=`<p class="muted">⏳ Gemini is watching the video ${fpgClock(u+"|"+a.id)} (usually about 1 minute; you can close this window, the draft is kept).</p>`;
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
     // Roger, 14 Nov 2026: "the button rewatch it's not always working": it was, but the old draft stayed on screen for the minute Gemini
     // takes, so it looked as if nothing happened. While Gemini watches again, the old draft is greyed out and says so.
-    h+=(busy?`<p style="margin:10px 0 4px;color:#b45309"><b>⏳ Gemini is watching the video again. The draft below is the OLD one; the new one replaces it in about a minute.</b></p>`:"")
+    h+=(busy?`<p style="margin:10px 0 4px;color:#b45309"><b>⏳ Gemini is watching the video again</b> ${fpgClock(u+"|"+a.id)}<br><b>The draft below is the OLD one; the new one replaces it in about a minute.</b></p>`:"")
       +`<div style="${busy?"opacity:.4;pointer-events:none":""}">`
       +`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
       +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x,u)
@@ -4123,7 +4129,7 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
       +`</div><label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching it again…":"✏️ Ask Gemini to change it"}</button></div>`
       // Roger, 9 Nov 2026: "I can't send this to Gemini" — the progress and any error were only at the top of the box, out of sight: shown here too
-      +(busy?`<p class="muted" id="fpgst">⏳ Sent. Gemini is watching the video again with your words (about 1–3 minutes). The new draft appears above when it is done; you can close this window.</p>`:"")
+      +(busy?`<p class="muted" id="fpgst">⏳ Sent. Gemini is watching the video again with your words ${fpgClock(u+"|"+a.id)} (about 1 minute). The new draft appears above when it is done; you can close this window.</p>`:"")
       +(d.error?`<p id="fpgst" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`:"")}
   box.innerHTML=h;const man=$("#fpman"),gem=!!(d&&d.draft&&R);if(man)man.hidden=gem;
   const sv=$('#dlgc button[data-do="save"]');if(sv)sv.hidden=gem}   // with a draft, ✅ Approve is the save (it still clicks this hidden button)
@@ -4186,7 +4192,7 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
   const s=S.P[u],old=(FPG.d[a.id]||{})[u]||{},g=G()||{},cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO",ls1=/my-real-routine/.test(a.ls);
   const ask={course:cs,level:ls1&&cs==="2 ESO"?"A1":"A2+",route:level(u,a.ls),student:fullName(s),group:!!teamOf(u,a.id)||/proposal/.test(a.id),
     task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d}))};
-  FPG.busy[k]=true;fpgFill(u,a);
+  FPG.busy[k]=true;FPG.t0[k]=Date.now();fpgFill(u,a);
   const keep={fileId:v.link&&v.id?v.id:(old.fileId||null),fileIds:v.link&&v.id?(v.ids||[]):(old.fileIds||[]),youtube:v.youtube||old.youtube||null,fileName:v.link&&v.name?v.name:(old.fileName||null)};
   let d;try{const j=await fpgCall({action:"fp_watch",fileId:v.id||"",fileIds:v.ids||[],youtube:v.youtube||"",ask,prev:change?old.draft:null,change:change||""});
     d=Object.assign({at:new Date().toISOString(),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]},keep)}
