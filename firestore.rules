@@ -184,6 +184,11 @@ service cloud.firestore {
     match /classResults/{id} {
       allow read, write: if isTeacher();
     }
+    // 📈 class performance (shared/js/el-class-perf.js): classPerf/{group}_{day}_{class mode start} = each student's share of the steps the
+    // teacher ticked ✔ Finished at the end of the class; written by the class tab, read by the dashboard's Students' progress. Teacher only.
+    match /classPerf/{id} {
+      allow read, write: if isTeacher();
+    }
     // each student's own class game results (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what
     // to study"): myGames/{email}.games[{group}_{sid}], written by the board at the end of a game (lab/game/host.js); the student reads only
     // their own (📝 Your notes on the LS page, shared/js/el-notes.js)

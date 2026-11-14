@@ -107,6 +107,16 @@ for (const g of global.EL_GROUPS) {
   D.games.push(Object.assign({}, g1, { day: '2026-11-10', sid: Date.parse('2026-11-10T09:00:00Z'), stu: g1.stu.map((y) => ({ e: y.e, r: Math.min(10, y.r + 2), a: 10 })) }));
 }
 
+// 📈 class performance (classPerf): four class modes per group, the steps ticked ✔ Finished and each student's share (a few absent each time)
+D.classPerf = [];
+const STEPS = [['Vocabulary', 'Reading'], ['Listening', 'Listen again', 'Grammar'], ['Reading log', 'Writing'], ['Grammar', 'Mixed', 'Speaking', 'Talk']];
+for (const g of global.EL_GROUPS) {
+  const studs = Object.values(D.st).filter((s) => s.group === g.id), will = Object.fromEntries(studs.map((s) => [s.email, 0.3 + rnd() * 0.75]));
+  ['2026-11-04', '2026-11-06', '2026-11-11', '2026-11-13'].forEach((day, i) => { const st = STEPS[i], s = Date.parse(day + 'T08:00:00Z');
+    D.classPerf.push({ group: g.id, day, s, steps: st.map((n) => ({ it: '', n, ls: LS2[g.course] })),
+      rows: studs.filter(() => rnd() > 0.08).map((x) => { const did = st.filter(() => rnd() < will[x.email]); return { e: x.email.toLowerCase(), uid: x.uid, name: x.name, n: did.length, of: st.length, left: st.filter((n) => !did.includes(n)) }; }) }); });
+}
+
 // none of the invented names may be a real student's (the private list, if it is on this machine)
 const LIST = process.env.EL_STUDENT_LIST;
 if (LIST && fs.existsSync(LIST)) {
