@@ -1673,11 +1673,20 @@ function fpManSide(u,a,R,d){const g=d.draft;g.rows=R.rows.map((r,i)=>{const z=(g
   const sel=N?N.rows.map((r,i)=>{const z=(g.rows||[])[i]||{};if(z.level==null)return {L:-1,tag:"you"};if(N.kind==="mark"){const m=fpgRow(z);return {L:m==null?-1:rbIdx(m),m,tag:"you"}}return {L:z.level===0?4:4-z.level,m:z.level?z.level*2.5:null,tag:"you"}}):[];
   return {bar:`<span><b>✍️ Your marks</b> <small class="muted">(${d.why==="not handed in"||d.why===FPG_NOVOICE?esc(d.why):"no video Gemini could watch"+(d.why?": "+esc(d.why):"")})</small>${mk!=null?` · <b>Mark: ${mk}/10</b>`:""}</span>`
       +(done?`<b class="gx">💾 Your marks saved${x.max?": "+x.score+"/"+x.max:""}</b>`:`<button class="gx" data-fpg="okside" data-u="${u}" data-a="${esc(a.id)}" title="Saves your levels, the mark and the comment for the student, then shows the next student">💾 Save · next student</button>`)
-      +(done?"":`<button class="g mini" data-fpg="mandel" data-u="${u}" data-a="${esc(a.id)}" title="Throw this away: nothing is saved for the student">✖ Discard</button>`),
+      +(done?"":`<button class="g mini" data-fpg="mandel" data-u="${u}" data-a="${esc(a.id)}" title="Throw this away: nothing is saved for the student">✖ Discard</button>`)
+      +(d.why===FPG_NOVOICE&&d.fileId?`<span style="flex-basis:100%">${FPG.busy[u+"|"+a.id]?`⏳ <b>Gemini is watching the video linked in the slides</b> ${fpgClock(u+"|"+a.id)}`
+        :`<button class="g" data-fpg="slv" data-u="${u}" data-a="${esc(a.id)}" title="Some students put a link to their video on a slide: look for it, and if this account can open it, Gemini watches it (a Google Vids is turned into an mp4 first)">🔗 Find the video linked in the slides</button>`}${FPG.slv[u+"|"+a.id]?` <small>${esc(FPG.slv[u+"|"+a.id])}</small>`:""}</span>`:""),
     rub:`<label style="display:block;margin:8px 0 2px"><b>Comment for the student</b> <small class="muted">(the rows' levels are added under it)</small></label><textarea id="fpscm" rows="4" data-u="${u}" data-a="${esc(a.id)}" style="width:100%;box-sizing:border-box;font:inherit;font-size:14px">${esc(fpgTop(g))}</textarea>`
       +(N?`<p class="muted" style="margin:8px 0 2px;font-size:12px">Click a square in each row (No evidence is under the row).</p>${rubH(N,sel,"you",{u,a:a.id})}`:"")}}
 document.addEventListener("input",e=>{const t=e.target;if(t.id!=="fpscm")return;const d=(FPG.d[t.dataset.a]||{})[t.dataset.u];if(!d||!d.draft)return;d.draft.top=t.value;
   if(d.approved){d.approved=null;const b=$("#fpsb");if(b&&!b.querySelector('[data-fpg="okside"]')){const a=cat.find(x=>x.id===t.dataset.a);if(a){const dr=fpSideDraft(t.dataset.u,a);b.innerHTML=dr.bar}}}});
+document.addEventListener("click",async e=>{const b=e.target.closest('[data-fpg="slv"]');if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a),d=a&&(FPG.d[a.id]||{})[k.u],key=k.u+"|"+(a&&a.id);
+  if(!a||!d||!d.fileId)return;FPG.slv[key]="⏳ Looking for a video link in the slides…";fpSide(k.u,a);let j;
+  try{j=await fpgCall({action:"fp_slides_video",fileId:d.fileId,student:fullName(S.P[k.u])})}
+  catch(er){FPG.slv[key]="⚠️ "+(/old version|bad request/.test(er.message)?"paste school script v28 first":er.message);fpSide(k.u,a);return}
+  FPG.slv[key]="✅ Found: "+(j.video.name||"the video");fpSide(k.u,a);
+  await fpgWatch(k.u,a,"",j.video.youtube?{youtube:j.video.youtube,name:j.video.name,link:true}:{id:j.video.id,ids:[d.fileId],name:j.video.name+" + slides",link:true});
+  delete FPG.slv[key];fpSide(k.u,a)});
 document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="man"],[data-fpg="manx"],[data-fpg="mandel"]');if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a);if(!a)return;
   if(k.fpg==="mandel"){const D=FPG.d[a.id]||{},o=Object.assign({},D[k.u]||{});["draft","manual","why","approved"].forEach(f=>delete o[f]);D[k.u]=o;FPG.noMan[k.u+"|"+a.id]=true;
     Promise.resolve().then(()=>fpgSave(a,k.u,o)).catch(e=>console.warn("fp manual discard",e))}
@@ -4304,7 +4313,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{},auto:{},noMan:{}};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{},auto:{},noMan:{},slv:{}};
 // Roger, 14 Nov 2026: "it says Gemini is watching the video, but I don't know if it's true or not, so I need a progress bar or that the clock
 // moves": a clock that counts the seconds since the video was sent and a bar that fills towards the usual minute (it never reaches the end
 // until the draft is back). Every [data-fpgt0] on the page is updated once a second.
@@ -4631,15 +4640,21 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
   await fpgLoad(a);let i=0;
   for(const s of studs){i++;const x=fpgClsOf(s.uid),old=(FPG.d[a.id]||{})[s.uid];
     if(!x||!x.items.length){rep.none.push(s);continue}
-    if(old&&old.draft&&(x.watch||(x.conv||[]).length)){rep.had.push(s);continue}
+    if(old&&old.draft&&!fpgNoVoice(old)&&(x.watch||(x.conv||[]).length)){rep.had.push(s);continue}
     if(!x.watch&&(x.conv||[]).length){const ids=[];let err="",okVid=false;
       for(const it of x.conv){FPG.bulk.note=`Converting ${i} of ${studs.length}: ${fullName(s)} · ${it.title||"file"} (Google Vids → mp4, slides → PDF; keep this page open)`;fpgRefresh(a);
         try{const j=await fpgCall({action:"fp_convert",fileId:it.id,student:fullName(s)});ids.push(j.id);if(/\.vid/.test(it.mime||""))okVid=true}catch(e){err=e.message}}
       // the recording (Google Vids) could not be turned into an mp4: never mark the slides alone (Roger, 14 Nov 2026: 2 ESO B, "Gravació …"
       // + slides, Gemini got only the slides)
-      if(!okVid){const nv=x.conv.some(it=>/\.vid/.test(it.mime||""));rep.unreach.push({s,x:Object.assign({},x,{why:nv?"the recording (Google Vids) could not be converted"+(err?": "+err:"")+": watch it yourself":FPG_NOVOICE})});continue}
+      // 🔗 no recording handed in: the video may be linked inside the slides (Roger, 14 Nov 2026: "I see that some presentations have the link
+      // of the video"): school script v28 looks for it (fp_slides_video) and turns a Google Vids into an mp4
+      let lv=null,lerr="";if(!okVid){const sl=x.conv.find(it=>/presentation|document/.test(it.mime||""));
+        if(sl){FPG.bulk.note=`Looking for a video link in ${fullName(s)}'s slides…`;fpgRefresh(a);
+          try{const j=await fpgCall({action:"fp_slides_video",fileId:sl.id,student:fullName(s)});lv=j.video||null}catch(e){lerr=/no link to a video|only Google|not the teacher|bad request|old version/.test(e.message)?"":e.message}}}
+      if(lv){x.watch=lv.youtube?{youtube:lv.youtube,name:lv.name}:{id:lv.id,ids,name:lv.name+" + slides"}}
+      else if(!okVid){const nv=x.conv.some(it=>/\.vid/.test(it.mime||""));rep.unreach.push({s,x:Object.assign({},x,{why:nv?"the recording (Google Vids) could not be converted"+(err?": "+err:"")+": watch it yourself":lerr?"the slides link to a video: "+lerr:FPG_NOVOICE})});continue}
       if(!ids.length){rep.unreach.push({s,x:Object.assign({},x,{why:"could not be converted: "+err})});continue}
-      x.watch={id:ids[0],ids:ids.slice(1),name:x.conv.map(it=>it.title||"file").join(" + ")+" (converted)"};}
+      if(!lv)x.watch={id:ids[0],ids:ids.slice(1),name:x.conv.map(it=>it.title||"file").join(" + ")+" (converted)"};}
     if(!x.watch){rep.unreach.push({s,x});continue}
     FPG.bulk.note=`Gemini is watching ${i} of ${studs.length}: ${fullName(s)} (about 1–3 minutes each; keep this page open)`;fpgRefresh(a);
     const ok=await fpgWatch(s.uid,a,"",Object.assign({link:true},x.watch));
