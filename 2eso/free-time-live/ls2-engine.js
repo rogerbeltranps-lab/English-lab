@@ -1180,7 +1180,7 @@ var LS2 = (function () {
   const recFields = r => [r.tr ? { l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 } : null,
     r.notes ? { l: 'Notes from the recording (task and pronunciation)', v: String(r.notes).slice(0, 3000), rec: 1 } : null].filter(Boolean);
   const handRec = (btn, id, title, task) => !window.elMic || !elMic.upload ? Promise.resolve(null)
-    : elMic.upload({ btn, step: id, title, level, task }).then(r => r && r.ok ? { audio: { id: r.id, s: r.secs || null }, f: recFields(r) } : null, () => null);
+    : elMic.upload({ btn, step: id, title, level, task }).then(r => r && r.ok ? { audio: Object.assign({ id: r.id, s: r.secs || null }, r.eur != null ? { eur: r.eur } : {}), f: recFields(r) } : null, () => null);
   const recSecs = btn => window.elMic && elMic.recSecs ? elMic.recSecs(btn) : 0;
   const cantRow = (host, id, title) => { if (host && window.elMic && elMic.cant) host.append(elMic.cant({ step: id, title })); };
   /* The recording goes to the teacher too (Roger, 8 Nov 2026: "I want you to save audios … an audio emoji which I can listen"): after a
@@ -1193,7 +1193,7 @@ var LS2 = (function () {
       const h = (state.steps || {})[id]; if (!r || !h) return;
       if (!r.ok && !/^too /.test(r.error || '')) return;   // the school script not updated yet, no folder access…: nothing to tell the student
       if (!r.ok) { msg.textContent += ' ' + (ca() ? '(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)' : '(The recording could not be saved: your transcript was handed in.)'); return; }
-      h.audio = { id: r.id, s: r.secs || null };
+      h.audio = { id: r.id, s: r.secs || null }; if (r.eur != null) h.audio.eur = r.eur;   // what Gemini cost (school script v22), for the dashboard
       h.f = (h.f || []).filter(x => !x.rec).concat(recFields(r));
       save(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
     }).catch(() => {});

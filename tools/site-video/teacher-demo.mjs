@@ -117,6 +117,27 @@ for (const g of global.EL_GROUPS) {
       rows: studs.filter(() => rnd() > 0.08).map((x) => { const did = st.filter(() => rnd() < will[x.email]); return { e: x.email.toLowerCase(), uid: x.uid, name: x.name, n: did.length, of: st.length, left: st.filter((n) => !did.includes(n)) }; }) }); });
 }
 
+// ✏️ Corrections (Roger, 14 Nov 2026: Gemini's and Claude's corrections in two tables, by student › task › day): speaking recordings Gemini
+// transcribed with notes, Claude's Wednesday corrections, a comment answered, a piece sent back to redo, and final product drafts (DEMO.fpg)
+D.fpg = {};
+{ const day = (d, h) => new Date(Date.parse('2026-11-' + String(d).padStart(2, '0') + 'T' + String(h).padStart(2, '0') + ':' + String(10 + d).padStart(2, '0') + ':00Z')).toISOString();
+  for (const [gid, k] of [['2ESOA', 7], ['4ESOB', 4]]) {
+    const c = gid.startsWith('2') ? '2eso' : '4eso', gs = CAT.find((a) => a.id === c + '/ls2-getting-started'), fp = global.EL_GRADING[LS2[c]].fp.a;
+    Object.values(D.st).filter((s) => s.group === gid).slice(0, k).forEach((s, i) => {
+      const pg = D.pg[s.uid][LS2[c]], st = JSON.parse(pg[gs.keys[0]] || '{}'); st.steps = st.steps || {};
+      st.steps.speak = { title: 'Speaking: my free time', date: day(6 + (i % 3), 9 + i), audio: Object.assign({ id: 'demo', s: 35 + i * 4 }, i % 2 ? {} : { eur: 0.0036 + i * 0.0002 }),
+        f: [{ l: 'Transcript', v: 'In my free time I play football and I listen music.' }, { l: 'Transcript of the recording', v: 'In my free time I play football with my friends and I listen to music.', rec: 1 },
+          { l: 'Notes from the recording (task and pronunciation)', v: 'Answers the task. Says "music" as "mu-SIC": stress on the first syllable.', rec: 1 }] };
+      pg[gs.keys[0]] = JSON.stringify(st);
+      const r = D.rs[s.uid][gs.id] = D.rs[s.uid][gs.id] || { ls: LS2[c], activity: gs.id };
+      if (i % 4 !== 3) Object.assign(r, { fbSig: { speak: 'demo' + i }, fbAt: { speak: day(11, 13) }, replies: { speak: 'Well done! "listen TO music".' } });
+      if (i % 3 === 0) r.answers = { speak: { t: 'Yes, "listen to" always takes "to".', at: day(12 + (i % 2), 11) } };
+      if (i === 1) r.flags = { read: { auto: true, done: 'redo', at: day(7, 17) } };
+      if (i < 4) (D.fpg[fp] = D.fpg[fp] || {})[s.uid] = Object.assign({ at: day(13 - i, 18), draft: { rows: [], secs: 95 + i * 25 }, model: 'gemini-4-argon', approved: i % 2 === 0 }, i < 2 ? { eur: 0.0712 + i * 0.03, n: 1 + i } : {});
+    });
+  }
+}
+
 // none of the invented names may be a real student's (the private list, if it is on this machine)
 const LIST = process.env.EL_STUDENT_LIST;
 if (LIST && fs.existsSync(LIST)) {

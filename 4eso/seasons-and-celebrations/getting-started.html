@@ -589,7 +589,7 @@ $('#handInSpeaking').onclick=async()=>{
     speakSending=true;m.className='feedback';m.textContent=ca()?'Enviant la gravació al professor…':'Sending your recording to your teacher…';
     const r=window.elMic&&elMic.upload?await elMic.upload({btn:'startRecord',step:'speak',title:'Speaking',level,task:$('#speakTask').textContent}).catch(()=>null):null;speakSending=false;
     if(!r||!r.ok){m.className='feedback no';m.textContent=ca()?'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.':'Your recording could not be sent. Try again in a moment.';return}
-    const f=recF(r);state.steps.speak={level,title:'Speaking',audio:{id:r.id,s:r.secs||null},f:f.length?f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
+    const f=recF(r);state.steps.speak={level,title:'Speaking',audio:Object.assign({id:r.id,s:r.secs||null},r.eur!=null?{eur:r.eur}:{}),f:f.length?f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
     complete('speak');$('#speakResult').classList.add('show');speakHanded();m.textContent+=' 🔊 '+(ca()?'Gravació desada.':'Recording saved.');return}
   state.steps.speak={level,title:'Speaking',ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
   complete('speak');$('#speakResult').classList.add('show');speakHanded();
@@ -597,7 +597,7 @@ $('#handInSpeaking').onclick=async()=>{
   if(window.elMic&&elMic.upload)elMic.upload({btn:'startRecord',step:'speak',title:'Speaking',level,task:$('#speakTask').textContent}).then(r=>{const h=(state.steps||{}).speak;if(!r||!h)return;
     if(!r.ok&&!/^too /.test(r.error||''))return;
     if(!r.ok){m.textContent+=' '+(ca()?'(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)':'(The recording could not be saved: your transcript was handed in.)');return}
-    h.audio={id:r.id,s:r.secs||null};h.f=(h.f||[]).filter(x=>!x.rec).concat(recF(r));
+    h.audio={id:r.id,s:r.secs||null};if(r.eur!=null)h.audio.eur=r.eur;h.f=(h.f||[]).filter(x=>!x.rec).concat(recF(r));
     save();m.textContent+=' 🔊 '+(ca()?'Gravació desada.':'Recording saved.')}).catch(()=>{});
 };
 speakHanded();
