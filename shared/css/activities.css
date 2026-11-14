@@ -221,7 +221,8 @@
   width: max-content;
   max-width: 290px;
   translate: -50% 0;
-  background: #173f33;
+  /* the page's own dark colour (navy in 4 ESO, green in 2 ESO), not a fixed green (Roger, 14 Nov 2026) */
+  background: var(--dark, #173f33);
   color: #fff;
   border-radius: 10px;
   padding: 9px 11px;
@@ -238,7 +239,7 @@
 
 .chip-tooltip b {
   display: block;
-  color: #bfe9d5;
+  color: var(--soft2, #d8eee3);
   margin-bottom: 3px;
 }
 

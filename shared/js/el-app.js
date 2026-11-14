@@ -453,7 +453,7 @@
     if (!NBOK) return;
     const on = nbOn(), H = document.documentElement;
     if (on && !document.getElementById("el-lpnb-css") && !document.querySelector('link[href*="shared/css/el-lpnb.css"]')) {
-      const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114a"; document.head.append(l); }
+      const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114b"; document.head.append(l); }
     // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
     if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
     const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
