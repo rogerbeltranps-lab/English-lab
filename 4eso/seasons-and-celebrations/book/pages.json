@@ -1,0 +1,163 @@
+{
+ "beginners": {
+  "cover": [
+   "book/beginners-01.webp",
+   "book/beginners-02.webp"
+  ],
+  "1": [
+   "book/beginners-03.webp",
+   "book/beginners-04.webp"
+  ],
+  "2": [
+   "book/beginners-05.webp",
+   "book/beginners-06.webp"
+  ],
+  "3": [
+   "book/beginners-07.webp",
+   "book/beginners-08.webp"
+  ],
+  "4": [
+   "book/beginners-09.webp",
+   "book/beginners-10.webp"
+  ],
+  "5": [
+   "book/beginners-11.webp"
+  ],
+  "6": [
+   "book/beginners-12.webp",
+   "book/beginners-13.webp"
+  ]
+ },
+ "insecure": {
+  "cover": [
+   "book/insecure-01.webp",
+   "book/insecure-02.webp"
+  ],
+  "1": [
+   "book/insecure-03.webp",
+   "book/insecure-04.webp"
+  ],
+  "2": [
+   "book/insecure-05.webp",
+   "book/insecure-06.webp"
+  ],
+  "3": [
+   "book/insecure-07.webp",
+   "book/insecure-08.webp"
+  ],
+  "4": [
+   "book/insecure-09.webp",
+   "book/insecure-10.webp"
+  ],
+  "5": [
+   "book/insecure-11.webp",
+   "book/insecure-12.webp"
+  ],
+  "6": [
+   "book/insecure-13.webp",
+   "book/insecure-14.webp"
+  ]
+ },
+ "safe": {
+  "cover": [
+   "book/safe-01.webp",
+   "book/safe-02.webp"
+  ],
+  "1": [
+   "book/safe-03.webp",
+   "book/safe-04.webp"
+  ],
+  "2": [
+   "book/safe-05.webp",
+   "book/safe-06.webp"
+  ],
+  "3": [
+   "book/safe-07.webp",
+   "book/safe-08.webp"
+  ],
+  "4": [
+   "book/safe-09.webp",
+   "book/safe-10.webp"
+  ],
+  "5": [
+   "book/safe-11.webp",
+   "book/safe-12.webp"
+  ],
+  "6": [
+   "book/safe-13.webp",
+   "book/safe-14.webp"
+  ]
+ },
+ "daring": {
+  "cover": [
+   "book/daring-01.webp",
+   "book/daring-02.webp"
+  ],
+  "1": [
+   "book/daring-03.webp",
+   "book/daring-04.webp",
+   "book/daring-05.webp"
+  ],
+  "2": [
+   "book/daring-06.webp",
+   "book/daring-07.webp",
+   "book/daring-08.webp"
+  ],
+  "3": [
+   "book/daring-09.webp",
+   "book/daring-10.webp",
+   "book/daring-11.webp"
+  ],
+  "4": [
+   "book/daring-12.webp",
+   "book/daring-13.webp",
+   "book/daring-14.webp"
+  ],
+  "5": [
+   "book/daring-15.webp",
+   "book/daring-16.webp",
+   "book/daring-17.webp"
+  ],
+  "6": [
+   "book/daring-18.webp",
+   "book/daring-19.webp",
+   "book/daring-20.webp"
+  ]
+ },
+ "native": {
+  "cover": [
+   "book/native-01.webp",
+   "book/native-02.webp"
+  ],
+  "1": [
+   "book/native-03.webp",
+   "book/native-04.webp",
+   "book/native-05.webp"
+  ],
+  "2": [
+   "book/native-06.webp",
+   "book/native-07.webp",
+   "book/native-08.webp"
+  ],
+  "3": [
+   "book/native-09.webp",
+   "book/native-10.webp",
+   "book/native-11.webp"
+  ],
+  "4": [
+   "book/native-12.webp",
+   "book/native-13.webp",
+   "book/native-14.webp"
+  ],
+  "5": [
+   "book/native-15.webp",
+   "book/native-16.webp",
+   "book/native-17.webp"
+  ],
+  "6": [
+   "book/native-18.webp",
+   "book/native-19.webp",
+   "book/native-20.webp"
+  ]
+ }
+}

@@ -97,10 +97,24 @@ for (const g of global.EL_GROUPS) {
   const studs = Object.values(D.st).filter((s) => s.group === g.id), skill = Object.fromEntries(studs.map((s) => [s.email, [0.35 + rnd() * 0.65, 0.35 + rnd() * 0.65]]));
   [1, 2, 3].forEach((lp) => ['vocab', 'grammar'].forEach((kind) => { const done = 10;
     D.games.push({ group: g.id, course: g.course, kind, lsId: LS2[g.course], ls: LS2T[g.course], lp: 'LP' + lp, title: (kind === 'vocab' ? 'Vocabulary' : 'Grammar') + ' · LP' + lp, day: '2026-11-0' + (2 + lp), done,
+      deck: `${g.course}-ls2-lp${lp}-${kind}`, sid: Date.parse('2026-11-0' + (2 + lp) + 'T09:00:00Z') + (kind === 'grammar' ? 1800e3 : 0),
       // a = questions answered: everyone all of them, except one late arrival per game (3 of 10, so that game is left out of their mark)
       stu: studs.filter(() => rnd() > 0.12).map((s, i) => { const r = Math.min(done, Math.round(done * skill[s.email][kind === 'vocab' ? 1 : 0] * (0.8 + rnd() * 0.4))), late = i === lp + 2;
         return { e: s.email.toLowerCase(), r: late ? Math.min(r, 3) : r, a: late ? 3 : done }; }) });
   }));
+  // the LP1 grammar game played again a week later (Roger, 11 Nov 2026: only the latest play counts): most students do better, nothing random
+  const g1 = D.games.find((x) => x.group === g.id && x.deck === g.course + '-ls2-lp1-grammar');
+  D.games.push(Object.assign({}, g1, { day: '2026-11-10', sid: Date.parse('2026-11-10T09:00:00Z'), stu: g1.stu.map((y) => ({ e: y.e, r: Math.min(10, y.r + 2), a: 10 })) }));
+}
+
+// 📈 class performance (classPerf): four class modes per group, the steps ticked ✔ Finished and each student's share (a few absent each time)
+D.classPerf = [];
+const STEPS = [['Vocabulary', 'Reading'], ['Listening', 'Listen again', 'Grammar'], ['Reading log', 'Writing'], ['Grammar', 'Mixed', 'Speaking', 'Talk']];
+for (const g of global.EL_GROUPS) {
+  const studs = Object.values(D.st).filter((s) => s.group === g.id), will = Object.fromEntries(studs.map((s) => [s.email, 0.3 + rnd() * 0.75]));
+  ['2026-11-04', '2026-11-06', '2026-11-11', '2026-11-13'].forEach((day, i) => { const st = STEPS[i], s = Date.parse(day + 'T08:00:00Z');
+    D.classPerf.push({ group: g.id, day, s, steps: st.map((n) => ({ it: '', n, ls: LS2[g.course] })),
+      rows: studs.filter(() => rnd() > 0.08).map((x) => { const did = st.filter(() => rnd() < will[x.email]); return { e: x.email.toLowerCase(), uid: x.uid, name: x.name, n: did.length, of: st.length, left: st.filter((n) => !did.includes(n)) }; }) }); });
 }
 
 // none of the invented names may be a real student's (the private list, if it is on this machine)

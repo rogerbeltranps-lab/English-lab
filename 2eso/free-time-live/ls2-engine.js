@@ -8,6 +8,7 @@ var LS2 = (function () {
   const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
   const PAGES = [
     ['getting-started.html', '1 · Getting started'],
+    ['book.html', '📖 Book · Maya Live!'],
     ['what-are-they-doing.html', '2 · What are they doing?'],
     ['recall-checkpoint-1.html', 'Recall checkpoint 1'],
     ['now-or-usually.html', '3 · Now or usually?'],
@@ -190,7 +191,8 @@ var LS2 = (function () {
     return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
   }
   function picksHtml(it, items, prefix, i, mode) {
-    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + choices(it, items, LP.key + prefix + i).map(o =>
+    const salt = LP.key + prefix + i, opts = it.opts ? it.opts.slice().sort((x, y) => hash(salt + x) - hash(salt + y)) : choices(it, items, salt);
+    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + opts.map(o =>
       '<button class="btn secondary" type="button" data-pick="' + prefix + i + '"' + (mode === 'say' ? ' data-say="1"' : '') + ' data-v="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>';
   }
   // highlights the option that is in the box (after a pick or when saved answers come back)
@@ -207,27 +209,112 @@ var LS2 = (function () {
       box.value = b.dataset.v; box.dispatchEvent(new Event('input', { bubbles: true })); syncPicks();
     });
   }
-  function typedHtml(items, prefix, mode) {
-    if (starter()) bindPicks();
+  /* Grammar in parts (Roger, 13 Nov 2026: "students don't have good activities to practise this theory"): a typed panel with `parts`
+     ([{id, r, title, note}]) shows its items in blocks, one per grammar point (item.p = the part's id), each item with its own kind:
+     hear: 1 = 🎧 listen and complete · opts: [...] = 👆 choose (buttons for every route; the first right answer is in a) ·
+     k: 'join' | 'change' | 'fix' = 🔗 / 🔄 / 🔧 · own: {must: [regex], min} = ✏️ a sentence of their own, right when it has at least
+     min words and every pattern (the teacher reads it in the activity) · otherwise ✏️ complete. show: the answer as the student sees it.
+     Without parts, nothing changes: the panel's mode is for every item, as before. */
+  const picking = it => !it.own && (starter() || !!it.opts);
+  // a step in parts keeps the panel's mode for its plain gaps (4 ESO LP3 has none: no listening there; the other LPs keep theirs)
+  const itemMode = (it, mode, parts) => parts ? (it.hear ? 'listen' : it.say ? 'say' : it.opts || it.k || it.own ? null : mode || null) : mode;
+  /* 7 compulsory questions per block, the rest is extra practice (Roger, 13 Nov 2026: "they are too many activities, make 7 of each section
+     compulsory and the rest to practice … when they have done 7, a message appears saying you can turn in this activity"). Per block, in the
+     route's own list: the first 6 questions plus the ✏️ own example (or the first 7 when there is none) are compulsory, shown first; the rest
+     follow under "➕ Extra practice". Only the compulsory ones count: the step is done when they are all answered and checked, and the mark
+     (first try) is over them; the extras get feedback but never count, and an empty extra is no error. */
+  /* How many are compulsory per block is the panel's `req` (Roger, 13 Nov 2026, new flow: explanation → 🙌 all together → notebook / pairs →
+     "a short individual set … it's not about volume but quality"): `req: 4` = 3 questions + the own example. Without `req`, 7. */
+  const REQ = 7, EXTRA = new WeakSet();
+  function arrange(items, n) {
+    n = n || REQ;
+    const order = [], by = {};
+    items.forEach(it => { if (!by[it.p]) { by[it.p] = []; order.push(it.p); } by[it.p].push(it); });
+    const out = [], need = [], per = {};
+    order.forEach(k => {
+      const list = by[k], own = list.filter(x => x.own), plain = list.filter(x => !x.own);
+      const req = own.length ? plain.slice(0, n - 1).concat(own.slice(0, 1)) : plain.slice(0, n);
+      const ext = list.filter(x => !req.includes(x));
+      per[k] = [];
+      req.forEach(it => { per[k].push(out.length); need.push(out.length); out.push(it); });
+      ext.forEach(it => { EXTRA.add(it); out.push(it); });
+    });
+    return { items: out, need, per };
+  }
+  const ownOk = (it, v) => { const t = String(v || '').trim(); return words(t) >= (it.own.min || 5) && (it.own.must || []).every(re => new RegExp(re, 'i').test(t)); };
+  function kindChip(it, m) {
+    const K = { listen: ['🎧', 'Escolta i completa', 'Listen and complete'], pick: ['👆', 'Tria', 'Choose'], join: ['🔗', 'Uneix les dues frases', 'Join the two sentences'],
+      change: ['🔄', 'Canvia la frase', 'Change the sentence'], fix: ['🔧', 'Troba l’error i corregeix-lo', 'Find the mistake and correct it'],
+      own: ['✏️', 'El teu exemple', 'Your own example'], fill: ['✏️', 'Completa', 'Complete'] };
+    const k = K[m === 'listen' ? 'listen' : it.own ? 'own' : it.k && K[it.k] ? it.k : it.opts ? 'pick' : 'fill'];
+    return '<span class="gkind gk-' + (it.own ? 'own' : m === 'listen' ? 'listen' : it.k || (it.opts ? 'pick' : 'fill')) + '">' + k[0] + ' ' + (ca() ? k[1] : k[2]) + '</span>';
+  }
+  function partsCss() {
+    if (document.getElementById('el-gparts-css')) return;
+    const st = document.createElement('style'); st.id = 'el-gparts-css';
+    st.textContent = '.gpart{margin:26px 0 6px;padding-top:14px;border-top:2px dashed var(--line,#d8e0ea)}.gpart:first-child{margin-top:0;padding-top:0;border-top:0}.gpart h3{margin:0 0 6px}' +
+      '.gnote{padding:10px 14px;border-radius:12px;background:#f3f7fc;border:1px solid #c5d8ef;line-height:1.55;margin-bottom:6px}' +
+      '.gkind{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:800;background:#eef2f7;color:#334155}' +
+      '.gk-pick{background:#e0f2fe;color:#075985}.gk-join{background:#ede9fe;color:#5b21b6}.gk-change{background:#fef3c7;color:#92400e}.gk-fix{background:#fee2e2;color:#991b1b}.gk-own{background:#dcfce7;color:#166534}.gk-listen{background:#f1f5f9;color:#334155}' +
+      '.question input.typed.own{width:100%;max-width:none}' +
+      '.gcount{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;font-size:.62em;font-weight:800;vertical-align:middle;background:#eef2f7;color:#334155}.gcount.ok{background:#dcfce7;color:#166534}' +
+      '.gbd{margin:14px 0 0;padding:10px 14px;border-radius:12px;background:#dcfce7;border:1px solid #86efac;color:#14532d;font-weight:700}' +
+      '#el-gready{font:700 15px system-ui,-apple-system,Segoe UI,sans-serif;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147481000;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#14532d;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}' +
+      '#el-gready button{border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#14532d;font-weight:800;cursor:pointer}' +
+      '.gextra{margin:22px 0 4px;padding:10px 14px;border-radius:12px;background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}';
+    document.head.appendChild(st);
+  }
+  function typedHtml(items, prefix, mode, parts) {
+    if (starter() || items.some(it => it.opts)) bindPicks();
+    if (parts) partsCss();
+    let sec = null, np = 0, inX = false;   // blocks are numbered in the order this route sees them
+    const head = it => {
+      if (!parts) return '';
+      if (it.p === sec) { if (EXTRA.has(it) && !inX) { inX = true; return '<div class="gextra">➕ <b>' + (ca() ? 'Pràctica extra (opcional)' : 'Extra practice (optional)') + '</b>: ' + (ca() ? 'no compta per a la nota. Fes-la si vols practicar més.' : 'it doesn’t count for your mark. Do it if you want more practice.') + '</div>'; } return ''; }
+      sec = it.p; inX = false; const pt = parts.find(x => x.id === it.p);
+      return pt ? '<div class="gpart"><h3>' + (++np) + ' · ' + tx(pt.title) + ' <span class="gcount" data-part="' + esc(it.p) + '"></span></h3>' + (pt.note ? '<div class="gnote">' + tx(pt.note) + '</div>' : '') + '</div>' : ''; };
     return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
-      items.map((it, i) => '<div class="question">' + (mode === 'listen'
+      items.map((it, i) => { const m = itemMode(it, mode, parts), pk = picking(it); return head(it) + '<div class="question' + (EXTRA.has(it) ? ' gx' : '') + '">' + (parts ? kindChip(it, m) : '') + (m === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
-        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : starter() ? ' readonly placeholder="Tria una opció"' : '') + '>' +
-      (starter() ? picksHtml(it, items, prefix, i, mode) : '') +
-      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
+        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
+      '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' +
+      (pk ? picksHtml(it, items, prefix, i, m) : '') +
+      '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  /* More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
+     whole sentence for "I ___ (watch) a basketball match right now." counts when it is a run of words of the sentence with the gap filled
+     that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails. */
+  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function fits(q, answers, typed) {
+    const v = norm(typed); if (!v) return false;
+    if (answers.some(a => norm(a) === v)) return true;
+    const t = bare(typed).split(' '); if (t.length < 2) return false;
+    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    if (g < 1) return false;
+    return answers.some(a => {
+      const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+      if (!fills) return false;
+      const words = [], gap = [], put = (x, f) => bare(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(words.length); words.push(y); });
+      put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+      if (!gap.length) return false;
+      for (let k = 0; k + t.length <= words.length; k++)
+        if (k <= gap[0] && k + t.length > gap[gap.length - 1] && t.every((x, j) => x === words[k + j])) return true;
+      return false;
+    });
+  }
   // the accepted answer the student said (in any recognition alternative), or null
   const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
-  function bindModes(items, prefix, mode) {
-    if (mode === 'listen') items.forEach((it, i) => {
+  function bindModes(items, prefix, mode, parts) {
+    items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'listen') return;
       $('[data-hear="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.9);
       $('[data-hear-slow="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.65);
     });
-    const SR = SRC(); if (mode !== 'say' || !SR) return;
+    const SR = SRC(); if (!SR) return;
     items.forEach((it, i) => {
+      if (itemMode(it, mode, parts) !== 'say') return;
       const b = $('[data-mic="' + prefix + i + '"]'), box = $('#' + prefix + i), h = $('#' + prefix + 'h' + i), k = prefix + i + 'say';
       b.onclick = () => {
         let r; try { r = new SR(); } catch (e) { box.readOnly = false; return; }
@@ -251,17 +338,18 @@ var LS2 = (function () {
   function checkTyped(items, prefix, reveal, count) {
     let score = 0; got = [];
     items.forEach((it, i) => {
-      const v = norm($('#' + prefix + i).value), ok = it.a.some(a => norm(a) === v), f = $('#' + prefix + 'f' + i);
+      const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
-      if (starter() && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
+      if (picking(it) && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
-      f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!')
-        : !v ? (starter() ? 'Tria una resposta.' : ca() ? 'Escriu una resposta.' : 'Type an answer.')
+      if (!v && EXTRA.has(it)) { f.innerHTML = ''; f.className = 'feedback'; return; }
+      f.innerHTML = ok ? (it.own ? (ca() ? 'Molt bé! El professor pot llegir la teva frase.' : 'Well done! Your teacher can read your sentence.') : (ca() ? 'Correcte!' : 'Correct!'))
+        : !v ? (picking(it) ? (ca() ? 'Tria una resposta.' : 'Choose an answer.') : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
-          (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.a[0]) + '</strong>'
+          (show ? (it.own ? (ca() ? 'Un exemple: ' : 'An example: ') : (ca() ? 'Resposta: ' : 'Answer: ')) + '<strong>' + esc(it.show || (it.a || [])[0] || '') + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
       f.className = 'feedback ' + (ok ? 'ok' : 'no');
     });
@@ -309,7 +397,9 @@ var LS2 = (function () {
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
-    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null), added: L === level };
+    Object.assign(tries, m.tries);
+    // the same questions in a new order (a step rebuilt in blocks, 13 Nov 2026) is no news for the student: no note
+    const nu = m.v.some(x => x == null); return { v: m.v, moved: !m.same && (nu || L !== level), fresh: nu, added: L === level };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -388,6 +478,8 @@ var LS2 = (function () {
   R.vocab = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
+      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar
+      (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group" aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +
@@ -468,6 +560,7 @@ var LS2 = (function () {
     const m = p.media || {};
     let h = '';
     if (m.text) h += '<div class="reading">' + byLevel(m.text) + '</div>'; // a string, or one text per route
+    if (m.pages) h += '<div class="el-book" id="' + p.id + 'Book"></div>';   // 📖 the book's page pictures, one list per route (shared/js/el-book.js)
     if (m.youtube) h += '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + m.youtube + '" title="' + esc(m.title || 'Video') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>' +
       '<div class="actions"><a class="btn secondary" href="https://www.youtube.com/watch?v=' + m.youtube + '" target="_blank" rel="noopener">Open on YouTube ↗</a></div>' + (m.credit ? '<p class="tiny">' + m.credit + '</p>' : '');
     // Local videos (normal + "-slow" copy, WebVTT subtitles, poster), e.g. the listening chart: media.videos = [{ base: 'video/name', title }]
@@ -591,40 +684,232 @@ var LS2 = (function () {
     };
     if (kept.some(v => v)) show();
   }
-  R.mc = p => ({
-    html: '<div class="section-card">' + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
+  R.mc = p => p.book ? bookPanel(p) : ({
+    html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
       bindAudio(p); bindCycle(p); bindDict(p);
-      const items = forLevel(p.items), f = $('#' + p.id + 'Form');
-      f.innerHTML = items.map((q, i) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + q.q + '</p><div class="options">' +
+      const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length;
+      f.innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="q-title">' + (i + 1) + '. ' + (q.guess ? '🔮 ' : '') + q.q + (q.qca && ca() ? ' <span class="q-ca">[' + q.qca + ']</span>' : '') + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
         '</div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
       stays(p.id, p.id, p.id + 'Form', items, count => {
         let score = 0; const g = [];
         items.forEach((q, i) => {
           const c = document.querySelector('input[name="' + p.id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + p.id + 'f' + i);
-          if (ok) score++; g.push([ok, c ? +c.value : null]);
+          g.push([ok, c ? +c.value : null]);
+          if (q.guess) { fb.textContent = c ? guessSaved(p) : (ca() ? 'Tria una resposta.' : 'Choose an answer.'); fb.className = 'feedback ' + (c ? 'ok' : 'no'); return; }
+          if (ok) score++;
           fb.textContent = q.ex && c ? (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex)
             : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
-        if (count) { firstTry(p.id, score, items.length); firstItems(p.id, p.items, items, g); }
+        if (count) { firstTry(p.id, score, scored); firstItems(p.id, p.items, items, g); }
         const ok = answered(items, p.id);
-        result($('#' + p.id + 'Result'), score, items.length, ok);
+        result($('#' + p.id + 'Result'), score, scored, ok);
         if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); };
+        guessBack(p); LP.panels.filter(x => x.prev === p.id).forEach(guessBack);
       }, p.items);
+      guessBack(p);
     }
   });
-
-  R.typed = p => ({
-    html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
-      '<div class="section-card">' + (p.mode ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+  /* 📖 Book chapters (Roger, 12 Nov 2026: "a Book LP with a section per chapter"; book.html, data/book.js from tools/reading-story/lp.py).
+     An mc item with guess: true ("What happens next? Guess!") is saved like any answer but never marked or scored: the step's score is
+     the other questions. The next chapter (p.prev = the chapter before) opens with the student's guess and, once it is checked, says
+     whether the guess was right (the right option is the first, as in every mc item). */
+  /* Answered in the book (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they press the options
+     there? and then they get the feedback? they can only do it once and when they finish, they can go to the other chapter or leave the
+     LP"). The questions are the chapter's last page (ELBook opts.end): the student taps an option on the page and presses Check, which works
+     only when both are answered and counts once: the feedback stays on the page (the right option green, a wrong one red) and nothing can
+     be changed or done again (no ↺). Then "Chapter n ▶" goes on with the next chapter (still full screen if the book was), and "Leave the
+     Book" goes back to the LS page. */
+  /* One book, one step (Roger, 13 Nov 2026: "some students will have different paces when reading the book so I need you to make only one
+     SLP for the book so that people can continue where they left off"; "when they have finished, to continue reading as many chapters as
+     wanted"): LP.book = {tab, title, intro} makes the page ONE tab, "book", with one book on it. The chapters stay the steps (LP.panels,
+     state.done.ch1 …), but they are not tabs: the book opens where the student left it (state.bookAt = {c: chapter, i: page}, saved with
+     their work), a chapter opens once the one before it is answered, and the row of chapters above the book takes them back to any
+     chapter they have read. */
+  const ONE = { book: null, c: null };
+  const reachable = c => !c.prev || !!state.done[c.prev];
+  function oneStart() {
+    const at = state.bookAt || {}, s = LP.panels.find(c => c.id === at.c && reachable(c));
+    return s ? { c: s, i: at.i | 0 } : { c: LP.panels.find(c => !state.done[c.id]) || LP.panels[LP.panels.length - 1], i: 0 };
+  }
+  // the chapter c on the book, at page i; full: keep the full screen the book is in
+  function oneShow(c, i, full) {
+    const el = $('#bookBook'); if (!el || !window.ELBook) return;
+    if (ONE.book) ONE.book.destroy(true);
+    ONE.c = c;
+    const pg = x => x && x.media && x.media.pages ? byLevel(x.media.pages) : [], pages = pg(c), n = LP.panels.indexOf(c) + 1;
+    const nx = LP.panels.find(x => x.prev === c.id), pv = LP.panels.find(x => x.id === c.prev);
+    // the paper turns on into the next chapter once this one is answered, and back into the one before (Roger, 13 Nov 2026: "they should
+    // be able to drag on to the next chapter")
+    ONE.book = ELBook.mount(el, pages, { ca: ca(), title: tx(c.title), end: $('#' + c.id + 'QPage'), atEnd: c._after, start: i,
+      pre: (ca() ? 'Capítol ' : 'Chapter ') + n + ' · ',
+      after: nx ? pg(nx) : null, before: pv ? pg(pv).concat([$('#' + pv.id + 'QPage')]) : null, canNext: () => !!state.done[c.id],
+      nextLabel: nx ? tx(nx.tab) : '', more: d => { const full = !!ONE.book && ONE.book.isFull(), to = d > 0 ? nx : pv; if (to) oneShow(to, d > 0 ? 0 : 'end', full); },
+      onTurn: k => { const o = state.bookAt || {}; if (o.c !== c.id || o.i !== k) { state.bookAt = { c: c.id, i: k }; save(); } } });
+    if (full && ONE.book) ONE.book.open();
+    oneChs();
+  }
+  function oneChs() {
+    const el = $('#bookChs'); if (!el) return;
+    el.innerHTML = '<span class="elb-chl">' + (ca() ? 'Capítols' : 'Chapters') + '</span>' + LP.panels.filter(reachable).map(c => { const n = LP.panels.indexOf(c) + 1, d = !!state.done[c.id];
+      return '<button type="button" class="elb-ch' + (c === ONE.c ? ' on' : '') + (d ? ' done' : '') + '" data-ch="' + c.id + '" title="' + esc(tx(c.title)) + '">' + (d ? '✓ ' : '') + n + '</button>'; }).join('');
+    el.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { const c = LP.panels.find(x => x.id === b.dataset.ch); if (c && c !== ONE.c) oneShow(c, 0, false); });
+  }
+  R.onebook = () => ({
+    html: '<style>.elb-chs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px}.elb-chl{font-weight:800;color:var(--muted,#66766f);margin-right:4px;font-size:.9rem}'
+      + '.elb-ch{min-width:44px;min-height:38px;border:1px solid var(--line,#d8e6df);background:#fff;color:var(--dark,#174d3d);border-radius:999px;padding:6px 12px;font:inherit;font-weight:800;cursor:pointer}'
+      + '.elb-ch.done{background:#ecfdf3;border-color:#86c9a0;color:#17703f}.elb-ch.on{background:var(--accent,#1f6b52);border-color:transparent;color:#fff}</style>'
+      + '<div class="section-card"><div class="elb-chs" id="bookChs"></div><div class="el-book" id="bookBook"></div>'
+      + '<div id="bookStash" hidden>' + LP.panels.map(c => { const r = bookPanel(c); c._r = r; return r.html; }).join('') + '</div></div>',
     bind() {
+      LP.panels.forEach(c => c._r.bind());
+      const s = oneStart(); oneShow(s.c, s.i, false);
+    }
+  });
+  function bookPanel(p) {
+    const T2 = (a, b) => ca() ? a : b, id = p.id;
+    const page = '<div class="elb-q" id="' + id + 'QPage"><div class="elbq-top">' + esc(tx(p.title)) + '</div>' + guessBackHtml(p) +
+      '<h3 class="elbq-k">Think about it</h3><p class="elbq-how" id="' + id + 'How">' + T2('Toca una resposta a cada pregunta i prem Comprova. Només ho pots fer una vegada!', 'Tap one answer for each question and press Check. You can only do it once!') + '</p>' +
+      '<form id="' + id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + id + 'Check">' + T2('Comprova', 'Check') + '</button>' + againBtn(id) + '</div>' +
+      '<div class="result" id="' + id + 'Result"></div><div class="elbq-after" id="' + id + 'After" hidden></div></div>';
+    const lab = q => q.guess ? '2 · What happens next? Guess!' + T2(' · Què passarà? Endevina-ho!', '') : '1 · Did you understand?' + T2(' · Ho has entès?', '');
+    function lock() {
+      const pg = $('#' + id + 'QPage'); pg.classList.add('locked');
+      $$('#' + id + 'Form input').forEach(x => { x.disabled = true; });
+      $('#' + id + 'Check').hidden = true; $('#' + id + 'How').hidden = true;
+      after(); oneChs(); if (ONE.c === p && ONE.book) ONE.book.refresh();
+    }
+    function after() {
+      const el = $('#' + id + 'After'); if (!el || !$('#' + id + 'QPage').classList.contains('locked')) return;
+      const nx = LP.panels.find(x => x.prev === id);
+      const h = (!nx ? '<p class="elbq-end">🎉 ' + T2('Has acabat el llibre! En parlarem a classe.', 'You’ve finished the book! We’ll talk about it in class.') + '</p>'
+        : '<p class="elbq-end">' + T2('Vols continuar llegint? Pots passar al ' + esc(tx(nx.tab)).toLowerCase() + ' ara mateix.', 'Want to keep reading? You can go on to ' + esc(tx(nx.tab)) + ' now.') + '</p>') +
+        '<div class="actions">' + (nx ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
+        '<a class="btn secondary" href="index.html">' + T2('Surt del llibre', 'Leave the Book') + '</a></div>';
+      if (el.innerHTML !== h) el.innerHTML = h;
+      el.hidden = false;
+      const b = el.querySelector('[data-go]');
+      if (b) b.onclick = () => {
+        const full = !!ONE.book && ONE.book.isFull();
+        oneShow(nx, 0, full);   // the browser stays in full screen for the next chapter
+        if (!full) { const n = $('#bookBook'); if (n) n.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      };
+    }
+    p._after = after;
+    return {
+      html: page,
+      bind() {
+        const items = forLevel(p.items), scored = items.filter(q => !q.guess).length;
+        $('#' + id + 'Form').innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="elbq-lab">' + lab(q) + '</p><p class="q-title">' + q.q + '</p>' +
+          (q.qca && ca() ? '<p class="elbq-ca">' + q.qca + '</p>' : '') + '<div class="options">' +
+          learningSupport.shuffledIndexes(q.o.length).map((j, n) => '<label class="option"><input type="radio" name="' + id + i + '" value="' + j + '"><b class="elbq-l">' + 'ABCD'[n] + '</b><span>' + q.o[j] + '</span></label>').join('') +
+          '</div><div class="feedback" id="' + id + 'f' + i + '"></div></div>').join('');
+        $('#' + id + 'Again').hidden = true; $('#' + id + 'Again').style.display = 'none';
+        stays(id, id, id + 'Form', items, count => {
+          let score = 0; const g = [];
+          items.forEach((q, i) => {
+            const c = document.querySelector('input[name="' + id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + id + 'f' + i);
+            g.push([ok, c ? +c.value : null]);
+            $$('input[name="' + id + i + '"]').forEach(x => { const l = x.closest('.option'); l.classList.toggle('right', !q.guess && +x.value === 0); l.classList.toggle('wrong', !q.guess && x.checked && +x.value !== 0); });
+            if (q.guess) { fb.textContent = c ? '🔮 ' + guessSaved(p) : ''; fb.className = 'feedback ok'; return; }
+            if (ok) score++;
+            fb.textContent = ok ? T2('✓ Correcte!', '✓ Correct!') : T2('✗ No és aquesta: la resposta és «' + q.o[0] + '».', '✗ Not this one: the answer is “' + q.o[0] + '”.');
+            fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+          });
+          if (count) { firstTry(id, score, scored); firstItems(id, p.items, items, g); }
+          const ok = answered(items, id);
+          result($('#' + id + 'Result'), score, scored, ok);
+          if (ok) { if (count) complete(id); else doneFrom(id, id); }
+          guessBack(p); LP.panels.filter(x => x.prev === id).forEach(guessBack);
+          lock();
+        }, p.items);
+        // one try: Check only with every question answered
+        const btn = $('#' + id + 'Check'), go = btn.onclick;
+        btn.onclick = () => {
+          const miss = items.findIndex((q, i) => !document.querySelector('input[name="' + id + i + '"]:checked'));
+          if (miss >= 0) { const fb = $('#' + id + 'f' + miss); fb.textContent = T2('Tria una resposta abans de comprovar.', 'Choose an answer before you check.'); fb.className = 'feedback no'; return; }
+          go();
+        };
+        $('#' + id + 'Form').addEventListener('change', e => { const fb = e.target.closest('.question') && e.target.closest('.question').querySelector('.feedback.no'); if (fb && !$('#' + id + 'QPage').classList.contains('locked')) { fb.textContent = ''; fb.className = 'feedback'; } });
+        guessBack(p);
+      }
+    };
+  }
+  function guessSaved(p) {
+    const next = LP.panels.some(x => x.prev === p.id);
+    return next ? (ca() ? 'Desat! Ho descobriràs al capítol següent.' : 'Saved! You’ll find out in the next chapter.') : (ca() ? 'Desat! En parlarem a classe.' : 'Saved! We’ll talk about it in class.');
+  }
+  function guessBackHtml(p) { return p.prev ? '<div class="guess-back" id="' + p.id + 'Back" hidden></div>' : ''; }
+  function guessBack(p) {
+    const el = $('#' + p.id + 'Back'); if (!el) return;
+    const pp = LP.panels.find(x => x.id === p.prev), its = pp ? forLevel(pp.items) : [], gi = its.findIndex(q => q.guess);
+    if (gi < 0) { el.hidden = true; return; }
+    const a = (state.ans || {})[pp.id], k = a && a.q ? a.q.indexOf(qid(its[gi])) : gi, v = a && a.v && k >= 0 ? a.v[k] : null, q = its[gi], n = tx(pp.tab);
+    const mine = v != null && q.o[v] != null ? q.o[v] : null;
+    let h = '<strong>🔮 ' + q.q + '</strong><br>';
+    if (mine == null) h += ca() ? 'Al ' + n.toLowerCase() + ' no vas triar cap resposta. Llegeix i descobreix què passa!' : 'You didn’t guess in ' + n + '. Read and find out what happens!';
+    else h += (ca() ? 'Al ' + n.toLowerCase() + ' vas dir: ' : 'In ' + n + ' you guessed: ') + '<b>' + mine + '</b>. ';
+    if (mine != null && !state.done[p.id]) h += ca() ? 'Llegeix i descobreix si l’has encertat!' : 'Read and find out if you were right!';
+    else if (mine != null) h += +v === 0 ? (ca() ? '✓ Ho has endevinat!' : '✓ You guessed right!') : (ca() ? 'Aquesta vegada no: era <b>' + q.o[0] + '</b>.' : 'Not this time: it was <b>' + q.o[0] + '</b>.');
+    el.innerHTML = h; el.hidden = false;
+  }
+
+  // a box of How it works tied to a block (e.p) gets the block's number, so "2" in the theory is "2" in the practice
+  function boxNum(p, e) {
+    if (!p.parts || !e || !e.p) return '';
+    const order = []; forLevel(p.items).forEach(it => { if (!order.includes(it.p)) order.push(it.p); });
+    const n = order.indexOf(e.p) + 1;
+    return n ? '<span style="display:inline-block;min-width:1.6em;margin-right:6px;padding:0 6px;border-radius:999px;background:var(--accent,#2d5b9a);color:#fff;font-weight:800;text-align:center">' + n + '</span>' : '';
+  }
+  R.typed = p => ({
+    html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + boxNum(p, e) + tx(e) + '</div>').join('') + '</div>' : '') +
+      '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+    bind() {
+      if (p.parts) return partsBind(p);
       const items = forLevel(p.items);
-      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
+      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
       stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = answered(items, p.id); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items);
     }
   });
+
+  // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
+  function partsBind(p) {
+    const A = arrange(forLevel(p.items), p.req), items = A.items, list = $('#' + p.id + 'List');
+    list.innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
+    const filled = i => { const t = $('#' + p.id + i); return !!(t && String(t.value).trim()); };
+    const ready = () => { let b = $('#el-gready'); const panel = $('#' + p.id), show = !state.done[p.id] && A.need.every(filled) && panel && panel.offsetParent !== null;
+      if (!show) { if (b) b.remove(); return; }
+      if (b) return;
+      b = document.createElement('div'); b.id = 'el-gready';
+      b.innerHTML = '<span>✅ ' + (ca() ? 'Ja has respost totes les preguntes obligatòries. Ja pots entregar l’activitat.' : 'You’ve answered all the compulsory questions. You can hand in this activity now.') + '</span>';
+      const go = document.createElement('button'); go.type = 'button'; go.textContent = (ca() ? 'Comprova i entrega' : 'Check and hand it in') + ' ✓';
+      go.onclick = () => { b.remove(); const c = $('#' + p.id + 'Check'); if (c) { c.click(); const r = $('#' + p.id + 'Result'); if (r) r.scrollIntoView({ block: 'center', behavior: 'smooth' }); } };
+      b.appendChild(go); document.documentElement.appendChild(b); };
+    const counts = () => {
+      $$('#' + p.id + 'List .gcount').forEach(c => { const ix = A.per[c.dataset.part] || [], n = ix.filter(filled).length, all = n === ix.length;
+        c.textContent = (all ? '✅ ' : '') + n + ' / ' + ix.length + (ca() ? ' obligatòries' : ' compulsory'); c.classList.toggle('ok', all); });
+      $$('#' + p.id + 'List .gbd').forEach(d => { const ix = A.per[d.dataset.part] || [], all = ix.length && ix.every(filled), more = !!(d.nextElementSibling && d.nextElementSibling.classList.contains('gextra'));
+        d.hidden = !all; if (all) d.textContent = '✅ ' + (ca() ? 'Has fet les ' + ix.length + ' preguntes obligatòries d’aquest bloc.' + (more ? ' Les de sota són pràctica extra, opcional.' : '') : 'You’ve done the ' + ix.length + ' compulsory questions of this block.' + (more ? ' The ones below are optional extra practice.' : '')); });
+      ready();
+    };
+    document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.tab')) setTimeout(ready, 150); });
+    list.addEventListener('input', counts);
+    stays(p.id, p.id, p.id + 'List', items, count => {
+      checkTyped(items, p.id, false, count);
+      const s = A.need.filter(i => got[i] && got[i][0]).length, n = A.need.length;
+      if (count) { firstTry(p.id, s, n); firstItems(p.id, p.items, A.need.map(i => items[i]), A.need.map(i => got[i])); }
+      const left = A.need.filter(i => !filled(i)).length, ok = !left, el = $('#' + p.id + 'Result');
+      el.innerHTML = '<b>' + s + ' / ' + n + '</b> ' + (ca() ? 'correctes (preguntes obligatòries)' : 'correct (compulsory questions)') + ' · ' + (ok
+        ? (ca() ? '✅ Ja has fet les preguntes obligatòries de tots els blocs: aquesta activitat està feta i entregada. La ➕ pràctica extra és opcional i no compta.' : '✅ You’ve done the compulsory questions of every block: this activity is done and handed in. The ➕ extra practice is optional and doesn’t count.')
+        : (ca() ? 'Et falten ' + left + ' preguntes obligatòries (mira el comptador de cada bloc).' : left + ' compulsory question' + (left > 1 ? 's' : '') + ' left (see the counter in each block).'));
+      el.classList.add('show');
+      if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }
+      counts();
+    }, p.items);
+    counts();
+  }
 
   /* Revision counts (research audit, Roger 26 Oct 2026): the first version sent for feedback is kept as the draft (state.drafts[key]);
      the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
@@ -1129,7 +1414,7 @@ var LS2 = (function () {
         m.onerror = () => { endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut carregar. Recarrega la pàgina.' : 'The clip could not load. Reload the page.'; halt(); };
         const play = done => {
           const src = slow ? c.slow : c.src, t = slow ? c.ts : c.t;
-          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(e => { if (e && e.name === 'AbortError') return; endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut reproduir. Torna-ho a provar.' : 'The clip could not play. Try again.'; halt(); }); sh.plays = (sh.plays || 0) + 1; count(); save(); };
+          const go = () => { if (SH) SH.lead(m, t[0]); else m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(e => { if (e && e.name === 'AbortError') return; endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut reproduir. Torna-ho a provar.' : 'The clip could not play. Try again.'; halt(); }); sh.plays = (sh.plays || 0) + 1; count(); save(); };
           if (!m.src || !m.src.endsWith(src)) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
         };
         // Listen and repeat: el-shadow.js plays sentence by sentence; a run counts as one play
@@ -1212,7 +1497,7 @@ var LS2 = (function () {
             const c = document.querySelector('input[name="' + p.id + i + '"]:checked'); ok = !!c && +c.value === 0; g.push([ok, c ? +c.value : null]);
             fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], null, !!(p.media && p.media.audio));
           } else {
-            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = q.a.some(a => norm(a) === v); g.push([ok, typedAs($('#' + p.id + i))]);
+            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = fits(q.q, q.a, $('#' + p.id + i).value); g.push([ok, typedAs($('#' + p.id + i))]);
             if (!ok && v && count) tries[key] = (tries[key] || 0) + 1;
             fb.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
               : (ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -1335,7 +1620,7 @@ var LS2 = (function () {
   }
   function markTabs() {
     let next = false;
-    LP.panels.forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t || t.classList.contains('el-sec-hide')) return; if (t.classList.contains('el-sec-cls')) { t.classList.remove('next'); return; } const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
+    tabsOf().forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t || t.classList.contains('el-sec-hide')) return; if (t.classList.contains('el-sec-cls')) { t.classList.remove('next'); return; } const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
     // Phone (Roger, 6 Nov 2026): keep the open step visible in the strip of steps.
     const a = $('.lp-body>.tabs .tab.active');
     if (a && innerWidth < 1000 && markTabs.on !== a.dataset.panel) { markTabs.on = a.dataset.panel; a.parentNode.scrollLeft = a.offsetLeft - a.parentNode.offsetLeft - 16; }
@@ -1346,19 +1631,21 @@ var LS2 = (function () {
   function bindStudy() { if (window.ELStudy && LP.study) ELStudy.bind(studyApi()); }
   function render() {
     carryRoute();
-    const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
-      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
+    const PS = tabsOf(), act0 = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : null, active = PS.some(p => p.id === act0) ? act0 : PS[0].id;
+    $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + PS.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
+      PS.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
-    LP.panels.forEach(p => p._r.bind());
+    PS.forEach(p => p._r.bind());
     bindPlan();
     bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); markTabs(); const top = innerWidth <= 640 ? $('.lp-body').getBoundingClientRect().top + scrollY : $('#lp').offsetTop - 64; if (innerWidth > 640 || scrollY > top) window.scrollTo({ top, behavior: 'smooth' }); });
-    initNext();
+    if (!LP.book) initNext();
     progress();
   }
-  function stepDone(p) { return p.type === 'info' || p.type === 'summary' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
+  // the page's tabs: its panels, or one tab for the whole book (LP.book: the chapters are its steps)
+  function tabsOf() { return LP.book ? [{ id: 'book', type: 'onebook', tab: LP.book.tab, title: LP.book.title, intro: LP.book.intro, steps: LP.panels }] : LP.panels; }
+  function stepDone(p) { if (p.steps) return p.steps.every(stepDone); return p.type === 'info' || p.type === 'summary' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
   function initNext() {
     $$('.section-next').forEach(e => e.remove());
     const last = LP.panels[LP.panels.length - 1];

@@ -73,7 +73,7 @@ window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pro:true,pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
   {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
 ];
 // The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
@@ -105,6 +105,8 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.2"],"ls2GettingStarted4ESO",5,{graded:false}),
+        // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
+        L("book.html","Book: Lantern Night",["4.1"],"ls2Book4ESO",6,{agendaDue:true}),
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",10,{steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -125,6 +127,8 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
+        // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
+        L("book.html","Book: Maya Live!",["4.1"],"ls2Book2ESO",6,{agendaDue:true}),
         L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",13,{steps:[["log","Reading log"],["talk","Talk"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
         L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -217,7 +221,7 @@ const agToday=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||ne
 // its = the day's agenda items in order; returns the link from the site root (learning path tabs, then each game; notes are left out).
 window.elPrintDay=function(its,gname,dlab){const by=new Map(),games=[];
   (its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;const id=it.slice(0,i),p=it.slice(i+1);
-    if(/^game:/.test(p)){if(!games.includes(p.slice(5)))games.push(p.slice(5));return}
+    if(/^game:/.test(p)){if(!/^game:cb-/.test(p)&&!games.includes(p.slice(5)))games.push(p.slice(5));return}   // 🕵️ Code Breakers: no paper version
     const a=(window.EL_CATALOG||[]).find(x=>x.id===id);if(!a||!a.path)return;const k=a.path.replace(/\.html$/,"");if(!by.has(k))by.set(k,[]);if(p)by.get(k).push(p);else by.get(k).all=true});
   const items=[...by].map(([k,ps])=>k+(ps.all?"":":"+ps.join("."))).join("|");
   return "shared/print/today.html?items="+encodeURIComponent(items)+"&games="+encodeURIComponent(games.join(","))+"&g="+encodeURIComponent(gname||"")+"&d="+encodeURIComponent(dlab||"")};
@@ -242,7 +246,7 @@ window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};
   const op=real?elClassOpenAt(gid,today):null,early=op!=null&&Date.now()<op,after=(d,x)=>d>today||(early&&d===today);   // today's items wait for the class
   const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.early===early&&m.src===src&&m.hw===info.homework&&m.push===info.push&&m.done===info.done)return m.v;
   const first={},tabFirst={};
-  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
+  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=elTabOf(id,it.slice(i+1));
     if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
   const free=new Set();   // opened at once by the teacher: homework and a pull-up; the sample exam stays open for revising (Roger, 7 Nov 2026: "I want them to see the sample exam")
   Object.keys(first).forEach(id=>{if(/sample-exam$/.test(id))free.add(id)});Object.keys(tabFirst).forEach(k=>{if(/sample-exam#/.test(k))free.add(k)});
@@ -271,7 +275,11 @@ window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(
 // the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
 window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
 window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
-window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
+// 📖 The Book is ONE tab, "book" (Roger, 13 Nov 2026: "only one SLP for the book so that people can continue where they left off"): its
+// steps are the chapters (ch1 … ch6). A chapter planned on the Time plan before then (path#ch1) counts as the book (elTabOf).
+window.elBookPath=a=>/\/ls2-book$|(^|\/)book\.html$/.test(typeof a==="string"?a.split("#")[0]:(a&&a.id)||"");   // an id or a page path
+window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p;
+window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];if(id==="book"&&elBookPath(a))return ks.slice();return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
@@ -283,7 +291,7 @@ const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];retur
 // as done in class, set as homework or pulled up; nor a path planned whole) is 🏫 for class too: shown read-only, never To do, like a tab
 // planned for a later day (it gets no day on its note). The tabs for a later day + these: [panel id].
 const laterTabs=(a,info,gid)=>{const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
-  const S=(window.EL_SECTIONS||{})[a.id],ids=S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
+  const S=(window.EL_SECTIONS||{})[a.id],ids=elBookPath(a)?["book"]:S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
   const un=ids.filter(id=>elSecSteps(a,id).length&&!L.planned.has(a.id+"#"+id)&&!L.free.has(a.id+"#"+id));
   return un.length?[...new Set([...later,...un])]:later};
 window.elLaterTabs=laterTabs;
@@ -296,7 +304,7 @@ window.elSecLockedFor=function(a,info,gid,done){const lk=secLk(a,info,gid,done);
 // Returns {panel id: the class day it is planned for (YYYY-MM-DD)}.
 window.elSecSoon=function(a,info,gid,done){if(window.EL_RAW_OPEN||!a||a.optional)return {};const later=laterTabs(a,info,gid);if(!later.length)return {};
   const lk=secLk(a,info,gid,done),ag=elAgendaOf(info,gid),today=agToday(),o={};
-  later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).includes(a.id+"#"+p)&&(!d||dd<d))d=dd});o[p]=d});return o};
+  later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).some(x=>{x=String(x);const i=x.indexOf("#");return i>0&&x.slice(0,i)===a.id&&elTabOf(a.id,x.slice(i+1))===p})&&(!d||dd<d))d=dd});o[p]=d});return o};
 // the steps of those tabs (elSecSteps), for counting
 window.elSoonSteps=function(a,soon){return Object.keys(soon||{}).flatMap(id=>elSecSteps(a,id))};
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
@@ -336,6 +344,12 @@ window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.s
       const tabs=secs.filter(([id])=>!off.includes(id)&&dueT(a,id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
       if(secs.length&&!tabs.length)return null;   // what is open and due is done; the rest is still locked or for a later class
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
+// 📘 Grammar together (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section. Start with the grammar of the
+// LP3, LS2"): the learning paths ("<course>/<ls folder>/<page>") whose Grammar tab gets ✅ Correct (shared/correct/, tab=grammar).
+// Another one: add it here (its grammar step: type typed, explain boxes and items with r: tags, like LP3).
+// Every LS2 learning path with a Grammar tab since 13 Nov 2026 (2ESO A used it on LP2 that morning and found no ✅ Correct there).
+window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/what-are-they-doing","2eso/free-time-live/now-or-usually","2eso/free-time-live/likes-and-screen-tips","2eso/free-time-live/write-your-vlog-script",
+  "4eso/seasons-and-celebrations/celebrations-around-the-world","4eso/seasons-and-celebrations/where-traditions-come-from","4eso/seasons-and-celebrations/plan-the-day","4eso/seasons-and-celebrations/write-to-the-head-teacher"];
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
   ((p&&p.rows)||[]).forEach(r=>String(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=acts.find(y=>sh(y.title).startsWith(nm)||nm.startsWith(sh(y.title)));if(a&&!m[n])m[n]=a}));
@@ -515,6 +529,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]};
   Object.assign(window.EL_ACTIONS,{
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
+    "4eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"read","log","listen","grammar","mixed","write","speak"],
     "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
     "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
@@ -531,6 +546,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];   // shadowing: half listening, half speaking
   window.EL_STEP_CRITERIA={
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "4eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "4eso/ls2-celebrations-around-the-world":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
     "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
     "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
@@ -547,6 +563,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];
   Object.assign(window.EL_ACTIONS,{
     "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
+    "2eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-now-or-usually":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","shadow","talk","factfile"],
@@ -559,6 +576,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   });
   Object.assign(window.EL_STEP_CRITERIA,{
     "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "2eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-check-the-source":{shadow:SH,cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
@@ -580,6 +598,12 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
 // click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the
 // list"). elGameStats(games) takes class game results [{kind, r, of}] (myGames on the student board, gameResults on the dashboard) and gives
 // {grammar, vocab} = % right (null when none played); elRing(p, label, size) draws one circle (inline styles, any page).
+// A class game played again (Roger, 11 Nov 2026: "the last version of the answers is the good one and therefore we are assessing the competences
+// better"): only the latest play of each game (deck) counts. elLatestGames(games) keeps, for each deck, the game with the highest sid (start time);
+// games without a deck are all kept. Used for the 🧩📚 circles (dashboard and board) and the class games part of the LS mark.
+// 🕵️ Code Breakers rounds (mode "cb", lab/game/cb-host.js) count next to the class game of the same deck: the latest round replaces only an earlier round.
+window.elLatestGames=function(games){const best=new Map(),rest=[];(games||[]).forEach(g=>{if(!g||!g.deck){if(g)rest.push(g);return}
+  const k=g.deck+(g.mode==="cb"?"#cb":""),b=best.get(k);if(!b||(+g.sid||0)>(+b.sid||0))best.set(k,g)});return [...best.values(),...rest]};
 window.elGameStats=function(games){
   const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
   const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};

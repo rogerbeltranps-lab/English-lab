@@ -18,52 +18,106 @@ window.ELExam = (function () {
   const forLevel = (items, level) => !items ? [] : Array.isArray(items)
     ? items.filter(x => x && ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level)))
     : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
-  const files = {};
+  const files = {}, ME = document.currentScript && document.currentScript.src;
+  // the section tabs of every activity (el-sections.js), loaded here when the page doesn't have them (an LS1 home, building LS2's chapter)
+  let secP = null;
+  const sections = () => window.EL_SECTIONS || !ME ? Promise.resolve() : secP || (secP = new Promise(ok => {
+    const sc = document.createElement('script'); sc.src = new URL('./el-sections.js', ME).href; sc.onload = sc.onerror = () => ok(); document.head.append(sc); }));
   const src = url => files[url] || (files[url] = fetch(url, { cache: 'no-cache' }).then(r => r.ok ? r.text() : '').catch(() => ''));
-  async function lpData(href, native) {
-    const page = String(href || '').replace(/[?#].*$/, '').replace(/\.html$/, ''), W = {};
+  // base: the LS's folder from this page ('' for this LS; '../other-ls/' for another LS of the course, in the one 📓 notebook)
+  async function lpData(href, native, base) {
+    const page = String(href || '').replace(/[?#].*$/, '').replace(/\.html$/, ''), W = {}, b = base || '';
     const run = s => { if (s) try { new Function('window', s)(W); } catch (e) { console.warn('exam data', page, e); } };
-    run(await src('data/' + page + '.js'));
-    if (native && W.LP) run(await src('data/native/' + page + '.js'));
+    run(await src(b + 'data/' + page + '.js'));
+    if (native && W.LP) run(await src(b + 'data/native/' + page + '.js'));
     return W.LP || null;
   }
   // the learning paths of this LS, in the order of the LS page (its <ol class="lps">), without checkpoints, extras and the final product
-  function lps() {
-    return [...document.querySelectorAll('ol.lps a.lp[data-a]')]
+  function lps(doc) {
+    return [...(doc || document).querySelectorAll('ol.lps a.lp[data-a]')]
       .filter(a => !a.classList.contains('cp') && !a.classList.contains('extra'))
       .map(a => ({ id: a.dataset.a, href: a.getAttribute('href'), n: ((a.querySelector('.n') || {}).textContent || '').trim(), title: ((a.querySelector('.t b') || {}).textContent || '').trim() }))
       .filter(x => x.href && !/^final product/i.test(x.title));
   }
-  const sample = () => { const a = document.querySelector('ol.lps a.lp[href*="sample-exam"]'); return a ? a.getAttribute('href') : null; };
+  const sample = doc => { const a = (doc || document).querySelector('ol.lps a.lp[href*="sample-exam"]'); return a ? a.getAttribute('href') : null; };
+  // another LS of the course, for the one 📓 notebook of every LS (Roger, 13 Nov 2026): its home page, read as text once
+  const homes = {};
+  const home = base => homes[base] || (homes[base] = src(base + 'index.html').then(h => h ? new DOMParser().parseFromString(h, 'text/html') : null));
   // the group's plan: exam day and the learning paths dropped for it
   function plan(LS, gid) {
     const W = window.ELWeek, x = W && gid ? (W.plans(gid) || []).find(y => y.ls === LS) : null;
     return { exam: x ? W.exam(x.p, x.gi) : null, dropped: x ? ((x.p._dropped || {})[x.gi] || []) : [] };
   }
   // done: {"activity#panel": day} · level: a route id · ca: Catalan for Starter/Base · games: {lpNumber: true} played
-  async function build({ LS, gid, done, level, ca, played }) {
+  async function build({ LS, gid, done, level, ca, played, base }) {
     level = ROUTES.includes(level) ? level : 'insecure';
     const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
-    const pl = plan(LS, gid), out = [], dropped = [];
-    for (const a of lps()) {
+    if (base) await sections();
+    const pl = plan(LS, gid), out = [], dropped = [], doc = base ? await home(base) : document;
+    if (!doc) return { lps: [], dropped: [], exam: pl.exam, sample: null };
+    for (const a0 of lps(doc)) {
+      const a = base ? Object.assign({}, a0, { href: base + a0.href }) : a0;
       if (pl.dropped.includes(a.id)) { dropped.push(a); continue; }
       const secs = (window.EL_SECTIONS || {})[a.id] || [], tabs = secs.filter(([id]) => done && done[a.id + '#' + id]).map(([id, name]) => ({ id, name, day: done[a.id + '#' + id] }));
-      if (!tabs.length && !(played && played[a.n])) continue;
-      const LP = await lpData(a.href, level === 'native');
+      const st = mine0(a.id), tried = st && st.items && Object.keys(st.items).length;
+      if (!tabs.length && !(played && played[a.n]) && !tried) continue;
+      const LP = await lpData(a0.href, level === 'native', base);
       const panels = ((LP && LP.panels) || []).map(p => level === 'native' && LP.native && LP.native[p.id] ? Object.assign({ id: p.id }, LP.native[p.id]) : p);
       const on = new Set(tabs.map(x => x.id)), mine = panels.filter(p => on.has(p.id));
-      const terms = [], grammar = [];
-      mine.forEach(p => {
-        if (Array.isArray(p.groups) && p.type !== 'self') forLevel(p.groups, level).forEach(g => {
-          const items = (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] }));
-          if (items.length) terms.push({ g: tx(g.g), items });
-        });
-        const ex = forLevel(p.explain, level).map(tx).filter(Boolean);
-        if (ex.length) grammar.push({ title: tx(p.title), boxes: ex });
+      const terms = [], grammar = [], parts = [];
+      // the level in a set's name ("Traditions (Safe)"): the route sets add up (a Plus student also has the Core ones, as on the learning
+      // path), so the notebook leaves the label out (Roger, 13 Nov 2026: "why does she have Core and plus mixed up?")
+      const nolv = s => String(s || '').replace(/\s*\((?:Beginners|Insecure|Safe|Daring|Native|Starter|Base|Core|Plus|Pro)(?: words| route)?\)/g, '');
+      const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: nolv(tx(g.g)), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
+      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [{ title: nolv(tx(p.title)), boxes: ex }] : []; };
+      mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
+      // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
+      // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
+      panels.forEach(p => {
+        const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx);
+        if (!tab && !work) return;
+        // (Roger, 13 Nov 2026: "even if the students don't do the activities, they must appear in the notebook, not done, with a note
+        // (to do / per fer, depending on the level), and the theory of the SLPs too"): a tab done in class that the student hasn't done
+        // shows its questions, unanswered, under a "To do" note; its theory shows anyway
+        const sd = (st && st.done) || {}, did = p.type === 'vocab' ? !!sd.practice : !!sd[p.id];
+        const todo = work || did || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
+        parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
+          terms: termsOf(p), grammar: gramOf(p), work, todo });
       });
-      out.push(Object.assign({}, a, { tabs, terms, grammar }));
+      out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
-    return { lps: out, dropped, exam: pl.exam, sample: sample() };
+    const sm = sample(doc);
+    return { lps: out, dropped, exam: pl.exam, sample: sm && base ? base + sm : sm };
+  }
+  // the student's own state of a learning path (the engine's localStorage, kept in sync by el-cloud.js): its first catalog key
+  function mine0(id) {
+    const a = (window.EL_CATALOG || []).find(x => x.id === id), k = a && a.keys && a.keys[0]; if (!k) return null;
+    try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; }
+  }
+  /* A panel's first check (ls2-engine.js firstItems: state.items[panel_route] = {level, date, q: the question's place in the list, ok, a:
+     what was typed, or the option chosen with 0 = the right one}): the questions with the student's answers, the right ones, ✓ / ✗.
+     The vocabulary practice is kept under "vocab". Only the first try, whatever the route it was done at. */
+  function firstTry(p, st, tx) {
+    const IT = (st && st.items) || {}, id = p.type === 'vocab' ? 'vocab' : p.id, src = p.type === 'vocab' ? p.practice : p.items;
+    if (!src) return null;
+    const rec = Object.keys(IT).filter(k => k.slice(0, id.length + 1) === id + '_' && ROUTES.includes(k.slice(id.length + 1))).map(k => IT[k]).filter(r => r && Array.isArray(r.q))
+      .sort((x, y) => String(x.date || '').localeCompare(String(y.date || '')))[0];
+    if (!rec) return null;
+    const list = Array.isArray(src) ? src : forLevel(src, rec.level);
+    const qs = rec.q.map((qi, j) => {
+      const it = list[qi]; if (!it || typeof it !== 'object') return null;
+      const mc = Array.isArray(it.o), a = (rec.a || [])[j];
+      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess };
+    }).filter(Boolean);
+    if (!qs.length) return null;
+    const scored = qs.filter(x => !x.guess);
+    return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+  }
+  // the questions of an activity not done yet, at the student's route, without answers: {task, qs: [{q, o: options in a fixed order}]}
+  function toDo(p, level, tx) {
+    const src = p.type === 'vocab' ? p.practice : p.items, list = !src ? [] : Array.isArray(src) ? forLevel(src, level) : forLevel(src, level);
+    const qs = list.filter(it => it && typeof it === 'object' && it.q).map(it => ({ q: tx(it.q), o: Array.isArray(it.o) ? it.o.map(tx).filter(Boolean).sort((a, b) => a.localeCompare(b)) : null }));
+    return { task: tx(p.task) || tx(p.intro) || '', qs };
   }
   return { build, lps, plan, ROUTES };
 })();

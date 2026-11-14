@@ -104,7 +104,10 @@ const asSave=o=>{try{sessionStorage.setItem(AS_K,JSON.stringify(o))}catch(e){}};
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 // Student list (roster/{email}, imported by the teacher in the dashboard): only listed school accounts (and testers) can use the site, and the list sets their group.
 // null = not on the list; undefined = the list could not be read (then the site behaves as before the list existed).
-const onRoster=async u=>{try{const s=await getDoc(doc(db,"roster",(u.email||"").toLowerCase()));return s.exists()?s.data():null}catch(e){console.warn("roster",e);return undefined}};
+// A refused read can come from an old sign-in pass (e.g. the account's email was changed or verified after this browser signed in,
+// Josue 2ESOB, 13 Nov 2026: stuck on "Tria el teu grup"): get a fresh pass once and try again, so a reload is enough.
+const onRoster=async(u,again)=>{try{const s=await getDoc(doc(db,"roster",(u.email||"").toLowerCase()));return s.exists()?s.data():null}
+  catch(e){if(!again&&e&&e.code==="permission-denied"){try{await u.getIdToken(true);return await onRoster(u,true)}catch(x){}}console.warn("roster",e);return undefined}};
 let myRoster;
 
 // Which activity / LS is this page?
@@ -123,11 +126,13 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 // homework (set from the dashboard) and planEdits (sessions moved to another day, tabs per session) came later: they were not copied
 // here, so the dashboard and the student board lost the homework set from the dashboard after a reload. planEdits is applied to the
 // time plan (ELWeek.applyEdits) as soon as it is read.
+// cpShown/cpClosed (closed recall checkpoints, elCpClosed) are kept too: without them a closed checkpoint still looked open on LP pages, so a
+// student who missed it could start it (the send was refused) and every later learning path asked for it first (problem report, 4ESOB, 11 Nov).
 // once per page here; ELCloud.lsInfo (the dashboard, after it changes an LS) always reads the server.
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}};
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{}};
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
 // sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.
@@ -339,8 +344,15 @@ async function gate(u){
   const ca=elCa(lvl);
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
+  // ↺ Let them do it (Roger, 11 Nov 2026: one student may still do a recall checkpoint that is closed or shown for the group): the
+  // teacher's redo:true on that student's try opens it for them alone (firestore.rules cpOk letMe); one read, only on such a page
+  let open=!a||elLpOpen(a,info,myGroup);
+  const ffp=a&&!tester&&!AS?ffPage():[];if(!open&&ffp.length&&elLpOpen(a,info,myGroup,true))open=true;   // ⚡ I've finished: the Book chapter given to this student in class mode
+  if(ffp.length){window.EL_CM_FREE=window.EL_CM_FREE||new Set();ffp.forEach(p=>window.EL_CM_FREE.add(p))}
+  if(!open&&!tester&&!AS&&a.checkpoint&&elLpOpen(a,info,myGroup,true)&&elCpClosed(a,info,myGroup)){
+    try{const s=await getDoc(doc(db,"students",u.uid,"checkpoints",a.keys[0]));if(s.exists()&&s.data().redo)open=true}catch(e){console.warn("checkpoint",e)}}
+  if(a&&!tester&&!open&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
+  if(a&&!tester&&!open){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
   if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn),myGroup);trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
@@ -408,7 +420,9 @@ function asBanner(){if(!AS||document.getElementById("el-as-frame"))return;
   const t=document.createElement("button");t.type="button";t.textContent="👁 "+(AS.name||AS.email||"Student")+" · ✕";
   t.title="Student view (read-only, nothing is saved). Click to exit and go back to your dashboard.";t.onclick=asExit;
   t.style.cssText="position:absolute;top:0;left:50%;transform:translateX(-50%);pointer-events:auto;border:0;border-radius:0 0 8px 8px;background:#dc2626;color:#fff;font:600 11px system-ui,sans-serif;padding:1px 8px 2px;cursor:pointer;opacity:.85";
-  f.append(t);(document.body||document.documentElement).append(f)}
+  f.append(t);(document.body||document.documentElement).append(f);
+  // never on paper (Roger, 13 Nov 2026: "No vull la línia vermella que surt aquí", the printed notebook)
+  const ps=document.createElement("style");ps.textContent="@media print{#el-as-frame{display:none!important}}";document.head.append(ps)}
 // The learning path the teacher has pulled up for the group (ls/{id}.push[group], elPullFor in el-catalog.js; Roger, 2 Nov 2026): on any
 // other page of this LS a bar "📌 Your teacher wants you to open …" with Open it →; on that learning path itself its tab opens once (the
 // first time the student lands there after the teacher pulled it up). ✕ hides the bar until the teacher pulls up something else.
@@ -442,8 +456,9 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 // blue shadow, a 🏫 on its tab and a note with the day; nothing in it can be answered, pressed or played (audio, video, YouTube) until then.
 // soon = {panel id: day}. It counts in the page's progress (it is not hidden), so the path never looks finished with tabs still to come.
 function lockSections(ids,ca,a,done,soon,gid){
+  const fr=window.EL_CM_FREE;if(fr)ids=ids.filter(id=>!fr.has(id));   // steps class mode opened for the student now (cmFree)
   if(!ids.length)return;soon=soon||{};
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon);const hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
   window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
   const today=elAgToday(),openAt=gid?elClassOpenAt(gid,today):null,hm=ms=>{const d=new Date(ms);return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")};
@@ -476,7 +491,7 @@ function lockSections(ids,ca,a,done,soon,gid){
         if(e.matches("iframe")){if(!e.dataset.elcls)e.dataset.elcls="f";e.tabIndex=-1;return}if(e.matches("[contenteditable]")){e.dataset.elcls="e";e.contentEditable="false";return}if(!e.disabled){e.dataset.elcls="d";e.disabled=true;e.tabIndex=-1}})});
     ro.forEach(id=>{const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-off");
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)}
-      p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
+      p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.dataset.elro="1";e.disabled=true;e.tabIndex=-1}})})};
   apply();if(cls.length&&window.elProgress)window.elProgress();   // again, now the tabs for class are marked: never the "next" one
   // today's tabs for class open by themselves 5 minutes before the class (elClassOpenAt), on this page too: what was frozen is given back
   const now0=cls.filter(id=>soon[id]===today);
@@ -487,6 +502,20 @@ function lockSections(ids,ca,a,done,soon,gid){
         if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true})});
     if(window.elProgress)window.elProgress()},openAt-Date.now());
   new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
+  // 🎓 class mode opens steps for the class there and then (Roger, 12 Nov 2026: steps added during the class, several steps at once): they
+  // are given back in place, hidden, 🏫 or read-only as they were, so nothing reloads (el-cloud.js cmFree; the agenda says so after a reload)
+  window.elSecFree=list=>{const f=(list||[]).filter(id=>hide.includes(id)||cls.includes(id)||ro.includes(id));if(!f.length)return;
+    hide=hide.filter(id=>!f.includes(id));cls=cls.filter(id=>!f.includes(id));ro=ro.filter(id=>!f.includes(id));
+    f.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{t.classList.remove("el-sec-hide","el-sec-cls");t.removeAttribute("title")});
+      const p=document.getElementById(id);if(!p)return;p.classList.remove("el-sec-hide","el-sec-cls","el-sec-off");const n=p.querySelector(":scope>.el-sec-note");if(n)n.remove();
+      p.querySelectorAll("[data-elcls]").forEach(e=>{const k=e.dataset.elcls;delete e.dataset.elcls;e.removeAttribute("tabindex");
+        if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true});
+      p.querySelectorAll("[data-elro]").forEach(e=>{delete e.dataset.elro;e.removeAttribute("tabindex");e.disabled=false})});
+    window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];apply();if(window.elProgress)window.elProgress()};
+  // a page left open from an earlier day (problem report, 2ESOA, 13 Nov 2026: a Chromebook closed after Thursday's class and opened again
+  // in Friday's class kept Friday's tabs 🏫 frozen): every minute, the tabs whose class day has come open in place, like the timer above
+  if(cls.length){const reday=setInterval(()=>{if(!cls.length)return clearInterval(reday);const t=elAgToday(),op=gid?elClassOpenAt(gid,t):null;
+    const f=cls.filter(id=>soon[id]&&(soon[id]<t||soon[id]===t&&(!op||Date.now()>=op)));if(f.length)window.elSecFree(f)},60e3)}
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
@@ -499,6 +528,90 @@ function trimJump(a,info,g){const sel=document.getElementById("sessionJump");if(
 // section opened so far (elSecLockedFor, elSecPending in el-catalog.js). A learning path still locked for the group shows a warning with
 // an Open button (ls/{id}.open, locked, lockedKeys, as api.lpOpen). LS1 pages are left as they are (Roger: leave LS1 alone).
 // The learning path pages do not load el-sections.js (the section list the dashboard uses), so it is loaded here for the teacher only.
+// 👥 Who is in the class, at the top right of a teacher's page (#el-fsfloat): ⛶ full screen for the group (live/{group}.fs = {on, at, until},
+// as on the dashboard; fsCheck below), who left (live/{group}/fsLeft) and who is not connected (live/{group}/here, elClassWatch and
+// elClassRoll in el-catalog.js), while full screen or a class game is on. One line of counts, the names under it on a tap (elWhoLine).
+// Made for the group picked in the learning path's bar (teacherSections) and, on the class tab, for the class mode's group (cmTeacher).
+// Roger, 13 Nov 2026: "I need to see who is in class during class mode and during the activities done together (grammar and reading)":
+// the class tab used to show the group last picked in a learning path's bar (a class mode started from the dashboard for 2ESO B showed
+// 2ESO A, out of its class, so nothing), showed nothing on pages without that bar (recall checkpoints…), and ✅ Correct together
+// (shared/correct/open.js) covered it. Now the class tab always shows its class mode's group, on every page, and while ✅ Correct
+// together is open the line sits as a strip above it (the frame starts under it). getG() = the group, redraw() = the page's redraw,
+// owns() = this one draws #el-fsfloat now (the class tab's panel wins while class mode is on). Listeners on the same documents are
+// shared by the Firestore SDK, so two panels for one group cost no more reads.
+let fsPanelN=0;const fsRoster={},fsAll=new Set();   // each group's student list, read once per page for every panel (fsAll: their redraws)
+function fsPanel(getG,redraw,owns){
+  const P={G:null,X:null,live:null,list:[],here:[],ro:fsRoster,wl:{open:null,hide:false}},id=String(++fsPanelN);
+  let sD=null,sL=null,sH=null,AT=null;
+  const gname=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).name||g,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  // in force now: the switch (P.X) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
+  P.tt=()=>(P.live&&P.live.tt)||elTT(P.G);P.eff=()=>elFsEff(P.X,P.tt());
+  const w0=()=>elClassWatch(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here);
+  P.watch=function(){const g=getG();if(!g||P.G===g)return;[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=g;P.X=P.live=null;P.list=[];P.here=[];
+    sD=onSnapshot(doc(db,"live",g),s=>{if(P.G!==g)return;P.live=s.exists()?s.data():null;P.X=(P.live&&P.live.fs)||null;listen();redraw()},e=>console.warn("live",e))};
+  function listen(){const g=P.G;if(!g)return;const on=w0().active;
+    if(on&&!sL){sL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{P.list=c.docs.map(d=>Object.assign({e:d.id},d.data()));redraw()},e=>console.warn("fsLeft",e));
+      sH=onSnapshot(collection(db,"live",g,"here"),c=>{P.here=c.docs.map(d=>Object.assign({e:d.id},d.data()));redraw()},e=>console.warn("here",e));
+      if(!P.ro[g]){P.ro[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{P.ro[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});fsAll.forEach(f=>f())}).catch(e=>{delete P.ro[g];console.warn("roster",e)})}}
+    else if(!on&&sL){sL();sH&&sH();sL=sH=null;P.list=[];P.here=[]}}
+  const iv=setInterval(()=>{if(P.live){listen();redraw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
+  const onCr=()=>redraw();window.addEventListener("el-correct",onCr);fsAll.add(redraw);   // ✅ Correct together opened or closed (shared/correct/open.js)
+  P.stop=()=>{[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=null;clearInterval(iv);window.removeEventListener("el-correct",onCr);fsAll.delete(redraw);
+    const f=document.getElementById("el-fsfloat");if(f&&f.dataset.o===id){f.remove();frTop(0)}};
+  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
+  P.toggle=async()=>{const g=P.G,now=Date.now(),c=elSlotNow(P.tt(),now),v=P.eff()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
+    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});return v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);return "✗ Not saved: "+(e.code||e.message||e)}};
+  P.hm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
+  // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once)
+  P.roll=()=>elClassRoll(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here,P.ro[P.G]||[]);
+  P.why=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+P.hm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+P.hm(y.seen):y.why==="lost"?"lost connection · since "+P.hm(y.seen):"not connected";
+  const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField});
+  // the ✅ Correct together frame starts under the strip (h px), back to the top when the strip goes
+  function frTop(h){const fr=document.getElementById("el-correct");if(!fr)return;const t=h?h+"px":"0px";if(fr.style.top!==t){fr.style.top=t;fr.style.height=h?"calc(100vh - "+h+"px)":"100vh"}}
+  // in the class tab (on the projector) one line of counts (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen … students
+  // played to log in and out so that their name appeared"): the names open under it only when the teacher taps a count (P.wl.open)
+  // ✥ Drag it anywhere (Roger, 13 Nov 2026: "I want to be able to move this icon"): a press that moves more than 6 px drags the panel (or the
+  // 👥 chip) instead of pressing its button; where it is left is kept on this computer (el_t_fspos, its top-left corner) and used again
+  // on every page, kept on screen when it grows or the window shrinks. Not the strip above ✅ Correct together. No reads, no writes.
+  const POS="el_t_fspos",posGet=()=>{try{const p=JSON.parse(localStorage.getItem(POS)||"null");return p&&isFinite(p.x)&&isFinite(p.y)?p:null}catch(e){return null}};
+  const fit=(f,x,y)=>{f.style.left=Math.max(4,Math.min(x,innerWidth-f.offsetWidth-4))+"px";f.style.top=Math.max(4,Math.min(y,innerHeight-f.offsetHeight-4))+"px";f.style.right=f.style.bottom="auto"};
+  const place=f=>{const p=posGet();if(p)fit(f,p.x,p.y)};
+  function drag(f){let sx=0,sy=0,ox=0,oy=0,on=false,pid=null;f.style.touchAction="none";f.style.cursor="grab";f.title="Drag to move it";
+    // move and release are followed on the whole window: a quick drag leaves the panel before it has moved
+    const mv=e=>{if(pid!==e.pointerId)return;const dx=e.clientX-sx,dy=e.clientY-sy;
+      if(!on){if(Math.abs(dx)+Math.abs(dy)<7)return;on=true;f.dataset.moving="1";f.style.cursor="grabbing"}
+      e.preventDefault();fit(f,ox+dx,oy+dy)};
+    const up=e=>{if(pid!==e.pointerId)return;pid=null;removeEventListener("pointermove",mv);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+      if(!on)return;on=false;delete f.dataset.moving;f.style.cursor="grab";f.dataset.dragged="1";setTimeout(()=>{delete f.dataset.dragged},400);
+      try{origSet.call(localStorage,POS,JSON.stringify({x:parseInt(f.style.left),y:parseInt(f.style.top)}))}catch(x){}};
+    f.addEventListener("pointerdown",e=>{if(e.button||e.target.closest(".el-wlbox"))return;const r=f.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;pid=e.pointerId;on=false;
+      addEventListener("pointermove",mv);addEventListener("pointerup",up);addEventListener("pointercancel",up)})}
+  P.float=function(){if(!owns())return;const w=P.roll();let f=document.getElementById("el-fsfloat");
+    if(!w.active){if(f&&f.dataset.o===id){f.remove();frTop(0)}return}
+    // over ✅ Correct together: a strip above it, or with ✕ Hide only the 👥 chip, bottom right (over the frame's empty corner)
+    const g=P.G,cr=!!document.getElementById("el-correct"),dock=cr&&!P.wl.hide,mode=dock?"dock":cr?"chip":"float";
+    if(f&&(f.dataset.o!==id||f.dataset.mode!==mode)){f.remove();f=null;frTop(0)}
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.dataset.o=id;f.dataset.mode=mode;
+      f.style.cssText=dock?"position:fixed;top:0;left:0;right:0;z-index:2147483001;background:#fff;border-bottom:3px solid #ffd34d;padding:4px 16px 5px;font:600 14px system-ui,sans-serif;color:#1e293b;box-shadow:0 3px 10px rgba(0,0,0,.25)"
+        :"position:fixed;"+(cr?"bottom:12px":"top:10px")+";right:12px;z-index:2147483001;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{const b=e.target.closest("button");if(!b||f.dataset.dragged)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),P.G,AT.cur,AT.w,P.ro[P.G]||[]).then(r=>{if(r)redraw()});return}
+        if(b.dataset.hide){P.wl.hide=!P.wl.hide;redraw()}else if(b.dataset.wl){P.wl.open=P.wl.open===b.dataset.wl?null:b.dataset.wl;redraw()}else P.toggle().then(redraw)};document.body.append(f);if(!dock)drag(f)}
+    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
+    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;redraw()}).catch(e=>console.warn("attendance",e))}
+    const aS=AT.m?AT.m.attClass(g,P.tt(),P.eff(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,redraw):undefined;
+    if(aS)AT.m.attLate(atApi(),g,aS,w);
+    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;";
+    const av=aS?AT.m.attView(w,aR,false):undefined,wl=elWhoLine(w,{open:P.wl.open,av,why:P.why,hm:P.hm});
+    // ✕ Hide (Roger, 10 Nov 2026: "can I hide the message?"): only a small 👥 in/of chip stays, a tap shows the panel again (this tab only)
+    const hb='<button data-hide="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(P.wl.hide?"Show who is in, who left and who is not here":"Hide this message")+'">'+(P.wl.hide?'👥 '+w.inn.length+'/'+w.n:'✕ Hide')+'</button>';
+    f.style.padding=dock?(P.wl.hide?"3px 16px":"4px 16px 5px"):P.wl.hide?"4px 6px":"8px 12px";
+    const h=P.wl.hide?hb:dock?'<div style="display:flex;gap:4px 12px;align-items:center;flex-wrap:wrap"><b style="white-space:nowrap">👥 '+E(gname(g))+'</b>'+wl.line.replace("margin-top:4px","margin:0")+'<span style="flex:1"></span>'+hb+'</div>'+wl.list
+      :'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+E(gname(g))+' in full screen':'🎮 '+E(gname(g))+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+P.hm(P.eff().until)+(P.eff().auto?' (class, by your timetable)':''):'')+'</div>'
+      +wl.line+wl.list;
+    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}
+    if(dock)frTop(f.offsetHeight);else if(!f.dataset.moving)place(f)};   // not while it is being dragged
+  return P}
 async function teacherSections(info){
   for(const [f,v] of [["el-sections","EL_SECTIONS"],["el-plan","EL_PLAN"]])if(!window[v])await new Promise(r=>{const sc=document.createElement("script");sc.src=new URL("shared/js/"+f+".js",ROOT).href;sc.onload=sc.onerror=r;document.head.append(sc)});
   const a=(window.EL_CATALOG||[]).find(x=>x.id===actId),secs=a&&(window.EL_SECTIONS||{})[a.id];
@@ -506,7 +619,9 @@ async function teacherSections(info){
   const ls=(window.EL_LS||[]).find(l=>l.id===lsId),course=lsId.split("-")[0];
   let grs=(window.EL_GROUPS||[]).filter(g=>elLsForGroup(ls,info,g.id));if(!grs.length)grs=(window.EL_GROUPS||[]).filter(g=>g.course===course);if(!grs.length)return;
   const k=a.id.replace("/","__"),ref=doc(db,"ls",lsId),all=secs.map(x=>x[0]),nm=id=>(secs.find(x=>x[0]===id)||[])[1]||id;
-  let g=localStorage.getItem("el_t_secgroup");if(!grs.some(x=>x.id===g))g=grs[0].id;
+  let g=localStorage.getItem("el_t_secgroup");
+  {const c=cmRead();if(c&&grs.some(x=>x.id===c.g))g=c.g}   // the class tab: its class mode's group (opened from the dashboard, the bar may remember another)
+  if(!grs.some(x=>x.id===g))g=grs[0].id;
   let msg="",busy=false;
   const st=document.createElement("style");st.textContent=".el-tsec{margin:0 0 10px;padding:10px 14px;border:2px solid #a5b4fc;border-radius:12px;background:#eef2ff;font:14px system-ui,sans-serif;color:#1e1b4b}"
     +".el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.el-tsec b{margin-right:4px}.el-tsec button{border:1px solid #c7d2fe;background:#fff;color:#3730a3;border-radius:999px;padding:3px 12px;cursor:pointer;font:600 13px system-ui,sans-serif}"
@@ -532,52 +647,11 @@ async function teacherSections(info){
   const cmOpen=()=>{const now=Date.now(),until=(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS,u=new URL(location.href);
     u.searchParams.set("elcm",g+"."+until);window.open(u.href,"_blank","noopener")};
   const cmStop=()=>setDoc(doc(db,"live",g),{go:null,fs:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
-  // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
-  // (live/{group}/fsLeft), live for the group chosen in this bar
-  // and who is not connected (live/{group}/here, elClassWatch in el-catalog.js), while full screen or a class game is on
-  let fsStop=null,fsStopL=null,fsStopH=null,fsG=null,fsX=null,fsLive=null,fsList=[],fsHere=[];
-  // in force now: the switch (fsX) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
-  const fsTT=()=>(fsLive&&fsLive.tt)||elTT(g),fsE=()=>elFsEff(fsX,fsTT());
-  const fsW=()=>elClassWatch(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere);
-  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL,fsStopH].forEach(f=>f&&f());fsStop=fsStopL=fsStopH=null;fsG=g;fsX=fsLive=null;fsList=[];fsHere=[];
-    fsStop=onSnapshot(doc(db,"live",g),s=>{fsLive=s.exists()?s.data():null;fsX=(fsLive&&fsLive.fs)||null;fsListen();draw()},e=>console.warn("live",e))}
-  function fsListen(){const on=fsW().active;
-    if(on&&!fsStopL){fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("fsLeft",e));
-      fsStopH=onSnapshot(collection(db,"live",g,"here"),c=>{fsHere=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("here",e));
-      if(!fsRo[g]){fsRo[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{fsRo[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});draw()}).catch(e=>{delete fsRo[g];console.warn("roster",e)})}}
-    else if(!on&&fsStopL){fsStopL();fsStopH&&fsStopH();fsStopL=fsStopH=null;fsList=[];fsHere=[]}}
-  setInterval(()=>{if(fsLive){fsListen();draw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
-  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
-  async function fsToggle(){const now=Date.now(),c=elSlotNow(fsTT(),now),v=fsE()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
-    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
-  const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
-  // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
-  // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once), ▾ makes it small,
-  // and it opens again by itself when a student who was in goes out (elClassRoll in el-catalog.js)
-  // in the class tab (on the projector) the panel starts small: the counts and who left by name, everybody one tap away
-  // since 10 Nov 2026 (Roger: "this was too big and I couldn't see the screen … students played to log in and out so that their name appeared"):
-  // one line of counts (elWhoLine in el-catalog.js), the names open under it only when the teacher taps a count (fsWl.open)
-  const fsRo={},fsWl={open:null,hide:false},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
-  const fsRoll=()=>elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]);
-  const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
-  let AT=null;const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField}),attRedraw=()=>draw();
-  function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
-    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147483000;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),g,AT.cur,AT.w,fsRo[g]||[]).then(r=>{if(r)draw()});return}
-        if(b.dataset.hide){fsWl.hide=!fsWl.hide;draw()}else if(b.dataset.wl){fsWl.open=fsWl.open===b.dataset.wl?null:b.dataset.wl;draw()}else fsToggle()};document.body.append(f)}
-    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
-    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;draw()}).catch(e=>console.warn("attendance",e))}
-    const aS=AT.m?AT.m.attClass(g,fsTT(),fsE(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,attRedraw):undefined;
-    if(aS)AT.m.attLate(atApi(),g,aS,w);
-    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;";
-    const av=aS?AT.m.attView(w,aR,false):undefined,wl=elWhoLine(w,{open:fsWl.open,av,why:fsWhy,hm:fsHm});
-    // ✕ Hide (Roger, 10 Nov 2026: "can I hide the message?"): only a small 👥 in/of chip stays, a tap shows the panel again (this tab only)
-    const hb='<button data-hide="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsWl.hide?"Show who is in, who left and who is not here":"Hide this message")+'">'+(fsWl.hide?'👥 '+w.inn.length+'/'+w.n:'✕ Hide')+'</button>';
-    f.style.padding=fsWl.hide?"4px 6px":"8px 12px";
-    const h=fsWl.hide?hb:'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
-      +wl.line+wl.list;
-    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
+  // 👥 who is in the class (fsPanel above): for the group picked in this bar; on the class tab the class mode's own panel shows instead
+  const FP=fsPanel(()=>g,()=>draw(),()=>!cmOn);
+  const fsWatch=()=>FP.watch(),fsE=()=>FP.eff(),fsRoll=()=>FP.roll(),fsHm=FP.hm,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  const fsToggle=()=>FP.toggle().then(m=>{msg=m;draw()});
+  const fsFloat=()=>FP.float();
   // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
   function fsRow(w){const x=fsE(),on=!!x;
     const {gone,never}=elWhoLeft(w);   // counts only: the names are in the panel at the top right, one tap away (Roger, 10 Nov 2026)
@@ -593,7 +667,7 @@ async function teacherSections(info){
         return ms?'<em class="y">✓ '+nm+' · '+plDay(ms)+'</em>':'<em class="n">✗ '+nm+' · not yet</em>'}).join("");
       if(s.dataset.h!==h){s.dataset.h=h;s.innerHTML=h;s.title="Played in class by each group (✓ day / ✗ not yet)"}})}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
-  function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
+  function cmRow(){fsWatch();const x=FP.live&&FP.live.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
     return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
       +(mine?'<span class="now">This tab is the class tab: '+gname(g)+' follows it'+(x&&x.until?' until '+fsHm(x.until):'')+'</span><button class="g" data-cm="-">⏹ Stop class mode</button>'
         :on?'<span class="now">On: they follow your class tab ('+E(x.t||"")+(x.pn?" · "+E(x.pn):"")+')</span><button class="g" data-cm="-">⏹ Stop class mode</button><button data-cm="1">Start it here instead</button>'
@@ -618,7 +692,7 @@ async function teacherSections(info){
       +cmRow()
       +(elLpOpen(a,info,g,true)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
-    fsFloat(fsRoll())
+    fsFloat()
     gamesPlayed();
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
@@ -666,11 +740,14 @@ function annReply(u,id,text){text=String(text||"").trim().slice(0,1000);if(!u||!
 // Plus student gets the Problem window and the cards in English there too. The board keeps its own language (the LS on screen).
 const repEn=()=>{const l=myLevel||homeLevel;return l?!elCa(l):onBoard&&document.documentElement.lang==="en"};
 // A screenshot goes in its own document (problemShots/{same id}), so the dashboard loads it only when the teacher opens it.
-const reportProblem=u=>report({en:repEn(),save:o=>{
+// The teacher has the same button (Roger, 13 Nov 2026: "I need a problem button available for the teacher"): on the dashboard, the class tab
+// and every page, in English. The report says teacher:true (firestore.rules: only the teacher's own account) and the group is the class
+// mode's group on the class tab; the same instant task reads it (docs/general/problem-reports-auto.md, "The teacher's own reports").
+const reportProblem=u=>{const tch=isTeacher(u)&&!AS;return report({en:repEn(),teacher:tch,save:o=>{
   const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
-  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
+  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:tch?((cmRead()||{}).g||null):myGroup||null,ls:lsId,activity:actId,route:tch?null:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()},tch?{teacher:true}:{}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
-  return b.commit().then(r=>{wakeFixer(u);return r})}});
+  return b.commit().then(r=>{wakeFixer(u);return r})}})};
 // Roger, 8 Nov 2026 ("read it straightaway … fix it and answer the student"): once the report is saved, the school Apps Script
 // (tools/notify/school-mail.gs, action "problem") starts the scheduled task that reads new reports, checked with the student's own
 // sign-in; fire and forget, nothing shown, nothing read. Without it the task still runs every hour.
@@ -731,6 +808,7 @@ function bar(){
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
+      else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Claude looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
@@ -826,8 +904,8 @@ function storyCard(u){
   el.innerHTML='<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap"><img src="'+new URL(s.pdf+"cover.jpg",ROOT).href+'" alt="" style="width:120px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.18)">'
     +'<div style="flex:1;min-width:220px"><h2>📖 '+(ca?"Història per llegir":"Reading story")+" · "+s.title+"</h2><p>"
     +(ca?"Un misteri en sis capítols. Llegeix un capítol cada setmana a casa, amb el seu Learning Path. A classe en parlem deu minuts.":"A story in six chapters. Read one chapter a week at home, with its Learning Path. In class we talk about it for ten minutes.")
-    +(every?"":" <b>"+elLevelLabel(ls.course,lv==="native"?"daring":lv)+"</b>")
-    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="native"?"daring":lv))+"</p></div></div>";
+    +(every?"":" <b>"+elLevelLabel(ls.course,lv==="native"&&!s.pro?"daring":lv)+"</b>")
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native"||s.pro).map(x=>a(x.id)).join(""):a(lv==="native"&&!s.pro?"daring":lv))+"</p></div></div>";   // story.pro: a C2 book for Pro (else Pro reads Plus)
   el.hidden=false;
 }
 let draw=()=>{},authKnown=false;
@@ -852,10 +930,317 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
+    const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
+// 📖 Read together (shared/correct/, Roger 12 Nov 2026: "can we read together instead of everyone having a different text" and "but
+// again, the text is not the same for everyone"): live/{group}.rt = {u, k, n, chat, l, h, at}. While it names this page, the reading box
+// shows h, the one text the class reads on the projector, instead of the student's own level's text, with a note, and marks block k
+// (the teacher's paragraph; -1 before the first). When rt is cleared (⏱ Your turn, or the screen closed) the student's own text comes
+// back, so each one answers their own level. Nothing is written and nothing saved changes: only what the box shows.
+let rtNow=null,rtKey="",rtBox=null,rtOrig=null,rtSig="";
+function rtRestore(){if(rtBox&&rtOrig!=null&&rtBox.isConnected)rtBox.innerHTML=rtOrig;rtBox=null;rtOrig=null;rtSig="";
+  const n=document.getElementById("el-rt-note");if(n)n.remove()}
+// 🆕 After reading together (rt.x, from ⏱ Your turn on): the student's own text is back, and the words it has that the shared text did
+// not (the extra details of a Core or Plus version) are marked green, so the student reads those on their own before answering
+// (Roger, 12 Nov 2026: "if they read different texts…"). A CSS highlight: the page's text and answers are not touched.
+const RT_STOP=new Set("a an the and or but of to in on at for from with by is are was were be it its this that there here i you he she we they me him her us them my your his our their not no as so if than then too very can will just also do does did have has had".split(" "));
+const rtStem=w=>w.replace(/'s$/,"").replace(/ies$/,"y").replace(/(ing|ed|es|s)$/,"").replace(/(.)\1$/,"$1");
+function rtExtras(box,h){if(typeof CSS==="undefined"||!CSS.highlights||typeof Highlight==="undefined")return 0;
+  CSS.highlights.delete("el-rt-new");if(!box||!h)return 0;
+  const seen=new Set((new DOMParser().parseFromString(h.replace(/<[^>]*>/g," "),"text/html").body.textContent.toLowerCase().replace(/[’‘]/g,"'").match(/[a-zà-ÿ0-9']+/g)||[]).map(rtStem));
+  const hl=new Highlight(),tw=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n,c=0,last=null;
+  while((n=tw.nextNode())){if(n.parentElement&&n.parentElement.closest(".tiny,script,style,button"))continue;
+    const re=/[A-Za-zÀ-ÿ0-9'’]+/g,t=n.nodeValue;let m;
+    while((m=re.exec(t))){const w=m[0].toLowerCase().replace(/’/g,"'");
+      if(RT_STOP.has(w)||seen.has(rtStem(w))||(w.length<2&&!/\d/.test(w)))continue;
+      // joined to the previous new word when only spaces, commas or little words are between them ("ten to twelve")
+      const gap=last&&last.endContainer===n?t.slice(last.endOffset,m.index):null;
+      if(gap!=null&&gap.length<14&&/^[\s,'’-]*$/.test(gap.replace(/[A-Za-z]+/g,x=>RT_STOP.has(x.toLowerCase())?" ":"#")))last.setEnd(n,m.index+m[0].length);
+      else{const r=new Range();r.setStart(n,m.index);r.setEnd(n,m.index+m[0].length);hl.add(r);last=r;c++}}
+    last=null}
+  if(c)CSS.highlights.set("el-rt-new",hl);return c}
+function rtCss(){if(!document.getElementById("el-rt-css")){const st=document.createElement("style");st.id="el-rt-css";
+    st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}"+
+      "#el-rt-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7cc;border:2px solid #ffd34d;font:700 15px system-ui,sans-serif;color:#713f12}"+
+      "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}"+
+      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}"+
+      ".el-rc-cur{box-shadow:0 0 0 4px #ffd34d!important;border-radius:12px;background:#fffbea!important}"+
+      "#el-rc-card{position:fixed;right:16px;bottom:16px;z-index:2147481000;width:400px;max-width:calc(100vw - 32px);max-height:70vh;overflow:auto;background:#fff;border-radius:14px;border:3px solid #6366f1;box-shadow:0 10px 30px rgba(15,23,42,.3);font:16px/1.45 system-ui,sans-serif;color:#13222c}"+
+      "#el-rc-card .h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 12px;background:#6366f1;color:#fff;font-weight:800;cursor:move;touch-action:none;user-select:none;position:sticky;top:0}"+
+      "#el-rc-card .b{padding:10px 14px}#el-rc-card p{margin:0 0 6px}#el-rc-card .q{font-weight:700}#el-rc-card .w{color:#5f6b73}"+
+      "#el-rc-card.ok{border-color:#2e8b57}#el-rc-card.ok .h{background:#2e8b57}#el-rc-card.no{border-color:#ef4444}#el-rc-card.no .h{background:#dc2626}"+
+      "#el-rc-card .y b{color:inherit}#el-rc-card.no .y{color:#991b1b}#el-rc-card .r{color:#14532d;font-weight:600}"+
+      "#el-rc-card .ev{margin-top:8px;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e3e7eb;font-size:15px}#el-rc-card .ev small{display:block;font-weight:700;color:#2b4fa8;margin-bottom:2px}"+
+      "#el-rc-card mark{background:#ffe680;padding:1px 3px;border-radius:4px;color:inherit}";document.head.append(st)}}
+function rtNote(box,cls,txt){let n=document.getElementById("el-rt-note");if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}n.className=cls;n.textContent=txt}
+/* ✅ Correcting together (Roger, 13 Nov 2026: "when correcting the reading I want students to see the feedback on their Chromebook with the
+   answers according to their level and see what they did", then "they should see this floating and they can move it if it's on their text;
+   when I change the question it disappears and the next one appears"): on the projector's question slides rt.c = {p: the step, qs: [{q,
+   a, alt}] the question (one per level when each level has its own), s: the answer is shown, w: [{r: level, n: its number, h: where the
+   text says it, the sentence marked}]}. The student's own question with that text is outlined and brought into view, and a floating card
+   (drag it by its top bar; the place is kept for the visit) shows that question: once the teacher shows the answer, what they answered
+   (✓ / ✗), the right answer of their level and where their text says it. The card changes with the projector's question and goes when
+   the screen closes or moves to the reading log. A question their level does not have: the card says so (listen). Nothing is written and
+   their answers are not touched. */
+const rcEsc=v=>String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rcClear(){const c=document.getElementById("el-rc-card");if(c)c.remove();document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"))}
+const rcTitle=el=>{const t=el.querySelector(".q-title");if(!t)return"";const c=t.cloneNode(true);c.querySelectorAll(".q-ca,small").forEach(x=>x.remove());return rtNorm(c.textContent.replace(/^\s*\d+\.\s*/,"").replace(/🔮/g,""))};
+let rcPos=null;try{rcPos=JSON.parse(sessionStorage.getItem("el_rc_pos")||"null")}catch(e){}
+function rcCard(){let c=document.getElementById("el-rc-card");if(c)return c;
+  c=document.createElement("div");c.id="el-rc-card";c.innerHTML='<div class="h"><span class="t"></span><span class="g" aria-hidden="true">⠿</span></div><div class="b"></div>';document.body.append(c);
+  const place=(x,y)=>{const w=c.offsetWidth,h=c.offsetHeight;x=Math.max(4,Math.min(innerWidth-w-4,x));y=Math.max(4,Math.min(innerHeight-h-4,y));c.style.left=x+"px";c.style.top=y+"px";c.style.right=c.style.bottom="auto";return {x,y}};
+  if(rcPos)requestAnimationFrame(()=>place(rcPos.x,rcPos.y));
+  const hd=c.querySelector(".h");let d=null;
+  hd.addEventListener("pointerdown",e=>{const r=c.getBoundingClientRect();d={dx:e.clientX-r.left,dy:e.clientY-r.top};hd.setPointerCapture(e.pointerId);e.preventDefault()});
+  hd.addEventListener("pointermove",e=>{if(d)rcPos=place(e.clientX-d.dx,e.clientY-d.dy)});
+  const up=()=>{if(!d)return;d=null;try{sessionStorage.setItem("el_rc_pos",JSON.stringify(rcPos))}catch(e){}};hd.addEventListener("pointerup",up);hd.addEventListener("pointercancel",up);
+  return c}
+function rtCorrect(c,box){
+  document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"));
+  if(!c||!Array.isArray(c.qs)){rcClear();return}
+  const list=document.getElementById(c.p+"Form")||document.getElementById(c.p+"List");if(!list||list.offsetParent===null){rcClear();return}
+  const ca=lockCa(),want=c.qs.map(x=>rtNorm(x.q));let hit=null,q=null;
+  [...list.querySelectorAll(".question")].some(el=>{const i=want.indexOf(rcTitle(el));if(i<0)return false;hit=el;q=c.qs[i];return true});
+  const card=rcCard(),T=card.querySelector(".t"),B=card.querySelector(".b"),k="c|"+want.join("|")+"|"+(c.s?1:0)+"|"+(hit?1:0);
+  if(!hit){card.className="none";T.textContent=ca?"✅ Corregim junts":"✅ Correcting together";
+    B.innerHTML=`<p>${ca?"Aquesta pregunta no és al teu reading: escolta i busca-la al text de la pissarra.":"This question isn't in your reading: listen and find it in the text on the board."}</p>`;rtKey=k;return}
+  hit.classList.add("el-rc-cur");
+  const num=(hit.querySelector(".q-title")||{}).textContent.match(/^\s*(\d+)\./),qt=(hit.querySelector(".q-title").cloneNode(true));qt.querySelectorAll(".q-ca,small").forEach(x=>x.remove());
+  T.textContent=(ca?"✅ Corregim · pregunta ":"✅ Correcting · question ")+(num?num[1]:"");
+  if(k!==rtKey){rtKey=k;const ae=document.activeElement;if(!(ae&&ae.closest&&ae.closest("input[type=text],textarea")))hit.scrollIntoView({block:"center",behavior:"smooth"})}
+  const qh=`<p class="q">${rcEsc(qt.textContent.replace(/^\s*\d+\.\s*/,"").trim())}</p>`;
+  if(!c.s){card.className="wait";B.innerHTML=qh+`<p class="w">${ca?"Pensa la resposta i escolta…":"Think of your answer and listen…"}</p>`;return}
+  // what they answered: the option they picked (0 = the right one in the data) or what they typed (the page's own ✓ when they checked)
+  const r=hit.querySelector("input[type=radio]:checked"),t=hit.querySelector("input.typed,input[type=text]"),fb=hit.querySelector(".feedback");
+  const said=r?(r.closest("label")||{}).textContent||"":t?t.value.trim():"";
+  const ok=r?+r.value===0:t?(fb&&fb.classList.contains("ok"))||[].concat(q.a||[],q.alt||[]).some(a=>rtNorm(a)===rtNorm(said)):false;
+  // where their text says it: their level's (the one whose marked sentence is in the text on their screen; their route first)
+  const w=Array.isArray(c.w)?c.w:[],inBox=rtNorm(box?box.textContent:""),mk=h=>rtNorm((h.match(/<mark>([\s\S]*?)<\/mark>/)||[,""])[1].replace(/<[^>]*>/g," "));
+  const ev=(q.h?{h:q.h}:null)||w.find(x=>x.r===myLevel&&x.h)||w.filter(x=>x.h&&mk(x.h)&&inBox.includes(mk(x.h))).sort((a,b)=>mk(b.h).length-mk(a.h).length)[0]||null;   // the longest: Starter's short sentence is inside Core's
+  card.className=ok?"ok":"no";
+  B.innerHTML=qh+(said?`<p class="y">${ca?"La teva resposta":"Your answer"}: <b>${rcEsc(said)}</b> ${ok?"✓":"✗"}</p>`:`<p class="y">${ca?"No l'has resposta.":"You didn't answer it."}</p>`)+
+    `<p class="r">${ok?"✓ "+(ca?"Correcte!":"Right!"):"✓ "+(ca?"Resposta correcta":"Right answer")+": <b>"+rcEsc(q.a||"")+"</b>"}</p>`+
+    (ev?`<div class="ev"><small>${ca?"On ho diu el text":"Where the text says it"}</small><div>${ev.h}</div></div>`:"");
+}
+function rtFollow(rt){rtNow=rt||null;
+  document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
+  document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
+  if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();wbClose();rtRestore();rcClear();return}
+  if(rt.p)return rtGram(rt);
+  const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
+  rtCss();
+  if(rt.x){wbClose();rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
+      n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
+    rtCorrect(rt.c,box);return}
+  if(typeof rt.h==="string"&&rt.h){
+    if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
+    const sig=rt.l+"|"+rt.h.length+"|"+rt.h.slice(0,80);
+    if(sig!==rtSig){box.innerHTML=rt.h;rtSig=sig;let n=document.getElementById("el-rt-note");
+      if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}
+      n.textContent=lockCa()?"📖 Llegim junts: ara tothom té el mateix text que a la pissarra. El teu text torna quan hagis de respondre.":"📖 Reading together: everyone has the same text as on the board now. Your own text comes back when it's time to answer."}}
+    if(typeof rt.h==="string"&&rt.h)wbShow(rt,"reading",rt.h,box);
+  if(!(rt.k>=0))return;
+  const bl=[...box.children].filter(e=>!e.classList.contains("tiny"));if(!bl.length)return;
+  const i=rt.chat&&bl.length!==rt.n?Math.round(rt.k*(bl.length-1)/Math.max(1,rt.n-1)):Math.min(rt.k,bl.length-1),el=bl[i];
+  el.classList.add("el-rt-cur");const k=rt.u+"|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
+/* 📘 Grammar together (shared/correct/ tab=grammar; Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section"):
+   rt = {u, p: the step ("grammar"), k: the box explained now (-1 before the first), n, l, h: the boxes in English, hc: in Catalan, at}.
+   The step's "How it works" card shows the projector's boxes (hc for a student who has the page in Catalan, Base and Starter) and marks
+   box k. From ⏱ Your turn on, rt = {u, p, k: -1, x: 1, hs: the text of every box seen together}: the student's own boxes are back and
+   the ones not seen together go green, to read before the exercise. Only what the card shows changes; nothing is saved. */
+const rtNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-zà-ÿ0-9']+/g," ").trim();
+/* 📝 Notes while explaining together (Roger, 13 Nov 2026: "during the grammar together I want students to have a note place to copy the notes
+   they want. It should appear in their notes with the day, the grammar summary and their notes"): under the shared boxes, a student gets
+   📝 Take your notes. Saved 2.5 s after they stop typing, when the teacher goes on to ⏱ Your turn, and when the page closes, in
+   students/{uid}/notes/gt-<course>-<ls>-<page> (the class games' notes collection, firestore.rules: their own) = {ls, course, deck, title, lp,
+   parts:{gt:{topic, day, sum: the boxes seen together, text, at}}, updated}. 🎯 What's in the exam on the LS page shows it in its learning
+   path's card (shared/js/el-notes.js gtCard). Nothing is saved until they write. */
+// the boxes as plain words + <b>/<br> (the visual ones are styled divs that would eat the 1500 characters)
+const gtFlat=h=>String(h||"").replace(/<\/(div|p|tr|table|h\d|li|ul|ol)>|<(br|hr)\b[^>]*>/gi,"<br>").replace(/<\/t[dh]>/gi," · ").replace(/<\/span>/gi," ").replace(/<(?!\/?(strong|em|b|i|br|del|s|u)\b)[^>]*>/gi,"").replace(/<(\/?)(strong|em|b|i|br|del|s|u)\b[^>]*>/gi,"<$1$2>").replace(/(\s*·\s*)+<br>/g,"<br>").replace(/(\s*<br>\s*){2,}/g,"<br>").replace(/^(\s*<br>)+|(<br>\s*)+$/g,"").trim();
+const GTN={el:null,v:"",dirty:false,t:0,st:"",rt:null,loaded:"",ca:false};
+const gtDeck=()=>"gt-"+relPath.replace(/\.html$/,"").replace(/\//g,"-");   // gt-2eso-free-time-live-what-are-they-doing
+const gtT=(c,e)=>GTN.ca?c:e;
+function gtState(st){if(st!=null)GTN.st=st;const e=document.getElementById("el-gt-st");if(!e)return;
+  e.textContent=GTN.st==="saving"?gtT("Desant…","Saving…"):GTN.st==="saved"?gtT("✓ Desat a 🎯 Què entra a l'examen, amb la data i l'explicació","✓ Saved in 🎯 What's in the exam, with the day and the explanation")
+    :GTN.st==="err"?gtT("⚠ Encara no s'ha desat: continua escrivint, ho torna a provar","⚠ Not saved yet: keep writing, it tries again"):gtT("Es desa sol mentre escrius.","Saved by itself while you write.")}
+async function gtSave(){
+  clearTimeout(GTN.t);if(!GTN.dirty||!user||!isStudent(user)||AS||!GTN.rt)return;GTN.dirty=false;
+  const rt=GTN.rt,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath),d=document.createElement("div");d.innerHTML=(GTN.ca&&rt.hc)||rt.h||"";
+  const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector(":scope>span:first-child");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12);
+  const title=(document.querySelector('#'+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .panel-head h2")||{}).textContent||"";
+  const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});gtState("saving");
+  try{await setDoc(doc(db,"students",user.uid,"notes",gtDeck()),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck:gtDeck(),
+      title:"📘 "+(title||"Grammar").trim(),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",parts:{gt:{topic:"How it works · together",day,sum,text:GTN.v.slice(0,3000),at:now}},updated:now},{merge:true});gtState("saved")}
+  catch(e){console.warn("grammar notes",e);GTN.dirty=true;gtState("err");GTN.t=setTimeout(gtSave,8e3)}
+}
+function gtBox(box,rt){
+  if(!user||!isStudent(user)||AS)return;GTN.rt=rt;GTN.ca=lockCa();
+  let f=document.getElementById("el-gt-notes");
+  if(!f||!f.isConnected||f.previousElementSibling!==box){if(f)f.remove();f=document.createElement("div");f.id="el-gt-notes";f.className="section-card";
+    f.innerHTML=`<h3>📝 ${gtT("Pren apunts","Take your notes")}</h3><p class="instruction">${gtT("Copia el que vulguis de l'explicació i escriu 2 frases teves amb aquesta gramàtica. Ho trobaràs a 🎯 Què entra a l'examen, amb la data i l'explicació.","Copy what you want from the explanation and write 2 sentences of your own with this grammar. You'll find it in 🎯 What's in the exam, with the day and the explanation.")}</p>`+
+      `<textarea maxlength="3000" spellcheck="false" style="width:100%;min-height:130px;font:16px/1.5 system-ui,sans-serif;padding:10px;border-radius:10px;border:2px solid #cbd5e1;box-sizing:border-box" placeholder="${GTN.ca?"1. …&#10;2. …&#10;Per recordar: …":"1. …&#10;2. …&#10;To remember: …"}"></textarea><p class="tiny" id="el-gt-st"></p>`;
+    box.after(f);const ta=f.querySelector("textarea");ta.value=GTN.v;
+    ta.addEventListener("input",()=>{GTN.v=ta.value;GTN.dirty=true;gtState("");clearTimeout(GTN.t);GTN.t=setTimeout(gtSave,2500)});
+    // what they wrote before on this learning path (another day, another device) comes back: one read per page
+    if(GTN.loaded!==gtDeck()){GTN.loaded=gtDeck();getDoc(doc(db,"students",user.uid,"notes",gtDeck())).then(s=>{const t=s.exists()?(((s.data().parts||{}).gt||{}).text||""):"";
+      const x=document.querySelector("#el-gt-notes textarea");if(t&&x&&!GTN.v){x.value=GTN.v=t}}).catch(e=>console.warn("grammar notes",e))}}
+  gtState(null);
+}
+function gtClose(){const f=document.getElementById("el-gt-notes");if(GTN.dirty)gtSave();if(f)f.remove()}
+addEventListener("pagehide",()=>{if(GTN.dirty)gtSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&GTN.dirty)gtSave()});
+/* 📘 📖 Only a whiteboard while the teacher explains (Roger, 13 Nov 2026: "when doing an activity together, and I'm explaining theory I want
+   students to only see a whiteboard and that when they take notes it looks like hand writing and they can underline, highlight, etc. this
+   notes appear in their notes"; "when doing theory like grammar or whatever, they must only see their notes"): while rt names this page
+   and it is not ⏱ Your turn yet, a student's Chromebook shows shared/js/el-whiteboard.js over the page: the projector's boxes (Grammar
+   together) or text (Read together) with the part being explained marked, and their handwriting page (el-pad.js). The page is saved like
+   📝 Take your notes was (2.5 s after they stop, on Your turn, when the page closes), in students/{uid}/notes/gt-<course>-<ls>-<page>
+   (reading: …-rd) parts.gt = {topic, day, sum, text, html: their page with its marks (nb-* classes only), dr: their drawings, at}; one read
+   per page brings back what they wrote before. 📓 My notebook on the LS page shows it (el-notebook.js). If the whiteboard can't load, the
+   old 📝 box under the boxes comes back (grammar). The teacher and 👁 Student view never get it. */
+const WB={m:null,p:null,fail:false,deck:"",v:null,dirty:false,t:0,rt:null,kind:"",loaded:"",ca:false,box:null};
+const wbDeck=k=>gtDeck()+(k==="reading"?"-rd":"");
+const wbT=(c,e)=>WB.ca?c:e;
+const wbMod=()=>WB.p||(WB.p=import("./el-whiteboard.js").then(m=>(WB.m=m)).catch(e=>{console.warn("whiteboard",e);WB.fail=true;throw e}));
+const wbTitle=()=>{const b=WB.box,pn=b&&(b.closest(".panel")||b.closest("section"));return String(((pn&&pn.querySelector(".panel-head h2"))||{}).textContent||"").trim()};
+function wbShow(rt,kind,html,box){
+  if(!user||!isStudent(user)||AS||WB.fail)return false;
+  const deck=wbDeck(kind);
+  if(WB.deck!==deck){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.deck=deck;WB.v=null;WB.dirty=false}
+  WB.rt=WB.srt=rt;WB.kind=kind;WB.ca=lockCa();WB.box=box;
+  const go=()=>{if(!WB.rt||WB.deck!==deck)return;
+    WB.m.render({kind,title:wbTitle(),head:window.LP&&window.LP.n?"LP"+window.LP.n:"",html,k:rt.k,n:rt.n,chat:rt.chat,ca:WB.ca,saved:WB.v,
+      onChange:v=>{WB.v=v;WB.dirty=true;WB.m.status(wbT("Desant…","Saving…"));clearTimeout(WB.t);WB.t=setTimeout(wbSave,2500)}});
+    if(!WB.dirty&&WB.loaded!==deck)WB.m.status(wbT("Es desa sol a 📓 La meva llibreta","Saved by itself in 📓 My notebook"));
+    if(WB.loaded!==deck){WB.loaded=deck;getDoc(doc(db,"students",user.uid,"notes",deck)).then(x=>{const p=x.exists()?((x.data().parts||{}).gt||{}):null;
+      if(p&&(p.html||p.text||(p.dr||[]).length)&&!WB.dirty&&WB.deck===deck&&WB.m.isOpen()){WB.v={html:p.html||"",text:p.text||"",dr:p.dr||[]};WB.m.set(WB.v)}}).catch(e=>console.warn("whiteboard notes",e))}};
+  if(WB.m)go();else wbMod().then(go).catch(()=>{if(kind==="grammar"&&WB.rt)gtBox(box,rt)});
+  return true;
+}
+async function wbSave(){
+  clearTimeout(WB.t);if(!WB.dirty||!WB.v||!user||!isStudent(user)||AS||!WB.srt)return;WB.dirty=false;
+  const rt=WB.srt,kind=WB.kind,deck=WB.deck,v=WB.v,a=(window.EL_CATALOG||[]).find(y=>y.path===relPath);
+  let sum=[];if(kind==="grammar"){const d=document.createElement("div");d.innerHTML=(WB.ca&&rt.hc)||rt.h||"";
+    sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector(":scope>span:first-child");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12)}
+  const html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
+  const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+  if(WB.m)WB.m.status(wbT("Desant…","Saving…"));
+  try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck,
+      title:(kind==="grammar"?"📘 ":"📖 ")+(wbTitle()||(kind==="grammar"?"Grammar":"Reading")),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",
+      parts:{gt:{topic:kind==="grammar"?"How it works · together":"Reading together",day,sum,text:String(v.text||"").slice(0,3000),html,dr,at:now}},updated:now},{merge:true});
+    if(WB.m&&WB.deck===deck)WB.m.status(wbT("✓ Desat a 📓 La meva llibreta","✓ Saved in 📓 My notebook"))}
+  catch(e){console.warn("whiteboard notes",e);WB.dirty=true;if(WB.m)WB.m.status(wbT("⚠ Encara no s'ha desat: continua, ho torna a provar","⚠ Not saved yet: keep going, it tries again"));WB.t=setTimeout(wbSave,8e3)}
+}
+function wbClose(){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.rt=null}
+addEventListener("pagehide",()=>{if(WB.dirty)wbSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&WB.dirty)wbSave()});
+/* 📓 My notebook, always at hand (Roger, 13 Nov 2026: "a floating icon like a notebook always present", "didn't I say that they should see
+   the notebook here?" on the board): a round 📓 button bottom left on every student page, the board, the learning paths, English Lab and
+   the course pages. It opens the notebook (the LS page's #notes) of the LS the student is in: this LS on an LS page from LS2 on (LS1 has no
+   notebook), elsewhere the last one the board or an LS page showed (el_nb on this device; window.elNbFab(href) from the board). Hidden on
+   the notebook itself, under the whiteboard and on the teacher's dashboard. No reads. */
+function nbFab(){
+  if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname))return;
+  let href=null;
+  if(lsId&&m){const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum)return;
+    href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}
+  else{try{href=localStorage.getItem("el_nb")}catch(e){}}
+  const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
+    "#el-nbfab[hidden]{display:none}#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
+    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none}@media print{#el-nbfab{display:none}}"+
+    // on a phone, above the students' tab bar (el-phone.css), not over 🏠 Home
+    "@media (max-width:640px){body.elptab #el-nbfab{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}";
+  document.head.append(st);
+  const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
+  const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
+  lab();document.body.append(a);
+  a.addEventListener("click",e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;if(qnOpen()){e.preventDefault();}});
+  const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&!!lsId&&/\/(index\.html)?$/.test(location.pathname));
+  here();addEventListener("hashchange",here);setTimeout(lab,4000);
+  // the board knows the student's LS now: its notebook (an LS1 or no LS: no button)
+  window.elNbFab=h=>{try{if(h)localStorage.setItem("el_nb",h);else localStorage.removeItem("el_nb")}catch(e){}a.hidden=!h;if(h)a.href=h;else a.removeAttribute("href")};
+}
+// 📓 opened from a learning path: the notebook opens on that learning path, at the step on screen (Roger, 13 Nov 2026: "When I open my
+// notebook from an SLP, I want the notebook to open there too"). el-notebook.js reads el_nb_at once, if it is less than 2 minutes old.
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href*="#notes"]');if(!a||!lsId||!m||/\/(index\.html)?$/.test(location.pathname))return;
+  const tab=document.querySelector(".tab.active[data-panel]");try{localStorage.setItem("el_nb_at",JSON.stringify({ls:lsId,page:location.pathname.split("/").pop(),panel:tab?tab.dataset.panel:"",t:Date.now()}))}catch(x){}},true);
+setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
+/* ✍ A quick note from any page (Roger, 13 Nov 2026: "is the floating icon of the notebook always available, so that students can note
+   what they need when they need it?"): for a signed-in student the 📓 button opens a small handwriting page (el-pad.js: pens, highlighters,
+   underline) over the page they are on, so they don't leave the activity. It is saved by itself (2 s after they stop, on ✓ and when the
+   page closes) into their notebook, students/{uid}/notes/nb-<LS> parts.n.<id> = {sec: "lp<n>" (the learning path they are in) or "qn"
+   (✍ Quick notes), html, text, dr, day, w: where they wrote it}, merged, so nothing else of the notebook is touched. "Open my notebook"
+   still goes to the whole notebook. No reads. */
+const QN={w:null,p:null,id:"",v:null,dirty:false,t:0,ls:"",sec:"",where:""};
+const qnLs=()=>{if(lsId)return lsId;let h="";try{h=localStorage.getItem("el_nb")||""}catch(e){}const x=h.match(/\/((2|4)eso)\/([^/]+)\/(index\.html)?#notes$/);return x?x[1]+"-"+x[3]:""};
+function qnOpen(){
+  if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off"))return false;
+  const ls=qnLs();if(!ls)return false;
+  if(QN.w){qnClose();return true}
+  const ca=lockCa(),T=(c,e2)=>ca?c:e2,LP=window.LP,tab=document.querySelector(".tab.active[data-panel]");
+  const lpN=LP&&LP.n&&lsId===ls?String(LP.n):"",step=String((tab&&(tab.innerText||tab.textContent))||"").replace(/\s+/g," ").trim().replace(/^\d+\s*/,"").slice(0,60);
+  const where=lpN?("LP"+lpN+(step?" · "+step:"")):String(document.title||"").replace(/\s*[·|–-]\s*English Lab.*$/i,"").slice(0,60);
+  if(!QN.id||QN.ls!==ls||QN.where!==where){if(QN.dirty)qnSave();QN.id="n"+Date.now().toString(36);QN.v=null;QN.dirty=false}
+  QN.ls=ls;QN.sec=lpN?"lp"+lpN:"qn";QN.where=where;
+  if(!document.getElementById("el-qn-css")){const st=document.createElement("style");st.id="el-qn-css";st.textContent=
+    "#el-qn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:78px;z-index:9991;width:min(520px,calc(100vw - 28px));height:min(430px,calc(100vh - 110px));display:flex;flex-direction:column;background:#fffef8;border:2px solid #1f4fb5;border-radius:14px;box-shadow:0 14px 34px rgba(20,40,90,.3);font:15px/1.35 system-ui,sans-serif;color:#1e293b;overflow:hidden}"+
+    "#el-qn .qn-top{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #dbe4f5;background:#f3f6fd}#el-qn .qn-top b{white-space:nowrap}#el-qn .qn-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:13px}"+
+    "#el-qn .qn-b{border:1px solid #c7d2ea;background:#fff;border-radius:8px;padding:4px 10px;font:600 13px system-ui,sans-serif;color:#1f4fb5;cursor:pointer;text-decoration:none;white-space:nowrap}#el-qn .qn-ok{background:#1f4fb5;color:#fff;border-color:#1f4fb5}"+
+    "#el-qn .qn-host{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:6px 8px}#el-qn .qn-st{padding:3px 10px 6px;font-size:12px;color:#64748b}#el-qn .pad-tools{margin:0 0 10px;border-radius:8px;border:1px solid #d5dce5}"+
+    "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
+  const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
+  const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
+  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
+  w.querySelector(".qn-w").textContent="📍 "+where;
+  document.body.append(w);QN.w=w;
+  const st=s2=>{const x=QN.w&&QN.w.querySelector(".qn-st");if(x)x.textContent=s2};
+  st(T("Es desa sol a la teva llibreta, a "+(lpN?"LP"+lpN:"✍ Notes ràpides")+".","Saved by itself in your notebook, in "+(lpN?"LP"+lpN:"✍ Quick notes")+"."));
+  w.querySelector(".qn-ok").addEventListener("click",()=>qnClose());
+  w.querySelector(".qn-open")?.addEventListener("click",()=>{if(QN.dirty)qnSave()});
+  w.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();qnClose()}});
+  import("./el-pad.js").then(P=>{if(QN.w!==w)return;
+    QN.p=P.pad(w.querySelector(".qn-host"),{html:QN.v&&QN.v.html,text:QN.v&&QN.v.text,dr:QN.v&&QN.v.dr,ca,ph:T("Escriu aquí el que vulguis recordar. Pots canviar de boli, subratllar i marcar.","Write here what you want to remember. You can change pens, highlight and underline."),
+      onChange:v=>{QN.v=v;QN.dirty=true;st(T("Desant…","Saving…"));clearTimeout(QN.t);QN.t=setTimeout(qnSave,2000)}});
+    QN.st=st;setTimeout(()=>{if(QN.p&&QN.p.ed)QN.p.ed.focus()},30)}).catch(e=>{console.warn("quick note",e);qnClose();if(href)location.href=href});
+  return true;
+}
+async function qnSave(){
+  clearTimeout(QN.t);if(!QN.dirty||!QN.v||!user||!isStudent(user)||AS)return;QN.dirty=false;
+  const v=QN.v,ca=lockCa(),T=(c,e2)=>ca?c:e2,st=QN.w&&QN.st,id=QN.id,deck="nb-"+QN.ls;
+  const L=(window.EL_LS||[]).find(l=>l.id===QN.ls)||{},html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
+  if(!html.replace(/<[^>]*>/g,"").trim()&&!String(v.text||"").trim()&&!dr.length)return;
+  const day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+  try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:QN.ls,course:L.course||(QN.ls.match(/^\d+eso/)||[""])[0],deck,title:"📓 My notebook",lp:"",
+      parts:{n:{[id]:{sec:QN.sec,html,text:String(v.text||"").slice(0,3000),dr,day,w:QN.where}}},updated:serverTimestamp()},{merge:true});
+    if(st&&QN.id===id)st(T("✓ Desat a la teva llibreta","✓ Saved in your notebook"))}
+  catch(e){console.warn("quick note",e);QN.dirty=true;if(st)st(T("⚠ Encara no s'ha desat: ho torna a provar","⚠ Not saved yet: it tries again"));QN.t=setTimeout(qnSave,8e3)}
+}
+function qnClose(){if(QN.p)QN.v=Object.assign(QN.v||{},QN.p.get());if(QN.dirty)qnSave();if(QN.w)QN.w.remove();QN.w=null;QN.p=null}
+addEventListener("pagehide",()=>{if(QN.dirty)qnSave()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&QN.dirty)qnSave()});
+function rtGram(rt){
+  const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
+  rtCss();const ca=lockCa();
+  if(rt.x){gtClose();wbClose();rtRestore();const hs=new Set(rt.hs||[]);let c=0;
+    box.querySelectorAll(".model").forEach(m=>{if(!hs.has(rtNorm(m.textContent))){m.classList.add("el-rt-newbox");c++}});
+    if(c)rtNote(box,"x",ca?"🆕 Els requadres en verd són del teu nivell i no els hem vist junts: llegeix-los ara, abans de començar.":"🆕 The green boxes are for your level and we didn't see them together: read them now, before you start.");
+    return}
+  const h=ca&&rt.hc?rt.hc:rt.h;
+  if(typeof h==="string"&&h){
+    if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
+    const sig="g|"+rt.l+"|"+(ca?1:0)+"|"+h.length+"|"+h.slice(0,80);
+    if(sig!==rtSig){box.innerHTML=h;rtSig=sig;
+      rtNote(box,"",ca?"📘 Aprenem junts: ara tothom veu la mateixa explicació que a la pissarra. La del teu nivell torna quan hagis de practicar.":"📘 Learning together: everyone sees the same explanation as on the board now. Your level's comes back when it's time to practise.")}
+    if(!wbShow(rt,"grammar",h,box))gtBox(box,rt)}
+  if(!(rt.k>=0))return;
+  const bl=[...box.querySelectorAll(".model")];if(!bl.length)return;
+  const el=bl[Math.min(rt.k,bl.length-1)];el.classList.add("el-rt-cur");const k=rt.u+"|g|"+rt.k;
+  if(k!==rtKey){rtKey=k;const ae=document.activeElement;if(!(ae&&ae.closest&&ae.closest("#el-gt-notes")))el.scrollIntoView({block:"center",behavior:"smooth"})}}   // not while they write their notes
+// the reading tab opened after the teacher moved on still gets the text and the mark (the page may draw the box again)
+document.addEventListener("click",e=>{if(rtNow&&e.target.closest(".tab"))setTimeout(()=>{rtKey="";if(rtBox&&!rtBox.isConnected){rtBox=null;rtOrig=null;rtSig=""}if(rtBox&&rtBox.offsetParent===null)rtSig="";rtFollow(rtNow)},120)});
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
 // the teacher's pull-up also writes live/{group}.go = {a, p, pn, t, at} (the document this page already listens to for class games, so
 // no extra reads). Every student page that is open goes to that learning path (and tab) after a 5-second notice that saves their work
@@ -885,30 +1270,118 @@ const lockOn=g=>!!(g&&g.lock&&(g.a||g.cm&&g.u)&&g.at&&(g.cm?elCmOn(g):Date.now()
 // read before the first pull-up or full screen message on pages that do not know it, such as the board)
 const lockCa=()=>{const lv=myLevel||homeLevel;return !!lv&&elCa(lv)};
 let lvTried=false;
-const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>!!LOCK&&(LOCK.cm?location.pathname===cmUrl(LOCK).pathname:actId===LOCK.a);
+const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>!!LOCK&&(LOCK.cm?cmHere(LOCK).length>0:actId===LOCK.a);
+// 🎓 Several steps at once (Roger, 12 Nov 2026: "let me enable more than one SLP at once since there are times where students need to navigate
+// them"): go.ps = [{u, p, n}] lists the steps the teacher opened with 👥 in 📋 Today (el-cm-agenda.js), the class tab's own step always
+// counts too. Students may work on any of them: they are not moved while they are on one, and a row of chips on the class mode bar takes
+// them from one to another (other pages too). go.vis = today's steps on the Time plan ("path#tab", "path#" a whole page): "me and they should
+// only see the SLP planned for the class", so on those learning path pages every other tab is hidden while class mode lasts (cmTabs).
+const onPage=u=>{try{return new URL(u,ROOT).pathname===location.pathname}catch(e){return false}};
+// 📖 the Book is one tab now: a chapter tab sent by an older plan (path#ch2) is the "book" tab (elTabOf in el-catalog.js)
+const tabP=(u,p)=>window.elTabOf?elTabOf(String(u||""),p||""):p||"";
+function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:tabP(g.u,g.p),n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
+  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{const xp=x&&tabP(x.u,x.p);if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===xp))out.push({u:x.u,p:xp,n:x.n||x.p||""})});
+  const f=ffRead(g);if(f)f.ps.forEach(p=>{if(!out.some(y=>y.u===f.u&&y.p===p))out.push({u:f.u,p,n:ffName(p,lockCa()),ff:true})});return out}
+const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
+// the tab the student is on: the active tab, or the panel shown when the page opened on a #tab link without marking a tab (the bar then
+// said "Go there" to a student already on the teacher's tab)
+const curPanel=()=>{const t=document.querySelector(".tab.active[data-panel]");if(t)return t.dataset.panel;const p=document.querySelector(".panel.active[id]");return p?p.id:null};
+// ⚡ I've finished (Roger, 12 Nov 2026: "I want to allow doing further activities planned on the agenda for fast finishers", then "yes add
+// I've finished but that brings them to the book section"): in class mode the student's 🎓 bar has ⚡ I've finished. Once every step open
+// for the class (cmEn: the teacher's step and the 👥 ones) is done on this student's progress, it takes them to the 📖 Book learning path
+// of the LS, at the first chapter they have not done, opened for them alone while this class mode lasts (sessionStorage el_cm_ff =
+// {s, until, u, ps: [chapters]}; page-only, like the Time plan's 🏫 tabs: the class tab opens the Book path for the group at the rules
+// level and names it on live/{group}.go.ff, el-cm-agenda.js). Not finished: a note says what is left. The chapter counts as one more open
+// step for them (a chip on the bar, not moved by the teacher's next move), and ⚡ again after it gives the next chapter. After the class
+// those chapters are as the Time plan says again (🏫 read-only until their day, answers kept).
+const FF_K="el_cm_ff";
+function ffRead(g){if(!g||!g.cm)return null;try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.s===g.s&&o.u&&Array.isArray(o.ps)?o:null}catch(e){return null}}
+// the chapters granted on this page while that class mode lasts (known before live/{group} is read: the page's first locks)
+function ffPage(){try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.u&&Array.isArray(o.ps)&&Date.now()<+o.until&&onPage(o.u)?o.ps:[]}catch(e){return []}}
+const ffName=(p,ca)=>"📖 "+(ca?"El llibre":"The book");
+const samePath=(a,b)=>{try{return new URL(a,ROOT).pathname===new URL(b,ROOT).pathname}catch(e){return false}};
+const ffAct=u=>(window.EL_CATALOG||[]).find(y=>y.path&&samePath(y.path,u));
+const ffDoneSet=a=>new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));
+// a step of the class done on this student's progress (a page with no steps, such as a game, holds nobody back)
+function ffDone(x){const a=ffAct(x.u);if(!a)return true;const sk=a.skip||[],ks=(x.p?elSecSteps(a,x.p):((window.EL_ACTIONS||{})[a.id]||[])).filter(k=>!sk.includes(k));
+  if(!ks.length)return true;const d=ffDoneSet(a);return ks.every(k=>d.has(k))}
+// the Book path the class tab offers (go.ff = [path]): the one of this page's LS, else the first
+function ffBook(g){const ps=g&&g.cm&&Array.isArray(g.ff)?g.ff:[];if(!ps.length)return null;const as=ps.map(ffAct).filter(Boolean);return as.find(a=>a.ls===lsId)||as[0]||null}
+function ffGo(){const g=LOCK;if(!g||!g.cm)return;const ca=lockCa(),bk=ffBook(g);if(!bk)return;
+  const left=cmEn(g).filter(x=>!ffDone(x));
+  if(left.length){lockToast((ca?"✋ Primer acaba: ":"✋ First finish: ")+left.map(x=>x.n||x.p).join(", "));return}
+  const d=ffDoneSet(bk),left2=((window.EL_ACTIONS||{})[bk.id]||[]).find(k=>!d.has(k)),nx="book";   // one tab: the book opens where they stopped
+  if(!left2){lockToast(ca?"🎉 Ja has llegit tot el llibre! Ajuda un company o repassa la feina d'avui.":"🎉 You've read the whole book! Help a classmate or look back at today's work.");return}
+  const f=ffRead(g)&&samePath(ffRead(g).u,bk.path)?ffRead(g):{s:g.s,u:bk.path,ps:[]};f.until=g.until||Date.now()+60*60e3;if(!f.ps.includes(nx))f.ps.push(nx);
+  try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}
+  if(onPage(bk.path)){window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(nx);if(window.elSecFree)elSecFree([nx])}
+  b0();cmJump({u:bk.path,p:nx})}
+const b0=()=>{const b=document.getElementById("el-lock");if(b)b.dataset.h=""};   // the bar is drawn again (a new chip)
+function ffBtn(b,ca){const x=document.createElement("button");x.dataset.ff="1";x.textContent=ca?"⚡ He acabat":"⚡ I've finished";
+  x.title=ca?"Has fet tot el d'avui? Continua amb el llibre":"Done with everything for now? Go on with the book";
+  x.style.cssText="border:0;border-radius:999px;padding:6px 16px;background:#facc15;color:#422006;font:800 14px system-ui,sans-serif;cursor:pointer";b.append(x)}
+// may the student open this tab now (a step the teacher opened on this page, or the one they were already on)
+const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lockFrom};
+window.elCmTabOk=p=>!LOCK||!LOCK.cm||!lockHere()||cmTabOk(p);   // ⛶ one step full screen (el-app.js): Previous / Next only through these
+// only today's steps on a learning path page (students and the class tab): keep = panel ids shown in any case
+function cmTabs(vis,keep){const ts=[...document.querySelectorAll(".tab[data-panel]")];if(!ts.length&&!document.querySelector(".el-cm-hide"))return;
+  const pv=(Array.isArray(vis)?vis:[]).map(String).filter(k=>onPage(k.slice(0,k.indexOf("#")))).map(k=>tabP(k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1))),on=pv.length>0&&!pv.includes(""),ok=new Set([...pv,...(keep||[])]);
+  if(on&&!document.getElementById("el-cm-hide-css")){const st=document.createElement("style");st.id="el-cm-hide-css";st.textContent=".tab.el-cm-hide{display:none!important}";document.head.append(st)}
+  ts.forEach(t=>{const x=on&&!ok.has(t.dataset.panel);if(t.classList.contains("el-cm-hide")!==x)t.classList.toggle("el-cm-hide",x)});
+  return on}
+// the steps opened for the class on this page are given back if this student's page had them hidden, 🏫 or read-only (lockSections)
+function cmFree(g){const ps=cmHere(g).map(x=>x.p).filter(Boolean);if(!ps.length)return;const f=window.EL_CM_FREE=window.EL_CM_FREE||new Set(),nw=ps.filter(p=>!f.has(p));
+  if(!nw.length)return;nw.forEach(p=>f.add(p));if(window.elSecFree)elSecFree(nw)}
+// a chip of the bar: the tab on this page, or the work saved and that page
+async function cmJump(x){if(onPage(x.u)){const t=x.p&&document.querySelector('.tab[data-panel="'+CSS.escape(x.p)+'"]');if(t){lockFrom=null;t.click()}else window.scrollTo(0,0);return}
+  try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}
+  try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}const u=new URL(x.u,ROOT);u.hash=x.p||"";location.href=u.href}
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
   n.textContent=t||(ca?"🔒 El professor t'ha fet venir aquí: no pots anar a cap altra part de la web fins que et deixi anar.":"🔒 Your teacher brought you here: you can't go to any other part of the website until they let you go.");
   clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
-function lockBar(){let b=document.getElementById("el-lock");
+// the 🎓 class mode bar is fixed on top of the page: the page moves down by its height (body padding, the sticky top bar with 🔍 Dictionary,
+// the left menu and the path's column), so nothing hides behind it (problem report, 2ESOA, 13 Nov 2026: "the top green line is covering
+// the dictionary"). The 🌟 line under it counts too; ⛶ one step full screen (slpPlace, !important) adds the bars' height itself.
+function lockPad(){const b=document.getElementById("el-lock"),c=document.getElementById("el-cmcheer"),h=(b&&b.offsetHeight||0)+(c&&c.offsetHeight||0),R=document.documentElement;
+  if(h&&!document.getElementById("el-lock-pad-css")){const st=document.createElement("style");st.id="el-lock-pad-css";
+    st.textContent="body.el-lockpad{padding-top:var(--el-lock-h,0px)}body.el-lockpad .topbar{top:var(--el-lock-h,0px)!important}body.el-lockpad .elrail{top:var(--el-lock-h,0px)!important}body.el-lockpad .ellpside{top:calc(var(--el-lock-h,0px) + 70px);max-height:calc(100vh - var(--el-lock-h,0px) - 80px)}";document.head.append(st)}
+  if(R.style.getPropertyValue("--el-lock-h")!==h+"px")R.style.setProperty("--el-lock-h",h+"px");
+  if(document.body.classList.contains("el-lockpad")!==!!h)document.body.classList.toggle("el-lockpad",!!h)}
+function lockBar(){lockBar0();lockPad()}
+function lockBar0(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
-  const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
+  const ca=lockCa(),cur=curPanel(),g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
-    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.ff)return ffGo();if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+  const en=cmEn(g);
+  if(en.length>1){   // several steps open: a chip for each, the one the student is on marked
+    const ff=!!ffBook(g),at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur)),h2="m|"+ca+"|"+ff+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
+    b.textContent="🎓 "+(ca?"Mode classe · pots treballar a:":"Class mode · you can work on:")+" ";
+    en.forEach((x,i)=>{const c=document.createElement("button");c.dataset.k=String(i);c.textContent=(i===at2?"● ":"")+(x.n||x.p);
+      c.style.cssText="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;"+(i===at2?"background:#fff;color:#0f766e":"background:#0f766e;color:#fff");b.append(c)});if(ff)ffBtn(b,ca);return}
   const off=g.p&&cur!==g.p,h=(g.cm?"🎓 "+(ca?"Mode classe: segueixes el professor":"Class mode: you follow your teacher"):"🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here"))+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
     +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
-  if(b.dataset.h!==h){b.dataset.h=h;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
-    x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}}}
+  const ff=!!ffBook(g);
+  if(b.dataset.h!==h+ff){b.dataset.h=h+ff;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
+    x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}if(ff)ffBtn(b,ca)}}
 // clicks on the kept page: links that leave it, and other tabs when the teacher chose one
 document.addEventListener("click",e=>{if(!lockHere())return;
   const t=e.target.closest&&e.target.closest(".tab[data-panel]");
-  if(t&&LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom){e.preventDefault();e.stopImmediatePropagation();lockToast((lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
+  if(t&&(LOCK.cm?!cmTabOk(t.dataset.panel):LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom)){e.preventDefault();e.stopImmediatePropagation();
+    const en=cmEn(LOCK);lockToast(en.length>1?(lockCa()?"🔒 Ara pots treballar a: ":"🔒 Now you can work on: ")+en.map(x=>x.n||x.p).join(", "):(lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
   const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;let u;try{u=new URL(a.href,location.href)}catch(x){return}
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
+  if(LOCK.cm&&u.origin===location.origin&&cmEn(LOCK).some(x=>new URL(x.u,ROOT).pathname===u.pathname))return;   // another step the teacher opened
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsRefresh();fsCheck();hereTick()},1000);   // the class is over (until) or LOCK_MS passed
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();cmTopSpace();cmStudentTabs();fsRefresh();fsCheck();hereTick()},1000);
+// the student's tabs in class mode (only today's steps); after class mode every tab is back
+function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){cmTabs(null);return}
+  if(!cmTabs(g.vis,cmHere(g).map(x=>x.p)))return;
+  const at=document.querySelector(".tab.active[data-panel]");if(!at||!at.classList.contains("el-cm-hide"))return;
+  const h=cmHere(g),p=(h.find(x=>x.me)||h[0]||{}).p,t=p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');if(t){lockFrom=null;t.click()}}   // the class is over (until) or LOCK_MS passed
 // ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
 // "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
 // already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
@@ -1011,18 +1484,24 @@ function cmGo(g){
   if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search)||!LOCK)return;
   const url=cmUrl(g),k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   try{origSet.call(localStorage,k,"1")}catch(e){}
-  if(location.pathname===url.pathname){lockFrom=null;
-    const t=g.p&&document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]'),at=document.querySelector(".tab.active[data-panel]");
+  // several steps open (go.ps): a student on one of them stays there; on this page but on another tab, to the teacher's tab (or the first
+  // step open here); on another page with none, to the teacher's page as before
+  const h=cmHere(g),multi=cmEn(g).length>1;
+  if(h.length){lockFrom=null;cmFree(g);
+    const at=document.querySelector(".tab.active[data-panel]"),cur=curPanel(),stay=multi&&h.some(x=>!x.p||x.p===cur);
+    const p=location.pathname===url.pathname?g.p:h[0].p,t=!stay&&p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');
     if(t&&t!==at){try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}t.click()}
-    lockBar();return}
+    cmStudentTabs();lockBar();return}
   goMove(url,(g.t||"")+(g.pn?" · "+g.pn:""),seen,seen?2:3,"🎓");
 }
 // 🌟 The student's encouraging sentence in class mode (Roger, 9 Nov 2026: "when they are on class mode they don't see the sentence where I
 // tell them positive things, can you make it visible for 4 minutes once I start the class mode? on the top of their screen"): the same
 // "Hi Pau, …" line as their board (ELCheer.student in el-cheer.js, Catalan for Starter/Base), in a bar at the top of whatever page class
 // mode takes them to, for the first 4 minutes after the teacher started it (go.s), then it goes away. No extra reads or writes.
-const CHEER_MS=4*60e3;let cheerT=0,cheerPad=null;
-function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();if(cheerPad!==null){document.body.style.paddingTop=cheerPad;cheerPad=null}}
+const CHEER_MS=4*60e3;let cheerT=0;
+function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
+// the 🌟 line sits under the 🎓 class mode bar: lockPad moves the page down by both (one place for it, #550 + #551)
+function cmTopSpace(){lockPad()}
 function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&&g.s?g.s+CHEER_MS:0;
   if(!end||Date.now()>=end||!user||!isStudent(user)||AS){if(was)cheerOff();return}
   if(was&&was.dataset.s===String(g.s))return;
@@ -1035,9 +1514,7 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
       b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:2147481990;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;font:800 clamp(18px,2.3vw,28px)/1.25 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(67,56,202,.3)";
       document.body.append(b)}
     b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
-    if(cheerPad===null)cheerPad=document.body.style.paddingTop||"";
-    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";
-      document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
+    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";cmTopSpace()};
     clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
@@ -1048,7 +1525,7 @@ const CM_K="el_cm";
 function cmRead(){try{const o=JSON.parse(sessionStorage.getItem(CM_K)||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}}
 const cmEnd=()=>{try{sessionStorage.removeItem(CM_K)}catch(e){}};
 (()=>{const sp=new URLSearchParams(location.search),v=sp.get("elcm");if(!v)return;const [g,u]=v.split(".");
-  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1")}catch(e){}   // 📋 today's agenda shows when class mode starts
+  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1");sessionStorage.setItem("el_cm_wu","1")}catch(e){}   // 📋 today's agenda shows when class mode starts
   sp.delete("elcm");history.replaceState(null,"",location.pathname+(sp.toString()?"?"+sp:"")+location.hash)})();
 let cmOn=false;
 function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=true;
@@ -1061,11 +1538,29 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   try{last=JSON.parse(sessionStorage.getItem(CM_K+"_last")||"null")}catch(e){}
   // 📋 Today (el-cm-agenda.js): the group's class day from the Time plan agenda, clickable; open when class mode starts and on every next
   // page until it is closed (Roger, 7 Nov 2026: "in class mode, I should have the day of the agenda so that I can click it")
-  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,lsInfo,root:ROOT,g:o.g,gname:gn});return m});
+  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,getDoc,getDocs,collection,query,where,deleteField:FBM[2].deleteField,serverTimestamp,lsInfo,root:ROOT,g:o.g,gname:gn,s:o.s,token:()=>user.getIdToken(),tester:e=>TESTERS.includes(e)});return m});
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
-  const key=x=>x.u+"#"+x.p;
-  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
-  if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  // today's steps and the 👥 ones (el-cm-agenda.js plan) go with every move; the module loads at once, the panel shown or not
+  agLoad().then(m=>m.init()).catch(e=>console.warn("agenda",e));
+  // 🔥 the warm-up game opens by itself when class mode starts (Roger, 13 Nov 2026: "so the class mode the game appears automatically"),
+  // once: not on the next pages of this class mode (el-warmup.js; 🔥 Warm-up in 📋 Today opens it again)
+  try{if(sessionStorage.getItem("el_cm_wu")==="1"){sessionStorage.removeItem("el_cm_wu");agLoad().then(m=>m.warmOpen(true)).catch(e=>console.warn("warm-up",e))}}catch(e){}
+  const key=x=>x.u+"#"+x.p+"|"+JSON.stringify(x.ps||[])+"|"+(x.vis||[]).join(",")+"|"+(x.ff||[]).join(",");
+  // ✅ Correct (Roger, 12 Nov 2026: correct the reading with the whole class, every level): on a Reading or Reading log tab of an LS2-on
+  // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
+  let crM=null;const crLoad=()=>crM?Promise.resolve(crM):import(new URL("shared/correct/open.js",ROOT).href).then(m=>crM=m);
+  const crRe=/^[24]eso\/(?!my-real-routine\/)[a-z0-9-]+\/[a-z0-9-]+\.html$/;
+  const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log"||x.p==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(x.u.replace(/\.html$/,"")))};   // 📘 grammar: LS2 LP3 first
+  const crOpen=()=>crLoad().then(m=>{const x=state(),r=m.readingOf(x.u,x.p);if(r)m.openCorrect(ROOT,Object.assign({tab:x.p,g:o.g},r))}).catch(e=>console.warn("correct",e));
+  // 👥 who is in the class, on every page this tab goes to and over ✅ Correct together (fsPanel; Roger, 13 Nov 2026)
+  const FPc=fsPanel(()=>o.g,()=>FPc.float(),()=>cmOn);FPc.watch();
+  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;FPc.stop();if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
+  cmTabs(null);if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  // ⏹ Stop: first the end-of-class window (✔ Finished / ⏭ Next class / 🏠 Homework for today's steps, el-cm-agenda.js wrapUp; Roger, 12 Nov
+  // 2026), then the students are let go. ↩ Back to class keeps class mode on.
+  let ending=false;
+  async function stopNow(){if(ending)return;ending=true;let r="none";try{const m=await agLoad();r=await m.wrapUp(true)}catch(e){console.warn("class mode",e)}ending=false;
+    if(r==="back")return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit(r==="saved"?"stopped · saved on your Time plan":"stopped")}
   // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
   // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
   // (inside a class of the timetable full screen stays on by itself, elFsEff)
@@ -1075,13 +1570,17 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
     try{await setDoc(doc(db,"live",o.g),w,{merge:true});if(w.fs)try{sessionStorage.setItem(CM_K+"_fs",String(o.s))}catch(e){}draw();if(agM)agM.refresh()}catch(e){console.warn("class mode",e);last=null;draw("✗ Not sent: "+(e.code||e.message||e))}}
   function draw(err){if(!chip){chip=document.createElement("div");chip.id="el-cmchip";
       chip.style.cssText="position:fixed;left:12px;bottom:12px;z-index:2147481500;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px);padding:8px 10px 8px 14px;border-radius:999px;background:#4338ca;color:#fff;font:700 14px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
-      chip.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ag)return agToggle();setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit("stopped")};document.body.append(chip)}
-    chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button data-ag="1" title="Today\'s class on your Time plan: click a tab to go there with the class" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">📋 Today</button><button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
+      chip.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ag)return agToggle();if(b.dataset.wu)return agLoad().then(m=>m.warmOpen()).catch(e=>console.warn("warm-up",e));if(b.dataset.cr)return crOpen();stopNow()};document.body.append(chip)}
+    chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button data-ag="1" title="Today\'s class on your Time plan: click a tab to go there with the class" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">📋 Today</button>'+'<button data-wu="1" title="The warm-up game again (it goes on with the same game)" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">🔥 Warm-up</button>'+(crHere()?'<button data-cr="1" title="'+(state().p==="grammar"?"Explain and correct this grammar with the whole class on the projector: every level at once, sentence by sentence (the students stay here)":"Correct this reading with the whole class on the projector: every level at once, question by question (the students stay here)")+'" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">✅ Correct</button>':'')+'<button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
   draw();
   try{if(sessionStorage.getItem("el_cm_ag")==="1")agToggle()}catch(e){}
   // stopped from the dashboard or another class tab started later
   stop=onSnapshot(doc(db,"live",o.g),s=>{const g=s.exists()?s.data().go:null;if(s.metadata.hasPendingWrites||!last)return;if(!g||!g.cm||g.s!==o.s)quit(g&&g.cm?"another tab took over":"stopped")},e=>console.warn("class mode",e));
-  const iv=setInterval(()=>{if(!cmRead())return quit("the class is over");const x=state(),k=key(x);
+  const iv=setInterval(()=>{if(!cmRead()){quit("the class is over");if(agM&&!ending){ending=true;agM.wrapUp(false).catch(e=>console.warn("class mode",e))}return}
+    const pl=agM&&agM.plan?agM.plan():null;
+    // only today's steps on this page for the class tab too: a tab now hidden goes to the first one shown
+    if(pl&&cmTabs(pl.vis,[])){const at=document.querySelector(".tab.active[data-panel]");if(at&&at.classList.contains("el-cm-hide")){const f=[...document.querySelectorAll(".tab[data-panel]")].find(t=>!t.classList.contains("el-cm-hide")&&!t.classList.contains("el-sec-hide"));if(f)f.click()}}
+    const x=state();Object.assign(x,{ps:pl?pl.ps.filter(y=>!(onPage(y.u)&&y.p===x.p)):[],vis:pl?pl.vis:[],ff:pl&&pl.ff?pl.ff:[]});const k=key(x);   // always both: go is merged
     if(k!==seen){seen=k;since=Date.now();return}
     if(Date.now()-since>=1000&&(!last||key(last)!==k||last.pn!==x.pn))send(x)},500);
 }
@@ -1240,10 +1739,23 @@ onAuthStateChanged(auth,async u=>{
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
     bellEl=m.bell({dash:DASH,onDash,me:()=>(user||{}).uid,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   remember(u);
+  // 🟢 Online now + 🕘 Visit history on the dashboard (shared/js/el-visits.js): the student's own visits/{day}_{uid}, never in the student view
+  if(u&&isStudent(u)&&!AS)import("./el-visits.js").then(m=>m.startVisits({db,fs:{doc,setDoc,serverTimestamp},user:u,root:ROOT.href,group:myGroup,tester:isTester(u),
+    name:myRoster&&myRoster.first?[myRoster.first,myRoster.surname1].filter(Boolean).join(" "):u.displayName||u.email||""})).catch(e=>console.warn("visits",e));
   userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
+
+// A page left open from an earlier day (a Chromebook closed at the end of a class and opened the next morning) reloads when it is shown
+// again, so it runs the site's latest version and today's plan (problem report, 2ESOA, 13 Nov 2026: yesterday's page had no ⛶ Full screen
+// and could not take the class mode changes made since). Work not sent yet is sent first; the reload keeps what this browser has not sent
+// (DIRTY). Not on the dashboard, recall checkpoints, the sample exam or a followed presentation.
+const elDayNow=()=>{try{return new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"})}catch(e){return new Date().toDateString()}},elLoadDay=elDayNow();
+async function newDayReload(){if(document.hidden||reloading||elDayNow()===elLoadDay||/\/teacher\.html$/.test(location.pathname)||/[?&]live=/.test(location.search)
+    ||/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname))return;
+  reloading=true;try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("new day",e)}location.reload()}
+document.addEventListener("visibilitychange",newDayReload);window.addEventListener("focus",newDayReload);setInterval(newDayReload,5*60e3);
 
 window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),annReply:(id,text)=>annReply(user,id,text),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null&&userDone)f(user)},get user(){return user}};

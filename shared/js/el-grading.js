@@ -37,6 +37,7 @@ window.EL_GRADING={
   "4eso-seasons-and-celebrations":(function(){
     const LP1="4eso/ls2-getting-started",LP2="4eso/ls2-celebrations-around-the-world",LP3="4eso/ls2-where-traditions-come-from",LP4="4eso/ls2-research-it-right",
       LP5="4eso/ls2-plan-the-day",LP6="4eso/ls2-write-to-the-head-teacher",FP="4eso/ls2-celebration-day-proposal",CP=n=>"4eso/ls2-recall-checkpoint-"+n;
+      const BK="4eso/ls2-book";   // 📖 Book: a reading tab per chapter, done on its day on the agenda (Roger, 12 Nov 2026)
     return {
       blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar, vocabulary and skills",w:35},{id:"other",name:"Other competences",w:5}],   // 2 Nov 2026 (Roger): daily work 40 %, shared by the amount of work (checkpoints a bit more: the only scored, uncopyable part)
       key:["4.1","4.2","2.2","3.2","5.1"],          // key competences (CE2–CE5): exam and final product
@@ -87,7 +88,7 @@ window.EL_GRADING={
         // Skills work (Roger, 2 Nov 2026: daily work = all the learning-path work): the reading, listening, speaking and writing tabs, done on time
         {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",sn:"skills",w:15,time:[[LP1,"read"],[LP1,"listen"],[LP1,"speak"],[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"write"],[LP2,"speak"],
           [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
-          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"]]}]},
+          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"],[BK,"ch1"],[BK,"ch2"],[BK,"ch3"],[BK,"ch4"],[BK,"ch5"],[BK,"ch6"]]}]},
       // Other competences: per criterion, half automatic (linked steps done; first:true = counts its first-try score) and half teacher levels (average).
       auto:{
         "1.1":[[LP2,"speak"]],
@@ -137,6 +138,7 @@ window.EL_GRADING={
   "2eso-free-time-live":(function(){
     const LP1="2eso/ls2-getting-started",LP2="2eso/ls2-what-are-they-doing",LP3="2eso/ls2-now-or-usually",LP4="2eso/ls2-check-the-source",
       LP5="2eso/ls2-likes-and-screen-tips",LP6="2eso/ls2-write-your-vlog-script",FP="2eso/ls2-free-time-vlog",CP=n=>"2eso/ls2-recall-checkpoint-"+n;
+      const BK="2eso/ls2-book";   // 📖 Book: a reading tab per chapter, done on its day on the agenda (Roger, 12 Nov 2026)
     return {
       blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar, vocabulary and skills",w:35},{id:"other",name:"Other competences",w:5}],   // 2 Nov 2026 (Roger): daily work 40 %, shared by the amount of work (checkpoints a bit more: the only scored, uncopyable part)
       key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
@@ -175,7 +177,7 @@ window.EL_GRADING={
         // Skills work (Roger, 2 Nov 2026, as in 4ESO LS2): the reading, listening, speaking and writing tabs, done on time
         {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",sn:"skills",w:15,time:[[LP1,"read"],[LP1,"listen"],[LP1,"speak"],[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"again"],[LP2,"shadow"],[LP2,"write"],[LP2,"speak"],[LP2,"talk"],
           [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
-          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"parts"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"]]}]},
+          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"parts"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"],[BK,"ch1"],[BK,"ch2"],[BK,"ch3"],[BK,"ch4"],[BK,"ch5"],[BK,"ch6"]]}]},
       auto:{
         "6.2":[[LP4,"credit",1],[LP4,"factfile"]],
         "CD2 2.2":[[FP,"slides"],[FP,"edit"]],

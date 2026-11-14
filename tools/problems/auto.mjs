@@ -67,7 +67,8 @@ if(cmd==="open"){
   if(nc)console.log(`NEW COMMENTS: ${nc} student(s) wrote a comment since the last run. Answer them: docs/general/problem-reports-auto.md, section "Students' comments, answered at once" (node tools/marking/marks.mjs comments --new).`);
   for(const x of L){
     const en=!!x.route&&!elCa(x.route);
-    console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
+    if(x.teacher)console.log("\n=== "+x.id+" · "+(x.created||"?")+" · FROM ROGER, THE TEACHER"+(x.group?" (in class with "+x.group+")":"")+(x.merge===false?" · ⏸ DON'T MERGE YET":" · ✅ MERGE STRAIGHT AWAY")+": no student to answer; see \"The teacher's own reports\" in docs/general/problem-reports-auto.md");
+    else console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
     console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(x.text):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
     if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>typeof e==="string"?e:JSON.stringify(e)).join("\n  "));
     if((x.msgs||[]).length)console.log("already answered: "+x.msgs.map(m=>JSON.stringify(m.text)).join(" | "));
@@ -92,6 +93,9 @@ if(cmd==="fixed"||cmd==="leave"){
     const a={verdict:"roger",status,note,at:new Date(now)};if(reply)a.reply=reply;if(todo)a.todo=todo;
     writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv(a)}},updateMask:{fieldPaths:["auto"]}});
     console.log("Status: "+status+(todo?" · first: "+todo:"")+(reply?"\nSuggested reply ("+(!!x.route&&!elCa(x.route)?"English":"Catalan")+"): "+JSON.stringify(reply):""));
+  }else if(x.teacher){   // Roger's own report (Roger, 13 Nov 2026): no card for anyone; auto.at still brings the ⚠️ IMPORTANT email
+    writes.push({update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",status:"fixed",note,at:new Date(now)})}},updateMask:{fieldPaths:["fixed","auto"]}});
+    console.log("Teacher's own report: marked fixed, no card (--msg is not used)");
   }else{
     const msg=String(opt("--msg")||"").trim().slice(0,MSG_MAX),en=!!x.route&&!elCa(x.route);
     const reply={uid:x.uid,kind:"fixed",what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String((/^(com estudiar|how to study)$/i.test(x.section||"")?"":x.section)||x.title||"").slice(0,200),en};   // "How to study" = the folded Study guide (reports before PR #290), not where they were

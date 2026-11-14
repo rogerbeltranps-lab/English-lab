@@ -61,8 +61,8 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
 const H={user:null,teacher:false,deckId:URLP.get("deck")||"",deck:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:""};
 const saved=tab.get();
-if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{}});
-const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw}:null);
+if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp});
+const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp}:null);
 // Catalan help on the theory slides (Roger, 5 Nov 2026: the grammar games explain the grammar "so that students understand it"):
 // off by default (the games are at Safe level, in English); CA on the board or the C key shows a slide's ca lines. Kept in this browser.
 const caOn=v=>{try{if(v!=null)localStorage.setItem("el_game_ca",v?"on":"off");return localStorage.getItem("el_game_ca")==="on"}catch(e){return !!v}};
@@ -271,11 +271,25 @@ function go(to){
   if(to==="reveal"){H.phase="reveal";award(H.i);G.music("");G.fx("reveal");setTimeout(()=>G.fx(H.aw[H.i]&&H.aw[H.i].length?"right":"wrong"),700)}
   else if(to==="next"){
     if(H.i+1>=slides().length){H.phase="end";saveResults();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700)}
-    else{H.i++;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
+    else{if(H.i<0){decideRp();if(H.rp===undefined)H.rp=false}
+      let j=H.i+1;if(H.rp&&!isQ(slides()[j])){let k=j;while(k<slides().length&&!isQ(slides()[k]))k++;if(k<slides().length)j=k}
+      H.i=j;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
   }
   keep();live();draw();autoReveal();
 }
 function more(){H.step++;keep();G.fx("tap");draw()}
+// ⏭ Skip to the questions (Roger, 11 Nov 2026, playing a game again: "I can review the theory or just skip it and go to the questions"): on a
+// theory or 📝 notes slide, jump to the next question, past the rest of this run of theory and its notes slide. Key: S.
+const nextQ=()=>{for(let j=H.i+1;j<slides().length;j++)if(isQ(slides()[j]))return j;return -1};
+// 🔁 A game the group has played before goes straight to the questions (Roger, 12 Nov 2026, on the whiteboard: "2nd time we play a game,
+// no theory slides"): H.rp (replay) is on when ls/{id}.played (PL) already has this game for this group from an earlier game, or after
+// "Play again". Then Next jumps over every theory and 📝 notes slide (the notes were taken the first time; absent students have the
+// theory on their LS page anyway). The lobby says so and has 📖 Show the theory to turn it off for this game. undefined = not decided yet
+// (PL still loading): decided when PL arrives, or at Start.
+const playedBefore=()=>{const w=PL&&(PL[H.deckId]||{})[H.g];return w&&+w!==H.sid?+w:0};
+const decideRp=()=>{if(H.rp===undefined&&PL){H.rp=!!playedBefore();keep()}};
+function skipTheory(){const j=nextQ();if(j<0||H.phase!=="show"||isQ(cur()))return;H.i=j-1;go("next")}
+const skipBtn=()=>nextQ()>=0?`<button class="btn ghost" data-do="skipth" title="Skip the theory and go straight to the next question (key S)">⏭ Skip to the questions<span class="kbd">S</span></button> `:"";
 function primary(){
   if(H.phase==="lobby")go("next");
   else if(H.phase==="show")isQ(cur())?go("reveal"):moreToShow()?more():go("next");
@@ -283,15 +297,16 @@ function primary(){
 }
 addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,select,textarea"))return;
   if([" ","Enter","ArrowRight","PageDown"].includes(e.key)){e.preventDefault();primary()}
+  else if((e.key==="s"||e.key==="S")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&H.teacher&&H.phase==="show"&&!isQ(cur())){e.preventDefault();skipTheory()}
   if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}
   if((e.key==="c"||e.key==="C")&&H.phase==="show"&&cur()&&cur().ca){caOn(!caOn());draw()}});
 
-function startGame(g){
-  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};keep();G.music("lobby");startGroup();
+function startGame(g,again){
+  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;decideRp();keep();G.music("lobby");startGroup();
 }
 function endGame(){
   const g=H.g;saveResults();liveOff(g);if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
-  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{}});keep();draw();
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();draw();
 }
 
 /* ---------- screens ---------- */
@@ -321,22 +336,28 @@ function draw(){
   if(!H.deck){
     // Games by course (2 ESO, 4 ESO), then by LS, then by learning path (Roger, 30 Oct 2026: "organised by course and LS").
     const list=window.EL_GAMES||[],by=(a,k)=>[...new Set(a.map(d=>d[k]||""))].sort((x,y)=>x.localeCompare(y,"en",{numeric:true}));
+    // 🕵️ Code Breakers (Roger, 11 Nov 2026): after the two games of each learning path (LP1–LP3 only for now, Roger 12 Nov 2026), the same path as a hacking game (codebreakers.html)
+    const cbCard=d=>`<a class="btn deckbtn cbbtn slidein" href="codebreakers.html?deck=${encodeURIComponent(d.id)}${BACK?"&from="+encodeURIComponent(BACK):""}"><span class="e">🕵️</span><span>${esc(String(d.lp).split(" · ")[0])} · Code Breakers<br><small style="opacity:.75">vocabulary + grammar, each at their own pace</small></span></a>`;
     const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}${plLine(d)}</span></button>`;loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
-      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map(card).join("")}</div>`).join("")}</section>`}).join("");
+      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&/-lp[1-3]-/.test(d.id)&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
+      ${meta().lp&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn deckbtn cbbtn" style="display:inline-flex" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ Play ${esc(String(meta().lp).split(" · ")[0])} as Code Breakers <small style="opacity:.75;margin-left:.4em">(vocabulary + grammar, no theory)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
+    loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
+    const rpLine=pb||again?`<p class="rp pop">${H.rp?`🔁 ${pb?`Played on ${esc(plDay(pb))}`:"Played again"}: no theory slides, straight to the questions.`:"📖 The theory slides will be shown again."}
+      <button class="btn ghost" data-do="rp">${H.rp?"📖 Show the theory":"⏭ Skip the theory"}</button></p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
-        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>
+        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>${rpLine}
       <div class="names">${P.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).map(em=>`<span${seen.has(em)?"":' class="pop"'}>${esc(nameOf(em))}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div>
     </div></div></div>`;P.forEach(em=>seen.add(em));return}
   if(H.phase==="end"){
@@ -352,14 +373,14 @@ function draw(){
     const block=(l,k)=>blockHtml(l,k>=n?' style="visibility:hidden"':"",s.step&&k===n-1&&k>0?" pop":"");
     app$.innerHTML=top()+`<div class="main"><div class="card theory slidein${s.wide?" wide":""}"><div class="pic">${pic(s.img)}</div><div class="tx"><h2>${md(s.theory)}</h2>${bl.map(block).join("")}
       ${ca.length&&caOn()?`<div class="ca pop"><b>En català</b>${ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div></div>
-      <div style="text-align:right">${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
+      <div style="text-align:right">${skipBtn()}${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
   const rev=H.phase==="reveal",n=answered(H.i).length;
   if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
     const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
     app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
       <p>On your Chromebook: write <b>2 sentences</b> of your own using ${noteWhat(meta().kind,H.deckId)}, and <b>anything that helps you remember</b> the theory. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
       <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
-      <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
+      <div style="text-align:right">${skipBtn()}<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
   if(isW(s)){
     const ok=accepted(H.i),wrong={};
     answered(H.i).forEach(a=>{if(!G.right(a[H.i],ok)){const t=G.norm(a[H.i]);wrong[t]=(wrong[t]||0)+1}});
@@ -395,6 +416,7 @@ app$.addEventListener("click",async e=>{
   if(d==="decks"){H.deck=null;H.deckId="";history.replaceState(null,"",location.pathname);draw()}
   if(d==="group")startGame(b.dataset.g);
   if(d==="next")go("next");
+  if(d==="skipth")skipTheory();
   if(d==="more")more();
   if(d==="ca"){caOn(!caOn());draw()}
   if(d==="reveal")go("reveal");
@@ -403,7 +425,8 @@ app$.addEventListener("click",async e=>{
   if(d==="end"){if(Date.now()-endArm<3000)endGame();else{endArm=Date.now();b.textContent="Tap again to end";setTimeout(()=>{if(b.isConnected)b.textContent="■ End"},3000)}}
   if(d==="finish")endGame();
   if(d==="cmback"){if(cmPlaying()&&Date.now()-cmArm>=3000){cmArm=Date.now();draw();setTimeout(()=>{if(Date.now()-cmArm>=3000)draw()},3100)}else backToClass()}
-  if(d==="again"){const g=H.g;startGame(g)}
+  if(d==="again"){const g=H.g;startGame(g,true)}
+  if(d==="rp"){H.rp=!H.rp;keep();draw()}
 });
 
 A.onAuthStateChanged(auth,async u=>{

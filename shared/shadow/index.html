@@ -115,7 +115,7 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
     if (rp && SH.has(cur) && SH.mode() === 'repeat') { endAt = 0; rp.start(0); return; }
     if (rp) rp.stop();
     const src = base + (slow ? cur.slow : cur.src), t = slow ? cur.ts : cur.t;
-    const go = () => { m.currentTime = t[0]; endAt = t[1]; m.play().catch(() => {}); plays++; count(); };
+    const go = () => { SH.lead(m, t[0]); endAt = t[1]; m.play().catch(() => {}); plays++; count(); };
     if (!m.src || !m.src.endsWith(src.replace('../../', ''))) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
   }
   const count = () => { $('#count').textContent = 'Plays: ' + plays; };

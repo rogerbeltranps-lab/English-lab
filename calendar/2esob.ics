@@ -24,6 +24,22 @@ URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:2esob-2eso-free-time-live-hw-2026-11-13-tf6h0y@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261112
+DTEND;VALUE=DATE:20261113
+SUMMARY:🏠 English homework for Fri 13 Nov: LP2 What are they doing?: Sha
+ dowing
+DESCRIPTION:LP2 What are they doing?: Shadowing\nFor the English class on F
+ ri 13 Nov · Per a la classe d'anglès del dv. 13 nov..\nFree Time\, Live!
+ : https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/ind
+ ex.html\nMy board / El meu tauler: https://rogerbeltranps-lab.github.io/En
+ glish-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:2esob-2eso-free-time-live-exam-2026-11-20-1alhb@english-lab
 DTSTAMP:20261031T000000Z
 DTSTART;VALUE=DATE:20261120
