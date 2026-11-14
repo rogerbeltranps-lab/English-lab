@@ -5,6 +5,7 @@
 //   node tools/exam-report/import-exam-report.mjs <reports.json outside the repo> <ls id, e.g. 4eso-my-real-routine> [--apply]
 // reports.json = {email: report}, made by tools/exam-report/build-4eso-ls1.py. Without --apply it only prints what would change.
 // The JSON holds personal data: keep it outside the repo (e.g. C:\Developer\dades-alumnes).
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -14,7 +15,14 @@ const args=process.argv.slice(2),apply=args.includes("--apply"),[file,ls]=args.f
 if(!file||!ls){console.error("Usage: node import-exam-report.mjs <reports.json> <ls id> [--apply]");process.exit(1)}
 const reports=JSON.parse(fs.readFileSync(file,"utf8"));
 
-async function token(){   // Google access token from the Firebase CLI login, as in tools/student-accounts
+async function token(){   // Google access token: the service account if there is one, else the Firebase CLI login, as in tools/student-accounts
+  const sa=process.env.FIREBASE_SERVICE_ACCOUNT;
+  if(sa){const t=sa.trim().replace(/^['"]|['"]$/g,""),k=JSON.parse(t.startsWith("{")?t:Buffer.from(t,"base64").toString("utf8")),
+    now=Math.floor(Date.now()/1000),b=o=>Buffer.from(JSON.stringify(o)).toString("base64url");
+    const un=b({alg:"RS256",typ:"JWT"})+"."+b({iss:k.client_email,scope:"https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/identitytoolkit",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3600});
+    const jwt=un+"."+crypto.createSign("RSA-SHA256").update(un).sign(k.private_key).toString("base64url");
+    const j=await (await fetch("https://oauth2.googleapis.com/token",{method:"POST",body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion:jwt})})).json();
+    if(!j.access_token)throw new Error("Service account token: "+JSON.stringify(j));return j.access_token}
   const f=path.join(process.env.XDG_CONFIG_HOME||path.join(os.homedir(),".config"),"configstore","firebase-tools.json");
   const rt=fs.existsSync(f)&&JSON.parse(fs.readFileSync(f,"utf8")).tokens?.refresh_token;
   if(!rt)throw new Error("Not signed in to the Firebase CLI: run `npx firebase-tools login` first.");

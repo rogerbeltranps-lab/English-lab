@@ -1200,7 +1200,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const P=p.parts||{},sub=(name,w,m,note)=>row(name,Math.round(w*100)/100,m,note,"in sub"),det=id=>{if(!TX)return id==="gv"?stu():"";
     if(id==="gv"&&g.gv){const sw=g.gv.parts.reduce((n,x)=>n+x.w,0);return g.gv.parts.map(x=>sub(esc(x.name),W("gv")*x.w/sw,(P.gv||{})[x.id]??null,/first try/i.test(x.name)?"":x.games?"% right in the class games":x.first?"Only the first try counts":"Done (late counts the same; missing counts 0 after its day)")).join("")}
     if(id==="other")return other.map(c=>sub(pill(c)+" "+esc(elCompetence(c)),W("other")/other.length,(P.other||{})[c]??null,"Learning paths: steps done"+(((g.teacher||{})[c]||[]).length?" + your level":""))).join("");
-    if(id==="exam"&&e){const tot=e.sections.reduce((n,x)=>n+(+x[2]||e.max),0);return e.sections.map(([k,n,mx])=>{const y=sc[k];return sub(esc(n),W("exam")*(+mx||e.max)/tot,y&&y.score!=null?y.score/(+(y.max||mx||e.max))*10:null,y&&y.score!=null?`${f1(+y.score)} / ${+(y.max||mx||e.max)}`:"")}).join("")}
+    if(id==="exam"&&e){const tot=e.sections.reduce((n,x)=>n+(+x[2]||e.max),0);return e.sections.map(([k,n,mx])=>{const y=sc[k];return sub(esc(n),W("exam")*(+mx||e.max)/tot,y&&y.score!=null?y.score/(+(y.max||mx||e.max))*10:null,y&&y.score!=null?`${f1(+y.score)} / ${+(y.max||mx||e.max)}`:y&&y.excused?t("No l'has fet: no compta","Not done: it doesn't count"):"")}).join("")}
     if(id==="fp"&&g.fp&&g.fp.rows){const fw=g.fp.rows.reduce((n,x)=>n+x.w,0);return g.fp.rows.map(x=>sub(esc(x.name),W("fp")*x.w/fw,(P.fp||{})[x.step+"|"+x.c]??null,"")).join("")}
     return ""};
   // what students see inside "Vocabulary, grammar and skills" (Roger, 2 Nov 2026: "make it clear for the students"): the gv parts in plain
