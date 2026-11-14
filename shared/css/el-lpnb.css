@@ -127,7 +127,13 @@ html.el-lpnb .lp-panels .panel .btn.secondary{background:#fff!important;border:1
 /* vocabulary chips: little post-its */
 html.el-lpnb .lp-panels .panel .chip{font:700 21px/1.1 var(--nb-hand)!important;background:#fff59d!important;color:#3b3300!important;border:0!important;border-radius:2px 2px 9px 2px!important;box-shadow:1px 2px 4px rgba(0,0,0,.14)}
 html.el-lpnb .lp-panels .panel .chip:nth-child(3n+2){background:#c8e6c9!important}html.el-lpnb .lp-panels .panel .chip:nth-child(3n){background:#f8bbd0!important}
-html.el-lpnb .lp-panels .panel .chip-tooltip{font-family:system-ui,sans-serif}
+/* the post-it's hover note: a paper slip taped above it, the Catalan in blue ink, the example in the teacher's handwriting
+   (Roger, 14 Nov 2026: the dark green box and its blue word didn't match the rest of the notebook) */
+html.el-lpnb .lp-panels .panel .chip-tooltip{font:400 16px/1.4 var(--nb-teacher);background:var(--nb-paper);color:var(--nb-black);
+  border:1px solid #e6dfc9;border-radius:3px;padding:12px 15px 11px;box-shadow:0 2px 4px rgba(0,0,0,.10),0 10px 24px rgba(30,40,60,.18)}
+html.el-lpnb .lp-panels .panel .chip-tooltip::before{content:"";position:absolute;top:-9px;left:50%;width:56px;height:17px;margin-left:-28px;
+  background:rgba(232,220,180,.85);box-shadow:0 1px 1px rgba(0,0,0,.08);transform:rotate(-3deg)}
+html.el-lpnb .lp-panels .panel .chip-tooltip b{font:700 23px/1.1 var(--nb-hand);color:var(--nb-ink)!important;margin-bottom:4px}
 /* things that keep their own look: the flashcards, the audio and video players, the recorder */
 html.el-lpnb .lp-panels .panel :is(.flashcard,.audio-player,audio,.video,.record-status){font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 
