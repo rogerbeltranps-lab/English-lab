@@ -191,14 +191,14 @@ function drawSpot(){const s=S.st,ws=s.it.ws;
   return `<div class="wu-sent">${t}</div>${s.shown?`<p class="wu-ok">✔ ${E(s.it.ok)}</p><p class="wu-sm">Not <s>${E(s.it.w)}</s> but <b>${E(s.it.a)}</b></p>`:s.pick>=0?'<p class="wu-no">That one is fine. Try again!</p>':""}`}
 
 const CSS=`
-#el-wu{position:fixed;inset:0;z-index:2147483000;color:var(--nb-black,#23262b);font:400 clamp(16px,1.25vw + 6px,30px)/1.35 var(--nb-teacher,"Kalam",cursive);display:flex;flex-direction:column;overflow:auto;
-  background:linear-gradient(90deg,transparent 3.4em,var(--nb-margin,#ef9a9a) 3.4em calc(3.4em + 2px),transparent calc(3.4em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line,#c7d9ee) 1.6em calc(1.6em + 1px)) var(--nb-paper,#fffef8);background-attachment:local}
+#el-wu{position:fixed;inset:0;z-index:2147483000;color:var(--nb-black,#23262b);font:400 clamp(18px,1.75vw + 8px,44px)/1.35 var(--nb-teacher,"Kalam",cursive);display:flex;flex-direction:column;overflow:auto;
+  background:linear-gradient(90deg,transparent 2.8em,var(--nb-margin,#ef9a9a) 2.8em calc(2.8em + 2px),transparent calc(2.8em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line,#c7d9ee) 1.6em calc(1.6em + 1px)) var(--nb-paper,#fffef8);background-attachment:local}
 #el-wu *{box-sizing:border-box}#el-wu h2{margin:0;font:700 1.6em/1.2 var(--nb-hand);color:var(--nb-pencil)}#el-wu p{margin:0}
-#el-wu .wu-top{display:flex;align-items:center;gap:.6em;flex-wrap:wrap;padding:.45em 1em;background:#f1ecd9;border-bottom:1px solid #e0d8bd;font-family:system-ui,sans-serif;font-size:.8em}
+#el-wu .wu-top{display:flex;align-items:center;gap:.6em;flex-wrap:wrap;padding:.45em 1em;background:#f1ecd9;border-bottom:1px solid #e0d8bd;font-family:system-ui,sans-serif;font-size:clamp(14px,.7vw + 8px,22px)}
 #el-wu .wu-tabs{display:flex;gap:.35em;flex-wrap:wrap;flex:1;justify-content:center}
 #el-wu .wu-t{font:600 .85em system-ui,sans-serif;color:#4b5563;background:#fff;border:1px solid #d6cfb6;border-radius:999px;padding:.3em .8em;cursor:pointer}
 #el-wu .wu-t.on{background:#ffe082;color:#2b2b2b;border-color:#e8c65a}
-#el-wu .wu-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6em;padding:.6em 1.2em 1em 4.2em;text-align:center}
+#el-wu .wu-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5em;padding:.4em 1.2em .8em 3.6em;text-align:center}
 #el-wu .wu-head{display:flex;align-items:center;gap:.8em;flex-wrap:wrap;justify-content:center;text-align:left}#el-wu .wu-head p{color:var(--nb-pencil);font-size:.9em}
 #el-wu .wu-head .nb-postit{margin:0;font-size:1.3em;line-height:1.3}
 #el-wu .wu-n{background:#fff;border:1.5px solid #333;border-radius:999px;padding:.05em .7em;font-weight:700;font-size:.9em;transform:rotate(-2deg)}
@@ -231,7 +231,7 @@ const CSS=`
 #el-wu .wu-sw:hover:not(:disabled){background:var(--nb-hl-y)}#el-wu .wu-sw.bad{color:var(--nb-red);text-decoration:line-through;text-decoration-thickness:.08em;border:2.2px solid var(--nb-red);border-radius:50% 45% 55% 48%/60% 50% 55% 45%}#el-wu .wu-sw.miss{background:#eceae2;animation:wuShake .35s}
 #el-wu .wu-end{display:grid;gap:.6em;justify-items:center}#el-wu .wu-big{font-size:3em}#el-wu .wu-end p{color:var(--nb-pencil)}
 #el-wu .wu-sayc{gap:.8em}#el-wu .wu-sayc>.nb-postit{margin:0 0 .2em;font-size:1.4em;line-height:1.3}
-#el-wu .wu-bigsay{margin:.6em 0 .2em;padding:.9em 1.4em .8em;max-width:min(30em,92%);font:700 3em/1.25 var(--nb-teacher);color:#23262b;transform:rotate(-.6deg)}
+#el-wu .wu-bigsay{margin:.5em 0 .1em;padding:.7em 1.3em .6em;max-width:min(30em,92%);font:700 2.7em/1.2 var(--nb-teacher);color:#23262b;transform:rotate(-.6deg)}
 #el-wu .wu-bigsay q{quotes:"“" "”"}
 #el-wu .wu-mean{font:400 1.45em/1.3 var(--nb-teacher);color:#23262b;max-width:34em}
 #el-wu .wu-cat{font:700 1.35em/1.3 var(--nb-hand);color:var(--nb-ink)}#el-wu .wu-cat small{font:600 .6em system-ui,sans-serif;color:var(--nb-pencil);margin-right:.3em}
