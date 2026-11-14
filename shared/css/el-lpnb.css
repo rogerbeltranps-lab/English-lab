@@ -24,6 +24,14 @@
 html.el-lpnb .ellpnb{background:#ffe082;border-color:#e6c25a;color:#3b3300;box-shadow:1px 2px 4px rgba(0,0,0,.12)}
 @media (max-width:760px){.panel-head:has(>.ellpnb){display:flex!important;flex-wrap:wrap}.panel-head:has(>.ellpnb)>div:first-child{flex:1 1 100%}}
 
+/* "📓 Saved in your notebook ✓" under a checked activity (ls2-engine.js nbSaved): opens My notebook at this step, in both looks */
+.el-nbsaved{display:inline-block;margin:10px 0 0;padding:6px 12px;border:1.5px solid #1f4fb5;border-radius:999px;background:#fffef8;color:#1f4fb5;
+  font:700 14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none}
+.el-nbsaved:hover{background:#e8eefc}
+.el-nbsaved[hidden]{display:none}
+html.el-lpnb .lp-panels .panel .el-nbsaved{border:0;background:transparent;padding:2px 0;font:700 24px/1.2 var(--nb-hand);color:var(--nb-ink);transform:rotate(-1deg)}
+html.el-lpnb .lp-panels .panel .el-nbsaved:hover{text-decoration:underline}
+
 /* ---------- the desk and the page ---------- */
 html.el-lpnb body.ellp,html.el-lpnb body.ellp .ellpgrid{background:var(--lpnb-desk)!important}
 html.el-lpnb body.elslpfs{background:var(--lpnb-desk)!important}

@@ -440,15 +440,16 @@ var LS2 = (function () {
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   // src: the panel's whole list (p.items / p.practice), to place answers saved at another route
   function stays(id, prefix, listId, items, check, src) {
-    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); };
+    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true); };
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
-    $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); };
+    $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
     if (state.ans && state.ans[id] && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }
     NBS[id] = { id, prefix, listId, items, check, src };
     if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
+    nbSaved(id, !!k);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
      they are pulled up to the laptop version to do it there and the new results are only shown there, not in the notebook").
@@ -469,7 +470,17 @@ var LS2 = (function () {
     clearStep(id, listId);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src);
     if (k) { fill(items, prefix, k.v); check(false); } else if (t) fill(items, prefix, t);
-    nbLock(id, listId, on && !!k);
+    nbLock(id, listId, on && !!k); nbSaved(id, !!k);
+  }
+  /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
+     in their own notebook"): the first try is in 📓 My notebook (el-exam.js), and the link opens it at this step (el-cloud.js el_nb_at) */
+  function nbSaved(id, on) {
+    const r = $('#' + id + 'Result'), c = $('#' + id + 'Check'), at = r || (c && c.parentNode); if (!at) return;
+    let a = document.getElementById(id + 'NbSaved');
+    if (!a) { if (!on) return; a = document.createElement('a'); a.id = id + 'NbSaved'; a.className = 'el-nbsaved'; a.href = 'index.html#notes'; at.after(a); }
+    a.textContent = ca() ? '📓 Desat a la teva llibreta ✓' : '📓 Saved in your notebook ✓';
+    a.title = ca() ? 'Obre la teva llibreta en aquest pas' : 'Open your notebook at this step';
+    a.hidden = !on;
   }
   window.elNbRefresh = () => { Object.values(NBS).forEach(S => { try { nbShow(S); } catch (e) {} }); };
 
