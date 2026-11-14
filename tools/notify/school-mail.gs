@@ -65,9 +65,11 @@ const PROBLEM_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
 const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_019JfVaVpNJdhGnFTsMxcWYg/fire";
 // Final product videos (Teacher Studio › 04_Students (private) › Final product videos): share it with this school account as Editor first.
 const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
-// The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). "gemini-pro-latest" = Google's newest Pro
-// (Gemini 3.1 Pro on 8 Nov 2026), about €0.10 a 3-minute video; "gemini-flash-latest" is about €0.03.
-const FP_MODEL = "gemini-pro-latest";
+// The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). v18 (Roger, 10 Nov 2026: "gemini was
+// completely mistaken" about Ashot and Hajra, 2 ESO A): "gemini-pro-latest" turned out to be Gemini 3.1 Pro Preview (January 2026), so the
+// videos now go to Google's flagship Gemini 4 Argon, with sharper frames (MEDIA_RESOLUTION_HIGH) and the default temperature 1.0 that Google
+// advises for Gemini 3 and later. About €0.07 a 100-second video (introductory price; Google doubles it on 1 Dec 2026).
+const FP_MODEL = "gemini-4-argon";
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
@@ -411,7 +413,7 @@ function fpAsk(m, ask, rows, fd, del) {
   try {
     const r = UrlFetchApp.fetch(G + "/v1beta/models/" + FP_MODEL + ":generateContent?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
       payload: JSON.stringify({contents: [{parts: [].concat(fd).map(f => ({file_data: f})).concat([{text: fpPrompt(ask, rows, m.prev, m.change)}])}],
-        generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+        generationConfig: {temperature: 1.0, mediaResolution: "MEDIA_RESOLUTION_HIGH", responseMimeType: "application/json"}})});
     if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + ([].concat(fd)[0].mime_type ? "" : ": the YouTube video may be private")};
     const j = JSON.parse(r.getContentText());
     addUsage(FP_MODEL, "video", j);
@@ -440,12 +442,15 @@ function fpRowMark(level, mark) {
   return isNaN(n) ? b[1] : Math.max(b[0], Math.min(b[1], n));
 }
 function fpPrompt(ask, rows, prev, change) {
+  // the dashboard sends "Surname1 Surname2, First" (v18: Gemini called Hajra Zaman "Zaman"): turn it into "First Surname1 Surname2"
+  const nm = String(ask.student || "").trim(), cm = nm.indexOf(",");
+  if (cm > 0) ask = Object.assign({}, ask, {student: (nm.slice(cm + 1).trim() + " " + nm.slice(0, cm).trim()).trim()});
   const marks = !!ask.marks, first = String(ask.student || "").trim().split(/\s+/)[0] || "the student";
   const lines = [
     "You are helping Roger, an English teacher at a secondary school in Catalonia, mark a final product video by a student aged 12-16.",
     "Course: " + String(ask.course || "ESO").slice(0, 40) + ". Every student is marked on the SAME rubric, at about " + String(ask.level || "A2+").slice(0, 20) + " level.",
     "The task: " + String(ask.task || "a short video presentation in English with slides").slice(0, 1500),
-    ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (call them " + first + ").",
+    ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (only so you know who it is: never write their name, see below).",
     ask.media === "audio" ? "This hand-in is an AUDIO recording only (no picture, no slides). Listen to the whole recording. Rows about slides, pictures or anything visual get level null; say in the reading note that it is audio only and judge reading from how it sounds."
       : ask.media === "pdf" ? "This hand-in is a PDF only (no sound, no video). Read the whole document. Rows about speaking, pronunciation, fluency or speaking without reading get level null; the reading verdict is \"partly\" and its note says there is no recording to hear. Do not list any sounds."
       : ask.media === "video+pdf" || ask.media === "audio+pdf" ? "This hand-in has two parts: the student's slides as a PDF and the student's " + (ask.media === "video+pdf" ? "video" : "voice recording (audio only)") + ". Look at the whole PDF and listen to the whole recording, and judge them together as one presentation."
@@ -456,6 +461,8 @@ function fpPrompt(ask, rows, prev, change) {
     "- Most students this age read part of their presentation. That is expected. Say how much they read in the reading check, let it count only in the row about speaking without reading (Speaking), and do not lower other rows because of it. If they read, the feedback always gives a kind, practical tip to try not to read next time (e.g. use the slides only as prompts, rehearse a few times, look at the camera).",
     "- Judge the language at the course level: small slips are normal. Quote the student's real words in quotation marks, with the correct form, e.g. \"he also have breakfast\" → \"he also has breakfast\". Praise with real examples too (verbs, expressions, connectors they used).",
     "- A row that cannot be judged from the video (for example a written hand-in, notes, sources or process steps) gets level null.",
+    // v21 (Roger, 14 Nov 2026: "Tell Gemini not to use names or surnames when giving feedback")
+    "- NO NAMES: never write anyone's name or surname anywhere in your answer, not the student's and not a classmate's or the person they interviewed. Talk to the student as \"you\" and say \"your classmate\" or \"the person you interviewed\"; in the notes for Roger say \"the student\". When you quote the student's real words, replace any name with \"…\".",
     "",
     "The rubric rows (levels: 4 = very good, 3 = good, 2 = fair, 1 = developing, 0 = no evidence):"
   ];
@@ -470,7 +477,7 @@ function fpPrompt(ask, rows, prev, change) {
     "rows: a list with one item per rubric row: {n: the row number, level: 0-4 or null (the level whose description fits best)" +
       (marks ? ", mark: the row's mark out of 10 in steps of 0.5, inside its level: level 4 = 9 to 10, level 3 = 6.5 to 8.5, level 2 = 4 to 6, level 1 = 1.5 to 3.5, level 0 = 0 (use the top of the level when the student is close to the next level)" : "") +
       ", why: one or two sentences for Roger with what you saw or heard (times help), good: 'What went well', one or two short specific sentences with real examples from the video, improve: 'To keep in mind', one short specific sentence with the real words and the correct form (empty if there is nothing to improve)};",
-    "feedback: Roger's comment to the student, 3 or 4 sentences in simple English, written as their teacher to them (you): start warmly with their first name (e.g. 'Great work, " + first + "!'), say specifically what was good, then give one or two concrete things for next time (the reading tip if they read). Never mention AI, Gemini, a rubric, levels or marks;",
+    "feedback: Roger's comment to the student, 3 or 4 sentences in simple English, written as their teacher to them (you): start warmly with no name (e.g. 'Great work!'), say specifically what was good, then give one or two concrete things for next time (the reading tip if they read). Never mention AI, Gemini, a rubric, levels or marks;",
     "well_done: one specific thing they did well; next_time: one small, concrete tip; seconds: the length of the video in seconds;",
     "sounds: for Roger only, NOT for the student (he collects them from the whole class to make a listen-and-repeat video): a list of up to 12 English words the student mispronounced in a way that matters, typical of Catalan and Spanish speakers, e.g. 'walk' with the L sounded, 'vegetables' with 4 syllables, 'clothes' as 2 syllables, a silent -ed sounded ('watched' as 'watch-ed'), 'v' and 'b' the same. Each item: {word: the word as written, heard: how the student said it in IPA, e.g. '/wɔːlk/', tip: the correct British pronunciation in IPA and a very short note, e.g. '/wɔːk/ (the L is silent)'}. Only words you clearly heard; an empty list if there are none. Do not mention these in the feedback."
   );
@@ -488,6 +495,7 @@ function testVideosFolder() {
 // ({idToken (teacher), action: "gemini_usage"} → {ok, months: [{month, eur, calls, audio, video}]}, newest first). Paid-tier prices in US$
 // per million tokens (ai.google.dev/pricing, Nov 2026); thinking tokens are billed as output. An estimate: Google's billing page is exact.
 const PRICES = {"gemini-flash-latest": {text: 0.50, audio: 1.00, out: 3.00}, "gemini-pro-latest": {text: 2.00, audio: 2.00, out: 12.00},
+  "gemini-4-argon": {text: 2.00, audio: 2.00, out: 10.00},   // introductory price until 30 Nov 2026; from 1 Dec: text/audio 4.00, out 20.00
   "gemini-2.5-flash": {text: 0.30, audio: 1.00, out: 2.50}, "gemini-2.5-pro": {text: 1.25, audio: 1.25, out: 10.00}};
 const EUR_PER_USD = 0.87;
 function addUsage(model, kind, j) {
