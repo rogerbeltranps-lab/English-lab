@@ -728,7 +728,13 @@ async function myAnnouncements(u){
   const g=viewGroup(u)||myGroup;
   await Promise.all([getDocs(query(c,where("uids","array-contains",u.uid))).then(add),g&&getDocs(query(c,where("groups","array-contains",g))).then(add)].filter(Boolean));
   // scheduled ones (at = ms, Roger 2 Nov 2026: "program announcements") reach the student only from that time, dated then (card and board)
-  return Object.values(out).filter(a=>!(a.at>Date.now())).map(a=>a.at?Object.assign(a,{created:a.at}):a);
+  // late answers on a private message (el-announce.js lateHold, Roger 14 Nov 2026): a teacher item dated after now stays hidden until then,
+  // and the card it would bring back waits too (the teacher's answer removed read.{uid}: seen as read until the item's time)
+  const now=Date.now();
+  return Object.values(out).filter(a=>!(a.at>now)).map(a=>{if(a.at)a.created=a.at;
+    const th=a.thread||[],vis=th.filter(x=>!(x.by==="t"&&x.at>now));
+    if(vis.length<th.length){a.thread=vis;if(!(a.read||{})[u.uid])a.read=Object.assign({},a.read,{[u.uid]:"later"})}
+    return a});
 }
 // The student's answer to a private message (to:"one"; Roger, 7 Nov 2026: "they should be able to answer back"): one more thread item, read
 // now, sAt = when (the teacher's 15-minute email looks for new sAt). firestore.rules allows exactly this to the student it was sent to.
@@ -1709,7 +1715,7 @@ onAuthStateChanged(auth,async u=>{
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
-    load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data()))),
+    load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now()))),   // at: sent late, from 7:30
     done:id=>deleteDoc(doc(db,"problemReplies",id))})).catch(e=>console.warn("replies",e));
   // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
   if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
