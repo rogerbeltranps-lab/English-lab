@@ -125,6 +125,13 @@ a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-si
 .lsn{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:40px;padding:0 8px;box-sizing:border-box;border-radius:12px;background:#eef2ff;color:#3157d5;font-weight:800;font-size:18px;vertical-align:middle}a.tile b.lsc{font-size:24px}a.tile .ti .badge{font-size:13px}table.lsps td,table.lsps th{text-align:left}table.lsps .lsop{text-align:center;white-space:nowrap}table.lsps .lsyes{color:#15803d}
 .tiles.wide{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:1180px){.tiles.wide{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.tiles.wide{grid-template-columns:repeat(2,minmax(0,1fr))}}.gal{display:flex;flex-direction:column;gap:12px;margin:0 0 16px}.gal:empty{display:none}
 table.fpt td,table.fpt th{text-align:left;vertical-align:middle}table.fpt td.n{white-space:nowrap}table.fpt tbody tr[data-fpsel]{cursor:pointer}table.fpt tbody tr[data-fpsel]:hover td{background:#f8fafc}table.fpt tbody tr.on td{background:#eff6ff}table.fpt tbody tr.on td.n{box-shadow:inset 4px 0 0 #2563eb}.fpwrap{display:grid;grid-template-columns:minmax(0,max-content) minmax(360px,1fr);gap:16px;align-items:start}.fpwrap>.wrap{max-height:calc(100vh - 40px)}.fpside{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;box-sizing:border-box}.fpside h3{margin:0;font-size:17px}.fpside .fpsh{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px}.fpside .fpsh .gx{margin-left:auto}.fpside .rbrow{padding:6px 8px;margin:6px 0}.fpside .rbc{font-size:.75rem;padding:4px 6px;line-height:1.3}.fpside .fpsok{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 8px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}.fpside .fpsok .gx{margin-left:auto}.fpside .fpsok .gx~.gx{margin-left:0}.fpsfbx{margin:0 0 10px;padding:8px 10px;border:1px solid #e2e8f0;border-radius:10px}.fpsfbx textarea{width:100%;box-sizing:border-box;margin:4px 0;font:inherit;font-size:.9rem}.fpsfbx summary{cursor:pointer;font-size:.85rem;margin-top:4px}.fpsfbr{margin-top:6px}@media(max-width:1000px){.fpwrap{display:block}.fpside{display:none}}
+/* 📝 exam report in the dashboard (xrOpen, examsPage) */
+#xrep{position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:2vh 2vw;box-sizing:border-box}#xrep[hidden]{display:none}
+#xrep .xrbox{background:#fff;border-radius:14px;width:min(1300px,100%);height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+#xrep .xrhd{padding:8px 14px;border-bottom:1px solid #e2e8f0}#xrep iframe{flex:1;width:100%;border:0}body.xropen{overflow:hidden}
+.xrh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.xrh .xrn b{font-size:16px}.xrh .xrb{margin-left:auto;display:flex;gap:6px}.xrh .xrb .mini{min-width:32px}
+.xrwrap{grid-template-columns:minmax(0,max-content) minmax(420px,1fr)}.xrside{display:flex;flex-direction:column;top:44px;height:calc(100vh - 56px);max-height:none;padding:8px 10px}table.xrt td{white-space:nowrap}.xrside iframe{flex:1;width:100%;border:0;margin-top:6px;border-top:1px solid #e2e8f0}
+@media(max-width:1000px){.xrside{display:none}}table.xrt tbody tr[data-xrsel]{cursor:pointer}table.xrt tbody tr[data-xrsel]:hover td{background:#f8fafc}table.xrt tbody tr.on td{background:#eff6ff}table.xrt tbody tr.on td.n{box-shadow:inset 4px 0 0 #2563eb}
 a.tile.c2eso{border-left:6px solid #16a34a}a.tile.c4eso{border-left:6px solid #2563eb}a.tile.c2eso .ti b,a.tile.c4eso .ti b{font-size:20px}
 details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;font-size:14px;cursor:pointer}
 @media (max-width:980px){.tshell{grid-template-columns:1fr;gap:6px}.tside{position:sticky;top:0;z-index:20;flex-direction:row;overflow-x:auto;max-height:none;padding:8px 0;background:rgba(248,250,252,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}
@@ -1328,7 +1335,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
+const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1522,7 +1529,7 @@ function render0(){
   const stuTermLs=lss.filter(l=>"t"+lsTerm(l)===S.term),stuBoth=S.place==="students"&&S.stuBoth&&stuTermLs.length>1,stuIds=stuBoth?stuTermLs.map(l=>l.id):[ls],
     stuList=stuBoth?stuIds.flatMap(acts):S.place==="students"&&!stuTermLs.some(l=>l.id===ls)?[]:list,stuP=S.place==="students"||S.place==="plan2"&&!!S.tp2prog,
     stuOnly=stuIds.filter(id=>(gradingFor(id,S.g)||{}).only).map(id=>lsLabel(EL_LS.find(l=>l.id===id)).split(" · ")[0]);
-  const lpAll=`<div class="box lpall"><h2>${stuList.length?"Learning paths and activities":"Points"}${stuList.length&&stuOnly.length?` <small class="muted">(${stuBoth?esc(stuOnly.join(", "))+(stuOnly.length>1?"'":"'s"):"this LS's"} learning paths are practice: not graded)</small>`:""}</h2>${fold("pthow","How points work",ptHow(S.g),"key")}${fold("key","Key",`<p class="muted"><b>Click any tab cell</b> to see what the student answered there (every question with their first try, what is on the page now and the right answer; a checkpoint shows its answers), and 👁 to open it as they see it. <b>📝 Exam</b>: click a mark for the student's exam report (as they see it), 🔍 for the points of each section and the mark per criterion. <b>Points, All work and Bonus</b> are of the term chosen above. Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+  const lpAll=`<div class="box lpall"><h2>${stuList.length?"Learning paths and activities":"Points"}${stuList.length&&stuOnly.length?` <small class="muted">(${stuBoth?esc(stuOnly.join(", "))+(stuOnly.length>1?"'":"'s"):"this LS's"} learning paths are practice: not graded)</small>`:""}</h2>${fold("pthow","How points work",ptHow(S.g),"key")}${fold("key","Key",`<p class="muted"><b>Click any tab cell</b> to see what the student answered there (every question with their first try, what is on the page now and the right answer; a checkpoint shows its answers), and 👁 to open it as they see it. <b>📝 Exam</b>: click a mark for the student's exam report (it opens here, as they see it on their board), 🔍 for the points of each section and the mark per criterion. <b>Points, All work and Bonus</b> are of the term chosen above. Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?sumBtn()+nmBtn():""}${shown.length?gzBar():""}${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,stuList,stuP,stuIds)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`;
   const legendB=`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`;
   const resultB=(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
@@ -1544,6 +1551,7 @@ function render0(){
     cov:()=>covPage(grp,ls),
     att:()=>attPage(grp),
     fp:()=>fpPage(grp,ls,list,inG.filter(s=>!s.away&&!s.tester)),
+    exams:()=>examsPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs,lpAll)};
   // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
@@ -1566,6 +1574,7 @@ function render0(){
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","open and lock, assessment criteria")
       +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Gemini's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
+      +examsTile(grp,ls,inG.filter(s=>!s.away&&!s.tester))
       +tTile("marks","📊","Assessment details","LS grade, criteria, self-assessment")
       +tTile("students","👥","Students' progress","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
@@ -2315,9 +2324,11 @@ function qaTab(){
 // preview, can change any row or leave it out, and applies it to one LS; later LSs take that route until he changes it (elRouteOf).
 const cutsOf=c=>Object.assign({},EL_ROUTE_CUTS[c],(S.D.cuts||{})[c]);
 const srcLs=c=>EL_LS.find(l=>l.course===c&&((window.EL_GRADING||{})[l.id]||{}).exam);
-function examMark(u,ls){const e=EL_GRADING[ls].exam,x=res(u,asId(ls)).sections||{};let s=0,m=0,n=0;
-  e.sections.forEach(([k,,mx])=>{const y=x[k];if(y&&y.score!=null){s+=+y.score;m+=+(y.max||mx||e.max);n++}});
-  return m?{mark:s/m*10,n,of:e.sections.length}:null}
+// a part the student could not do (sections[k].excused, late exam without the listening; Roger 14 Nov 2026) counts as entered but is left
+// out of the mark (out: their names): the mark is the other parts' points out of 10
+function examMark(u,ls){const e=EL_GRADING[ls].exam,x=res(u,asId(ls)).sections||{};let s=0,m=0,n=0;const out=[];
+  e.sections.forEach(([k,nm,mx])=>{const y=x[k];if(y&&y.score!=null){s+=+y.score;m+=+(y.max||mx||e.max);n++}else if(y&&y.excused){n++;out.push(nm)}});
+  return m?{mark:s/m*10,n,of:e.sections.length,out}:null}
 function rtRows(c,src,to,studs){const cu=cutsOf(c);S.rtPick=S.rtPick||{};S.rtOn=S.rtOn||{};
   return studs.filter(s=>!s.away).map(s=>{const ex=examMark(s.uid,src.id),sug=ex?elRouteFromMark(ex.mark,cu):null,now=elRouteOf(S.D.lv[s.uid],to),
     // Pro (native speaker) is never given by a mark: a Pro student keeps Pro unless Roger picks another route (Roger, 30 Oct 2026)
@@ -2515,7 +2526,8 @@ const exPills=ls=>{const e=exOf(ls),cs=e?exCrits(e).sort():[];return cs.length?"
 function exCell(u,ls){const e=exOf(ls),m=examMark(u,ls);if(!e)return "";
   // (Roger, 11 Nov 2026: "I want to be able to press the exam and see the student report") the mark opens their 📄 exam report as they see
   // it (new tab); 🔍 next to it keeps the sections dialog (points per section, mark per criterion)
-  return `<td class="first sc exm">${m?`<a class="exrep" href="today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(ls)}#exam" target="_blank" rel="noopener" title="Open their exam report, as they see it (new tab)"><b>${f1(m.mark)}</b></a>${m.n<m.of?`<br><small class="muted">${m.n} of ${m.of} sections</small>`:""}`:'<span class="muted">not yet</span>'}<button type="button" class="exsec" data-do="exdlg" data-u="${u}" data-ls="${esc(ls)}" title="The exam section by section and the mark per criterion">🔍</button></td>`}
+  // (Roger, 14 Nov 2026: "I don't want to go to student's view") the report opens here, on top of the dashboard (xrOpen), not in the student view
+  return `<td class="first sc exm">${m?`<a class="exrep" href="#" data-xr="open" data-u="${u}" data-ls="${esc(ls)}" title="Open their exam report here, as they see it on their board"><b>${f1(m.mark)}</b></a>${m.n<m.of?`<br><small class="muted">${m.n} of ${m.of} sections</small>`:""}${m.out.length?`<br><small class="muted" title="Not done (late exam): left out of the mark, not 0">${esc(m.out.join(", "))} left out</small>`:""}`:'<span class="muted">not yet</span>'}<button type="button" class="exsec" data-do="exdlg" data-u="${u}" data-ls="${esc(ls)}" title="The exam section by section and the mark per criterion">🔍</button></td>`}
 function exDlg(u,lsId){const s=S.P[u],ls=lsId||S.ls,e=exOf(ls),l=EL_LS.find(x=>x.id===ls);if(!s||!e)return;redraw=null;
   const x=res(u,asId(ls)),sc=x.sections||{},m=examMark(u,ls),bc=elExamByCrit(e,sc),cr=exCrits(e),p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,s.group):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
   dlg(`<h3>📝 Exam · ${lsLabel(l)}</h3><p class="muted">${name(s)} · exam version ${esc(LV[x.version]||x.version||"not set")}${ex?" · on "+esc(ELWeek.date(ex)):""}</p>`
@@ -2524,7 +2536,74 @@ function exDlg(u,lsId){const s=S.P[u],ls=lsId||S.ls,e=exOf(ls),l=EL_LS.find(x=>x
     +(e.level?`<p>Writing level ${pill(e.level.c)}: <b>${((x.levels||{})[e.level.step]||{})[e.level.c]||"–"}</b></p>`:"")
     +(cr.length&&m?`<p class="muted">By criterion: ${cr.map(c=>{const o=bc.find(y=>y.c===c);return pill(c)+" "+f1(critMark(o))}).join(" · ")}</p>`:"")
     +`<p class="muted">The exam is done on paper, so the site keeps each section's points, not the answers. Type or change the points in 📊 Assessment details. The 📄 report is the exam page of the student's board, as they see it.</p>`
-    +`<div class="row" style="justify-content:flex-start"><a class="btn" href="today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(ls)}#exam" target="_blank" rel="noopener">📄 Their exam report</a></div>`,true)}
+    +`<div class="row" style="justify-content:flex-start"><button type="button" data-xr="open" data-u="${u}" data-ls="${esc(ls)}">📄 Their exam report</button></div>`,true)}
+// ---- 📝 The exam report inside the dashboard (Roger, 14 Nov 2026: "when seeing the reports of the exams, I don't want to go to student's view,
+// however I want to see the same report when I go from the student's progress"). The report is the student board's own 📝 My exams (today.html
+// examView), drawn in a frame: today.html?embed=exam takes this student's data from the dashboard (elExamEmbed: what the dashboard already
+// read, so no Firestore read, no sign-in and no student view) and shows only that report, in the student's language (or the one picked here).
+// From 👥 Students' progress (the exam mark, 🔍 › 📄) it opens on top of the dashboard (xrOpen: ‹ › go through the group, Esc closes); in
+// 📝 Exams it sits on the right of the table, as the final product's side panel does.
+const XR={lang:null,u:null,ls:null,sel:{}};
+window.elExamEmbed=(u,ls,lang)=>{const s=S.P[u];if(!s||!exOf(ls))return null;const c=o=>JSON.parse(JSON.stringify(o||{}));
+  return {embed:{ls,en:lang==="en"?true:lang==="ca"?false:null},me:{name:fullName(s),group:s.group,email:s.email||""},rs:c(S.D.rs[u]),lv:c(S.D.lv[u]),pg:{},ls:c(S.D.ls)}};
+const xrSrc=(u,ls)=>`today.html?embed=exam&student=${encodeURIComponent(u)}&ls=${encodeURIComponent(ls)}${XR.lang?"&lang="+XR.lang:""}`;
+const xrLang=(u,ls)=>XR.lang||(elCa(level(u,ls))?"ca":"en");
+// the students the arrows go through: the group's, by name (signed in, not testers)
+const xrList=u=>{const g=(S.P[u]||{}).group;return Object.values(S.P).filter(s=>s.uid&&s.group===g&&!s.away&&!s.tester).sort(byName).map(s=>s.uid)};
+function xrHead(u,ls,big){const s=S.P[u],l=EL_LS.find(x=>x.id===ls),m=examMark(u,ls),L=xrLang(u,ls),list=xrList(u),i=list.indexOf(u);
+  return `<div class="xrh"><span class="xrn"><b>${name(s)}</b> <small class="muted">${big?esc(lsLabel(l))+" · ":""}${route(level(u,ls))}</small></span>`
+    +`<span class="xrm">${m?`Exam <b>${f1(m.mark)}</b> / 10`:'<span class="muted">not marked yet</span>'}</span>`
+    +`<span class="xrb"><button type="button" class="g mini" data-xr="lang" title="${L==="ca"?"Show the board's words in English (the report's own text stays as written)":"Show it in Catalan, as a Starter or Base student sees it"}">${L==="ca"?"🌐 English":"🌐 Català"}</button>`
+    +(list.length>1?`<button type="button" class="g mini" data-xr="go" data-d="-1" data-u="${u}" data-ls="${esc(ls)}" title="Previous student">‹</button><button type="button" class="g mini" data-xr="go" data-d="1" data-u="${u}" data-ls="${esc(ls)}" title="Next student">›</button>`:"")
+    +(big?`<button type="button" class="g mini" data-xr="close" title="Close (Esc)">✕</button>`:`<button type="button" class="g mini" data-xr="open" data-u="${u}" data-ls="${esc(ls)}" title="Open it bigger, on top of the dashboard">⤢</button>`)+`</span></div>`}
+function xrOpen(u,ls){if(!S.P[u]||!exOf(ls))return;const d=$("#dlg");if(d&&d.open)d.close();XR.u=u;XR.ls=ls;
+  let o=$("#xrep");if(!o){o=document.createElement("div");o.id="xrep";o.innerHTML=`<div class="xrbox"><div class="xrhd"></div><iframe title="Exam report"></iframe></div>`;document.body.appendChild(o);
+    o.addEventListener("click",e=>{if(e.target===o)xrClose()})}
+  o.querySelector(".xrhd").innerHTML=xrHead(u,ls,true);xrNav(o.querySelector("iframe"),xrSrc(u,ls));
+  o.hidden=false;document.body.classList.add("xropen")}
+// a new student in the same frame: location.replace, so the browser's Back still goes back in the dashboard (setting src again adds a step
+// to the history, and Back then only went back inside the frame)
+function xrNav(f,src){if(f.dataset.src===src)return;f.dataset.src=src;try{if(f.contentWindow&&f.getAttribute("src")){f.contentWindow.location.replace(src);return}}catch(e){}f.setAttribute("src",src)}
+window.xrEsc=()=>{if(XR.u)xrClose()};   // Esc inside the report frame (today.html embed)
+function xrClose(){const o=$("#xrep");if(o)o.hidden=true;document.body.classList.remove("xropen");XR.u=null}
+// the side panel of 📝 Exams
+function xrSideH(u,ls){if(!u)return `<p class="muted">Click a student to see their report here.</p>`;return `<div class="xrsh">${xrHead(u,ls,false)}</div><iframe title="Exam report" src="${esc(xrSrc(u,ls))}" data-src="${esc(xrSrc(u,ls))}"></iframe>`}
+function xrPick(u,ls){XR.sel[ls]=u;const b=$("#xrside");if(!b||getComputedStyle(b).display==="none"){xrOpen(u,ls);return}
+  document.querySelectorAll("table.xrt tbody tr[data-xrsel]").forEach(r=>r.classList.toggle("on",r.dataset.xrsel===u));b.dataset.u=u;
+  const f=b.querySelector("iframe"),h=b.querySelector(".xrsh");if(f&&h){h.innerHTML=xrHead(u,ls,false);xrNav(f,xrSrc(u,ls))}else b.innerHTML=xrSideH(u,ls)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-xr]");if(!b){const r=e.target.closest("tr[data-xrsel]");if(r&&!e.target.closest("button,a,input"))xrPick(r.dataset.xrsel,r.dataset.ls);return}
+  e.preventDefault();const k=b.dataset;
+  if(k.xr==="open")xrOpen(k.u,k.ls);
+  else if(k.xr==="close")xrClose();
+  else if(k.xr==="lang"){const sd=$("#xrside"),c=b.closest("#xrep")||!sd?{u:XR.u,ls:XR.ls}:{u:sd.dataset.u,ls:sd.dataset.ls};if(!c.u)return;XR.lang=xrLang(c.u,c.ls)==="ca"?"en":"ca";xrRedraw()}
+  else if(k.xr==="go"){const L=xrList(k.u),i=L.indexOf(k.u),n=L[(i+ +k.d+L.length)%L.length];if(!n)return;if(b.closest("#xrep"))xrOpen(n,k.ls);else xrPick(n,k.ls)}});
+function xrRedraw(){const o=$("#xrep");if(XR.u&&o&&!o.hidden)xrOpen(XR.u,XR.ls);const b=$("#xrside");if(b&&b.dataset.u)xrPick(b.dataset.u,b.dataset.ls)}
+document.addEventListener("keydown",e=>{const o=$("#xrep");if(e.key==="Escape"&&XR.u&&o&&!o.hidden&&!$("#dlg").open){e.preventDefault();xrClose()}});
+// ---- 📝 Exams (Roger, 14 Nov 2026: "I want a section with only exams here in all LS similar to Final products but with students reports"): a
+// tile on the group page next to 🎬 Final product, for any LS with an exam (LS chips under the title). One row per student: the exam version,
+// where the marking is (not yet · n of m parts · marked; a part the student could not do is "left out"), the mark and what report they have
+// (question by question, or only the questions to review). A click shows their report on the right; ⤢ opens it bigger. No extra reads: the
+// marks and reports are in the results the dashboard has already loaded.
+const xrRep=x=>{const r=(x||{}).report||{};return r.full?`<span title="Every question of their exam, with the texts, and the writing corrected">📄 Full</span>`:(r.questions||[]).length||r.writing?`<span title="The questions to review and the writing corrected">📄 To review</span>`:""};
+function xrSt(u,ls){const e=exOf(ls),sc=res(u,asId(ls)).sections||{},n=e.sections.filter(([k])=>sc[k]&&(sc[k].score!=null||sc[k].excused)).length;
+  return n===0?"none":n<e.sections.length?"part":"done"}
+function examsTile(grp,ls,studs){const e=exOf(ls),on=studs.filter(s=>s.uid),nd=e?on.filter(s=>xrSt(s.uid,ls)==="done").length:0;
+  return tTile("exams","📝","Exams",e?(nd?`every student's exam mark and their report, as they see it`:"the exam marks and every student's report, once it is marked"):"this LS has no exam on the site",e&&nd?nd+"/"+on.length+" marked":"",false)}
+function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(byName);
+  if(!e)return `<div class="box"><p class="muted">This LS has no exam on the site yet.</p></div>`;
+  const on=studs.filter(s=>s.uid),p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,grp.id):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
+  const ms=on.map(s=>examMark(s.uid,ls)).filter(Boolean),avg=ms.length?ms.reduce((a,m)=>a+m.mark,0)/ms.length:null,nd=on.filter(s=>xrSt(s.uid,ls)==="done").length,
+    np=on.filter(s=>xrSt(s.uid,ls)==="part").length,nr=on.filter(s=>xrRep(res(s.uid,asId(ls)))).length,nOut=ms.filter(m=>m.out.length).length;
+  const cur=XR.sel[ls],sel=cur&&on.some(s=>s.uid===cur)?cur:(on.find(s=>xrSt(s.uid,ls)!=="none")||{}).uid||null;if(sel)XR.sel[ls]=sel;
+  const st=u=>{const k=xrSt(u,ls),m=examMark(u,ls);return k==="done"?"✅ Marked":k==="part"?`🟡 ${m?m.n:0} of ${e.sections.length} parts`:'<span class="muted">Not yet</span>'};
+  const row=s=>{if(!s.uid)return `<tr class="muted"><td class="n">${name(s)}</td><td colspan="5"><small>not signed in yet</small></td></tr>`;
+    const u=s.uid,x=res(u,asId(ls)),m=examMark(u,ls),rp=xrRep(x);
+    return `<tr data-xrsel="${u}" data-ls="${esc(ls)}"${u===sel?' class="on"':""}><td class="n">${name(s)}</td><td>${x.version?esc(LV[x.version]||x.version):'<span class="muted">–</span>'}</td><td>${st(u)}${m&&m.out.length?`<br><small class="muted" title="Not done (late exam): left out of the mark, not 0">${esc(m.out.join(", "))} left out</small>`:""}</td>`
+      +`<td><b>${m?f1(m.mark):"–"}</b></td><td>${rp||'<span class="muted">–</span>'}</td><td><button type="button" class="g mini" data-xr="open" data-u="${u}" data-ls="${esc(ls)}" title="Open the report bigger, on top of the dashboard">⤢</button></td></tr>`};
+  return `<div class="box"><h2>📝 ${esc(lsLabel(EL_LS.find(l=>l.id===ls)))} · exam ${ex?`<small class="muted">· ${esc(ELWeek.date(ex))}</small>`:""}</h2>`
+    +`<p class="muted"><b>${nd} of ${on.length} marked</b>${np?` · ${np} partly marked`:""}${avg!=null?` · average <b>${f1(avg)}</b>`:""} · ${nr} with a report${nOut?` · ${nOut} with a part left out (not done, not 0)`:""}. Click a student to see their report on the right, exactly as they see it on their board; ⤢ opens it bigger. Type or change the points in 📊 Assessment details.</p>`
+    +`<div class="fpwrap xrwrap"><div class="wrap"><table class="fpt xrt"><thead><tr><th>Student</th><th>Version</th><th>Marking</th><th>Exam<br><small class="muted">/10</small></th><th>Report</th><th></th></tr></thead><tbody>${studs.map(row).join("")}</tbody></table></div>`
+    +`<aside class="fpside xrside" id="xrside" data-ls="${esc(ls)}" data-u="${sel||""}"${sel?"":' style="height:auto"'}>${sel?xrSideH(sel,ls):`<p class="muted">No exam marked yet in this LS. Once you type the points in 📊 Assessment details (or import them), each student's report shows here.</p>`}</aside></div></div>`}
 // 🏠 on a learning path's heading (set some of its tabs as homework): a group tab whose time plan has this LS, and a page with tabs
 const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).length>0&&ELWeek.col((window.EL_PLAN||{})[a.ls],S.g)>=0;
 // 🧩 📚 class game circles next to each student (Roger, 6 Nov 2026: "I want those circles next to the students in the list"): % right in the

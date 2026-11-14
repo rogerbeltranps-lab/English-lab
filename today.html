@@ -265,6 +265,15 @@ details.fv-how{margin-top:10px}details.fv-how>summary{cursor:pointer;color:var(-
 <div class="page"><div id="crumb"></div><div class="phead"><div class="pht"><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p></div><div id="lvl"></div></div><div id="note"></div><div id="main"></div></div></div>
 <script>/* the first words in the language of who was signed in here last (el_who, el-cloud.js), not Catalan for everyone (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null"),a=w&&w.role==="teacher"?JSON.parse(sessionStorage.getItem("el_as")||"null"):null,sp=new URLSearchParams(location.search).get("student"),as=a&&a.uid&&(!sp||sp===a.uid)?a:null;if(w&&(as?as.ca===false:w.role!=="student"||w.ca===false)){document.querySelector(".page h1").textContent="My dashboard";document.getElementById("sub").textContent="Loading…"}}catch(e){}</script>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
+<script>/* The exam report inside the teacher dashboard (Roger, 14 Nov 2026: "when seeing the reports of the exams, I don't want to go to student's
+view, however I want to see the same report"): teacher.html opens today.html?embed=exam&student=…&ls=… in a frame and hands over that student's
+data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no student view). The board then runs as in demo mode and draws only the
+📝 My exams report of that LS, exactly as the student sees it; links open in a new tab. */
+(()=>{const q=new URLSearchParams(location.search);if(q.get("embed")!=="exam"||parent===window)return;
+  try{const d=parent.elExamEmbed&&parent.elExamEmbed(q.get("student"),q.get("ls"),q.get("lang"));if(!d)return;window.EL_DEMO_STUDENT=d;
+    document.documentElement.classList.add("embed");const b=document.createElement("base");b.target="_blank";document.head.appendChild(b);
+    addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.querySelector("dialog[open]")&&parent.xrEsc)parent.xrEsc()})}catch(e){console.warn("exam embed",e)}})();</script>
+<style>html.embed .side,html.embed .mtabs,html.embed .bnav,html.embed #crumb,html.embed .phead,html.embed #note{display:none!important}html.embed .app{display:block}html.embed .page{max-width:none;padding:8px 10px}html.embed body{background:#fff}html.embed .t-exam{border:0;padding:0 2px}</style>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
@@ -339,6 +348,7 @@ const all=()=>!DEMO&&!AS&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.
 function setLang(){
   const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
+  if(DEMO&&DEMO.embed&&DEMO.embed.en!=null)EN=!!DEMO.embed.en;   // the teacher's report frame: Català / English switch
   document.documentElement.lang=EN?"en":"ca";
   // the teacher's student view: the student's language goes with el_as, so the LS pages opened from here draw in it at once (el-ls-home.js, el-app.js)
   if(AS&&lv)try{const A=JSON.parse(sessionStorage.getItem("el_as")||"null");if(A&&A.uid===AS&&A.ca!==!EN){A.ca=!EN;sessionStorage.setItem("el_as",JSON.stringify(A))}}catch(e){}
@@ -724,6 +734,9 @@ function phoneBox(){
     +`<div class="box"><h2>${t("Com posar English Lab a la pantalla d'inici","How to put English Lab on your home screen")}</h2>${ios?iph+and:and+iph}`
     +`<p class="muted">${t("Si tens el mòbil en castellà: «Añadir a pantalla de inicio» i «Añadir».","If your phone is in Spanish: “Añadir a pantalla de inicio” and “Añadir”. In Catalan: “Afegeix a la pantalla d'inici” and “Afegeix”.")}</p></div>`}
 function render(){
+  // the teacher dashboard's exam report frame (?embed=exam): only 📝 My exams of that LS, nothing else of the board
+  if(DEMO&&DEMO.embed){const ls=EL_LS.find(l=>l.id===DEMO.embed.ls);if(!ls){$("#main").innerHTML="";return}S.ls=ls.id;COURSE=ls.course;document.body.dataset.course=COURSE;setLang();
+    $("#main").innerHTML=`<div class="tabbody t-exam">${examView(ls)}</div>`;return}
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
     .sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"));   // open LS first
@@ -938,10 +951,13 @@ const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")}
 //             review:[{text, lp:{t, href}}]}
 // The report's texts are written in the student's language (Catalan for Starter and Base, English for the others), as on the paper.
 const pts1=n=>f1(+(+n).toFixed(2)),bar=p=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,p))}%;background:${col(p)}"></span></span>`;
-function examParts(e,sc){const got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null);if(!got.length)return "";
+// a part the student could not do (sections[k].excused, Roger 14 Nov 2026: the late LS1 2 ESO exams had no listening) shows as "Not done:
+// it doesn't count": it is left out of the exam mark, which is the other parts' points out of 10
+function examParts(e,sc){const got=e.sections.filter(([k])=>sc[k]&&(sc[k].score!=null||sc[k].excused));if(!got.some(([k])=>sc[k].score!=null))return "";
   const k=p=>p>=75?"fk-g":p>=50?"fk-a":"fk-r";
   return `<div class="box fv">${fvHead("🧮","1 · "+t("Resultats per apartats","Results per part"))}<div class="fv-stats fv-sm">`
-    +got.map(([key,n,mx,cs])=>{const m=+(sc[key].max||mx||e.max),v=+sc[key].score,p=v/m*100;
+    +got.map(([key,n,mx,cs])=>{const m=+(sc[key].max||mx||e.max);if(sc[key].score==null)return `<div class="fv-stat fk-n"><span class="fv-sh">${esc(n)}</span><b class="fv-big fv-no">${t("No l'has fet","Not done")}</b><span>${t("No compta per a la nota de l'examen.","It doesn't count for your exam mark.")}</span>${(cs||[]).length?`<span>${(cs||[]).map(pill).join("")}</span>`:""}</div>`;
+      const v=+sc[key].score,p=v/m*100;
       return `<div class="fv-stat ${k(p)}"><span class="fv-sh">${esc(n)}</span><b class="fv-big">${pts1(v)} <small>/ ${m}</small></b><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,p))}%"></span></span>${(cs||[]).length?`<span>${(cs||[]).map(pill).join("")}</span>`:""}</div>`}).join("")
     +`</div></div>`}
 function examCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n);if(!by.length)return "";
