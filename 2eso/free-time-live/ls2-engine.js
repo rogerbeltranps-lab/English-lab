@@ -390,10 +390,10 @@ var LS2 = (function () {
     return out;
   }
   const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
-  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
+  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; state.nb = state.nb || {}; if (!state.nb[id]) state.nb[id] = state.ans[id]; save(); }
   // the answers to show on this route ({v, moved}), with their tries, or null
-  function kept(id, prefix, items, src) {
-    const a = !fresh[id] && state.ans && state.ans[id]; if (!a || !Array.isArray(a.v)) return null;
+  function kept(id, prefix, items, src, rec) {
+    const a = rec || (!fresh[id] && state.ans && state.ans[id]); if (!a || !Array.isArray(a.v)) return null;
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
@@ -440,11 +440,38 @@ var LS2 = (function () {
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   // src: the panel's whole list (p.items / p.practice), to place answers saved at another route
   function stays(id, prefix, listId, items, check, src) {
-    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); };
-    $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
+    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); };
+    // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
+    $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
+    // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
+    if (state.ans && state.ans[id] && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }
+    NBS[id] = { id, prefix, listId, items, check, src };
+    if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
   }
+  /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
+     they are pulled up to the laptop version to do it there and the new results are only shown there, not in the notebook").
+     state.nb[id]: the answers of the activity's first check (like state.ans). With the notebook look on (html.el-lpnb, el-app.js) a
+     checked activity shows those answers with their corrections, written in pen: nothing can be changed (inert) and Check is hidden.
+     ↺ Practise again stays: it takes the page back to the laptop look (window.elLpNb(false)) and clears the activity there; the new
+     answers and results show only in the laptop look. el-app.js calls window.elNbRefresh() when the look changes. Marks never change. */
+  const NBS = {};
+  const nbFrozen = id => document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(state.nb && state.nb[id] && Array.isArray(state.nb[id].v));
+  function nbLock(id, listId, on) {
+    const l = $('#' + listId); if (l) { l.inert = on; l.classList.toggle('el-nbink', on); }
+    const c = $('#' + id + 'Check'); if (c) c.style.display = on ? 'none' : '';
+  }
+  function nbShow(S) {
+    const { id, prefix, listId, items, check, src } = S, on = nbFrozen(id);
+    if (!$('#' + listId)) return;
+    Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; });
+    clearStep(id, listId);
+    const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src);
+    if (k) { fill(items, prefix, k.v); check(false); } else if (t) fill(items, prefix, t);
+    nbLock(id, listId, on && !!k);
+  }
+  window.elNbRefresh = () => { Object.values(NBS).forEach(S => { try { nbShow(S); } catch (e) {} }); };
 
   /* ---------- redo one activity (Roger, 2 Nov 2026: "I don't want them restart the whole learning path"; 4 Nov 2026: "I only want
      redo this activity, not the entire page") ---------- */
