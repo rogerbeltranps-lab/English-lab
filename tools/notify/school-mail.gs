@@ -42,6 +42,8 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  14. v25 (Roger, 14 Nov 2026: "I will ask students to load it on the web"): Gemini drafts every final product video uploaded on the site
+//      by itself, right after the upload (actions fp_auto_setup / fp_auto_list / fp_auto_ack, see "v25" below). Students never see it.
 //  13. v24 (Roger, 14 Nov 2026: "4/4 is 10/10"): in "fp_watch", a rubric row at level 4 (Very good) is always 10/10 (it was 9 to 10).
 //  12. v23 (Roger, 14 Nov 2026: "I want gemini see my changes and learn from them"): "fp_watch" also takes ask.lessons, Roger's latest
 //      corrections of Gemini's final product drafts (up to 6 short texts from the dashboard, no names), and puts them in the prompt.
@@ -93,6 +95,9 @@ function doPost(e) {
   if (m.action === "fp_folder") return out(m.idToken && isTeacher(m.idToken) ? fpFolder(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
     try { return out(fpClassroom(m)); } catch (x) { return out({ok: false, error: "Classroom: " + String(x && x.message || x).slice(0, 300)}); } }
+  if (m.action === "fp_auto_setup") return out(m.idToken && isTeacher(m.idToken) ? fpaSetup(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_auto_list") return out(m.idToken && isTeacher(m.idToken) ? fpaList(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
@@ -318,7 +323,8 @@ function videoStart(m) {
   const url = header(r, "location");
   if (r.getResponseCode() !== 200 || !url) return {ok: false, error: "Drive did not start the upload (HTTP " + r.getResponseCode() + ")"};
   const token = Utilities.getUuid().replace(/-/g, "") + Utilities.getUuid().replace(/-/g, "");
-  CacheService.getScriptCache().put("up:" + token, JSON.stringify({url, size, email: who.email}), 21600);
+  CacheService.getScriptCache().put("up:" + token, JSON.stringify({url, size, email: who.email, name: who.name || "",   // v25: meta for the automatic draft
+    meta: {activity: String(meta.activity || "").slice(0, 80), uid: String(meta.uid || "").slice(0, 64), level: String(meta.level || "").slice(0, 20), group: String(meta.group || "").slice(0, 20)}}), 21600);
   return {ok: true, token, chunk: CHUNK};
 }
 function videoChunk(m) {
@@ -342,8 +348,10 @@ function upAnswer(r, token) {
   const code = r.getResponseCode();
   if (code === 308) { const g = String(header(r, "range") || "").match(/-(\d+)$/); return {ok: true, next: g ? Number(g[1]) + 1 : 0}; }
   if (code === 200 || code === 201) {
+    const up = upOf(token);
     CacheService.getScriptCache().remove("up:" + token);
     const f = JSON.parse(r.getContentText() || "{}");
+    try { fpAutoQueue(up, f.id); } catch (x) { console.warn("fpAutoQueue " + x); }   // v25: Gemini drafts it by itself
     return {ok: true, done: true, id: f.id || "", name: f.name || ""};
   }
   return {ok: false, error: "Drive refused the piece (HTTP " + code + ")"};
@@ -643,3 +651,115 @@ function testClassroom() {
   Logger.log(c.name + ": " + (Classroom.Courses.CourseWork.list(c.id, {pageSize: 20}).courseWork || []).map(x => x.title).join(" · "));
   Logger.log("Students: " + (Classroom.Courses.Students.list(c.id, {pageSize: 50}).students || []).length);
 }
+
+// ---- v25 (Roger, 14 Nov 2026: "next final product, I will ask students to load it on the web" … "students don't have to see that I use
+// Gemini"): Gemini drafts every final product video uploaded on the site BY ITSELF, right after the upload, so the draft is waiting in the
+// dashboard (🎬 Final product table) when Roger opens it. Nothing changes for the student: the page only says the video reached the teacher.
+//   - The dashboard keeps here what Gemini needs per final product (the rubric, the task, Roger's latest corrections, no names):
+//     {idToken (teacher), action: "fp_auto_setup", tpls: {activityId: {course, level, task, marks, group, rows, lessons}}, on: {activityId: true|false}}
+//     → {ok, on: {activityId: bool}}. A final product is On the first time it arrives; "on" switches it off or on (🤖 in the dashboard).
+//   - The last piece of an upload with meta.activity puts the video in a queue (one per student and final product: a newer version
+//     replaces the older one), and up to FPA_PAR videos are watched at the same time by one-off triggers (fpAutoRun, one video each, as
+//     fp_watch does). A failed watch is tried once more 4 minutes later; at most FPA_DAY automatic watches a day (cost guard).
+//   - Each answer is kept as a small JSON file in "Automatic drafts" inside VIDEO_FOLDER until the dashboard takes it:
+//     {idToken (teacher), action: "fp_auto_list", act?} → {ok, on, queue: [{act, uid, email, fileId, at, state: "waiting" | "queued" |
+//     "watching"}], done: [{rid, act, uid, email, fileId, at, ok, draft, model, eur, error}]}; {action: "fp_auto_ack", rids} marks them
+//     taken (the file name starts with ✓; nothing is deleted).
+const FPA_PAR = 3, FPA_DAY = 120;
+function fpaGet(k) { const P = PropertiesService.getScriptProperties(), n = Number(P.getProperty(k + "#n") || 0); if (!n) return null;
+  let s = ""; for (let i = 0; i < n; i++) s += P.getProperty(k + "#" + i) || ""; try { return JSON.parse(s); } catch (x) { return null; } }
+function fpaPut(k, o) { const P = PropertiesService.getScriptProperties(), s = JSON.stringify(o), old = Number(P.getProperty(k + "#n") || 0), parts = {};
+  let n = 0; for (let i = 0; i < s.length; i += 8000) parts[k + "#" + (n++)] = s.slice(i, i + 8000);
+  parts[k + "#n"] = String(n); P.setProperties(parts); for (let i = n; i < old; i++) P.deleteProperty(k + "#" + i); }
+function fpaOn() { return JSON.parse(PropertiesService.getScriptProperties().getProperty("fpa:on") || "{}"); }
+function fpaSetup(m) {
+  const P = PropertiesService.getScriptProperties(), on = fpaOn(), clean = v => String(v || "").slice(0, 200);
+  Object.keys(m.tpls || {}).slice(0, 12).forEach(act => { const t = m.tpls[act] || {};
+    if (!/^[\w-]+\/[\w-]+$/.test(act) || !Array.isArray(t.rows) || !t.rows.length) return;
+    fpaPut("fpt:" + act, {course: clean(t.course), level: clean(t.level), task: String(t.task || "").slice(0, 1500), marks: !!t.marks, group: !!t.group,
+      rows: t.rows.slice(0, 12), lessons: [].concat(t.lessons || []).slice(0, 6).map(x => String(x).slice(0, 700))});
+    if (!(act in on)) on[act] = true; });
+  Object.keys(m.on || {}).forEach(act => { if (/^[\w-]+\/[\w-]+$/.test(act)) on[act] = !!m.on[act]; });
+  P.setProperty("fpa:on", JSON.stringify(on));
+  fpAutoKick();
+  return {ok: true, on};
+}
+// the last piece of an upload arrived: queue it for Gemini when the page said which final product it is
+function fpAutoQueue(up, fileId) {
+  const mt = up && up.meta || {};
+  if (!fileId || !/^[\w-]+\/[\w-]+$/.test(mt.activity || "")) return;
+  const P = PropertiesService.getScriptProperties(), key = "fpq:" + mt.activity + "|" + up.email;
+  P.setProperty(key, JSON.stringify({act: mt.activity, email: up.email, name: String(up.name || "").slice(0, 80), uid: String(mt.uid || "").slice(0, 64),
+    level: String(mt.level || "").slice(0, 20), group: String(mt.group || "").slice(0, 20), fileId, at: new Date().toISOString(), tries: 0, claimed: 0, after: 0}));
+  fpAutoKick();
+}
+function fpaQueue() { const all = PropertiesService.getScriptProperties().getProperties(), q = [];
+  Object.keys(all).forEach(k => { if (k.indexOf("fpq:") === 0) try { q.push(Object.assign(JSON.parse(all[k]), {key: k})); } catch (x) {} });
+  return q.sort((a, b) => a.at < b.at ? -1 : 1); }
+const fpaLive = x => x.claimed && Date.now() - x.claimed < 8 * 60e3;   // being watched now (a run that died frees it after 8 minutes)
+// start enough one-off runs for the videos waiting, never more than FPA_PAR at a time
+function fpAutoKick() {
+  const lock = LockService.getScriptLock(); if (!lock.tryLock(10000)) return;
+  try {
+    const on = fpaOn(), q = fpaQueue(), now = Date.now();
+    const ready = q.filter(x => on[x.act] && !fpaLive(x) && (x.after || 0) <= now && fpaGet("fpt:" + x.act)).length, live = q.filter(fpaLive).length;
+    const pend = ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === "fpAutoRun").length;
+    for (let i = 0; i < Math.min(ready - pend, FPA_PAR - live - pend); i++) ScriptApp.newTrigger("fpAutoRun").timeBased().after(15e3).create();
+    if (!ready && !pend && q.some(x => on[x.act] && (x.after || 0) > now)) ScriptApp.newTrigger("fpAutoRun").timeBased().after(4.5 * 60e3).create();
+  } catch (x) { console.warn("fpAutoKick " + x); } finally { lock.releaseLock(); }
+}
+// one run = one video: claim the oldest ready one, let Gemini watch it (fpWatch, as the dashboard's 🎬 does), keep the answer for the dashboard
+function fpAutoRun(e) {
+  try { ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === "fpAutoRun" && (!e || !e.triggerUid || t.getUniqueId() === e.triggerUid)).forEach(t => ScriptApp.deleteTrigger(t)); } catch (x) {}
+  const P = PropertiesService.getScriptProperties(), lock = LockService.getScriptLock();
+  let it = null, tpl = null;
+  if (!lock.tryLock(20000)) return;
+  try {
+    const on = fpaOn(), now = Date.now(), day = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd"), c = JSON.parse(P.getProperty("fpa:day") || "{}");
+    if (c.day === day && c.n >= FPA_DAY) return;
+    for (const x of fpaQueue()) { if (!on[x.act] || fpaLive(x) || (x.after || 0) > now) continue; tpl = fpaGet("fpt:" + x.act); if (tpl) { it = x; break; } }
+    if (!it) return;
+    if ((it.tries || 0) >= 3) {   // three runs died on it (too long for one go): leave it to Roger's 🎬 in the dashboard
+      fpaKeep({act: it.act, uid: it.uid, email: it.email, group: it.group, fileId: it.fileId, at: it.at, watched: new Date().toISOString(), ok: false, draft: null,
+        model: "", eur: null, error: "the video is too long to watch by itself: press 🎬 to try again"});
+      P.deleteProperty(it.key); it = null; return;
+    }
+    it.claimed = now; it.tries = (it.tries || 0) + 1;
+    const key = it.key; delete it.key; P.setProperty(key, JSON.stringify(it)); it.key = key;
+    P.setProperty("fpa:day", JSON.stringify({day, n: (c.day === day ? c.n : 0) + 1}));
+  } finally { lock.releaseLock(); }
+  let r;
+  try { r = fpWatch({fileId: it.fileId, ask: Object.assign({}, tpl, {student: it.name || it.email.split("@")[0], route: it.level})}); }
+  catch (x) { r = {ok: false, error: String(x && x.message || x).slice(0, 200)}; }
+  const lock2 = LockService.getScriptLock(); lock2.tryLock(20000);
+  try {
+    const cur = JSON.parse(P.getProperty(it.key) || "null"), same = cur && cur.fileId === it.fileId;
+    if (!r.ok && it.tries < 2 && same) { cur.claimed = 0; cur.after = Date.now() + 4 * 60e3; cur.tries = it.tries; P.setProperty(it.key, JSON.stringify(cur)); }
+    else {
+      fpaKeep({act: it.act, uid: it.uid, email: it.email, group: it.group, fileId: it.fileId, at: it.at, watched: new Date().toISOString(),
+        ok: !!r.ok, draft: r.draft || null, model: r.model || "", eur: typeof r.eur === "number" ? r.eur : null, error: r.ok ? "" : String(r.error || "")});
+      if (same) P.deleteProperty(it.key);   // a newer version uploaded meanwhile stays in the queue
+    }
+  } finally { try { lock2.releaseLock(); } catch (x) {} }
+  fpAutoKick();
+}
+function fpaFolder() { const root = DriveApp.getFolderById(VIDEO_FOLDER), it = root.getFoldersByName("Automatic drafts"); return it.hasNext() ? it.next() : root.createFolder("Automatic drafts"); }
+function fpaKeep(o) { const clean = v => String(v || "").replace(/[\\/:*?"<>|\n\r]/g, " ").slice(0, 60);
+  fpaFolder().createFile(Utilities.newBlob(JSON.stringify(o), "application/json", Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd HH.mm.ss") + " · " + clean(o.act) + " · " + clean(o.email) + ".json")); }
+function fpaList(m) {
+  const on = fpaOn(), act = String(m.act || ""), mine = x => !act || x.act === act, done = [];
+  const queue = fpaQueue().filter(mine).map(x => ({act: x.act, uid: x.uid, email: x.email, fileId: x.fileId, at: x.at,
+    state: !on[x.act] || !fpaGet("fpt:" + x.act) ? "waiting" : fpaLive(x) ? "watching" : "queued"}));
+  const fs = fpaFolder().getFiles();
+  while (fs.hasNext() && done.length < 80) { const f = fs.next(); if (/^✓/.test(f.getName())) continue;
+    try { const o = JSON.parse(f.getBlob().getDataAsString()); if (mine(o)) done.push(Object.assign(o, {rid: f.getId()})); } catch (x) {} }
+  return {ok: true, on, queue, done};
+}
+function fpaAck(m) {
+  let n = 0;
+  [].concat(m.rids || []).slice(0, 80).forEach(id => { try { const f = DriveApp.getFileById(String(id));
+    if (f.getParents().hasNext() && f.getParents().next().getName() === "Automatic drafts" && !/^✓/.test(f.getName())) { f.setName("✓ " + f.getName()); n++; } } catch (x) {} });
+  return {ok: true, n};
+}
+// Run this once from the editor after pasting v25 (Allow if Google asks): it lists the automatic queue and the drafts not taken yet.
+function testAutoDrafts() { const r = fpaList({}); Logger.log("On: " + JSON.stringify(r.on) + " · queue " + r.queue.length + " · drafts waiting " + r.done.length + " · folder " + fpaFolder().getName()); }
