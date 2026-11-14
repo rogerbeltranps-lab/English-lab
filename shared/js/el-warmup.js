@@ -54,9 +54,11 @@ const SAY_TOPIC={
     ["An apple a day keeps the doctor away.","Eating well keeps you healthy.",""],
     ["Variety is the spice of life.","Doing different things makes life fun.",""]]};
 const hash=t=>{let h=2166136261;for(const c of String(t)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
-function sayOfDay(o){const pre=String((o.decks||[])[0]||"").split("-").slice(0,2).join("-"),top=SAY_TOPIC[pre]||[],all=top.concat(SAY_GEN);
-  const d=new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"}),h=hash(d+"|"+o.g);
+// sayFor(group, class game ids, "YYYY-MM-DD"): the saying of that day; the teacher's 📅 Time plan shows it on each class day (teacher.html wuRow)
+export function sayFor(g,decks,day){const pre=String((decks||[])[0]||"").split("-").slice(0,2).join("-"),top=SAY_TOPIC[pre]||[],all=top.concat(SAY_GEN);
+  const d=day||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"}),h=hash(d+"|"+g);
   return top.length&&h%3!==0?top[h%top.length]:all[h%all.length]}
+const sayOfDay=o=>sayFor(o.g,o.decks);
 
 let root=null,box=null,S=null,keyH=null;
 
