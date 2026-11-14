@@ -44,6 +44,7 @@
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
 //  14. v25 (Roger, 14 Nov 2026: "I will ask students to load it on the web"): Gemini drafts every final product video uploaded on the site
 //      by itself, right after the upload (actions fp_auto_setup / fp_auto_list / fp_auto_ack, see "v25" below). Students never see it.
+//  13. v24 (Roger, 14 Nov 2026: "4/4 is 10/10"): in "fp_watch", a rubric row at level 4 (Very good) is always 10/10 (it was 9 to 10).
 //  12. v23 (Roger, 14 Nov 2026: "I want gemini see my changes and learn from them"): "fp_watch" also takes ask.lessons, Roger's latest
 //      corrections of Gemini's final product drafts (up to 6 short texts from the dashboard, no names), and puts them in the prompt.
 //      Nothing else changes; a dashboard that sends none gets the same prompt as v22.
@@ -449,7 +450,8 @@ function fpAsk(m, ask, rows, fd, del) {
 // (pronouncing the L) … not for the students individually but to create a listen and repeat video to correct that in class" (sounds:
 // teacher only; the video itself is made without Gemini).
 // a row's mark out of 10 (steps of 0.5) kept inside its level's band, so the level the student board shades (mark ÷ 2.5 rounded) is the same
-const FP_BAND = [[0, 0], [1.5, 3.5], [4, 6], [6.5, 8.5], [9, 10]];
+// v24 (Roger, 14 Nov 2026: "4/4 is 10/10"): level 4 (Very good) is always 10
+const FP_BAND = [[0, 0], [1.5, 3.5], [4, 6], [6.5, 8.5], [10, 10]];
 function fpRowMark(level, mark) {
   if (level === null) return null;
   const b = FP_BAND[level], n = Math.round(Number(mark) * 2) / 2;
@@ -489,7 +491,7 @@ function fpPrompt(ask, rows, prev, change) {
     "Answer in JSON with these keys:",
     "reading: {verdict: \"speaks\" | \"partly\" | \"reads\", note: one or two sentences for Roger with evidence and times, e.g. 'reads the slides from 0:40 to 1:20'};",
     "rows: a list with one item per rubric row: {n: the row number, level: 0-4 or null (the level whose description fits best)" +
-      (marks ? ", mark: the row's mark out of 10 in steps of 0.5, inside its level: level 4 = 9 to 10, level 3 = 6.5 to 8.5, level 2 = 4 to 6, level 1 = 1.5 to 3.5, level 0 = 0 (use the top of the level when the student is close to the next level)" : "") +
+      (marks ? ", mark: the row's mark out of 10 in steps of 0.5, inside its level: level 4 = always 10, level 3 = 6.5 to 8.5, level 2 = 4 to 6, level 1 = 1.5 to 3.5, level 0 = 0 (use the top of the level when the student is close to the next level)" : "") +
       ", why: one or two sentences for Roger with what you saw or heard (times help), good: 'What went well', one or two short specific sentences with real examples from the video, improve: 'To keep in mind', one short specific sentence with the real words and the correct form (empty if there is nothing to improve)};",
     "feedback: Roger's comment to the student, 3 or 4 sentences in simple English, written as their teacher to them (you): start warmly with no name (e.g. 'Great work!'), say specifically what was good, then give one or two concrete things for next time (the reading tip if they read). Never mention AI, Gemini, a rubric, levels or marks;",
     "well_done: one specific thing they did well; next_time: one small, concrete tip; seconds: the length of the video in seconds;",
