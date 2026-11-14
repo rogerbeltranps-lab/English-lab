@@ -1552,6 +1552,7 @@ const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};i
   return !!(g.fp&&g.fp.a===a.id&&!g.fp.mark&&g.fp.rows.length&&g.fp.rows.every(r=>lvOf(u,a.id,r.step,r.c)))};
 // Gemini drafts not approved yet (0 until the drafts doc is read; reading it re-draws the page once)
 function fpWaiting(a,studs){if(!FPG.d[a.id]&&DEMO&&DEMO.fpg)FPG.d[a.id]=DEMO.fpg[a.id]||{};   // previews: sample drafts
+  if(fpgAutoOk(a)&&!(FPG.auto[a.id]||{}).ld)fpgAuto(a);   // 🤖 drafts Gemini made by itself (school script v25)
   if(!FPG.les&&!FPG.lesLd){FPG.lesLd=1;fpgLesLoad().then(l=>{if(l&&S.g&&GR.some(g=>g.id===S.g))render()})}
   if(!FPG.d[a.id]){if(!DEMO&&!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g&&GR.some(g=>g.id===S.g))render()}).catch(()=>{})}return 0}
   const d=FPG.d[a.id];return studs.filter(s=>d[s.uid]&&d[s.uid].draft&&!d[s.uid].approved&&!fpMarked(s.uid,a)).length}
@@ -1569,13 +1570,14 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
     hinH=u=>{if(hin(u)){const z=cr&&(cr.unreach||[]).find(z=>z.u===u)&&!fpgVideo(u,a);return z?`<span title="Handed in on Classroom, but Gemini cannot open it: ${esc(((cr.unreach||[]).find(z=>z.u===u)||{}).why||"")}">✅ Handed in ⚠️</span>`:"✅ Handed in"}
       return `<span style="color:#b91c1c" title="${cr&&inR("none",u)?"Nothing handed in on Classroom ("+esc(day(cr.at))+")":"No video found"}">❌ Not handed in</span>`};
   const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
-  const dr=u=>{const x=d[u];if(!x)return `<span class="muted">–</span>`;if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
+  const dr=u=>{const x=d[u],au=fpgAutoSt(u,a);if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(au&&!(x&&x.draft&&(x.approved||fpgMine(x))))return au;if(!x)return `<span class="muted">–</span>`;if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
     const my=fpgMine(x);
     return x.draft?(x.approved||fpMarked(u,a)?(x.approved&&my?"💾 your marks":"✅ approved"):my?`✏️ changed <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save your levels, the mark and the comment for the student; Gemini learns from your changes">💾 Save my marks</button>`
       :`🟡 to approve <button class="mini" data-fpg="okrow" data-u="${u}" data-a="${esc(a.id)}" title="Save Gemini's draft as it is: the levels, the mark and the comment (as ✅ Approve in the student's box)">✅ Approve</button>`):`<span class="muted">–</span>`};
   return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
     +`<p class="muted">${(n=>`<b>${n} of ${on.length} handed in</b> · `)(on.filter(s=>hin(s.uid)).length)}${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
     +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
+    +fpgAutoH(a,on)
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button> ${fpgLesB()}</p>`
     +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Handed in</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
@@ -4174,7 +4176,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{}};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{},t0:{},eur0:{},auto:{}};
 // Roger, 14 Nov 2026: "it says Gemini is watching the video, but I don't know if it's true or not, so I need a progress bar or that the clock
 // moves": a clock that counts the seconds since the video was sent and a bar that fills towards the usual minute (it never reaches the end
 // until the draft is back). Every [data-fpgt0] on the page is updated once a second.
@@ -4322,7 +4324,7 @@ const FPG_LES_MAX=40,FPG_LES_SEND=6;
 const fpgSnap=x=>({rows:(x.rows||[]).map(g=>({level:g.level==null?null:g.level,mark:g.mark==null?null:g.mark})),top:String(fpgTop(x)||"")});
 async function fpgLesLoad(){if(FPG.les)return FPG.les;if(DEMO)return FPG.les=(DEMO.fples||[]).slice();
   try{const c=await F.getDoc(F.doc(db(),"settings","fp__lessons"));FPG.les=c.exists()?(c.data().l||[]):[]}catch(e){console.warn("fp lessons",e);return null}return FPG.les}
-const fpgLesSave=()=>put(["settings","fp__lessons"],{l:FPG.les});
+const fpgLesSave=()=>{setTimeout(fpgAutoResend);return put(["settings","fp__lessons"],{l:FPG.les})};
 // the student's own first name and surnames (2+ letters) become "…" in what Gemini will read
 function fpgNoNames(t,s){let o=String(t||"");const n=s&&nameOf(s),w=(n?[n.first,n.surname1,n.surname2].join(" "):String(s&&s.name||"")).split(/[\s,]+/).filter(x=>x&&x.length>1);
   w.forEach(x=>{o=o.replace(new RegExp("(^|[^\\p{L}])"+x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\p{L}])","giu"),"$1…")});return o}
@@ -4392,6 +4394,45 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
   if(!d.error)delete d.error;FPG.busy[k]=false;FPG.cost=null;
   try{await fpgSave(a,u,d)}catch(e){console.warn("fp draft save",e)}
   fpgFill(u,a);return !d.error}
+// ---- 🤖 Automatic drafts (Roger, 14 Nov 2026: "next final product, I will ask students to load it on the web" … "students don't have to see
+// that I use Gemini"): on final products uploaded on the site (a.video, LS2 on), the school script (v25) lets Gemini watch each video by
+// itself as soon as the student uploads it. The dashboard gives the script what it needs once per session (fp_auto_setup: the rubric, the
+// task and Roger's latest corrections, no names; again when a correction is kept) and, when a group page opens, takes the drafts that are
+// ready (fp_auto_list) into the usual drafts doc, as if 🎬 had been pressed, then marks them taken (fp_auto_ack). A draft Roger approved or
+// changed is never replaced. 🤖 in the 🎬 Final product table switches it off or on per final product. Previews: DEMO.fpauto.
+const fpgAutoOk=a=>!!a&&!!a.video&&!!fpgRubric(a);
+function fpgTpl(a){const R=fpgRubric(a);if(!R)return null;const cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO";
+  return {course:cs,level:"A2+",task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",group:/proposal/.test(a.id),
+    rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d})),lessons:fpgLesLines("",a)}}
+const fpgUidOf=x=>{if(x.uid&&S.P[x.uid])return x.uid;const e=String(x.email||"").toLowerCase(),s=e&&Object.values(S.P).find(p=>String(p.email||"").toLowerCase()===e);return s?s.uid:""};
+const fpgAutoOf=a=>{if(DEMO&&DEMO.fpauto&&!FPG.auto[a.id])FPG.auto[a.id]=Object.assign({q:{}},DEMO.fpauto[a.id]||{});return FPG.auto[a.id]||null};
+async function fpgAuto(a,set){if(DEMO||!fpgAutoOk(a))return;const A=FPG.auto[a.id]=FPG.auto[a.id]||{q:{}};if(A.busy)return;A.busy=1;A.ld=1;
+  const was=JSON.stringify([A.on,A.q,A.old]);let news=0;
+  try{await fpgLesLoad();await fpgLoad(a);
+    if(!A.sent||set){const j=await fpgCall(Object.assign({action:"fp_auto_setup",tpls:{[a.id]:fpgTpl(a)}},set&&"on" in set?{on:{[a.id]:set.on}}:{}));A.sent=1;A.on=(j.on||{})[a.id]!==false}
+    const L=await fpgCall({action:"fp_auto_list",act:a.id}),q={},rids=[];A.on=(L.on||{})[a.id]!==false;A.old=0;
+    (L.queue||[]).forEach(x=>{const u=fpgUidOf(x);if(u)q[u]=x.state});A.q=q;
+    for(const r of (L.done||[]).sort((x,y)=>x.watched<y.watched?-1:1)){const u=fpgUidOf(r);if(!u)continue;rids.push(r.rid);
+      const old=(FPG.d[a.id]||{})[u]||{};if(old.vid===r.fileId&&old.draft)continue;   // taken already
+      if(old.draft&&(old.approved||fpMarked(u,a)||fpgMine(old)))continue;              // Roger's work stays: 🔄 Watch again for the new version
+      if(!r.ok){if(!old.draft){await fpgSave(a,u,Object.assign({},old,{error:"Gemini could not watch it by itself: "+(r.error||"try again")+". Press 🎬 to try again.",at:r.watched||new Date().toISOString(),vid:r.fileId}));news++}continue}
+      await fpgSave(a,u,Object.assign({at:r.watched||new Date().toISOString(),draft:r.draft,model:r.model||"",changes:[],gem0:fpgSnap(r.draft),auto:true,vid:r.fileId},
+        typeof r.eur==="number"?{eur:r.eur,n:1}:{}));news++}
+    if(rids.length)fpgCall({action:"fp_auto_ack",rids}).catch(e=>console.warn("fp auto ack",e));
+  }catch(e){if(/old version/.test(e.message))A.old=1;else console.warn("fp auto",e)}
+  finally{A.busy=0}
+  clearTimeout(A.t);if(Object.keys(A.q).length)A.t=setTimeout(()=>{if(S.g&&GR.some(g=>g.id===S.g)&&S.ls===a.ls)fpgAuto(a)},90e3);   // look again while videos are in line
+  if((news||was!==JSON.stringify([A.on,A.q,A.old]))&&S.g&&GR.some(g=>g.id===S.g))render()}
+// a correction Roger kept (🧠): the scripts' copies of the final products seen this session get the new lessons
+const fpgAutoResend=()=>Object.keys(FPG.auto).forEach(id=>{const a=byId(id),A=FPG.auto[id];if(a&&A.sent&&!A.busy)fpgCall({action:"fp_auto_setup",tpls:{[id]:fpgTpl(a)}}).catch(()=>{})});
+const fpgAutoSt=(u,a)=>{const A=fpgAutoOf(a),s=A&&A.q&&A.q[u];return s==="watching"?"⏳ watching by itself":s==="queued"?"🕒 next in line":s==="waiting"?"🕒 waiting (🤖 off)":""};
+function fpgAutoH(a,studs){if(!a.video)return "";const A=fpgAutoOf(a);if(!fpgRubric(a))return "";
+  const n=A?studs.filter(s=>s.uid&&A.q&&A.q[s.uid]).length:0;
+  if(A&&A.old)return `<p class="fpauto" style="margin:6px 0;padding:8px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa">🤖 <b>Automatic drafts</b> start once you paste and deploy the school script <b>v25</b> (project files › school-script › school-mail-v25.gs). Until then, press 🎬 in each student's box.</p>`;
+  const on=!A||A.on!==false;
+  return `<p class="fpauto" style="margin:6px 0;padding:8px 12px;border-radius:10px;background:${on?"#ecfdf5":"#f1f5f9"};border:1px solid ${on?"#a7f3d0":"#cbd5e1"}">🤖 <b>Automatic drafts: ${on?"On":"Off"}</b> · `
+    +(on?`Gemini watches each video as soon as the student uploads it, and the draft waits here for you. Students see nothing of it.`:`Videos wait until you turn it on, or press 🎬 in a student's box.`)
+    +(n?` <b>${n} video${n===1?"":"s"} in line now.</b>`:"")+` <button class="g mini" data-fpg="auto" data-a="${esc(a.id)}" data-on="${on?0:1}">${on?"Turn off":"Turn on"}</button></p>`}
 // ---- 📁 A Drive folder of final products (Roger, 9 Nov 2026: the 2 ESO A videos that were not on Classroom, "one is a PDF and one an audio",
 // each file named after its student, e.g. "Max Grau.mp4", "Paula N.mp4", "noa presentacio.pdf" + "Presentació Noa veu.mp4"): the school
 // script lists the folder (action fp_folder; the folder must be shared with the school account), each file is matched to a student of the
@@ -4509,6 +4550,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(
   else if(k.fpg==="okside")fpgApproveNow(k.u,a,true);
   else if(k.fpg==="side"){e.preventDefault();if(!fpPick(k.u,a))cellPanel(k.u,a.id)}
   else if(k.fpg==="cost")fpgCost();
+  else if(k.fpg==="auto"){if(DEMO){const A=fpgAutoOf(a);A.on=k.on==="1";render();return}b.disabled=true;fpgAuto(a,{on:k.on==="1"})}
   else if(k.fpg==="les")fpgLes();
   else if(k.fpg==="lesdel"){FPG.les=(FPG.les||[]).filter(l=>l.u+"|"+l.a!==k.k);Promise.resolve(fpgLesSave()).catch(e=>alert("Could not save: "+e.message));fpgLes()}
   else if(k.fpg==="sounds")fpgSounds(k.u,a);
