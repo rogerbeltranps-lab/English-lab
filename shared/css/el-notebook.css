@@ -449,6 +449,7 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 /* ⬜ To do: an activity done in class that the student hasn't done yet */
 .nb-tdo{display:inline-block;margin-left:10px;padding:0 10px;border:2px dashed var(--nb-red);color:var(--nb-red);border-radius:6px;font:700 18px/24px var(--nb-hand);transform:rotate(-3deg);vertical-align:middle}
 .nb-tdo.sm{font-size:15px;line-height:19px;padding:0 6px;margin-left:6px;border-width:1.5px}
+.nb-tdo.nb-opt{border-color:#64748b;color:#475569}a.nb-tdo.nb-tdgo.nb-opt{box-shadow:2px 2px 0 rgba(100,116,139,.25)}
 .nb-todo .nb-ans li{color:var(--nb-black)}
 .nb-gap{display:inline-block;min-width:90px;border-bottom:1.5px solid var(--nb-pencil);margin:0 4px;height:1em;vertical-align:baseline}
 .nb-opts{display:flex;flex-wrap:wrap;gap:2px 18px;font:16px/24px var(--nb-hand);color:var(--nb-pencil)}

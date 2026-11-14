@@ -162,13 +162,28 @@ window.elScore=function(a,x,pg){if(a.manual||!a.graded||!pg||!a.keys.some(k=>pg[
 // but he sees that, why?"). Before 1 Nov a writing went to ChatGPT first and was done only once the final version was saved; many students
 // stopped after the draft, and the Wednesday run corrects drafts too (fbItems in el-marking.js). A corrected step counts as done, unless
 // the teacher sent it back to redo (flags[step].done = "redo"). → [step ids]
-window.elCorrected=function(a,r){const rp=(r&&r.replies)||{},fl=(r&&r.flags)||{};
-  return ((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>String(rp[k]||"").trim()&&!(fl[k]&&fl[k].done==="redo"))};
+// Excused steps count too (elExcused).
+window.elCorrected=function(a,r){const rp=(r&&r.replies)||{},fl=(r&&r.flags)||{},ex=(r&&r.excused)||{};
+  return ((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>(String(rp[k]||"").trim()&&!(fl[k]&&fl[k].done==="redo"))||ex[k])};
+// Steps the teacher excused (results/{activity}.excused = {step: "YYYY-MM-DD"}; Roger, 14 Nov 2026): work lost by the old Submit lock of
+// the LS2 learning paths (until 6 Nov 2026: a submitted path was read-only and saved nothing). They count as done on that day, so on time
+// on the dashboard, the board and the bonus, and never as to do; the student may still do them (shown as optional), and if they do, the
+// excused day stays as the day it was done (never late). → [step ids]
+window.elExcused=function(a,r){const ex=(r&&r.excused)||{};return ((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>ex[k])};
+// excused steps the student has not done themselves (state.opt[step], set by elInjectCorrected): every one of ks
+window.elStepsOptional=function(st,ks){const o=(st&&st.opt)||{};return ks.length>0&&ks.every(k=>o[k])};
 // The same in a student's loaded progress, in memory only (nothing is saved): pg = {ls: {key: state JSON}}, rs = {activity id: result}.
 // Each corrected step gets done[step] and, when it has none, doneAt[step] = the day the text was first saved (draft or final version).
 window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||[]).forEach(a=>{if(a.manual||!a.keys||!a.keys.length)return;
-  const ks=elCorrected(a,rs[a.id]);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
-  let ch=false;ks.forEach(k=>{if((st.done||{})[k])return;(st.done=st.done||{})[k]=true;ch=true;
+  const r=rs[a.id],ks=elCorrected(a,r);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
+  const ex=(r&&r.excused)||{};
+  let ch=false;ks.forEach(k=>{
+    // excused: done on its day (08:30 UTC, morning class), whatever the student did later; st.opt marks the ones they haven't done
+    if(ex[k]){const at=String(ex[k]).slice(0,10)+"T08:30:00.000Z",was=(st.doneAt||{})[k];st.doneAt=st.doneAt||{};
+      if(!(st.done||{})[k]){(st.done=st.done||{})[k]=true;(st.opt=st.opt||{})[k]=true;st.doneAt[k]=at;ch=true}
+      else if(!was||was===true||String(was).slice(0,10)>at.slice(0,10)){st.doneAt[k]=at;ch=true}
+      return}
+    if((st.done||{})[k])return;(st.done=st.done||{})[k]=true;ch=true;
     const at=[st.drafts,st.finals].flatMap(o=>Object.entries(o||{}).filter(([x])=>x===k||x.indexOf(k+"_")===0).map(([,v])=>v&&v.at)).filter(Boolean).sort()[0]||((st.steps||{})[k]||{}).date;
     if(at)(st.doneAt=st.doneAt||{})[k]=(st.doneAt||{})[k]||at});
   if(ch)L[a.keys[0]]=JSON.stringify(st)})};

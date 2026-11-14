@@ -240,7 +240,7 @@
   async function exBuild(){
     if(!window.ELExam||!exCtx||!data){draw();return}
     const k=++exSeq;draw();
-    try{const ex=await ELExam.build({LS,gid:exCtx.gid,done:exCtx.done,level:exCtx.level,ca:ca(),played:lpPlayed(data.games)});
+    try{const ex=await ELExam.build({LS,gid:exCtx.gid,done:exCtx.done,level:exCtx.level,ca:ca(),played:lpPlayed(data.games),rs:data.rs});
       if(k===exSeq&&data&&window.ELNotebook){const chs=await chBuild(k).catch(e=>{console.warn("chapters",e);return null});if(k===exSeq&&data)data.chs=chs}
       if(k===exSeq&&data){data.ex=ex;draw()}}
     catch(e){console.warn("exam",e);if(k===exSeq){exCtx=null;draw()}}
@@ -271,7 +271,7 @@
       if(list.indexOf(L)>me&&!Object.keys(done).length&&!Object.keys(played).length)continue;
       const nb=notes.find(n=>n.id==="nb-"+L.id)||null,games=build(played,notes.filter(n=>!/^nb-/.test(n.id)),mine,L.id);
       const base="../"+L.id.replace(/^\d+eso-/,"")+"/";
-      const ex=await ELExam.build({LS:L.id,gid,done,level:exCtx.level,ca:ca(),played:lpPlayed(games),base});
+      const ex=await ELExam.build({LS:L.id,gid,done,level:exCtx.level,ca:ca(),played:lpPlayed(games),base,rs:data.rs});
       out.push({LS:L.id,ex,games,nb:nb||{parts:{}},save:parts=>nbSave(parts,L.id)});
     }
     const chs=out.length>1?out:null;chCache={key,chs};return chs;

@@ -156,13 +156,16 @@ window.ELNotebook = (function () {
       return root.href + 'today.html?student=' + encodeURIComponent(H.uid) + '&go=' + encodeURIComponent(rel);
     } catch (e) { return href; }
   }
-  function todo(w, go) {
+  // opt: a tab the teacher excused (elExcused, work lost by the old Submit lock): "Optional" instead of "To do", not counted as to do
+  function todo(w, go, opt) {
     go = asLink(go);
+    const lab = opt ? t('Opcional', 'Optional') : t('Per fer', 'To do');
     const line = '<span class="nb-gap"></span>';
     const li = x => `<li>${blank.test(x.q) ? String(x.q).replace(blank, line) : `${x.q}${x.o ? '' : ' ' + line}`}${x.o ? `<span class="nb-opts">${x.o.map(o => `<span>▢ ${esc(o)}</span>`).join('')}</span>` : ''}</li>`;
-    return `<div class="nb-work nb-todo"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')}${go ? `<a class="nb-tdo nb-tdgo" href="${esc(go)}" target="_blank" rel="noopener" title="${t('Obre aquesta activitat al learning path', 'Open this activity on the learning path')}">${t('Per fer', 'To do')} ➜</a>` : `<span class="nb-tdo">${t('Per fer', 'To do')}</span>`}</div>`
+    return `<div class="nb-work nb-todo"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')}${go ? `<a class="nb-tdo nb-tdgo${opt ? ' nb-opt' : ''}" href="${esc(go)}" target="_blank" rel="noopener" title="${t('Obre aquesta activitat al learning path', 'Open this activity on the learning path')}">${lab} ➜</a>` : `<span class="nb-tdo${opt ? ' nb-opt' : ''}">${lab}</span>`}</div>`
       + (w.task ? `<p class="nb-pencil">${esc(plainOf(w.task)).slice(0, 400)}</p>` : '')
-      + (w.qs.length ? `<ol class="nb-ans nb-tdq">${w.qs.map(li).join('')}</ol>` : `<p class="nb-pencil">${t('Encara no ho has fet: toca «Per fer ➜» per fer-ho al learning path.', 'You haven\'t done it yet: tap “To do ➜” to do it on the learning path.')}</p>`) + `</div>`;
+      + (opt ? `<p class="nb-pencil">${t('Les teves respostes no es van guardar per un canvi a la web. Compta com a feta: no cal que la tornis a fer, només si vols.', 'Your answers were not saved because of a change on the website. It counts as done: you don\'t need to do it again, only if you want to.')}</p>` : '')
+      + (w.qs.length ? `<ol class="nb-ans nb-tdq">${w.qs.map(li).join('')}</ol>` : opt ? '' : `<p class="nb-pencil">${t('Encara no ho has fet: toca «Per fer ➜» per fer-ho al learning path.', 'You haven\'t done it yet: tap “To do ➜” to do it on the learning path.')}</p>`) + `</div>`;
   }
   const noteHtml = v => `${v.w ? `<span class="nb-when nb-qw">📍 ${esc(v.w)}${v.day ? ' · ' + esc(H.exDay(v.day)) : ''}</span>` : ''}<div class="nb-notes${/^[ygpb]$/.test(v.pi || '') ? ' nb-pi pi-' + v.pi : ''}">${v.html ? clean(v.html, (v.dr || []).length) : lines(v.text)}${svg(v.dr)}</div>`;
 
@@ -505,7 +508,7 @@ window.ELNotebook = (function () {
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
     const when = n == null || n < 0 ? '' : n === 0 ? t('avui!', 'today!') : n === 1 ? t('demà!', 'tomorrow!') : t(`d'aquí a ${n} dies`, `in ${n} days`);
     const st = { lps: ex.lps.filter(lp => lp.tabs.length).length, words: ex.lps.reduce((n, lp) => n + (lp.parts || []).reduce((m, pt) => m + pt.terms.reduce((k, g) => k + g.items.length, 0), 0), 0),
-      todo: ex.lps.reduce((n, lp) => n + (lp.parts || []).filter(pt => pt.todo).length, 0),
+      todo: ex.lps.reduce((n, lp) => n + (lp.parts || []).filter(pt => pt.todo && !pt.opt).length, 0),
       notes: Object.values(NT()).filter(v => v && (String(v.text || '').trim() || String(v.html || '').trim() || (v.dr || []).length)).length + games.filter(g => g.gt && (String(g.gt.text || '').trim() || String(g.gt.html || '').replace(/<[^>]*>/g, '').trim() || (g.gt.dr || []).length)).length
         + games.reduce((n, g) => n + Object.values(g.notes || {}).filter(v => v && (String(v.text || '').trim() || String(v.html || '').replace(/<[^>]*>/g, '').trim() || (v.dr || []).length)).length, 0) };
     const eng = `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p>`;
@@ -539,9 +542,9 @@ window.ELNotebook = (function () {
         pt.terms.forEach((g, gi) => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3" data-gs="${pid}~v${gi}">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
         pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
-        else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '');
+        else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '', pt.opt);
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
-        blocks.push({ id: key + '-p-' + fk(pt.id), lock: !!pt.todo, l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm">${t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
+        blocks.push({ id: key + '-p-' + fk(pt.id), lock: !!pt.todo, l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm${pt.opt ? ' nb-opt' : ''}">${pt.opt ? t('Opcional', 'Optional') : t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
       });
       // the class games and the whiteboard notes go after the part they belong to (vocabulary / grammar / reading), else at the end
       const after = (k, list) => { const at = blocks.map(b => b.kind).lastIndexOf(k); blocks.splice(at < 0 ? blocks.length : at + 1, 0, ...list); };
