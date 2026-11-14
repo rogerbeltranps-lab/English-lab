@@ -23,6 +23,10 @@
 // wrapUp() is the window ⏹ Stop opens: ✔ Finished (ticked on the Time plan, teacherPlan/{group}.ticks "ls|@day#item"), ⏭ Next class or 🏠
 // Homework for each step of today. Every change reads the LS document first (the dashboard may have changed the agenda) and writes it once.
 import {readingOf,openCorrect} from "../correct/open.js";
+import * as PERF from "./el-class-perf.js";
+// ✉️ in the end-of-class window: on unless the teacher took it off last time (this computer)
+const mailOn=()=>{try{return localStorage.getItem("el_cm_mail")!=="0"}catch(e){return true}};
+const mailSet=v=>{try{localStorage.setItem("el_cm_mail",v?"1":"0")}catch(e){}};
 const K="el_cm_ag";
 const E=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const SHD="note:🎬 Shadowing with the whole class";
@@ -120,9 +124,12 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmwrap .ft button{border:1.5px solid #c7d2fe;border-radius:999px;background:#fff;color:#3730a3;font:800 14px system-ui,sans-serif;padding:9px 16px;cursor:pointer}
 #el-cmwrap .ft button.go{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmwrap .ft .m{margin-right:auto;color:#475569;font-size:13px}#el-cmwrap .ft .m.err{color:#b91c1c}
 #el-cmwrap button:disabled{opacity:.6;cursor:default}
+#el-cmwrap .ml{display:block;padding:10px 20px;border-top:1.5px solid #e0e7ff;font-size:14px;cursor:pointer;line-height:1.35}#el-cmwrap .ml input{width:17px;height:17px;vertical-align:-3px;margin-right:4px}
+#el-cmwrap .ml small{color:#64748b;font-weight:500}#el-cmwrap .ft .m.ok{color:#166534;font-weight:800}
 @media (max-width:640px){#el-cmwrap .r{flex-wrap:wrap}#el-cmwrap .seg{width:100%}#el-cmwrap .seg button{flex:1;padding:7px 4px}}`;
 
-// ctx: {db, doc, setDoc, getDoc, deleteField, serverTimestamp, lsInfo, root, g (group id), gname, s (when this class mode started)}
+// ctx: {db, doc, setDoc, getDoc, getDocs, collection, query, where, deleteField, serverTimestamp, lsInfo, root, g (group id), gname,
+//   s (when this class mode started), token() (the teacher's idToken, for the school mail script), tester(email)}
 export function setup(ctx){C=ctx;enLoad()}
 export function isOpen(){return !!box}
 export function close(){if(box){box.remove();box=null}clearInterval(placeT);want(false)}
@@ -343,15 +350,23 @@ export async function wrapUp(canBack){try{await init();L=await agendas()}catch(e
   const body=()=>rows.map((z,i)=>{const lp=z.p?lpLab(z.x,z.a):"",h=lp&&lp!==last?`<div class="lp">${E(lp)}</div>`:"";last=lp||last;
     return h+`<div class="r"><span class="n">${E(z.p?itName(z.a,z.p):lpLab(z.x,z.a))}</span><span class="seg">${seg(i,z)}</span></div>`}).join("");
   w.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-cmwrap-h"><div class="hd"><h2 id="el-cmwrap-h">🎓 End of the class · ${E(C.gname)}</h2><p>How did today's steps go? ✔ Finished is ticked on your Time plan, ⏭ Next class moves it to ${nd?E(dLab(nd)):"the next class"}, 🏠 Homework is for students to finish at home by then.</p></div>`
-    +`<div class="ls">${body()}</div><div class="ft"><span class="m"></span>${canBack?'<button type="button" data-a="back">↩ Back to class</button>':""}<button type="button" data-a="skip">End without saving</button><button type="button" class="go" data-a="save">✔ Save and end class</button></div></div>`;
+    +`<div class="ls">${body()}</div><label class="ml"><input type="checkbox" ${mailOn()?"checked":""}> ✉️ Email students their result: below ${PERF.BELOW}% of the ✔ Finished steps “please keep up”, 100% “well done” <small>(only students who were in class mode; everyone's % goes to 📈 Class performance in Students' progress)</small></label><div class="ft"><span class="m"></span>${canBack?'<button type="button" data-a="back">↩ Back to class</button>':""}<button type="button" data-a="skip">End without saving</button><button type="button" class="go" data-a="save">✔ Save and end class</button></div></div>`;
   document.body.append(w);
   return new Promise(res=>{const m=w.querySelector(".ft .m"),done=v=>{w.remove();res(v)};
     w.onclick=async e=>{const b=e.target.closest("button");if(!b)return;
       if(b.dataset.r){const i=+b.dataset.r;ch[i]=b.dataset.v;b.parentElement.querySelectorAll("button").forEach(q=>{const on=q===b;q.classList.toggle("on",on);q.setAttribute("aria-pressed",on)});return}
       if(b.dataset.a==="back")return done("back");if(b.dataset.a==="skip")return done("skipped");
       if(b.dataset.a!=="save")return;w.querySelectorAll("button").forEach(q=>q.disabled=true);m.className="m";m.textContent="Saving…";
-      try{await saveWrap(rows,ch,t,nd);done("saved")}
-      catch(err){console.warn("class mode",err);m.className="m err";m.textContent="✗ Not saved: "+(err.code||err.message||err);w.querySelectorAll("button").forEach(q=>q.disabled=false)}}})}
+      try{await saveWrap(rows,ch,t,nd)}
+      catch(err){console.warn("class mode",err);m.className="m err";m.textContent="✗ Not saved: "+(err.code||err.message||err);w.querySelectorAll("button").forEach(q=>q.disabled=false);return}
+      // 📈 each student's share of the ✔ Finished steps: saved for the dashboard and emailed (el-class-perf.js); the Time plan is saved already
+      const ml=w.querySelector(".ml input"),mail=!!(ml&&ml.checked);mailSet(mail);if(ml)ml.disabled=true;
+      try{const fin=rows.filter((z,i)=>ch[i]==="done"&&z.a&&!isGame(z.p)).map(z=>({a:z.a,p:z.p,it:z.it,n:stepName(z),ag:z.x.ag}));
+        const r=await PERF.run(C,fin,t,mail,x=>{m.className="m";m.textContent=x});
+        if(r.saved){m.className="m ok";m.textContent="✔ Saved"+(r.present?` · ${r.present} in class`+(mail?` · ✉️ ${r.sent} emailed`+(r.failed?` · ✗ ${r.failed} not sent`:""):""):" · nobody was in class mode");
+          await new Promise(z=>setTimeout(z,r.failed?6000:2500))}
+        done("saved")}
+      catch(err){console.warn("class performance",err);m.className="m err";m.textContent="✔ Time plan saved · ✗ class performance not saved: "+(err.code||err.message||err);setTimeout(()=>done("saved"),6000)}}})}
 async function saveWrap(rows,ch,t,nd){const xs=[...new Set(rows.map(z=>z.x))];
   for(const x of xs){const mine=rows.map((z,i)=>[z,ch[i]]).filter(([z])=>z.x===x);
     const nx=mine.filter(([,v])=>v==="next").map(([z])=>z.it);

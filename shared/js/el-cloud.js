@@ -1538,7 +1538,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   try{last=JSON.parse(sessionStorage.getItem(CM_K+"_last")||"null")}catch(e){}
   // 📋 Today (el-cm-agenda.js): the group's class day from the Time plan agenda, clickable; open when class mode starts and on every next
   // page until it is closed (Roger, 7 Nov 2026: "in class mode, I should have the day of the agenda so that I can click it")
-  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,getDoc,deleteField:FBM[2].deleteField,serverTimestamp,lsInfo,root:ROOT,g:o.g,gname:gn,s:o.s});return m});
+  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,getDoc,getDocs,collection,query,where,deleteField:FBM[2].deleteField,serverTimestamp,lsInfo,root:ROOT,g:o.g,gname:gn,s:o.s,token:()=>user.getIdToken(),tester:e=>TESTERS.includes(e)});return m});
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
   // today's steps and the 👥 ones (el-cm-agenda.js plan) go with every move; the module loads at once, the panel shown or not
   agLoad().then(m=>m.init()).catch(e=>console.warn("agenda",e));
