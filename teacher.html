@@ -1563,7 +1563,7 @@ const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bul
 function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().sort(byName);
   if(!a)return `<div class="box"><p class="muted">This LS has no final product on the site yet.</p></div>`;
   fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),sel=fpSelOf(a,studs),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
-  const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
+  const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length,gv=nv+nd>0;
   const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
   // 📥 Handed in (Roger, 14 Nov 2026: "I need a column with handed in and not handed in"): a video found (site, Classroom, a link or a Drive
   // folder), a Gemini draft, the final product submitted on the site, or the last 📥 Classroom report (saved in the drafts doc, no extra
@@ -1584,9 +1584,10 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
     +fpgAutoH(a,on)
     +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
     +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button> ${fpgLesB()}</p>`
-    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Handed in</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
-    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${hinH(s.uid)}</td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
-      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+4:5}"><small>not signed in yet</small></td></tr>`).join("")
+    // no video and no Gemini draft in the group (4 ESO LS1, marked by hand: "in here we don't need the gemini's column or the video one"): no such columns
+    +`<div class="fpwrap"><div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Handed in</th>${gv?"<th>Video</th><th>Gemini</th>":""}${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
+    +studs.map(s=>s.uid?`<tr data-fpsel="${s.uid}" data-a="${esc(a.id)}"${s.uid===sel?' class="on"':""}><td class="n"><a href="#" data-fpg="side" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${hinH(s.uid)}</td>${gv?`<td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>`:""}${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}" title="The full box: Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
+      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${(lv?lv.length+2:3)+(gv?2:0)}"><small>not signed in yet</small></td></tr>`).join("")
     +`</tbody></table></div><aside class="fpside" id="fpside" data-a="${esc(a.id)}" data-u="${sel||""}">${fpSideH(sel,a)}</aside></div></div>`}
 // ---- 🎬 Side panel beside the final product table (Roger, 14 Nov 2026: "I want a button to approve Gemini's feedback here and I want to see
 // the video and the rubric on the right since I have enough space. I want further details when I open the box"): a click on a student's
@@ -1595,10 +1596,11 @@ function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().so
 // (Open / Mark). Nothing more is read from Firestore: the drafts doc is the one the table already read.
 const fpToDo=(u,a)=>{const x=(FPG.d[a.id]||{})[u];return !!(x&&x.draft&&!x.approved&&!fpMarked(u,a))};
 function fpSelOf(a,studs){const ok=u=>studs.some(s=>s.uid===u),cur=(FPG.sel||{})[a.id];if(cur&&ok(cur))return cur;const d=FPG.d[a.id]||{},on=studs.filter(s=>s.uid);
-  const f=on.find(s=>fpToDo(s.uid,a))||on.find(s=>(d[s.uid]||{}).draft)||on.find(s=>fpgVideo(s.uid,a));return f?f.uid:null}
+  const f=on.find(s=>fpToDo(s.uid,a))||on.find(s=>(d[s.uid]||{}).draft)||on.find(s=>fpgVideo(s.uid,a))||on.find(s=>fpMarked(s.uid,a));return f?f.uid:null}
 function fpNext(u,a){const on=Object.values(S.P).filter(s=>s.uid&&s.group===(S.P[u]||{}).group&&!s.away&&!s.tester).sort(byName),i=on.findIndex(s=>s.uid===u);
   const n=on.slice(i+1).concat(on.slice(0,i)).find(s=>s.uid!==u&&fpToDo(s.uid,a));return n?n.uid:u}
-function fpSideVid(u,a,v){if(!v)return {k:"none",h:`<p class="muted">No video found yet. <button class="g mini" data-do="cell" data-u="${u}" data-a="${esc(a.id)}">Open the box</button> to look on Classroom or paste a Drive link.</p>`};
+function fpSideVid(u,a,v){if(!v&&fpMarked(u,a)&&!((FPG.d[a.id]||{})[u]||{}).draft)return {k:"none",h:""};   // marked by hand, no video needed
+  if(!v)return {k:"none",h:`<p class="muted">No video found yet. <button class="g mini" data-do="cell" data-u="${u}" data-a="${esc(a.id)}">Open the box</button> to look on Classroom or paste a Drive link.</p>`};
   const yid=v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],pl=!yid?fpgPlay(u,a,v):{},pid=pl.id||v.id,au=v.link&&!pl.id?"?authuser="+encodeURIComponent(FPG_SCHOOL):"";
   if(pl.busy)return {k:"busy",h:`<p class="muted">⏳ Making a copy in your Final product videos folder so you can play it here (a few seconds)…</p>`};
   const src=yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(pid)}/preview${au}`;
@@ -1663,7 +1665,7 @@ function fpsFbSet(t){const a=cat.find(x=>x.id===t.dataset.a),d=a&&(FPG.d[a.id]||
 document.addEventListener("input",e=>{const t=e.target;if(t.classList&&t.classList.contains("fpsfb"))fpsFbSet(t)});
 document.addEventListener("change",e=>{const t=e.target;if(!t.classList||!t.classList.contains("fpsfb"))return;const r=fpsFbSet(t);
   if(r&&FPG.fbDirty&&FPG.fbDirty.has(r.d)){FPG.fbDirty.delete(r.d);Promise.resolve().then(()=>fpgSave(r.a,t.dataset.u,r.d)).catch(er=>console.warn("fp feedback",er))}});
-function fpSideH(u,a){if(!u)return `<p class="muted">Click a student to see their video and Gemini's rubric here.</p>`;const s=S.P[u]||{uid:u,name:u},vd=fpSideVid(u,a,fpgVideo(u,a)),dr=fpSideDraft(u,a);
+function fpSideH(u,a){if(!u)return `<p class="muted">Click a student to see their video, their rubric and the feedback here.</p>`;const s=S.P[u]||{uid:u,name:u},vd=fpSideVid(u,a,fpgVideo(u,a)),dr=fpSideDraft(u,a);
   return `<div class="fpsh"><h3>${name(s)}</h3><button class="g mini gx" data-do="cell" data-u="${u}" data-a="${esc(a.id)}" title="Gemini's comment, ✔ ➜ notes, words said wrong, Watch again, ask Gemini to change it">🔎 All the details</button></div>`
     +`<div id="fpsb" class="fpsok">${dr.bar}</div><div id="fpsf">${dr.fb||""}</div><div id="fpsv" data-k="${esc(vd.k)}">${vd.h}</div><div id="fpsd">${dr.rub}</div>`}
 // refresh the panel without reloading the video when it is the same one (a level clicked, Gemini's draft back)
