@@ -8,6 +8,8 @@
 // scored step like the others: never put "write" in skip for a new LS.
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // video:true = its video is uploaded on its own page (Submit tab, shared/js/el-video.js, into the teacher's Drive; Roger, 8 Nov 2026), not on Classroom.
+// reup:true = handed in on Classroom, but a student can also upload the video on its page (Submit tab, el-video.js) when the Classroom link doesn't
+//   work (Roger, 14 Nov 2026: "all the links that didn't work … hand it through the app"); the upload is drafted by itself as for video:true.
 // steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 // self: the id of the LS's self-assessment panel (shared/js/el-self.js, on the Reflect page; Roger, 2 Nov 2026): the dashboard's Self-assessment box reads it.
@@ -91,7 +93,7 @@ window.EL_CATALOG=(function(){
     A("2eso","present-simple-grammar.html","Present simple grammar",["5.1"],["s2GrammarState"],5,{graded:false}),
     A("2eso","healthy-habits.html","Healthy habits",["3.1","5.1"],["healthyHabitsState2ESO"],8,{skip:["write","match"],graded:false}),
     A("2eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
-    A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","9.2"],["finalProduct2ESO"],0,{manual:true}),
+    A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","9.2"],["finalProduct2ESO"],0,{manual:true,reup:true}),
     A("4eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted4ESO"],4,{graded:false}),
     A("4eso","a-day-in-real-life.html","A day in real life",["3.1","5.1"],["lp2StateV2_4ESO"],8,{skip:["write","match"],graded:false}),
     A("4eso","useful-expressions.html","Useful expressions",["3.1","5.1"],["s3Real4State"],4,{skip:["write"],graded:false}),
