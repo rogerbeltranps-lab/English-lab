@@ -79,7 +79,7 @@ window.EL_GRADING={
       gv:{parts:[
         {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
         {id:"warm",name:"Recall warm-ups (first try)",sn:"remember",w:2.5,first:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
-        {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"grammarRel"],[LP3,"grammarComp"],[LP3,"grammarFeel"],[LP3,"mixed"],
+        {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammarPrep"],[LP3,"grammar"],[LP3,"grammarRel"],[LP3,"grammarComp"],[LP3,"grammarFeel"],[LP3,"mixed"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]},
         // Class games (Roger, 9 Nov 2026: "the performance in those games should be counted on performance of the students when it comes to
         // vocab and grammar, apart from giving points"): % right in this LS's grammar and vocabulary class games (gameResults, the same % as

@@ -258,15 +258,25 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 
 ### Vocabulary
 
-- [I] **Dates & time:** on 31 October; in November; at Christmas; at night; every year; once a year; the night before; ordinal dates (the first, the twenty-fifth)
-- [S] **Comparing cultures:** both… and…; similar to; different from; whereas; in the same way; unlike
+*14 Nov 2026 (Roger: "a lot of vocab-grammar stuff and not real vocabulary"): Dates & time and Verb + preposition moved to their own step, **Prepositions + vocab** (below); Comparing cultures is taught in Grammar · Comparing. The Vocabulary step now starts with the podcast's words.*
+
+- [B] **Where traditions come from:** harvest; feast; bonfire; mask; carve; turnip; pumpkin; roasted chestnuts
+- [I] **More from the stories:** spirits; settlers; cemetery; grateful; turkey
+- [S] **History words:** ancient; national holiday; make something official; a day of mourning
 - [S] **Places & travel:** travel home for the holidays; the town square; the community centre; the school hall; crowded streets
 - [D] **Change & debate:** commercialised; consumerism; keep a tradition alive; die out; evolve; adapt; reinvent; date back to; cultural appropriation; stereotype; inclusive; take something for granted
 - [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with (Safe since 31 Oct 2026: the programme gives verb + preposition to Safe and Daring)
 - [B] **Feelings, -ed = how you feel · -ing = what it is like** (all routes, 9 Nov 2026: the lexicon map plans "Sentiments i emocions (-ed / -ing)" in LS2): excited / exciting; bored / boring; tired / tiring
 - [I] **More feelings, -ed or -ing?:** interested (in) / interesting; amazed / amazing; disappointed / disappointing
 - [S] **Surprised or surprising?:** surprised / surprising
-- Receptive: pilgrims; feast; harvest festival
+- Receptive: pilgrims; Wampanoag; Samhain; bell ringers
+
+### Prepositions + vocab (own step, 14 Nov 2026)
+
+7 compulsory (6 + ✏️ own example) and 7 ➕ extra per level, no listening, like the grammar steps.
+- [B] **Dates & time:** on 31 October; in November; at Christmas; at night; every year; once a year; the night before; ordinal dates (the first, the twenty-fifth)
+- [B] **Words + preposition (Starter, Base):** come from; be famous for; be interested in; wait for
+- [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with · **adjective + preposition:** interested in; famous for; grateful for; excited about; proud of
 
 ### Practice (80 %)
 

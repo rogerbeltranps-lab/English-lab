@@ -472,7 +472,7 @@ var LS2 = (function () {
     Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; });
     clearStep(id, listId);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src);
-    if (k) { fill(items, prefix, k.v); check(false); if (!on) splitNote(id); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false); if (!on) { if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k);
   }
   /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
@@ -1766,10 +1766,18 @@ var LS2 = (function () {
      each new step that holds some of those questions, at the route they were checked at. The step that keeps the old id keeps its done and
      first try; the new ones are done once the student completes and checks them (Roger chose "Carry answers, finish the rest"). Answers typed
      but not checked (state.typing[from_route], by place in the old list: old[route] = each one's place in the new steps' items) move too. */
-  function splitOld() {
-    const S = LP.split; if (!S || (state.split || {})[S.from]) return;
+  /* LP.split can also be a list of such moves (Roger, 14 Nov 2026: "we could add a Prepositions + vocab and add it to the LP": the
+     preposition questions of 4 ESO LP3 Vocabulary went to their own step). A vocabulary panel's questions are its practice list;
+     old[route] = -1 for a question that is in no step now (its typed answer is dropped). */
+  function splitOld() { [].concat(LP.split || []).forEach(splitOne); }
+  function splitOne(S) {
+    if (!S || (state.split || {})[S.from]) return;
     const P = S.ids.map(id => LP.base.find(p => p.id === id)); if (P.some(p => !p)) return;
-    const U = P.flatMap(p => p.items).map(qid), listAt = (p, r) => atLevel(r, () => p.parts ? arrange(forLevel(p.items), p.req).items : forLevel(p.items));
+    const qs = p => p.items || p.practice || [];
+    const U = P.flatMap(qs).map(qid), listAt = (p, r) => atLevel(r, () => p.parts ? arrange(forLevel(p.items), p.req).items : forLevel(qs(p)));
+    // answers checked before the questions were saved with them: name them from their place in the old list, so they stay on their question
+    [state.ans, state.nb].forEach(B => { const b = B && B[S.from]; if (!b || !Array.isArray(b.v) || (b.q && b.q.length)) return;
+      const L = b.l || checkLevel(S.from), o = S.old[L]; if (o && o.length === b.v.length) { b.l = L; b.q = o.map((i, n) => i >= 0 ? U[i] : '#gone' + n); } });
     const a = state.ans && state.ans[S.from];
     if (a && Array.isArray(a.v) && Array.isArray(a.q) && S.old[a.l]) P.forEach(p => {
       if (p.id === S.from || state.ans[p.id]) return;
@@ -1780,7 +1788,7 @@ var LS2 = (function () {
     Object.keys(S.old).forEach(r => {
       const t = T[S.from + '_' + r], o = S.old[r]; if (!Array.isArray(t)) return;
       if (t.length !== o.length) { delete T[S.from + '_' + r]; return; }   // not the old list: never put answers on the wrong questions
-      const by = {}; t.forEach((x, i) => { if (x != null && x !== '') by[U[o[i]]] = x; });
+      const by = {}; t.forEach((x, i) => { if (x != null && x !== '' && o[i] >= 0) by[U[o[i]]] = x; });
       P.forEach(p => { const v = listAt(p, r).map(it => by[qid(it)] != null ? by[qid(it)] : ''); if (p.id === S.from || v.some(x => x !== '')) T[p.id + '_' + r] = v; });
     });
     state.typing = T;
@@ -1792,7 +1800,9 @@ var LS2 = (function () {
   function splitNote(id) {
     const a = state.ans && state.ans[id], el = $('#' + id + 'Result'); if (!a || !a.from || state.done[id] || !el) return false;
     const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
-    p.textContent = ca() ? '✨ Aquesta part de la gramàtica ara és una activitat a part. Les respostes que ja havies fet hi són: respon les preguntes obligatòries que falten i prem Comprova per entregar-la.'
+    p.textContent = a.from === 'vocab' ? (ca() ? '✨ Aquestes preguntes abans eren al Vocabulari i ara són una activitat a part. Les respostes que ja havies fet hi són: respon les preguntes obligatòries que falten i prem Comprova per entregar-la.'
+      : '✨ These questions used to be in the Vocabulary: now they are an activity of their own. The answers you had already given are here: answer the compulsory questions still empty and press Check to hand it in.')
+      : ca() ? '✨ Aquesta part de la gramàtica ara és una activitat a part. Les respostes que ja havies fet hi són: respon les preguntes obligatòries que falten i prem Comprova per entregar-la.'
       : '✨ This part of the grammar is now an activity of its own. The answers you had already given are here: answer the compulsory questions still empty and press Check to hand it in.';
     el.appendChild(p); el.classList.add('show'); return true;
   }
