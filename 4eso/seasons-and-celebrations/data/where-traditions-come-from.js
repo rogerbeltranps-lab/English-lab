@@ -15,6 +15,8 @@ window.LP = (function () {
         const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
         const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
         const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        // a row of small tiles (a scale): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
         const PAIRS = ['bor', 'excit', 'tir', 'interest', 'amaz', 'surpris', 'disappoint', 'frighten'].map(w => [w + '<b style="color:#1d4ed8">ed</b>', w + '<b style="color:#c2410c">ing</b>']);
         // a timeline from the past to now, with dots where things happen (x in %) and an optional ✗ at "now"
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
@@ -131,7 +133,40 @@ window.LP = (function () {
                 card('orange', '≠ Diferent', pill('orange', 'but') + ex('Halloween is about costumes, <b>but</b> the Castanyada is about food.') + ex('Christmas is in winter, <b>but</b> Diwali is in autumn.'))) +
               mistakes('Compte!', bad('Halloween and the Castanyada both is…', 'Halloween and the Castanyada <b>are</b> both…', '(dues festes → are)')),
             en: head('⚖️', 'Comparing two celebrations', 'Say what is <b>the same</b> and what is <b>different</b>.') +
-              row(card('green', '🟰 The same', ex('Halloween and the Castanyada are <b>both</b> on 31 October.')), card('orange', '≠ Different', ex('Halloween is about costumes, <b>but</b> the Castanyada is about food.'))) }
+              row(card('green', '🟰 The same', ex('Halloween and the Castanyada are <b>both</b> on 31 October.')), card('orange', '≠ Different', ex('Halloween is about costumes, <b>but</b> the Castanyada is about food.'))) },
+          /* 🔗 Prepositions + vocab (Roger, 14 Nov 2026: "here now it appears like a lot of vocab-grammar stuff and not real vocabulary … we
+             could add a Prepositions + vocab and add it to the LP"; "and add activities to work on them"): the dates and word + preposition
+             boxes that were in the Vocabulary step's How it works. */
+          { p: 'dates', ca: head('📆', 'Dates: <em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'nit · hora · període de festa']]) +
+              row(card('blue', 'IN', ex('Thanksgiving is <b>in</b> November.') + ex('Diwali is <b>in</b> autumn.'), 180),
+                card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
+                card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
+              row(card('teal', '🔁 Sense preposició', ex('We celebrate it <b>every year</b>.', 'cada any') + ex('It happens <b>once a year</b>.', 'un cop l’any') + ex('We prepare <b>the night before</b>.', 'la nit abans'))) +
+              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: sense preposició)')),
+            en: head('📆', 'Dates: <em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'night · clock time · holiday time']]) +
+              row(card('blue', 'IN', ex('Thanksgiving is <b>in</b> November.') + ex('Diwali is <b>in</b> autumn.'), 180),
+                card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
+                card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
+              row(card('teal', '🔁 No preposition', ex('We celebrate it <b>every year</b>.') + ex('It happens <b>once a year</b>.') + ex('We prepare <b>the night before</b>.'))) +
+              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: no preposition)')) },
+          { p: 'prepB', only: ['beginners', 'insecure'],
+            ca: head('🔗', 'Paraules que van amb preposició', 'La preposició va enganxada a la paraula: aprèn-les juntes, com un bloc. Sovint no és la mateixa que en català!') +
+              row(card('blue', 'come <b>from</b> · venir de', ex('Halloween <b>comes from</b> Ireland.') + ex('Where do the pumpkins <b>come from</b>?'), 200),
+                card('green', 'be famous <b>for</b> · ser famós per', ex('Leicester <b>is famous for</b> its Diwali lights.') + ex('Rio <b>is famous for</b> its carnival.'), 200),
+                card('orange', 'be interested <b>in</b> · estar interessat en', ex('I’m <b>interested in</b> old traditions.') + ex('Are you <b>interested in</b> Diwali?'), 200),
+                card('purple', 'wait <b>for</b> · esperar', ex('We <b>wait for</b> the fireworks.', 'en català no hi ha preposició!') + ex('The children <b>wait for</b> the Three Kings.'), 200)) +
+              mistakes('Compte!', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.'), bad('famous by', 'famous <b>for</b>')),
+            en: head('🔗', 'Words that go with a preposition', 'Learn the word and its preposition together, like one block.') +
+              row(card('blue', 'come <b>from</b>', ex('Halloween <b>comes from</b> Ireland.'), 200), card('green', 'be famous <b>for</b>', ex('Leicester <b>is famous for</b> its Diwali lights.'), 200),
+                card('orange', 'be interested <b>in</b>', ex('I’m <b>interested in</b> old traditions.'), 200), card('purple', 'wait <b>for</b>', ex('We <b>wait for</b> the fireworks.'), 200)) +
+              mistakes('Watch out', bad('interested on', 'interested <b>in</b>'), bad('We wait the fireworks.', 'We <b>wait for</b> the fireworks.')) },
+          { p: 'prep', r: 'safe', en: head('🔗', 'Words that go with a preposition', 'The preposition is fixed: learn it together with the word, like one block.') +
+              row(card('blue', 'Verb + preposition', table([['Word', 'Example'], ['come <b>from</b>', 'Halloween <b>comes from</b> Samhain.'], ['depend <b>on</b>', 'The date of Diwali <b>depends on</b> the moon.'], ['contribute <b>to</b>', 'Everyone <b>contributes to</b> the party.'], ['be known <b>for</b>', 'Leicester <b>is known for</b> its Diwali lights.'], ['be associated <b>with</b>', 'Pumpkins <b>are associated with</b> Halloween.']]), 300),
+                card('orange', 'Adjective + preposition', table([['Word', 'Example'], ['interested <b>in</b>', 'I’m <b>interested in</b> old traditions.'], ['famous <b>for</b>', 'Rio is <b>famous for</b> its carnival.'], ['grateful <b>for</b>', 'People say what they are <b>grateful for</b>.'], ['excited <b>about</b>', 'The children are <b>excited about</b> the fireworks.'], ['proud <b>of</b>', 'We’re <b>proud of</b> our festa major.']]), 300)) +
+              tip('Comparing?', '<em>similar to, different from, both … and, unlike</em> are in <b>Grammar · Comparing</b>.') +
+              mistakes('Watch out', bad('It depends of the moon.', 'It depends <b>on</b> the moon.'), bad('known by its lights', 'known <b>for</b> its lights'), bad('interested on', 'interested <b>in</b>'), bad('associated to', 'associated <b>with</b>')) }
         ];
         // a section's boxes in the order asked, without the old block key (each section is one block: no number on its boxes)
         return (...ps) => all.filter(b => ps.includes(b.p)).sort((a, b) => ps.indexOf(a.p) - ps.indexOf(b.p)).map(b => { const o = Object.assign({}, b); delete o.p; return o; });
@@ -141,12 +176,20 @@ window.LP = (function () {
   /* The old one-step Grammar (until 14 Nov 2026) split into four steps: answers checked there come back in the step that now holds each
      question, and answers typed but not checked move with them (ls2-engine.js splitOld). old[route] = the place of each question of that
      route's old list (4 compulsory per block, the order students saw) in the new steps' items, one after the other. */
-  split: { from: 'grammar', ids: ['grammar', 'grammarRel', 'grammarComp', 'grammarFeel'], old: {
+  split: [{ from: 'grammar', ids: ['grammar', 'grammarRel', 'grammarComp', 'grammarFeel'], old: {
     beginners: [71,69,85,90,72,86,70,92,93,94,111,100,101],
     insecure: [71,69,85,90,72,86,70,87,88,89,73,91,92,93,94,111,98,99,100,101,102,103,104,105,106],
     safe: [91,0,1,2,12,3,4,5,10,6,7,9,14,15,16,17,18,19,29,30,31,41,32,33,34,43,36,37,39,44,59,45,46,47,48,49,50,51,61,62,63,74,64,65,66,92,93,94,111,95,96,97,98,99,101,102,106,107],
     daring: [91,1,2,3,12,4,5,10,6,7,9,14,15,16,17,18,19,29,30,31,41,32,33,34,43,36,37,39,44,59,45,46,47,48,49,50,51,61,62,64,74,65,66,52,53,67,84,83,54,92,93,94,111,95,96,97,98,99,101,102,106,107,108]
   } },
+    /* Vocabulary → Prepositions + vocab (14 Nov 2026): the dates and preposition questions of the Vocabulary practice moved to grammarPrep;
+       old[route] = the place of each old Vocabulary question in vocab.practice + grammarPrep.items (-1: in no step now, comparing words). */
+    { from: 'vocab', ids: ['vocab', 'grammarPrep'], old: {
+    beginners: [13,14,15,16,17],
+    insecure: [13,14,15,20,21,16,17],
+    safe: [13,14,15,20,21,16,17,-1,-1,10,31],
+    daring: [13,14,15,20,21,16,17,-1,-1,10,11,12,31]
+  } }],
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 1 i 2', en: 'Recall: Learning Paths 1 and 2' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -162,59 +205,19 @@ window.LP = (function () {
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
       ] },
-    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Dates, comparar i canviar', en: 'Dates, comparing and change' },
+    /* Vocabulary = real words of the topic (Roger, 14 Nov 2026: "here now it appears like a lot of vocab-grammar stuff and not real
+       vocabulary"): the words of the podcast (origins), places, change and feelings. Dates (in / on / at) and words + preposition went to
+       their own step, Prepositions + vocab (grammarPrep below), with their questions (LP.split); comparing words are in Grammar · Comparing. */
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Orígens, costums i canvis', en: 'Origins, customs and change' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
-      receptive: 'pilgrims · feast · harvest festival',
-      core: { beginners: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year', 'excited', 'exciting', 'bored', 'boring', 'tired', 'tiring'], insecure: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth', 'excited', 'exciting', 'bored', 'boring', 'interested (in)', 'interesting', 'tired', 'tiring', 'amazed', 'amazing', 'disappointed', 'disappointing'], safe: ['on 31 October', 'in November', 'at Christmas', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth', 'both… and…', 'similar to', 'different from', 'whereas', 'in the same way', 'unlike', 'travel home for the holidays', 'the town square', 'the community centre', 'crowded streets', 'contribute to', 'depend on', 'come from', 'be known for', 'be associated with', 'interested (in)', 'interesting', 'amazed', 'amazing', 'surprised', 'surprising', 'disappointed', 'disappointing'], daring: ['once a year', 'the night before', 'both… and…', 'similar to', 'different from', 'whereas', 'unlike', 'commercialised', 'consumerism', 'keep a tradition alive', 'die out', 'evolve', 'adapt', 'date back to', 'stereotype', 'inclusive', 'take something for granted', 'contribute to', 'depend on', 'be associated with', 'surprised', 'surprising', 'disappointed', 'disappointing'] },
-      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
-         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
-      explain: (function () {
-        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
-          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
-        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
-        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
-        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
-        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
-        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
-        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
-        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
-        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
-        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
-        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
-        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
-        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
-        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
-        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
-        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
-          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
-          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
-        return [
-          { ca: head('📆', 'Dates: <em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
-              scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'nit · hora · període de festa']]) +
-              row(card('blue', 'IN', ex('Thanksgiving is <b>in</b> November.') + ex('Diwali is <b>in</b> autumn.'), 180),
-                card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
-                card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
-              row(card('teal', '🔁 Sense preposició', ex('We celebrate it <b>every year</b>.', 'cada any') + ex('It happens <b>once a year</b>.', 'un cop l’any') + ex('We prepare <b>the night before</b>.', 'la nit abans'))) +
-              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: sense preposició)')),
-            en: head('📆', 'Dates: <em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
-              scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'night · clock time · holiday time']]) +
-              row(card('blue', 'IN', ex('Thanksgiving is <b>in</b> November.') + ex('Diwali is <b>in</b> autumn.'), 180),
-                card('purple', 'ON', ex('The Castanyada is <b>on</b> 31 October.') + ex('Thanksgiving is <b>on</b> the fourth Thursday.'), 180),
-                card('orange', 'AT', ex('We get together <b>at</b> Christmas.') + ex('The fireworks are <b>at</b> night.'), 180)) +
-              row(card('teal', '🔁 No preposition', ex('We celebrate it <b>every year</b>.') + ex('It happens <b>once a year</b>.') + ex('We prepare <b>the night before</b>.'))) +
-              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October'), bad('on Christmas', '<b>at</b> Christmas'), bad('in every year', '<b>every</b> year', '(every: no preposition)')) },
-          { r: 'safe', en: head('🔗', 'Verb + preposition and comparing words', 'The preposition is fixed: learn it with the word.') +
-              row(card('blue', 'Verb + preposition', table([['Word', 'Example'], ['contribute <b>to</b>', 'Everyone <b>contributes to</b> the party.'], ['depend <b>on</b>', 'The date <b>depends on</b> the moon.'], ['come <b>from</b>', 'Halloween <b>comes from</b> Samhain.'], ['be known <b>for</b>', 'Leicester <b>is known for</b> its Diwali lights.'], ['be associated <b>with</b>', 'Pumpkins <b>are associated with</b> Halloween.']]), 300),
-                card('green', 'Comparing', table([['Word', 'Example'], ['similar <b>to</b>', 'It’s <b>similar to</b> a harvest festival.'], ['different <b>from</b>', 'It’s <b>different from</b> Christmas.'], ['<b>both</b> … <b>and</b> …', '<b>Both</b> Diwali <b>and</b> Hanukkah use lights.'], ['<b>unlike</b> + noun', '<b>Unlike</b> Halloween, it’s at home.']]), 300)) +
-              mistakes('Watch out', bad('It depends of the moon.', 'It depends <b>on</b> the moon.'), bad('similar than', 'similar <b>to</b>'), bad('known by its lights', 'known <b>for</b> its lights')) }
-        ];
-      })(),
+      receptive: 'pilgrims · Wampanoag · Samhain · bell ringers',
+      core: { beginners: ['harvest', 'feast', 'bonfire', 'mask', 'carve', 'turnip', 'pumpkin', 'roasted chestnuts', 'excited', 'exciting', 'bored', 'boring', 'tired', 'tiring'], insecure: ['harvest', 'feast', 'bonfire', 'mask', 'carve', 'turnip', 'pumpkin', 'roasted chestnuts', 'spirits', 'settlers', 'cemetery', 'grateful', 'turkey', 'excited', 'exciting', 'bored', 'boring', 'amazed', 'amazing'], safe: ['harvest', 'feast', 'bonfire', 'carve', 'turnip', 'spirits', 'settlers', 'grateful', 'ancient', 'national holiday', 'travel home for the holidays', 'the town square', 'crowded streets', 'interested (in)', 'interesting', 'surprised', 'surprising', 'disappointed', 'disappointing'], daring: ['feast', 'settlers', 'ancient', 'national holiday', 'a day of mourning', 'commercialised', 'consumerism', 'keep a tradition alive', 'die out', 'evolve', 'adapt', 'date back to', 'stereotype', 'inclusive', 'take something for granted', 'surprised', 'surprising', 'disappointed', 'disappointing'] },
       groups: [
-        { g: 'Dates & time', items: [['on 31 October', 'el 31 d’octubre', 'The Castanyada is on 31 October.'], ['in November', 'al novembre', 'Thanksgiving is in November.'], ['at Christmas', 'per Nadal', 'We get together at Christmas.'], ['at night', 'a la nit', 'The fireworks are at night.'], ['every year', 'cada any', 'We celebrate it every year.'], ['once a year', 'un cop l’any', 'It happens once a year.'], ['the night before', 'la nit abans', 'We decorate the night before.'], ['the first', 'el primer (dia 1)', 'on the first of November'], ['the twenty-fifth', 'el vint-i-cinc', 'on the twenty-fifth of December']] },
-        { r: 'safe', g: 'Comparing cultures (Safe)', items: [['both… and…', 'tant… com…', 'Both Diwali and Hanukkah use lights.'], ['similar to', 'semblant a', 'It’s similar to a harvest festival.'], ['different from', 'diferent de', 'It’s different from Christmas.'], ['whereas', 'mentre que', 'Halloween is about costumes, whereas the Castanyada is about family.'], ['in the same way', 'de la mateixa manera', 'In the same way, we eat together.'], ['unlike', 'a diferència de', 'Unlike Hanukkah, Diwali lasts five days.']] },
+        { g: 'Where traditions come from', items: [['harvest', 'collita', 'Samhain was at the end of the harvest.'], ['feast', 'festí, gran àpat', 'The Pilgrims had a harvest feast in 1621.'], ['bonfire', 'foguera', 'People used to light bonfires.'], ['mask', 'màscara', 'They wore masks to hide from the spirits.'], ['carve', 'tallar, esculpir (amb un ganivet)', 'We carve pumpkins at Halloween.'], ['turnip', 'nap', 'People used to carve turnips.'], ['pumpkin', 'carbassa', 'Pumpkins are bigger and easier to carve.'], ['roasted chestnuts', 'castanyes torrades', 'We eat roasted chestnuts at the Castanyada.']] },
+        { r: 'insecure', g: 'More from the stories', items: [['spirits', 'esperits', 'People believed the spirits of the dead came back.'], ['settlers', 'colons', 'The Pilgrims were English settlers.'], ['cemetery', 'cementiri', 'On All Saints’ Day, many people visit the cemetery.'], ['grateful', 'agraït/da', 'People say what they are grateful for.'], ['turkey', 'gall dindi', 'Many families eat turkey at Thanksgiving.']] },
+        { r: 'safe', g: 'History words (Safe)', items: [['ancient', 'antic/ga, molt antic', 'Samhain is an ancient Celtic festival.'], ['national holiday', 'festa nacional', 'Thanksgiving became a national holiday in 1863.'], ['make something official', 'fer oficial una cosa', 'Lincoln made Thanksgiving official.'], ['a day of mourning', 'un dia de dol', 'For some Native Americans, it is a day of mourning.']] },
         { r: 'safe', g: 'Places & travel (Safe)', items: [['travel home for the holidays', 'tornar a casa per les festes', 'Many people travel home for the holidays.'], ['the town square', 'la plaça del poble', 'The parade ends in the town square.'], ['the community centre', 'el centre cívic', 'There’s a party at the community centre.'], ['the school hall', 'la sala d’actes de l’escola', 'The event is in the school hall.'], ['crowded streets', 'carrers plens de gent', 'At Christmas there are crowded streets.']] },
         { r: 'daring', g: 'Change & debate (Daring)', items: [['commercialised', 'comercialitzat', 'Halloween is very commercialised.'], ['consumerism', 'consumisme', 'Some people criticise consumerism at Christmas.'], ['keep a tradition alive', 'mantenir viva una tradició', 'Schools keep the tradition alive.'], ['die out', 'desaparèixer', 'Some customs die out.'], ['evolve', 'evolucionar', 'Traditions evolve.'], ['adapt', 'adaptar(-se)', 'People adapt old customs.'], ['reinvent', 'reinventar', 'Young people reinvent traditions.'], ['date back to', 'remuntar-se a', 'It dates back to the 1600s.'], ['cultural appropriation', 'apropiació cultural', 'Wearing sacred symbols as a costume can be cultural appropriation.'], ['stereotype', 'estereotip', 'Avoid stereotypes.'], ['inclusive', 'inclusiu', 'An inclusive event.'], ['take something for granted', 'donar per fet', 'We take our traditions for granted.']] },
-        { r: 'safe', g: 'Verb + preposition (Safe)', items: [['contribute to', 'contribuir a', 'Everyone contributes to the meal.'], ['depend on', 'dependre de', 'The date depends on the moon.'], ['come from', 'venir de', 'Halloween comes from Samhain.'], ['be known for', 'ser conegut per', 'Leicester is known for its Diwali lights.'], ['be associated with', 'estar associat a', 'Pumpkins are associated with Halloween.']] },
         /* Feelings -ed / -ing (Roger, 9 Nov 2026: the lexicon map plans "Sentiments i emocions (adjectius -ed / -ing)" in 4 ESO LS2; the
            feelings words were in LP1, the -ed / -ing contrast nowhere). -ed = how you feel, -ing = what the thing is like. */
         { g: 'Feelings: -ed = how you feel · -ing = what it is like', items: [['excited', 'il·lusionat/da (com em sento)', 'The children are excited about the fireworks.'], ['exciting', 'emocionant', 'The fireworks are exciting.'], ['bored', 'avorrit/da (com em sento)', 'I’m bored: the speech is too long.'], ['boring', 'avorrit/da, pesat/da (com és una cosa)', 'The speech is boring.'], ['tired', 'cansat/da', 'After the parade, we’re tired.'], ['tiring', 'cansat/da, esgotador/a (que cansa)', 'Dancing all night is tiring.']] },
@@ -227,19 +230,61 @@ window.LP = (function () {
         { r: 'daring', g: 'Learning Path 2', items: [['heritage', 'herència cultural', 'Our cultural heritage.']] }
       ],
       practice: [
-        { q: 'Thanksgiving is ___ November.', a: ['in'] },
-        { q: 'We celebrate the Castanyada ___ 31 October.', a: ['on'] },
-        { q: 'We get together ___ Christmas.', a: ['at'] },
-        { r: 'insecure', q: '25/12 → on the ___ of December', a: ['twenty-fifth', 'twenty fifth', '25th'] },
-        { r: 'insecure', q: '1/11 → on the ___ of November', a: ['first', '1st'] },
-        { q: 'We celebrate it ___ a year, in spring.', a: ['once'] },
-        { q: 'The Castanyada is on the night ___ All Saints’ Day.', a: ['before'] },
-        { r: 'safe', q: 'Diwali is ___ from Christmas in many ways.', a: ['different'] },
-        { r: 'safe', q: '___ Halloween and the Castanyada take place on 31 October.', a: ['both'] },
+        { q: 'At the end of the summer, farmers collect the food: it’s the ___.', a: ['harvest'] },
+        { q: 'People used to light ___ and wear masks.', a: ['bonfires', 'bonfire'] },
+        { q: 'Before pumpkins, people in Ireland used to carve ___.', a: ['turnips', 'turnip'] },
+        { q: 'At the Castanyada we eat roasted ___ and panellets.', a: ['chestnuts'] },
+        { q: 'In 1621 the Pilgrims had a big harvest ___ that lasted three days.', a: ['feast'] },
+        { r: 'insecure', q: 'People believed that the ___ of the dead came back on that night.', a: ['spirits'] },
+        { r: 'insecure', q: 'On All Saints’ Day, many people visit the ___.', a: ['cemetery'] },
+        { r: 'insecure', q: 'At Thanksgiving, many people say what they are ___ for.', a: ['grateful'] },
+        { r: 'safe', q: 'Thanksgiving became a national ___ in 1863.', a: ['holiday'] },
+        { r: 'safe', q: 'Samhain is an ___ Celtic festival, more than 2,000 years old.', a: ['ancient'] },
         { r: 'safe', q: 'At Christmas the ___ streets are full of people.', a: ['crowded'] },
         { r: 'daring', q: 'Halloween ___ back to an old Celtic festival.', a: ['dates'] },
-        { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized'] },
-        { r: 'safe', q: 'Spain is known ___ its summer festivals.', a: ['for'] }
+        { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized'] }
+      ] },
+    /* 🔗 Prepositions + vocab (Roger, 14 Nov 2026: "we could add a Prepositions + vocab and add it to the LP" + "and add activities to work
+       on them"): dates with in / on / at and words that go with a preposition, out of the Vocabulary. Like the grammar steps: 7 compulsory
+       (6 questions + ✏️ own example) and 7 ➕ extra for every level, no listening; Starter and Base get their own list. Its id starts with
+       'grammar' so 📘 Grammar together, class mode and the notebook treat it like the grammar steps. Answers given in the Vocabulary to the
+       questions that moved come back here (LP.split). */
+    { id: 'grammarPrep', req: 7, type: 'typed', tab: { ca: 'Preposicions + vocabulari', en: 'Prepositions + vocab' }, title: { ca: 'Preposicions: dates i paraules que van amb preposició', en: 'Prepositions: dates and words with a preposition' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Llegeix com funciona i mira els exemples. Hi ha 7 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després venen 7 preguntes de ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and look at the examples. There are 7 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. After them come 7 ➕ extra practice questions, optional. After two wrong tries you will see the answer.' },
+      explain: GX('dates', 'prepB', 'prep'),
+      parts: [{ id: 'prep', title: { ca: 'Dates i paraules amb preposició', en: 'Dates and words with a preposition' }, note: { ca: 'Mes / estació → <b>in</b> · dia / data → <b>on</b> · nit / Nadal → <b>at</b> · <em>every year</em>: sense preposició · <em>come from, famous for, interested in, wait for</em>.', en: 'Month / season → <b>in</b> · day / date → <b>on</b> · night / Christmas → <b>at</b> · <em>every year</em>: no preposition · the word decides its preposition: <em>depend on, come from, known for, associated with, interested in</em>.' } }],
+      items: [
+        // Starter and Base
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['in', 'on', 'at'], q: 'Thanksgiving is ___ November.', a: ['in'], ca: 'Mes → in.', en: 'Month → in.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['in', 'on', 'at'], q: 'We celebrate the Castanyada ___ 31 October.', a: ['on'], ca: 'Data → on.', en: 'Date → on.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['in', 'on', 'at'], q: 'We get together ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'Holiday time → at.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['once', 'one', 'every'], q: 'We celebrate it ___ a year, in spring.', a: ['once'], ca: 'un cop l’any = once a year.', en: 'once a year.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['before', 'after', 'in'], q: 'The Castanyada is on the night ___ All Saints’ Day.', a: ['before'], ca: 'la nit abans = the night before.', en: 'the night before.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['from', 'of', 'to'], q: 'Halloween comes ___ an old Celtic festival.', a: ['from'], ca: 'venir de = come from.', en: 'come from.' },
+        { p: 'prep', only: ['beginners', 'insecure'], a: [], own: { must: ['\\b(in|on|at)\\b'], min: 6 }, q: 'Quan és la teva festa preferida? Escriu-ho amb <b>in</b>, <b>on</b> o <b>at</b>. <span class="tiny">(When is your favourite celebration?)</span>', show: 'My favourite celebration is Sant Joan. It’s on 23 June, at night.', ca: 'Fes servir in, on o at.', en: 'Use in, on or at.' },
+        { p: 'prep', only: ['beginners', 'insecure'], q: '25/12 → on the ___ of December', a: ['twenty-fifth', 'twenty fifth', '25th'], ca: 'El número ordinal: vint-i-cinquè.', en: 'The ordinal number.' },
+        { p: 'prep', only: ['beginners', 'insecure'], q: '1/11 → on the ___ of November', a: ['first', '1st'], ca: 'El número ordinal: primer.', en: 'The ordinal number.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['in', 'on', 'at'], q: 'The fireworks are ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['for', 'to', 'at'], q: 'We wait ___ the fireworks.', a: ['for'], ca: 'esperar = wait for (en català no hi ha preposició).', en: 'wait for.' },
+        { p: 'prep', only: ['beginners', 'insecure'], k: 'fix', q: '“We celebrate it in every year.” → We celebrate it ___ year.', a: ['every'], ca: 'every: sense preposició.', en: 'every: no preposition.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['for', 'of', 'by'], q: 'Leicester is famous ___ its Diwali lights.', a: ['for'], ca: 'ser famós per = be famous for.', en: 'famous for.' },
+        { p: 'prep', only: ['beginners', 'insecure'], opts: ['in', 'on', 'of'], q: 'I’m interested ___ old traditions.', a: ['in'], ca: 'estar interessat en = be interested in.', en: 'interested in.' },
+        // Core and Plus
+        { p: 'prep', r: 'safe', q: 'We celebrate the Castanyada ___ 31 October.', a: ['on'], en: 'Date → on.' },
+        { p: 'prep', r: 'safe', q: 'We get together ___ Christmas.', a: ['at'], en: 'Holiday time → at.' },
+        { p: 'prep', r: 'safe', q: 'The date of Diwali depends ___ the moon.', a: ['on'], en: 'depend on (not of).' },
+        { p: 'prep', r: 'safe', q: 'Halloween comes ___ Samhain, an old Celtic festival.', a: ['from'], en: 'come from.' },
+        { p: 'prep', r: 'safe', q: 'Spain is known ___ its summer festivals.', a: ['for'], en: 'be known for (not by).' },
+        { p: 'prep', r: 'safe', k: 'fix', q: '“Pumpkins are associated to Halloween.” → Pumpkins are associated ___ Halloween.', a: ['with'], en: 'be associated with.' },
+        { p: 'prep', r: 'safe', a: [], own: { must: ['\\b(comes?|came) from\\b', '\\bknown for\\b'], min: 10 }, q: 'Write about a celebration you know: where it <b>comes from</b> and what it <b>is known for</b>.', show: 'Sant Jordi comes from an old legend, and it is known for books and roses.', en: 'Use comes from and is known for.' },
+        { p: 'prep', r: 'safe', q: 'Thanksgiving is ___ November.', a: ['in'], en: 'Month → in.' },
+        { p: 'prep', r: 'safe', q: 'We celebrate it ___ a year, in spring.', a: ['once'], en: 'once a year.' },
+        { p: 'prep', r: 'safe', q: 'The Castanyada is on the night ___ All Saints’ Day.', a: ['before'], en: 'the night before.' },
+        { p: 'prep', r: 'safe', q: '25/12 → on the ___ of December', a: ['twenty-fifth', 'twenty fifth', '25th'], en: 'The ordinal number.' },
+        { p: 'prep', r: 'safe', q: 'Everyone contributes ___ the party: some bring food, others bring music.', a: ['to'], en: 'contribute to.' },
+        { p: 'prep', r: 'safe', k: 'fix', q: '“I’m very interested on Diwali.” → I’m very interested ___ Diwali.', a: ['in'], en: 'interested in (not on).' },
+        { p: 'prep', only: ['safe'], q: 'At Thanksgiving, many people say what they are grateful ___.', a: ['for'], en: 'grateful for.' },
+        { p: 'prep', r: 'daring', q: 'Many people in our town are proud ___ the festa major.', a: ['of'], en: 'proud of.' }
       ] },
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: { ca: 'Pòdcast', en: 'Podcast' },
       intro: { ca: 'Escolta el pòdcast una vegada per saber de quines dues festes parla. Després llegeix les preguntes i torna’l a escoltar.', en: 'Listen once to find the two celebrations. Then read the questions and listen again.' },
