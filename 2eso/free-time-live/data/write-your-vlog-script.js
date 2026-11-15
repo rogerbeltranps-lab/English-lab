@@ -119,7 +119,6 @@ window.LP = {
         const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
         const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
         const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
-        const turn = (title, t) => '<div style="margin-top:10px;padding:8px 12px;border-radius:12px;background:#dcfce7;border:1px solid #86efac">✏️ <b>' + title + '</b> ' + t + '</div>';
         const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
         const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
         const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
@@ -129,10 +128,6 @@ window.LP = {
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
           (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
-        // 🙌 a few questions the whole class does together after the explanation, answers hidden until the teacher opens them
-        // (Roger, 13 Nov 2026: "some activities to do all together a few so that students understand better")
-        const together = (ca, ...qs) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef2ff;border:1px solid #a5b4fc"><div style="font-weight:800;color:#4338ca;margin-bottom:2px">🙌 ' + (ca ? 'Tots junts' : 'All together') + '</div>' +
-          qs.map(([q, a], i) => '<div style="margin:5px 0">' + (i + 1) + '. ' + q + ' <details style="display:inline-block;vertical-align:top;margin-left:4px"><summary style="cursor:pointer;color:#4338ca;font-weight:700">' + (ca ? 'Resposta' : 'Answer') + '</summary><b style="color:#15803d">' + a + '</b></details></div>').join('') + '</div>';
         return [
           { p: 'forms', ca: head('🎥', 'El guió del vlog en quatre formes', 'Cada part del vlog té la seva forma. Repàs del que ja saps.') +
               row(card('orange', '👀 Ara: am / is / are + -ing', ex('Today I<b>’m</b> at the skate park.') + ex('Right now my friends <b>are skating</b>.'), 200),
@@ -140,29 +135,21 @@ window.LP = {
                 card('pink', '❤️ Gustos: love / like / hate + -ing', ex('I <b>love skating</b> because it’s fast.') + ex('Do you <b>like watching</b> basketball?'), 200),
                 card('green', '💡 Consells: imperatius', ex('<b>Take</b> a break every thirty minutes.') + ex('<b>Don’t use</b> your phone in bed.'), 200)) +
               '<div>' + ['today', 'right now', 'at the moment'].map(w => pill('orange', w)).join('') + ['usually', 'on Saturday mornings', 'twice a week'].map(w => pill('blue', w)).join('') + '</div>' +
-              mistakes('Compte!', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) +
-              together(true, ['Right now we ___ (eat) pizza.', '’re eating'], ['I hate ___ (lose).', 'losing'], ['___ your helmet! (portar posat)', 'Wear']) +
-              turn('Ara tu:', 'una frase de cada color per al teu vlog.'),
+              mistakes('Compte!', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')),
             en: head('🎥', 'The vlog script in four forms', 'Each part of the vlog has its own form. A review of what you know.') +
               row(card('orange', '👀 Now: am / is / are + -ing', ex('Today I<b>’m</b> at the skate park.') + ex('Right now my friends <b>are skating</b>.'), 200),
                 card('blue', '🔁 Usually: Present Simple', ex('I usually <b>come</b> here on Saturdays.') + ex('My sister <b>trains</b> twice a week.'), 200),
                 card('pink', '❤️ Likes: love / like / hate + -ing', ex('I <b>love skating</b> because it’s fast.') + ex('Do you <b>like watching</b> basketball?'), 200),
                 card('green', '💡 Tips: imperatives', ex('<b>Take</b> a break every thirty minutes.') + ex('<b>Don’t use</b> your phone in bed.'), 200)) +
               '<div>' + ['today', 'right now', 'at the moment'].map(w => pill('orange', w)).join('') + ['usually', 'on Saturday mornings', 'twice a week'].map(w => pill('blue', w)).join('') + '</div>' +
-              mistakes('Watch out', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) +
-              together(false, ['Right now we ___ (eat) pizza.', '’re eating'], ['I hate ___ (lose).', 'losing'], ['___ your helmet! (portar posat)', 'Wear']) +
-              turn('Your turn:', 'one sentence of each colour for your vlog.') },
+              mistakes('Watch out', bad('Today I skating.', 'Today I<b>’m</b> skating.'), bad('I love skate.', 'I love <b>skating</b>.'), bad('You take a break.', '<b>Take</b> a break.')) },
           { p: 'link', r: 'safe', en: head('🔗', 'Linking sentences', 'Four little words make your vlog sound natural.') +
               scale([['green', '➕ and', 'adds'], ['orange', '↔️ but', 'contrast'], ['purple', '❓ because', 'reason'], ['blue', '➡️ so', 'result']]) +
               row(card('slate', 'Example', ex('I love climbing <b>because</b> it’s like a puzzle, <b>so</b> I train twice a week.') + ex('I hate falling, <b>but</b> you learn from it.') + ex('It’s cold, <b>so</b> I’m wearing a jacket.'))) +
-              mistakes('Watch out', bad('I want to get better, because I practise every day.', 'I want to get better, <b>so</b> I practise every day.', '(result → so)')) +
-              together(false, ['I was tired, ___ I went to bed early.', 'so'], ['I like it ___ it’s fun.', 'because']) +
-              turn('Your turn:', 'one sentence for your vlog with <em>because</em> and <em>so</em>.') },
+              mistakes('Watch out', bad('I want to get better, because I practise every day.', 'I want to get better, <b>so</b> I practise every day.', '(result → so)')) },
           { p: 'longer', r: 'daring', en: head('📝', 'Longer descriptions', 'Mix the forms in one paragraph.') +
               card('slate', 'Model', '<div style="line-height:1.7">I usually <b>skate</b> on Saturdays, <span style="background:#ffedd5">but this month I<b>’m training</b> for a competition</span>, <b>so</b> I come every day. <span style="background:#ede9fe">I <b>think</b> bouldering is the most fun</span>, and <span style="background:#ede9fe">I <b>prefer</b> the park <b>to</b> the sports hall</span>. For me, climbing <b>means</b> freedom.</div>' + small('🟧 temporary situation · 🟪 opinion with a state verb'), 600) +
-              mistakes('Watch out', bad('I’m thinking bouldering is fun.', 'I <b>think</b> bouldering is fun.'), bad('I prefer the park than the hall.', 'I prefer the park <b>to</b> the hall.')) +
-              together(false, ['I prefer football ___ basketball.', 'to'], ['This month I ___ (learn) to skate.', '’m learning']) +
-              turn('Your turn:', 'write three linked sentences: a temporary situation, an opinion and a reason.') }
+              mistakes('Watch out', bad('I’m thinking bouldering is fun.', 'I <b>think</b> bouldering is fun.'), bad('I prefer the park than the hall.', 'I prefer the park <b>to</b> the hall.')) }
         ];
       })(),
       // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
