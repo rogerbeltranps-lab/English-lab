@@ -102,7 +102,7 @@ dialog.fxd{max-width:640px}.fxpt{margin:2px 0 10px;display:flex;flex-direction:c
 .fxcard{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin:10px 0}.fxq{font-size:18px;line-height:1.5;margin:0 0 8px}
 .fxgap{display:inline-block;min-width:60px;border-bottom:2px solid #0f766e;text-align:center;padding:0 6px}.fxgap.bad{background:#fee2e2;color:#b91c1c;border-color:#b91c1c}.fxgap.ok{background:#dcfce7;color:#166534;font-weight:700}
 .fxhint{font-size:14px;color:#475569;margin:6px 0}.fxform{display:flex;gap:8px}.fxform input{flex:1;font:inherit;font-size:17px;padding:8px 10px;border:2px solid #cbd5e1;border-radius:10px}.fxform input:focus{border-color:#0f766e;outline:0}
-.fxopts{display:flex;flex-direction:column;gap:8px}.fxopt{font:inherit;font-size:16px;text-align:left;background:#fff;border:2px solid #cbd5e1;border-radius:10px;padding:9px 12px;cursor:pointer}.fxopt:hover:not(:disabled){border-color:#0f766e}.fxopt:disabled{opacity:1;color:#334155;cursor:default}.fxopt.ok{background:#dcfce7;border-color:#16a34a;color:#14532d;font-weight:700}.fxopt.was{color:#b91c1c;text-decoration:line-through}.fxend+.row a.g{background:#e2e8f0;color:#0f172a;border-radius:8px;padding:8px 14px;text-decoration:none;font-weight:600}.fxopt.no{background:#fee2e2;border-color:#dc2626}
+.fxopts{display:flex;flex-direction:column;gap:8px}.fxopt{font:inherit;font-size:16px;text-align:left;background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:9px 12px;cursor:pointer}.fxopt:hover:not(:disabled){border-color:#0f766e}.fxopt:disabled{opacity:1;color:#334155;cursor:default}.fxopt.ok{background:#dcfce7;border-color:#16a34a;color:#14532d;font-weight:700}.fxopt.was{color:#b91c1c;text-decoration:line-through}.fxend+.row a.g{background:#e2e8f0;color:#0f172a;border-radius:8px;padding:8px 14px;text-decoration:none;font-weight:600}.fxopt.no{background:#fee2e2;border-color:#dc2626}
 .fxfb{margin:10px 0 0;font-weight:700;font-size:15px}.fxfb.ok{color:#166534}.fxfb.no{color:#b91c1c}.fxfb.show{color:#1e40af}
 .fxrule{background:#fffbeb;border-radius:10px;padding:8px 12px}.fxrule summary{cursor:pointer;font-weight:700;color:#92400e}.fxsl{margin-top:8px;font-size:14px}.fxsl p,.fxsl ul{margin:4px 0}.fxw{color:#9a3412}
 .fxtb{border-collapse:collapse;font-size:13px;margin:4px 0}.fxtb th,.fxtb td{border:1px solid #fde68a;padding:3px 6px;text-align:left}.fxtb th{background:#fef3c7}
@@ -1385,23 +1385,37 @@ const fxMd=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/~~(.+?)~~/g,
 const fxRule=sl=>sl.map(s=>`<div class="fxsl"><b>${esc(s.img||"")} ${esc(s.theory)}</b>`+(!EN&&s.ca?`<ul>${s.ca.map(c=>`<li>${fxMd(c)}</li>`).join("")}</ul>`:"")
   +(s.lines||[]).map(x=>typeof x==="string"?`<p>${fxMd(x)}</p>`:x.table?`<table class="fxtb">${x.table.map((r,i)=>`<tr>${r.map(c=>i?`<td>${fxMd(c)}</td>`:`<th>${fxMd(c)}</th>`).join("")}</tr>`).join("")}</table>`:x.watch?`<p class="fxw">⚠️ ${fxMd(x.watch)}</p>`:"").join("")+`</div>`).join("");
 document.getElementById("dlg")?.addEventListener("close",()=>{if(!S.fx)return;S.fx=null;$("#dlg").classList.remove("fxd");const y=scrollY;render();scrollTo(0,y)});
+// A "Which is correct?" question saved without the student's answer (a game played before answers were kept, or not answered) has no
+// sentence to show: its options come from the class game's own deck (lab/game/decks/{k}.js, a static file, no Firestore read), loaded only
+// then (problem report, 4ESOA, 16 Nov 2026: "la frase no surt"). Not found → the right answer is shown, never an empty text box.
+const fxDecks={};
+function fxDeck(k,cb){if(fxDecks[k])return cb(fxDecks[k]);const prev=window.ELGameDeck,sc=document.createElement("script");window.ELGameDeck=d=>{fxDecks[k]=d||{}};
+  sc.src="lab/game/decks/"+encodeURIComponent(k)+".js";sc.onload=sc.onerror=()=>{window.ELGameDeck=prev;fxDecks[k]=fxDecks[k]||{slides:[]};cb(fxDecks[k])};document.head.appendChild(sc)}
+const fxPlain=s=>String(s??"").replace(/\*\*/g,"").trim();
+function fxOpts(m){if(m.a&&fxNorm(m.a)!==fxNorm(m.ok))return (m.q+m.ok).length%2?[m.ok,m.a]:[m.a,m.ok];
+  return m.opts||null}
 function fixPanel(k,p){const R=(S.gv||{})[k],P=R&&R.pts.find(x=>x.k===p);if(!P)return;
   const FX=gvFixed(),todo=P.miss.filter(m=>!FX[gvKey(k,m)]);
-  S.fx={k,P,R,items:(todo.length?todo:P.miss).slice(),i:0,tries:0,state:"ask",right:0};drawFix();if(!$("#dlg").open)$("#dlg").showModal()}
+  const go=()=>{S.fx={k,P,R,items:(todo.length?todo:P.miss).slice(),i:0,tries:0,state:"ask",right:0};drawFix();if(!$("#dlg").open)$("#dlg").showModal()};
+  if(!P.miss.some(m=>!/_{2,}/.test(m.q)&&!m.a&&!m.opts))return go();
+  fxDeck(k,dk=>{const sl=(dk.slides||[]).filter(s=>Array.isArray(s.options)&&s.options.length>1);
+    P.miss.forEach(m=>{if(/_{2,}/.test(m.q)||m.a||m.opts)return;const x=sl.find(s=>fxPlain(s.q).slice(0,160)===m.q&&fxPlain(s.options[0]).slice(0,80)===m.ok);
+      if(x){const o=x.options.map(fxPlain),r=(m.q+m.ok).length%o.length;m.opts=o.slice(r).concat(o.slice(0,r))}});go()})}
 function drawFix(){const F=S.fx;if(!F)return;const P=F.P,n=F.items.length,m=F.items[F.i],dlg=$("#dlg");dlg.classList.add("fxd");
   const head=`<h3>✏️ ${t("Corregeix els teus errors","Fix your mistakes")}</h3><p class="fxpt"><span class="gvk">${F.R.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(F.R.l))} LP${esc(F.R.lp||"")}</span><b>${esc(P.name)}</b></p>`;
   const rule=open=>`<details class="fxrule"${open?" open":""}><summary>📖 ${t("Recorda la regla","Remember the rule")}</summary>${fxRule(P.slides||[])}</details>`;
   if(F.state==="end"){$("#dlgc").innerHTML=head+`<div class="fxend"><span class="fxbig">🎉</span><b>${F.right===n?t("Perfecte! Els has corregit tots.","Perfect! You fixed them all."):F.right?t(`Fet! N'has corregit ${F.right} de ${n} tu sol.`,`Done! You fixed ${F.right} of ${n} by yourself.`):t("Fet! Ara ja saps les respostes correctes.","Done! Now you know the right answers.")}</b><p class="muted">${F.right<n?t("Els que no has encertat queden per corregir: torna-hi d'aquí a una estona i prova de fer-los tu sol.","The ones you didn't get right are still to fix: come back later and try to do them by yourself."):t("Torna-hi d'aquí a uns dies per recordar-ho bé.","Come back in a few days to remember it well.")}</p></div>`
     +`<div class="row"><a class="g" href="${lsHref(F.R.l)}#notes">📖 ${t("Estudia la teoria","Study the theory")}</a><button class="g" data-do="fxagain">↺ ${t("Torna-hi","Again")}</button><button class="sub" data-do="fxclose">${t("Tanca","Close")}</button></div>`;return}
-  const gap=/_{2,}/.test(m.q),wrong=m.a&&fxNorm(m.a)!==fxNorm(m.ok),choice=!gap&&wrong,ord=choice?((m.q+m.ok).length%2?[m.ok,m.a]:[m.a,m.ok]):null;
+  const gap=/_{2,}/.test(m.q),wrong=m.a&&fxNorm(m.a)!==fxNorm(m.ok),ord=gap?null:fxOpts(m),choice=!!ord;
+  if(!gap&&!ord&&!m.a&&/\?\s*$/.test(m.q)&&F.state==="ask")F.state="show";
   const sent=gap?esc(m.q).replace(/_{2,}/,F.state==="ok"||F.state==="show"?`<span class="fxgap ok">${esc(m.ok)}</span>`:wrong?`<span class="fxgap bad"><s>${esc(m.a)}</s></span>`:`<span class="fxgap">____</span>`):esc(m.q);
   const fb={ok:`<p class="fxfb ok">✅ ${t("Molt bé!","Well done!")}</p>`,no:`<p class="fxfb no">❌ ${t("Encara no. Llegeix la regla i torna-ho a provar.","Not yet. Read the rule and try again.")}</p>`,
     show:`<p class="fxfb show">💡 ${t("La resposta correcta","The right answer")}: <b>${esc(m.ok)}</b></p>`}[F.state]||"";
   const done=F.state==="ok"||F.state==="show";
   $("#dlgc").innerHTML=head+`<div class="fxprog"><span>${t("Error","Mistake")} ${F.i+1} ${t("de","of")} ${n}</span><span class="xbar"><span style="width:${F.i/n*100}%;background:#0f766e"></span></span></div>`
     +`<div class="fxcard"><p class="fxq">${sent}</p>`
-    +(choice?`<p class="fxhint">${t("Quina és la correcta? Una és la que vas triar al joc.","Which one is correct? One of them is what you chose in the game.")}</p><div class="fxopts">${ord.map((o,j)=>`<button type="button" class="fxopt${done&&o===m.ok?" ok":done&&o!==m.ok?" was":""}${F.state==="no"&&F.pick===j?" no":""}" data-do="fxpick" data-j="${j}"${done?" disabled":""}>${esc(o)}</button>`).join("")}</div>`
-      :`<p class="fxhint">${wrong?t("Al joc vas posar la paraula ratllada. Escriu la correcta:","In the game you wrote the crossed-out words. Write the right ones:"):t("Aquesta no la vas contestar. Escriu les paraules que falten:","You didn't answer this one. Write the missing words:")}</p>`
+    +(choice?`<p class="fxhint">${wrong?t("Quina és la correcta? Una és la que vas triar al joc.","Which one is correct? One of them is what you chose in the game."):t("Quina és la correcta? Tria-la:","Which one is correct? Choose it:")}</p><div class="fxopts">${ord.map((o,j)=>`<button type="button" class="fxopt${done&&o===m.ok?" ok":done&&o!==m.ok?" was":""}${F.state==="no"&&F.pick===j?" no":""}" data-do="fxpick" data-j="${j}"${done?" disabled":""}>${esc(o)}</button>`).join("")}</div>`
+      :!gap&&!m.a&&/\?\s*$/.test(m.q)?"":`<p class="fxhint">${wrong?t("Al joc vas posar la paraula ratllada. Escriu la correcta:","In the game you wrote the crossed-out words. Write the right ones:"):t("Aquesta no la vas contestar. Escriu les paraules que falten:","You didn't answer this one. Write the missing words:")}</p>`
         +`<form class="fxform" data-fx="1"><input id="fxin" autocomplete="off" spellcheck="false" ${done?"disabled":""} value="${esc(F.typed||"")}" aria-label="${t("La teva resposta","Your answer")}"><button class="sub" type="submit" ${done?"disabled":""}>${t("Comprova","Check")}</button></form>`)
     +fb+`</div>`+rule(F.state==="no"||F.state==="show")
     +`<div class="row"><button class="g" data-do="fxclose">${t("Tanca","Close")}</button>${done?`<button class="sub" data-do="fxnext">${F.i+1<n?t("Següent","Next")+" →":t("Acaba","Finish")+" ✓"}</button>`:""}</div>`;
@@ -1413,7 +1427,7 @@ function fxAnswer(ok,pick){const F=S.fx,m=F.items[F.i];F.pick=pick;
 document.addEventListener("submit",e=>{if(!e.target.matches("form[data-fx]"))return;e.preventDefault();const F=S.fx;if(!F)return;const m=F.items[F.i],v=$("#fxin").value;if(!v.trim())return;F.typed=v;
   const a=fxNorm(v),ok=a===fxNorm(m.ok)||a===fxNorm(m.q.replace(/_{2,}/,m.ok))||a===fxNorm(m.q.replace(/_{2,}/,m.ok).replace(/\s*\([^)]*\)/g,""));fxAnswer(ok)});
 function fxDo(d){const F=S.fx;if(!F)return;
-  if(d.do==="fxpick"){const m=F.items[F.i],ord=((m.q+m.ok).length%2?[m.ok,m.a]:[m.a,m.ok]);fxAnswer(ord[+d.j]===m.ok,+d.j);if(F.state==="no"){F.state="show";drawFix()}}
+  if(d.do==="fxpick"){const m=F.items[F.i],ord=fxOpts(m)||[];fxAnswer(fxPlain(ord[+d.j])===fxPlain(m.ok),+d.j);if(F.state==="no"&&ord.length<3){F.state="show";drawFix()}}
   else if(d.do==="fxnext"){F.typed="";F.tries=0;F.pick=null;if(F.i+1<F.items.length){F.i++;F.state="ask"}else F.state="end";drawFix()}
   else if(d.do==="fxagain"){F.items=F.P.miss.slice();F.i=0;F.tries=0;F.right=0;F.typed="";F.state="ask";drawFix()}
   else if(d.do==="fxclose"){$("#dlg").close()}}
