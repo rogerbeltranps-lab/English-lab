@@ -428,6 +428,20 @@ var LS2 = (function () {
   /* ↺ Practise again (Roger, 6 Nov 2026: "if they don't finish and leave the page without checking, next time they come back they see the
      old results"): the boxes empty for a new try, but the last checked answers stay saved (state.ans) until the new try is checked. */
   const fresh = {};
+  /* A class game took the student away in the middle of a new try (Roger, 16 Nov 2026: Víctor "was doing the activities when I started
+     the game and he says his answers didn't save"): el-cloud.js gamePush notes this page in sessionStorage el_game_took before it opens
+     the game. Back here, an activity with a checked try AND answers typed at this level after it (state.typing: an unchecked new try)
+     opens as that new try again, with what they had typed, instead of the old checked answers (the 6 Nov rule "leave without checking
+     = old results back" is for leaving on their own). el-cloud.js forgets the note when this page is left (not on its own reload). */
+  const gameTook = (() => { try { const o = JSON.parse(sessionStorage.getItem('el_game_took') || 'null'); return !!o && o.p === location.pathname && Date.now() - o.at < 3 * 3600e3; } catch (e) { return false; } })();
+  let gameBack = false;
+  function retryBack(id) {
+    const v = gameTook && state.ans && state.ans[id] && state.typing && state.typing[id + '_' + level];
+    if (!Array.isArray(v) || !v.some(x => x != null && x !== '')) return;
+    fresh[id] = true;
+    // like ↺ Practise again in the notebook look: the new try is done in the laptop look (el-app.js draws the look after this script)
+    if (!gameBack) { gameBack = true; const go = () => { if (window.elLpNb && document.documentElement.classList.contains('el-lpnb')) window.elLpNb(false); }; document.readyState === 'complete' ? setTimeout(go, 0) : addEventListener('load', go); }
+  }
   function forget(id, prefix) { fresh[id] = true; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
      the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
@@ -447,6 +461,7 @@ var LS2 = (function () {
     // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
     if (state.ans && state.ans[id] && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }
     NBS[id] = { id, prefix, listId, items, check, src };
+    retryBack(id);
     if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
     nbSaved(id, !!k);
