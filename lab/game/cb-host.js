@@ -176,6 +176,7 @@ async function saveResults(){
   Object.entries(right).forEach(([e,r])=>{H.pts[e]=(H.pts[e]||0)+r;w.set(S.doc(db,"points",e),{[H.term]:S.increment(r),updated:now},{merge:true})});
   hackers(w,M,now);
   if(Object.keys(right).length)w.set(S.doc(db,"teams",H.g),{best:{[H.term]:Math.max(0,...Object.keys(H.names).map(e=>H.pts[e]||0))},updated:now},{merge:true});
+  try{["vocab","grammar"].forEach(k=>sessionStorage.removeItem("el_gp_"+H.g+"_"+k))}catch(e){}   // 📊 the class game board's ticks read this group's results again
   try{await w.commit()}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
 }
 
