@@ -610,8 +610,10 @@ var LS2 = (function () {
   R.vocab = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
-      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar
-      (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
+      // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar,
+      // titled 💬 Expressions, not grammar (Roger, 16 Nov 2026: "can we label them as Expressions, since they are expressions"): play / go / do,
+      // on / at / in + time, verb + preposition are words that go together, learnt as one block. The class games put them in the 🧩 grammar game.
+      (p.explain ? '<div class="section-card worked vocab-expr"><h3>💬 Expressions</h3><p class="instruction">' + (ca() ? 'Paraules que van juntes: aprèn-les en bloc.' : 'Words that go together: learn them as one block.') + '</p>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group" aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +

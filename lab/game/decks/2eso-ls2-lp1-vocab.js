@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Free-time activities",
   slides:[
-    {theory:"play, go or do?",point:"play, go or do + a sport",tab:"vocab",pointCa:"play, go o do + un esport",img:"⚽",lines:[
+    {theory:"play, go or do?",ex:true,point:"play, go or do + a sport",tab:"vocabEx",pointCa:"play, go o do + un esport",img:"⚽",lines:[
       "**play** + a sport with a ball or a game: **play** football · **play** basketball · **play** video games",
       "**play the** + an instrument: **play the** guitar · **play the** piano",
       "**go** + -ing: **go** swimming · **go** skating · **go** cycling",
@@ -17,7 +17,7 @@ ELGameDeck({
     {q:"My cousin plays ___ guitar in a band.",img:"🎸",write:["the"],why:"An instrument: **play the** guitar."},
     {q:"It's raining, so Hugo is at home ___ video games.",img:"🎮",options:["playing","doing","going","making"],why:"**play** video games."},
     {q:"We ___ friends in the square after school. (m...)",img:"👫",write:["meet"],why:"**meet friends** = see them, spend time with them."},
-    {theory:"How often?",point:"How often? (once a week…)",tab:"vocab",pointCa:"Cada quan? (once a week…)",img:"📅",lines:[
+    {theory:"How often?",ex:true,point:"How often? (once a week…)",tab:"vocabEx",pointCa:"Cada quan? (once a week…)",img:"📅",lines:[
       "**once a week** (1) · **twice a week** (2) · **every day**",
       "**at the weekend** · **in my free time**",
       "**How often** do you go swimming? — **Once a week.**"]},
@@ -39,5 +39,18 @@ ELGameDeck({
     {q:"Come and support us at the competition! We need ___!",img:"📣",options:["fans","subscribers","highlights","ramps"],why:"**fans** come, watch and support a team or a player."},
     {q:"You need to ___ every day to get better at the piano. (pr...)",img:"🎹",write:["practise","practice"],why:"**practise** (UK) = **practice** (US): do it again and again."},
     {q:"Which word doesn't belong? karate · yoga · gymnastics · guitar",img:"🤔",options:["guitar","karate","yoga","gymnastics"],why:"You **do** karate, yoga and gymnastics, but you **play the** guitar."},
+    {theory:"Free-time activities",point:"Free-time activities (draw, read comics…)",tab:"vocab",pointCa:"Activitats de temps lliure (draw, read comics…)",img:"🎨",lines:[
+      "At home: **draw** · **read comics** · **listen to music** · **play video games** · **play the guitar**",
+      "Out: **meet friends** · **go to the park** · **dance** · **skating** · **cycling** · **swimming**",
+      "Clubs: **karate** · **gymnastics** · **yoga** · **basketball** · a **hobby** (what you love doing in your free time)"]},
+    {q:"Pau has got a pencil and some paper. What does he love doing?",img:"✏️",options:["drawing","dancing","swimming","cycling"],why:"**draw** = make pictures with a pencil."},
+    {q:"Júlia has got her headphones on. She's listening to ___. (m...)",img:"🎧",write:["music"],why:"**listen to music**."},
+    {q:"Which one do you READ?",img:"📚",options:["comics","karate","guitar","video games"],why:"You **read comics** (and books, magazines)."},
+    {q:"On sunny afternoons we go to the ___ with a ball and a frisbee. (p...)",img:"🌳",write:["park"],why:"**go to the park**."},
+    {q:"Which sport do you do on a bike?",img:"🚲",options:["cycling","skating","swimming","gymnastics"],why:"**cycling** = riding a bike."},
+    {q:"Music is on and Lucía can't stop moving. She loves to ___. (d...)",img:"💃",write:["dance"],why:"**dance** = move your body to music."},
+    {q:"Which activity do you do in water?",img:"🏊",options:["swimming","skating","karate","yoga"],why:"**swimming** happens in a swimming pool or the sea."},
+    {q:"Drawing comics is my favourite ___: I do it every day after school. (h...)",img:"🖍️",write:["hobby"],why:"A **hobby** = something you love doing in your free time."},
+    {q:"Which one is NOT a free-time activity?",img:"🤔",options:["do my homework","read comics","meet friends","play the piano"],why:"Homework is school work, not a hobby!"},
   ]
 });

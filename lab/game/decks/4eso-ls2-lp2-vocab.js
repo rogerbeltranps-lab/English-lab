@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Celebrations around the world",
   slides:[
-    {theory:"Traditions: what people do",point:"Tradition verbs (gather, exchange gifts…)",tab:"vocab",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
+    {theory:"Traditions: what people do",ex:true,point:"Tradition verbs (gather, exchange gifts…)",tab:"vocabEx",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
       "**get together** / **gather** (meet as a group) · **share a meal** · **exchange gifts** · **make a wish**",
       "**take part in** (participate) · **look forward to** (feel excited about something that is coming)",
       "**pass down** (give to the next generation) · **mark an occasion** (show that a day is special)"]},
@@ -27,14 +27,21 @@ ELGameDeck({
     {q:"There are activities for children, parents and grandparents. It's a ___ event.",img:"👨‍👩‍👧",options:["family-friendly","crowded","secular","local"],why:"**family-friendly** = good for all the family."},
     {q:"Red lanterns, dragon costumes, bright lights: the streets are very ___. (c...)",img:"🏮",write:["colourful","colorful"],why:"**colourful** (UK) = **colorful** (US)."},
     {q:"All Saints' Day is ___ for my family: it helps us remember my grandparents.",img:"💛",options:["meaningful","crowded","worldwide","festive"],why:"**meaningful** = important, with a special meaning."},
+    {q:"Music, lights and happy people everywhere: the town feels really ___. (f...)",img:"🎉",write:["festive"],why:"**festive** = happy, like a party."},
+    {q:"La Mercè is a ___ festival: it's only in Barcelona.",img:"🏙️",options:["local","worldwide","religious","secular"],why:"**local** = from one town or place ↔ **worldwide**."},
+    {q:"My grandmother cooks the ___ dish, the same recipe as her mother. (tr...)",img:"🥘",write:["traditional"],why:"**traditional** = done the same way for a long time."},
     {theory:"Words from four celebrations",point:"Celebration words (diyas, lanterns, parade…)",tab:"vocab",pointCa:"Paraules de festes (diyas, lanterns, parade…)",img:"🪔",lines:[
       "Diwali: **diyas** (small oil lamps) · Hanukkah: a **menorah** (a candle holder)",
       "Lunar New Year: red **lanterns**, a **reunion dinner** (the whole family together) · Christmas: an **Advent calendar**, the **Caga Tió**",
-      "Everywhere: a **parade**, **fireworks**, **decorations**, **relatives** (family members), **guests**"]},
+      "Everywhere: a **parade**, **fireworks**, **decorations**, **costumes**, **relatives** (family members), **guests**"]},
     {q:"At Diwali people light small oil lamps called ___.",img:"🪔",options:["diyas","menorahs","lanterns","candles"],why:"**diyas** = small oil lamps."},
     {q:"On Sunday we visit our ___ in Girona: my aunt, my uncle and my cousins. (r...)",img:"🚗",write:["relatives"],why:"**relatives** = family members."},
     {q:"Every night of Hanukkah, families light one more candle on a ___.",img:"🕎",options:["menorah","diya","lantern","Caga Tió"],why:"A **menorah** = the Hanukkah candle holder."},
     {q:"People walk, dance and play music through the streets in a big ___. (p...)",img:"🥁",write:["parade"],why:"A **parade** = people moving through the streets to celebrate."},
     {q:"At Lunar New Year, many people travel home for a big ___.",img:"🥟",options:["reunion dinner","Advent calendar","parade","menorah"],why:"A **reunion dinner** = the whole family eats together."},
+    {q:"At midnight the sky is full of colours and loud bangs: the ___ start! (f...)",img:"🎆",write:["fireworks"],why:"**fireworks** explode in the sky with colours and noise."},
+    {q:"Children open one little window every day until Christmas on their ___.",img:"📅",options:["Advent calendar","menorah","reunion dinner","Caga Tió"],why:"An **Advent calendar** counts the days to Christmas."},
+    {q:"We put lights, stars and paper chains in the classroom: we love making ___. (d...)",img:"⭐",write:["decorations"],why:"**decorations** make a place look special for a celebration."},
+    {q:"At Carnival I always wear a funny ___: this year I'm a pirate.",img:"🏴‍☠️",options:["costume","lantern","diya","guest"],why:"A **costume** = special clothes to look like somebody or something else."},
   ]
 });

@@ -16,7 +16,8 @@
 //                         password words come from when the round has no vocabulary (a grammar game alone); x = {rv, tp} from 🧩 Which
 //                         grammar? (host.js, Roger 16 Nov 2026): tp {deck: [points]} keeps only the questions of the ticked grammar points
 //                         (a deck not in tp has none; tp comes only with one game alone), rv = other grammar games whose ticked points come in as 🔁 review (keys r<j>_<n>),
-//                         n of each review point (chosen with seed, the same on the board and every Chromebook)
+//                         n of each review point (chosen with seed, the same on the board and every Chromebook); 💬 the expressions of the
+//                         game's own learning path (its vocabulary deck's ex points, Roger 16 Nov 2026) come in as review but keep all their questions
 //   order(pool, seed)     the order of the questions for one student: new questions first, vocabulary and grammar taking turns
 //   shown(qu, seed)       the order of a question's options for one student (the deck's first option is the right one)
 //   similar(pool, qu, a, seed, avoid)  a question like qu to try after a wrong answer (key)
@@ -47,6 +48,7 @@ function deckQs(d,id,kind,th){const out=[],np=d.notes===false;let k=0,inRun=fals
   return out}
 // wordIds: other decks whose vocabulary only gives the password words (a 🧩 grammar game played alone as Code Breakers: the words of its
 // learning path's 📚 vocabulary game), never questions of the round
+const sameLp=(a,b)=>{const L=window.EL_GAMES||[],A=L.find(x=>x.id===a),B=L.find(x=>x.id===b);return !!A&&!!B&&A.course===B.course&&A.ls===B.ls&&A.lp===B.lp};
 async function load(ids,wordIds,x){
   const decks={},tp=x&&x.tp&&typeof x.tp==="object"?x.tp:null,rv=((x&&x.rv)||[]).filter(id=>/^[\w-]+$/.test(id)&&!ids.includes(id));
   for(const id of ids.concat(rv)){if(!/^[\w-]+$/.test(id))continue;const R=rv.indexOf(id);
@@ -56,7 +58,8 @@ async function load(ids,wordIds,x){
     if(more&&Array.isArray(more.questions)){let n=qs.length;more.questions.forEach(q=>{n++;qs.push(Object.assign({},q,{deck:id,kind,n,tp:+q.p||0,p:q.p?"p"+q.p:"",key:(kind==="vocab"?"v":"g")+n,extra:R<0}))})}
     const nmax=qs.length;if(R>=0)qs.forEach(q=>{q.key="r"+R+"_"+q.n;q.rv=true});
     if(tp)qs=qs.filter(q=>(tp[id]||[]).map(Number).includes(q.tp));
-    if(R>=0&&+x.n>0){const keep=new Set();[...new Set(qs.map(q=>q.tp))].forEach(t=>shuf(qs.filter(q=>q.tp===t),(+x.seed||0)+hash(id+"."+t)).slice(0,+x.n).forEach(q=>keep.add(q.key)));qs=qs.filter(q=>keep.has(q.key))}
+    // 💬 the expressions of the round's own learning path (a vocabulary deck's ex points in a grammar game, host.js) keep all their questions
+    if(R>=0&&+x.n>0&&!sameLp(id,ids[0])){const keep=new Set();[...new Set(qs.map(q=>q.tp))].forEach(t=>shuf(qs.filter(q=>q.tp===t),(+x.seed||0)+hash(id+"."+t)).slice(0,+x.n).forEach(q=>keep.add(q.key)));qs=qs.filter(q=>keep.has(q.key))}
     decks[id]={id,title:got.title,kind,qs,th,more:!!more,nmax,rv:R>=0}}
   const pool=Object.values(decks).flatMap(d=>d.qs);let ws=words(pool);
   if(!ws.length&&wordIds&&wordIds.length){const ex=await load(wordIds.filter(id=>!decks[id]));ws=ex.words}

@@ -103,7 +103,9 @@
     const nTerms=lp.terms.reduce((n,g)=>n+g.items.length,0);
     const terms=nTerms?`<details class="ex-sec"><summary>🔑 ${t("Paraules clau","Key terms")} <span class="muted">· ${nTerms}</span></summary>${lp.terms.map(g=>`<h4>${g.g}</h4><ul class="ex-terms">${g.items.map(x=>
       `<li><b>${x.en}</b>${x.ca?` <span class="ex-ca">${x.ca}</span>`:""}${x.ex?`<small>${x.ex}</small>`:""}</li>`).join("")}</ul>`).join("")}</details>`:"";
-    const gram=lp.grammar.length?`<details class="ex-sec"><summary>🧩 ${t("Gramàtica","Grammar")} <span class="muted">· ${lp.grammar.reduce((n,g)=>n+g.boxes.length,0)}</span></summary>${lp.grammar.map(g=>`<h4>${g.title}</h4>${g.boxes.map(b=>`<div class="ex-rule">${b}</div>`).join("")}`).join("")}</details>`:"";
+    // 🧩 grammar, and 💬 the Expressions boxes of the Vocabulary steps (ex, el-exam.js) apart (Roger, 16 Nov 2026)
+    const sec=(L,ic,ca,en)=>L.length?`<details class="ex-sec"><summary>${ic} ${t(ca,en)} <span class="muted">· ${L.reduce((n,g)=>n+g.boxes.length,0)}</span></summary>${L.map(g=>`<h4>${g.title}</h4>${g.boxes.map(b=>`<div class="ex-rule">${b}</div>`).join("")}`).join("")}</details>`:"";
+    const gram=sec(lp.grammar.filter(g=>!g.ex),"🧩","Gramàtica","Grammar")+sec(lp.grammar.filter(g=>g.ex),"💬","Expressions","Expressions");
     const gm=games.length?`<div class="ex-games"><span class="nt-lab">${games.some(g=>g.gt)?(games.every(g=>g.gt)?"📘 ":"🎮 📘 ")+t("Teoria i els teus apunts","Theory and your notes"):"🎮 "+t("Jocs de classe: teoria i els teus apunts","Class games: theory and your notes")}</span>${games.map(game).join("")}</div>`:"";
     const none=!terms&&!gram&&!gm?`<p class="muted">${t("En aquest learning path heu fet pràctica de comprensió i expressió: repassa'l obrint-lo.","In this learning path you practised the skills: open it to look at it again.")}</p>`:"";
     return `<article class="bigcard ncard ex-lp"><div class="nt-head"><div><span class="nlp">LP${esc(lpN)}</span><h2>${esc(lp.title)}</h2></div><a class="nbtn" href="${esc(lp.href)}">${t("Obre","Open")} →</a></div>
