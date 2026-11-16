@@ -52,12 +52,13 @@ async function buildGrammar(){
   const g=LP.panels.find(p=>p.id===GP);
   if(!g||!Array.isArray(g.items))throw new Error("This learning path has no grammar step to correct together.");
   CTX={LP,key:LS+"/"+LPF,routes:ROUTES,chat:null,notes:{},textPanel:g};
-  // 🙌 4 questions from the extra practice together, then ⏱ Your turn (Roger, 16 Nov 2026); the corrections after it are the compulsory ones
-  slides=[{kind:"explain",panel:GP}].concat(X.togetherFor(g,ROUTES,4).map(s=>Object.assign(s,{gram:true})),{kind:"turn",panel:GP},X.slidesFor(CTX,g,false).map(s=>Object.assign(s,{gram:true})));
+  // 🙌 4 questions from the extra practice together, then ⏱ Your turn, and that's the end (Roger, 16 Nov 2026: "students get instant feedback,
+  // question by question, I only want the questions before the time"): no correction slides after it; the class results stay on ⏱ Your turn
+  slides=[{kind:"explain",panel:GP}].concat(X.togetherFor(g,ROUTES,4).map(s=>Object.assign(s,{gram:true})),{kind:"turn",panel:GP});
   // Pro (4 ESO): its own grammar (data/native/<lp>.js), last; only when the group has a Pro student (or no group is given)
   if(course==="4eso"&&GP==="grammar"){try{await load(base+"data/native/"+LPF+".js")}catch(e){}
     const N=LP.native&&LP.native.grammar;
-    if(N&&Array.isArray(N.items)){const pr=Object.assign({},N,{id:GP});slides.pro=X.slidesFor({LP,key:CTX.key,routes:["native"],chat:null,notes:{},textPanel:pr},pr,true).map(s=>Object.assign(s,{gram:true}))}}
+    if(N&&Array.isArray(N.items))slides.pro=[]}   // no Pro correction slides either; [] still turns on the Pro boxes in How it works (PRO_ON)
 }
 // the boxes on the projector for the view GV, Pro's last (only in "all", when the group has a Pro student)
 function gBoxes(){
