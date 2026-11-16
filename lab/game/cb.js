@@ -12,8 +12,11 @@
 //   hacker sees that word's clue (its sentence with a gap) and the 3 words, so knowing the vocabulary is what cracks it.
 // - The board is the referee of the hacks (it alone reads every player's password) and publishes the scores in live/{group}.
 // window.ELCB:
-//   load(ids, wordIds)    loads the decks (and their decks/more files) → {decks:{id:{id, title, kind, qs}}, pool, words}; wordIds: where the
-//                         password words come from when the round has no vocabulary (a grammar game alone)
+//   load(ids, wordIds, x) loads the decks (and their decks/more files) → {decks:{id:{id, title, kind, qs}}, pool, words}; wordIds: where the
+//                         password words come from when the round has no vocabulary (a grammar game alone); x = {rv, tp} from 🧩 Which
+//                         grammar? (host.js, Roger 16 Nov 2026): tp {deck: [points]} keeps only the questions of the ticked grammar points
+//                         (a grammar deck not in tp has none), rv = other grammar games whose ticked points come in as 🔁 review (keys r<j>_<n>),
+//                         n of each review point (chosen with seed, the same on the board and every Chromebook)
 //   order(pool, seed)     the order of the questions for one student: new questions first, vocabulary and grammar taking turns
 //   shown(qu, seed)       the order of a question's options for one student (the deck's first option is the right one)
 //   similar(pool, qu, a, seed, avoid)  a question like qu to try after a wrong answer (key)
@@ -44,14 +47,17 @@ function deckQs(d,id,kind,th){const out=[],np=d.notes===false;let k=0,inRun=fals
   return out}
 // wordIds: other decks whose vocabulary only gives the password words (a 🧩 grammar game played alone as Code Breakers: the words of its
 // learning path's 📚 vocabulary game), never questions of the round
-async function load(ids,wordIds){
-  const decks={};
-  for(const id of ids){if(!/^[\w-]+$/.test(id))continue;
+async function load(ids,wordIds,x){
+  const decks={},tp=x&&x.tp&&typeof x.tp==="object"?x.tp:null,rv=((x&&x.rv)||[]).filter(id=>/^[\w-]+$/.test(id)&&!ids.includes(id));
+  for(const id of ids.concat(rv)){if(!/^[\w-]+$/.test(id))continue;const R=rv.indexOf(id);
     const meta=(window.EL_GAMES||[]).find(x=>x.id===id)||{},kind=meta.kind||(/-vocab$/.test(id)?"vocab":"grammar");
     let got=null;window.ELGameDeck=d=>{got=d};await script(base+"decks/"+id+".js");if(!got)continue;
-    const th={},qs=deckQs(got,id,kind,th);let more=null;window.ELGameMore=m=>{more=m};await script(base+"decks/more/"+id+".js");
-    if(more&&Array.isArray(more.questions)){let n=qs.length;more.questions.forEach(q=>{n++;qs.push(Object.assign({},q,{deck:id,kind,n,tp:+q.p||0,p:q.p?"p"+q.p:"",key:(kind==="vocab"?"v":"g")+n,extra:true}))})}
-    decks[id]={id,title:got.title,kind,qs,th,more:!!more}}
+    const th={};let qs=deckQs(got,id,kind,th),more=null;window.ELGameMore=m=>{more=m};await script(base+"decks/more/"+id+".js");
+    if(more&&Array.isArray(more.questions)){let n=qs.length;more.questions.forEach(q=>{n++;qs.push(Object.assign({},q,{deck:id,kind,n,tp:+q.p||0,p:q.p?"p"+q.p:"",key:(kind==="vocab"?"v":"g")+n,extra:R<0}))})}
+    const nmax=qs.length;if(R>=0)qs.forEach(q=>{q.key="r"+R+"_"+q.n;q.rv=true});
+    if(tp&&kind!=="vocab")qs=qs.filter(q=>(tp[id]||[]).map(Number).includes(q.tp));
+    if(R>=0&&+x.n>0){const keep=new Set();[...new Set(qs.map(q=>q.tp))].forEach(t=>shuf(qs.filter(q=>q.tp===t),(+x.seed||0)+hash(id+"."+t)).slice(0,+x.n).forEach(q=>keep.add(q.key)));qs=qs.filter(q=>keep.has(q.key))}
+    decks[id]={id,title:got.title,kind,qs,th,more:!!more,nmax,rv:R>=0}}
   const pool=Object.values(decks).flatMap(d=>d.qs);let ws=words(pool);
   if(!ws.length&&wordIds&&wordIds.length){const ex=await load(wordIds.filter(id=>!decks[id]));ws=ex.words}
   return {decks,pool,words:ws}}

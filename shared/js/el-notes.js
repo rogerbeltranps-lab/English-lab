@@ -62,7 +62,7 @@
     if(g.gt)return gtCard(g,inLp);
     const r=g.res,hasNotes=Object.values(g.notes).some(p=>String(p.text||"").trim()),absent=!r&&!hasNotes;
     const pc=r&&r.of?Math.round(r.r/r.of*100):null,miss=(r&&r.miss)||[];
-    const byPart={};miss.forEach(x=>{(byPart[x.p||""]=byPart[x.p||""]||[]).push(x)});
+    const byPart={};miss.forEach(x=>{const k=x.d?"rv":x.p||"";(byPart[k]=byPart[k]||[]).push(x)});   // rv: 🔁 review questions of another game's grammar (🧩 Which grammar?, lab/game/host.js)
     const badge=r?`<span class="nt-score${pc<50?" low":pc>=80?" good":""}">${r.r} / ${r.of} · ${pc} %</span>`:absent?`<span class="nt-score away">${t("No hi eres","You weren't there")}</span>`:"";
     // 🎯 What to study: the theory parts with mistakes first, then the questions to look at again
     let study="";
@@ -70,7 +70,7 @@
     else if(r&&!miss.length)study=`<div class="nt-study good"><b>🎯 ${t("Què has d'estudiar","What to study")}</b><p>${t("Ho tens tot bé! Repassa els teus apunts abans de l'examen.","All right! Read your notes again before the exam.")}</p></div>`;
     else if(r){const ps=Object.entries(byPart).sort((a,b)=>b[1].length-a[1].length);
       study=`<div class="nt-study"><b>🎯 ${t("Què has d'estudiar","What to study")}</b>${pc<50?`<p>${t("Llegeix tota la teoria de sota amb calma i torna a mirar les preguntes.","Read all the theory below slowly and look at the questions again.")}</p>`:""}<ul>${ps.map(([k,l])=>{const p=g.parts.find(x=>x.k===k);
-        return `<li>${p?`<a href="#nt-${esc(g.id)}-${esc(k)}">${md(p.topic)}</a>`:t("Altres preguntes","Other questions")} <span class="muted">· ${l.length} ${l.length===1?t("errada","mistake"):t("errades","mistakes")}</span></li>`}).join("")}</ul>
+        return `<li>${p?`<a href="#nt-${esc(g.id)}-${esc(k)}">${md(p.topic)}</a>`:k==="rv"?"🔁 "+t("Repàs de gramàtica d'abans","Review of earlier grammar"):t("Altres preguntes","Other questions")} <span class="muted">· ${l.length} ${l.length===1?t("errada","mistake"):t("errades","mistakes")}</span></li>`}).join("")}</ul>
         <details><summary>${t("Les preguntes que has de revisar","The questions to look at again")} (${miss.length})</summary><ol class="nt-miss">${miss.map(x=>`<li>${md(x.q)}<br>${x.a==null?"":`<span class="no">✗ ${x.a?esc(x.a):t("sense resposta","no answer")}</span> → `}<span class="ok">✓ ${esc(x.ok)}</span></li>`).join("")}</ol></details></div>`}
     const parts=g.parts.map(p=>{const n=g.notes[p.k],txt=n&&String(n.text||"").trim(),bad=(byPart[p.k]||[]).length;
       return `<section class="npart" id="nt-${esc(g.id)}-${esc(p.k)}">${bad?`<span class="nt-flag">🎯 ${bad} ${bad===1?t("errada","mistake"):t("errades","mistakes")} ${t("sobre això","on this")}</span>`:""}
