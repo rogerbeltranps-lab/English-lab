@@ -1798,6 +1798,8 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
   const lpN=p&&gi>=0?lpNums(p,gi):()=>"";
   // done in class already (a class day before now, ticked, or set as homework: elDueBefore): to do on their own, not "we'll do it in class"
   const db=D.me.group&&!window.EL_RAW_OPEN?elDueBefore(info,D.me.group):null,dueB=a=>!!db&&(db.acts.has(a.id)||!!db.tabs[a.id]);
+  // a tab is red ✗ only if THAT tab was done in class or set as homework, not every tab of a path one tab of which was (problem report, 4ESOB, 16 Nov)
+  const dueT=(a,k)=>!!db&&(db.acts.has(a.id)||!!(db.tabs[a.id]&&db.tabs[a.id].has(panelOf(a,k))));
   const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},drop=dr.includes(a.id),cp=!TX&&open&&canDo(a,info)&&elCheckpointMissing(a,doneSet,y=>canDo(y,info)),can=canDo(a,info)&&!cp;
     if(!TX&&!can&&!ds.size&&!D.rs[a.id])return "";   // students never see a learning path they cannot open yet (Roger, 7 Nov 2026: "they mustn't see that anything is locked")
     const vis=steps(a).filter(k=>TX||ds.has(k)||(can&&(!secOff(a,info,k)||soonK(a,info,k))));   // students: only the tabs they have done or can open, + 🏫 the ones for a later class
@@ -1815,7 +1817,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
       if(ln&&!sk&&!next&&!a.optional)next={a,k,nm,past};
       const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd&&(TX||past)?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
-      const red=past||(ln&&!sk&&dueB(a));   // done in class and missing: red too (Roger, 9 Nov 2026)
+      const red=past||(ln&&!sk&&g.some(x=>dueT(a,x)));   // done in class and missing: red too (Roger, 9 Nov 2026), per tab
       const lbl=`${off?"🔒":red?"✗":"·"} ${esc(nm)}`;
       return ln?`<a class="stp go2 ${red?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
     const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
