@@ -52,7 +52,8 @@ async function buildGrammar(){
   const g=LP.panels.find(p=>p.id===GP);
   if(!g||!Array.isArray(g.items))throw new Error("This learning path has no grammar step to correct together.");
   CTX={LP,key:LS+"/"+LPF,routes:ROUTES,chat:null,notes:{},textPanel:g};
-  slides=[{kind:"explain",panel:GP},{kind:"turn",panel:GP}].concat(X.slidesFor(CTX,g,false).map(s=>Object.assign(s,{gram:true})));
+  // 🙌 4 questions from the extra practice together, then ⏱ Your turn (Roger, 16 Nov 2026); the corrections after it are the compulsory ones
+  slides=[{kind:"explain",panel:GP}].concat(X.togetherFor(g,ROUTES,4).map(s=>Object.assign(s,{gram:true})),{kind:"turn",panel:GP},X.slidesFor(CTX,g,false).map(s=>Object.assign(s,{gram:true})));
   // Pro (4 ESO): its own grammar (data/native/<lp>.js), last; only when the group has a Pro student (or no group is given)
   if(course==="4eso"&&GP==="grammar"){try{await load(base+"data/native/"+LPF+".js")}catch(e){}
     const N=LP.native&&LP.native.grammar;
@@ -85,9 +86,9 @@ function gHtml(B,ca){const lab=b=>ca?b.lab.replace("Everyone","Tothom").replace(
   return `<h3>📘 ${ca?"Com funciona · junts":"How it works · together"}</h3>`+B.map(b=>`<div class="model"><span style="display:inline-block;font:800 12px system-ui,sans-serif;padding:1px 8px;border-radius:999px;margin-right:6px;background:${b.all?"#e3f4ea":b.pro?"#f3e8ff":"#dfe9ff"};color:${b.all?"#1f6b40":b.pro?"#6b21a8":"#2b4fa8"}">${esc(lab(b))}</span>${ca&&b.ca?b.ca:b.en}</div>`).join("")}
 const textOf=h=>{const d=document.createElement("div");d.innerHTML=h||"";return d.textContent};
 function gSend(){
-  const s=slides[at],on=s&&s.kind==="explain",ei=slides.findIndex(x=>x.kind==="explain"),after=s&&ei>=0&&at>ei,u=LS+"/"+LPF+".html";
+  const s=slides[at],tg=!!(s&&s.together),on=s&&(s.kind==="explain"||tg),ei=slides.findIndex(x=>x.kind==="explain"),after=s&&ei>=0&&at>ei,u=LS+"/"+LPF+".html";
   let v=null,key="";
-  if(on){const B=gBoxes();v={u,p:GP,k:RP<B.length?RP:-1,n:B.length,l:GV,h:gHtml(B,false),hc:gHtml(B,true),at:Date.now()};key=u+"|g|"+v.k+"|"+v.n+"|"+GV}
+  if(on){const B=gBoxes();v={u,p:GP,k:!tg&&RP<B.length?RP:-1,n:B.length,l:GV,h:gHtml(B,false),hc:gHtml(B,true),at:Date.now()};key=u+"|g|"+v.k+"|"+v.n+"|"+GV}
   else if(after){const B=gBoxes(),hs=[...new Set(B.flatMap(b=>[X.norm(textOf(b.en)),b.ca?X.norm(textOf(b.ca)):""]).filter(Boolean))];
     v={u,p:GP,k:-1,x:1,l:GV,hs,at:Date.now()};key=u+"|gx|"+GV+"|"+hs.length}
   if(key===rtLast)return Promise.resolve();rtLast=key;
@@ -95,9 +96,9 @@ function gSend(){
 }
 // one gap-fill sentence: the sentence (its gaps filled when shown), the answer, the levels that have it with their number, the rule
 function gram(s,open){
-  const it=itemOf(s.panel,s.qid,s.pro),t=open?tally(s.panel,s.qid,s.on,it):null,why=it.en||it.ca||"",whyCa=it.ca&&it.en&&it.ca!==it.en?it.ca:"";
-  const only=s.all||s.pro?"":`<p class="hint">${s.routes.filter(r=>!s.on.includes(r)).map(r=>NAME[r]).join(" and ")}: this sentence is not in your exercise. Listen and think of the answer.</p>`;
-  return classBox(t)+`<div class="chips">${chipsFor(s)}</div><h1 class="gq">${X.fill(s.q,s.ans,open)}</h1>`+
+  const it=itemOf(s.panel,s.qid,s.pro),t=open&&!s.together?tally(s.panel,s.qid,s.on,it):null,why=it.en||it.ca||"",whyCa=it.ca&&it.en&&it.ca!==it.en?it.ca:"";
+  const only=s.all||s.pro||s.together?"":`<p class="hint">${s.routes.filter(r=>!s.on.includes(r)).map(r=>NAME[r]).join(" and ")}: this sentence is not in your exercise. Listen and think of the answer.</p>`;
+  return classBox(t)+`<div class="chips">${s.together?`<span class="chip all">🙌 Together · ${slides.filter(x=>x.together).indexOf(s)+1} of ${slides.filter(x=>x.together).length}</span>`:chipsFor(s)}</div><h1 class="gq">${X.fill(s.q,s.ans,open)}</h1>`+
     (open?`<div class="ans">✓ ${esc(s.ans)}</div>${s.alt.length?`<div class="alt">Also right: ${s.alt.map(esc).join(" · ")}</div>`:""}`+
       (why?`<p class="why">💡 ${esc(why)}${whyCa?`<span class="cax"> · ${esc(whyCa)}</span>`:""}</p>`:"")
      :`<div class="ans hid">? &nbsp;Think, then say your answer</div>`)+only;
@@ -316,14 +317,14 @@ function tick(){if(!TM.on)return;TM.left=Math.max(0,TM.left-1);if(!TM.left){TM.o
   if(!TM.on&&slides[at]&&slides[at].kind==="turn")draw()}
 function timer(k){if(k==="tgo"){TM.on=!TM.on&&TM.left>0;clearInterval(TM.iv);if(TM.on)TM.iv=setInterval(tick,1000)}
   else if(k==="+1"){TM.left+=60;TM.len=Math.max(TM.len,TM.left)}else{TM.len=TM.left=+k*60;TM.on=false;clearInterval(TM.iv)}draw()}
-const label=s=>s.kind==="explain"?"📘":s.kind==="readall"?"📖":s.kind==="turn"?"⏱":s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&/shared|own/.test(x.kind)&&x.panel===s.panel).indexOf(s)+1);
+const label=s=>s.together?"🙌":s.kind==="explain"?"📘":s.kind==="readall"?"📖":s.kind==="turn"?"⏱":s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&!x.together&&/shared|own/.test(x.kind)&&x.panel===s.panel).indexOf(s)+1);
 function draw(){
   const s=slides[at],open=shown.has(at);
   $("out").outerHTML=`<div class="card${s&&(s.kind==="explain"||s.kind==="readall")?" nbx":""}" id="out">${!s?"":s.kind==="explain"?explainAll():s.gram?gram(s,open):s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
   const m=$("tmini");if(m)m.textContent=(TM.on||TM.left<TM.len)&&s&&s.kind!=="turn"?"⏱ "+(TM.left?mmss(TM.left):"Time!"):"";
   let lastPanel=null;
-  $("dots").innerHTML=slides.map((x,i)=>{const pk=x.panel+(x.pro?"p":"")+(x.gram?"|"+(x.all?"all":x.on[0]):""),gap=lastPanel&&lastPanel!==pk?'<span class="gap"></span>':"";lastPanel=pk;   // grammar: a gap between Everyone, Base, Core+ and Plus
-    return gap+`<button data-i="${i}" class="${i===at?"now":shown.has(i)?"seen":""}" title="${x.kind==="explain"?"How it works, together":x.kind==="readall"?"Read together":x.kind==="turn"?"Your turn: each level answers":x.gram?(x.pro?"Pro grammar":"Grammar"):x.kind==="log"?"Reading log":x.pro?"Pro":x.panel==="log"?"Reading log":"Reading"}">${label(x)}</button>`}).join("");
+  $("dots").innerHTML=slides.map((x,i)=>{const pk=x.panel+(x.pro?"p":"")+(x.together?"|tg":x.gram?"|"+(x.all?"all":x.on[0]):""),gap=lastPanel&&lastPanel!==pk?'<span class="gap"></span>':"";lastPanel=pk;   // grammar: a gap between Everyone, Base, Core+ and Plus
+    return gap+`<button data-i="${i}" class="${i===at?"now":shown.has(i)?"seen":""}" title="${x.kind==="explain"?"How it works, together":x.kind==="readall"?"Read together":x.kind==="turn"?"Your turn: each level answers":x.together?"Together: the class answers aloud":x.gram?(x.pro?"Pro grammar":"Grammar"):x.kind==="log"?"Reading log":x.pro?"Pro":x.panel==="log"?"Reading log":"Reading"}">${label(x)}</button>`}).join("");
   const rk=s&&(s.kind==="readall"||s.kind==="explain"),plain=s&&(rk||s.kind==="turn"),last=rk?document.querySelectorAll("[data-rp]").length-1:0;
   $("bar").innerHTML=`<button data-k="back" ${at?"":"disabled"}>◀ Back</button>`+
     (plain?(rk&&RP<last?`<button class="pri" data-k="para">▶ ${RP<0?(s.kind==="explain"?"Start":"Start reading"):s.kind==="explain"?"Next box":"Next sentence"}</button><button data-k="next">Skip ▶</button>`:`<button class="pri" data-k="next">Next ▶</button>`):open?`<button class="pri" data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`:`<button class="pri" data-k="show">👁 ${s&&s.kind==="log"?"Show the model notes":"Show the answer"}</button>`+`<button data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`)+
