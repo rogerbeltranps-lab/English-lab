@@ -49,6 +49,16 @@ window.EL_CORRECT = {
       'Which tip is Noa going to apply?': ['keep your phone out of your bedroom', 'That’s the one I’m going to apply']
     } }
   },
+  // The Reading after the LP3 podcast (16 Nov 2026): the Starter glossary line shares the words, and the Halloween question needs two sentences
+  '4eso/seasons-and-celebrations/where-traditions-come-from': {
+    ev: { read: {
+      'What did families bring to the bell ringers?': 'brought them',
+      'What does the last paragraph say about Halloween?': ['a rival: Halloween', 'neither of them has died out']
+    }, 'read.native': {
+      'What is the writer’s attitude to the story of the bell ringers?': ['It may well be true', 'it may equally be'],
+      'In the third paragraph, “shedding its sectarian edge” means…': ['anti-Catholic tone', 'shedding its sectarian edge']
+    } }
+  },
   '4eso/seasons-and-celebrations/research-it-right': {
     ev: { read: { 'Which sentence avoids a stereotype?': 'Avoid stereotypes' } }
   },
