@@ -928,13 +928,17 @@ const GAME=new URL("lab/game/play.html",ROOT),onGame=location.pathname===GAME.pa
 // class mode ends. el_game_in = the game the player joined in this browser (play.js).
 const cmHold=x=>{if(!x||!x.game||!x.sid||!elCmOn(x.go)||!x.go.lock)return false;let k="";try{k=localStorage.getItem("el_game_in")||""}catch(e){}
   return k===String(x.sid)&&+x.sid>(+x.cmBack||0)&&+x.sid>+x.go.at};
+// A game that takes the student away in the middle of a new try: el_game_took {p: this page, at} (ls2-engine.js retryBack, Roger 16 Nov
+// 2026). The first page after the game keeps the note through its own reload after the pull and forgets it when it is left.
+const TOOK="el_game_took",LOADED=Date.now();
+addEventListener("pagehide",()=>{if(reloading)return;try{const o=JSON.parse(sessionStorage.getItem(TOOK)||"null");if(o&&o.at<LOADED)sessionStorage.removeItem(TOOK)}catch(e){}});
 function gamePush(u){
   if(stopGame){stopGame();stopGame=null}
   if(!u||!isStudent(u)||!myGroup||onGame)return;
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
-    if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
+    if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{try{sessionStorage.setItem(TOOK,JSON.stringify({p:location.pathname,at:Date.now()}))}catch(e){}location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
     const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsKnown=true;fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},

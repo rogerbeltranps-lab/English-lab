@@ -135,7 +135,9 @@ function live(){
   // the students are kept and in full screen again; a field the slide does not use (q, th, ok, nt) is removed
   // the end: the class's % right, as on the board's 🏁 Well done!, also on the students' screens (Roger, 9 Nov 2026: "I want the percentage of the class at the end too")
   if(H.phase==="end"){const P=Object.keys(H.players),tot=P.length*qs.length,right=P.reduce((t,em)=>t+Object.values(H.aw).filter(l=>l.includes(em)).length,0);if(tot)base.cp=Math.round(right/tot*100)}
-  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D},base);
+  // mode and cb are removed too (Roger, 16 Nov 2026: "I was seeing the proper game but students were playing a hacker game"): a 🕵️ Code
+  // Breakers round leaves live/{group}.mode "cb", and play.js shows Code Breakers whenever it is there, so a class game must clear it
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D,mode:D,cb:D},base);
   S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
@@ -272,9 +274,13 @@ function go(to){
   if(to==="reveal"){H.phase="reveal";award(H.i);G.music("");G.fx("reveal");setTimeout(()=>G.fx(H.aw[H.i]&&H.aw[H.i].length?"right":"wrong"),700)}
   else if(to==="next"){
     if(H.i+1>=slides().length){H.phase="end";saveResults();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700)}
-    else{if(H.i<0){decideRp();if(H.rp===undefined)H.rp=false}
-      let j=H.i+1;if(H.rp&&!isQ(slides()[j])){let k=j;while(k<slides().length&&!isQ(slides()[k]))k++;if(k<slides().length)j=k}
-      H.i=j;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
+    else{
+      // No theory slides in the class games (Roger, 16 Nov 2026: "during the game of vocab and grammar, I didn't want theory anymore"):
+      // Next always jumps over the theory and 📝 notes slides, so a game is questions only. The decks keep their theory: it still splits
+      // the questions into parts (pn, 🎯 What to study), it is on the LS page's 📝 Your notes (theory.js) and Code Breakers shows it after a wrong answer.
+      let j=H.i+1;while(j<slides().length&&!isQ(slides()[j]))j++;
+      if(j>=slides().length){H.i=slides().length-1;H.phase="end";saveResults();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700)}
+      else{H.i=j;H.phase="show";H.step=1;G.fx("next");G.music("think")}}
   }
   keep();live();draw();autoReveal();
 }
@@ -348,15 +354,14 @@ function draw(){
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${qList().length} questions, no theory. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
       ${meta().lp&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn deckbtn cbbtn" style="display:inline-flex" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ Play ${esc(String(meta().lp).split(" · ")[0])} as Code Breakers <small style="opacity:.75;margin-left:.4em">(vocabulary + grammar, no theory)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
     loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
-    const rpLine=pb||again?`<p class="rp pop">${H.rp?`🔁 ${pb?`Played on ${esc(plDay(pb))}`:"Played again"}: no theory slides, straight to the questions.`:"📖 The theory slides will be shown again."}
-      <button class="btn ghost" data-do="rp">${H.rp?"📖 Show the theory":"⏭ Skip the theory"}</button></p>`:"";
+    const rpLine=pb?`<p class="rp pop">🔁 Played on ${esc(plDay(pb))}.</p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
