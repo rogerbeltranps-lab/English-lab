@@ -58,12 +58,12 @@ if(INSTANT){
   // email has the PR with its preview or the plan, and the report's link, where 🤖 Fix with Claude starts the thread
   const bigOnes=looked.filter(x=>x.teacher&&x.auto.verdict!=="fixed");
   if(bigOnes.length){
-    const out=["Claude looked at "+n(bigOnes.length,"report","reports")+" you sent. Nothing is merged yet: check the preview or the plan, then start a thread.",""];
-    bigOnes.forEach(x=>out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🧭 "+String(x.auto.note||"").trim(),"   👉 Start the thread: "+SITE+"teacher.html#pb-"+x.id+" (🤖 Fix with Claude)",""));
+    const out=["Beltran looked at "+n(bigOnes.length,"report","reports")+" you sent. Nothing is merged yet: check the preview or the plan, then start a thread.",""];
+    bigOnes.forEach(x=>out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🧭 "+String(x.auto.note||"").trim().replace(/\bClaude\b/g,"Beltran"),"   👉 Start the thread: "+SITE+"teacher.html#pb-"+x.id+" (🤖 Fix with Beltran)",""));
     out.push("—","Reports sent with ✅ Merge straight away (little tweaks and bugs) come in the ⚠️ IMPORTANT email instead.");
     await sendMail("English Lab: your report"+(bigOnes.length>1?"s":"")+" not merged yet: "+n(bigOnes.length,"preview or plan","previews or plans")+" to check",out.join("\n"))}
   if(autoFixed.length){
-    const ns=autoFixed.filter(x=>!x.teacher).length,out=["Claude fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself"+(ns?" and answered the student"+(ns>1?"s":"")+" for you":"")+":",""];
+    const ns=autoFixed.filter(x=>!x.teacher).length,out=["Beltran fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself"+(ns?" and answered the student"+(ns>1?"s":"")+" for you":"")+":",""];
     autoFixed.forEach(x=>{out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🔧 "+String(x.auto.note||"").trim());
       const m=(x.msgs||[]).filter(y=>y.fix).pop();out.push(x.teacher?"   👨‍🏫 Your own report: hard reload the page (Ctrl+Shift+R) to see it fixed.":"   💬 The student got: ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
     out.push("Check them or reopen one: "+SITE+"teacher.html#probs","","—","Only technical problems are fixed automatically; everything else stays in ⚠️ Problem reports for you. Students do not see this email.");

@@ -94,7 +94,7 @@ export function report({en,save,teacher,where:at}){
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
   const $=s=>d.querySelector(s),ta=$("textarea"),ok=$("[data-ok]"),x=$("[data-x]");
   $("h3").textContent="⚠️ "+t("Avisa d'un problema","Report a problem");
-  $("[data-i]").textContent=teacher?"What is not working, or what should change? Claude looks at it straight away and emails you. ✅ Merge straight away: it is done and merged, and you check it on the site. ⏸ Don't merge yet: you get a preview (or, for a big change, a plan) and start a thread with 🤖 Fix with Claude in ⚠️ Problem reports."
+  $("[data-i]").textContent=teacher?"What is not working, or what should change? Beltran looks at it straight away and emails you. ✅ Merge straight away: it is done and merged, and you check it on the site. ⏸ Don't merge yet: you get a preview (or, for a big change, a plan) and start a thread with 🤖 Fix with Beltran in ⚠️ Problem reports."
     :t("Què no funciona? El professor ho veurà i ho intentarà arreglar.","What is not working? Your teacher will see it and try to fix it.");
   KINDS.forEach(k=>{const l=document.createElement("label");l.style.cssText="display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer";
     l.innerHTML='<input type="radio" name="el-rep" value="'+k.id+'"><span></span>';l.querySelector("span").textContent=t(k.ca,k.en);$("[data-k]").append(l)});
@@ -133,7 +133,7 @@ export function report({en,save,teacher,where:at}){
     // ✅ / ⏸ (Roger, 13 Nov 2026: "I want a dropdown button where I say merge or don't merge yet")
     const mg=teacher?d.querySelector("[data-m] select").value==="1":null;
     try{await save(Object.assign({kind,text},ctx,shot?{shot,shotFrom:src}:{},teacher?{merge:mg}:{}));
-      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=teacher?(mg?"Sent. Claude makes it and merges it now; the email says what changed. Then hard reload the page (Ctrl+Shift+R) to check it.":"Sent. Nothing is merged: the email brings the preview or the plan, and 🤖 Fix with Claude in ⚠️ Problem reports starts the thread."):t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=teacher?(mg?"Sent. Beltran makes it and merges it now; the email says what changed. Then hard reload the page (Ctrl+Shift+R) to check it.":"Sent. Nothing is merged: the email brings the preview or the plan, and 🤖 Fix with Beltran in ⚠️ Problem reports starts the thread."):t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
       const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c);c.focus()}
     catch(e){console.warn("problem report",e);ok.disabled=false;err(teacher?"It could not be sent. Try again in a minute (a page open since yesterday: reload it first).":t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
   d.addEventListener("close",()=>d.remove());

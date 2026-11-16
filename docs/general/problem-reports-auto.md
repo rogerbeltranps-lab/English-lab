@@ -7,6 +7,8 @@ informed though via mail, with an important subject."
 This file is the routine of the scheduled task **"English Lab: problem reports"** (a fresh Claude session in the English Lab cloud
 environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool is `tools/problems/auto.mjs`.
 
+On the site and in anything Roger reads (`--note`, `--todo`, emails), call yourself **Beltran**, never Claude, and call Gemini **Roig** (Roger, 16 Nov 2026; AGENTS.md).
+
 ## When it runs
 
 Only when a student sends a report (Roger, 8 Nov 2026: "I want you to be triggered only when there's a problem"). The task is
@@ -83,9 +85,9 @@ His window has a dropdown, saved as `merge` (`auto.mjs open` prints "✅ MERGE S
   firestore.rules, how a routine works) do not merge: treat it as ⏸ and say why in the note.
 - **⏸ Don't merge yet** (`merge: false`) → small and clear: make it on a branch `claude/problem-<short id>`, open the PR with a clickable
   preview (screenshots in the PR) and do not merge. Big or unclear: build nothing, write the plan. Then `auto.mjs leave <id> --status you
-  --note "PR #n with its preview, or the plan in two or three lines and your questions" --todo "Start a thread: 🤖 Fix with Claude" --apply`
+  --note "PR #n with its preview, or the plan in two or three lines and your questions" --todo "Start a thread: 🤖 Fix with Beltran" --apply`
   (no `--reply`) and start the email Action: he gets "English Lab: your report not merged yet" with the note and the link to the report,
-  where 🤖 Fix with Claude copies everything (your note too) into a new thread of the English Lab project, where he says "merge" or asks for
+  where 🤖 Fix with Beltran copies everything (your note too) into a new thread of the English Lab project, where he says "merge" or asks for
   changes (a task cannot open a project thread by itself).
 - **Unclear**, whatever he chose → as ⏸, with the one question you need answered in the note.
 
