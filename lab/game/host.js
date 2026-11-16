@@ -12,6 +12,13 @@
 //                   q:{text, img, opts} (a question) or q:{text, img, write:true} (a written one), th:{title, img} (a theory slide),
 //                   ok (once shown: the right option, or the answer to show for a written one)}
 // The board keeps its place in this tab (sessionStorage), so a reload goes on with the same game.
+// 🎮 Quiz or 🕵️ Code Breakers (Roger, 16 Nov 2026: "make grammar and vocabulary games as hackers too … so I choose hackers or Kahoot"): after
+// choosing a game, the teacher chooses how to play it (kept in this browser, el_game_fmt) and then the group. Quiz = this board; Code Breakers
+// = codebreakers.html?game=<deck>&g=<group>&go=1 (cb-host.js), that game alone, each student at their own pace. Both save the same results
+// (gameResults + myGames, +1 point per right answer), so the marks read them the same way.
+// 🔒 One game per group (Roger, 16 Nov 2026: the board showed the quiz while the Chromebooks showed Code Breakers): live/{group} belongs to
+// the board that started its game last. This board checks it when it picks a game up again (a reload) and once a minute (one read): if a
+// newer game took the group (Code Breakers or another board), it stops at once and never writes to live/{group} again.
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -65,6 +72,8 @@ if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved
 const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp}:null);
 // Catalan help on the theory slides (Roger, 5 Nov 2026: the grammar games explain the grammar "so that students understand it"):
 // off by default (the games are at Safe level, in English); CA on the board or the C key shows a slide's ca lines. Kept in this browser.
+// how the teacher plays the class games: "quiz" (this board) or "cb" (🕵️ Code Breakers), kept in this browser
+const fmt=v=>{try{if(v!=null)localStorage.setItem("el_game_fmt",v==="cb"?"cb":"quiz");return localStorage.getItem("el_game_fmt")==="cb"?"cb":"quiz"}catch(e){return v==="cb"?"cb":"quiz"}};
 const caOn=v=>{try{if(v!=null)localStorage.setItem("el_game_ca",v?"on":"off");return localStorage.getItem("el_game_ca")==="on"}catch(e){return !!v}};
 
 const slides=()=>H.deck?H.deck.slides:[];
@@ -137,13 +146,26 @@ function live(){
   if(H.phase==="end"){const P=Object.keys(H.players),tot=P.length*qs.length,right=P.reduce((t,em)=>t+Object.values(H.aw).filter(l=>l.includes(em)).length,0);if(tot)base.cp=Math.round(right/tot*100)}
   // mode and cb are removed too (Roger, 16 Nov 2026: "I was seeing the proper game but students were playing a hacker game"): a 🕵️ Code
   // Breakers round leaves live/{group}.mode "cb", and play.js shows Code Breakers whenever it is there, so a class game must clear it
-  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D,mode:D,cb:D},base);
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D,mode:D,cb:D,offBy:D},base);
   S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
-function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
-addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g)});   // a reload puts it back on at once (the tab keeps the game)
+function liveOff(g,by){if(g)S.setDoc(S.doc(db,"live",g),Object.assign({on:false,at:S.serverTimestamp()},by?{offBy:by}:{}),{merge:true}).catch(e=>console.warn("live",e))}
+addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g,H.sid)});   // a reload puts it back on at once (the tab keeps the game)
 
+// the students' answers docs say which game they are in (no extra reads): a newer game than ours → this board stops at once; an older game
+// written after ours started (another board wrote live/{group} over ours) → ours is published again (at most every 5 s)
+let reAt=0;
+function otherGame(qs){let newer=false,older=false;qs.forEach(d=>{const x=d.data(),s=+x.sid||0,at=x.at&&x.at.toMillis?x.at.toMillis():0;if(s>H.sid)newer=true;else if(s&&s<H.sid&&at>H.sid+3000)older=true});
+  if(newer){stepAside();return true}if(older&&Date.now()-reAt>5000){reAt=Date.now();live()}return false}
+// offBy: the game whose board was closed or reloaded (pagehide) turned live/{group} off; if that was this board while a newer game was on,
+// the newer game is turned on again (the newer board's writes remove offBy, so a game that really ended stays off)
+async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",H.g),d=await S.getDoc(r),x=d.exists()?d.data():null;if(!(x&&+x.sid>H.sid))return false;
+  if(x.on===false&&+x.offBy===H.sid)await S.setDoc(r,{on:true,offBy:S.deleteField(),at:S.serverTimestamp()},{merge:true});return true}catch(e){console.warn("live",e);return false}}
+async function stepAside(){if(!H.g||!H.sid)return;const gn=groupName(H.g);clearInterval(liveBeat);if(ansStop)ansStop();ansStop=null;whoStop();G.music("");
+  if(H.phase!=="lobby")try{await saveResults()}catch(e){console.warn("results",e)}   // what they answered still counts
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();H.note=`⏹ ${gn} is playing another game now (started on another screen), so this board stopped.`;draw()}
 async function startGroup(){
+  if(await taken())return stepAside();
   const g=H.g;H.err="";H.players={};
   if(!CMT)S.getDoc(S.doc(db,"live",g)).then(d=>{CMG=d.exists()&&d.data().go||null;CMGg=g;if(cmGroup())draw()}).catch(e=>console.warn("class mode",e));
   try{
@@ -155,6 +177,7 @@ async function startGroup(){
   }catch(e){console.warn("game",e);H.err="⚠ Could not read the group: "+e.message}
   if(ansStop)ansStop();
   ansStop=S.onSnapshot(S.collection(db,"live",g,"answers"),qs=>{
+    if(otherGame(qs))return;
     const before=Object.keys(H.players).length,P={};
     qs.forEach(d=>{const x=d.data();if(x.sid===H.sid)P[d.id]=x.a||{}});
     H.players=P;if(H.phase==="lobby"&&Object.keys(P).length>before)G.fx("join");
@@ -165,7 +188,7 @@ async function startGroup(){
   whoStop();
   WHO.stops=[S.onSnapshot(S.collection(db,"live",g,"fsLeft"),c=>{WHO.left=c.docs.map(d=>Object.assign({e:d.id},d.data()));drawTop()},e=>console.warn("fsLeft",e)),
     S.onSnapshot(S.collection(db,"live",g,"here"),c=>{WHO.here={};c.docs.forEach(d=>WHO.here[d.id]=d.data());drawTop()},e=>console.warn("here",e))];
-  clearInterval(liveBeat);liveBeat=setInterval(live,60e3);   // every minute too: the students' devices know the game is still on
+  clearInterval(liveBeat);liveBeat=setInterval(async()=>{if(await taken())return stepAside();live()},60e3);   // every minute too: the students' devices know the game is still on
   live();draw();
 }
 // The answer is shown: everyone who tapped the right one (or wrote an accepted answer) gets +1 (once per slide and game; late taps after this don't count).
@@ -309,6 +332,7 @@ addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,sele
   if((e.key==="c"||e.key==="C")&&H.phase==="show"&&cur()&&cur().ca){caOn(!caOn());draw()}});
 
 function startGame(g,again){
+  H.note="";try{sessionStorage.removeItem("elCB")}catch(e){}   // a Code Breakers round of this tab is over
   H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;decideRp();keep();G.music("lobby");startGroup();
 }
 // ■ End and Finish also send a group in class mode back to the class (cmBack, as 🎓 Back to class mode; Roger, 16 Nov 2026: "students
@@ -350,13 +374,16 @@ function draw(){
     const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}${plLine(d)}</span></button>`;loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
       return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&/-lp[1-3]-/.test(d.id)&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then play it as a 🎮 Quiz or as 🕵️ Code Breakers. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${qList().length} questions, no theory. Start the game for a group: its students are taken into it.</p>
-      <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
-      ${meta().lp&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn deckbtn cbbtn" style="display:inline-flex" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ Play ${esc(String(meta().lp).split(" · ")[0])} as Code Breakers <small style="opacity:.75;margin-left:.4em">(vocabulary + grammar, no theory)</small></a></p>`:""}
+    const cb=fmt()==="cb",lpN=String(meta().lp||"").split(" · ")[0];
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1>${H.note?`<p class="card msg pop" style="margin:.4em auto 1em">${esc(H.note)}</p>`:""}
+      <div class="fmt" role="radiogroup" aria-label="How to play it"><span>How do you want to play it?</span><button class="btn${cb?" ghost":" go on"}" role="radio" aria-checked="${!cb}" data-do="fmt" data-f="quiz">🎮 Quiz</button><button class="btn cbbtn${cb?" on":" off"}" role="radio" aria-checked="${cb}" data-do="fmt" data-f="cb">🕵️ Code Breakers</button></div>
+      <p class="sub">${cb?`Questions only, no theory. <b>Each student at their own pace</b> on their Chromebook: a right answer opens a file (💾 bits, 🛡️ firewall, 💻 hack…). Only the % right counts for their marks.`:`${qList().length} questions, no theory. <b>Everyone answers the same question</b>, on the board. Every right answer is +1 point.`}<br>Start it for a group: its students are taken into it.</p>
+      <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn deckbtn${cb?" cbbtn":" go"}" data-do="group" data-g="${g.id}">${cb?"🕵️":"▶"} ${esc(g.name)}${PL&&!cb?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
+      ${cb&&lpN&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn ghost" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ ${esc(lpN)} with both games in one round <small style="opacity:.75;margin-left:.3em">(vocabulary + grammar)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
@@ -427,7 +454,8 @@ app$.addEventListener("click",async e=>{
   if(d==="signout")A.signOut(auth);
   if(d==="deck"){H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
   if(d==="decks"){H.deck=null;H.deckId="";history.replaceState(null,"",location.pathname);draw()}
-  if(d==="group")startGame(b.dataset.g);
+  if(d==="group"){if(fmt()==="cb"){keep();location.href="codebreakers.html?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(b.dataset.g)+"&go=1"+(BACK?"&from="+encodeURIComponent(BACK):"");return}startGame(b.dataset.g)}
+  if(d==="fmt"){fmt(b.dataset.f);draw()}
   if(d==="next")go("next");
   if(d==="skipth")skipTheory();
   if(d==="more")more();

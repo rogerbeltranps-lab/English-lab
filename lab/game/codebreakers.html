@@ -47,6 +47,12 @@ h1.logo{font-size:3em;margin:.1em 0;letter-spacing:.01em;text-shadow:0 .08em 0 r
 .msg h2{margin:.1em 0 .4em;color:#5b21b6}
 .kbd{opacity:.7;font-size:.75em;margin-left:.4em}
 .muted{opacity:.7}
+/* the choice of game on a learning path: 📚 vocabulary, 🧩 grammar or both (Roger, 16 Nov 2026) */
+.cblp{display:flex;align-items:center;gap:.3em .6em;flex-wrap:wrap;background:rgba(0,0,0,.2);border-radius:14px;padding:.35em .7em;text-align:left;font-size:.92em}
+.cblp .e{font-size:1.3em}.cblp .nm{flex:1 1 9em;font-weight:700;line-height:1.2}
+.cbopts{display:flex;gap:.35em;flex-wrap:wrap}.cbone{padding:.3em .7em;font-size:.9em}
+.course:has(.cblp) .picks{gap:.5em}
+.cbnote{margin:.4em auto 1em}
 </style></head>
 <body class="board cb"><div class="app" id="app"><div class="center"><p>Loading…</p></div></div>
 <script src="../../shared/js/el-catalog.js"></script>

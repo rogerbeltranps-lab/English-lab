@@ -1,6 +1,8 @@
 // 🕵️ Code Breakers (Roger, 11–12 Nov 2026: "can we make a game like a blooket, hackers like?"): a second way to play the class games of a
 // learning path. Our own game, name and look. What the board (codebreakers.html, cb-host.js) and the player (play.html, cb-play.js) share.
-// - One round = the questions of BOTH games of the learning path (vocabulary + grammar, Roger 11 Nov 2026: "if I choose Code Breakers, it picks
+// - Any one class game alone too (Roger, 16 Nov 2026: "make grammar and vocabulary games as hackers too … so I choose hackers or Kahoot"): the
+//   class game board (host.js) asks 🎮 Quiz or 🕵️ Code Breakers before the group; Code Breakers opens codebreakers.html?game=<deck id>.
+// - Or one round = the questions of BOTH games of the learning path (vocabulary + grammar, Roger 11 Nov 2026: "if I choose Code Breakers, it picks
 //   the questions of the grammar and the vocabulary of that LP"), with no theory slides. Each answer is still saved as vocabulary or grammar.
 // - New questions on the same words and grammar (Roger, 12 Nov 2026: "different questions asking the same grammar and vocabulary … to make the
 //   games more complete"): decks/more/<deck id>.js = ELGameMore({deck, questions:[…]}), each question as in a deck plus p (the theory part it
@@ -10,7 +12,8 @@
 //   hacker sees that word's clue (its sentence with a gap) and the 3 words, so knowing the vocabulary is what cracks it.
 // - The board is the referee of the hacks (it alone reads every player's password) and publishes the scores in live/{group}.
 // window.ELCB:
-//   load(ids)             loads the decks (and their decks/more files) → {decks:{id:{id, title, kind, qs}}, pool, words}
+//   load(ids, wordIds)    loads the decks (and their decks/more files) → {decks:{id:{id, title, kind, qs}}, pool, words}; wordIds: where the
+//                         password words come from when the round has no vocabulary (a grammar game alone)
 //   order(pool, seed)     the order of the questions for one student: new questions first, vocabulary and grammar taking turns
 //   shown(qu, seed)       the order of a question's options for one student (the deck's first option is the right one)
 //   similar(pool, qu, a, seed, avoid)  a question like qu to try after a wrong answer (key)
@@ -39,7 +42,9 @@ function deckQs(d,id,kind,th){const out=[],np=d.notes===false;let k=0,inRun=fals
   (d.slides||[]).forEach(s=>{if(s.q){if(inRun){k++;inRun=false;th[k]=run;run=[]}n++;out.push(Object.assign({},s,{deck:id,kind,n,tp:k,p:k&&!np?"p"+k:"",key:(kind==="vocab"?"v":"g")+n}))}
     else if(s.notes!==false){inRun=true;if(s.theory)run.push(s)}});
   return out}
-async function load(ids){
+// wordIds: other decks whose vocabulary only gives the password words (a 🧩 grammar game played alone as Code Breakers: the words of its
+// learning path's 📚 vocabulary game), never questions of the round
+async function load(ids,wordIds){
   const decks={};
   for(const id of ids){if(!/^[\w-]+$/.test(id))continue;
     const meta=(window.EL_GAMES||[]).find(x=>x.id===id)||{},kind=meta.kind||(/-vocab$/.test(id)?"vocab":"grammar");
@@ -47,8 +52,9 @@ async function load(ids){
     const th={},qs=deckQs(got,id,kind,th);let more=null;window.ELGameMore=m=>{more=m};await script(base+"decks/more/"+id+".js");
     if(more&&Array.isArray(more.questions)){let n=qs.length;more.questions.forEach(q=>{n++;qs.push(Object.assign({},q,{deck:id,kind,n,tp:+q.p||0,p:q.p?"p"+q.p:"",key:(kind==="vocab"?"v":"g")+n,extra:true}))})}
     decks[id]={id,title:got.title,kind,qs,th,more:!!more}}
-  const pool=Object.values(decks).flatMap(d=>d.qs);
-  return {decks,pool,words:words(pool)}}
+  const pool=Object.values(decks).flatMap(d=>d.qs);let ws=words(pool);
+  if(!ws.length&&wordIds&&wordIds.length){const ex=await load(wordIds.filter(id=>!decks[id]));ws=ex.words}
+  return {decks,pool,words:ws}}
 // password words: the vocabulary questions whose answer is one word (4 letters or more) and whose sentence has a gap; the clue is that sentence
 function words(pool){const seen=new Set(),out=[];
   pool.filter(q=>q.kind==="vocab"&&/_{3,}/.test(q.q)).forEach(q=>{const w=plain(q.write?q.write[0]:q.options[0]).trim();
