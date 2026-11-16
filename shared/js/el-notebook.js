@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261114w', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261116a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -1004,6 +1004,8 @@ window.ELNotebook = (function () {
       // they were somewhere else…", "So no My board button"): back to the page the notebook was opened from (el-cloud.js el_nb_from)
       + (H.own ? (f => `<a class="nb-tool nb-home nb-from" href="${esc(f.u)}" title="${esc(f.tip)}">↩<span class="nb-hlab"> ${esc(f.lab)}</span></a>`)(fromPage()) : '')
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
+      // ⚠️ the same Problem window as the bottom bar, which the notebook covers (Roger, 16 Nov 2026: "they should be able to report problems in the notebook")
+      + (H.own && !H.preview ? `<button type="button" class="nb-tool nb-report" title="${t('Avisa d\'un problema: alguna cosa de la llibreta no funciona', 'Report a problem: something in the notebook does not work')}" aria-label="${t('Avisa d\'un problema', 'Report a problem')}">⚠️</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav>${chs ? `<nav class="nb-lside${CH.length > 4 ? ' nb-many' : ''}" aria-label="${t('Situacions d\'aprenentatge', 'Learning situations')}">${CH.map((c, i) => { const L = (window.EL_LS || []).find(l => l.id === c.LS) || {}; return `<button type="button" class="nb-tab nb-ctab nb-lt" data-chap="${i}" data-nbto="s:chap|${i}" style="--i:${i}" title="${esc(chapName(L))}"><b>${lsNum(c)}</b><span> ${esc(chapName(L).replace(/^\S+\s*/, '').replace(/^\((.*)\)$/, '$1'))}</span></button>`; }).join('')}</nav>` : ''}</div>`
       + (!chs && chapters().length > 1 ? `<nav class="nb-chaps" aria-label="${t('Capítols', 'Chapters')}"><span class="nb-chl">📚</span>${chapters().map(l => l.id === H.LS
@@ -1048,7 +1050,10 @@ window.ELNotebook = (function () {
       const k = sp.clientWidth + 'x' + sp.clientHeight + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
       if (k === laid) return;
       const a = document.activeElement; if (a && a.closest && a.closest('.nb-ed,.nb-ied,.nb-stitle,.nb-add')) return;
-      clearTimeout(RO.t); RO.t = setTimeout(() => { if (!printing()) layout(); }, laid ? 120 : 0);
+      // nor while a note is open on the page (the pen still loading, not focused yet): the pages made again took it away and what the
+      // student typed went nowhere. Closing the note draws the pages again anyway.
+      if (ED && ED.inl) return;
+      clearTimeout(RO.t); RO.t = setTimeout(() => { if (!printing() && !(ED && ED.inl)) layout(); }, laid ? 120 : 0);
     });
     RO.observe(sp);
   }
@@ -1137,6 +1142,16 @@ window.ELNotebook = (function () {
     const c = document.querySelector('.nb .nb-help'); if (c) c.focus({ preventScroll: true });
   }
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.nb .nb-help')) tour(); });
+  // ⚠️ Report a problem: el-cloud.js's Problem window (window.elReport, problems/{id} and the instant task), told it is the notebook and
+  // which page; the screenshot it can take is the notebook as the student sees it
+  document.addEventListener('click', e => {
+    if (!(e.target.closest && e.target.closest('.nb .nb-report')) || !H || !H.own || H.preview) return;
+    if (ED) closeEditor();
+    const p = pages[pg], where = '📓 ' + t('Llibreta', 'Notebook') + (p ? ' › ' + pname(p) + ' · ' + t('pàgina', 'page') + ' ' + (pg + 1) : '');
+    if (typeof window.elReport === 'function') { menuOff(); window.elReport({ where }); return; }
+    const h = document.createElement('div'); h.className = 'nb-tipb'; h.setAttribute('role', 'status'); h.textContent = t('Ara no es pot enviar: torna-ho a provar d\'aquí a un moment o digues-ho al professor.', 'It can\'t be sent right now: try again in a moment or tell your teacher.');
+    document.querySelector('.nb').append(h); h.style.right = '16px'; h.style.top = '56px'; setTimeout(() => h.remove(), 4000);
+  });
 
   // ---------- one set of listeners for every redraw ----------
   document.addEventListener('click', e => {

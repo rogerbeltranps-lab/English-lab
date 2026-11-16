@@ -76,9 +76,10 @@ async function pageShot(skip){
 // Opens the report window. en: English (Safe, Daring) or Catalan (Insecure, no route). save(o) stores {kind, text, ...context()}.
 // teacher: the teacher's own ⚠️ Problem (Roger, 13 Nov 2026: "I need a problem button available for the teacher"), always in English,
 // with words that say what happens next (the same instant task reads it; no student to answer).
-export function report({en,save,teacher}){
+// where: the place to send instead of the heading on screen (📓 the notebook, which has no headings of its own: its section and page).
+export function report({en,save,teacher,where:at}){
   if(teacher)en=true;
-  const t=(ca,e)=>en?e:ca,ctx=context(),d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
+  const t=(ca,e)=>en?e:ca,ctx=context();if(at)ctx.section=cut(at,120);const d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
   d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
   d.innerHTML='<h3 style="margin:0 0 6px"></h3><p data-i style="margin:0 0 8px;color:#475569"></p><div data-k></div>'
     +'<textarea maxlength="1000" rows="4" style="width:100%;box-sizing:border-box;font:inherit;padding:6px;border:1px solid #cbd5e1;border-radius:8px;margin-top:8px"></textarea>'

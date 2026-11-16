@@ -21,7 +21,9 @@ hourly task "English Lab: problem reports" is switched off.
 1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" (no open report and no new comment) → stop at once (no email, no PR,
    nothing else read). A line "NEW COMMENTS" → also do "Students' comments, answered at once" below (after the reports, if any).
 2. For each report: read everything it holds, look at the screenshot file it prints (shots from before 6 Nov 2026 can show the folded
-   Study guide over the page; the section "Com estudiar / How to study" then means nothing), open the page's code and data, and look at the
+   Study guide over the page; the section "Com estudiar / How to study" then means nothing; a section starting "📓 Notebook / Llibreta" was
+   sent from the ⚠️ in the notebook's top bar: the page is the LS page #notes, the section names the notebook section and page, and the code
+   is shared/js/el-notebook.js + el-pad.js), open the page's code and data, and look at the
    student's own documents only if needed (`students/{uid}/progress`, `results`). Decide:
    - **Technical bug** (the site does not work as it was built to: a button, audio or video, saving or showing the student's work, a page
      that looks broken, a card or word missing, a step that cannot be done or is counted wrong, an answer key that refuses an answer that is

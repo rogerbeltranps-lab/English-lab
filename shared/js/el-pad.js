@@ -10,10 +10,17 @@ const INK = Object.fromEntries(PENS.map(p => [p[0], p[1]]));
 const hex2rgb = h => 'rgb(' + [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join(',') + ')';
 const PEN_OF = {}; PENS.forEach(([k, h]) => { PEN_OF[h] = PEN_OF[hex2rgb(h)] = 'nb-pen-' + k; });
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// the pen chosen stays chosen (Roger, 16 Nov 2026: "they choose black but they see blue"): every page started again — the notebook makes
+// the note again when the page fills up, a new note, the whiteboard — used to start with the blue pen while the black one looked chosen.
+// Kept on this device (localStorage el_nb_pen), no Firestore.
+const PEN_K = 'el_nb_pen';
+let lastPen = (() => { try { const k = localStorage.getItem(PEN_K); return INK[k] ? k : 'b'; } catch (e) { return 'b'; } })();
+const penKeep = k => { lastPen = k; try { localStorage.setItem(PEN_K, k); } catch (e) {} };
+const penOf = (el, ed) => { const pe = el && el.closest && el.closest('[class*="nb-pen-"]'); return pe && ed.contains(pe) ? [...pe.classList].find(c => c.startsWith('nb-pen-')) : 'nb-pen-b'; };
 
 export function css() {
   if (document.getElementById('el-nb-css')) return;
-  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261113j', import.meta.url).href; document.head.append(l);
+  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261116a', import.meta.url).href; document.head.append(l);
 }
 export function clean(h) {
   let n = 0;
@@ -46,9 +53,9 @@ const txt2html = t => String(t || '').split('\n').map(l => '<div>' + (esc(l) || 
 export function pad(host, o) {
   css();
   const T = (c, e) => o.ca ? c : e;
-  let dr = Array.isArray(o.dr) ? o.dr.slice() : [], pen = 'b', hist = [], typing = false;
+  let dr = Array.isArray(o.dr) ? o.dr.slice() : [], pen = lastPen, hist = [], typing = false;
   host.innerHTML = (o.readOnly ? '' : `<div class="pad-tools" role="toolbar" aria-label="${T('Bolis i marques', 'Pens and marks')}">
-      <div class="pad-g">${PENS.map(([k, h, en, ca], i) => `<button type="button" class="pad-tb pad-pen" data-pen="${k}" aria-pressed="${i === 0}" title="${T(ca, en)}"><span class="pad-dot" style="background:${h}"></span></button>`).join('')}</div>
+      <div class="pad-g">${PENS.map(([k, h, en, ca], i) => `<button type="button" class="pad-tb pad-pen" data-pen="${k}" aria-pressed="${k === pen}" title="${T(ca, en)}"><span class="pad-dot" style="background:${h}"></span></button>`).join('')}</div>
       <div class="pad-g"><button type="button" class="pad-tb pad-mk" data-k="nb-hl-y" title="${T('Subratllador groc', 'Yellow highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-y)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-g" title="${T('Subratllador verd', 'Green highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-g)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-p" title="${T('Subratllador rosa', 'Pink highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-p)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-b" title="${T('Subratllador blau', 'Blue highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-b)"></span></button><button type="button" class="pad-tb pad-mk" data-k="nb-hl-o" title="${T('Subratllador taronja', 'Orange highlighter')}"><span class="pad-hlb" style="background:var(--nb-hl-o)"></span></button></div>
       <div class="pad-g"><button type="button" class="pad-tb pad-mk" data-k="nb-ul" title="${T('Subratlla', 'Underline')}"><span class="nb-ul pad-l">U</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-ulw" title="${T('Subratlla ondulat', 'Wavy underline')}"><span class="nb-ulw pad-l">W</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-circ" title="${T('Encercla', 'Circle')}"><span class="nb-circ pad-l" style="font-size:16px">o</span></button><button type="button" class="pad-tb pad-mk" data-k="nb-boxd" title="${T('Requadre', 'Box')}"><span class="nb-boxd pad-l" style="font-size:16px">b</span></button></div>
       <div class="pad-g"><button type="button" class="pad-tb pad-clean" title="${T('Treu les marques de les paraules triades', 'Take the marks off the selected words')}">🧽</button><button type="button" class="pad-tb pad-undo" title="${T('Desfés', 'Undo')}">↶</button></div>
@@ -71,12 +78,29 @@ export function pad(host, o) {
     const el = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer;
     const mark = el.closest(MARK); let atEnd = false;
     if (mark && ed.contains(mark)) { const rr = document.createRange(); rr.selectNodeContents(mark); rr.setStart(r.startContainer, r.startOffset); atEnd = rr.toString() === ''; }
-    const pe = el.closest('[class*="nb-pen-"]'), cur = pe && ed.contains(pe) ? [...pe.classList].find(c => c.startsWith('nb-pen-')) : 'nb-pen-b', want = 'nb-pen-' + pen;
+    const cur = penOf(el, ed), want = 'nb-pen-' + pen;
     if (!atEnd && cur === want) return;
     e.preventDefault();
     const sp = document.createElement('span'); sp.className = want; sp.textContent = e.data;
     if (atEnd) mark.after(sp); else r.insertNode(sp);
     const nr = document.createRange(); nr.setStart(sp.firstChild, sp.firstChild.length); nr.collapse(true); s.removeAllRanges(); s.addRange(nr); changed();
+  });
+  // letters the browser writes by itself (the Chromebook's on-screen keyboard, accents typed with two keys like à or è, a word the
+  // keyboard completes) don't go through the step above: they are given the chosen pen once they are written
+  const inkBack = n => {
+    const s = getSelection(); if (!n || !s.rangeCount) return; const r = s.getRangeAt(0), tn = r.startContainer;
+    if (!r.collapsed || tn.nodeType !== 3 || !ed.contains(tn)) return;
+    const want = 'nb-pen-' + pen; if (penOf(tn.parentElement, ed) === want) return;
+    const end = r.startOffset, st = Math.max(0, end - n); if (st >= end) return;
+    const mid = tn.splitText(st); mid.splitText(end - st);
+    const sp = document.createElement('span'); sp.className = want; mid.replaceWith(sp); sp.append(mid);
+    const nr = document.createRange(); nr.setStart(mid, mid.length); nr.collapse(true); s.removeAllRanges(); s.addRange(nr); changed();
+  };
+  let comp = false;
+  ed.addEventListener('compositionstart', () => { comp = true; });
+  ed.addEventListener('compositionend', e => { comp = false; const n = (e.data || '').length; setTimeout(() => inkBack(n), 0); });
+  ed.addEventListener('input', e => {
+    if (!comp && (e.inputType === 'insertText' || e.inputType === 'insertReplacementText' || e.inputType === 'insertFromComposition') && e.data) inkBack(e.data.length);
   });
   ed.addEventListener('input', e => { if (e.inputType === 'insertParagraph') ed.querySelectorAll(MARK).forEach(x => { if (!x.textContent) x.replaceWith(...x.childNodes); }); changed(); });
   // paste: plain text only, and only as much as the page can hold
@@ -84,8 +108,10 @@ export function pad(host, o) {
   ed.addEventListener('drop', e => e.preventDefault());
   const selIn = () => { const s = getSelection(); if (!s.rangeCount || s.isCollapsed) return null; const r = s.getRangeAt(0); return ed.contains(r.commonAncestorContainer) ? r : null; };
   host.querySelectorAll('.pad-tools button').forEach(b => b.addEventListener('mousedown', e => e.preventDefault()));
-  host.querySelectorAll('.pad-pen').forEach(b => b.addEventListener('click', () => {
-    pen = b.dataset.pen; host.querySelectorAll('.pad-pen').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  // (the buttons are kept here: the notebook moves the tools into its floating strip, out of host)
+  const penBtns = [...host.querySelectorAll('.pad-pen')];
+  penBtns.forEach(b => b.addEventListener('click', () => {
+    pen = b.dataset.pen; penKeep(pen); penBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     const r = selIn(); if (!r) { ed.focus(); return; }
     snap(); const f = r.extractContents(); f.querySelectorAll('[class*="nb-pen-"]').forEach(x => x.classList.remove(...[...x.classList].filter(c => c.startsWith('nb-pen-'))));
     const sp = document.createElement('span'); sp.className = 'nb-pen-' + pen; sp.appendChild(f); r.insertNode(sp); getSelection().removeAllRanges(); changed();
