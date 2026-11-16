@@ -232,6 +232,32 @@ function tpCount(sel,cb){const a=anchor(sel),P=RAW[a]||[],mine=sel[a]||new Set()
   const own=P.filter(p=>mine.has(p.k)).concat(X.filter(p=>xs.has(p.k))).reduce((t,p)=>t+p.qs.length+(cb?p.more.length:0),0);let rv=0;
   Object.entries(sel).forEach(([id,ks])=>{const Q=RAW[id];if(!Q||id===a||x&&id===x.id)return;Q.filter(p=>ks.has(p.k)).forEach(p=>{rv+=Math.min(n,p.qs.length+p.more.length)})});
   return {own,rv}}
+// 📊 How the group did on each point the last time it was played (Roger, 16 Nov 2026: "what I want to know, even when I select them, is the %
+// performance that the class did the last time so that I choose the one that they need to work on"): next to each tick, the class's % right
+// on that point's questions in the latest game that asked them (Quiz or 🕵️ Code Breakers, this game or a 🔁 review in another one). From the
+// group's gameResults (one query: a read per game the group played), once per group and kind in this tab (sessionStorage el_gp_<group>_<kind>,
+// forgotten when this tab saves a game of that group). A saved question is matched to its point by its text in the deck (RAW).
+const GP={};let gpBusy="";
+const qKey=t=>String(t??"").replace(/\*\*|~~/g,"").replace(/\s+/g," ").trim().slice(0,150).toLowerCase();
+const gpKey=g=>g+"_"+kindOf();
+function gpForget(g){["vocab","grammar"].forEach(k=>{delete GP[g+"_"+k];try{sessionStorage.removeItem("el_gp_"+g+"_"+k)}catch(e){}})}
+async function loadGp(g){const k=gpKey(g);if(GP[k]||gpBusy===k)return;
+  try{const c=JSON.parse(sessionStorage.getItem("el_gp_"+k)||"null");if(c&&c.m&&Date.now()-c.t<3*3600e3){GP[k]=c.m;draw();return}}catch(e){}
+  gpBusy=k;const m={};
+  try{const docs=(await S.getDocs(S.query(S.collection(db,"gameResults"),S.where("group","==",g)))).docs.map(d=>d.data());
+    const idx={};gDecks().concat(exDecks()).forEach(d=>{const P=RAW[d.id];if(!P)return;const x=idx[d.id]=new Map();P.forEach(p=>p.qs.concat(p.more).forEach(q=>x.set(qKey(q.q),p.k)))});
+    // oldest first: a later game that asked a point replaces what an earlier one said about it
+    docs.sort((a,b)=>(+a.sid||0)-(+b.sid||0)).forEach(r=>{const t={};
+      (r.qs||[]).forEach(q=>{const dk=q.d||r.deck,x=idx[dk];if(!x||!(+q.of))return;const pk=x.get(qKey(q.q));if(!pk)return;const id=dk+"#"+pk;(t[id]=t[id]||[0,0]);t[id][0]+=+q.right||0;t[id][1]+=+q.of});
+      Object.entries(t).forEach(([id,[a,b]])=>m[id]={p:Math.round(a/b*100),d:r.day||"",n:b,...(r.mode==="cb"?{cb:1}:{})})})}
+  catch(e){console.warn("results",e)}
+  GP[k]=m;gpBusy="";try{sessionStorage.setItem("el_gp_"+k,JSON.stringify({t:Date.now(),m}))}catch(e){}draw()}
+// the % on one point: red under 50, orange under 80, green (as the 🧩📚 circles)
+function gpTag(g,d,p){const m=GP[gpKey(g)];if(!m)return "";const x=m[d.id+"#"+p.k];
+  if(!x)return `<span class="tpp none" title="No game has asked about this point yet">–</span>`;
+  const dd=/^\d{4}-\d\d-\d\d$/.test(x.d)?new Date(x.d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
+  return `<span class="tpp ${x.p<50?"lo":x.p<80?"mid":"hi"}" title="Last time${dd?" ("+dd+(x.cb?", Code Breakers":"")+")":""}: ${x.p} % right in ${x.n} answer${x.n===1?"":"s"}">${x.p} %</span>`}
+const gpDay=(g,d,p)=>{const x=(GP[gpKey(g)]||{})[d.id+"#"+p.k];if(!x||!/^\d{4}-\d\d-\d\d$/.test(x.d))return "";return `<span class="tpd">📊 ${esc(new Date(x.d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}${x.cb?" 🕵️":""}</span>`};
 // for Code Breakers (codebreakers.html &tp=): "deck.1.2,deck2.3"
 const tpParam=tp=>Object.entries(tp).map(([id,ks])=>id+"."+ks.join(".")).join(",");
 
@@ -364,6 +390,7 @@ async function saveResults(){
     qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),ok:String(isW(slides()[i])?slides()[i].write[0]:slides()[i].options[0]).replace(/\*\*/g,"").slice(0,80),right:H.aw[i].length,of:answered(i).length,...(slides()[i]._rv?{d:slides()[i]._rv.d}:{})})),
     nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu,...(H.tp?{tp:H.tp}:{})};
   savedSid=H.sid;
+  gpForget(H.g);   // 📊 the ticks screen reads this group's results again
   try{await S.setDoc(S.doc(db,"gameResults",H.g+"_"+H.sid),doc)}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
   // each student's own result (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what to study"):
   // myGames/{email}.games[{group}_{sid}] = {deck, title, kind, ls, lp, day, sid, r, of, miss:[{n, q, a (their answer), ok, p (the notes part
@@ -565,19 +592,20 @@ function drawPoints(){
   const g=H.tg,cb=fmt()==="cb",head=`<h1 class="logo pop">${esc(boardName())}</h1>`,what=kindOf()==="vocab"?"vocabulary":"grammar";
   if(!PL||!pointsReady()){loadPlayed();loadPoints();app$.innerHTML=`<div class="center"><div>${head}<p class="sub">Loading the grammar points…</p></div></div>`;return}
   if(!H.tsel)H.tsel=tpDefault(g);
+  if(!GP[gpKey(g)])loadGp(g);
   const sel=H.tsel,day=v=>{const t=/^\d{4}-\d\d-\d\d$/.test(String(v))?new Date(v+"T12:00:00"):new Date(+v||v);return isNaN(t)?"":t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
   const lsList=[...new Set(gDecks().map(d=>d.ls||""))];
   // the ticks of one deck's points (a grammar deck, or 💬 the expressions of its learning path's vocabulary deck, labelled as such)
   const A=anchor(sel),rows=(d,me)=>{const P=ptsOf(d),done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set(),ex=kindIs(d)==="vocab"&&kindOf()==="grammar";
     const why=p=>{if(p.tab&&info){const v=doneDay(d,g,p);return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
       return pl?`<span class="tpy">✓ ${ex?"vocabulary ":""}game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">${ex?"vocabulary ":""}game not played yet</span>`};
-    return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}><span class="tpt">${ex?"💬 <b>Expressions</b> · ":""}${esc(p.name)}</span><small>${why(p)}</small></label>`).join("")};
+    return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}>${gpTag(g,d,p)}<span class="tpt">${ex?"💬 <b>Expressions</b> · ":""}${esc(p.name)}</span><small>${[gpDay(g,d,p),why(p)].filter(Boolean).join(" · ")}</small></label>`).join("")};
   const lp=d=>{const me=d.id===A,x=exDeck(d);
     return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">${H.lsg?"All its questions":"This game"}</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
       ${rows(d,me)}${x&&RAW[x.id]?rows(x,me):""}</div>`};
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
-    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions.${H.lsg?` The newest learning path ticked gets all its questions; each earlier point gets 🔁 review questions.`:` Tick earlier points to review them.`}</p>
+    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions. The coloured % = how the class did on it the last time it was asked${GP[gpKey(g)]?"":" (loading…)"}.${H.lsg?` The newest learning path ticked gets all its questions; each earlier point gets 🔁 review questions.`:` Tick earlier points to review them.`}</p>
     <div class="tpcols">${lsList.map(l=>`<section class="course tpls">${l?`<h3>${esc(l)}</h3>`:""}${gDecks().filter(d=>(d.ls||"")===l).map(lp).join("")}</section>`).join("")}</div>
     <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
       <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · 🕵️ each at their own pace":""}`}</b>
