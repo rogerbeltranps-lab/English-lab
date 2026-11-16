@@ -1163,7 +1163,8 @@ function nbFab(){
   const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
   const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
   lab();document.body.append(a);
-  a.addEventListener("click",e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;if(qnOpen()){e.preventDefault();}});
+  // the 📓 button always opens the notebook itself (Roger, 16 Nov 2026: "students should open their notebook whenever they press the notebook
+  // button"); the ✍ Quick note pad it used to open first (qnOpen below) is no longer started from here
   const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&!!lsId&&/\/(index\.html)?$/.test(location.pathname));
   here();addEventListener("hashchange",here);setTimeout(lab,4000);
   // the board knows the student's LS now: its notebook (an LS1 or no LS: no button)
