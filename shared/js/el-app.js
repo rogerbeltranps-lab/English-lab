@@ -128,8 +128,12 @@
     // a computer (Chromebook): the LS home's side menu, brand + wide buttons with labels and › (Roger, 7 Nov 2026: "the format should be
     // the same (buttons)"); a narrow window (641–980 px): the strip of icon buttons; a phone: the bottom bar (bar below)
     // a student on an LS (its learning paths, its vocabulary games): the menu is a strip of icons that opens when the mouse is on it
-    // (Roger, 8 Nov 2026: "to see better the screen"; elMiniRail in el-catalog.js, el-app.css section 3)
-    const sm = stuMenu(), mini = !!sm && !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail;
+    // (Roger, 8 Nov 2026: "to see better the screen"; elMiniRail in el-catalog.js, el-app.css section 3); the teacher's menu too
+    // (Roger, iPad, 16 Nov 2026: "when I'm here I want the buttons to shrink to a square to have more space for the SLP")
+    // Not the teacher's class tab (html.elcmtab, el-catalog.js): there the column is the place of 📋 Today (el-cm-agenda.js docks it
+    // in a menu ≥200 px wide), so a strip left it empty and white (Roger, 16 Nov 2026: "look! There's a bug")
+    const cmTab = document.documentElement.classList.contains("elcmtab");
+    const sm = stuMenu(), mini = !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail && (!!sm || !cmTab);
     document.body.classList.toggle("elmini", mini);
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
       + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`

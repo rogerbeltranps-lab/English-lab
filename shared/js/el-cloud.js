@@ -816,7 +816,7 @@ function bar(){
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
-      else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Claude looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
+      else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Beltran looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
