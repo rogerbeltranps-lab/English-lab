@@ -361,6 +361,7 @@ html.el-nb-full .eldict,html.el-nb-full .eldict-tipbox{z-index:2147482600!import
 .nb-tour-f button:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 html.nb-touring .eldict-tipbox{display:none!important}
 .nb .nb-help{min-width:40px}
+.nb .nb-report{min-width:40px;background:#b45309;border-color:#b45309;color:#fff}.nb .nb-report:hover{background:#92400e}
 @media print{.nb-tour{display:none}}
 html.nb-touring .nb-bt{opacity:1}
 /* the corrections in green (Roger, 13 Nov 2026: "use green for the corrections"); what was wrong is still crossed out in red */

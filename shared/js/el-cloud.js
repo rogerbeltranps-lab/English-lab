@@ -749,7 +749,7 @@ const repEn=()=>{const l=myLevel||homeLevel;return l?!elCa(l):onBoard&&document.
 // The teacher has the same button (Roger, 13 Nov 2026: "I need a problem button available for the teacher"): on the dashboard, the class tab
 // and every page, in English. The report says teacher:true (firestore.rules: only the teacher's own account) and the group is the class
 // mode's group on the class tab; the same instant task reads it (docs/general/problem-reports-auto.md, "The teacher's own reports").
-const reportProblem=u=>{const tch=isTeacher(u)&&!AS;return report({en:repEn(),teacher:tch,save:o=>{
+const reportProblem=(u,x)=>{const tch=isTeacher(u)&&!AS;return report({en:repEn(),teacher:tch,where:x&&x.where,save:o=>{
   const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
   b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:tch?((cmRead()||{}).g||null):myGroup||null,ls:lsId,activity:actId,route:tch?null:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()},tch?{teacher:true}:{}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
@@ -805,6 +805,8 @@ function bar(){
   // student on every page (Roger, 7 Nov 2026: "all pages still pop up in between")
   return u=>{el.innerHTML="";el.style.visibility=authKnown?"":"hidden";if(!authKnown)return;
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
+    // the same Problem window for 📓 the notebook, which covers this bar (el-notebook.js ⚠️; not in the teacher's student view)
+    window.elReport=u&&!AS&&(isStudent(u)||isTeacher(u))?(x=>reportProblem(u,x)):null;
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};el.append((AS.name||AS.email||"")+" ");   // the student's own bar; its buttons do nothing here
       const p=b("⚠️ "+(ca?"Problema":"Problem"),no);p.style.background="#b45309";el.append(p," ",b("💡 Idea",no)," ");
