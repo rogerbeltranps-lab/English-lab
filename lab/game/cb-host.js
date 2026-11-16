@@ -107,7 +107,9 @@ function go(){H.phase="play";H.end=Date.now()+H.mins*60e3;keep();G.music("think"
 function more(){H.end=Math.max(H.end,Date.now())+2*60e3;keep();publish(true);draw()}
 function finish(){if(H.phase!=="play")return;H.phase="end";H.end=Math.min(H.end,Date.now());const t=totals();H.cp=t.n?Math.round(t.r/t.n*100):null;
   keep();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700);publish(true);saveResults();draw()}
-function endGame(){const g=H.g;if(H.phase==="play")finish();liveOff(g);if(ansStop)ansStop();ansStop=null;clearInterval(beat);G.music("");
+// ■ End and Finish also send a group in class mode back to the class (cmBack, as 🎓 Back to class mode; Roger, 16 Nov 2026: "students
+// couldn't leave the game once finished"); not ▶ Play again (again: the next round starts at once)
+function endGame(again){const g=H.g;if(H.phase==="play")finish();if(again)liveOff(g);else if(g)S.setDoc(S.doc(db,"live",g),{on:false,cmBack:Date.now(),at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e));if(ansStop)ansStop();ansStop=null;clearInterval(beat);G.music("");
   Object.assign(H,{g:"",sid:0,phase:"pick",end:0,hr:{},players:{},feed:[]});keep();draw()}
 setInterval(()=>{if(H.phase==="play"&&H.end&&Date.now()>=H.end)finish();else if(H.phase==="play")drawTime()},500);
 
@@ -216,7 +218,7 @@ app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if
   if(d==="mute"){G.sound(!G.sound());draw()}
   if(d==="end"){if(Date.now()-endArm<3000){endArm=0;if(H.phase==="play")finish();else endGame()}else{endArm=Date.now();draw();setTimeout(draw,3100)}}
   if(d==="finish")endGame();
-  if(d==="again"){const g=H.g;endGame();startGame(g)}
+  if(d==="again"){const g=H.g;endGame(true);startGame(g)}
   if(d==="cmback")backToClass();
 });
 addEventListener("keydown",e=>{if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}});

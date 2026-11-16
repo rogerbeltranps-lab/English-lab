@@ -265,9 +265,11 @@ var LS2 = (function () {
       '.gextra{margin:22px 0 4px;padding:10px 14px;border-radius:12px;background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}';
     document.head.appendChild(st);
   }
-  function typedHtml(items, prefix, mode, parts) {
+  // one: every question gets its own ✓ Check (not the recall warm-up, which is one try for the whole set)
+  function typedHtml(items, prefix, mode, parts, one) {
     if (starter() || items.some(it => it.opts)) bindPicks();
     if (parts) partsCss();
+    if (one) oneCss();
     let sec = null, np = 0, inX = false;   // blocks are numbered in the order this route sees them
     const head = it => {
       if (!parts) return '';
@@ -279,7 +281,7 @@ var LS2 = (function () {
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' +
+      (one ? '<div class="el-onerow">' : '') + '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (one ? oneBtn(prefix, i) + '</div>' : '') +
       (pk ? picksHtml(it, items, prefix, i, m) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
@@ -336,11 +338,13 @@ var LS2 = (function () {
   // got: [right, what was typed] per question of the last check (firstItems)
   let got = [];
   const typedAs = el => String(el.value || '').trim().slice(0, 40);
-  function checkTyped(items, prefix, reveal, count) {
+  // only: the questions to check and show (one sentence's ✓ Check, or the ones checked before on a restore); null = all of them
+  function checkTyped(items, prefix, reveal, count, only) {
     let score = 0; got = [];
     items.forEach((it, i) => {
       const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
+      if (only && !only.includes(i)) return;
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
       if (picking(it) && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
@@ -362,6 +366,50 @@ var LS2 = (function () {
             : (ca() ? ' · Respon totes les preguntes per completar el pas.' : ' · Answer every question to complete the step.')) + (extra || '');
     el.classList.add('show');
   }
+  /* ---------- ✓ Check one sentence at a time (Roger, 16 Nov 2026: "I want students to be able to check each sentence of a set of sentences
+     when doing an activity, since they end up checking the answers before finishing") ----------
+     Every question of a typed, vocabulary-practice or reading / listening (mc) activity has its own small Check (button[data-one]); Enter in
+     a box checks that box. The step's button (now "Check all") checks every answered question, and an empty one is never marked wrong.
+     What counts for the mark is each question's FIRST check: state.items[id_route] (per: 1) is built question by question, and tries[k] is
+     the right first checks over every counted question, so a question not checked yet counts 0 until it is (as an empty one did before).
+     The step is done once every counted question has been answered and checked. Records saved before this (no per) never change. */
+  const CHK = {};   // step id → the questions checked in this attempt (positions; saved as state.ans[id].c; "Check all" adds the empty ones too)
+  const chk = id => CHK[id] || (CHK[id] = new Set());
+  const filledV = x => x != null && String(x).trim() !== '';
+  const allIx = items => items.map((_, i) => i);
+  // the questions a check has just marked: the ones shown that have an answer
+  const marked = (items, prefix, only) => { const v = vals(items, prefix); return (only || allIx(items)).filter(i => filledV(v[i])); };
+  // k: the step (tries / last / done); id: the activity (state.items id_route); need: the counted positions; idx: the ones just checked;
+  // g: [right, answer] per question; counts(i): false for a question that is saved but never scored (a 🔮 guess)
+  function firsts(k, id, src, items, need, idx, g, counts) {
+    idx = idx.filter(i => need.includes(i)); if (!idx.length) return;
+    counts = counts || (() => true);
+    const now = new Date().toISOString(), sc = need.filter(counts);
+    lastTry(k, sc.filter(i => g[i] && g[i][0]).length, sc.length);
+    state.items = state.items || {}; state.tries = state.tries || {};
+    const key = id + '_' + level; let R = state.items[key];
+    if (R && !R.per) return save();   // checked as a whole set before 16 Nov 2026: that first try stays
+    if (!R) R = state.items[key] = { level, date: now, q: [], ok: [], a: [], per: 1 };
+    const qi = i => Array.isArray(src) ? src.indexOf(items[i]) : i;
+    idx.forEach(i => { const q = qi(i); if (q < 0 || R.q.includes(q)) return; R.q.push(q); R.ok.push(g[i][0] ? 1 : 0); R.a.push(g[i][1]); });
+    const at = i => R.q.indexOf(qi(i)), full = need.every(i => at(i) >= 0), T = state.tries[k];
+    if (!T || (T.per && (T.level === level || !T.full)))
+      state.tries[k] = { score: sc.filter(i => at(i) >= 0 && R.ok[at(i)]).length, max: sc.length, level, date: T && T.per && T.level === level ? T.date : now, per: 1, full };
+    save();
+  }
+  // done: every counted question answered and checked in this attempt, or each one checked once (its first check) on this route
+  const doneNow = (id, k, items, prefix, need) => { const v = vals(items, prefix), C = chk(id), T = (state.tries || {})[k];
+    return need.every(i => C.has(i) && filledV(v[i])) || !!(T && T.per && T.full && T.level === level); };
+  function oneCss() {
+    if (document.getElementById('el-one-css')) return;
+    const st = document.createElement('style'); st.id = 'el-one-css';
+    st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
+      '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
+      '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}';
+    document.head.appendChild(st);
+  }
+  const oneBtn = (prefix, i) => '<button class="btn secondary el-one" type="button" data-one="' + prefix + '" data-i="' + i + '" title="' + (ca() ? 'Comprova només aquesta pregunta' : 'Check only this question') + '">✓ ' + (ca() ? 'Comprova' : 'Check') + '</button>';
+  const allLabel = () => ca() ? 'Comprova-ho tot' : 'Check all';
   /* ---------- answers and feedback stay (Roger, 26 Oct 2026) ---------- */
   // What a student typed or chose, with its feedback, is back when they return to the page (state.ans[id], synced like the rest),
   // until they press "Do it again" next to Check. A restore shows the feedback again without counting a try.
@@ -393,16 +441,30 @@ var LS2 = (function () {
     return out;
   }
   const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
-  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => mine(k, prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; state.nb = state.nb || {}; if (!state.nb[id]) state.nb[id] = state.ans[id]; save(); }
+  // c: the questions checked in this attempt (✓ Check one at a time, 16 Nov 2026). The notebook gets each question's answer at its first
+  // check (nb.c); a notebook kept before (no c) or on another route stays as it is.
+  function keep(id, prefix, v, items) {
+    delete fresh[id]; if (state.again) delete state.again[id]; state.ans = state.ans || {};
+    const tr = Object.fromEntries(Object.entries(tries).filter(([k]) => mine(k, prefix))), one = !!(NBS[id] && NBS[id].one), C = [...chk(id)].sort((a, b) => a - b);
+    state.ans[id] = { v, tries: tr, l: level, q: (items || []).map(qid) }; if (one) state.ans[id].c = C;
+    if (state.typing) delete state.typing[id + '_' + level];
+    state.nb = state.nb || {}; const nb = state.nb[id];
+    const F = C.filter(i => filledV(v[i]));   // the notebook keeps answers only (an empty question checked with "Check all" is not in it)
+    if (!nb) state.nb[id] = one ? { v: v.map((x, i) => F.includes(i) ? x : null), tries: tr, l: level, q: state.ans[id].q, c: F } : state.ans[id];
+    else if (one && Array.isArray(nb.c) && nb.l === level && Array.isArray(nb.v)) F.forEach(i => { if (nb.c.includes(i)) return; nb.v[i] = v[i]; nb.c.push(i); Object.keys(tr).forEach(k => { if (new RegExp('^' + prefix + i + '(\\D|$)').test(k)) nb.tries[k] = tr[k]; }); });
+    save();
+  }
   // the answers to show on this route ({v, moved}), with their tries, or null
   function kept(id, prefix, items, src, rec) {
     const a = rec || (!fresh[id] && state.ans && state.ans[id]); if (!a || !Array.isArray(a.v)) return null;
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
-    if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
+    const cOf = v => Array.isArray(a.c) ? v.map((x, i) => x ? i : -1).filter(i => i >= 0) : null;   // null: checked as a whole set (before 16 Nov 2026)
+    if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false, c: cOf(a.v.map((_, i) => Array.isArray(a.c) && a.c.includes(i))) }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
     Object.assign(tries, m.tries);
+    const mc = Array.isArray(a.c) ? moveTo(items, from, a.v.map((_, i) => a.c.includes(i)), prefix) : null;
     // the same questions in a new order (a step rebuilt in blocks, 13 Nov 2026) is no news for the student: no note
-    const nu = m.v.some(x => x == null); return { v: m.v, moved: !m.same && (nu || L !== level), fresh: nu, added: L === level };
+    const nu = m.v.some(x => x == null); return { v: m.v, moved: !m.same && (nu || L !== level), fresh: nu, added: L === level, c: mc ? cOf(mc.v) : null };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -439,13 +501,15 @@ var LS2 = (function () {
   const gameTook = (() => { try { const o = JSON.parse(sessionStorage.getItem('el_game_took') || 'null'); return !!o && o.p === location.pathname && Date.now() - o.at < 3 * 3600e3; } catch (e) { return false; } })();
   let gameBack = false;
   function retryBack(id) {
-    const v = gameTook && state.ans && state.ans[id] && state.typing && state.typing[id + '_' + level];
+    // state.again[id]: ↺ Practise again was pressed and nothing of the new try is checked yet (forget sets it, keep clears it), so the
+    // typing is a new try, not the unchecked rest of a first try checked one question at a time
+    const v = gameTook && state.again && state.again[id] && state.ans && state.ans[id] && state.typing && state.typing[id + '_' + level];
     if (!Array.isArray(v) || !v.some(x => x != null && x !== '')) return;
     fresh[id] = true;
     // like ↺ Practise again in the notebook look: the new try is done in the laptop look (el-app.js draws the look after this script)
     if (!gameBack) { gameBack = true; const go = () => { if (window.elLpNb && document.documentElement.classList.contains('el-lpnb')) window.elLpNb(false); }; document.readyState === 'complete' ? setTimeout(go, 0) : addEventListener('load', go); }
   }
-  function forget(id, prefix) { fresh[id] = true; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; }); save(); }
+  function forget(id, prefix) { fresh[id] = true; CHK[id] = new Set(); state.again = state.again || {}; state.again[id] = 1; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
      the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
      practice, the micro-dictation), which clears only that activity. There is no button that clears a whole section. */
@@ -454,19 +518,32 @@ var LS2 = (function () {
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
-  // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
-  // src: the panel's whole list (p.items / p.practice), to place answers saved at another route
-  function stays(id, prefix, listId, items, check, src) {
-    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true); };
+  // check(count, only): the step's own check (only: the questions to check and show; null = all); stays(id, prefix, listId, items, check)
+  // wires Check, Do it again and the restore. src: the panel's whole list (p.items / p.practice), to place answers saved at another route.
+  // one: the counted questions (positions) when every question has its own ✓ Check; without it (the recall warm-up) one Check for the set.
+  function stays(id, prefix, listId, items, check, src, one) {
+    $('#' + id + 'Check').onclick = () => { if (one) allIx(items).forEach(i => chk(id).add(i)); check(true, null); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true); };
+    if (one) {
+      const go = i => {
+        if (!(i >= 0 && i < items.length) || nbFrozen(id)) return;
+        const v = vals(items, prefix);
+        if (!filledV(v[i])) return check(false, [i]);   // "Type an answer": nothing is marked or saved
+        chk(id).add(i); check(true, [i]); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true);
+      };
+      const L = $('#' + listId);
+      L.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-one]'); if (b && b.dataset.one === prefix) go(+b.dataset.i); });
+      L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('input.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
+    }
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
     $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
     if (state.ans && state.ans[id] && !state.ans[id].from && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }   // answers brought from a split step (splitOld) are not a first try here: the step stays open to finish
-    NBS[id] = { id, prefix, listId, items, check, src };
+    NBS[id] = { id, prefix, listId, items, check, src, one };
     retryBack(id);
     if (nbFrozen(id)) return nbShow(NBS[id]);
-    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } else if (t) fill(items, prefix, t);
     nbSaved(id, !!k);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
@@ -476,7 +553,9 @@ var LS2 = (function () {
      ↺ Practise again stays: it takes the page back to the laptop look (window.elLpNb(false)) and clears the activity there; the new
      answers and results show only in the laptop look. el-app.js calls window.elNbRefresh() when the look changes. Marks never change. */
   const NBS = {};
-  const nbFrozen = id => document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(state.nb && state.nb[id] && Array.isArray(state.nb[id].v));
+  // a notebook filled question by question (nb.c) is frozen only once every counted question is in it; until then the activity stays open
+  const nbFrozen = id => { const nb = state.nb && state.nb[id], S = NBS[id];
+    return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(nb && Array.isArray(nb.v)) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
   function nbLock(id, listId, on) {
     const l = $('#' + listId); if (l) { l.inert = on; l.classList.toggle('el-nbink', on); }
     const c = $('#' + id + 'Check'); if (c) c.style.display = on ? 'none' : '';
@@ -486,8 +565,8 @@ var LS2 = (function () {
     if (!$('#' + listId)) return;
     Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; });
     clearStep(id, listId);
-    const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src);
-    if (k) { fill(items, prefix, k.v); check(false); if (!on) { if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); if (!on) { if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k);
   }
   /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
@@ -542,7 +621,7 @@ var LS2 = (function () {
       '<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>' + (ca() ? 'Clica per girar la targeta' : 'Click to turn the card') + '</p></div><div class="face back"><div class="label" id="cardBackLabel">Català + example</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>' +
       '<div class="actions" id="cardTypeRow" hidden><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (ca() ? 'Escriu la paraula en anglès' : 'Type the English') + '"><button class="btn" type="button" id="cardTypeCheck">' + (ca() ? 'Comprova i gira' : 'Check and turn') + '</button></div><p class="feedback" id="cardTypeMsg"></p>' +
       '<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← ' + (ca() ? 'Anterior' : 'Previous') + '</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">' + (ca() ? 'Següent' : 'Next') + ' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p></div>' +
-      (p.practice ? '<div class="section-card"><h3>' + (p.practiceMode === 'listen' ? (ca() ? 'Escolta i completa' : 'Listen and complete') : (ca() ? 'Completa les frases' : 'Complete the sentences')) + '</h3>' + (p.practiceMode ? '<p class="instruction">' + modeHow(p.practiceMode) + '</p>' : '') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
+      (p.practice ? '<div class="section-card"><h3>' + (p.practiceMode === 'listen' ? (ca() ? 'Escolta i completa' : 'Listen and complete') : (ca() ? 'Completa les frases' : 'Complete the sentences')) + '</h3>' + (p.practiceMode ? '<p class="instruction">' + modeHow(p.practiceMode) + '</p>' : '') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + allLabel() + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
     bind() {
       const groups = forLevel(p.groups);
       /* Review words (Roger, 8 Nov 2026: "no flashcards that don't appear on the list"): the English → Català deck adds p.review
@@ -606,8 +685,9 @@ var LS2 = (function () {
       $('#cardType').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); typedCheck(); } };
       if (p.practice) {
         const items = forLevel(p.practice);
-        $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode); bindModes(items, 'vp', p.practiceMode);
-        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = answered(items, 'vp'); result($('#vocabResult'), s, items.length, ok); if (ok) { if (count) complete('practice'); else doneFrom('practice', 'practice'); }; }, p.practice);
+        $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode, null, true); bindModes(items, 'vp', p.practiceMode);
+        const all = allIx(items);
+        stays('vocab', 'vp', 'vocabPractice', items, (count, only) => { checkTyped(items, 'vp', false, count, only); if (count) firsts('practice', 'vocab', p.practice, items, all, marked(items, 'vp', only), got); const C = chk('vocab'), s = all.filter(i => C.has(i) && got[i][0]).length, ok = doneNow('vocab', 'practice', items, 'vp', all); result($('#vocabResult'), s, items.length, ok); if (ok) { if (count) complete('practice'); else doneFrom('practice', 'practice'); }; }, p.practice, all);
       }
     }
   });
@@ -741,30 +821,32 @@ var LS2 = (function () {
     if (kept.some(v => v)) show();
   }
   R.mc = p => p.book ? bookPanel(p) : ({
-    html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
+    html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + allLabel() + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
-      bindAudio(p); bindCycle(p); bindDict(p);
-      const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length;
+      bindAudio(p); bindCycle(p); bindDict(p); oneCss();
+      const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length, all = allIx(items);
       f.innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="q-title">' + (i + 1) + '. ' + (q.guess ? '🔮 ' : '') + q.q + (q.qca && ca() ? ' <span class="q-ca">[' + q.qca + ']</span>' : '') + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
-        '</div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
-      stays(p.id, p.id, p.id + 'Form', items, count => {
+        '</div>' + oneBtn(p.id, i) + '<div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
+      stays(p.id, p.id, p.id + 'Form', items, (count, only) => {
         let score = 0; const g = [];
         items.forEach((q, i) => {
           const c = document.querySelector('input[name="' + p.id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + p.id + 'f' + i);
           g.push([ok, c ? +c.value : null]);
+          if (only && !only.includes(i)) return;
           if (q.guess) { fb.textContent = c ? guessSaved(p) : (ca() ? 'Tria una resposta.' : 'Choose an answer.'); fb.className = 'feedback ' + (c ? 'ok' : 'no'); return; }
           if (ok) score++;
           fb.textContent = q.ex && c ? (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex)
             : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
-        if (count) { firstTry(p.id, score, scored); firstItems(p.id, p.items, items, g); }
-        const ok = answered(items, p.id);
+        if (count) firsts(p.id, p.id, p.items, items, all, marked(items, p.id, only), g, i => !items[i].guess);
+        const C = chk(p.id); score = all.filter(i => !items[i].guess && C.has(i) && g[i][0]).length;
+        const ok = doneNow(p.id, p.id, items, p.id, all);
         result($('#' + p.id + 'Result'), score, scored, ok);
         if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); };
         guessBack(p); LP.panels.filter(x => x.prev === p.id).forEach(guessBack);
-      }, p.items);
+      }, p.items, all);
       guessBack(p);
     }
   });
@@ -921,19 +1003,20 @@ var LS2 = (function () {
   }
   R.typed = p => ({
     html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + boxNum(p, e) + tx(e) + '</div>').join('') + '</div>' : '') +
-      '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+      '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + allLabel() + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       if (p.parts) return partsBind(p);
       const items = forLevel(p.items);
-      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
-      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = answered(items, p.id); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items);
+      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode, p.parts, true); bindModes(items, p.id, p.mode, p.parts);
+      const all = allIx(items);
+      stays(p.id, p.id, p.id + 'List', items, (count, only) => { checkTyped(items, p.id, false, count, only); if (count) firsts(p.id, p.id, p.items, items, all, marked(items, p.id, only), got); const C = chk(p.id), s = all.filter(i => C.has(i) && got[i][0]).length, ok = doneNow(p.id, p.id, items, p.id, all); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items, all);
     }
   });
 
   // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
   function partsBind(p) {
     const A = arrange(forLevel(p.items), p.req), items = A.items, list = $('#' + p.id + 'List');
-    list.innerHTML = typedHtml(items, p.id, p.mode, p.parts); bindModes(items, p.id, p.mode, p.parts);
+    list.innerHTML = typedHtml(items, p.id, p.mode, p.parts, true); bindModes(items, p.id, p.mode, p.parts);
     const filled = i => { const t = $('#' + p.id + i); return !!(t && String(t.value).trim()); };
     const ready = () => { let b = $('#el-gready'); const panel = $('#' + p.id), show = !state.done[p.id] && A.need.every(filled) && panel && panel.offsetParent !== null;
       if (!show) { if (b) b.remove(); return; }
@@ -952,18 +1035,18 @@ var LS2 = (function () {
     };
     document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.tab')) setTimeout(ready, 150); });
     list.addEventListener('input', counts);
-    stays(p.id, p.id, p.id + 'List', items, count => {
-      checkTyped(items, p.id, false, count);
-      const s = A.need.filter(i => got[i] && got[i][0]).length, n = A.need.length;
-      if (count) { firstTry(p.id, s, n); firstItems(p.id, p.items, A.need.map(i => items[i]), A.need.map(i => got[i])); }
-      const left = A.need.filter(i => !filled(i)).length, ok = !left, el = $('#' + p.id + 'Result');
+    stays(p.id, p.id, p.id + 'List', items, (count, only) => {
+      checkTyped(items, p.id, false, count, only);
+      const C = chk(p.id), s = A.need.filter(i => C.has(i) && got[i] && got[i][0]).length, n = A.need.length;
+      if (count) firsts(p.id, p.id, p.items, items, A.need, marked(items, p.id, only), got);
+      const left = A.need.filter(i => !(C.has(i) && filled(i))).length, ok = !left || doneNow(p.id, p.id, items, p.id, A.need), el = $('#' + p.id + 'Result');
       el.innerHTML = '<b>' + s + ' / ' + n + '</b> ' + (ca() ? 'correctes (preguntes obligatòries)' : 'correct (compulsory questions)') + ' · ' + (ok
         ? (ca() ? '✅ Ja has fet les preguntes obligatòries de tots els blocs: aquesta activitat està feta i entregada. La ➕ pràctica extra és opcional i no compta.' : '✅ You’ve done the compulsory questions of every block: this activity is done and handed in. The ➕ extra practice is optional and doesn’t count.')
-        : (ca() ? 'Et falten ' + left + ' preguntes obligatòries (mira el comptador de cada bloc).' : left + ' compulsory question' + (left > 1 ? 's' : '') + ' left (see the counter in each block).'));
+        : (ca() ? 'Et falten ' + left + ' preguntes obligatòries per respondre i comprovar (mira el comptador de cada bloc).' : left + ' compulsory question' + (left > 1 ? 's' : '') + ' left to answer and check (see the counter in each block).'));
       el.classList.add('show');
       if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }
       counts();
-    }, p.items);
+    }, p.items, A.need);
     counts();
   }
 
