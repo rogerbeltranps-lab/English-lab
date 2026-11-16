@@ -460,17 +460,17 @@ window.ELNotebook = (function () {
     // ✨ the last page: a summary of the LS (Roger, 13 Nov 2026: "on the last page, there should be a summary of the grammar indicating the
     // pages, and vocabulary topics and expressions. And a final sentence bigger and bolded"): every grammar point and vocabulary topic with
     // the page it is on, the expressions (the words of more than one word), and "Do shadowing, I promise it works!"
-    const sg = [], sv = [], sx = [], sxSeen = new Set(), seenT = new Set();
+    const sg = [], sv = [], sx = [], se = [], sxSeen = new Set(), seenT = new Set();
     // one line per point (the same point in a part and in a game is listed once, at its first page)
-    const once = (list, html, to) => { const k = plainOf(html).replace(/\s+/g, ' ').trim().toLowerCase(); if (!k || seenT.has((list === sg ? 'g' : 'v') + k)) return; seenT.add((list === sg ? 'g' : 'v') + k); list.push([html, to]); };
+    const once = (list, html, to) => { const k = plainOf(html).replace(/\s+/g, ' ').trim().toLowerCase(); const p = list === sg ? 'g' : list === se ? 'e' : 'v'; if (!k || seenT.has(p + k)) return; seenT.add(p + k); list.push([html, to]); };
     const multi = list.length > 1;
     list.forEach(({ ex, games, ci }) => { const L = CH[ci] ? CH[ci].LS : H.LS, lsN = multi ? esc(window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === L) || {}) : '') + ' · ' : '';
       const li = (l, to) => liTo(l, to, ci);
     ex.lps.forEach(lp => {
-      const tag = ` <small class="nb-sumlp">${lsN}LP${esc(lp.n)}</small>`, from = sg.length, fromV = sv.length;
+      const tag = ` <small class="nb-sumlp">${lsN}LP${esc(lp.n)}</small>`, from = sg.length, fromV = sv.length, fromE = se.length;
       (lp.parts || []).forEach(pt => {
         const pid = 'lp' + lp.n + '-p-' + fk(pt.id);
-        pt.grammar.forEach((g, gi) => once(sg, g.title, 'g:' + pid + '~' + gi));
+        pt.grammar.forEach((g, gi) => once(g.ex ? se : sg, g.title, 'g:' + pid + '~' + gi));   // 💬 a Vocabulary step's Expressions boxes go with the expressions
         pt.terms.forEach((g, gi) => {
           if (!(g.items || []).length) return;
           once(sv, g.g || esc(pt.title && pt.title !== pt.name ? pt.title : pt.name), pt.terms.length > 1 || g.g ? 'g:' + pid + '~v' + gi : 'b:' + pid);
@@ -485,14 +485,15 @@ window.ELNotebook = (function () {
       });
       for (let i = from; i < sg.length; i++) sg[i] = li(sg[i][0] + tag, sg[i][1]);
       for (let i = fromV; i < sv.length; i++) sv[i] = li(sv[i][0] + tag, sv[i][1]);
+      for (let i = fromE; i < se.length; i++) se[i] = li(se[i][0] + tag, se[i][1]);
     });
     });
     const sumUl = (ic, ca, en, items) => items.length ? `<div class="nb-h2">${ic} <span class="u">${t(ca, en)}</span></div><ul class="nb-idx nb-sum">${items.map(x => `<li>${x}</li>`).join('')}</ul>` : '';
     return { key: 'sum', fixed: true, tab: '✨ ' + t('Resum de gram. i vocab.', 'Gram & Vocab summary'), l: '✨ ' + t('Resum de gramàtica i vocabulari', 'Grammar & Vocabulary summary'), blocks: [],
       head: `<p class="nb-h1"><u>✨ ${t('Resum de gramàtica i vocabulari', 'Grammar & Vocabulary summary')}</u> ${multi ? '' : `<small class="nb-chap">· ${esc(chapName((window.EL_LS || []).find(l => l.id === H.LS) || {}))}</small>`}</p>`
         + sumUl('🧩', 'Gramàtica', 'Grammar', sg) + sumUl('📚', 'Vocabulari: temes', 'Vocabulary topics', sv)
-        + (sx.length ? `<div class="nb-h2">💬 <span class="u">${t('Expressions', 'Expressions')}</span></div><ul class="nb-voc">${sx.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>` : '')
-        + (!sg.length && !sv.length && !sx.length ? `<p class="nb-pencil">${t('Quan feu gramàtica i vocabulari a classe, el resum apareixerà aquí.', 'When you do grammar and vocabulary in class, the summary will appear here.')}</p>` : '')
+        + (sx.length || se.length ? `<div class="nb-h2">💬 <span class="u">${t('Expressions', 'Expressions')}</span></div>${se.length ? `<ul class="nb-idx nb-sum">${se.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}<ul class="nb-voc">${sx.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>` : '')
+        + (!sg.length && !sv.length && !sx.length && !se.length ? `<p class="nb-pencil">${t('Quan feu gramàtica i vocabulari a classe, el resum apareixerà aquí.', 'When you do grammar and vocabulary in class, the summary will appear here.')}</p>` : '')
         + `<p class="nb-final">${t('Fes shadowing, t\'ho prometo: funciona!', 'Do shadowing, I promise it works!')}</p>` };
   }
   // mode: 'one' = the notebook of one LS (cover, index, sections, summary); 'cover' = only the cover of the notebook of every LS;
@@ -540,7 +541,7 @@ window.ELNotebook = (function () {
         if (pt.title && pt.title !== pt.name) h += `<div class="nb-h3">${esc(pt.title)}</div>`;
         const pid = key + '-p-' + fk(pt.id);
         pt.terms.forEach((g, gi) => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3" data-gs="${pid}~v${gi}">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
-        pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
+        pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.ex ? '💬 Expressions · ' : ''}${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
         else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '', pt.opt);
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;

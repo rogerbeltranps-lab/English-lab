@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Vocabulary · Now or usually? Time words and sport",
   slides:[
-    {theory:"Now or usually? Time words",point:"Time words: now or usually?",tab:"vocab",pointCa:"Paraules de temps: ara o normalment?",img:"⏱️",lines:[
+    {theory:"Now or usually? Time words",ex:true,point:"Time words: now or usually?",tab:"vocab",pointCa:"Paraules de temps: ara o normalment?",img:"⏱️",lines:[
       "**Now:** now · **right now** (ara mateix) · **at the moment** · today · **this weekend** · Look! · Listen!",
       "**Usually:** usually · always · never · **every weekend** · **on Saturday mornings** · **in winter** / in summer",
       "**How often?** once a week · **twice** a week (two times) · every day · **as usual** (like always)"]},

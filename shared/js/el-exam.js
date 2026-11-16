@@ -5,7 +5,8 @@
 //  - the tabs (SLPs) ticked on the Time plan or on a class day already past: ls/{id}.done[group] = {"activity#panel": day}, the same map the
 //    board's "What we've done" reads (the dashboard copies it, doneSync); a class game the group played counts too (ls/{id}.played);
 //  - 🔑 key terms: the words of every done tab that has a word list (p.groups, at the student's route, as the tab's Explore shows them);
-//  - 🧩 grammar: the "How it works" boxes of every done tab that has them (p.explain, at the student's route);
+//  - 🧩 grammar: the "How it works" boxes of every done tab that has them (p.explain, at the student's route); a Vocabulary step's
+//    boxes are 💬 Expressions (ex: true), shown apart from the grammar;
 //  - 🎮 the class games of that learning path with their theory, the student's notes, result and what to study (el-notes.js card).
 // Learning paths dropped for the group (✂ on the Time plan, p._dropped) are out and named as "not in your exam". Checkpoints, the sample exam,
 // the final product and Reflect are not learning paths here. Nothing that has not been done shows, so nothing locked shows.
@@ -71,7 +72,8 @@ window.ELExam = (function () {
       // path), so the notebook leaves the label out (Roger, 13 Nov 2026: "why does she have Core and plus mixed up?")
       const nolv = s => String(s || '').replace(/\s*\((?:Beginners|Insecure|Safe|Daring|Native|Starter|Base|Core|Plus|Pro)(?: words| route)?\)/g, '');
       const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: nolv(tx(g.g)), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
-      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [{ title: nolv(tx(p.title)), boxes: ex }] : []; };
+      // a Vocabulary step's boxes are 💬 Expressions, not grammar (Roger, 16 Nov 2026): ex = true
+      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [Object.assign({ title: nolv(tx(p.title)), boxes: ex }, p.type === 'vocab' ? { ex: true } : {})] : []; };
       mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
       // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
       // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)

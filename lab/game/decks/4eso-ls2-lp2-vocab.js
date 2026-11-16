@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Celebrations around the world",
   slides:[
-    {theory:"Traditions: what people do",point:"Tradition verbs (gather, exchange gifts…)",tab:"vocab",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
+    {theory:"Traditions: what people do",ex:true,point:"Tradition verbs (gather, exchange gifts…)",tab:"vocab",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
       "**get together** / **gather** (meet as a group) · **share a meal** · **exchange gifts** · **make a wish**",
       "**take part in** (participate) · **look forward to** (feel excited about something that is coming)",
       "**pass down** (give to the next generation) · **mark an occasion** (show that a day is special)"]},
