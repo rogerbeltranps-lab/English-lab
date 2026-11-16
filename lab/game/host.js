@@ -25,7 +25,11 @@
 // tick, grouped by LS and learning path; the points whose tab the group has done (ls/{id}.done, the Time plan) are ticked by themselves.
 // This game's ticked points bring all their questions; each ticked point of another game brings 1, 2 or 3 🔁 review questions (its deck and
 // decks/more questions, a new choice every game), spread among this game's. An unticked point has no questions. Code Breakers gets the same
-// choice (&tp=, every question of the ticked points). Results stay this game's; a review question keeps its own game and point (d, dp).
+// choice (&tp=, the same questions). Results stay this game's; a review question keeps its own game and point (d, dp).
+// 📚 Vocabulary games too, and ONE grammar game and ONE vocabulary game per LS (Roger, 16 Nov 2026: "And the same with the vocab, so now we
+// only have one game of grammar and one game of vocab per LS"): the board's list has 🧩 Grammar · LSn and 📚 Vocabulary · LSn (?ls=<ls id>&kind=);
+// after the group, the points of every learning path of the LS (and earlier LSs) are ticked by the Time plan, and the game is saved as the
+// newest learning path's game with ticked points (all its ticked questions); the other ticked points bring their 🔁 questions.
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -73,7 +77,10 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // H: the game on this board. deckId, deck (the deck file's content), g (group), sid (this game: the time it started), i (slide; -1 lobby),
 // phase, keys {slide: right option, in the shown order}, aw {slide: [emails that got the point]}. names {email: "First S."} (student list),
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
-const H={user:null,teacher:false,deckId:URLP.get("deck")||"",deck:null,deck0:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:"",tg:"",tp:null,tsel:null};
+// the LS game (🧩 Grammar · LSn / 📚 Vocabulary · LSn): {ls: EL_LS id, kind}; H.deckId is then its newest learning path's game
+const lsGames=(ls,kind)=>(window.EL_GAMES||[]).filter(d=>(d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar"))===kind&&lsOf(d)===ls).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));
+const LSG0=(()=>{const ls=URLP.get("ls"),k=URLP.get("kind");return ls&&/^(grammar|vocab)$/.test(k||"")&&lsGames(ls,k).length?{ls,kind:k}:null})();
+const H={user:null,teacher:false,lsg:LSG0,deckId:URLP.get("deck")||(LSG0?lsGames(LSG0.ls,LSG0.kind).slice(-1)[0].id:""),deck:null,deck0:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:"",tg:"",tp:null,tsel:null};
 const saved=tab.get();
 if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp,tp:saved.tp||null,rvn:saved.rvn});
 const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp,tp:H.tp,rvn:H.rvn}:null);
@@ -96,6 +103,9 @@ const noteWhat=(kind,id)=>{kind=kind||(/-vocab$/.test(id||"")?"vocab":/-grammar$
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
 // the game's name starts with its learning path: "LP2 · Vocabulary · Clothes, kit and weather" (decks/index.js elGameName, Roger 7 Nov 2026)
 const gName=()=>meta().lp?elGameName(H.deckId):H.deck.title;
+// the LS game's name on the board's screens before it starts: "🧩 Grammar · LS2 · Seasons & Celebrations"
+const lsgName=()=>{const d=meta();return (H.lsg.kind==="vocab"?"📚 Vocabulary":"🧩 Grammar")+" · "+(d.ls||"")};
+const boardName=()=>H.lsg?lsgName():gName();
 // the LS of the game (decks/index.js ls "LS2 · Free Time, Live!" → EL_LS id "2eso-free-time-live"), where the notes are shown
 const lsId=()=>{const m=meta(),c=m.course||(H.deck&&H.deck.course)||"",nm=String(m.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
   const l=(window.EL_LS||[]).find(x=>x.course===c&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
@@ -152,10 +162,11 @@ async function rawDeck(id){if(id in RAW)return RAW[id];if(!/^[\w-]+$/.test(id))r
   window.ELGameDeck=d=>{got=d};await script(`decks/${id}.js`);window.ELGameMore=m=>{more=m};await script(`decks/more/${id}.js`);
   window.ELGameDeck=was;window.ELGameMore=wasM;return RAW[id]=got?pointsOf(got,more):null}
 const gm=id=>(window.EL_GAMES||[]).find(d=>d.id===id)||{};
-const lsOf=d=>{const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
+function lsOf(d){const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""}
 const lpNum=d=>String(d.lp||"").split(" · ")[0];
-// the grammar games of this game's course, by LS and then learning path (decks/index.js)
-const gDecks=()=>{const c=meta().course;return (window.EL_GAMES||[]).filter(d=>d.course===c&&(d.kind==="grammar"||/-grammar$/.test(d.id)))
+// the games of this game's course and kind (grammar or vocabulary), by LS and then learning path (decks/index.js)
+const kindIs=d=>d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar");
+const gDecks=()=>{const c=meta().course,k=kindOf();return (window.EL_GAMES||[]).filter(d=>d.course===c&&kindIs(d)===k)
   .sort((a,b)=>(a.ls+" "+a.lp).localeCompare(b.ls+" "+b.lp,"en",{numeric:true}))};
 let tpBusy=false;
 async function loadPoints(){if(tpBusy)return;tpBusy=true;for(const d of gDecks())await rawDeck(d.id);tpBusy=false;draw()}
@@ -167,14 +178,20 @@ const doneOf=(d,g)=>((DN||{})[lsOf(d)]||{})[g]||{};
 function tpDefault(g){const out={};
   gDecks().forEach(d=>{const P=RAW[d.id];if(!P)return;const done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g];
     // earlier LSs start unticked (the list grows every LS): the teacher ticks the ones to review
-    let ks=d.ls!==meta().ls?[]:P.filter(p=>p.tab&&info?!!done[d.act+"#"+p.tab]:(d.id===H.deckId||!!pl)).map(p=>p.k);
-    if(d.id===H.deckId&&!ks.length)ks=P.map(p=>p.k);
+    let ks=d.ls!==meta().ls?[]:P.filter(p=>p.tab&&info?!!done[d.act+"#"+p.tab]:(d.id===H.deckId&&!H.lsg||!!pl)).map(p=>p.k);
+    if(d.id===H.deckId&&!H.lsg&&!ks.length)ks=P.map(p=>p.k);
     out[d.id]=new Set(ks)});
+  // an LS game with nothing done yet: its first learning path
+  if(H.lsg&&!gDecks().some(d=>d.ls===meta().ls&&out[d.id]&&out[d.id].size)){const f=gDecks().find(d=>d.ls===meta().ls);if(f&&RAW[f.id])out[f.id]=new Set(RAW[f.id].map(p=>p.k))}
   return out}
+// the game it is saved as: this game, or for an LS game the newest learning path of the LS with ticked points
+function anchor(sel){if(!H.lsg)return H.deckId;const ds=gDecks().filter(d=>d.ls===meta().ls&&sel&&sel[d.id]&&sel[d.id].size);return ds.length?ds[ds.length-1].id:H.deckId}
 // the choice as it is kept: null = this game exactly as it is (all its points, nothing else)
-function tpFrom(sel){const o={};Object.entries(sel||{}).forEach(([id,ks])=>{const a=[...ks].sort((x,y)=>x-y);if(a.length)o[id]=a});
-  const P=RAW[H.deckId]||[],mine=o[H.deckId]||[];if(Object.keys(o).length===(mine.length?1:0)&&mine.length===P.length)return null;return o}
-const rvN=v=>{try{if(v!=null)localStorage.setItem("el_game_rvn",String(v));const n=+localStorage.getItem("el_game_rvn");return n>=1&&n<=3?n:1}catch(e){return v>=1&&v<=3?v:1}};
+function tpFrom(sel,a){a=a||H.deckId;const o={};Object.entries(sel||{}).forEach(([id,ks])=>{const x=[...ks].sort((p,q)=>p-q);if(x.length)o[id]=x});
+  const P=RAW[a]||[],mine=o[a]||[];if(Object.keys(o).length===(mine.length?1:0)&&mine.length===P.length)return null;return o}
+// questions per earlier point: 1, 2, 3 or 99 (all of them)
+const rvOk=n=>n>=1&&n<=3||n===99;
+const rvN=v=>{try{if(v!=null)localStorage.setItem("el_game_rvn",String(v));const n=+localStorage.getItem("el_game_rvn");return rvOk(n)?n:1}catch(e){return rvOk(v)?v:1}};
 // the questions of the game for the chosen points: this game's points in the deck's order, the 🔁 review questions spread among them
 async function build(){
   if(!H.deck0)return;if(!H.tp){H.deck=H.deck0;return}
@@ -190,9 +207,9 @@ async function build(){
 }
 // how many questions the choice gives (the 🧩 screen): this game's, and review
 // (Code Breakers: this game's decks/more questions too, and the same number of review questions per point)
-function tpCount(sel,cb){const P=RAW[H.deckId]||[],mine=sel[H.deckId]||new Set(),n=H.rvn||rvN();
+function tpCount(sel,cb){const a=anchor(sel),P=RAW[a]||[],mine=sel[a]||new Set(),n=H.rvn||rvN();
   const own=P.filter(p=>mine.has(p.k)).reduce((t,p)=>t+p.qs.length+(cb?p.more.length:0),0);let rv=0;
-  Object.entries(sel).forEach(([id,ks])=>{const Q=RAW[id];if(!Q||id===H.deckId)return;Q.filter(p=>ks.has(p.k)).forEach(p=>{rv+=Math.min(n,p.qs.length+p.more.length)})});
+  Object.entries(sel).forEach(([id,ks])=>{const Q=RAW[id];if(!Q||id===a)return;Q.filter(p=>ks.has(p.k)).forEach(p=>{rv+=Math.min(n,p.qs.length+p.more.length)})});
   return {own,rv}}
 // for Code Breakers (codebreakers.html &tp=): "deck.1.2,deck2.3"
 const tpParam=tp=>Object.entries(tp).map(([id,ks])=>id+"."+ks.join(".")).join(",");
@@ -299,8 +316,7 @@ async function loadPlayed(){
   PL=out;DN=dn;plBusy=false;draw();
 }
 const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
-const plLine=d=>{if(!PL)return "";const gs=(window.EL_GROUPS||[]).filter(g=>g.course===d.course),p=PL[d.id]||{};
-  return `<br><small class="pl">${gs.map(g=>p[g.id]?`<span class="pl-y">✓ ${esc(g.name)}</span>`:`<span class="pl-n">✗ ${esc(g.name)}</span>`).join(" ")}</small>`};
+
 function markPlayed(){
   const id=lsId();if(!id||!H.g||!H.sid||playedSid===H.sid||!H.deck||H.deck.notes===false)return;playedSid=H.sid;
   if(PL&&!(PL[H.deckId]||{})[H.g])(PL[H.deckId]=PL[H.deckId]||{})[H.g]=H.sid;
@@ -440,28 +456,32 @@ function draw(){
   if(!H.deck){
     // Games by course (2 ESO, 4 ESO), then by LS, then by learning path (Roger, 30 Oct 2026: "organised by course and LS").
     const list=window.EL_GAMES||[],by=(a,k)=>[...new Set(a.map(d=>d[k]||""))].sort((x,y)=>x.localeCompare(y,"en",{numeric:true}));
-    // 🕵️ Code Breakers (Roger, 11 Nov 2026): after the two games of each learning path (LP1–LP3 only for now, Roger 12 Nov 2026), the same path as a hacking game (codebreakers.html)
-    const cbCard=d=>`<a class="btn deckbtn cbbtn slidein" href="codebreakers.html?deck=${encodeURIComponent(d.id)}${BACK?"&from="+encodeURIComponent(BACK):""}"><span class="e">🕵️</span><span>${esc(String(d.lp).split(" · ")[0])} · Code Breakers<br><small style="opacity:.75">vocabulary + grammar, each at their own pace</small></span></a>`;
-    const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}${plLine(d)}</span></button>`;loadPlayed();
+    // ONE 🧩 grammar game and ONE 📚 vocabulary game per LS (Roger, 16 Nov 2026: "so now we only have one game of grammar and one game of vocab
+    // per LS"): each opens the LS's points to tick (drawPoints). Under it, which learning paths each group has played. The learning path
+    // games still open from their learning path page and the Time plan; Code Breakers with both games of a path is on codebreakers.html.
+    const lsCard=(c,l,kind)=>{const ds=list.filter(d=>d.course===c&&(d.ls||"")===l&&kindIs(d)===kind).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));if(!ds.length)return "";
+      const id=lsOf(ds[0]),gs=(window.EL_GROUPS||[]).filter(g=>g.course===c);
+      const pl=PL?`<br><small class="pl">${gs.map(g=>{const n=ds.filter(d=>(PL[d.id]||{})[g.id]).map(d=>lpNum(d));return n.length?`<span class="pl-y">✓ ${esc(g.name)}: ${esc(n.join(" "))}</span>`:`<span class="pl-n">✗ ${esc(g.name)}</span>`}).join(" ")}</small>`:"";
+      return `<button class="btn deckbtn slidein" data-do="lsgame" data-ls="${esc(id)}" data-kind="${kind}"><span class="e">${kind==="vocab"?"📚":"🧩"}</span><span>${kind==="vocab"?"Vocabulary":"Grammar"} · ${esc(String(l).split(" · ")[0])}<br><small style="opacity:.7">${ds.map(d=>esc(lpNum(d))).join(" · ")}: tick the points you've done</small>${pl}</span></button>`};loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
-      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&/-lp[1-3]-/.test(d.id)&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then play it as a 🎮 Quiz or as 🕵️ Code Breakers. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${lsCard(c,l,"grammar")}${lsCard(c,l,"vocab")}</div>`).join("")}</section>`}).join("");
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then play it as a 🎮 Quiz or as 🕵️ Code Breakers. All games are at Safe level. Each LS has one 🧩 grammar game and one 📚 vocabulary game: you tick the points you've done.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.tg&&!H.g){drawPoints();return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     const cb=fmt()==="cb",lpN=String(meta().lp||"").split(" · ")[0];
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1>${H.note?`<p class="card msg pop" style="margin:.4em auto 1em">${esc(H.note)}</p>`:""}
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(boardName())}</h1>${H.note?`<p class="card msg pop" style="margin:.4em auto 1em">${esc(H.note)}</p>`:""}
       <div class="fmt" role="radiogroup" aria-label="How to play it"><span>How do you want to play it?</span><button class="btn${cb?" ghost":" go on"}" role="radio" aria-checked="${!cb}" data-do="fmt" data-f="quiz">🎮 Quiz</button><button class="btn cbbtn${cb?" on":" off"}" role="radio" aria-checked="${cb}" data-do="fmt" data-f="cb">🕵️ Code Breakers</button></div>
-      <p class="sub">${cb?`Questions only, no theory. <b>Each student at their own pace</b> on their Chromebook: a right answer opens a file (💾 bits, 🛡️ firewall, 💻 hack…). Only the % right counts for their marks.`:`${qList().length} questions, no theory. <b>Everyone answers the same question</b>, on the board. Every right answer is +1 point.`}<br>Start it for a group: its students are taken into it.</p>
+      <p class="sub">${cb?`Questions only, no theory. <b>Each student at their own pace</b> on their Chromebook: a right answer opens a file (💾 bits, 🛡️ firewall, 💻 hack…). Only the % right counts for their marks.`:`${H.lsg?"Questions on the points you tick":qList().length+" questions"}, no theory. <b>Everyone answers the same question</b>, on the board. Every right answer is +1 point.`}<br>Start it for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn deckbtn${cb?" cbbtn":" go"}" data-do="group" data-g="${g.id}">${cb?"🕵️":"▶"} ${esc(g.name)}${PL&&!cb?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
-      ${cb&&lpN&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn ghost" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ ${esc(lpN)} with both games in one round <small style="opacity:.75;margin-left:.3em">(vocabulary + grammar)</small></a></p>`:""}
+      ${cb&&lpN&&!H.lsg&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn ghost" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ ${esc(lpN)} with both games in one round <small style="opacity:.75;margin-left:.3em">(vocabulary + grammar)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
     loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
     const rpLine=pb?`<p class="rp pop">🔁 Played on ${esc(plDay(pb))}.</p>`:"";
-    const tpLine=H.tp?`<p class="rp pop">🧩 ${qList().length} questions on ${Object.values(H.tp).reduce((t,a)=>t+a.length,0)} grammar points${Object.keys(H.tp).some(id=>id!==H.deckId)?`, with 🔁 review of earlier learning paths`:""}.</p>`:"";
+    const tpLine=H.tp?`<p class="rp pop">${kindOf()==="vocab"?"📚":"🧩"} ${qList().length} questions on ${Object.values(H.tp).reduce((t,a)=>t+a.length,0)} ${kindOf()==="vocab"?"vocabulary":"grammar"} points${Object.keys(H.tp).some(id=>id!==H.deckId)?`, with 🔁 review of earlier learning paths`:""}.</p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
@@ -521,22 +541,22 @@ function draw(){
 
 // 🧩 Which grammar? for the group H.tg: every grammar point of the course's grammar games, by LS and learning path, ticked by the Time plan
 function drawPoints(){
-  const g=H.tg,cb=fmt()==="cb",head=`<h1 class="logo pop">${esc(gName())}</h1>`;
+  const g=H.tg,cb=fmt()==="cb",head=`<h1 class="logo pop">${esc(boardName())}</h1>`,what=kindOf()==="vocab"?"vocabulary":"grammar";
   if(!PL||!pointsReady()){loadPlayed();loadPoints();app$.innerHTML=`<div class="center"><div>${head}<p class="sub">Loading the grammar points…</p></div></div>`;return}
   if(!H.tsel)H.tsel=tpDefault(g);
   const sel=H.tsel,day=v=>{const t=/^\d{4}-\d\d-\d\d$/.test(String(v))?new Date(v+"T12:00:00"):new Date(+v||v);return isNaN(t)?"":t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
   const lsList=[...new Set(gDecks().map(d=>d.ls||""))];
-  const lp=d=>{const P=RAW[d.id]||[],me=d.id===H.deckId,done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set();
+  const A=anchor(sel),lp=d=>{const P=RAW[d.id]||[],me=d.id===A,done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set();
     const why=p=>{if(p.tab&&info){const v=done[d.act+"#"+p.tab];return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
       return pl?`<span class="tpy">✓ game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">game not played yet</span>`};
-    return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">This game</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
+    return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">${H.lsg?"All its questions":"This game"}</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
       ${P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}><span class="tpt">${esc(p.name)}</span><small>${why(p)}</small></label>`).join("")}</div>`};
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
-    <p class="sub">🧩 <b>Which grammar for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions. Tick earlier points to review them.</p>
+    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions.${H.lsg?` The newest learning path ticked gets all its questions; each earlier point gets 🔁 review questions.`:` Tick earlier points to review them.`}</p>
     <div class="tpcols">${lsList.map(l=>`<section class="course tpls">${l?`<h3>${esc(l)}</h3>`:""}${gDecks().filter(d=>(d.ls||"")===l).map(lp).join("")}</section>`).join("")}</div>
-    <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k} question${k>1?"s":""}</button>`).join("")}
-      <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from this game + ${c.rv} review)`:""}${cb?" · 🕵️ each at their own pace":""}`}</b>
+    <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
+      <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · 🕵️ each at their own pace":""}`}</b>
       <button class="btn ${cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?"🕵️":"▶"} Start for ${esc(groupName(g))}</button></div>
     <p>${backBtn()}<button class="btn ghost" data-do="tpback">← Groups</button></p></div></div>`;
 }
@@ -547,16 +567,20 @@ app$.addEventListener("click",async e=>{
   const b=e.target.closest("[data-do]");if(!b)return;const d=b.dataset.do;
   if(d==="signin"){try{const p=new A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await A.signInWithPopup(auth,p)}catch(x){console.warn("sign in",x)}}
   if(d==="signout")A.signOut(auth);
-  if(d==="deck"){H.tp=null;H.tg="";H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
-  if(d==="decks"){H.deck=H.deck0=null;H.deckId="";H.tp=null;H.tg="";history.replaceState(null,"",location.pathname);draw()}
-  if(d==="group"&&kindOf()==="grammar"){H.tg=b.dataset.g;H.tsel=null;H.err="";loadPlayed();loadPoints();draw();window.scrollTo(0,0);return}
+  if(d==="lsgame"){const L=lsGames(b.dataset.ls,b.dataset.kind);if(!L.length)return;H.lsg={ls:b.dataset.ls,kind:b.dataset.kind};H.tp=null;H.tg="";H.deckId=L[L.length-1].id;
+    history.replaceState(null,"","?ls="+encodeURIComponent(H.lsg.ls)+"&kind="+H.lsg.kind);if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw();return}
+  if(d==="deck"){H.lsg=null;H.tp=null;H.tg="";H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
+  if(d==="decks"){H.deck=H.deck0=null;H.deckId="";H.tp=null;H.tg="";H.lsg=null;history.replaceState(null,"",location.pathname);draw()}
+  if(d==="group"&&/^(grammar|vocab)$/.test(kindOf())){H.tg=b.dataset.g;H.tsel=null;H.err="";loadPlayed();loadPoints();draw();window.scrollTo(0,0);return}
   if(d==="group"){if(fmt()==="cb"){keep();location.href="codebreakers.html?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(b.dataset.g)+"&go=1"+(BACK?"&from="+encodeURIComponent(BACK):"");return}startGame(b.dataset.g)}
   if(d==="fmt"){fmt(b.dataset.f);draw()}
   if(d==="tpk"){const s=H.tsel&&H.tsel[b.dataset.id];if(s){const k=+b.dataset.k;if(b.checked)s.add(k);else s.delete(k);draw()}}
   if(d==="tpall"||d==="tpnone"){const P=RAW[b.dataset.id];if(P&&H.tsel){H.tsel[b.dataset.id]=new Set(d==="tpall"?P.map(p=>p.k):[]);draw()}}
   if(d==="tpn"){rvN(+b.dataset.n);draw()}
   if(d==="tpback"){H.tg="";H.tsel=null;draw()}
-  if(d==="tpgo"&&H.tsel){const g=H.tg,tp=tpFrom(H.tsel);if(tp&&!Object.keys(tp).length)return;
+  if(d==="tpgo"&&H.tsel){const g=H.tg,a=anchor(H.tsel),tp=tpFrom(H.tsel,a);if(tp&&!Object.keys(tp).length)return;
+    if(a!==H.deckId){H.deckId=a;if(!await loadDeck(a)){H.err="Could not load the game.";draw();return}}
+    if(H.lsg)history.replaceState(null,"","?deck="+encodeURIComponent(a)+"&ls="+encodeURIComponent(H.lsg.ls)+"&kind="+H.lsg.kind);
     if(fmt()==="cb"){keep();location.href="codebreakers.html?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(g)+"&go=1"+(tp?"&tp="+encodeURIComponent(tpParam(tp))+"&rn="+rvN()+"&rs="+(Date.now()%1e6):"")+(BACK?"&from="+encodeURIComponent(BACK):"");return}
     H.tp=tp;H.tsel=null;startGame(g)}
   if(d==="next")go("next");
