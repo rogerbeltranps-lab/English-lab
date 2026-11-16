@@ -37,5 +37,21 @@ ELGameDeck({
     {q:"\"All Americans eat turkey every day\" is a ___. (st...)",img:"🙅",write:["stereotype"],why:"A **stereotype** = a fixed, simple idea about a group."},
     {q:"We often take our traditions ___ granted until we live abroad.",img:"🌍",options:["for","as","to","with"],why:"**take something for granted** = not value it."},
     {q:"An ___ event: everybody is welcome. (in...)",img:"🤝",write:["inclusive"],why:"**inclusive** = everyone can take part."},
+    {q:"Halloween has ___ a lot: it started with turnips and now it's pumpkins and parties.",img:"🎃",options:["evolved","died out","taken","granted"],why:"**evolve** = change slowly over time."},
+    {q:"When families moved to a new country, they ___ their traditions to the new place. (ad...)",img:"🧳",write:["adapted"],why:"**adapt** = change something so it works in a new situation."},
+    {theory:"Where traditions come from",point:"Where traditions come from (harvest, feast, bonfire…)",tab:"vocab",pointCa:"D'on venen les tradicions (harvest, feast, bonfire…)",img:"🔥",lines:[
+      "the **harvest** (collecting the crops) · a **feast** (a big special meal) · a **bonfire** (a big fire outside)",
+      "**carve** a **turnip** / a **pumpkin** · wear a **mask** · **roasted chestnuts** · the **spirits** of the dead",
+      "**settlers** (people who go to live in a new land) · **grateful** (thankful) · an **ancient** festival · a **national holiday**"]},
+    {q:"In autumn farmers collect the crops: it's the ___.",img:"🌾",options:["harvest","feast","bonfire","turkey"],why:"The **harvest** = collecting the crops."},
+    {q:"The Pilgrims had a big ___ with turkey, corn and vegetables. (f...)",img:"🍗",write:["feast"],why:"A **feast** = a big special meal."},
+    {q:"On Sant Joan people light a big ___ on the beach.",img:"🔥",options:["bonfire","lantern","candle","firework"],why:"A **bonfire** = a big fire outside."},
+    {q:"Before pumpkins, Irish children used to carve a ___. (t...)",img:"🥔",write:["turnip"],why:"A **turnip** (nap) was the first Jack-o'-lantern."},
+    {q:"We use a knife to ___ a face into the pumpkin.",img:"🔪",options:["carve","bake","peel","paint"],why:"**carve** = cut a shape with a knife."},
+    {q:"At the Castanyada we eat panellets and roasted ___. (ch...)",img:"🌰",write:["chestnuts"],why:"**roasted chestnuts** (castanyes torrades)."},
+    {q:"People wore ___ so the spirits couldn't recognise them.",img:"🎭",options:["masks","turnips","bonfires","feasts"],why:"A **mask** covers your face."},
+    {q:"Thanksgiving is a day to say thank you: people feel ___ for what they have. (gr...)",img:"🙏",write:["grateful"],why:"**grateful** = thankful."},
+    {q:"Samhain is more than 2,000 years old: it's an ___ festival.",img:"🏺",options:["ancient","national","inclusive","crowded"],why:"**ancient** = very, very old."},
+    {q:"In 1863 Thanksgiving became a national ___: no school and no work. (h...)",img:"🇺🇸",write:["holiday"],why:"A **national holiday** = a day off for the whole country."},
   ]
 });
