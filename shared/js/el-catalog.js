@@ -112,7 +112,7 @@ window.EL_CATALOG=(function(){
         L("book.html","Book: Lantern Night",["4.1"],"ls2Book4ESO",6,{agendaDue:true}),
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",10,{steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
-        L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
+        L("where-traditions-come-from.html","Where traditions come from",["2.2","4.1","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint24ESO",1,C),
         L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",10,{steps:[["card","Research card"],["talk","Talk"]]}),
         L("plan-the-day.html","Plan the day",["2.2","5.1","3.2","CC1 1.3"],"ls2Plan4ESO",11,{steps:[["talk","Talk"]]}),
@@ -604,7 +604,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
     "4eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"vocabEx","read","log","listen","grammar","mixed","write","speak"],   // 💬 Expressions (Roger, 16 Nov 2026)
-    "4eso/ls2-where-traditions-come-from":[...LP,"grammarPrep","listen","chart","shadow","grammar","grammarRel","grammarComp","grammarFeel","mixed","write","speak","talk"],   // Grammar in four steps (Roger, 14 Nov 2026)
+    "4eso/ls2-where-traditions-come-from":[...LP,"grammarPrep","listen","read","chart","shadow","grammar","grammarRel","grammarComp","grammarFeel","mixed","write","speak","talk"],   // Grammar in four steps (Roger, 14 Nov 2026)
     "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
     "4eso/ls2-plan-the-day":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
     "4eso/ls2-write-to-the-head-teacher":[...LP,"read","register","again","shadow","grammar","write","speak","talk"],
@@ -621,7 +621,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
     "4eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "4eso/ls2-celebrations-around-the-world":{vocabEx:LW,read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
-    "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammarPrep:LW,grammar:LW,grammarRel:LW,grammarComp:LW,grammarFeel:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
+    "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],read:["4.1"],chart:["2.2"],practice:LW,grammarPrep:LW,grammar:LW,grammarRel:LW,grammarComp:LW,grammarFeel:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
     "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
     "4eso/ls2-plan-the-day":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
     "4eso/ls2-write-to-the-head-teacher":{shadow:SH,cards:RS,read:["4.1"],register:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
