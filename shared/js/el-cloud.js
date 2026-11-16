@@ -936,7 +936,7 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
+    const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsKnown=true;fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
@@ -1399,10 +1399,26 @@ function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){cmTabs(null);ret
 // already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
 // after a tap), then Esc is locked (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen brings the
 // cover back and writes live/{group}/fsLeft/{email} = {name, at, pull: fs.at, n}: the dashboard and the teacher bar list who left. Moving
-// to another page of the site (a link, the pull-up, a reload: beforeunload/pagehide) needs a new tap but does not count as leaving. When it is switched off or
+// to another page of the site (a link, the pull-up, a reload: beforeunload/pagehide) does not count as leaving, and inside class.html
+// it needs no new tap either (🖥 below). When it is switched off or
 // the class ends, the page leaves full screen. Never on a recall checkpoint or the sample exam (they have their own full screen: leaving
 // it sends the checkpoint), nor in the teacher's student view; not on iPhones (no full screen for pages there).
-const FD=document,FE=FD.documentElement;
+let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListener("pagehide",()=>{fsBye=true});   // going to another page: not leaving
+// 🖥 Full screen that stays on from page to page (Roger, 16 Nov 2026: "whenever they change from one page of the website to another they
+// exit fullscreen"). A browser leaves full screen whenever the whole tab changes page, but not when a frame inside the tab does. So while
+// the class full screen is on, a student's page opens itself inside class.html (one frame the size of the window, EL_SHELL; no sign-in, no
+// reads), and from then on that frame is what moves from page to page: links, the pull-up, the game and back. The one tap puts class.html
+// in full screen, and it stays until the student holds Esc or the teacher turns it off. FW = the window whose full screen counts (class.html
+// in the frame). When the group's full screen ends, the page leaves the frame (one reload). Recall checkpoints and the sample exam leave it
+// too (their own full screen sends the checkpoint when it is left). Other tabs, PDFs opened in a new tab and a reload of class.html still need the tap.
+const inShell=(()=>{try{return window.parent!==window&&!!window.frameElement&&window.frameElement.id==="el-shell"&&window.parent.EL_SHELL===true}catch(e){return false}})();
+const FW=inShell?window.parent:window,SHELL=new URL("class.html",ROOT);
+let shellGo=false,fsKnown=false;   // fsKnown: the group's live doc has been read once on this page (gamePush)
+const ownFs=()=>{const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !!(h&&(h.checkpoint||/sample-exam$/.test(h.id)))};
+function shellLeave(){if(!inShell||shellGo)return;shellGo=true;fsBye=true;try{FW.location.replace(location.href)}catch(e){}}
+function shellEnter(){if(inShell||shellGo||window.top!==window||ownFs())return false;shellGo=true;fsBye=true;
+  const u=new URL(SHELL);u.searchParams.set("u",location.pathname+location.search+location.hash);location.replace(u.href);return true}
+const FD=FW.document,FE=FD.documentElement;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
 // FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs) or the group's class by the timetable (TT = live/{group}.tt),
 // elFsEff in el-catalog.js (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have class")
@@ -1414,15 +1430,17 @@ const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
 const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));   // FSG is refreshed every second
 function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
-let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListener("pagehide",()=>{fsBye=true});   // going to another page: not leaving
 async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
   try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
-function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
+function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.lock(["Escape"]).catch(()=>{})}catch(e){}},
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
-  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
+  if(shellGo)return;
+  if(inShell&&(ownFs()||authKnown&&!isStudent(user)||fsKnown&&!fsOnG())){shellLeave();return}   // 🖥 the full screen is over (or this page has its own)
+  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{const K=FW.navigator.keyboard;if(K&&K.unlock)K.unlock()}catch(e){}
     try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
   if(fsIs()){if(c)c.remove();fsWas=true;return}
+  if(!fsWas&&shellEnter())return;   // 🖥 into class.html first (a page load, no tap): the tap there keeps full screen from page to page
   const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!fsBye)fsLeft()},500)}   // after the cover is on (fsLeft's write can call fsCheck again); not when the page is being left
   const ca=lockCa(),again=left||(+fsSS(fsKey()+"_n")||0)>0;
   c=document.getElementById("el-fs");if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
@@ -1445,7 +1463,9 @@ const fsOk=()=>!fsWanted()||fsIs();let fsOkWas=null;
 function hereTick(){if(!fsOnG())return;const k=fsOk();if(k!==fsOkWas&&fsOkWas!==null&&document.visibilityState==="visible"){fsOkWas=k;hereBeat(false);return}fsOkWas=k;
   if(document.visibilityState==="visible"&&Date.now()-beatAt>=(window.EL_BEAT_MS||60e3))hereBeat(false)}
 document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document.visibilityState==="hidden"){if(!fsBye)hereBeat(true)}else hereBeat(false)});
-FD.addEventListener("fullscreenchange",()=>{fsCheck();hereTick()});FD.addEventListener("webkitfullscreenchange",()=>{fsCheck();hereTick()});
+const fsChanged=()=>{fsCheck();hereTick()},FSEV=["fullscreenchange","webkitfullscreenchange"];FSEV.forEach(t=>FD.addEventListener(t,fsChanged));
+// in class.html the listeners are on its document: taken off when this page goes (the frame's next page adds its own)
+if(inShell){addEventListener("pagehide",()=>FSEV.forEach(t=>FD.removeEventListener(t,fsChanged)));addEventListener("pageshow",e=>{if(e.persisted)FSEV.forEach(t=>FD.addEventListener(t,fsChanged))})}
 function goTo(g,first){
   cmCheer(g);   // 🌟 the first 4 minutes of class mode (gone when it stops)
   const was=LOCK;LOCK=lockOn(g)?g:null;

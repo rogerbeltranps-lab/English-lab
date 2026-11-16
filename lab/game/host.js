@@ -305,8 +305,10 @@ addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,sele
 function startGame(g,again){
   H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;decideRp();keep();G.music("lobby");startGroup();
 }
+// ■ End and Finish also send a group in class mode back to the class (cmBack, as 🎓 Back to class mode; Roger, 16 Nov 2026: "students
+// couldn't leave the game once finished"): ending the game is the teacher saying so. Out of class mode cmBack changes nothing.
 function endGame(){
-  const g=H.g;saveResults();liveOff(g);if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
+  const g=H.g;saveResults();if(g)S.setDoc(S.doc(db,"live",g),{on:false,cmBack:Date.now(),at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e));if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
   Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();draw();
 }
 
