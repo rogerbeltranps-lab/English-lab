@@ -31,7 +31,7 @@ addEventListener("pagehide",()=>{if(st)flush()});
 /* ---------- starting: the decks, my list, what I did before a reload ---------- */
 async function start(){
   sid=x().sid;st=null;scr="";L=null;seenHr=null;
-  const decks=(C().decks||[]).filter(id=>/^[\w-]+$/.test(id)),got=await CB.load(decks,(C().wd||[]).filter(id=>/^[\w-]+$/.test(id)));if(x().sid!==sid)return;
+  const decks=(C().decks||[]).filter(id=>/^[\w-]+$/.test(id)),got=await CB.load(decks,(C().wd||[]).filter(id=>/^[\w-]+$/.test(id)),{rv:Array.isArray(C().rv)?C().rv:[],tp:C().tp||null,n:C().rn||0,seed:C().rs||0});if(x().sid!==sid)return;
   got.byKey={};got.pool.forEach(q=>got.byKey[q.key]=q);L=got;
   const sv=ctx.saved()||{},c=sv.cb||{},seed=CB.hash(em()+":"+sid);
   st={seed,order:CB.order(L.pool,seed),a:Object.assign({},sv.a||{}),e:+c.e||0,n:+c.n||0,r:+c.r||0,i:+c.i||0,lp:+c.lp||0,pw:c.pw||"",ws:Array.isArray(c.ws)&&c.ws.length?c.ws:CB.pwFor(em(),L.words).map(w=>w.w),

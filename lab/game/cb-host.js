@@ -6,8 +6,10 @@
 // 🔒 One game per group (Roger, 16 Nov 2026: the board showed the quiz while the Chromebooks showed Code Breakers): live/{group} is the
 // game of the board that started last. Each board checks it when it picks a game up again after a reload and once per heartbeat (one read):
 // if a newer game took the group (the other board, another tab or computer), this board stops at once and never writes to it again.
+// 🧩 Which grammar? (Roger, 16 Nov 2026; host.js asks it before the group): &tp=deck.1.2,deck2.3 keeps only the questions of those grammar
+// points; the other games' points come in as 🔁 review (cb.rv, cb.tp to the players) and are saved with this game's grammar results (d, dp).
 //   live/{group} = {on, game:true, mode:"cb", deck, title, sid, at, phase: lobby | play | end, cp (at the end: the class's % right),
-//                   cb:{decks:[vocab id, grammar id] (or one game), wd:[the vocabulary game for the passwords of a grammar game alone], lp, end (ms), pl:{pid: {nm, av, e, s, ws, c, sh, n, r}}, hr:{pid_k: {f, t, ok, blk, n, at}}}}
+//                   cb:{decks:[vocab id, grammar id] (or one game), rv, tp, wd:[the vocabulary game for the passwords of a grammar game alone], lp, end (ms), pl:{pid: {nm, av, e, s, ws, c, sh, n, r}}, hr:{pid_k: {f, t, ok, blk, n, at}}}}
 // pl = the players (pid = ELCB.pid(email), never the email): name, animal, bits earned (e) and bits now (s), their 3 password words (ws) and
 // the clue of the one they chose (c, never the word), firewall until (sh), answered (n) and right (r). hr = every hack, judged here: the
 // board alone reads the passwords (in the players' answers docs). Published at most every 4 s (a hack at once): the Firestore reads stay low.
@@ -39,15 +41,20 @@ function lpGames(key,deck,only){const L=window.EL_GAMES||[];if(only){const o=L.f
   return L.filter(x=>x.course===d.course&&x.ls===d.ls&&x.lp===d.lp).sort((a,b)=>(a.kind==="vocab"?0:1)-(b.kind==="vocab"?0:1))}
 const lpKeyOf=d=>d.id.replace(/-(vocab|grammar)$/,"");
 
-const H={user:null,teacher:false,games:lpGames(URLP.get("lp"),URLP.get("deck"),URLP.get("game")),L:null,g:"",sid:0,phase:"pick",end:0,mins:8,hr:{},names:{},pts:{},players:{},
+// "deck.1.2,deck2.3" → {deck:[1,2], deck2:[3]}
+const tpOf=v=>{if(!v)return null;const o={};String(v).split(",").forEach(x=>{const [id,...ks]=x.split(".");if(/^[\w-]+$/.test(id||"")){const a=ks.map(Number).filter(k=>k>0);if(a.length)o[id]=a}});return Object.keys(o).length?o:null};
+const tpStr=o=>o?Object.entries(o).map(([id,ks])=>id+"."+ks.join(".")).join(","):"";
+const H={user:null,teacher:false,tp:tpOf(URLP.get("tp")),rn:+URLP.get("rn")||0,rs:+URLP.get("rs")||0,games:lpGames(URLP.get("lp"),URLP.get("deck"),URLP.get("game")),L:null,g:"",sid:0,phase:"pick",end:0,mins:8,hr:{},names:{},pts:{},players:{},
   feed:[],lx:{},err:"",term:elTerm(),av:{},rw:{},ups:[]};
 const saved=ss.get();
 const idsOf=gs=>gs.map(d=>d.id).join(",");
 const savedGames=s=>s.ids?s.ids.split(",").map(id=>(window.EL_GAMES||[]).find(x=>x.id===id)).filter(Boolean):lpGames(s.lp);
-if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.games.length||idsOf(H.games)===idsOf(savedGames(saved)))){H.games=savedGames(saved);Object.assign(H,{g:saved.g,sid:saved.sid,phase:saved.phase,end:saved.end,mins:saved.mins||8,hr:saved.hr||{}})}
-const keep=()=>ss.set(H.sid?{ids:idsOf(H.games),g:H.g,sid:H.sid,phase:H.phase,end:H.end,mins:H.mins,hr:H.hr}:null);
+if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.games.length||idsOf(H.games)===idsOf(savedGames(saved))&&(!URLP.get("tp")||URLP.get("tp")===(saved.tp||"")))){H.games=savedGames(saved);H.tp=tpOf(saved.tp);H.rn=+saved.rn||0;H.rs=+saved.rs||0;Object.assign(H,{g:saved.g,sid:saved.sid,phase:saved.phase,end:saved.end,mins:saved.mins||8,hr:saved.hr||{}})}
+const keep=()=>ss.set(H.sid?{ids:idsOf(H.games),tp:tpStr(H.tp),rn:H.rn,rs:H.rs,g:H.g,sid:H.sid,phase:H.phase,end:H.end,mins:H.mins,hr:H.hr}:null);
 // one game alone (?game=): its name; the vocabulary game of its learning path gives the passwords when it is a grammar game
 const one=()=>H.games.length===1;
+// the 🔁 review games: the grammar games of the ticked points that are not this round's
+const rvIds=()=>H.tp?Object.keys(H.tp).filter(id=>!H.games.some(d=>d.id===id)):[];
 const wordDecks=()=>H.games.some(d=>d.kind==="vocab")||!H.games.length?[]:lpGames(lpKeyOf(H.games[0])).filter(d=>d.kind==="vocab").map(d=>d.id);
 const meta=()=>H.games[0]||{};
 const lpName=()=>meta().lp||"";
@@ -93,7 +100,7 @@ function publish(soon){
   if(!H.g||!H.sid||quiet)return;clearTimeout(pubT);const wait=soon?250:Math.max(0,4000-(Date.now()-pubAt));
   pubT=setTimeout(()=>{if(!H.g||!H.sid||quiet)return;pubAt=Date.now();const P=pl();Object.values(P).forEach(p=>delete p.pw);
     const D=S.deleteField(),data={on:true,game:true,mode:"cb",deck:location.pathname,title:title(),sid:H.sid,phase:H.phase,i:0,qn:0,qt:0,keys:{},at:S.serverTimestamp(),
-      cb:{decks:H.games.map(d=>d.id),wd:wordDecks(),lp:lpName(),end:H.end,pl:P,hr:H.hr,rw:H.phase==="end"?H.rw:{}},q:D,th:D,ok:D,nt:D,offBy:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
+      cb:{decks:H.games.map(d=>d.id),...(H.tp?{rv:rvIds(),tp:H.tp,rn:H.rn,rs:H.rs}:{}),wd:wordDecks(),lp:lpName(),end:H.end,pl:P,hr:H.hr,rw:H.phase==="end"?H.rw:{}},q:D,th:D,ok:D,nt:D,offBy:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
     S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()})},wait)}
 function liveOff(g,by){if(g)S.setDoc(S.doc(db,"live",g),Object.assign({on:false,at:S.serverTimestamp()},by?{offBy:by}:{}),{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g,H.sid)});
@@ -148,18 +155,21 @@ async function saveResults(){
   if(!H.g||!H.sid||savedSid===H.sid||!H.L)return;savedSid=H.sid;const M=marks(),m=meta(),d=new Date(H.sid);
   const day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const w=S.writeBatch(db),now=S.serverTimestamp(),mine={};
-  H.games.forEach((gm,gi)=>{const dk=H.L.decks[gm.id];if(!dk)return;
-    const qs=dk.qs.filter(q=>Object.values(M).some(x=>x[q.key]));if(!qs.length)return;
+  // 🔁 the review questions of 🧩 Which grammar? go with this round's grammar game, numbered after its own (n), with their game and point (d, dp)
+  const gGame=H.games.find(z=>z.kind!=="vocab"),off=gGame&&H.L.decks[gGame.id]?H.L.decks[gGame.id].nmax:0;let rn=off;
+  const rvQs=rvIds().flatMap(id=>((H.L.decks[id]||{}).qs||[]).map(q=>Object.assign({},q,{n:++rn,d:id,dp:q.p,p:""})));
+  H.games.forEach((gm,gi)=>{const dk=H.L.decks[gm.id];if(!dk)return;const all=gm===gGame?dk.qs.concat(rvQs):dk.qs;
+    const qs=all.filter(q=>Object.values(M).some(x=>x[q.key]));if(!qs.length)return;
     const said=x=>String(x.v).slice(0,80),okText=q=>CB.plain(q.write?q.write[0]:q.options[0]).slice(0,80);
     const stu=Object.entries(M).map(([e,x])=>{const mineQ=qs.filter(q=>x[q.key]);if(!mineQ.length)return null;const ans={};mineQ.forEach(q=>ans[q.n]=said(x[q.key]));
       return {e,r:mineQ.filter(q=>x[q.key].ok).length,a:mineQ.length,miss:mineQ.filter(q=>!x[q.key].ok).map(q=>q.n),ans}}).filter(Boolean);
     const key=H.g+"_"+(H.sid+gi);
     const doc={group:H.g,course:gm.course||"",deck:gm.id,title:dk.title,kind:gm.kind||dk.kind,ls:gm.ls||"",lp:gm.lp||"",mode:"cb",cb:true,sid:H.sid+gi,day,term:H.term,at:now,
-      qn:dk.qs.length,done:qs.length,qs:qs.map(q=>{const all=Object.values(M).map(x=>x[q.key]).filter(Boolean);return {n:q.n,q:CB.plain(q.q).slice(0,160),ok:okText(q),right:all.filter(z=>z.ok).length,of:all.length}}),nts:[],stu};
+      qn:all.length,done:qs.length,qs:qs.map(q=>{const all=Object.values(M).map(x=>x[q.key]).filter(Boolean);return Object.assign({n:q.n,q:CB.plain(q.q).slice(0,160),ok:okText(q),right:all.filter(z=>z.ok).length,of:all.length},q.d?{d:q.d}:{})}),nts:[],stu,...(H.tp&&gm===gGame?{tp:H.tp}:{})};
     w.set(S.doc(db,"gameResults",key),doc);
-    stu.forEach(x=>{const pn={},miss=x.miss.map(n=>{const q=qs.find(z=>z.n===n);return {n,q:CB.plain(q.q).slice(0,160),a:x.ans[n]||"",ok:okText(q),p:q.p||""}});
-      qs.filter(q=>M[x.e][q.key]).forEach(q=>{if(q.p)pn[q.p]=(pn[q.p]||0)+1});
-      (mine[x.e]=mine[x.e]||{})[key]={deck:gm.id,title:dk.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid+gi,r:x.r,of:x.a,pn,miss,mode:"cb"}})});
+    stu.forEach(x=>{const pn={},px={},miss=x.miss.map(n=>{const q=qs.find(z=>z.n===n);return Object.assign({n,q:CB.plain(q.q).slice(0,160),a:x.ans[n]||"",ok:okText(q),p:q.p||""},q.d?{d:q.d,dp:q.dp||""}:{})});
+      qs.filter(q=>M[x.e][q.key]).forEach(q=>{if(q.d){if(q.dp)(px[q.d]=px[q.d]||{})[q.dp]=(px[q.d][q.dp]||0)+1}else if(q.p)pn[q.p]=(pn[q.p]||0)+1});
+      (mine[x.e]=mine[x.e]||{})[key]={deck:gm.id,title:dk.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid+gi,r:x.r,of:x.a,pn,miss,mode:"cb",...(Object.keys(px).length?{px}:{})}})});
   Object.entries(mine).forEach(([e,games])=>w.set(S.doc(db,"myGames",e),{games,updated:now},{merge:true}));
   // +1 term point per right answer (the same points as the class game); the group's best over the student list only
   const right={};Object.entries(M).forEach(([e,x])=>{const r=Object.values(x).filter(z=>z.ok).length;if(r)right[e]=r});
@@ -208,7 +218,7 @@ function draw(){
   if(!H.L){app$.innerHTML=`<div class="center"><p>Loading the questions…</p></div>`;return}
   if(H.phase==="pick"||!H.g){const gs=(window.EL_GROUPS||[]).filter(g=>g.course===meta().course),n=H.L.pool.length,nx=H.L.pool.filter(q=>q.extra).length;
     const quiz=one()?`<a class="btn ghost" href="host.html?deck=${encodeURIComponent(H.games[0].id)}${BACK?"&from="+encodeURIComponent(BACK):""}">🎮 Play it as a quiz instead</a> `:"";
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🕵️ Code Breakers</h1>${H.note?`<p class="card msg cbnote pop">${esc(H.note)}</p>`:""}<p class="sub"><b>${esc(gameName())}</b> · ${esc(meta().ls||"")}<br>${one()?"":H.games.map(d=>esc(d.title)).join(" + ")+" · "}${n} questions${nx?` (${nx} new ones first)`:""} · no theory</p>
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🕵️ Code Breakers</h1>${H.note?`<p class="card msg cbnote pop">${esc(H.note)}</p>`:""}<p class="sub"><b>${esc(gameName())}</b> · ${esc(meta().ls||"")}<br>${one()?"":H.games.map(d=>esc(d.title)).join(" + ")+" · "}${n} questions${nx?` (${nx} new ones first)`:""}${H.tp?` · 🧩 only the grammar points you ticked${rvIds().length?", with 🔁 review":""}`:""} · no theory</p>
       <p class="sub">Each student answers at their own pace. A right answer opens a file: 💾 bits, ⚡ double, 🛡️ firewall, 🦠 virus or 💻 hack (steal bits by cracking a player's password). Only the % right counts for their marks.</p>
       <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
       <p>${back()}${quiz}<button class="btn ghost" data-do="lps">← Other games</button> <a class="btn ghost" href="host.html">🎮 Class games</a></p></div></div>`;return}
@@ -238,6 +248,7 @@ function drawTime(){const e=$("#cbtime");if(e){e.textContent="⏱ "+fmt(left());
 let endArm=0,lastEnd="";
 app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if(!b)return;const d=b.dataset.do;
   if(d==="signin"){try{const p=new A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await A.signInWithPopup(auth,p)}catch(x){console.warn("sign in",x)}}
+  if(d==="game"||d==="lp"||d==="lps"){H.tp=null;H.rn=H.rs=0}
   if(d==="game"){H.games=lpGames("","",b.dataset.id);history.replaceState(null,"","?game="+encodeURIComponent(b.dataset.id));H.L=null;draw();await loadLP();draw()}
   if(d==="lp"){H.games=lpGames(b.dataset.k);history.replaceState(null,"","?lp="+encodeURIComponent(b.dataset.k));H.L=null;draw();await loadLP();draw()}
   if(d==="lps"){H.games=[];H.L=null;history.replaceState(null,"",location.pathname);draw()}
@@ -252,7 +263,7 @@ app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if
   if(d==="cmback")backToClass();
 });
 addEventListener("keydown",e=>{if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}});
-async function loadLP(){if(!H.games.length)return;const L=await CB.load(H.games.map(d=>d.id),wordDecks());L.byKey={};L.pool.forEach(q=>L.byKey[q.key]=q);H.L=L}
+async function loadLP(){if(!H.games.length)return;const L=await CB.load(H.games.map(d=>d.id),wordDecks(),{rv:rvIds(),tp:H.tp,n:H.rn,seed:H.rs});L.byKey={};L.pool.forEach(q=>L.byKey[q.key]=q);H.L=L}
 
 A.onAuthStateChanged(auth,async u=>{
   H.user=u;H.teacher=!!u&&TEACHERS.includes((u.email||"").toLowerCase());

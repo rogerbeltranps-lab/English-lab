@@ -19,6 +19,13 @@
 // 🔒 One game per group (Roger, 16 Nov 2026: the board showed the quiz while the Chromebooks showed Code Breakers): live/{group} belongs to
 // the board that started its game last. This board checks it when it picks a game up again (a reload) and once a minute (one read): if a
 // newer game took the group (Code Breakers or another board), it stops at once and never writes to live/{group} again.
+// 🧩 Which grammar? (Roger, 16 Nov 2026: "When doing grammar games I want to choose the topics done in all the LS like: comparatives, ed/ing
+// relative clauses… so we add more and more difficulty as we progress and if I don't have time to do whatever there are no questions about it"):
+// a grammar game asks, after the group, which grammar points go in. Every grammar point of every grammar game of the course (all LSs) is a
+// tick, grouped by LS and learning path; the points whose tab the group has done (ls/{id}.done, the Time plan) are ticked by themselves.
+// This game's ticked points bring all their questions; each ticked point of another game brings 1, 2 or 3 🔁 review questions (its deck and
+// decks/more questions, a new choice every game), spread among this game's. An unticked point has no questions. Code Breakers gets the same
+// choice (&tp=, every question of the ticked points). Results stay this game's; a review question keeps its own game and point (d, dp).
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -55,7 +62,7 @@ const cmBtn=()=>cmGroup()?`<button class="btn cm" data-do="cmback" title="End th
 async function backToClass(){const g=cmGroup();if(!g||cmBusy)return;cmBusy=true;draw();
   const was=H.g,sid=H.sid;
   if(sid){try{await saveResults()}catch(e){console.warn("results",e)}if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
-    Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{}});keep()}
+    Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},tp:null,deck:H.deck0||H.deck});keep()}
   const w={cmBack:Date.now()};if(sid&&was===g)Object.assign(w,{on:false,at:S.serverTimestamp()});
   try{await S.setDoc(S.doc(db,"live",g),w,{merge:true});if(sid&&was&&was!==g)await S.setDoc(S.doc(db,"live",was),{on:false,at:S.serverTimestamp()},{merge:true})}
   catch(e){cmBusy=false;H.err="⚠ The students were not sent back: "+e.message;draw();return}
@@ -66,10 +73,10 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // H: the game on this board. deckId, deck (the deck file's content), g (group), sid (this game: the time it started), i (slide; -1 lobby),
 // phase, keys {slide: right option, in the shown order}, aw {slide: [emails that got the point]}. names {email: "First S."} (student list),
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
-const H={user:null,teacher:false,deckId:URLP.get("deck")||"",deck:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:""};
+const H={user:null,teacher:false,deckId:URLP.get("deck")||"",deck:null,deck0:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:"",tg:"",tp:null,tsel:null};
 const saved=tab.get();
-if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp});
-const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp}:null);
+if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp,tp:saved.tp||null,rvn:saved.rvn});
+const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp,tp:H.tp,rvn:H.rvn}:null);
 // Catalan help on the theory slides (Roger, 5 Nov 2026: the grammar games explain the grammar "so that students understand it"):
 // off by default (the games are at Safe level, in English); CA on the board or the C key shows a slide's ca lines. Kept in this browser.
 // how the teacher plays the class games: "quiz" (this board) or "cb" (🕵️ Code Breakers), kept in this browser
@@ -106,7 +113,7 @@ const nameOf=em=>H.names[em]||em.split("@")[0];
 
 /* ---------- the deck file ---------- */
 // A deck is loaded only for the teacher, so nothing on a student's device ever loads the answers.
-window.ELGameDeck=d=>{H.deck=withNotes(d)};
+window.ELGameDeck=d=>{H.deck=H.deck0=withNotes(d)};
 // 📝 Take your notes (Roger, 6 Nov 2026: "in the slides I explain theory, I want students to have a slide with: Take your notes: and then
 // they can see on their LS: your notes"): after each run of theory slides the board adds a notes slide {notes:k, topics, from}. The board
 // shows the theory again in small (the projector) and each student types notes on their device (play.js), saved in
@@ -127,6 +134,68 @@ function loadDeck(id){
   return new Promise(res=>{if(!/^[\w-]+$/.test(id))return res(false);H.deck=null;
     const s=document.createElement("script");s.src=`decks/${id}.js`;s.onload=()=>res(!!H.deck);s.onerror=()=>res(false);document.head.append(s)});
 }
+
+/* ---------- 🧩 Which grammar? (the grammar points of the game, chosen before it starts) ---------- */
+// RAW[id] = a deck's points: [{k (1 = its first run of theory slides, as the 📝 notes parts), name (point), tab, qs (its questions), more
+// (its decks/more questions)}]. Loaded one after the other (the deck files call the global ELGameDeck), never on a student's device.
+const RAW={};
+const script=src=>new Promise(res=>{const s=document.createElement("script");s.src=src;s.onload=()=>res(true);s.onerror=()=>res(false);document.head.append(s)});
+function pointsOf(d,more){const out=[];let run=false,cur=null;
+  (d.slides||[]).forEach(s=>{if(s.q){run=false;if(cur)cur.qs.push(s);return}if(s.notes===false)return;
+    if(!run){run=true;cur={k:out.length+1,name:"",tab:"",qs:[],more:[]};out.push(cur)}
+    if(!cur.name&&s.point)cur.name=s.point;if(!cur.tab&&s.tab)cur.tab=s.tab;if(!cur.th&&s.theory)cur.th=String(s.theory).replace(/\*\*/g,"")});
+  out.forEach(p=>{p.name=p.name||p.th||"Part "+p.k});
+  ((more&&more.questions)||[]).forEach(q=>{const p=out[(+q.p||0)-1];if(p&&q.q)p.more.push(q)});
+  return out}
+async function rawDeck(id){if(id in RAW)return RAW[id];if(!/^[\w-]+$/.test(id))return RAW[id]=null;
+  const was=window.ELGameDeck,wasM=window.ELGameMore;let got=null,more=null;
+  window.ELGameDeck=d=>{got=d};await script(`decks/${id}.js`);window.ELGameMore=m=>{more=m};await script(`decks/more/${id}.js`);
+  window.ELGameDeck=was;window.ELGameMore=wasM;return RAW[id]=got?pointsOf(got,more):null}
+const gm=id=>(window.EL_GAMES||[]).find(d=>d.id===id)||{};
+const lsOf=d=>{const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
+const lpNum=d=>String(d.lp||"").split(" · ")[0];
+// the grammar games of this game's course, by LS and then learning path (decks/index.js)
+const gDecks=()=>{const c=meta().course;return (window.EL_GAMES||[]).filter(d=>d.course===c&&(d.kind==="grammar"||/-grammar$/.test(d.id)))
+  .sort((a,b)=>(a.ls+" "+a.lp).localeCompare(b.ls+" "+b.lp,"en",{numeric:true}))};
+let tpBusy=false;
+async function loadPoints(){if(tpBusy)return;tpBusy=true;for(const d of gDecks())await rawDeck(d.id);tpBusy=false;draw()}
+const pointsReady=()=>gDecks().every(d=>d.id in RAW);
+// done: the tabs the group has done in that LS (ls/{id}.done[group], read with the played games: no extra reads)
+const doneOf=(d,g)=>((DN||{})[lsOf(d)]||{})[g]||{};
+// a point of this game's LS is ticked when the group has done its tab; a point with no tab (or an LS with no Time plan ticks for that path) when the group
+// played its game; this game's points all ticked if none of them is
+function tpDefault(g){const out={};
+  gDecks().forEach(d=>{const P=RAW[d.id];if(!P)return;const done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g];
+    // earlier LSs start unticked (the list grows every LS): the teacher ticks the ones to review
+    let ks=d.ls!==meta().ls?[]:P.filter(p=>p.tab&&info?!!done[d.act+"#"+p.tab]:(d.id===H.deckId||!!pl)).map(p=>p.k);
+    if(d.id===H.deckId&&!ks.length)ks=P.map(p=>p.k);
+    out[d.id]=new Set(ks)});
+  return out}
+// the choice as it is kept: null = this game exactly as it is (all its points, nothing else)
+function tpFrom(sel){const o={};Object.entries(sel||{}).forEach(([id,ks])=>{const a=[...ks].sort((x,y)=>x-y);if(a.length)o[id]=a});
+  const P=RAW[H.deckId]||[],mine=o[H.deckId]||[];if(Object.keys(o).length===(mine.length?1:0)&&mine.length===P.length)return null;return o}
+const rvN=v=>{try{if(v!=null)localStorage.setItem("el_game_rvn",String(v));const n=+localStorage.getItem("el_game_rvn");return n>=1&&n<=3?n:1}catch(e){return v>=1&&v<=3?v:1}};
+// the questions of the game for the chosen points: this game's points in the deck's order, the 🔁 review questions spread among them
+async function build(){
+  if(!H.deck0)return;if(!H.tp){H.deck=H.deck0;return}
+  const tp=H.tp,own=new Set(tp[H.deckId]||[]),seed=H.sid||1,n=H.rvn||rvN(),main=[];let k=0;
+  H.deck0.slides.forEach(s=>{if(isN(s)){k=s.notes;return}if(s.q&&(!k||own.has(k)))main.push(Object.assign({},s,{_p:k&&H.deck0.notes!==false?"p"+k:""}))});
+  const rv=[];
+  for(const id of Object.keys(tp)){if(id===H.deckId)continue;const P=await rawDeck(id),d=gm(id);if(!P)continue;
+    tp[id].forEach(kk=>{const p=P.find(x=>x.k===kk);if(!p)return;const pool=p.qs.concat(p.more),h=[...(id+kk)].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7);
+      G.shuffle(pool.length,seed+h).slice(0,n).forEach(j=>{const q=Object.assign({},pool[j]);delete q.p;rv.push(Object.assign(q,{_p:"",_rv:{d:id,dp:"p"+kk,lp:lpNum(d),ls:String(d.ls||"").split(" · ")[0],name:p.name}}))})})}
+  const R=G.shuffle(rv.length,seed+17).map(j=>rv[j]),out=[];
+  if(!main.length)out.push(...R);else main.forEach((q,i)=>{out.push(q);out.push(...R.slice(Math.floor(i*R.length/main.length),Math.floor((i+1)*R.length/main.length)))});
+  H.deck=Object.assign({},H.deck0,{slides:out});
+}
+// how many questions the choice gives (the 🧩 screen): this game's, and review
+// (Code Breakers: this game's decks/more questions too, and the same number of review questions per point)
+function tpCount(sel,cb){const P=RAW[H.deckId]||[],mine=sel[H.deckId]||new Set(),n=H.rvn||rvN();
+  const own=P.filter(p=>mine.has(p.k)).reduce((t,p)=>t+p.qs.length+(cb?p.more.length:0),0);let rv=0;
+  Object.entries(sel).forEach(([id,ks])=>{const Q=RAW[id];if(!Q||id===H.deckId)return;Q.filter(p=>ks.has(p.k)).forEach(p=>{rv+=Math.min(n,p.qs.length+p.more.length)})});
+  return {own,rv}}
+// for Code Breakers (codebreakers.html &tp=): "deck.1.2,deck2.3"
+const tpParam=tp=>Object.entries(tp).map(([id,ks])=>id+"."+ks.join(".")).join(",");
 
 /* ---------- Firebase ---------- */
 let liveBeat=null,ansStop=null;
@@ -163,7 +232,7 @@ async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",
   if(x.on===false&&+x.offBy===H.sid)await S.setDoc(r,{on:true,offBy:S.deleteField(),at:S.serverTimestamp()},{merge:true});return true}catch(e){console.warn("live",e);return false}}
 async function stepAside(){if(!H.g||!H.sid)return;const gn=groupName(H.g);clearInterval(liveBeat);if(ansStop)ansStop();ansStop=null;whoStop();G.music("");
   if(H.phase!=="lobby")try{await saveResults()}catch(e){console.warn("results",e)}   // what they answered still counts
-  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();H.note=`⏹ ${gn} is playing another game now (started on another screen), so this board stopped.`;draw()}
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined,tp:null,deck:H.deck0||H.deck});keep();H.note=`⏹ ${gn} is playing another game now (started on another screen), so this board stopped.`;draw()}
 async function startGroup(){
   if(await taken())return stepAside();
   const g=H.g;H.err="";H.players={};
@@ -220,14 +289,14 @@ let playedSid=0;
 // Which groups played each game (Roger, 8 Nov 2026: "I need to know if the games-theory have been played in a class to make sure they all
 // do them"): the game list and the group buttons show ✓ + day per group, from the same ls/{id}.played. One read per LS that has games,
 // once per board load (PL = {deck: {group: ms}}); a game played here is added at once.
-let PL=null,plBusy=false;
+let PL=null,DN=null,plBusy=false;
 async function loadPlayed(){
-  if(PL||plBusy||!H.teacher)return;plBusy=true;const out={};
+  if(PL||plBusy||!H.teacher)return;plBusy=true;const out={},dn={};
   const lsIds=[...new Set((window.EL_GAMES||[]).map(d=>{const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
     const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""}).filter(Boolean))];
-  await Promise.all(lsIds.map(async id=>{try{const d=await S.getDoc(S.doc(db,"ls",id)),p=(d.exists()&&d.data().played)||{};
+  await Promise.all(lsIds.map(async id=>{try{const d=await S.getDoc(S.doc(db,"ls",id)),p=(d.exists()&&d.data().played)||{};dn[id]=(d.exists()&&d.data().done)||{};
     for(const g in p)for(const k in p[g])(out[k]=out[k]||{})[g]=p[g][k]}catch(e){console.warn("played",e)}}));
-  PL=out;plBusy=false;draw();
+  PL=out;DN=dn;plBusy=false;draw();
 }
 const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
 const plLine=d=>{if(!PL)return "";const gs=(window.EL_GROUPS||[]).filter(g=>g.course===d.course),p=PL[d.id]||{};
@@ -255,8 +324,8 @@ async function saveResults(){
   const d=new Date(H.sid),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const doc={group:H.g,course:meta.course||H.deck.course||"",deck:H.deckId,title:H.deck.title,kind:meta.kind||"mixed",ls:meta.ls||"",lp:meta.lp||"",
     sid:H.sid,day,term:H.term,at:S.serverTimestamp(),qn:qs.length,done:shown.length,
-    qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),ok:String(isW(slides()[i])?slides()[i].write[0]:slides()[i].options[0]).replace(/\*\*/g,"").slice(0,80),right:H.aw[i].length,of:answered(i).length})),
-    nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu};
+    qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),ok:String(isW(slides()[i])?slides()[i].write[0]:slides()[i].options[0]).replace(/\*\*/g,"").slice(0,80),right:H.aw[i].length,of:answered(i).length,...(slides()[i]._rv?{d:slides()[i]._rv.d}:{})})),
+    nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu,...(H.tp?{tp:H.tp}:{})};
   savedSid=H.sid;
   try{await S.setDoc(S.doc(db,"gameResults",H.g+"_"+H.sid),doc)}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
   // each student's own result (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what to study"):
@@ -264,12 +333,14 @@ async function saveResults(){
   // whose theory it practises)}]} (firestore.rules: the student reads their own, only the teacher writes). One write per player per game;
   // the LS page's 📝 Your notes reads it once (shared/js/el-notes.js) and puts it with the theory and their notes.
   if(!shown.length)return;
-  const partOf=i=>{for(let j=i-1;j>=0;j--)if(isN(slides()[j]))return "p"+slides()[j].notes;return ""};
+  const partOf=i=>{const s=slides()[i];if(s&&s._p!=null)return s._p;for(let j=i-1;j>=0;j--)if(isN(slides()[j]))return "p"+slides()[j].notes;return ""};
+  // 🔁 a review question (🧩 Which grammar?) counts for its own game's point: px {deck: {point: shown}} and d / dp on a miss
+  const px={};shown.forEach(i=>{const r=slides()[i]._rv;if(r)(px[r.d]=px[r.d]||{})[r.dp]=(px[r.d][r.dp]||0)+1});
   // pn = how many shown questions practised each notes part (Roger, 9 Nov 2026: the student's % per grammar or vocabulary point in 🎓 My progress)
   const pn={};shown.forEach(i=>{const p=partOf(i);if(p)pn[p]=(pn[p]||0)+1});
   try{const w=S.writeBatch(db),key=H.g+"_"+H.sid;
-    stu.forEach(x=>{const miss=x.miss.map(n=>{const i=qs[n-1],q=doc.qs.find(z=>z.n===n)||{};return {n,q:q.q||"",a:x.ans[n]==null?"":x.ans[n],ok:q.ok||"",p:partOf(i)}});
-      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,pn,miss}},updated:S.serverTimestamp()},{merge:true})});
+    stu.forEach(x=>{const miss=x.miss.map(n=>{const i=qs[n-1],q=doc.qs.find(z=>z.n===n)||{};const r=slides()[i]._rv;return Object.assign({n,q:q.q||"",a:x.ans[n]==null?"":x.ans[n],ok:q.ok||"",p:partOf(i)},r?{d:r.d,dp:r.dp}:{})});
+      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,pn,miss,...(Object.keys(px).length?{px}:{})}},updated:S.serverTimestamp()},{merge:true})});
     await w.commit()}catch(e){console.warn("my games",e);H.err="⚠ Students' results not saved: "+e.message;draw()}
 }
 let autoT=null;
@@ -331,15 +402,15 @@ addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,sele
   if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}
   if((e.key==="c"||e.key==="C")&&H.phase==="show"&&cur()&&cur().ca){caOn(!caOn());draw()}});
 
-function startGame(g,again){
-  H.note="";try{sessionStorage.removeItem("elCB")}catch(e){}   // a Code Breakers round of this tab is over
-  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;decideRp();keep();G.music("lobby");startGroup();
+async function startGame(g,again){
+  H.note="";H.tg="";try{sessionStorage.removeItem("elCB")}catch(e){}   // a Code Breakers round of this tab is over
+  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;if(!H.tp)H.rvn=undefined;else if(!again)H.rvn=rvN();await build();decideRp();keep();G.music("lobby");startGroup();
 }
 // ■ End and Finish also send a group in class mode back to the class (cmBack, as 🎓 Back to class mode; Roger, 16 Nov 2026: "students
 // couldn't leave the game once finished"): ending the game is the teacher saying so. Out of class mode cmBack changes nothing.
 function endGame(){
   const g=H.g;saveResults();if(g)S.setDoc(S.doc(db,"live",g),{on:false,cmBack:Date.now(),at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e));if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
-  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();draw();
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined,tp:null,deck:H.deck0||H.deck});keep();draw();
 }
 
 /* ---------- screens ---------- */
@@ -350,7 +421,7 @@ const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${back.length?`<p class="bk">↩ Left and came back (${back.length}): ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${hm(y.left.at)})</small>`).join(", ")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
   ${w.active?`<button class="pill who${gone.length?" warn":""}" data-do="who" title="Who is in full screen and connected, who left and who is not in the game (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${gone.length} left${back.length?` · ↩ ${back.length}`:""}${never.length?` · ⚪ ${never.length} not here`:""}</button>`:""}${box}
-  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
+  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}${cur()._rv?` · 🔁 ${esc(cur()._rv.ls+" "+cur()._rv.lp)}`:""}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
@@ -375,6 +446,7 @@ function draw(){
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
       return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&/-lp[1-3]-/.test(d.id)&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then play it as a 🎮 Quiz or as 🕵️ Code Breakers. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+  if(H.tg&&!H.g){drawPoints();return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
@@ -389,10 +461,11 @@ function draw(){
   if(H.phase==="lobby"){
     loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
     const rpLine=pb?`<p class="rp pop">🔁 Played on ${esc(plDay(pb))}.</p>`:"";
+    const tpLine=H.tp?`<p class="rp pop">🧩 ${qList().length} questions on ${Object.values(H.tp).reduce((t,a)=>t+a.length,0)} grammar points${Object.keys(H.tp).some(id=>id!==H.deckId)?`, with 🔁 review of earlier learning paths`:""}.</p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
-        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>${rpLine}
+        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>${rpLine}${tpLine}
       <div class="names">${P.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).map(em=>`<span${seen.has(em)?"":' class="pop"'}>${esc(nameOf(em))}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div>
     </div></div></div>`;P.forEach(em=>seen.add(em));return}
   if(H.phase==="end"){
@@ -446,16 +519,46 @@ function draw(){
     ${rev&&s.why?`<div class="card why pop">💡 ${md(s.why)}</div>`:""}${tiles(s,H.i,rev)}</div>`;
 }
 
+// 🧩 Which grammar? for the group H.tg: every grammar point of the course's grammar games, by LS and learning path, ticked by the Time plan
+function drawPoints(){
+  const g=H.tg,cb=fmt()==="cb",head=`<h1 class="logo pop">${esc(gName())}</h1>`;
+  if(!PL||!pointsReady()){loadPlayed();loadPoints();app$.innerHTML=`<div class="center"><div>${head}<p class="sub">Loading the grammar points…</p></div></div>`;return}
+  if(!H.tsel)H.tsel=tpDefault(g);
+  const sel=H.tsel,day=v=>{const t=/^\d{4}-\d\d-\d\d$/.test(String(v))?new Date(v+"T12:00:00"):new Date(+v||v);return isNaN(t)?"":t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
+  const lsList=[...new Set(gDecks().map(d=>d.ls||""))];
+  const lp=d=>{const P=RAW[d.id]||[],me=d.id===H.deckId,done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set();
+    const why=p=>{if(p.tab&&info){const v=done[d.act+"#"+p.tab];return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
+      return pl?`<span class="tpy">✓ game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">game not played yet</span>`};
+    return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">This game</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
+      ${P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}><span class="tpt">${esc(p.name)}</span><small>${why(p)}</small></label>`).join("")}</div>`};
+  const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
+  app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
+    <p class="sub">🧩 <b>Which grammar for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions. Tick earlier points to review them.</p>
+    <div class="tpcols">${lsList.map(l=>`<section class="course tpls">${l?`<h3>${esc(l)}</h3>`:""}${gDecks().filter(d=>(d.ls||"")===l).map(lp).join("")}</section>`).join("")}</div>
+    <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k} question${k>1?"s":""}</button>`).join("")}
+      <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from this game + ${c.rv} review)`:""}${cb?" · 🕵️ each at their own pace":""}`}</b>
+      <button class="btn ${cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?"🕵️":"▶"} Start for ${esc(groupName(g))}</button></div>
+    <p>${backBtn()}<button class="btn ghost" data-do="tpback">← Groups</button></p></div></div>`;
+}
+
 let endArm=0;
 const seen=new Set();   // names already on the lobby (only a new one pops in)
 app$.addEventListener("click",async e=>{
   const b=e.target.closest("[data-do]");if(!b)return;const d=b.dataset.do;
   if(d==="signin"){try{const p=new A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await A.signInWithPopup(auth,p)}catch(x){console.warn("sign in",x)}}
   if(d==="signout")A.signOut(auth);
-  if(d==="deck"){H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
-  if(d==="decks"){H.deck=null;H.deckId="";history.replaceState(null,"",location.pathname);draw()}
+  if(d==="deck"){H.tp=null;H.tg="";H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
+  if(d==="decks"){H.deck=H.deck0=null;H.deckId="";H.tp=null;H.tg="";history.replaceState(null,"",location.pathname);draw()}
+  if(d==="group"&&kindOf()==="grammar"){H.tg=b.dataset.g;H.tsel=null;H.err="";loadPlayed();loadPoints();draw();window.scrollTo(0,0);return}
   if(d==="group"){if(fmt()==="cb"){keep();location.href="codebreakers.html?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(b.dataset.g)+"&go=1"+(BACK?"&from="+encodeURIComponent(BACK):"");return}startGame(b.dataset.g)}
   if(d==="fmt"){fmt(b.dataset.f);draw()}
+  if(d==="tpk"){const s=H.tsel&&H.tsel[b.dataset.id];if(s){const k=+b.dataset.k;if(b.checked)s.add(k);else s.delete(k);draw()}}
+  if(d==="tpall"||d==="tpnone"){const P=RAW[b.dataset.id];if(P&&H.tsel){H.tsel[b.dataset.id]=new Set(d==="tpall"?P.map(p=>p.k):[]);draw()}}
+  if(d==="tpn"){rvN(+b.dataset.n);draw()}
+  if(d==="tpback"){H.tg="";H.tsel=null;draw()}
+  if(d==="tpgo"&&H.tsel){const g=H.tg,tp=tpFrom(H.tsel);if(tp&&!Object.keys(tp).length)return;
+    if(fmt()==="cb"){keep();location.href="codebreakers.html?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(g)+"&go=1"+(tp?"&tp="+encodeURIComponent(tpParam(tp))+"&rn="+rvN()+"&rs="+(Date.now()%1e6):"")+(BACK?"&from="+encodeURIComponent(BACK):"");return}
+    H.tp=tp;H.tsel=null;startGame(g)}
   if(d==="next")go("next");
   if(d==="skipth")skipTheory();
   if(d==="more")more();
@@ -473,6 +576,7 @@ app$.addEventListener("click",async e=>{
 A.onAuthStateChanged(auth,async u=>{
   H.user=u;H.teacher=!!u&&TEACHERS.includes((u.email||"").toLowerCase());
   if(H.teacher&&H.deckId&&!H.deck&&!await loadDeck(H.deckId)){H.deckId="";H.phase="pick";H.g="";H.sid=0;keep()}
+  if(H.teacher&&H.deck&&H.g&&H.sid&&H.tp)await build();
   if(H.teacher&&H.deck&&H.g&&H.sid){if(H.phase==="lobby")G.music("lobby");else if(H.phase==="show"&&isQ(cur()))G.music("think");startGroup()}
   draw();
 });
