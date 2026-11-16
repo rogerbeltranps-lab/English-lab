@@ -42,7 +42,12 @@ function load(src,has){return has()?Promise.resolve():new Promise(r=>{const s=do
 const byId=id=>(window.EL_CATALOG||[]).find(a=>a.id===id);
 const secs=a=>((window.EL_SECTIONS||{})[a.id]||[]);
 const gameOf=id=>(window.EL_GAMES||[]).find(g=>g.id===id);
-function itName(a,p){if(/^game:cb-/.test(p)){const g=(window.EL_GAMES||[]).find(z=>z.id.startsWith(p.slice(8)+"-"));return "🕵️ "+(g&&g.lp?String(g.lp).split(" · ")[0]+" · ":"")+"Code Breakers"}if(isGame(p)){const g=gameOf(p.slice(5));return "🎮 "+String(g?(window.elGameName?elGameName(g):g.title):p.slice(5)).replace(/^LP\d+ · /,"")}const z=secs(a).find(q=>q[0]===p);return z?z[1]:p}
+// ONE grammar game and ONE vocabulary game per LS (Roger, 16 Nov 2026): a learning path's game on the Time plan opens the LS game
+// (🧩 Grammar · LSn / 📚 Vocabulary · LSn: Quiz or 🕵️ Code Breakers, then the points to tick), as on teacher.html
+const gKind=g=>g.kind||(/-vocab$/.test(g.id)?"vocab":"grammar");
+const gLsId=g=>{const nm=String(g.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase(),l=(window.EL_LS||[]).find(x=>x.course===g.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
+const lsgQ=id=>{const g=gameOf(id),ls=g&&g.lp?gLsId(g):"";return ls?"&ls="+encodeURIComponent(ls)+"&kind="+gKind(g):""};
+function itName(a,p){if(/^game:cb-/.test(p)){const g=(window.EL_GAMES||[]).find(z=>z.id.startsWith(p.slice(8)+"-"));return "🕵️ "+(g&&g.lp?String(g.lp).split(" · ")[0]+" · ":"")+"Code Breakers"}if(isGame(p)){const g=gameOf(p.slice(5));return g&&g.lp?(gKind(g)==="vocab"?"📚 Vocabulary":"🧩 Grammar")+" · "+String(g.ls||"").split(" · ")[0]:"🎮 "+String(g?g.title:p.slice(5))}const z=secs(a).find(q=>q[0]===p);return z?z[1]:p}
 // the day's items as the dashboard shows them: [{a (learning path or null), its}]; a day reordered by hand (ag.man[day]) keeps its order,
 // any other day groups each learning path's tabs; a learning path's tabs always follow the path's order (teacher.html agRuns, agTabOrder)
 function runs(ag,d){const its=((ag.days||{})[d]||[]).filter(it=>it!=="self"),man=!!(ag.man||{})[d],gs=[];
@@ -299,7 +304,7 @@ function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dat
   // from"): the board's 🎓 Back to class mode brings the tab back to this page and tab, still in class mode (lab/game/host.js)
   // 🕵️ Code Breakers (Roger, 12 Nov 2026), "game:cb-<lp>": its own board, the same way back to the class
   if(/^game:cb-/.test(x.p)){location.href=new URL("lab/game/codebreakers.html?lp="+encodeURIComponent(x.p.slice(8))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
-  if(isGame(x.p)){location.href=new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
+  if(isGame(x.p)){location.href=new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+lsgQ(x.p.slice(5))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
   go(x,b)}
 const busy=async(b,f)=>{b.disabled=true;try{await f()}catch(err){console.warn("class mode",err);say("✗ Not saved: "+(err.code||err.message||err),true)}b.disabled=false;draw()};
 // ➕ on today's agenda (taken off a later day where it was planned), open for the group, 👥 for the students
