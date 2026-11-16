@@ -555,8 +555,19 @@ window.ELNotebook = (function () {
       const vocOwn = voc.filter(g => !into('vocab', g)), gramOwn = gram.filter(g => !into('grammar', g));
       after('vocab', vocOwn.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) })));
       after('read', rd.map(g => ({ id: fk('g-' + g.id), l: '📖 ' + t('Apunts de la lectura', 'Reading notes'), html: together(g), gt: true })));
-      after('grammar', gt.map(g => ({ id: fk('g-' + g.id), l: '✍ ' + t('Apunts de la pissarra', 'My whiteboard notes'), html: together(g), gt: true }))
-        .concat(gramOwn.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) }))));
+      /* each grammar point's whiteboard notes (its theory, then what they wrote) right after that grammar step (Roger, 16 Nov 2026: "students
+         should see the grammar ed/ing and below their notes and when we do another grammar point, the grammar theory and then their notes"):
+         the step is parts.gt.sec, the deck's -<step id> ending, or (an old one-per-page doc) the step whose title it has */
+      const gtLoose = [];
+      gt.forEach(g => {
+        const pt = parts.find(x => x.kind === 'grammar' && (x.id === (g.gt || {}).sec || String(g.id).endsWith('-' + x.id))) || parts.find(x => x.kind === 'grammar' && x.title && x.title === gname(g).trim());
+        const at = pt ? blocks.findIndex(b => b.id === key + '-p-' + fk(pt.id)) : -1;
+        const blk = { id: fk('g-' + g.id), l: '✍ ' + t('Apunts de la pissarra', 'My whiteboard notes') + (pt ? ' · ' + esc(pt.name) : ''), html: together(g), gt: true, gsec: pt ? pt.id : '' };
+        if (at < 0) { gtLoose.push(blk); return; }
+        let i = at + 1; while (blocks[i] && blocks[i].gt && blocks[i].gsec === pt.id) i++;
+        blocks.splice(i, 0, blk);
+      });
+      after('grammar', gtLoose.concat(gramOwn.map(g => ({ id: fk('g-' + g.id), l: '🎮 ' + esc(gname(g)), html: game(g) }))));
       const empty = !blocks.length ? `<p class="nb-pencil">${t('En aquest learning path heu fet pràctica de comprensió i expressió: obre\'l per repassar-lo.', 'In this learning path you practised the skills: open it to look at it again.')}</p>` : '';
       out.push({ key, tab: 'LP' + lp.n, l: `LP${esc(lp.n)} ${esc(lp.title)}`, head: head + empty, blocks: ordered(key, blocks.concat(notesOf(key))), foot: addBtn(key) + `<div class="nb-links"><a href="${esc(lp.href)}">${t('Obre el learning path', 'Open the learning path')} →</a></div>` });
     });

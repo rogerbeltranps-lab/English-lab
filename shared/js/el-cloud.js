@@ -1074,6 +1074,25 @@ const rtNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[
 const gtFlat=h=>String(h||"").replace(/<\/(div|p|tr|table|h\d|li|ul|ol)>|<(br|hr)\b[^>]*>/gi,"<br>").replace(/<\/t[dh]>/gi," · ").replace(/<\/span>/gi," ").replace(/<(?!\/?(strong|em|b|i|br|del|s|u)\b)[^>]*>/gi,"").replace(/<(\/?)(strong|em|b|i|br|del|s|u)\b[^>]*>/gi,"<$1$2>").replace(/(\s*·\s*)+<br>/g,"<br>").replace(/(\s*<br>\s*){2,}/g,"<br>").replace(/^(\s*<br>)+|(<br>\s*)+$/g,"").trim();
 const GTN={el:null,v:"",dirty:false,t:0,st:"",rt:null,loaded:"",ca:false};
 const gtDeck=()=>"gt-"+relPath.replace(/\.html$/,"").replace(/\//g,"-");   // gt-2eso-free-time-live-what-are-they-doing
+/* one notes doc per grammar section (Roger, 16 Nov 2026: "students should see the grammar ed/ing and below their notes and when we do another
+   grammar point, the grammar theory and then their notes"): gt-<page>-<step id> (gt-…-where-traditions-come-from-grammarFeel), with
+   parts.gt.sec = the step id; the notebook puts each one after its grammar step. Before, a page had one doc for all its sections
+   (gt-<page>): gtLegacy() moves it, once, to the section it was written in (parts.gt.sec, or the step whose title it has). */
+const gtSecId=rt=>String(rt&&rt.p||"grammar").replace(/[^a-z0-9_-]/gi,"")||"grammar";
+const gtSecDeck=rt=>gtDeck()+"-"+gtSecId(rt);
+let gtLeg=null;
+function gtLegacy(){
+  if(gtLeg)return gtLeg;const base=gtDeck(),ref=id=>doc(db,"students",user.uid,"notes",id);
+  return gtLeg=getDoc(ref(base)).then(async s=>{
+    if(!s.exists())return;const d=s.data(),g=(d.parts||{}).gt;if(!g)return;
+    const t=String(d.title||"").replace(/^📘\s*/,"").trim(),ps=[...document.querySelectorAll("section.panel[id]")].filter(x=>x.querySelector(".section-card.worked"));
+    const m=ps.find(x=>String((x.querySelector(".panel-head h2")||{}).textContent||"").trim()===t);
+    const sec=String(g.sec||(m?m.id:ps.length===1?ps[0].id:"grammar")).replace(/[^a-z0-9_-]/gi,"")||"grammar",to=base+"-"+sec;
+    if((await getDoc(ref(to))).exists())return;   // never overwrite: both stay
+    await setDoc(ref(to),Object.assign({},d,{deck:to,parts:Object.assign({},d.parts,{gt:Object.assign({},g,{sec})})}));
+    await deleteDoc(ref(base));
+  }).catch(e=>console.warn("old grammar notes",e));
+}
 const gtT=(c,e)=>GTN.ca?c:e;
 function gtState(st){if(st!=null)GTN.st=st;const e=document.getElementById("el-gt-st");if(!e)return;
   e.textContent=GTN.st==="saving"?gtT("Desant…","Saving…"):GTN.st==="saved"?gtT("✓ Desat a 🎯 Què entra a l'examen, amb la data i l'explicació","✓ Saved in 🎯 What's in the exam, with the day and the explanation")
@@ -1084,8 +1103,8 @@ async function gtSave(){
   const sum=[...d.querySelectorAll(".model")].map(m=>{const c=m.cloneNode(true),l=c.querySelector(":scope>span:first-child");if(l)l.remove();return gtFlat(c.innerHTML).slice(0,2500).replace(/<[^>]*$/,"")}).slice(0,12);
   const title=(document.querySelector('#'+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .panel-head h2")||{}).textContent||"";
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});gtState("saving");
-  try{await setDoc(doc(db,"students",user.uid,"notes",gtDeck()),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck:gtDeck(),
-      title:"📘 "+(title||"Grammar").trim(),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",parts:{gt:{topic:"How it works · together",day,sum,text:GTN.v.slice(0,3000),at:now}},updated:now},{merge:true});gtState("saved")}
+  try{await gtLegacy();const deck=gtSecDeck(rt);await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck,
+      title:"📘 "+(title||"Grammar").trim(),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",parts:{gt:{topic:"How it works · together",sec:gtSecId(rt),day,sum,text:GTN.v.slice(0,3000),at:now}},updated:now},{merge:true});gtState("saved")}
   catch(e){console.warn("grammar notes",e);GTN.dirty=true;gtState("err");GTN.t=setTimeout(gtSave,8e3)}
 }
 function gtBox(box,rt){
@@ -1097,7 +1116,7 @@ function gtBox(box,rt){
     box.after(f);const ta=f.querySelector("textarea");ta.value=GTN.v;
     ta.addEventListener("input",()=>{GTN.v=ta.value;GTN.dirty=true;gtState("");clearTimeout(GTN.t);GTN.t=setTimeout(gtSave,2500)});
     // what they wrote before on this learning path (another day, another device) comes back: one read per page
-    if(GTN.loaded!==gtDeck()){GTN.loaded=gtDeck();getDoc(doc(db,"students",user.uid,"notes",gtDeck())).then(s=>{const t=s.exists()?(((s.data().parts||{}).gt||{}).text||""):"";
+    if(GTN.loaded!==gtSecDeck(rt)){const dk=GTN.loaded=gtSecDeck(rt);gtLegacy().then(()=>getDoc(doc(db,"students",user.uid,"notes",dk))).then(s=>{const t=s.exists()?(((s.data().parts||{}).gt||{}).text||""):"";
       const x=document.querySelector("#el-gt-notes textarea");if(t&&x&&!GTN.v){x.value=GTN.v=t}}).catch(e=>console.warn("grammar notes",e))}}
   gtState(null);
 }
@@ -1114,20 +1133,20 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
    per page brings back what they wrote before. 📓 My notebook on the LS page shows it (el-notebook.js). If the whiteboard can't load, the
    old 📝 box under the boxes comes back (grammar). The teacher and 👁 Student view never get it. */
 const WB={m:null,p:null,fail:false,deck:"",v:null,dirty:false,t:0,rt:null,kind:"",loaded:"",ca:false,box:null};
-const wbDeck=k=>gtDeck()+(k==="reading"?"-rd":"");
+const wbDeck=(k,rt)=>k==="reading"?gtDeck()+"-rd":gtSecDeck(rt);
 const wbT=(c,e)=>WB.ca?c:e;
 const wbMod=()=>WB.p||(WB.p=import("./el-whiteboard.js").then(m=>(WB.m=m)).catch(e=>{console.warn("whiteboard",e);WB.fail=true;throw e}));
 const wbTitle=()=>{const b=WB.box,pn=b&&(b.closest(".panel")||b.closest("section"));return String(((pn&&pn.querySelector(".panel-head h2"))||{}).textContent||"").trim()};
 function wbShow(rt,kind,html,box){
   if(!user||!isStudent(user)||AS||WB.fail)return false;
-  const deck=wbDeck(kind);
+  const deck=wbDeck(kind,rt);
   if(WB.deck!==deck){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.deck=deck;WB.v=null;WB.dirty=false}
   WB.rt=WB.srt=rt;WB.kind=kind;WB.ca=lockCa();WB.box=box;
   const go=()=>{if(!WB.rt||WB.deck!==deck)return;
     WB.m.render({kind,title:wbTitle(),head:window.LP&&window.LP.n?"LP"+window.LP.n:"",html,k:rt.k,n:rt.n,chat:rt.chat,ca:WB.ca,saved:WB.v,
       onChange:v=>{WB.v=v;WB.dirty=true;WB.m.status(wbT("Desant…","Saving…"));clearTimeout(WB.t);WB.t=setTimeout(wbSave,2500)}});
     if(!WB.dirty&&WB.loaded!==deck)WB.m.status(wbT("Es desa sol a 📓 La meva llibreta","Saved by itself in 📓 My notebook"));
-    if(WB.loaded!==deck){WB.loaded=deck;getDoc(doc(db,"students",user.uid,"notes",deck)).then(x=>{const p=x.exists()?((x.data().parts||{}).gt||{}):null;
+    if(WB.loaded!==deck){WB.loaded=deck;(kind==="grammar"?gtLegacy():Promise.resolve()).then(()=>getDoc(doc(db,"students",user.uid,"notes",deck))).then(x=>{const p=x.exists()?((x.data().parts||{}).gt||{}):null;
       if(p&&(p.html||p.text||(p.dr||[]).length)&&!WB.dirty&&WB.deck===deck&&WB.m.isOpen()){WB.v={html:p.html||"",text:p.text||"",dr:p.dr||[]};WB.m.set(WB.v)}}).catch(e=>console.warn("whiteboard notes",e))}};
   if(WB.m)go();else wbMod().then(go).catch(()=>{if(kind==="grammar"&&WB.rt)gtBox(box,rt)});
   return true;
@@ -1140,9 +1159,10 @@ async function wbSave(){
   const html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
   const now=serverTimestamp(),day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
   if(WB.m)WB.m.status(wbT("Desant…","Saving…"));
-  try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck,
+  try{if(kind==="grammar")await gtLegacy();
+    await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:lsId||"",course:(relPath.match(/^\d+eso/)||[""])[0],deck,
       title:(kind==="grammar"?"📘 ":"📖 ")+(wbTitle()||(kind==="grammar"?"Grammar":"Reading")),lp:window.LP&&window.LP.n?"LP"+window.LP.n+" "+String(window.LP.title&&(window.LP.title.en||window.LP.title)||a&&a.title||"").replace(/\s*\(.*$/,""):a&&window.elLpLabel?elLpLabel(a):"",
-      parts:{gt:{topic:kind==="grammar"?"How it works · together":"Reading together",day,sum,text:String(v.text||"").slice(0,3000),html,dr,at:now}},updated:now},{merge:true});
+      parts:{gt:{topic:kind==="grammar"?"How it works · together":"Reading together",...(kind==="grammar"?{sec:gtSecId(rt)}:{}),day,sum,text:String(v.text||"").slice(0,3000),html,dr,at:now}},updated:now},{merge:true});
     if(WB.m&&WB.deck===deck)WB.m.status(wbT("✓ Desat a 📓 La meva llibreta","✓ Saved in 📓 My notebook"))}
   catch(e){console.warn("whiteboard notes",e);WB.dirty=true;if(WB.m)WB.m.status(wbT("⚠ Encara no s'ha desat: continua, ho torna a provar","⚠ Not saved yet: keep going, it tries again"));WB.t=setTimeout(wbSave,8e3)}
 }

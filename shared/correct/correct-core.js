@@ -176,7 +176,32 @@
   }
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[^a-zà-ÿ0-9']+/g, ' ').trim();
 
-  const api = { ROUTES, NAME, byLevel, forLevel, qid, esc, plain, units, evidence, slidesFor, snippet, textFor, answerOf, boxesFor, boxLabel, fill, norm };
+  /* 🙌 4 questions together, before ⏱ Your turn (Roger, 16 Nov 2026: "I only want to do 4 questions together and then give their time to do
+     their questions on the SLP"): taken from the ➕ extra practice, never from a question that is compulsory for any level (those stay for
+     the students to do alone). The ones every level has first, then the ones most levels have, in the data's order; no ✏️ own examples. */
+  function togetherFor(panel, routes, n) {
+    if (!panel || !Array.isArray(panel.items)) return [];
+    const req = new Set();
+    routes.forEach(r => {
+      const by = {}, order = [];
+      forLevel(panel.items, r).forEach(it => { const k = panel.parts ? it.p : ''; if (!by[k]) { by[k] = []; order.push(k); } by[k].push(it); });
+      order.forEach(k => { const L = by[k], own = L.filter(x => x.own), plain = L.filter(x => !x.own), m = panel.req || 7;
+        (own.length ? plain.slice(0, m - 1).concat(own.slice(0, 1)) : plain.slice(0, m)).forEach(x => req.add(x)); });
+    });
+    const list = r => forLevel(panel.items, r).filter(x => !x.own);
+    // when no extra is for every level, half of them come from the Starter / Base extras (easy ones first), the rest from Core and Plus
+    const c = panel.items.map((it, i) => ({ it, i, on: routes.filter(r => forLevel([it], r).length) }))
+      .filter(x => !x.it.own && !req.has(x.it) && x.on.length)
+      .sort((a, b) => b.on.length - a.on.length || a.i - b.i), N = n || 4, low = x => x.on.includes('beginners') || x.on.includes('insecure');
+    const pick = c.filter(x => x.on.length === routes.length).slice(0, N);
+    c.filter(x => !pick.includes(x) && low(x)).slice(0, Math.max(0, Math.ceil(N / 2) - pick.length)).forEach(x => pick.push(x));
+    c.filter(x => !pick.includes(x)).slice(0, N - pick.length).forEach(x => pick.push(x));
+    return pick.sort((a, b) => ri(a.on[0]) - ri(b.on[0]) || a.i - b.i)
+      .map(({ it, on }) => ({ kind: 'shared', together: true, panel: panel.id, q: tx(it.q), ans: answerOf(it), alt: it.a ? [].concat(it.a).slice(1) : [], mc: !!it.o, qid: qid(it),
+        routes, on, all: on.length === routes.length, per: on.map(r => ({ r, num: list(r).indexOf(it) + 1 })) }));
+  }
+
+  const api = { ROUTES, NAME, byLevel, forLevel, qid, esc, plain, units, evidence, slidesFor, togetherFor, snippet, textFor, answerOf, boxesFor, boxLabel, fill, norm };
   root.ELCorrect = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
