@@ -295,7 +295,8 @@ window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
 // 📖 The Book is ONE tab, "book" (Roger, 13 Nov 2026: "only one SLP for the book so that people can continue where they left off"): its
 // steps are the chapters (ch1 … ch6). A chapter planned on the Time plan before then (path#ch1) counts as the book (elTabOf).
 window.elBookPath=a=>/\/ls2-book$|(^|\/)book\.html$/.test(typeof a==="string"?a.split("#")[0]:(a&&a.id)||"");   // an id or a page path
-window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p;
+// 💬 Expressions (vocabEx, tools/gen-sections.js): a planning-only item of the Vocabulary step, so it opens and counts as that tab
+window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p==="vocabEx"?"vocab":p;
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];if(id==="book"&&elBookPath(a))return ks.slice();return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked

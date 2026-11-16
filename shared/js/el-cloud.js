@@ -707,7 +707,9 @@ async function teacherSections(info){
 function teacherCore(){let n=0;const go=()=>{const b=document.querySelector('.route[data-level="safe"]');
   if(b&&b.onclick){if(!b.classList.contains("active"))b.click();return}if(++n<60)setTimeout(go,150)};go()}
 // A link to a section (activity.html#read, from the to-do list) opens that tab once the page is ready.
-function openHashTab(){const id=decodeURIComponent(location.hash.slice(1));if(!id)return;const t=[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click()}
+function openHashTab(){const h=decodeURIComponent(location.hash.slice(1)),id=h==="vocabEx"?"vocab":h;if(!id)return;const t=[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click();
+  // 💬 Expressions (#vocabEx, a Time plan item): the Vocabulary tab, at its Expressions card
+  if(t&&h==="vocabEx")setTimeout(()=>{const b=[...document.querySelectorAll(".vocab-expr")].find(x=>x.offsetParent);if(b)b.scrollIntoView({behavior:"smooth",block:"start"})},300)}
 addEventListener("hashchange",openHashTab);
 
 // Submit (lock) an activity from any page, using the progress saved in the cloud.

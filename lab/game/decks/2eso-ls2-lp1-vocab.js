@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Free-time activities",
   slides:[
-    {theory:"play, go or do?",ex:true,point:"play, go or do + a sport",tab:"vocab",pointCa:"play, go o do + un esport",img:"⚽",lines:[
+    {theory:"play, go or do?",ex:true,point:"play, go or do + a sport",tab:"vocabEx",pointCa:"play, go o do + un esport",img:"⚽",lines:[
       "**play** + a sport with a ball or a game: **play** football · **play** basketball · **play** video games",
       "**play the** + an instrument: **play the** guitar · **play the** piano",
       "**go** + -ing: **go** swimming · **go** skating · **go** cycling",
@@ -17,7 +17,7 @@ ELGameDeck({
     {q:"My cousin plays ___ guitar in a band.",img:"🎸",write:["the"],why:"An instrument: **play the** guitar."},
     {q:"It's raining, so Hugo is at home ___ video games.",img:"🎮",options:["playing","doing","going","making"],why:"**play** video games."},
     {q:"We ___ friends in the square after school. (m...)",img:"👫",write:["meet"],why:"**meet friends** = see them, spend time with them."},
-    {theory:"How often?",ex:true,point:"How often? (once a week…)",tab:"vocab",pointCa:"Cada quan? (once a week…)",img:"📅",lines:[
+    {theory:"How often?",ex:true,point:"How often? (once a week…)",tab:"vocabEx",pointCa:"Cada quan? (once a week…)",img:"📅",lines:[
       "**once a week** (1) · **twice a week** (2) · **every day**",
       "**at the weekend** · **in my free time**",
       "**How often** do you go swimming? — **Once a week.**"]},

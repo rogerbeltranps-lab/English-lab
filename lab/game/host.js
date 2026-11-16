@@ -183,12 +183,17 @@ async function loadPoints(){if(tpBusy)return;tpBusy=true;for(const d of gDecks()
 const pointsReady=()=>gDecks().concat(exDecks()).every(d=>d.id in RAW);
 // done: the tabs the group has done in that LS (ls/{id}.done[group], read with the played games: no extra reads)
 const doneOf=(d,g)=>((DN||{})[lsOf(d)]||{})[g]||{};
+// is "<act>#<tab>" on the group's Time plan agenda (any day)? ls/{id}.planEdits[group].agenda, read with the played games
+const onAgenda=(d,g,key)=>{try{const a=JSON.parse((((AGP||{})[lsOf(d)]||{})[g]||{}).agenda||"{}");return Object.values(a.days||{}).some(its=>(its||[]).includes(key))}catch(e){return false}};
+// the day a point's tab was done in class: 💬 Expressions (tab "vocabEx", a Time plan item of the Vocabulary step, Roger 16 Nov 2026) when
+// the teacher planned them on their own, else with the Vocabulary tab
+const doneDay=(d,g,p)=>{const done=doneOf(d,g),k=d.act+"#"+p.tab;if(done[k]||p.tab!=="vocabEx"||onAgenda(d,g,k))return done[k]||"";return done[d.act+"#vocab"]||""};
 // a point of this game's LS is ticked when the group has done its tab; a point with no tab (or an LS with no Time plan ticks for that path) when the group
 // played its game; this game's points all ticked if none of them is
 function tpDefault(g){const out={};
   gDecks().concat(exDecks()).forEach(d=>{if(!RAW[d.id])return;const P=ptsOf(d),done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g];
     // earlier LSs start unticked (the list grows every LS): the teacher ticks the ones to review
-    let ks=d.ls!==meta().ls?[]:P.filter(p=>p.tab&&info?!!done[d.act+"#"+p.tab]:(d.id===H.deckId&&!H.lsg||!!pl)).map(p=>p.k);
+    let ks=d.ls!==meta().ls?[]:P.filter(p=>p.tab&&info?!!doneDay(d,g,p):(d.id===H.deckId&&!H.lsg||!!pl)).map(p=>p.k);
     if(d.id===H.deckId&&!H.lsg&&!ks.length)ks=P.map(p=>p.k);
     out[d.id]=new Set(ks)});
   // an LS game with nothing done yet: its first learning path
@@ -322,14 +327,14 @@ let playedSid=0;
 // Which groups played each game (Roger, 8 Nov 2026: "I need to know if the games-theory have been played in a class to make sure they all
 // do them"): the game list and the group buttons show ✓ + day per group, from the same ls/{id}.played. One read per LS that has games,
 // once per board load (PL = {deck: {group: ms}}); a game played here is added at once.
-let PL=null,DN=null,plBusy=false;
+let PL=null,DN=null,AGP=null,plBusy=false;
 async function loadPlayed(){
-  if(PL||plBusy||!H.teacher)return;plBusy=true;const out={},dn={};
+  if(PL||plBusy||!H.teacher)return;plBusy=true;const out={},dn={},agp={};
   const lsIds=[...new Set((window.EL_GAMES||[]).map(d=>{const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
     const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""}).filter(Boolean))];
-  await Promise.all(lsIds.map(async id=>{try{const d=await S.getDoc(S.doc(db,"ls",id)),p=(d.exists()&&d.data().played)||{};dn[id]=(d.exists()&&d.data().done)||{};
+  await Promise.all(lsIds.map(async id=>{try{const d=await S.getDoc(S.doc(db,"ls",id)),p=(d.exists()&&d.data().played)||{};dn[id]=(d.exists()&&d.data().done)||{};agp[id]=(d.exists()&&d.data().planEdits)||{};
     for(const g in p)for(const k in p[g])(out[k]=out[k]||{})[g]=p[g][k]}catch(e){console.warn("played",e)}}));
-  PL=out;DN=dn;plBusy=false;draw();
+  PL=out;DN=dn;AGP=agp;plBusy=false;draw();
 }
 const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
 
@@ -564,7 +569,7 @@ function drawPoints(){
   const lsList=[...new Set(gDecks().map(d=>d.ls||""))];
   // the ticks of one deck's points (a grammar deck, or 💬 the expressions of its learning path's vocabulary deck, labelled as such)
   const A=anchor(sel),rows=(d,me)=>{const P=ptsOf(d),done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set(),ex=kindIs(d)==="vocab"&&kindOf()==="grammar";
-    const why=p=>{if(p.tab&&info){const v=done[d.act+"#"+p.tab];return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
+    const why=p=>{if(p.tab&&info){const v=doneDay(d,g,p);return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
       return pl?`<span class="tpy">✓ ${ex?"vocabulary ":""}game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">${ex?"vocabulary ":""}game not played yet</span>`};
     return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}><span class="tpt">${ex?"💬 <b>Expressions</b> · ":""}${esc(p.name)}</span><small>${why(p)}</small></label>`).join("")};
   const lp=d=>{const me=d.id===A,x=exDeck(d);
