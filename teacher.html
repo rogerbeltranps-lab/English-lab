@@ -847,6 +847,10 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
 const audioUrl=(id,p)=>"https://drive.google.com/file/d/"+encodeURIComponent(id)+"/"+(p||"view");
 const audioA=x=>x&&x.audio&&x.audio.id?` <a class="au" href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""}" style="text-decoration:none">🔊</a>`:"";
 const audioBox=x=>x&&x.audio&&x.audio.id?`<p><b>🔊 Recording</b>${x.audio.s?` <small class="muted">(${x.audio.s} s)</small>`:""} · <a href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener">open in Drive</a></p><iframe src="${audioUrl(x.audio.id,"preview")}" style="width:100%;height:90px;border:0" allow="autoplay"></iframe>`:"";
+// 🔇 no recording (Roger, 16 Nov 2026: "why don't I see the audio here?" on a Speaking handed in Sun 8 Nov at 18:00): recordings are only
+// kept since PR #444 (Sun 8 Nov, 19:45); before that, and when an upload did not reach Drive, the hand-in has no x.audio. Say so instead of nothing.
+const REC_FROM="2026-11-08T18:45:00Z";
+const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
 const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+audioA(((pstate(u,a)||{}).steps||{})[k])};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
 // the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
@@ -867,7 +871,7 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l==="Text"&&/speak|talk/.test(step)?"What they said (transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${audioBox(((pstate(u,a)||{}).steps||{})[step])}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
@@ -3823,7 +3827,7 @@ function handIns(u,a){
     const wait=waits(x,xr,id),ca=cmtCa(xr,x,id);
     return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Claude left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Claude":cmtGone(xr,x,id)?" · Claude's answer removed":x.comment?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
-      +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)
+      +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+(audioBox(x)||noAudio(x,id))
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
       +(x.peers||[]).map(q=>`<p>👥 ${esc(q.name)}: ${q.r.map(r=>r.v+" "+esc(r.s)).join(" · ")}</p>`).join("")
       +cmtBox(u,a,id,x)+`</div></details>`}).join("");
