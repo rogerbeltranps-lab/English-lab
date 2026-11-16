@@ -25,7 +25,7 @@ const TM={len:600,left:600,on:false,iv:null};
    seen together in green), then the sentences one by one: the answer in its gap, the levels that have it with their own number, the
    rule, and what the class wrote. GV: the boxes shown together, "all" (every level's, each with its level) or one level's. */
 // GP: the grammar step (tab=grammar, or one of the steps a Grammar tab was split into: tab=grammarRel…, 4 ESO LS2 LP3, 14 Nov 2026)
-const GRAM=window.elIsGrammar?elIsGrammar(TAB):TAB==="grammar",GP=GRAM?TAB:"grammar",GV_K="el_gx_view_"+course;let GV="all";try{const v=localStorage.getItem(GV_K);if(v==="all"||ROUTES.includes(v))GV=v}catch(e){}
+const GRAM=window.elIsGrammar?elIsGrammar(TAB):TAB==="grammar",GP=GRAM?TAB:"grammar",XP=TAB==="vocabEx",GV_K="el_gx_view_"+course;let GV="all";try{const v=localStorage.getItem(GV_K);if(v==="all"||ROUTES.includes(v))GV=v}catch(e){}
 let PRO_ON=false;
 
 async function build(){
@@ -71,20 +71,20 @@ function gBoxes(){
 const lvCls=b=>b.pro?"pro":b.all?"all":"on";
 function explainAll(){
   const B=gBoxes(),g=LP.panels.find(p=>p.id===GP);
-  return `<div class="chips"><span class="chip all">📘 How it works · together</span>`+
+  return `<div class="chips"><span class="chip all">${XP?"💬 Expressions · together":"📘 How it works · together"}</span>`+
     ["all"].concat(ROUTES).map(v=>`<button class="chip lvb ${v===GV?"on":""}" data-gv="${v}" title="${v==="all"?"Every level's boxes, each with its level":"Only the "+NAME[v]+" boxes"}">${v==="all"?"All levels":NAME[v]}</button>`).join("")+`</div>`+
     // 📓 drawn like the student's notebook (Roger, 13 Nov 2026: "when I explain the theory, I want the slide look like this"): lined paper,
     // a 🧩 Grammar post-it, the title in pencil and each box a taped slip in the teacher's handwriting, the same boxes (panel.explain)
     // and the same el-notebook.css classes as the notebook, only bigger for the projector (.nbx in index.html).
     // A visual box's Catalan copy (cards, tables) stays on the Base / Starter Chromebooks only: on the projector it doubled the box
-    `<div class="nb-postit k-grammar">🧩 Grammar</div><h1 class="gt nb-h3">${esc(tx(g.title))}</h1>`+
+    `<div class="nb-postit k-grammar">${XP?"💬 Expressions":"🧩 Grammar"}</div><h1 class="gt nb-h3">${esc(tx(g.title))}</h1>`+
     `<div class="gxs ${RP>=0?"focus":""}">`+B.map((b,i)=>`<div class="gx nb-slip ${i===RP?"now":""}" data-rp="${i}"><span class="chip ${lvCls(b)}">${b.all?"👥 ":""}${esc(b.lab)}</span><div class="en">${b.en}</div>${b.ca&&X.norm(b.ca)!==X.norm(b.en)&&!/<(div|table)\b/i.test(b.ca)?`<div class="cax">${b.ca}</div>`:""}</div>`).join("")+`</div>`+
     `<p class="hint">${GV==="all"?"Every level's explanation, each box with the levels that have it.":"The "+NAME[GV]+" explanation."}${G?" Every Chromebook shows these same boxes now (Base and Starter in Catalan where there is a translation) and follows the yellow one; their own level's boxes come back for ⏱ Your turn"+(GV==="all"?".":", with the ones not seen together in green.")+" Space, → or a click: next box.":""}</p>`;
 }
 // what the students' "How it works" box shows while explaining together (el-cloud.js rtFollow, rt.p): the same boxes, English (h) and
 // Catalan where the box has it (hc, for Base and Starter), each with its level
 function gHtml(B,ca){const lab=b=>ca?b.lab.replace("Everyone","Tothom").replace(" only"," només"):b.lab;
-  return `<h3>📘 ${ca?"Com funciona · junts":"How it works · together"}</h3>`+B.map(b=>`<div class="model"><span style="display:inline-block;font:800 12px system-ui,sans-serif;padding:1px 8px;border-radius:999px;margin-right:6px;background:${b.all?"#e3f4ea":b.pro?"#f3e8ff":"#dfe9ff"};color:${b.all?"#1f6b40":b.pro?"#6b21a8":"#2b4fa8"}">${esc(lab(b))}</span>${ca&&b.ca?b.ca:b.en}</div>`).join("")}
+  return `<h3>${XP?"💬 "+(ca?"Expressions · junts":"Expressions · together"):"📘 "+(ca?"Com funciona · junts":"How it works · together")}</h3>`+B.map(b=>`<div class="model"><span style="display:inline-block;font:800 12px system-ui,sans-serif;padding:1px 8px;border-radius:999px;margin-right:6px;background:${b.all?"#e3f4ea":b.pro?"#f3e8ff":"#dfe9ff"};color:${b.all?"#1f6b40":b.pro?"#6b21a8":"#2b4fa8"}">${esc(lab(b))}</span>${ca&&b.ca?b.ca:b.en}</div>`).join("")}
 const textOf=h=>{const d=document.createElement("div");d.innerHTML=h||"";return d.textContent};
 function gSend(){
   const s=slides[at],tg=!!(s&&s.together),on=s&&(s.kind==="explain"||tg),ei=slides.findIndex(x=>x.kind==="explain"),after=s&&ei>=0&&at>ei,u=LS+"/"+LPF+".html";

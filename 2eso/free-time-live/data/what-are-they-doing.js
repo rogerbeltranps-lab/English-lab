@@ -21,8 +21,43 @@ window.LP = {
       intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'crowd · half-time · highlights',
       core: { beginners: ['T-shirt', 'trainers', 'shorts', 'cap', 'It’s sunny', 'It’s cold', 'It’s hot', 'It’s raining'], insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
-      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
-         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      groups: [
+        { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
+        { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
+        { r: 'safe', g: 'Events (Safe)', items: [['a concert', 'un concert', 'We’re going to a concert tonight.'], ['a match', 'un partit', 'The match starts at six.'], ['a festival', 'un festival', 'There is a music festival in July.'], ['a competition', 'una competició', 'She’s in a dance competition.'], ['a tournament', 'un torneig', 'Our team is playing in a tournament.'], ['a show', 'un espectacle', 'The show starts at eight.'], ['a fair', 'una fira', 'The town fair is this weekend.'], ['win / lose a match', 'guanyar / perdre un partit', 'We usually win, but today we’re losing!'], ['score a goal', 'marcar un gol', 'Marc is scoring a lot of goals this season.']] },
+        { r: 'safe', g: 'More weather (Safe)', items: [['foggy', 'hi ha boira', 'It’s foggy this morning.'], ['stormy', 'hi ha tempesta', 'It’s stormy, so the fair is closed.'], ['freezing', 'gèlid', 'It’s freezing! Minus two degrees.'], ['What’s the weather like?', 'Quin temps fa?', 'What’s the weather like in Girona today?'], ['degrees', 'graus', 'It’s 25 degrees.']] },
+        { r: 'daring', g: 'At the event (Daring)', items: [['the crowd', 'el públic', 'The crowd is cheering.'], ['cheer', 'animar', 'The fans are cheering for the team.'], ['warm up', 'escalfar', 'The players are warming up.'], ['take part in', 'participar en', 'Twenty teams are taking part in the tournament.']] }
+      ],
+      review: [
+        { g: 'Learning Path 1', items: [['go skating', 'anar a patinar', 'They go skating at the skate park.'], ['do gymnastics', 'fer gimnàstica', 'She does gymnastics at a club.'], ['meet friends', 'quedar amb amics', 'I meet friends on Saturdays.'], ['draw', 'dibuixar', 'She draws comics.']] },
+        { r: 'safe', g: 'Learning Path 1', items: [['twice a week', 'dos cops per setmana', 'We train twice a week.']] }
+      ],
+      practice: [
+        { r: 'insecure', q: 'It’s cold and it’s raining. Take an umbrella and wear a ___. (jaqueta)', a: ['jacket'] },
+        { q: 'On your bike, always wear a ___. (casc)', a: ['helmet'] },
+        { q: 'It’s 32 degrees. It’s very ___. (calor)', a: ['hot'] },
+        { q: 'I run in my new ___. (bambes)', a: ['trainers'] },
+        { q: 'Look at the sky! It’s ___: white and cold. (nevar)', a: ['snowing'] },
+        { q: 'Put on a ___: the sun is strong. (gorra)', a: ['cap'] },
+        { q: 'It’s ___ today: the clouds are grey. (ennuvolat)', a: ['cloudy'] },
+        { r: 'insecure', q: 'The football team wears a blue ___. (uniforme)', a: ['uniform'] },
+        { r: 'insecure', q: 'In summer we play in ___, not in long trousers. (pantalons curts)', a: ['shorts'] },
+        { r: 'insecure', q: 'It’s ___: look at the trees moving! (vent)', a: ['windy'] },
+        { r: 'safe', q: 'Our team is in a basketball ___ with 12 teams this weekend.', a: ['tournament'] },
+        { r: 'safe', q: 'It’s ___: I can’t see the end of the street.', a: ['foggy'] },
+        { r: 'safe', q: '___ the weather like today? — It’s sunny.', a: ["what's", 'what is'] },
+        { r: 'safe', q: 'Marc is a great player: he ___ a goal in every match.', a: ['scores'] },
+        { r: 'daring', q: 'The ___ is cheering: 500 people!', a: ['crowd'] },
+        { r: 'daring', q: 'Before the match, the players ___ up for ten minutes.', a: ['warm'] }
+      ] },
+    /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
+       put it on the agenda"; "expressions must have the option like the grammar to correct together where I explain, then 4 examples and then
+       time to do their own questions according to their level"): the Expressions boxes moved here from the Vocabulary step, with 6 compulsory
+       questions per level (req: 6; Starter and Base their own list with choices and Catalan hints) and ➕ extra practice for every level, which
+       📘 Expressions together (shared/correct/, elIsGrammar) takes its 🙌 4 questions from. No listening. Until 💬 Expressions is on a class day
+       of the Time plan, students see the tab 🏫 for class: never To do or homework (elLaterTabs in el-catalog.js). */
+    { id: 'vocabEx', req: 6, type: 'typed', tab: { ca: '💬 Expressions', en: '💬 Expressions' }, title: { ca: 'Expressions: el temps i la roba', en: 'Expressions: weather and clothes' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Mira les expressions: són paraules que van juntes i s’aprenen en bloc. Hi ha 6 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després ve ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Look at the expressions: words that go together, learnt as one block. There are 6 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. Then comes ➕ extra practice, optional. After two wrong tries you will see the answer.' },
       explain: (function () {
         const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
           teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
@@ -68,34 +103,27 @@ window.LP = {
               mistakes('Watch out', bad('win the other team', '<b>beat</b> the other team / <b>win</b> the match'), bad('How is the weather like?', '<b>What’s</b> the weather like?')) }
         ];
       })(),
-      groups: [
-        { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
-        { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
-        { r: 'safe', g: 'Events (Safe)', items: [['a concert', 'un concert', 'We’re going to a concert tonight.'], ['a match', 'un partit', 'The match starts at six.'], ['a festival', 'un festival', 'There is a music festival in July.'], ['a competition', 'una competició', 'She’s in a dance competition.'], ['a tournament', 'un torneig', 'Our team is playing in a tournament.'], ['a show', 'un espectacle', 'The show starts at eight.'], ['a fair', 'una fira', 'The town fair is this weekend.'], ['win / lose a match', 'guanyar / perdre un partit', 'We usually win, but today we’re losing!'], ['score a goal', 'marcar un gol', 'Marc is scoring a lot of goals this season.']] },
-        { r: 'safe', g: 'More weather (Safe)', items: [['foggy', 'hi ha boira', 'It’s foggy this morning.'], ['stormy', 'hi ha tempesta', 'It’s stormy, so the fair is closed.'], ['freezing', 'gèlid', 'It’s freezing! Minus two degrees.'], ['What’s the weather like?', 'Quin temps fa?', 'What’s the weather like in Girona today?'], ['degrees', 'graus', 'It’s 25 degrees.']] },
-        { r: 'daring', g: 'At the event (Daring)', items: [['the crowd', 'el públic', 'The crowd is cheering.'], ['cheer', 'animar', 'The fans are cheering for the team.'], ['warm up', 'escalfar', 'The players are warming up.'], ['take part in', 'participar en', 'Twenty teams are taking part in the tournament.']] }
-      ],
-      review: [
-        { g: 'Learning Path 1', items: [['go skating', 'anar a patinar', 'They go skating at the skate park.'], ['do gymnastics', 'fer gimnàstica', 'She does gymnastics at a club.'], ['meet friends', 'quedar amb amics', 'I meet friends on Saturdays.'], ['draw', 'dibuixar', 'She draws comics.']] },
-        { r: 'safe', g: 'Learning Path 1', items: [['twice a week', 'dos cops per setmana', 'We train twice a week.']] }
-      ],
-      practice: [
-        { r: 'insecure', q: 'It’s cold and it’s raining. Take an umbrella and wear a ___. (jaqueta)', a: ['jacket'] },
-        { q: 'On your bike, always wear a ___. (casc)', a: ['helmet'] },
-        { q: 'It’s 32 degrees. It’s very ___. (calor)', a: ['hot'] },
-        { q: 'I run in my new ___. (bambes)', a: ['trainers'] },
-        { q: 'Look at the sky! It’s ___: white and cold. (nevar)', a: ['snowing'] },
-        { q: 'Put on a ___: the sun is strong. (gorra)', a: ['cap'] },
-        { q: 'It’s ___ today: the clouds are grey. (ennuvolat)', a: ['cloudy'] },
-        { r: 'insecure', q: 'The football team wears a blue ___. (uniforme)', a: ['uniform'] },
-        { r: 'insecure', q: 'In summer we play in ___, not in long trousers. (pantalons curts)', a: ['shorts'] },
-        { r: 'insecure', q: 'It’s ___: look at the trees moving! (vent)', a: ['windy'] },
-        { r: 'safe', q: 'Our team is in a basketball ___ with 12 teams this weekend.', a: ['tournament'] },
-        { r: 'safe', q: 'It’s ___: I can’t see the end of the street.', a: ['foggy'] },
-        { r: 'safe', q: '___ the weather like today? — It’s sunny.', a: ["what's", 'what is'] },
-        { r: 'safe', q: 'Marc is a great player: he ___ a goal in every match.', a: ['scores'] },
-        { r: 'daring', q: 'The ___ is cheering: 500 people!', a: ['crowd'] },
-        { r: 'daring', q: 'Before the match, the players ___ up for ten minutes.', a: ['warm'] }
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>It’s</b> + adjectiu (sunny, cold, raining) · color + roba: <em>a <b>red</b> T-shirt</em> · <b>wear</b> = portar posat', en: '<b>It’s</b> + adjective (sunny, cold, raining) · colour + clothes: <em>a <b>red</b> T-shirt</em> · <b>wear</b> clothes' } }],
+      items: [
+        // Starter and Base
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['It’s', 'Is', 'It makes'], q: '___ sunny today.', a: ['It’s'], ca: 'El temps sempre amb It’s.', en: 'Weather → always It’s.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['cloudy', 'cloud', 'clouds'], q: 'Look at the clouds! It’s ___.', a: ['cloudy'], ca: 'nom + y: cloud → cloudy.', en: 'noun + y: cloud → cloudy.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['cold', 'sun', 'wind'], q: 'Put on your coat: it’s ___!', a: ['cold'], ca: 'fa fred = it’s cold.', en: 'it’s cold.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['a red T-shirt', 'a T-shirt red', 'red a T-shirt'], q: 'He’s wearing ___.', a: ['a red T-shirt'], ca: 'El color va davant de la roba.', en: 'The colour goes before the clothes.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['wearing', 'carrying', 'doing'], q: 'She’s ___ a costume.', a: ['wearing'], ca: 'portar posat = wear.', en: 'Clothes on your body → wear.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['raining', 'rain', 'rains'], q: 'Take an umbrella: it’s ___.', a: ['raining'], ca: 'Ara mateix: It’s raining.', en: 'Right now: It’s raining.' },
+        // Core and Plus
+        { p: 'ex', r: 'safe', k: 'fix', q: '“It’s sun today.” → It’s ___ today.', a: ['sunny'], en: 'noun + y: sun → sunny.' },
+        { p: 'ex', r: 'safe', q: 'Mia is ___ blue shorts and new trainers. (wear)', a: ['wearing'], en: 'Clothes on your body → wear.' },
+        { p: 'ex', r: 'safe', q: 'What’s the weather ___? — It’s foggy.', a: ['like'], en: 'What’s the weather like? (not How is…)' },
+        { p: 'ex', r: 'safe', q: 'It’s ___! Minus two degrees! (f...)', a: ['freezing'], en: 'freezing = very, very cold.' },
+        { p: 'ex', r: 'safe', q: 'Our team always ___ a lot of goals. (s...)', a: ['scores'], en: 'score a goal.' },
+        { p: 'ex', r: 'safe', k: 'fix', q: '“We won the other team.” → We ___ the other team.', a: ['beat'], en: 'win a match, beat a team.' },
+        // ➕ for every level (📘 Expressions together takes its 4 questions from these)
+        { p: 'ex', opts: ['windy', 'wind', 'winds'], q: 'Today it’s ___: there’s a lot of wind.', a: ['windy'], ca: 'nom + y: wind → windy.', en: 'noun + y: wind → windy.' },
+        { p: 'ex', opts: ['black trainers', 'trainers black', 'black the trainers'], q: 'I’m wearing ___.', a: ['black trainers'], ca: 'El color va davant.', en: 'The colour goes first.' },
+        { p: 'ex', opts: ['It’s', 'Is', 'It'], q: '___ snowing in the mountains.', a: ['It’s'], ca: 'El temps sempre amb It’s.', en: 'Weather → always It’s.' },
+        { p: 'ex', opts: ['to', 'at', 'in'], q: 'Let’s go ___ the concert tonight!', a: ['to'], ca: 'go to + un lloc o un esdeveniment.', en: 'go to a concert, a match.' }
       ] },
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: A post and a web page', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix un post d’un club i una pàgina web d’un esdeveniment. Després respon.', en: 'Read a post from a club and an event web page. Then answer.' },
