@@ -153,7 +153,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .agc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.35;border:1px solid #c7d4ff;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:2px 8px;cursor:grab;user-select:none}
 .agc small{color:#64748b;font-size:11px}.agpl{font-size:10.5px;font-weight:700;border-radius:999px;padding:0 6px;white-space:nowrap}.agpl.y{background:#dcfce7;color:#166534}.agpl.n{background:#fee2e2;color:#991b1b}.agtg{display:inline-flex;gap:2px;margin-left:2px}.agtg i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.aglh .agtg{margin-left:6px;vertical-align:1px}.agkey{font-size:11.5px;color:#64748b;margin:4px 0 8px}.agkey i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
-.agwu{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:4px 0 6px;padding:4px 10px;border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:10px;font-size:12.5px;line-height:1.35}.agwu b{font-weight:700}.agwus{font-style:italic;color:#7c2d12}.agwu small{color:#c2410c}
+.agwu{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:4px 0 6px;padding:4px 10px;border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:10px;font-size:12.5px;line-height:1.35}.agwu b{font-weight:700}.agwu .agmin,.agwu .agiw{align-self:center}.agwus{font-style:italic;color:#7c2d12}.agwu small{color:#c2410c}
 a.agnm{color:inherit;text-decoration:none}a.agnm:hover{text-decoration:underline}.aghwd{font-size:11px;color:#0e7490;white-space:nowrap}.agc.hw small{white-space:nowrap}.agl .agc.hw{flex-wrap:wrap}
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#fef08a;border-color:#eab308;color:#713f12;font-weight:600;border-radius:10px;box-shadow:0 1px 2px #a1620726}.agc.nt.dl{background:#ffedd5;border-color:#f97316;color:#9a3412}
@@ -3353,7 +3353,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
   if(fn&&fn(ag,tk,on)===false)return;
   Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
-  if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
+  if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|"),it=q.slice(i+1);if(!(it===WU?wuOn(ag,q.slice(0,i)):(ag.days[q.slice(0,i)]||[]).includes(it))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
   if(ag.man){Object.keys(ag.man).forEach(d=>{if(!ag.days[d])delete ag.man[d]});if(!Object.keys(ag.man).length)delete ag.man}
   if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
   if(ag.solo){Object.keys(ag.solo).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.solo[q]});if(!Object.keys(ag.solo).length)delete ag.solo}
@@ -3545,19 +3545,27 @@ const agPl=(x,p,sh)=>{if(!isGame(p)||isCb(p))return "";const ms=(((S.D.ls[x.ls]|
 // 🔥 The warm-up first on every class day (Roger, 14 Nov 2026: "the games that we do now should appear at the beginning of each day"): class
 // mode opens each class with it (el-warmup.js, since 13 Nov): 💬 the saying of the day, then a game (Hangman, Word order, Spot the mistake
 // or No vowels, taking turns) with the words of the day's class games (el-cm-agenda.js warmDecks; with none that day, the last class day's).
-// Display only, nothing saved: the saying shown is the one class mode will show that day for the group (el-warmup.js sayFor).
-const WU_FROM="2026-11-13";
+// Nothing saved but its minutes: the saying shown is the one class mode will show that day for the group (el-warmup.js sayFor).
+// It counts as whole-class work (Roger, 16 Nov 2026: "the warm up activity should be counted as group work (class)"): it carries the whole-class
+// icon and a ⏱ menu (5 min unless you change it, stored like any item's minutes as min["day|warmup"]), and its minutes go into the day's
+// "of 60 min planned" and into the "How they work" circle as whole class.
+const WU_FROM="2026-11-13",WU="warmup";
+const wuOn=(ag,d)=>{const its=(ag.days||{})[d]||[];return d>=WU_FROM&&!its.includes("self")&&its.some(it=>it!=="exam"&&!/^note:⏰/.test(it))};
+const wuMin=(ag,d)=>wuOn(ag,d)?agMin(ag,d,WU)||5:0;
+const wuSel=(x,d)=>{const v=wuMin(agOf(x),d),os=[...new Set([...MINS,v])].sort((a,b)=>a-b);
+  return `<select class="agmin on" data-do="agmin" data-d="${d}" data-it="${WU}" data-gid="${x.gid}" data-ls="${x.ls}" title="Minutes for the warm-up (5 unless you change it)" aria-label="Minutes for the warm-up">`
+    +`${os.map(m=>`<option value="${m===5?"":m}" ${m===v?"selected":""}>${m} min</option>`).join("")}<option value="other">Other…</option></select>`};
 const wuDecks=(x,d)=>{const ag=agOf(x),G=(window.EL_GAMES||[]).filter(g=>g.kind==="vocab"||g.kind==="grammar"),ids=[],add=id=>{if(!ids.includes(id)&&G.some(g=>g.id===id))ids.push(id)};
   const on=dd=>((ag.days||{})[dd]||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0||/^note:/.test(it))return;const a=byId(it.slice(0,i)),p=it.slice(i+1);
     if(/^game:(?!cb-)/.test(p))add(p.slice(5));else if(a&&!/\/book\.html$/.test(a.path||""))gamesOf(a).forEach(z=>{if(!isCb(z[0]))add(z[2].id)})});
   on(d);if(!ids.length)Object.keys(ag.days||{}).filter(z=>z<d).sort().reverse().some(z=>{on(z);return ids.length});return ids};
 let wuLoad=null;
-function wuRow(x,d){if(d<WU_FROM||!((agOf(x).days||{})[d]||[]).some(it=>it!=="self"&&it!=="exam"&&!/^note:⏰/.test(it)))return "";
+function wuRow(x,d){if(!wuOn(agOf(x),d))return "";
   if(!window.ELWu){if(!wuLoad)wuLoad=import("./shared/js/el-warmup.js?v=20261114").then(m=>{window.ELWu=m;render()}).catch(e=>console.warn("warm-up",e));return ""}
   const ds=wuDecks(x,d),G=window.EL_GAMES||[],lps=[...new Set(ds.map(id=>String((G.find(g=>g.id===id)||{}).lp||"").split(" · ")[0]).filter(Boolean))];
   const pre=ds.length?ds:acts(x.ls).flatMap(a=>gamesOf(a).filter(z=>!isCb(z[0])).map(z=>z[2].id)),say=ELWu.sayFor(x.gid,pre,d)||[];
   return `<div class="agwu" title="Class mode opens with it, before anything else: the saying of the day, then a quick whole-class game (Hangman, Word order, Spot the mistake or No vowels, a different one each class)${lps.length?" with the words of "+esc(lps.join(" + ")):""}">`
-    +`<b>🔥 Warm-up</b>${say[0]?` <span class="agwus" title="${esc(say[1]||"")}${say[2]?" · "+esc(say[2]):""}">💬 “${esc(say[0])}”</span>`:""}<small>🎲 game${lps.length?" · "+esc(lps.join(" + "))+" words":""}</small></div>`}
+    +`${wuSel(x,d)}<b>🔥 Warm-up</b><span class="agiw c fix" title="Whole class">${wkIco("c")}</span>${say[0]?` <span class="agwus" title="${esc(say[1]||"")}${say[2]?" · "+esc(say[2]):""}">💬 “${esc(say[0])}”</span>`:""}<small>🎲 game${lps.length?" · "+esc(lps.join(" + "))+" words":""}</small></div>`}
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
@@ -3581,7 +3589,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const l=Object.entries(((x.p._added||{})[x.gi])||{}).find(([,v])=>v.key==="@"+d),ri=l?x.p.rows.findIndex(r=>lines(x,r).includes(l[0])):-1;
   return `<div class="agday ${d===t?"today":""} ${past?"past":""} ${done?"done":""} ${late?"late":""} ${c?"cpt":""}" data-agdrop="${d}" ${D}>`
     +`<div class="agdh"><b>${esc(dayLab(d))}</b><small>${esc(slotOf(x.gid,d))}</small>${d===t?`<span class="agt">Today</span>`:""}${done?`<span class="agok">✓ Done</span>`:late?`<span class="agwarn">⚠ not ticked</span>`:""}</div>`
-    +(m=>{if(!m)return "";const L=+((window.EL_TIMETABLE||{}).len)||60;return `<div class="agtot agtotd ${m>L?"over":""}" title="Minutes you set on this day's items · the class lasts ${L} min">⏱ ${m} of ${L} min planned${m>L?` · ${m-L} too many`:m<L?` · ${L-m} free`:""}</div>`})(its.reduce((t,it)=>t+agMin(ag,d,it),0))
+    +(m=>{if(!m)return "";const L=+((window.EL_TIMETABLE||{}).len)||60;return `<div class="agtot agtotd ${m>L?"over":""}" title="Minutes you set on this day's items · the class lasts ${L} min">⏱ ${m} of ${L} min planned${m>L?` · ${m-L} too many`:m<L?` · ${L-m} free`:""}</div>`})(its.reduce((t,it)=>t+agMin(ag,d,it),wuMin(ag,d)))
     +(self?`<div class="agself">📚 Self-study (you are away) <button type="button" class="agx" data-do="agself" data-d="${d}" ${D} title="You teach this class yourself">✕</button></div>`:"")
     +(self?"":wuRow(x,d))+(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
     +(!its.length&&!isEx?`<p class="agempty">Drop a learning path or a tab here</p>`:"")
@@ -3655,12 +3663,12 @@ function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.i
 // How the class works (Roger, 9 Nov 2026: "I need a % of the kind of activity on top like individually 20%, pairs 20%, groups 5%, class 20"
 // + "I need cercles"): a circle with the share of the class-day minutes done individually, in pairs, in groups and as a whole class. Every
 // tab on a class day (not in a dropped learning path) counts with its ⏱ minutes, 10 when none are set; 🎬 shadowing with the whole class
-// counts its minutes or 5; homework counts as individual work.
+// counts its minutes or 5, and so does the 🔥 warm-up (wuMin); homework counts as individual work.
 const WKC={i:"#64748b",p:"#0ea5e9",g:"#f59e0b",c:"#a855f7"};
 function wkPie(x){const ag=agOf(x);if(!ag)return "";const dr=(x.p._dropped||{})[x.gi]||[],hw=hwItems(x),m={i:0,p:0,g:0,c:0};
-  Object.entries(ag.days).forEach(([d,its])=>its.forEach(it=>{if(it===SHD){m.c+=agMin(ag,d,it)||5;return}
+  Object.entries(ag.days).forEach(([d,its])=>{m.c+=wuMin(ag,d);its.forEach(it=>{if(it===SHD){m.c+=agMin(ag,d,it)||5;return}
     const i=it.indexOf("#");if(/^note:/.test(it)||i<1||i===it.length-1||dr.includes(it.slice(0,i))||!byId(it.slice(0,i)))return;
-    m[agWkX(x,ag,d,it,hw)]+=agMin(ag,d,it)||10}));
+    m[agWkX(x,ag,d,it,hw)]+=agMin(ag,d,it)||10})});
   const tot=m.i+m.p+m.g+m.c;if(!tot)return "";const ks=["i","p","g","c"],pc={};
   ks.forEach(k=>{pc[k]=Math.round(m[k]/tot*100)});const big=ks.reduce((a,k)=>m[k]>m[a]?k:a,"i");pc[big]+=100-ks.reduce((a,k)=>a+pc[k],0);
   let at=0;const grad=ks.filter(k=>m[k]).map(k=>{const a=at;at+=m[k]/tot*360;return `${WKC[k]} ${a}deg ${at}deg`}).join(",");
