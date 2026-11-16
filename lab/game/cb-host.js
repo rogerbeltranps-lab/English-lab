@@ -156,7 +156,7 @@ async function saveResults(){
   const day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const w=S.writeBatch(db),now=S.serverTimestamp(),mine={};
   // 🔁 the review questions of 🧩 Which grammar? go with this round's grammar game, numbered after its own (n), with their game and point (d, dp)
-  const gGame=H.games.find(z=>z.kind!=="vocab"),off=gGame&&H.L.decks[gGame.id]?H.L.decks[gGame.id].nmax:0;let rn=off;
+  const gGame=H.games.length===1?H.games[0]:H.games.find(z=>z.kind!=="vocab"),off=gGame&&H.L.decks[gGame.id]?H.L.decks[gGame.id].nmax:0;let rn=off;
   const rvQs=rvIds().flatMap(id=>((H.L.decks[id]||{}).qs||[]).map(q=>Object.assign({},q,{n:++rn,d:id,dp:q.p,p:""})));
   H.games.forEach((gm,gi)=>{const dk=H.L.decks[gm.id];if(!dk)return;const all=gm===gGame?dk.qs.concat(rvQs):dk.qs;
     const qs=all.filter(q=>Object.values(M).some(x=>x[q.key]));if(!qs.length)return;

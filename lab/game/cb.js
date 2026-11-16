@@ -15,7 +15,7 @@
 //   load(ids, wordIds, x) loads the decks (and their decks/more files) → {decks:{id:{id, title, kind, qs}}, pool, words}; wordIds: where the
 //                         password words come from when the round has no vocabulary (a grammar game alone); x = {rv, tp} from 🧩 Which
 //                         grammar? (host.js, Roger 16 Nov 2026): tp {deck: [points]} keeps only the questions of the ticked grammar points
-//                         (a grammar deck not in tp has none), rv = other grammar games whose ticked points come in as 🔁 review (keys r<j>_<n>),
+//                         (a deck not in tp has none; tp comes only with one game alone), rv = other grammar games whose ticked points come in as 🔁 review (keys r<j>_<n>),
 //                         n of each review point (chosen with seed, the same on the board and every Chromebook)
 //   order(pool, seed)     the order of the questions for one student: new questions first, vocabulary and grammar taking turns
 //   shown(qu, seed)       the order of a question's options for one student (the deck's first option is the right one)
@@ -55,7 +55,7 @@ async function load(ids,wordIds,x){
     const th={};let qs=deckQs(got,id,kind,th),more=null;window.ELGameMore=m=>{more=m};await script(base+"decks/more/"+id+".js");
     if(more&&Array.isArray(more.questions)){let n=qs.length;more.questions.forEach(q=>{n++;qs.push(Object.assign({},q,{deck:id,kind,n,tp:+q.p||0,p:q.p?"p"+q.p:"",key:(kind==="vocab"?"v":"g")+n,extra:R<0}))})}
     const nmax=qs.length;if(R>=0)qs.forEach(q=>{q.key="r"+R+"_"+q.n;q.rv=true});
-    if(tp&&kind!=="vocab")qs=qs.filter(q=>(tp[id]||[]).map(Number).includes(q.tp));
+    if(tp)qs=qs.filter(q=>(tp[id]||[]).map(Number).includes(q.tp));
     if(R>=0&&+x.n>0){const keep=new Set();[...new Set(qs.map(q=>q.tp))].forEach(t=>shuf(qs.filter(q=>q.tp===t),(+x.seed||0)+hash(id+"."+t)).slice(0,+x.n).forEach(q=>keep.add(q.key)));qs=qs.filter(q=>keep.has(q.key))}
     decks[id]={id,title:got.title,kind,qs,th,more:!!more,nmax,rv:R>=0}}
   const pool=Object.values(decks).flatMap(d=>d.qs);let ws=words(pool);
