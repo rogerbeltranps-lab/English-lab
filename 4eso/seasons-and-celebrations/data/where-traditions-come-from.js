@@ -17,7 +17,19 @@ window.LP = (function () {
         const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
         // a row of small tiles (a scale): [colour, big top line, label]
         const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
-        const PAIRS = ['bor', 'excit', 'tir', 'interest', 'amaz', 'surpris', 'disappoint', 'frighten'].map(w => [w + '<b style="color:#1d4ed8">ed</b>', w + '<b style="color:#c2410c">ing</b>']);
+        /* the verbs behind the -ed / -ing feelings (Roger, 16 Nov 2026: "When explaining the -ed/-ing feelings grammar, I want regular and irregular
+           verbs and a mini explanation"): [verb, -ed stem, -ing stem, Catalan]. Regular: + -ed / + -ing (bore → bor|ed, bor|ing). */
+        const ED = s => '<b style="color:#1d4ed8">' + s + '</b>', ING = s => '<b style="color:#c2410c">' + s + '</b>';
+        const REG = [['bore', 'bor', 'bor', 'avorrir'], ['excite', 'excit', 'excit', 'il·lusionar'], ['tire', 'tir', 'tir', 'cansar'], ['interest', 'interest', 'interest', 'interessar'],
+          ['amaze', 'amaz', 'amaz', 'meravellar'], ['surprise', 'surpris', 'surpris', 'sorprendre'], ['disappoint', 'disappoint', 'disappoint', 'decebre'], ['frighten', 'frighten', 'frighten', 'espantar'],
+          ['relax', 'relax', 'relax', 'relaxar'], ['annoy', 'annoy', 'annoy', 'molestar'], ['embarrass', 'embarrass', 'embarrass', 'avergonyir'], ['worry', 'worri', 'worry', 'preocupar']];
+        const regRows = (h, cat) => [h].concat(REG.map(([v, e, i, c]) => ['<b>' + v + '</b>' + (cat ? ' <span style="color:#64748b;font-size:.9em">(' + c + ')</span>' : ''), e + ED('ed'), i + ING('ing')]));
+        // irregular verbs: no -ed; the feeling word is the verb's 3rd form (past participle)
+        const IRR = cat => [cat ? ['Verb (1 · 2 · <b>3</b>)', '🙋 Com et sents', '🎆 Com és la cosa'] : ['Verb (1 · 2 · <b>3</b>)', '🙋 How you feel', '🎆 What it is like'],
+          ['upset · upset · <b>upset</b>' + (cat ? ' <span style="color:#64748b;font-size:.9em">(disgustar, entristir)</span>' : ''), 'I’m ' + ED('upset') + '.', 'The news is ' + ING('upsetting') + '.'],
+          ['break · broke · <b>broken</b>' + (cat ? ' <span style="color:#64748b;font-size:.9em">(trencar)</span>' : ''), 'She was heart' + ED('broken') + '.', 'The ending was heart' + ING('breaking') + '.'],
+          ['lose · lost · <b>lost</b>' + (cat ? ' <span style="color:#64748b;font-size:.9em">(perdre)</span>' : ''), 'I felt ' + ED('lost') + ' in the crowd.', '—'],
+          ['feed · fed · <b>fed</b>' + (cat ? ' <span style="color:#64748b;font-size:.9em">(alimentar)</span>' : ''), 'I’m ' + ED('fed up') + ' with the rain.', '—']];
         // a timeline from the past to now, with dots where things happen (x in %) and an optional ✗ at "now"
         const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
           dots.map(([x, t]) => '<span style="position:absolute;left:' + x + '%;top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-25%);font-size:.95em;color:#1d4ed8">' + t + '</span>' : '')).join('') +
@@ -81,14 +93,30 @@ window.LP = (function () {
               row(card('blue', '🙋 -ed = com et sents TU', ex('I’m <b>bored</b>.', 'm’avorreixo') + ex('We were <b>excited</b> about the party.', 'il·lusionats') + ex('She was <b>tired</b> after the parade.', 'cansada') + ex('My brother was <b>frightened</b> of the masks.', 'tenia por') + ex('I’m <b>interested in</b> Diwali.', 'm’interessa')),
                 card('orange', '🎆 -ing = com és LA COSA', ex('The speech is <b>boring</b>.', 'és avorrit') + ex('The fireworks were <b>amazing</b>.', 'increïbles') + ex('Dancing all night is <b>tiring</b>.', 'cansa') + ex('The film was <b>frightening</b>.', 'feia por'))) +
               tip('Truc:', 'pregunta’t <u>qui</u> sent què. 🎬 <em>The film was <b>frightening</b></em> → 😱 <em>so I was <b>frightened</b>.</em>') +
-              table([['🙋 -ed (persona)', '🎆 -ing (cosa)']].concat(PAIRS)) +
               mistakes('Compte!', bad('I’m boring.', 'I’m <b>bored</b>.', '(“I’m boring” = sóc una persona avorrida!)'), bad('interested on', 'interested <b>in</b>')),
             en: head('😊', 'Feelings: -ed or -ing?', 'Many feeling adjectives have two forms, and they don’t mean the same thing!') +
               row(card('blue', '🙋 -ed = how YOU feel', ex('I’m <b>bored</b>.') + ex('We were <b>excited</b> about the party.') + ex('She was <b>tired</b> after the parade.') + ex('My brother was <b>frightened</b> of the masks.') + ex('I’m <b>interested in</b> Diwali.')),
                 card('orange', '🎆 -ing = what THE THING is like', ex('The speech is <b>boring</b>.') + ex('The fireworks were <b>amazing</b>.') + ex('Dancing all night is <b>tiring</b>.') + ex('The film was <b>frightening</b>.'))) +
               tip('Trick:', 'ask <u>who</u> feels what. 🎬 <em>The film was <b>frightening</b></em> → 😱 <em>so I was <b>frightened</b>.</em>') +
-              table([['🙋 -ed (person)', '🎆 -ing (thing)']].concat(PAIRS)) +
               mistakes('Watch out', bad('I’m boring.', 'I’m <b>bored</b>.', '(“I’m boring” = you are a boring person!)'), bad('interested on', 'interested <b>in</b>')) },
+          // Where -ed / -ing come from: regular and irregular verbs + a mini explanation (Roger, 16 Nov 2026), every level
+          { p: 'feel',
+            ca: head('🔤', 'D’on surten? De verbs regulars i irregulars', 'Cada parella ve d’un verb que diu què et fa una cosa: <em>The film <b>bored</b> me.</em> (la pel·lícula em va avorrir)') +
+              row(card('green', '✅ Verbs regulars: verb + -ed / verb + -ing', table(regRows(['Verb', '🙋 -ed (persona)', '🎆 -ing (cosa)'], true)) +
+                  '<div style="font-size:.9em;color:#475569">Acaba en <b>-e</b>: només <b>-d</b> i treu la e davant de -ing (<em>bore → bored, boring</em>). Consonant + <b>y</b>: <em>worry → worr<b>ied</b></em>, però <em>worr<b>ying</b></em>.</div>', 330),
+                card('purple', '⚡ Verbs irregulars: sense -ed!', '<div style="margin-bottom:4px">La forma <b>-ed</b> és la <b>3a columna</b> del verb (participi). Els irregulars no fan -ed: fes servir la seva 3a forma.</div>' + table(IRR(true)), 330)) +
+              tip('Mini explicació:', 'amb un verb <b>regular</b>, la 3a forma acaba en <b>-ed</b>, igual que el Past Simple: <em>bore → bored → <b>bored</b></em>. Amb un verb <b>irregular</b>, mira la llista de verbs: <em>break → broke → <b>broken</b></em>. La forma <b>-ing</b> és sempre <b>verb + -ing</b>.') +
+              row(card('blue', '🎬 Verb (Past Simple): què va fer la cosa', ex('The film <b>bored</b> me.', 'em va avorrir') + ex('The fireworks <b>amazed</b> us.', 'ens van meravellar')),
+                card('orange', '😊 Adjectiu: com et sents / com és', ex('I was <b>bored</b>. The film was <b>boring</b>.') + ex('We were <b>amazed</b>. They were <b>amazing</b>.'))) +
+              mistakes('Compte!', bad('I was worryed.', 'I was <b>worried</b>.'), bad('I was very upsetted.', 'I was very <b>upset</b>.', '(irregular: upset · upset · upset)'), bad('The film was bored.', 'The film was <b>boring</b>.')),
+            en: head('🔤', 'Where do they come from? Regular and irregular verbs', 'Every pair comes from a verb that says what something does to you: <em>The film <b>bored</b> me.</em>') +
+              row(card('green', '✅ Regular verbs: verb + -ed / verb + -ing', table(regRows(['Verb', '🙋 -ed (person)', '🎆 -ing (thing)'])) +
+                  '<div style="font-size:.9em;color:#475569">Ends in <b>-e</b>: just add <b>-d</b>, and drop the e before -ing (<em>bore → bored, boring</em>). Consonant + <b>y</b>: <em>worry → worr<b>ied</b></em>, but <em>worr<b>ying</b></em>.</div>', 330),
+                card('purple', '⚡ Irregular verbs: no -ed!', '<div style="margin-bottom:4px">The <b>-ed</b> word is really the verb’s <b>3rd form</b> (past participle). Irregular verbs don’t take -ed: use their 3rd form.</div>' + table(IRR()), 330)) +
+              tip('In short:', 'with a <b>regular</b> verb, the 3rd form ends in <b>-ed</b>, just like the Past Simple: <em>bore → bored → <b>bored</b></em>. With an <b>irregular</b> verb, check the verb list: <em>break → broke → <b>broken</b></em>. The <b>-ing</b> word is always <b>verb + -ing</b>.') +
+              row(card('blue', '🎬 Verb (Past Simple): what the thing did', ex('The film <b>bored</b> me.') + ex('The fireworks <b>amazed</b> us.')),
+                card('orange', '😊 Adjective: how you feel / what it is like', ex('I was <b>bored</b>. The film was <b>boring</b>.') + ex('We were <b>amazed</b>. They were <b>amazing</b>.'))) +
+              mistakes('Watch out', bad('I was worryed.', 'I was <b>worried</b>.'), bad('I was very upsetted.', 'I was very <b>upset</b>.', '(irregular: upset · upset · upset)'), bad('The film was bored.', 'The film was <b>boring</b>.')) },
           // Concession (Plus): the second half of the old "Extra information and concession" box; the first half is now in Relative clauses
           { p: 'plusConc', r: 'daring', en: head('🤔', 'Concession: two ideas that seem to clash', 'When you compare, sometimes the two facts surprise each other: use <em>although</em>, <em>even though</em> or <em>On the other hand,</em>.') +
               card('orange', '🤔 Concession', ex('<b>Although</b> Halloween started in Europe, it is now very popular in the USA.') + ex('We had fun <b>even though</b> it rained.') + ex('Many families love the feast. <b>On the other hand</b>, some Native Americans see it as a day of mourning.'), 600) +
