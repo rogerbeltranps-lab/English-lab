@@ -296,8 +296,7 @@ window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
 // 📖 The Book is ONE tab, "book" (Roger, 13 Nov 2026: "only one SLP for the book so that people can continue where they left off"): its
 // steps are the chapters (ch1 … ch6). A chapter planned on the Time plan before then (path#ch1) counts as the book (elTabOf).
 window.elBookPath=a=>/\/ls2-book$|(^|\/)book\.html$/.test(typeof a==="string"?a.split("#")[0]:(a&&a.id)||"");   // an id or a page path
-// 💬 Expressions (vocabEx, tools/gen-sections.js): a planning-only item of the Vocabulary step, so it opens and counts as that tab
-window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p==="vocabEx"?"vocab":p;
+window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p;
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];if(id==="book"&&elBookPath(a))return ks.slice();return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
@@ -365,12 +364,15 @@ window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.s
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
 // A grammar step: "grammar", or one of the steps a Grammar tab was split into, "grammarRel"… (4 ESO LS2 LP3 in four steps: Roger, 14 Nov 2026:
 // "This grammar section is too long, I need to break it down into 4 sections"). Used by 📘 Grammar together, class mode and the notebook.
-window.elIsGrammar=k=>/^grammar([A-Z]\w*)?$/.test(String(k||""));
+// 💬 Expressions (vocabEx, Roger, 16 Nov 2026: "expressions must have the option like the grammar to correct together") counts too: 📘
+// Expressions together is Grammar together on that step (shared/correct/).
+window.elIsGrammar=k=>/^(grammar([A-Z]\w*)?|vocabEx)$/.test(String(k||""));
 // 📘 Grammar together (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section. Start with the grammar of the
 // LP3, LS2"): the learning paths ("<course>/<ls folder>/<page>") whose Grammar tab gets ✅ Correct (shared/correct/, tab=grammar).
 // Another one: add it here (its grammar step: type typed, explain boxes and items with r: tags, like LP3).
-// Every LS2 learning path with a Grammar tab since 13 Nov 2026 (2ESO A used it on LP2 that morning and found no ✅ Correct there).
-window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/what-are-they-doing","2eso/free-time-live/now-or-usually","2eso/free-time-live/likes-and-screen-tips","2eso/free-time-live/write-your-vlog-script",
+// Every LS2 learning path with a Grammar tab since 13 Nov 2026 (2ESO A used it on LP2 that morning and found no ✅ Correct there), and every one
+// with a 💬 Expressions tab (vocabEx, 16 Nov 2026: 2 ESO LP1 has no grammar step, only Expressions).
+window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/getting-started","2eso/free-time-live/what-are-they-doing","2eso/free-time-live/now-or-usually","2eso/free-time-live/likes-and-screen-tips","2eso/free-time-live/write-your-vlog-script",
   "4eso/seasons-and-celebrations/celebrations-around-the-world","4eso/seasons-and-celebrations/where-traditions-come-from","4eso/seasons-and-celebrations/plan-the-day","4eso/seasons-and-celebrations/write-to-the-head-teacher"];
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
@@ -601,7 +603,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   Object.assign(window.EL_ACTIONS,{
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
     "4eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
-    "4eso/ls2-celebrations-around-the-world":[...LP,"read","log","listen","grammar","mixed","write","speak"],
+    "4eso/ls2-celebrations-around-the-world":[...LP,"vocabEx","read","log","listen","grammar","mixed","write","speak"],   // 💬 Expressions (Roger, 16 Nov 2026)
     "4eso/ls2-where-traditions-come-from":[...LP,"grammarPrep","listen","read","chart","shadow","grammar","grammarRel","grammarComp","grammarFeel","mixed","write","speak","talk"],   // Grammar in four steps (Roger, 14 Nov 2026)
     "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
     "4eso/ls2-plan-the-day":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
@@ -618,7 +620,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   window.EL_STEP_CRITERIA={
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
     "4eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
-    "4eso/ls2-celebrations-around-the-world":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
+    "4eso/ls2-celebrations-around-the-world":{vocabEx:LW,read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
     "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],read:["4.1"],chart:["2.2"],practice:LW,grammarPrep:LW,grammar:LW,grammarRel:LW,grammarComp:LW,grammarFeel:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
     "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
     "4eso/ls2-plan-the-day":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
@@ -633,10 +635,10 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
 (function(){
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];
   Object.assign(window.EL_ACTIONS,{
-    "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
+    "2eso/ls2-getting-started":[...LP,"vocabEx","read","listen","speak"],   // 💬 Expressions (Roger, 16 Nov 2026)
     "2eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
-    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","shadow","grammar","mixed","write","speak","talk"],
-    "2eso/ls2-now-or-usually":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
+    "2eso/ls2-what-are-they-doing":[...LP,"vocabEx","read","log","listen","again","shadow","grammar","mixed","write","speak","talk"],
+    "2eso/ls2-now-or-usually":[...LP,"vocabEx","listen","chart","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","shadow","talk","factfile"],
     "2eso/ls2-likes-and-screen-tips":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-write-your-vlog-script":[...LP,"read","parts","again","shadow","grammar","write","speak","talk"],
@@ -646,10 +648,10 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "2eso/ls2-reflect":["self","reflect"]
   });
   Object.assign(window.EL_STEP_CRITERIA,{
-    "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "2eso/ls2-getting-started":{vocabEx:LW,read:["4.1"],listen:["2.2"],speak:[]},
     "2eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
-    "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
-    "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
+    "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,vocabEx:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
+    "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,vocabEx:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-check-the-source":{shadow:SH,cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
     "2eso/ls2-likes-and-screen-tips":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S},
     "2eso/ls2-write-your-vlog-script":{shadow:SH,cards:RS,read:["4.1"],parts:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1"],speak:["3.2"],talk:S},

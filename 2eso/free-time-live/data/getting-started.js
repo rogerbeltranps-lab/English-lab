@@ -22,8 +22,41 @@ window.LP = {
       intro: { ca: 'Explora les paraules, practica amb les targetes i completa les frases.', en: 'Explore the words, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights · fans',
       core: { insecure: ['play football', 'play basketball', 'play video games', 'play the guitar', 'play the piano', 'go swimming', 'go skating', 'go cycling', 'go to the park', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends'], safe: ['play football', 'play basketball', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'every day', 'at the weekend', 'in my free time'], daring: ['play football', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do yoga', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'at the weekend', 'in my free time', 'be good at', 'spend time + -ing', 'join a club', 'practise'] },
-      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
-         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      groups: [
+        { g: 'play + sport / game', items: [['play football', 'jugar a futbol', 'I play football on Saturday mornings.'], ['play basketball', 'jugar a bàsquet', 'We play basketball at the park.'], ['play video games', 'jugar a videojocs', 'He plays video games after dinner.'], ['play the guitar', 'tocar la guitarra', 'She plays the guitar in a band.'], ['play the piano', 'tocar el piano', 'My cousin plays the piano very well.']] },
+        { g: 'go + -ing', items: [['go swimming', 'anar a nedar', 'We go swimming in summer.'], ['go skating', 'anar a patinar', 'They go skating at the skate park.'], ['go cycling', 'anar amb bici', 'I go cycling with my dad.'], ['go to the park', 'anar al parc', 'We go to the park after school.']] },
+        { g: 'do + activity', items: [['do karate', 'fer karate', 'He does karate on Tuesdays.'], ['do gymnastics', 'fer gimnàstica', 'She does gymnastics at a club.'], ['do yoga', 'fer ioga', 'My mum does yoga in the morning.']] },
+        { g: 'Other activities', items: [['dance', 'ballar', 'I dance in my room.'], ['draw', 'dibuixar', 'She draws comics.'], ['read comics', 'llegir còmics', 'I read comics at night.'], ['listen to music', 'escoltar música', 'We listen to music on the bus.'], ['meet friends', 'quedar amb amics', 'I meet friends on Saturday afternoons.']] },
+        { r: 'safe', g: 'How often? (Safe)', items: [['once a week', 'un cop per setmana', 'I go swimming once a week.'], ['twice a week', 'dos cops per setmana', 'We train twice a week.'], ['every day', 'cada dia', 'He practises every day.'], ['at the weekend', 'el cap de setmana', 'I meet friends at the weekend.'], ['in my free time', 'en el meu temps lliure', 'In my free time I draw.']] },
+        { r: 'daring', g: 'Talking about hobbies (Daring)', items: [['be good at', 'ser bo en', 'She is good at drawing.'], ['spend time + -ing', 'passar temps fent', 'I spend time playing the guitar.'], ['join a club', 'apuntar-se a un club', 'He wants to join a climbing club.'], ['practise', 'practicar', 'They practise after school.']] }
+      ],
+      review: [
+        { g: 'My Real Routine', items: [['get up', 'llevar-se', 'I get up at seven.'], ['have breakfast', 'esmorzar', 'We have breakfast at eight.'], ['go to bed', 'anar a dormir', 'She goes to bed at ten.'], ['do homework', 'fer deures', 'I do homework after school.']] }
+      ],
+      practice: [
+        { q: 'I ___ football with my friends on Saturdays. (jugar)', a: ['play'] },
+        { q: 'We go ___ in the sea in August. (nedar)', a: ['swimming'] },
+        { r: 'insecure', q: 'My brother ___ karate twice a week. (fer)', a: ['does'] },
+        { r: 'insecure', q: 'She plays ___ guitar in her room. (article)', a: ['the'] },
+        { q: 'I like to ___ comics at night. (llegir)', a: ['read'] },
+        { q: 'We ___ friends in the square after school. (quedar amb)', a: ['meet'] },
+        { q: 'They go ___ at the skate park. (patinar)', a: ['skating'] },
+        { q: 'I ___ to music on the bus. (escoltar)', a: ['listen'] },
+        { r: 'insecure', q: 'My sister ___ pictures of animals. (dibuixar)', a: ['draws'] },
+        { r: 'insecure', q: 'We go ___ the park after lunch.', a: ['to'] },
+        { r: 'safe', q: 'I go cycling ___ a week: on Saturday and Sunday.', a: ['twice'] },
+        { r: 'safe', q: 'I don’t play football during the week, only ___ the weekend.', a: ['at'] },
+        { r: 'daring', q: 'He is very good ___ basketball.', a: ['at'] },
+        { r: 'daring', q: 'I ___ a lot of time drawing. (passar)', a: ['spend'] }
+      ] },
+    /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
+       put it on the agenda"; "expressions must have the option like the grammar to correct together where I explain, then 4 examples and then
+       time to do their own questions according to their level"): the Expressions boxes moved here from the Vocabulary step, with 6 compulsory
+       questions per level (req: 6; Starter and Base their own list with choices and Catalan hints) and ➕ extra practice for every level, which
+       📘 Expressions together (shared/correct/, elIsGrammar) takes its 🙌 4 questions from. No listening. Until 💬 Expressions is on a class day
+       of the Time plan, students see the tab 🏫 for class: never To do or homework (elLaterTabs in el-catalog.js). */
+    { id: 'vocabEx', req: 6, type: 'typed', tab: { ca: '💬 Expressions', en: '💬 Expressions' }, title: { ca: 'Expressions: play, go o do?', en: 'Expressions: play, go or do?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Mira les expressions: són paraules que van juntes i s’aprenen en bloc. Hi ha 6 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després ve ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Look at the expressions: words that go together, learnt as one block. There are 6 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. Then comes ➕ extra practice, optional. After two wrong tries you will see the answer.' },
       explain: (function () {
         const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
           teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
@@ -68,32 +101,29 @@ window.LP = {
               mistakes('Watch out', bad('good in drawing', 'good <b>at</b> drawing'), bad('I spend time to play.', 'I spend time <b>playing</b>.')) }
         ];
       })(),
-      groups: [
-        { g: 'play + sport / game', items: [['play football', 'jugar a futbol', 'I play football on Saturday mornings.'], ['play basketball', 'jugar a bàsquet', 'We play basketball at the park.'], ['play video games', 'jugar a videojocs', 'He plays video games after dinner.'], ['play the guitar', 'tocar la guitarra', 'She plays the guitar in a band.'], ['play the piano', 'tocar el piano', 'My cousin plays the piano very well.']] },
-        { g: 'go + -ing', items: [['go swimming', 'anar a nedar', 'We go swimming in summer.'], ['go skating', 'anar a patinar', 'They go skating at the skate park.'], ['go cycling', 'anar amb bici', 'I go cycling with my dad.'], ['go to the park', 'anar al parc', 'We go to the park after school.']] },
-        { g: 'do + activity', items: [['do karate', 'fer karate', 'He does karate on Tuesdays.'], ['do gymnastics', 'fer gimnàstica', 'She does gymnastics at a club.'], ['do yoga', 'fer ioga', 'My mum does yoga in the morning.']] },
-        { g: 'Other activities', items: [['dance', 'ballar', 'I dance in my room.'], ['draw', 'dibuixar', 'She draws comics.'], ['read comics', 'llegir còmics', 'I read comics at night.'], ['listen to music', 'escoltar música', 'We listen to music on the bus.'], ['meet friends', 'quedar amb amics', 'I meet friends on Saturday afternoons.']] },
-        { r: 'safe', g: 'How often? (Safe)', items: [['once a week', 'un cop per setmana', 'I go swimming once a week.'], ['twice a week', 'dos cops per setmana', 'We train twice a week.'], ['every day', 'cada dia', 'He practises every day.'], ['at the weekend', 'el cap de setmana', 'I meet friends at the weekend.'], ['in my free time', 'en el meu temps lliure', 'In my free time I draw.']] },
-        { r: 'daring', g: 'Talking about hobbies (Daring)', items: [['be good at', 'ser bo en', 'She is good at drawing.'], ['spend time + -ing', 'passar temps fent', 'I spend time playing the guitar.'], ['join a club', 'apuntar-se a un club', 'He wants to join a climbing club.'], ['practise', 'practicar', 'They practise after school.']] }
-      ],
-      review: [
-        { g: 'My Real Routine', items: [['get up', 'llevar-se', 'I get up at seven.'], ['have breakfast', 'esmorzar', 'We have breakfast at eight.'], ['go to bed', 'anar a dormir', 'She goes to bed at ten.'], ['do homework', 'fer deures', 'I do homework after school.']] }
-      ],
-      practice: [
-        { q: 'I ___ football with my friends on Saturdays. (jugar)', a: ['play'] },
-        { q: 'We go ___ in the sea in August. (nedar)', a: ['swimming'] },
-        { r: 'insecure', q: 'My brother ___ karate twice a week. (fer)', a: ['does'] },
-        { r: 'insecure', q: 'She plays ___ guitar in her room. (article)', a: ['the'] },
-        { q: 'I like to ___ comics at night. (llegir)', a: ['read'] },
-        { q: 'We ___ friends in the square after school. (quedar amb)', a: ['meet'] },
-        { q: 'They go ___ at the skate park. (patinar)', a: ['skating'] },
-        { q: 'I ___ to music on the bus. (escoltar)', a: ['listen'] },
-        { r: 'insecure', q: 'My sister ___ pictures of animals. (dibuixar)', a: ['draws'] },
-        { r: 'insecure', q: 'We go ___ the park after lunch.', a: ['to'] },
-        { r: 'safe', q: 'I go cycling ___ a week: on Saturday and Sunday.', a: ['twice'] },
-        { r: 'safe', q: 'I don’t play football during the week, only ___ the weekend.', a: ['at'] },
-        { r: 'daring', q: 'He is very good ___ basketball.', a: ['at'] },
-        { r: 'daring', q: 'I ___ a lot of time drawing. (passar)', a: ['spend'] }
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>play</b> + esports amb pilota i jocs · <b>play the</b> + instrument · <b>go</b> + -ing · <b>do</b> + karate, ioga… · <b>listen to</b> music', en: '<b>play</b> + ball sports and games · <b>play the</b> + instrument · <b>go</b> + -ing · <b>do</b> + karate, yoga… · <b>listen to</b> music' } }],
+      items: [
+        // Starter and Base
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['play', 'do', 'go'], q: 'I ___ football with my friends on Saturdays.', a: ['play'], ca: 'Esport amb pilota → play.', en: 'Ball sport → play.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['swimming', 'swim', 'to swim'], q: 'We go ___ in the sea in summer.', a: ['swimming'], ca: 'go + -ing: go swimming.', en: 'go + -ing.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['does', 'plays', 'goes'], q: 'My brother ___ karate after school.', a: ['does'], ca: 'Sense pilota → do (he → does).', en: 'No ball → do (he → does).' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['the', 'a', 'to'], q: 'She plays ___ guitar in a band.', a: ['the'], ca: 'Instrument → play the.', en: 'Instrument → play the.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['to', 'at', 'for'], q: 'I listen ___ music on the bus.', a: ['to'], ca: 'escoltar = listen to.', en: 'listen to.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['go', 'do', 'play'], q: 'They ___ skating at the skate park.', a: ['go'], ca: 'go + -ing: go skating.', en: 'go + -ing.' },
+        // Core and Plus
+        { p: 'ex', r: 'safe', q: 'My sister ___ gymnastics at a club.', a: ['does'], en: 'do + activities without a ball (she → does).' },
+        { p: 'ex', r: 'safe', q: 'We usually go ___ on Sundays. (cycle)', a: ['cycling'], en: 'go + -ing: go cycling.' },
+        { p: 'ex', r: 'safe', q: 'He ___ the piano really well.', a: ['plays'], en: 'play the + instrument.' },
+        { p: 'ex', r: 'safe', k: 'fix', q: '“I go to swim every Saturday.” → I go ___ every Saturday.', a: ['swimming'], en: 'go + -ing (not go to + verb).' },
+        { p: 'ex', only: ['safe'], q: 'We train on Mondays and Thursdays: we train ___ a week.', a: ['twice'], en: 'Two times → twice.' },
+        { p: 'ex', only: ['safe'], q: 'I go swimming ___ a week: only on Saturdays.', a: ['once'], en: 'One time → once.' },
+        { p: 'ex', r: 'daring', q: 'She is really good ___ drawing.', a: ['at'], en: 'be good at + -ing.' },
+        { p: 'ex', r: 'daring', q: 'I spend a lot of time ___ video games. (play)', a: ['playing'], en: 'spend time + -ing.' },
+        // ➕ for every level (📘 Expressions together takes its 4 questions from these)
+        { p: 'ex', opts: ['plays', 'does', 'goes'], q: 'Pau ___ basketball after school.', a: ['plays'], ca: 'Esport amb pilota → play (he → plays).', en: 'Ball sport → play (he → plays).' },
+        { p: 'ex', opts: ['to', 'at', 'in'], q: 'Let’s go ___ the park!', a: ['to'], ca: 'Lloc → go to.', en: 'A place → go to.' },
+        { p: 'ex', opts: ['does', 'plays', 'goes'], q: 'My mum ___ yoga in the morning.', a: ['does'], ca: 'ioga → do (she → does).', en: 'yoga → do (she → does).' },
+        { p: 'ex', opts: ['read', 'play', 'do'], q: 'I ___ comics in bed at night.', a: ['read'], ca: 'llegir còmics = read comics.', en: 'read comics.' }
       ] },
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Two posts from Saturday', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix dos missatges d’un grup de classe. Fixa’t en què fan normalment i en què fan avui.', en: 'Read two posts from a class group chat. Notice what people usually do and what they are doing today.' },

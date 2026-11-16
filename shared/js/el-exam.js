@@ -73,7 +73,7 @@ window.ELExam = (function () {
       const nolv = s => String(s || '').replace(/\s*\((?:Beginners|Insecure|Safe|Daring|Native|Starter|Base|Core|Plus|Pro)(?: words| route)?\)/g, '');
       const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: nolv(tx(g.g)), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
       // a Vocabulary step's boxes are 💬 Expressions, not grammar (Roger, 16 Nov 2026): ex = true
-      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [Object.assign({ title: nolv(tx(p.title)), boxes: ex }, p.type === 'vocab' ? { ex: true } : {})] : []; };
+      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [Object.assign({ title: nolv(tx(p.title)), boxes: ex }, p.type === 'vocab' || p.id === 'vocabEx' ? { ex: true } : {})] : []; };
       mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
       // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
       // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
