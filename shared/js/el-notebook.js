@@ -116,10 +116,10 @@ window.ELNotebook = (function () {
   }
   // notes taken on the whiteboard while the teacher explained (el-whiteboard.js): the boxes seen together, then the page they wrote
   function together(g) {
-    const p = g.gt || {}, rd = /-rd$/.test(g.id), txt = String(p.text || '').trim();
+    const p = g.gt || {}, rd = /-rd$/.test(g.id), xp = /-vocabEx$/.test(g.id), txt = String(p.text || '').trim();   // xp: 💬 Expressions together
     const sum = (p.sum || []).length ? `<div class="nb-slip">${p.sum.map(b => `<div class="ex-rule">${H.safe(b)}</div>`).join('')}<span class="nb-clip">📎 ${t('de la pissarra', 'from the whiteboard')}</span></div>` : '';
     const mine = p.html || (p.dr && p.dr.length) ? `<div class="nb-notes">${clean(p.html, (p.dr || []).length)}${svg(p.dr)}</div>` : txt ? `<div class="nb-mine">${lines(txt)}</div>` : `<p class="nb-pencil">${t('No vas prendre apunts aquí.', 'You didn\'t take notes here.')}</p>`;
-    return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
+    return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : xp ? '💬' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : xp ? t('Expressions junts', 'Expressions together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
   const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬' };
@@ -480,7 +480,7 @@ window.ELNotebook = (function () {
       });
       // the theory of the class games and the grammar explained on the whiteboard, too
       games.filter(g => H.lpOf(g) === String(lp.n)).forEach(g => {
-        if (g.gt) { if (!/-rd$/.test(g.id)) once(sg, esc(gname(g)), 'g:gt-' + fk(g.id)); return; }
+        if (g.gt) { if (!/-rd$/.test(g.id)) once(/-vocabEx$/.test(g.id) ? se : sg, esc(gname(g)), 'g:gt-' + fk(g.id)); return; }
         (g.parts || []).forEach((p, pi) => once(g.kind === 'vocab' ? sv : sg, H.md(p.topic), 'g:gm-' + fk(g.id) + '~' + pi));
       });
       for (let i = from; i < sg.length; i++) sg[i] = li(sg[i][0] + tag, sg[i][1]);
@@ -536,12 +536,12 @@ window.ELNotebook = (function () {
       // the section's name"): key terms and how it works if it was done in class, then the student's own answers, corrected
       const parts = lp.parts || [];
       parts.forEach((pt, i) => {
-        const ic = KIND[pt.kind] || '📝', nm = esc(pt.name);
+        const xp = pt.id === 'vocabEx', ic = xp ? '💬' : KIND[pt.kind] || '📝', nm = esc(xp ? String(pt.name).replace(/^💬\s*/, '') : pt.name);   // 💬 Expressions: its own icon
         let h = `<div class="nb-postit k-${pt.kind}">${ic} ${nm}${pt.day && pt.day !== true ? `<small>${esc(H.exDay(pt.day))}</small>` : ''}</div>`;
         if (pt.title && pt.title !== pt.name) h += `<div class="nb-h3">${esc(pt.title)}</div>`;
         const pid = key + '-p-' + fk(pt.id);
         pt.terms.forEach((g, gi) => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3" data-gs="${pid}~v${gi}">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
-        pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.ex ? '💬 Expressions · ' : ''}${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
+        pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.ex && !/^Expressions\b/.test(g.title) ? '💬 Expressions · ' : ''}${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
         else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '', pt.opt);
         else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;

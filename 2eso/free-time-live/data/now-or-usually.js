@@ -22,8 +22,40 @@ window.LP = {
       intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights',
       core: { beginners: ['now', 'right now', 'today', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never'], insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
-      /* How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): shown under
-         Explore on the Vocabulary step and in the 📓 notebook. Same visual helpers as the Grammar step. */
+      groups: [
+        { g: 'Now: time expressions', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
+        { g: 'Usually: time expressions', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
+        { r: 'safe', g: 'Doing sport (Safe)', items: [['practise', 'practicar', 'I practise my turns every day.'], ['train', 'entrenar', 'We train twice a week.'], ['go to a concert', 'anar a un concert', 'We’re going to a concert tonight.'], ['watch a match', 'mirar un partit', 'I usually watch the match on TV.'], ['temperature', 'temperatura', 'The temperature is three degrees.']] },
+        { r: 'daring', g: 'State verbs (Daring)', items: [['know', 'saber, conèixer', 'I know the answer.'], ['need', 'necessitar', 'I need new trainers.'], ['want', 'voler', 'She wants to join the team.'], ['prefer', 'preferir', 'I prefer skating to cycling.'], ['believe', 'creure', 'I believe you.'], ['understand', 'entendre', 'Do you understand the rules?'], ['mean', 'voler dir', 'What does “crowd” mean?']] }
+      ],
+      review: [
+        { g: 'Learning Path 2', items: [['trainers', 'bambes', 'I need new trainers.'], ['It’s windy', 'fa vent', 'It’s windy today.'], ['wear a costume', 'portar una disfressa', 'People wear costumes at the fair.']] },
+        { r: 'safe', g: 'Learning Path 2', items: [['a tournament', 'un torneig', 'We’re playing in a tournament.'], ['freezing', 'gèlid', 'It’s freezing!']] }
+      ],
+      practice: [
+        { q: 'I can’t talk ___ now: I’m in class. (ara mateix)', a: ['right'] },
+        { q: 'At the ___ she’s training for a show. (en aquest moment)', a: ['moment'] },
+        { q: 'We ___ go to the park on Sundays. (normalment)', a: ['usually'] },
+        { q: 'I play football ___ Saturday mornings.', a: ['on'] },
+        { r: 'insecure', q: '___ weekend we’re going to a tournament. (aquest)', a: ['this'] },
+        { q: 'My dad ___ gets up late: he’s always up at 6! (mai)', a: ['never'] },
+        { r: 'insecure', q: '___ winter we go skating in the square.', a: ['in'] },
+        { q: '___! It’s snowing! (Mira!)', a: ['look'] },
+        { r: 'safe', q: 'I ___ the piano every day for twenty minutes. (practicar)', a: ['practise', 'practice'] },
+        { r: 'safe', q: 'The ___ is only two degrees: it’s freezing.', a: ['temperature'] },
+        { r: 'safe', q: 'We’re going ___ a concert on Friday.', a: ['to'] },
+        { r: 'daring', q: 'I ___ skating to cycling. (preferir)', a: ['prefer'] },
+        { r: 'daring', q: 'What does “highlights” ___? (voler dir)', a: ['mean'] },
+        { r: 'daring', q: 'I ___ new gloves: mine are broken. (necessitar)', a: ['need'] }
+      ] },
+    /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
+       put it on the agenda"; "expressions must have the option like the grammar to correct together where I explain, then 4 examples and then
+       time to do their own questions according to their level"): the Expressions boxes moved here from the Vocabulary step, with 6 compulsory
+       questions per level (req: 6; Starter and Base their own list with choices and Catalan hints) and ➕ extra practice for every level, which
+       📘 Expressions together (shared/correct/, elIsGrammar) takes its 🙌 4 questions from. No listening. Until 💬 Expressions is on a class day
+       of the Time plan, students see the tab 🏫 for class: never To do or homework (elLaterTabs in el-catalog.js). */
+    { id: 'vocabEx', req: 6, type: 'typed', tab: { ca: '💬 Expressions', en: '💬 Expressions' }, title: { ca: 'Expressions: quantes vegades i quan', en: 'Expressions: how often and when' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Mira les expressions: són paraules que van juntes i s’aprenen en bloc. Hi ha 6 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després ve ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Look at the expressions: words that go together, learnt as one block. There are 6 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. Then comes ➕ extra practice, optional. After two wrong tries you will see the answer.' },
       explain: (function () {
         const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
           teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
@@ -67,31 +99,27 @@ window.LP = {
               mistakes('Watch out', bad('in Saturday', '<b>on</b> Saturday'), bad('on every weekend', '<b>every</b> weekend'), bad('every weekends', 'every <b>weekend</b>')) }
         ];
       })(),
-      groups: [
-        { g: 'Now: time expressions', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
-        { g: 'Usually: time expressions', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
-        { r: 'safe', g: 'Doing sport (Safe)', items: [['practise', 'practicar', 'I practise my turns every day.'], ['train', 'entrenar', 'We train twice a week.'], ['go to a concert', 'anar a un concert', 'We’re going to a concert tonight.'], ['watch a match', 'mirar un partit', 'I usually watch the match on TV.'], ['temperature', 'temperatura', 'The temperature is three degrees.']] },
-        { r: 'daring', g: 'State verbs (Daring)', items: [['know', 'saber, conèixer', 'I know the answer.'], ['need', 'necessitar', 'I need new trainers.'], ['want', 'voler', 'She wants to join the team.'], ['prefer', 'preferir', 'I prefer skating to cycling.'], ['believe', 'creure', 'I believe you.'], ['understand', 'entendre', 'Do you understand the rules?'], ['mean', 'voler dir', 'What does “crowd” mean?']] }
-      ],
-      review: [
-        { g: 'Learning Path 2', items: [['trainers', 'bambes', 'I need new trainers.'], ['It’s windy', 'fa vent', 'It’s windy today.'], ['wear a costume', 'portar una disfressa', 'People wear costumes at the fair.']] },
-        { r: 'safe', g: 'Learning Path 2', items: [['a tournament', 'un torneig', 'We’re playing in a tournament.'], ['freezing', 'gèlid', 'It’s freezing!']] }
-      ],
-      practice: [
-        { q: 'I can’t talk ___ now: I’m in class. (ara mateix)', a: ['right'] },
-        { q: 'At the ___ she’s training for a show. (en aquest moment)', a: ['moment'] },
-        { q: 'We ___ go to the park on Sundays. (normalment)', a: ['usually'] },
-        { q: 'I play football ___ Saturday mornings.', a: ['on'] },
-        { r: 'insecure', q: '___ weekend we’re going to a tournament. (aquest)', a: ['this'] },
-        { q: 'My dad ___ gets up late: he’s always up at 6! (mai)', a: ['never'] },
-        { r: 'insecure', q: '___ winter we go skating in the square.', a: ['in'] },
-        { q: '___! It’s snowing! (Mira!)', a: ['look'] },
-        { r: 'safe', q: 'I ___ the piano every day for twenty minutes. (practicar)', a: ['practise', 'practice'] },
-        { r: 'safe', q: 'The ___ is only two degrees: it’s freezing.', a: ['temperature'] },
-        { r: 'safe', q: 'We’re going ___ a concert on Friday.', a: ['to'] },
-        { r: 'daring', q: 'I ___ skating to cycling. (preferir)', a: ['prefer'] },
-        { r: 'daring', q: 'What does “highlights” ___? (voler dir)', a: ['mean'] },
-        { r: 'daring', q: 'I ___ new gloves: mine are broken. (necessitar)', a: ['need'] }
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>always / usually / never</b> davant del verb (darrere de <em>be</em>) · <b>on</b> Saturdays · <b>at</b> the weekend · <b>in</b> winter · <b>every</b> weekend', en: '<b>always / usually / never</b> before the verb (after <em>be</em>) · <b>on</b> Saturdays · <b>at</b> the weekend · <b>in</b> winter · <b>every</b> weekend' } }],
+      items: [
+        // Starter and Base
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['usually play', 'play usually', 'usually plays'], q: 'I ___ football on Saturdays.', a: ['usually play'], ca: 'usually va davant del verb.', en: 'usually goes before the verb.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['on', 'in', 'at'], q: 'We play tennis ___ Saturdays.', a: ['on'], ca: 'Dies → on.', en: 'Days → on.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['in', 'on', 'at'], q: 'We go skating ___ winter.', a: ['in'], ca: 'Estacions → in.', en: 'Seasons → in.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['at', 'in', 'on'], q: 'I meet my friends ___ the weekend.', a: ['at'], ca: 'el cap de setmana = at the weekend.', en: 'at the weekend.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['never gets up', 'gets never up', 'never get up'], q: 'She ___ late: she’s always on time.', a: ['never gets up'], ca: 'never va davant del verb.', en: 'never goes before the verb.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['every', 'on every', 'in every'], q: 'I go swimming ___ weekend.', a: ['every'], ca: 'every: sense preposició.', en: 'every: no preposition.' },
+        // Core and Plus
+        { p: 'ex', r: 'safe', k: 'fix', q: '“I play usually football on Saturdays.” → I ___ football on Saturdays.', a: ['usually play'], en: 'usually before the verb.' },
+        { p: 'ex', r: 'safe', q: 'We go to the beach ___ summer.', a: ['in'], en: 'Seasons → in.' },
+        { p: 'ex', r: 'safe', k: 'fix', q: '“We play on every weekend.” → We play ___ weekend.', a: ['every'], en: 'every: no preposition.' },
+        { p: 'ex', r: 'safe', q: 'My dad ___ on Sundays. (never / cook)', a: ['never cooks'], en: 'never + verb (he → cooks).' },
+        { p: 'ex', r: 'safe', q: 'I train ___ Tuesday mornings.', a: ['on'], en: 'on + days: on Tuesday mornings.' },
+        { p: 'ex', r: 'safe', q: 'He ___ late for school. (always / be)', a: ['is always'], en: 'After be: is always.' },
+        // ➕ for every level (📘 Expressions together takes its 4 questions from these)
+        { p: 'ex', opts: ['at', 'in', 'on'], q: 'Look! It’s snowing ___ the moment.', a: ['at'], ca: 'en aquest moment = at the moment.', en: 'at the moment.' },
+        { p: 'ex', opts: ['usually', 'now', 'today'], q: 'We ___ eat pizza on Fridays: it’s our habit.', a: ['usually'], ca: 'Un hàbit → usually.', en: 'A habit → usually.' },
+        { p: 'ex', opts: ['in', 'on', 'at'], q: 'I read comics ___ the morning.', a: ['in'], ca: 'al matí = in the morning.', en: 'in the morning.' },
+        { p: 'ex', opts: ['are never', 'never are', 'never is'], q: 'They ___ late for class.', a: ['are never'], ca: 'Darrere de be: are never.', en: 'After be: are never.' }
       ] },
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Mei’s Saturday vlog', pill: { ca: 'Vídeo', en: 'Video' },
       intro: { ca: 'Mira el vlog de la Mei una vegada per saber on és. Després llegeix les preguntes i torna’l a mirar. A la ruta Insecure pots triar la versió més lenta.', en: 'Watch Mei’s vlog once to find out where she is. Then read the questions and watch again.' },

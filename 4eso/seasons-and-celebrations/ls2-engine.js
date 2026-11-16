@@ -616,6 +616,7 @@ var LS2 = (function () {
       // How it works for the structures in these words (Roger, 13 Nov 2026: "Also vocab structures like prepositions"): the same visual boxes as Grammar,
       // titled 💬 Expressions, not grammar (Roger, 16 Nov 2026: "can we label them as Expressions, since they are expressions"): play / go / do,
       // on / at / in + time, verb + preposition are words that go together, learnt as one block. The class games put them in the 🧩 grammar game.
+      // Since 16 Nov 2026 they are their own step, 💬 Expressions (vocabEx, a typed panel after Vocabulary), so no Vocabulary panel has explain now.
       (p.explain ? '<div class="section-card worked vocab-expr"><h3>💬 Expressions</h3><p class="instruction">' + (ca() ? 'Paraules que van juntes: aprèn-les en bloc.' : 'Words that go together: learn them as one block.') + '</p>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group"' + (level === 'native' ? ' hidden' : '') + ' aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
@@ -1004,7 +1005,9 @@ var LS2 = (function () {
     return n ? '<span style="display:inline-block;min-width:1.6em;margin-right:6px;padding:0 6px;border-radius:999px;background:var(--accent,#2d5b9a);color:#fff;font-weight:800;text-align:center">' + n + '</span>' : '';
   }
   R.typed = p => ({
-    html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + boxNum(p, e) + tx(e) + '</div>').join('') + '</div>' : '') +
+    // 💬 Expressions (vocabEx, Roger 16 Nov 2026): its boxes are the expressions of the Vocabulary words, not "How it works"
+    html: (p.explain ? (p.id === 'vocabEx' ? '<div class="section-card worked vocab-expr"><h3>💬 Expressions</h3><p class="instruction">' + (ca() ? 'Paraules que van juntes: aprèn-les en bloc.' : 'Words that go together: learn them as one block.') + '</p>'
+      : '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>') + forLevel(p.explain).map(e => '<div class="model">' + boxNum(p, e) + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card">' + (p.mode && !p.parts ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + allLabel() + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       if (p.parts) return partsBind(p);

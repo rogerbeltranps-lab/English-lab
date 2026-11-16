@@ -23,9 +23,9 @@ window.EL_COVER = {
     },
     lex: {
       "Tecnologia, mitjans i recerca": ["2eso/ls2-check-the-source#vocab", "2eso/ls2-likes-and-screen-tips#vocab"],
-      "Roba, oci i esports": ["2eso/ls2-getting-started#vocab", "2eso/ls2-what-are-they-doing#vocab", "2eso/ls2-now-or-usually#vocab"],
-      "Oci, esdeveniments i temps atmosfèric": ["2eso/ls2-what-are-they-doing#vocab"],
-      "Expressions de temps": ["2eso/ls2-now-or-usually#vocab"],
+      "Roba, oci i esports": ["2eso/ls2-getting-started#vocab", "2eso/ls2-getting-started#vocabEx", "2eso/ls2-what-are-they-doing#vocab", "2eso/ls2-now-or-usually#vocab"],
+      "Oci, esdeveniments i temps atmosfèric": ["2eso/ls2-what-are-they-doing#vocab", "2eso/ls2-what-are-they-doing#vocabEx"],
+      "Expressions de temps": ["2eso/ls2-now-or-usually#vocab", "2eso/ls2-now-or-usually#vocabEx", "2eso/ls2-getting-started#vocabEx"],
       "Paraules compostes": ["2eso/ls2-likes-and-screen-tips#vocab"],
       "Rutines i hàbits": ["2eso/ls2-getting-started#recall"],
       "Salut i benestar": ["2eso/ls2-likes-and-screen-tips#vocab"]
@@ -60,7 +60,7 @@ window.EL_COVER = {
       "Plans, sortides i reptes": ["4eso/ls2-plan-the-day#vocab"],
       "Cultures i opinions": ["4eso/ls2-celebrations-around-the-world#vocab", "4eso/ls2-where-traditions-come-from#vocab"],
       "Expressions de temps": ["4eso/ls2-where-traditions-come-from#grammarPrep", "4eso/ls2-plan-the-day#vocab"],
-      "Verb + preposició": ["4eso/ls2-where-traditions-come-from#grammarPrep"],
+      "Verb + preposició": ["4eso/ls2-where-traditions-come-from#grammarPrep", "4eso/ls2-celebrations-around-the-world#vocabEx"],
       "Fer plans, quedar i reservar": ["4eso/ls2-plan-the-day#vocab"],
       "Fórmules de missatges": ["4eso/ls2-write-to-the-head-teacher#vocab"],
       "Registre formal i informal": ["4eso/ls2-write-to-the-head-teacher#vocab"],

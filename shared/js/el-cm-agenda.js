@@ -33,7 +33,6 @@ const SHD="note:🎬 Shadowing with the whole class";
 const today=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
 const dLab=d=>{const x=new Date(d+"T12:00");return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][x.getDay()]+" "+x.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]};
 const isGame=p=>/^game:/.test(p||"");
-const noHw=p=>isGame(p)||p==="vocabEx";   // 💬 Expressions: done together in class, never homework
 export const wanted=()=>{try{return sessionStorage.getItem(K)==="1"}catch(e){return false}};
 const want=v=>{try{sessionStorage.setItem(K,v?"1":"0")}catch(e){}};
 
@@ -64,7 +63,6 @@ function pickDay(list){const t=today(),has=(x,d)=>((x.ag.days||{})[d]||[]).some(
   return list.flatMap(x=>Object.keys(x.ag.days||{}).concat(x.ag.exam?[x.ag.exam]:[]).filter(d=>d>t&&has(x,d))).sort()[0]||t}
 
 function hereIs(a,p){if(!a)return false;const u=new URL(a.path,C.root);if(u.pathname!==location.pathname)return false;
-  if(p==="vocabEx")p="vocab";   // 💬 Expressions: in the Vocabulary tab
   if(!p)return true;const t=document.querySelector(".tab.active[data-panel]");return !!t&&t.dataset.panel===p}
 
 const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;width:min(460px,calc(100vw - 24px));max-height:calc(100vh - 96px);overflow:auto;
@@ -211,7 +209,7 @@ async function tickDone(list){if(!list.length)return;const t=today(),ref=C.doc(C
     on=it=>{const k=x.ls.id+"|@"+t+"#"+it;return k in tk?tk[k]:cur[k]},all=its.length>0&&its.every(on),k=x.ls.id+"|@"+t;if(!!cur[k]!==all)tk[k]=all?t:false});
   await C.setDoc(ref,{ticks:tk,updated:C.serverTimestamp()},{merge:true})}
 // a learning path or tab still locked for the group opens (as Start class mode on the dashboard does)
-async function ensureOpen(x,a,p){const info=x.info,g=C.g,ref=C.doc(C.db,"ls",a.ls);if(p==="vocabEx")p="vocab";
+async function ensureOpen(x,a,p){const info=x.info,g=C.g,ref=C.doc(C.db,"ls",a.ls);
   if(window.elLpOpen&&!elLpOpen(a,info,g,true)){const ids=[...(window.EL_CATALOG||[]).filter(y=>y.ls===a.ls&&elLpOpen(y,info,g,true)).map(y=>y.id),a.id],Lk=elLpLocks(a.ls,ids);
     await C.setDoc(ref,{open:{[g]:ids},locked:{[g]:Lk.locked},lockedKeys:{[g]:Lk.lockedKeys}},{merge:true});
     info.open=Object.assign({},info.open,{[g]:ids});info.locked=Object.assign({},info.locked,{[g]:Lk.locked});info.lockedKeys=Object.assign({},info.lockedKeys,{[g]:Lk.lockedKeys})}
@@ -328,8 +326,7 @@ async function go(x,b){const a=x.a,p=x.p||"";b.disabled=true;
   // docked, it stays (the class tab has no menu to show in its place, el-catalog.js) and its "now" mark moves; floating, it closes
   if(box&&box.classList.contains("dock"))b.disabled=false;else close();
   const u=new URL(a.path,C.root);
-  if(u.pathname===location.pathname){const tp=p==="vocabEx"?"vocab":p,t=tp&&[...document.querySelectorAll(".tab[data-panel]")].find(z=>z.dataset.panel===tp);if(t)t.click();else if(!p)window.scrollTo(0,0);
-    if(t&&p==="vocabEx")setTimeout(()=>{const e=[...document.querySelectorAll(".vocab-expr")].find(z=>z.offsetParent);if(e)e.scrollIntoView({behavior:"smooth",block:"start"})},300);return}
+  if(u.pathname===location.pathname){const t=p&&[...document.querySelectorAll(".tab[data-panel]")].find(z=>z.dataset.panel===p);if(t)t.click();else if(!p)window.scrollTo(0,0);return}
   location.href=u.href+(p?"#"+encodeURIComponent(p):"")}
 // the video plays over the page with ⛶ Full screen that keeps the list of who left on top (elPlayVideo in el-catalog.js; Roger, 9 Nov 2026)
 function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(vid)vid.remove();vid=document.createElement("div");vid.id="el-cmvid";
@@ -347,9 +344,9 @@ export function refresh(){if(box&&L)draw()}
 export async function wrapUp(canBack){try{await init();L=await agendas()}catch(e){return "none"}
   const t=today(),rows=todayItems();if(!rows.length)return "none";
   if(!document.getElementById("el-cmag-css")){const st=document.createElement("style");st.id="el-cmag-css";st.textContent=CSS;document.head.append(st)}
-  const nd=nextDay(t),ch=rows.map(z=>z.p&&!noHw(z.p)&&hwNext(z.x,t,z.it)?"hw":"done");
+  const nd=nextDay(t),ch=rows.map(z=>z.p&&!isGame(z.p)&&hwNext(z.x,t,z.it)?"hw":"done");
   const w=document.createElement("div");w.id="el-cmwrap";let last="";
-  const seg=(i,z)=>[["done","✔ Finished"],...(nd?[["next","⏭ Next class"]]:[]),...(z.p&&!noHw(z.p)?[["hw","🏠 Homework"]]:[])].map(([v,l])=>`<button type="button" data-r="${i}" data-v="${v}" class="${ch[i]===v?"on":""}" aria-pressed="${ch[i]===v}">${l}</button>`).join("");
+  const seg=(i,z)=>[["done","✔ Finished"],...(nd?[["next","⏭ Next class"]]:[]),...(z.p&&!isGame(z.p)?[["hw","🏠 Homework"]]:[])].map(([v,l])=>`<button type="button" data-r="${i}" data-v="${v}" class="${ch[i]===v?"on":""}" aria-pressed="${ch[i]===v}">${l}</button>`).join("");
   const body=()=>rows.map((z,i)=>{const lp=z.p?lpLab(z.x,z.a):"",h=lp&&lp!==last?`<div class="lp">${E(lp)}</div>`:"";last=lp||last;
     return h+`<div class="r"><span class="n">${E(z.p?itName(z.a,z.p):lpLab(z.x,z.a))}</span><span class="seg">${seg(i,z)}</span></div>`}).join("");
   w.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-cmwrap-h"><div class="hd"><h2 id="el-cmwrap-h">🎓 End of the class · ${E(C.gname)}</h2><p>How did today's steps go? ✔ Finished is ticked on your Time plan, ⏭ Next class moves it to ${nd?E(dLab(nd)):"the next class"}, 🏠 Homework is for students to finish at home by then.</p></div>`
