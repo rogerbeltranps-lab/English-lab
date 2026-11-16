@@ -72,11 +72,12 @@ window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=
 // study (optional): start of the path of the vocabulary and grammar summary PDFs; the board adds the route + ".pdf".
 // story (optional): the LS's reading story (tools/reading-story): title, start of the PDF path, key = the Drive doc with the answer key and teacher notes (only on the teacher's Materials tab); the LS home page adds the route + ".pdf" (and "cover.jpg").
 // shadowing (optional): the LS's shadowing video (tools/shadowing-video), the same for every route: on the board next to the summary and in the dashboard's Materials tab.
+// shadowingIntro: the second where its introduction ends (the "Ready? Let's start!" slide; build.js prints it): every player of the video marks it and has ⏭ Skip the intro.
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pro:true,pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
-  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",shadowingIntro:111.1,story:{title:"Lantern Night",pro:true,pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
+  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",shadowingIntro:116.8,story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
 ];
 // The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
 // The number is the LS's place in its course in EL_LS (LS1 first).
@@ -499,14 +500,18 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
     d.head.append(s)};
   let big=null,mine=false,swap=false;
   const on=()=>R.classList.toggle("el-vid-on",!!(big||d.getElementById("el-vid")));
-  const pageFs=()=>{if(fsEl())return Promise.resolve();const r=R.requestFullscreen||R.webkitRequestFullscreen;if(!r)return Promise.reject();
-    try{const p=r.call(R);mine=true;return p&&p.then?p.catch(e=>{mine=false;throw e}):Promise.resolve()}catch(e){mine=false;return Promise.reject(e)}};
-  function bigOn(v){css();if(big&&big!==v)bigOff(true);big=v;v.classList.add("el-bigvid");
-    if(!d.getElementById("el-bigx")){const b=d.createElement("button");b.id="el-bigx";b.type="button";b.textContent="✕ Smaller";b.title="Back to the page (Esc)";b.onclick=()=>bigOff();d.body.append(b)}on()}
-  function bigOff(keepFs){if(big)big.classList.remove("el-bigvid");big=null;const b=d.getElementById("el-bigx");if(b)b.remove();
+  // what goes full screen: the page, so the list of who left stays on top; with no list, the shadowing video's own box (.el-si: the video, its bar
+  // and ⏭ Skip the intro), also inside a window (<dialog>), which cannot go full screen itself and would sit under a full-screen page
+  let fsT=R;const pageFs=()=>{if(fsEl())return Promise.resolve();const r=fsT.requestFullscreen||fsT.webkitRequestFullscreen;if(!r)return Promise.reject();
+    try{const p=r.call(fsT);mine=true;return p&&p.then?p.catch(e=>{mine=false;throw e}):Promise.resolve()}catch(e){mine=false;return Promise.reject(e)}};
+  // ✕ Smaller goes into what is full screen (or into the window, <dialog>, the video is in): elsewhere it would sit under it; .el-si = the shadowing video's intro bar (below)
+  const si=(v,y)=>{const w=v&&v.parentNode;if(w&&w.classList&&w.classList.contains("el-si"))w.classList.toggle("el-si-big",y)};
+  function bigOn(v){css();if(big&&big!==v)bigOff(true);big=v;v.classList.add("el-bigvid");si(v,true);fsT=!watch()&&v.parentNode.classList.contains("el-si")?v.parentNode:R;const x=d.getElementById("el-bigx");if(x)x.remove();
+    {const b=d.createElement("button");b.id="el-bigx";b.type="button";b.textContent="✕ Smaller";b.title="Back to the page (Esc)";b.onclick=()=>bigOff();(fsT!==R?fsT:v.closest("dialog")||d.body).append(b)}on()}
+  function bigOff(keepFs){if(big){big.classList.remove("el-bigvid");si(big,false)}big=null;const b=d.getElementById("el-bigx");if(b)b.remove();
     if(!keepFs&&mine&&fsEl()){mine=false;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}on()}
   ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>d.addEventListener(ev,()=>{const f=fsEl();if(swap)return;
-    if(f&&(f.tagName==="VIDEO"||f.tagName==="IFRAME")&&watch()){swap=true;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d),v=f;
+    if(f&&(f.tagName==="VIDEO"||f.tagName==="IFRAME")&&(watch()||(f.dataset&&f.dataset.elsi))){swap=true;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d),v=f;
       Promise.resolve(x).catch(()=>{}).then(()=>{bigOn(v);return pageFs()}).catch(()=>{}).then(()=>{swap=false})}
     else if(!f){mine=false;if(big)bigOff(true)}}));
   d.addEventListener("keydown",e=>{if(e.key==="Escape"&&big&&!fsEl())bigOff()});
@@ -517,6 +522,51 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
     d.body.append(o);on();return o};
   // links marked data-elvid play over the page instead of opening the video file in a new tab
   d.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-elvid]");if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();window.elPlayVideo(a.href)})})();
+// ⏭ The shadowing video's introduction (Roger, 16 Nov 2026: "in the shadowing video, I want to have a mark where the introduction finishes so that
+// I can skip it"): every <video> that plays an LS's shadowing video (EL_LS[].shadowing with shadowingIntro), wherever it is (the LS home page's
+// window, the sample exam, the dashboard and the class tab through elPlayVideo, the student board), gets a bar under it: Introduction | Sentences,
+// a mark where the sentences start and where the video is now (tap the bar to jump there), and ⏭ Skip the intro over the video while the
+// introduction plays. Its ⛶ full screen fills the page with the video instead (bigOn above), so the bar and the button stay. No reads, no writes.
+(function(){if(typeof document==="undefined"||window.elSkipIntro)return;const d=document;
+  const mm=s=>(s=Math.round(s),Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0"));
+  const introOf=v=>{const src=v.getAttribute("src");if(!src)return 0;let p="";try{p=decodeURI(new URL(src,location.href).pathname)}catch(e){return 0}
+    const l=(window.EL_LS||[]).find(x=>x.shadowing&&x.shadowingIntro&&p.endsWith("/"+x.shadowing));return l?l.shadowingIntro:0};
+  const css=()=>{if(d.getElementById("el-sicss"))return;const s=d.createElement("style");s.id="el-sicss";s.textContent=
+    ".el-si{position:relative;display:block;max-width:100%}#el-vid .el-si{width:100%;display:flex;flex-direction:column;align-items:center}#el-vid .el-si video{max-height:calc(100vh - 130px)}#el-vid .el-si-bar{align-self:flex-start}"
+    +".el-si-skip{position:absolute;z-index:3;border:0;border-radius:999px;padding:9px 18px;background:#fff;color:#0f172a;font:800 16px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 16px #0007;white-space:nowrap}"
+    +".el-si-skip.el-si-sm{padding:6px 12px;font-size:13px}.el-si-skip:hover{background:#fef9c3}.el-si-skip[hidden]{display:none}"
+    +".el-si-bar{position:relative;display:flex;height:30px;margin:6px 0 4px;border-radius:9px;overflow:hidden;cursor:pointer;font:700 13px/30px system-ui,sans-serif;user-select:none;-webkit-user-select:none;box-sizing:border-box}"
+    +".el-si-bar>span{position:relative;z-index:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 10px;box-sizing:border-box}"
+    +".el-si-a{flex:none;background:#e2e8f0;color:#475569}.el-si-b{flex:1;min-width:0;background:#166534;color:#fff;border-left:4px solid #facc15}"
+    +".el-si-now{position:absolute;z-index:2;left:0;top:0;bottom:0;background:#0f172a40;pointer-events:none;border-right:3px solid #0f172a}"
+    +".el-si-big .el-si-bar{position:fixed;left:16px;right:16px;bottom:0;width:auto!important;margin:0!important;border-radius:9px 9px 0 0;z-index:2147482100}"
+    +".el-si-big video.el-bigvid{height:calc(100vh - 30px)!important}"
+    +".el-si-big .el-si-skip{position:fixed;left:auto!important;top:auto!important;right:28px!important;bottom:110px!important;z-index:2147482600}";
+    d.head.append(s)};
+  const IN=16;   // the bar lines up with the video's own time bar (Chrome draws it 16 px in from each side)
+  function add(v){if(v.dataset.elsi||!v.parentNode)return;const t=introOf(v);if(!t)return;v.dataset.elsi="1";css();
+    const w=d.createElement("div");w.className="el-si";v.parentNode.insertBefore(w,v);w.append(v);if(v.preload==="none")v.preload="metadata";
+    w.insertAdjacentHTML("beforeend",'<button type="button" class="el-si-skip" title="Go to sentence 1 ('+mm(t)+')">⏭ Skip the intro</button>'
+      +'<div class="el-si-bar" title="Tap to jump to that point" style="visibility:hidden"><span class="el-si-a">Introduction</span>'
+      +'<span class="el-si-b">⏭ Sentences from '+mm(t)+'</span><i class="el-si-now"></i></div>');
+    const b=w.querySelector(".el-si-skip"),bar=w.querySelector(".el-si-bar"),A=bar.children[0],N=bar.children[2];
+    const go=s=>{if(v.readyState<1){v.addEventListener("loadedmetadata",()=>go(s),{once:true});v.load();return}
+      v.currentTime=s;const p=v.play();if(p&&p.catch)p.catch(()=>{})};
+    const B=bar.children[1];
+    const draw=()=>{const D=v.duration,sm=v.offsetWidth<560;b.hidden=v.currentTime>t-1;b.classList.toggle("el-si-sm",sm);
+      A.textContent=sm?"Intro":"Introduction";B.textContent=(sm?"⏭ ":"⏭ Sentences from ")+mm(t);
+      b.style.left="auto";b.style.right=Math.max(8,w.clientWidth-v.offsetLeft-v.offsetWidth+14)+"px";b.style.top=Math.max(8,v.offsetTop+v.offsetHeight-(sm?84:108))+"px";
+      bar.style.width=Math.max(0,v.offsetWidth-2*IN)+"px";bar.style.marginLeft=(v.offsetLeft+IN)+"px";
+      if(!(D>t))return;bar.style.visibility="";A.style.width=(100*t/D)+"%";N.style.width=(100*Math.min(1,v.currentTime/D))+"%"};
+    b.onclick=e=>{e.stopPropagation();go(t)};
+    bar.onclick=e=>{const D=v.duration;if(!(D>0))return;const r=bar.getBoundingClientRect();let s=(e.clientX-r.left)/r.width*D;
+      if(Math.abs(s-t)<D*0.02)s=t;go(Math.max(0,Math.min(D-0.5,s)))};
+    ["loadedmetadata","timeupdate","seeked","play"].forEach(ev=>v.addEventListener(ev,draw));
+    if(window.ResizeObserver)new ResizeObserver(draw).observe(v);else window.addEventListener("resize",draw);draw()}
+  window.elSkipIntro=add;
+  const scan=n=>{if(!n||n.nodeType!==1)return;if(n.tagName==="VIDEO")add(n);else if(n.getElementsByTagName)for(const v of [...n.getElementsByTagName("video")])add(v)};
+  const start=()=>{scan(d.body);new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)scan(n)}).observe(d.body,{childList:true,subtree:true})};
+  if(d.body)start();else d.addEventListener("DOMContentLoaded",start)})();
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));

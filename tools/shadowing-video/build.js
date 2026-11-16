@@ -202,6 +202,7 @@ function totalSecs() {
       still(`e${i}b`, P, ['-i', cue, '-af', `apad=whole_dur=${P}`], bar(P), `e${i}b`);
     } else still(`e${i}b`, it.pause, turn(it.pause), bar(it.pause), `e${i}b`);
   });
+  const introSegs = segs.length; // everything before "Ready? Let's start!" is the introduction
   if (VO) spoken('ready', VO.ready, READY);
   else still('ready', READY, silence(READY), null, 'ready');
   spec.items.forEach((it, i) => {
@@ -219,4 +220,6 @@ function totalSecs() {
   // Poster for the page: the first intro slide.
   ff(['-i', path.join(work, 'i0.png'), '-q:v', '3', out.replace(/\.mp4$/, '-poster.jpg')]);
   console.log(out, totalSecs().toFixed(1) + ' s');
+  // ⏭ Skip the intro on the site (el-catalog.js): put this number in the LS's EL_LS entry as shadowingIntro.
+  console.log('Intro ends at', segs.slice(0, introSegs).reduce((a, f) => a + len(f), 0).toFixed(1), 's: shadowingIntro in EL_LS (shared/js/el-catalog.js)');
 })();
