@@ -1267,6 +1267,9 @@ const NMCA={"Listening":"Comprensió oral","Reading":"Comprensió lectora","Voca
 const nmT=n=>EN?n:NMCA[n]||n;
 function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
   const x=D.rs[l.id+"/assessment"]||{},pr=x.progress||{},P=pr.parts||{},sc=x.sections||{},fin=x.final||{},SC=window.EL_STEP_CRITERIA||{};
+  // 🔒 a closed term (the teacher's Close term, teams/{group}.closed): the dashboard splits the daily work by term (progress.seg, progSync):
+  // each side counts in its own term with its share of the weight and the mark of its own steps; only the term marks change, not the LS mark
+  const seg=pr.seg||{};
   const p=(window.EL_PLAN||{})[l.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,rep=(p&&p.report)||{},nT=EL_TERMS.length;
   const lsT=Math.min(nT,l.term||Math.ceil((EL_LS.filter(y=>y.course===l.course).indexOf(l)+1)/2));
   const termOfDay=d=>EL_TERMS.findIndex(y=>y.id===elTerm(d))+1,last=ids=>gi<0?null:[...new Set(ids)].map(id=>ELWeek.due(p,id,gi)).filter(Boolean).sort().pop()||null;
@@ -1281,10 +1284,12 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
         return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?elBoosted(y.score/(+(y.max||secMax(e,k)))*10,elExamBoost(e,x)):null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
     else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
       else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
-    else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))}
-    else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}));
-    pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c)))return;   // English criteria only ("5.1"); transversals and process/teamwork out
-      if(fin[y.c])y.m=EL_DEGREE_MARK[fin[y.c]]??y.m;y.term=term;y.ls=l;out.push(y)})});
+    else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))
+      .flatMap(y=>seg.gv?seg.gv.map(e=>Object.assign({},y,{w:y.w*e.f,m:e.m,tt:e.t})):[y])}
+    else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}))
+      .flatMap(y=>seg.other&&seg.other[y.c]?seg.other[y.c].map(e=>Object.assign({},y,{w:y.w*e.f,m:e.m,tt:e.t})):[y]);
+    pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c))||!(y.w>0))return;   // English criteria only ("5.1"); transversals and process/teamwork out
+      if(fin[y.c])y.m=EL_DEGREE_MARK[fin[y.c]]??y.m;y.term=y.tt||term;y.ls=l;out.push(y)})});
   // "by how much it is worked", as the dashboard (teacher.html lsWork/byWork): each competence's share of the LS is how many steps of the LS
   // activities work on its criteria (a step with two criteria counts half for each); the pieces keep their proportions inside their competence.
   // It moves weight between competences and between LSs, exactly as on the dashboard, so the marks here match its whole-year view.
