@@ -5,7 +5,7 @@
 // teacher taps; nothing is written or read in Firestore, no marks, the students' Chromebooks stay where they are.
 // The words and sentences are the class games' (lab/game/decks/<id>.js, + decks/more/<id>.js) of today's learning paths (el-cm-agenda.js
 // warmDecks). Four games take turns, a different one each class for the group (localStorage el_wu, this browser): 🔤 Hangman (a word from
-// the vocabulary, its sentence as the clue, a letter keyboard; the hangman is drawn in 8 parts), 🔀 Word order (a sentence in shuffled tiles: tap them in
+// the vocabulary, a letter keyboard; the hangman is drawn in 8 parts; its sentence is hidden at first, see clueHang), 🔀 Word order (a sentence in shuffled tiles: tap them in
 // order, a wrong tile shakes), 🕵️ Spot the mistake (a sentence with a wrong form: tap the wrong word), 🅰 No vowels (a word without its
 // vowels; 💡 adds one). Three rounds; the teacher never needs to know the answer (👁 Show answer is there anyway).
 // 📓 Drawn like the student's notebook and in two slides (Roger, 14 Nov 2026: "I want the initial games and saying to have the same
@@ -121,7 +121,7 @@ function start(id){S.game=id;S.round=0;S.items=shuf(itemsFor(id,S.pool)).slice(0
 // from the saying to the game (or, with no game for today, the class)
 function toGame(){if(!S.game){close();return}S.view="game";if(!S.st)newRound();else draw()}
 function newRound(){curSave();const it=S.items[S.round];if(!it)return draw();
-  if(S.game==="hang")S.st={it,got:new Set(),miss:[],shown:false};
+  if(S.game==="hang")S.st={it,got:new Set(),miss:[],shown:false,cl:0};
   if(S.game==="vow")S.st={it,hint:0,shown:false};
   if(S.game==="order"){let t=it.ws.map((w,i)=>({w,i}));for(let k=0;k<6;k++){t=shuf(t);if(t.some((x,j)=>x.i!==j))break}S.st={it,tiles:t,done:0,bad:-1,shown:false,miss:0}}
   if(S.game==="spot")S.st={it,pick:-1,shown:false,tries:0};
@@ -141,6 +141,7 @@ function click(e){const b=e.target.closest("button");if(!b||!S&&!b.dataset.x)ret
   if(b.dataset.next){S.round++;return newRound()}
   if(b.dataset.again)return start(S.game);
   if(b.dataset.show){S.st.shown=true;if(S.game==="hang")letters(S.st.it.w).forEach(c=>S.st.got.add(c));if(S.game==="order")S.st.done=S.st.it.ws.length;return draw()}
+  if(b.dataset.cl&&S.game==="hang"){S.st.cl=Math.max(S.st.cl||0,+b.dataset.cl);return draw()}
   if(b.dataset.hint&&S.game==="vow"){S.st.hint++;return draw()}
   if(b.dataset.t!=null&&S.game==="order"){const s=S.st,t=s.tiles[+b.dataset.t];if(t.used||s.shown)return;
     if(t.w===s.it.ws[s.done]){t.used=true;s.done++;s.bad=-1;if(s.done>=s.it.ws.length)s.shown=true}else{s.bad=+b.dataset.t;s.miss++}return draw()}
@@ -176,9 +177,20 @@ function drawHang(){const s=S.st,w=s.it.w,lost=s.miss.length>=LIVES,won=hangWon(
   const man=`<svg class="wu-man ${lost?"dead":won?"saved":""}" viewBox="0 0 110 140" aria-label="${LIVES-s.miss.length} wrong letters left">${P.map((x,i)=>`<g class="${i<s.miss.length?"on":"todo"}">${x}</g>`).join("")}</svg>`;
   const kb=["qwertyuiop","asdfghjkl","zxcvbnm"].map(r=>`<div class="wu-kr">${r.split("").map(c=>`<button class="wu-k ${s.got.has(c)?"ok":s.miss.includes(c)?"no":""}" data-k="${c}" ${s.got.has(c)||s.miss.includes(c)||s.shown?"disabled":""}>${c.toUpperCase()}</button>`).join("")}</div>`).join("");
   return `<div class="wu-hang">${man}<div class="wu-hr"><div class="wu-word">${slots}</div>
-    <p class="wu-clue">${s.it.img?`<span>${E(s.it.img)}</span> `:""}${E(s.it.c)}</p><p class="wu-sm">${s.miss.length?"✗ "+s.miss.map(c=>c.toUpperCase()).join(" "):""}</p></div></div>
+    ${clueHang(s,lost||won)}<p class="wu-sm">${s.miss.length?"✗ "+s.miss.map(c=>c.toUpperCase()).join(" "):""}</p></div></div>
     ${won?'<p class="wu-ok">✔ Well done!</p>':lost?`<p class="wu-no">Hanged! It was <b>${E(w)}</b>.</p>`:""}
     <div class="wu-kb">${kb}</div>`}
+// 💡 The sentence is hidden at first (Roger, 17 Nov 2026: "the hangman is easy because students can guess it super fast with the
+// sentence … if they are clueless I show them half of the sentence, or the entire sentence"): the round starts with no sentence and no
+// picture; ½ Half the sentence shows the first half of its words (the rest as blank lines, the gap always there), 📝 The whole sentence
+// shows it all with its picture. Once the word is found, the class is hanged or 👁 Show answer, the whole sentence shows anyway.
+function clueHang(s,end){const c=s.it.c,cl=end||s.shown?2:(s.cl||0);
+  const bt=(n,t,tip)=>`<button class="wu-b" data-cl="${n}" title="${tip}">${t}</button>`;
+  if(cl>=2)return `<p class="wu-clue">${s.it.img?`<span>${E(s.it.img)}</span> `:""}${E(c)}</p>`;
+  if(cl===1){const ws=c.split(" "),gi=ws.findIndex(w=>/_{3,}/.test(w)),n=Math.ceil(ws.length/2);
+    const t=ws.map((w,i)=>i<n||i===gi?E(w):`<span class="wu-hid" style="width:${Math.max(1.2,w.length*.42).toFixed(2)}em"></span>`).join(" ");
+    return `<p class="wu-clue">${t}</p><div class="wu-row wu-cl">${bt(2,"📝 The whole sentence","Show the whole sentence and its picture")}</div>`}
+  return `<div class="wu-row wu-cl"><span class="wu-sm">💡 Stuck?</span>${bt(1,"½ Half the sentence","Show the first half of the sentence")}${bt(2,"📝 The whole sentence","Show the whole sentence and its picture")}</div>`}
 function drawVow(){const s=S.st,w=s.it.w;let k=0;
   const out=w.split("").map(c=>{if(/[aeiou]/i.test(c)){k++;return s.shown||k<=s.hint?`<span class="wu-l on">${E(c)}</span>`:'<span class="wu-l"></span>'}return c===" "?'<span class="wu-sp"></span>':/[a-z]/i.test(c)?`<span class="wu-l on cons">${E(c)}</span>`:`<span class="wu-p">${E(c)}</span>`}).join("");
   const nv=(w.match(/[aeiou]/gi)||[]).length;
@@ -214,6 +226,8 @@ const CSS=`
 #el-wu .wu-l.lost{color:var(--nb-red)}#el-wu .wu-l.cons{color:#23262b;border-bottom-color:transparent;width:auto;min-width:.7em}#el-wu .wu-sp{width:.8em}#el-wu .wu-p{align-self:end}
 #el-wu .wu-clue{position:relative;max-width:34em;font-size:1em;color:#222;background:#fff;padding:.6em 1.1em .5em;box-shadow:0 2px 5px rgba(0,0,0,.14);transform:rotate(-.5deg);margin-top:.5em}
 #el-wu .wu-clue::before,#el-wu .wu-clue::after{content:"";position:absolute;top:-.45em;width:2.6em;height:.85em;background:rgba(232,220,180,.78)}#el-wu .wu-clue::before{left:.7em;transform:rotate(-5deg)}#el-wu .wu-clue::after{right:.7em;transform:rotate(4deg)}
+#el-wu .wu-hid{display:inline-block;height:.9em;border-bottom:2px dotted #9e9784;vertical-align:baseline}
+#el-wu .wu-cl{align-items:center;margin-top:.3em}#el-wu .wu-cl .wu-b{font-size:.7em}
 #el-wu .wu-hang{display:flex;align-items:center;justify-content:center;gap:1.4em;flex-wrap:wrap;max-width:52em}
 #el-wu .wu-hr{display:grid;gap:.5em;justify-items:center;min-width:0;flex:1 1 20em}
 #el-wu .wu-man{width:6.5em;height:auto;flex:none;fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
