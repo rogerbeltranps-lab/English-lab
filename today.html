@@ -213,6 +213,7 @@ body[data-course="2eso"]{--c:#1f6b52;--c-dark:#174d3d;--c-soft:#e9f5ef}body[data
 .box.fv{border-radius:18px;padding:18px 20px}
 .fvh{display:flex;align-items:baseline;gap:6px 8px;flex-wrap:wrap;margin:0 0 2px}.fvh h2{margin:0;font-size:1.3rem;letter-spacing:-.01em}.fvh .fvt{color:#64748b;font-size:15px}
 .fvlead{color:#475569;margin:4px 0 12px;font-size:15px}.fvlead b{color:#0f172a}.fv-tip{display:block;font-size:13.5px;margin-top:2px}
+.fv-bonus{margin:8px 0 4px;padding:8px 12px;border-radius:10px;background:#fef9c3;border:1px solid #fde68a;color:#713f12;font-size:15px}.fv-bonus b{color:#713f12}
 .fv-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 0 4px}
 .fv-stat,.fv-part{display:flex;flex-direction:column;gap:2px;min-width:0;background:var(--ks);border-radius:14px;padding:12px 14px;border-top:5px solid var(--k)}
 .fv-sh{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--k);font-size:15px;line-height:1.2}.fv-si{font-size:22px;line-height:1}
@@ -960,12 +961,12 @@ function examParts(e,sc){const got=e.sections.filter(([k])=>sc[k]&&(sc[k].score!
       const v=+sc[key].score,p=v/m*100;
       return `<div class="fv-stat ${k(p)}"><span class="fv-sh">${esc(n)}</span><b class="fv-big">${pts1(v)} <small>/ ${m}</small></b><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,p))}%"></span></span>${(cs||[]).length?`<span>${(cs||[]).map(pill).join("")}</span>`:""}</div>`}).join("")
     +`</div></div>`}
-function examCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n);if(!by.length)return "";
+function examCrit(e,sc,f){const by=elExamByCrit(e,sc,f).filter(o=>o.n);if(!by.length)return "";const cm=o=>elBoosted(o.score/o.max*10,o.f);
   return `<div class="box fv">${fvHead("📏","2 · "+t("L'examen per criteris","Your exam by criteria"))}<div class="fv-crits">`
     +by.map(o=>`<button type="button" class="fv-crit ${fvK(o.c)}" data-do="crit" data-c="${esc(o.c)}"><span class="fv-ch"><span class="fv-chip"><span aria-hidden="true">${fvIc(o.c)}</span> ${esc(o.c)}</span><b>${esc(elCompetence(o.c))}</b></span>`
       +`<span class="fv-cd">${esc(easy(o.c))}</span><small>${t("Parts de l'examen","Exam parts")}: ${esc(e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + "))}</small>`
-      +`<span class="fv-cn"><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,o.score/o.max*100))}%"></span></span><span><b>${f1(o.score/o.max*10)}</b> / 10 <small>· ${pts1(o.score)} / ${o.max} ${t("punts","points")}</small></span></span></button>`).join("")
-    +`</div><p class="muted">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")} ${t("Toca un criteri per veure'n el text oficial.","Tap a criterion to see its official wording.")}</p></div>`}
+      +`<span class="fv-cn"><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,cm(o)*10))}%"></span></span><span><b>${f1(cm(o))}</b> / 10 <small>· ${pts1(o.score)} / ${o.max} ${t("punts","points")}${o.f>1?" × "+o.f:""}</small></span></span></button>`).join("")
+    +`</div><p class="muted">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${f>1?t(`La nota de l'examen és el total de punts ÷ 10, × ${f} perquè has fet l'examen més difícil (fins a 10).`,`Your exam mark is all your points ÷ 10, × ${f} because you took the harder exam (up to 10).`):t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")} ${t("Toca un criteri per veure'n el text oficial.","Tap a criterion to see its official wording.")}</p></div>`}
 const lpLink=lp=>lp&&lp.href?`<a class="go" href="${esc(lp.href)}">${t("Repassa","Review")}: ${esc(lp.t||"")} →</a>`:lp&&lp.t?`<small class="muted">${t("Repassa","Review")}: ${esc(lp.t)}</small>`:"";
 function examQuestions(r){if(r.full)return examWhole(r);const qs=(r.questions||[]);if(!qs.length)return "";
   return `<div class="box fv">${fvHead("❓","3 · "+t("Preguntes que cal revisar","Questions to review"),String(qs.length))}<p class="fvlead">${t("Les preguntes on has perdut punts: la teva resposta, la correcta i per què.","The questions where you lost points: your answer, the right one and why.")}</p>`
@@ -1108,21 +1109,23 @@ function examReview(r){const xs=r.review||[];if(!xs.length)return "";
 // in the others the exam is one block of the LS mark, which the teacher gives at the end.
 function examView(ls){const id=ls.id,g=(window.EL_GRADING||{})[id];if(!g||!g.exam)return `<div class="box"><p class="muted">${t("Aquesta LS no té examen.","This LS has no exam.")}</p></div>`;
   const e=g.exam,x=D.rs[id+"/assessment"]||{},sc=x.sections||{},rep=x.report||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null);
-  const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null;
+  // the harder exam version counts more (elExamBoost: LS1 Daring ×1.2, Roger 17 Nov 2026); the points of each part stay as marked
+  const f=elExamBoost(e,x),m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),raw=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,exam=elBoosted(raw,f);
   const big=v=>`<b class="fv-hm" style="color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+` <small>/ 10</small>`}</b>`;
   const ver=x.version?`<span class="tag">${t("Versió de l'examen","Exam version")}: ${esc(LV[x.version]||x.version)}${rep.model?" · Model "+esc(rep.model):""}</span>`:"";
+  const bonus=f>1&&raw!=null?`<p class="fv-bonus">⭐ ${t(`Has fet l'examen més difícil, així que la teva nota compta un ${Math.round((f-1)*100)} % més: ${f1(raw)} × ${f} = <b>${f1(exam)}</b>${raw*f>10?" (com a màxim 10)":""}.`,`You took the harder exam, so your mark counts ${Math.round((f-1)*100)} % more: ${f1(raw)} × ${f} = <b>${f1(exam)}</b>${raw*f>10?" (10 at most)":""}.`)}</p>`:"";
   let head;
   if(g.only){const fp=D.rs[g.fp.a]||{},prod=fp.max?(fp.score||0)/fp.max*10:null,val={exam,fp:prod},
       total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null,name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")};
     const ic={exam:"📝",fp:"🎬"},kk={exam:"fk-i",fp:"fk-a"};
-    head=`<div class="box fv" id="exam">${fvHead("🎓",t("Nota de la LS","LS grade"))}${ver}<p class="fvlead">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><div class="fv-parts">`
+    head=`<div class="box fv" id="exam">${fvHead("🎓",t("Nota de la LS","LS grade"))}${ver}${bonus}<p class="fvlead">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><div class="fv-parts">`
       +g.blocks.map(b=>fvCard(kk[b.id]||"fk-b",ic[b.id]||"📊",name[b.id],t(`${b.w} % de la nota`,`${b.w} % of the mark`),val[b.id])).join("")
       +fvCard("fk-b eq main","🎓",t("Nota de la LS","LS mark"),"100 %",total)+`</div></div>`}
   else{const w=(g.blocks.find(b=>b.id==="exam")||{}).w;
-    head=`<div class="box fv" id="exam"><div class="lphead"><div>${fvHead("📝",t("Examen final","Final exam"))}${ver}<p class="fvlead" style="margin-bottom:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
+    head=`<div class="box fv" id="exam"><div class="lphead"><div>${fvHead("📝",t("Examen final","Final exam"))}${ver}${bonus}<p class="fvlead" style="margin-bottom:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
   if(!got.length){const p=(window.EL_PLAN||{})[id],ex=ELWeek.exam(p,ELWeek.col(p,D.me.group));
     return head+`<div class="box fv notyet">📝 <b>${t("Encara no tens els resultats de l'examen.","Your exam results are not here yet.")}</b> ${ex?t(`Examen: ${when(ex)}. `,`Exam: ${when(ex)}. `):""}${t("Quan el professor l'hagi corregit, aquí veuràs la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.","When your teacher has marked it, you will see here the mark of each part, the criteria, the questions to review and your writing corrected.")}</div>`}
-  return head+examParts(e,sc)+examCrit(e,sc)+examQuestions(rep)+examWriting(rep,e)+examReview(rep)}
+  return head+examParts(e,sc)+examCrit(e,sc,f)+examQuestions(rep)+examWriting(rep,e)+examReview(rep)}
 // My LS mark so far (Roger, 2 Nov 2026: "students should see their progress"): each block of EL_GRADING[ls] with its share and my mark
 // so far, out of 10. The teacher dashboard keeps the marks in results/{ls}__assessment .progress (progSync in teacher.html: only it can
 // work out the continuous assessment); the exam comes from its sections when they are there. Missing work is left out, so it is "so far".
@@ -1152,11 +1155,11 @@ function lsDone(l,tm){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)ret
   const w=parts.reduce((n,x)=>n+x.w,0);return {parts,w,pct:w?parts.reduce((n,x)=>n+x.w*x.f,0)/w*100:null}}
 function lsMarks(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||!g.blocks)return null;
   const x=D.rs[ls.id+"/assessment"]||{},p=x.progress||{},e=g.exam,sc=x.sections||{},got=e?e.sections.filter(([k])=>sc[k]&&sc[k].score!=null):[];
-  const em=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0;
-  if(g.only){const exam=em?got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10:null,f=g.fp&&D.rs[g.fp.a]||{},fp=f.max?(f.score||0)/f.max*10:fpMissed(ls)?0:null,val={exam,fp};
+  const em=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0,xf=elExamBoost(e,x);
+  if(g.only){const exam=em?elBoosted(got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10,xf):null,f=g.fp&&D.rs[g.fp.a]||{},fp=f.max?(f.score||0)/f.max*10:fpMissed(ls)?0:null,val={exam,fp};
     const total=exam!=null&&fp!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
     return {only:true,exam,fp,daily:null,total,w:{daily:0,exam:W("exam"),fp:W("fp")}}}
-  const exam=em?got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10:p.exam??null;
+  const exam=em?elBoosted(got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10,xf):p.exam??null;
   const v={exam,fp:p.fp??(fpMissed(ls)?0:null),gv:p.gv??null,other:p.other??null};
   const cw=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"),cs=cw.filter(b=>v[b.id]!=null),cont=cs.length?cs.reduce((n,b)=>n+v[b.id]*b.w,0)/cs.reduce((n,b)=>n+b.w,0):null;
   const has=g.blocks.filter(b=>v[b.id]!=null),total=has.length?has.reduce((n,b)=>n+v[b.id]*b.w,0)/has.reduce((n,b)=>n+b.w,0):null;
@@ -1216,7 +1219,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const P=p.parts||{},sub=(name,w,m,note)=>row(name,Math.round(w*100)/100,m,note,"in sub"),det=id=>{if(!TX)return id==="gv"?stu():"";
     if(id==="gv"&&g.gv){const sw=g.gv.parts.reduce((n,x)=>n+x.w,0);return g.gv.parts.map(x=>sub(esc(x.name),W("gv")*x.w/sw,(P.gv||{})[x.id]??null,/first try/i.test(x.name)?"":x.games?"% right in the class games":x.first?"Only the first try counts":"Done (late counts the same; missing counts 0 after its day)")).join("")}
     if(id==="other")return other.map(c=>sub(pill(c)+" "+esc(elCompetence(c)),W("other")/other.length,(P.other||{})[c]??null,"Learning paths: steps done"+(((g.teacher||{})[c]||[]).length?" + your level":""))).join("");
-    if(id==="exam"&&e){const tot=e.sections.reduce((n,x)=>n+(+x[2]||e.max),0);return e.sections.map(([k,n,mx])=>{const y=sc[k];return sub(esc(n),W("exam")*(+mx||e.max)/tot,y&&y.score!=null?y.score/(+(y.max||mx||e.max))*10:null,y&&y.score!=null?`${f1(+y.score)} / ${+(y.max||mx||e.max)}`:y&&y.excused?t("No l'has fet: no compta","Not done: it doesn't count"):"")}).join("")}
+    if(id==="exam"&&e){const tot=e.sections.reduce((n,x)=>n+(+x[2]||e.max),0);return e.sections.map(([k,n,mx])=>{const y=sc[k];return sub(esc(n),W("exam")*(+mx||e.max)/tot,y&&y.score!=null?elBoosted(y.score/(+(y.max||mx||e.max))*10,elExamBoost(e,x)):null,y&&y.score!=null?`${f1(+y.score)} / ${+(y.max||mx||e.max)}`:y&&y.excused?t("No l'has fet: no compta","Not done: it doesn't count"):"")}).join("")}
     if(id==="fp"&&g.fp&&g.fp.rows){const fw=g.fp.rows.reduce((n,x)=>n+x.w,0);return g.fp.rows.map(x=>sub(esc(x.name),W("fp")*x.w/fw,(P.fp||{})[x.step+"|"+x.c]??null,"")).join("")}
     return ""};
   // what students see inside "Vocabulary, grammar and skills" (Roger, 2 Nov 2026: "make it clear for the students"): the gv parts in plain
@@ -1272,7 +1275,7 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
     if(b.id==="exam"&&g.exam){const e=g.exam,tot=e.sections.reduce((n,[k])=>n+secMax(e,k),0),gvc=Object.keys(gvS);
       pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
         if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
-        return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?y.score/(+(y.max||secMax(e,k)))*10:null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
+        return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?elBoosted(y.score/(+(y.max||secMax(e,k)))*10,elExamBoost(e,x)):null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
     else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
       else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))}

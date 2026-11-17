@@ -11,10 +11,17 @@ window.elExamShared=e=>e.sections.filter(x=>(x[3]||[]).length>1).map(x=>x[1]+" (
 // Exam score per criterion: each section counts for every criterion it carries ([key, name, max, criteria]), so a section shared by two
 // criteria (4ESO LS1 vocabulary: 4.1 and 5.1) counts in both. sc = results/{ls}/assessment .sections. Returns [{c, score, max, n, of}]
 // in the order the criteria first appear; score and max only from the sections entered (n of `of`); [] when no section has criteria.
-window.elExamByCrit=function(e,sc){const out={};sc=sc||{};
-  e.sections.forEach(([k,,mx,cs])=>(cs||[]).forEach(c=>{const o=out[c]=out[c]||{c,score:0,max:0,n:0,of:0},y=sc[k];o.of++;
+// f: the harder-version factor (elExamBoost), kept on each criterion as o.f so its mark is elBoosted(score/max×10, f).
+window.elExamByCrit=function(e,sc,f){const out={};sc=sc||{};
+  e.sections.forEach(([k,,mx,cs])=>(cs||[]).forEach(c=>{const o=out[c]=out[c]||{c,score:0,max:0,n:0,of:0,f:f||1},y=sc[k];o.of++;
     if(y&&y.score!=null&&y.score!==""){o.score+=+y.score;o.max+=+(y.max||mx||e.max);o.n++}}));
   return Object.values(out)};
+// Harder exam version (Roger, 17 Nov 2026: "students who took the daring exam in the LS1 should be rewarded, since it was more difficult,
+// so I want it to count a 20 % more"): exam.boost = {version: factor}, e.g. {daring: 1.2}. x = results/{ls}__assessment (its .version).
+// The saved points stay as they are; every mark worked out from them (exam mark, each part, each criterion, so the LS mark and the term
+// mark too) is multiplied by the factor and capped at 10 (elBoosted). Levels (routes) are never moved by it: the route tool uses the raw mark.
+window.elExamBoost=(e,x)=>(e&&e.boost&&x&&x.version&&+e.boost[x.version])||1;
+window.elBoosted=(m,f)=>m==null||isNaN(m)||!f||f===1?m:Math.min(10,m*f);
 window.EL_GRADING={
   // LS1 My Real Routine, 2ESO and 4ESO (Roger, 25 Oct 2026): done in class and redesigned for next year, so this year only the final
   // exam and the final product count. only: the student board shows just these two. fp.mark: the final product is the teacher's mark
@@ -25,7 +32,7 @@ window.EL_GRADING={
   // the writing is split into its rubric rows (C1 task 8, C2 grammar 4, C3 vocabulary 4 → 5.1; C4 organisation 4 → 5.2). Vocabulary
   // is evidence for both 4.1 and 5.1, so a criterion score (elExamByCrit) is not a share of the exam mark: the exam mark stays points / 10.
   ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:75},{id:"fp",name:"Final product",w:25}],only:true,
-    exam:{sections,max:10},fp:{a:c+"/final-product",mark:true}});
+    exam:{sections,max:10,boost:{daring:1.2}},fp:{a:c+"/final-product",mark:true}});   // boost: the Daring version ×1.2 (elExamBoost)
     // 2ESO (Roger, 30 Oct 2026): its exam cover gives criteria per item type: vocabulary choose 4.1, complete 5.1; grammar choose 5.1 and 4.1,
     // complete 5.1; writing as in 4ESO. So vocabulary (28) and grammar (32) are split into their choose and complete parts.
     return {"2eso-my-real-routine":e("2eso",[["listening","Listening",10,["2.1"]],["reading","Reading",10,["4.1"]],["vchoose","Vocabulary · choose",16,["4.1"]],["vcomplete","Vocabulary · complete",12,["5.1"]],
