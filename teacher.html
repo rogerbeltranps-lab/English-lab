@@ -986,17 +986,26 @@ function stuGames(u){loadGames();const s=S.P[u],gl=GAMES[S.g];if(!s||!s.email||!
     .sort((a,b)=>(+a.sid||0)-(+b.sid||0)||String(a.day).localeCompare(String(b.day)));
   const keep=new Set(elLatestGames(list.filter(x=>!x.out)));list.forEach(x=>{if(!x.out&&!keep.has(x))x.old=true});
   const inn=[...keep],of=inn.reduce((n,x)=>n+x.of,0);return {v:of?inn.reduce((n,x)=>n+x.r,0)/of*10:null,list}}
-function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.games?stuGames(u).v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
-    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:(o===LATE?LATE_W:1)*10,id,k)}).filter(x=>x!==undefined))}));
+// S.seg (🔒 Close term, segSplit): only the steps whose tab was ticked in that side of the close day, and the class games played then; a part
+// with no step on that side is left out (never 0)
+const segSt=st=>S.seg&&st?st.filter(([id,k])=>segOn(id,k)):st;
+// the class games part: only the games of that side (S.seg); in a term where daily work counts only done or not (📏 formMode), a game the
+// student took part in counts in full (10), whatever they got right
+function gamesV(u,g){const G0=stuGames(u),dy=x=>String(x.day||"").slice(0,10)||ELWeek.today(),fm=g&&fmAny();if(!S.seg&&!fm)return G0.v;
+  const inn=G0.list.filter(x=>!x.out&&!x.old&&(!S.seg||segIn(S.seg.sg,dy(x)))),full=x=>fm&&formMode(g,dayTerm(dy(x),g))==="done",of=inn.reduce((n,x)=>n+x.of,0);
+  return of?inn.reduce((n,x)=>n+(full(x)?x.of:x.r),0)/of*10:null}
+function gvBlock(u,g){const parts=G().gv.parts.map(p0=>{const p={...p0,first:segSt(p0.first),time:segSt(p0.time)};p.none=!!S.seg&&!p.games&&!(p.first||p.time||[]).length;
+    p.v=p.games?gamesV(u,g):p.first?avg(p.first.map(([id,k])=>missZ(firstV(u,id,k,g),id,k)))
+    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:(o===LATE?LATE_W:1)*10,id,k)}).filter(x=>x!==undefined));return p});
   // a part made only of checkpoints, none done (ill on every one): left out too, never 0
-  return {mark:wavg(parts.filter(p=>(!p.games||p.v!=null)&&!(p.v==null&&p.first&&p.first.every(([id,k])=>isCpStep(id,k)))).map(p=>[p.v,p.w])),parts}}
+  return {mark:wavg(parts.filter(p=>!p.none&&(!p.games||p.v!=null)&&!(p.v==null&&p.first&&p.first.every(([id,k])=>isCpStep(id,k)))).map(p=>[p.v,p.w])),parts}}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
-function otherCrit(u,c){const g=G();
-  const auto=avg((g.auto[c]||[]).map(([id,k,first])=>missZ(first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null,id,k)));
-  const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
+function otherCrit(u,c){const g=G(),A=segSt(g.auto[c]||[]),T=segSt(g.teacher[c]||[]);
+  const gg=(S.P[u]||{}).group||S.g,auto=avg(A.map(([id,k,first])=>missZ(first?firstV(u,id,k,gg):doneAt(u,id,k)?10:null,id,k)));
+  const teacher=avg(T.map(([id,k])=>lvMark(lvOf(u,id,k,c))));
   // a half with no pieces drops out (1.1 and 1.2 in 4ESO LS2 have only steps), so it never counts 0
-  const onlyCp=auto==null&&(g.auto[c]||[]).length&&(g.auto[c]||[]).every(([id,k])=>isCpStep(id,k));   // only missed checkpoints: left out
-  return {auto,teacher,mark:wavg([[auto,(g.auto[c]||[]).length&&!onlyCp?1:0],[teacher,(g.teacher[c]||[]).length?1:0]].filter(x=>x[1]))}}
+  const onlyCp=auto==null&&A.length&&A.every(([id,k])=>isCpStep(id,k));   // only missed checkpoints: left out
+  return {auto,teacher,mark:wavg([[auto,A.length&&!onlyCp?1:0],[teacher,T.length?1:0]].filter(x=>x[1]))}}
 // Transversal competences (Roger, 30 Oct 2026): the CC, CD, CPSAA and entrepreneurial criteria in EL_GRADING[ls].other are assessed and
 // shown apart, but they never count in the LS mark: the 20 % block is the English integrated competences only.
 const isTransC=c=>/^(CC|CD|CPSAA|CE)\s?\d/.test(String(c)),engOther=g=>(g.other||[]).filter(c=>!isTransC(c)),transOther=g=>(g.other||[]).filter(isTransC);
@@ -1342,14 +1351,23 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()
 function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
   if(g.gv&&g.gv.parts.some(p=>p.games)){loadGames();if(!GAMES[S.g]||GAMES[S.g].busy)return}   // the class games part: wait for the group's games (loadGames renders again)
   S.tickZ=null;const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
+  const l=EL_LS.find(x=>x.id===S.ls),segIts=l?withS("yShare","plan",()=>lsItems(l,S.g)).filter(it=>it.seg):[];   // 🔒 closed terms: the daily work split by term
   try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{S.dueZero=s.group||S.g;const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
     // the pieces of each block, for the teacher's view of the student's board (today.html?student=…; Roger, 2 Nov 2026)
     const parts={gv:Object.fromEntries(((B.gv&&B.gv.parts)||[]).map(x=>[x.id,r1(x.v)])),other:Object.fromEntries(engOther(g).map(c=>[c,r1(otherCrit(s.uid,c).mark)])),
       fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step+"|"+x.c,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
-    if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v)))return;p.at=ymd(Date.now());
+    p.seg=segProgress(s,segIts,r1);
+    if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v))&&JSON.stringify(cur.seg??null)===JSON.stringify(p.seg))return;p.at=ymd(Date.now());
     const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
   finally{S.zero=z;S.dueZero=null;S.tickZ=null}}
+// 🔒 Close term on the student board (🎓 My progress): progress.seg = {gv: [{t, f, m}], other: {criterion: [{t, f, m}]}} (null when no term
+// of this LS's daily work is closed): for each side of the close day, its term, its share of the block (f, 0–1) and the mark of its steps only.
+// Both keys are always written, so a reopened term leaves nothing behind (the write merges).
+function segProgress(s,its,r1){if(!its.length)return null;const r3=v=>Math.round(v*1000)/1000,o={gv:null,other:null};
+  its.forEach(it=>{if(it.b.id==="gv"){const pc=it.pcs[0];(o.gv=o.gv||[]).push({t:it.term,f:r3(pc.f),m:s.away?null:r1(pc.m(s))})}
+    else it.pcs.filter(pc=>pc.c&&!isTransC(pc.c)).forEach(pc=>{const x=o.other=o.other||{};(x[pc.c]=x[pc.c]||[]).push({t:it.term,f:r3(pc.f),m:s.away?null:r1(pc.m(s))})})});
+  return o}
 // ---- Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"; the student board's rule: "the menus have
 // little information and when you go to a place you can find the info that you need"). A side menu (Home, the groups, Questions, Materials,
 // Reference) and, for Home and each group, a page with only a few red alerts, ONE big card for the class (now or next, by EL_TIMETABLE, with
@@ -1447,7 +1465,7 @@ const lsChips=(lss,ls,mine)=>`<div class="bar lsbar"><span class="muted">LS:</sp
 // 👥 Students: the term (its points, and the LSs it offers) and the LS (its learning paths)
 function stuBar(grp,lss,mine){const now=elTerm(),inT=lss.filter(l=>"t"+lsTerm(l)===S.term);
   return `<div class="bar lsbar"><span class="muted">Term:</span> ${EL_TERMS.map(t=>`<button class="chip ${t.id===S.term?"on":""}" data-do="stuterm" data-t="${t.id}">${esc(t.en)}${t.id===now?" · now":""}</button>`).join("")}`
-    +`<span class="muted" style="margin-left:10px">LS:</span> ${inT.length?inT.map(l=>lsChip(l,!(S.stuBoth&&inT.length>1)&&l.id===S.ls,mine)).join("")+(inT.length>1?`<button class="chip ${S.stuBoth?"on":""}" data-do="lsboth" title="Every LS of ${esc(elTermName(S.term))} in one table: their summaries side by side, then each LS's learning paths">Both LSs</button>`:""):`<span class="muted">no LS in ${esc(elTermName(S.term))} yet: the table shows the points only</span>`}</div>`}
+    +`<span class="muted" style="margin-left:10px">LS:</span> ${inT.length?inT.map(l=>lsChip(l,!(S.stuBoth&&inT.length>1)&&l.id===S.ls,mine)).join("")+(inT.length>1?`<button class="chip ${S.stuBoth?"on":""}" data-do="lsboth" title="Every LS of ${esc(elTermName(S.term))} in one table: their summaries side by side, then each LS's learning paths">Both LSs</button>`:""):`<span class="muted">no LS in ${esc(elTermName(S.term))} yet: the table shows the points only</span>`}</div>`+termTools(grp)}
 // the group's next class by the timetable (or the one going on now): {gid, date, start, end, now}
 function nextClass(gid){const T=window.EL_TIMETABLE;if(!T||!T.groups)return null;const now=window.EL_NOW?new Date(window.EL_NOW):new Date(),m0=now.getHours()*60+now.getMinutes();
   const off=d=>(T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d),DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
@@ -3040,8 +3058,95 @@ function lsItems(l,gid){const g=gradingFor(l.id,gid);if(!g||!g.blocks)return [];
   const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(x=>(x.first||x.time||[]).map(y=>y[0])):[],
     other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
   const its=g.blocks.map(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean));
-    const it={l,g,b,date,term:+rep[b.id]||(date?termOf(date):lsTerm(l))};it.pcs=pieces(it);return it});
+    const it={l,g,b,date,term:+rep[b.id]||(date?termOf(date):lsTerm(l))};it.pcs=pieces(it);return it}).flatMap(it=>segSplit(it,gid));
   return S.yShare==="plan"?its:byWork(l,its)}
+// ---- 🔒 Close term (Roger, 17 Nov 2026: "There must be an option to say close term, so that it only counts what we've done, there'll always
+// be LPs or SLPs that I [won't] be able to do. All the criteria and work done will be calculated proportionally. And the rest of the SLP and
+// LP will be included in the next term."). Per group: teams/{group}.closed = {t1: "YYYY-MM-DD"} (the close day; the student board already
+// reads that document). A closed term n splits every daily-work block (gv, other: made of learning-path steps) that goes in term n by the day
+// each step's tab was ticked as done in the Time plan (doneMap, the same as ls/{ls}.done[group]): ticked on or before the close day = term n;
+// ticked later or not ticked yet = term n+1 (and so on if n+1 is closed too). Each side keeps the share of the block's weight that its steps
+// are (proportional: 4 of 6 paths' steps done = 4/6 of the 35 % in term n, the rest in term n+1), and its mark is worked out from its own
+// steps only (class games by their day). Exams and final products stay in the term of the plan (EL_PLAN report). Each LS's own mark is not
+// changed: only the term marks (whole-year view, student board 🎓 My progress via progress.seg, written by progSync). Reopen = delete the day.
+const closeDay=(g,n)=>{const T=S.closeTry;if(T&&T.g===g&&T.n===n)return T.day||null;return ((((S.D&&S.D.tm)||{})[g]||{}).closed||{})["t"+n]||null};
+function termSegs(n,gid){const out=[];let lo="",t=n;while(t<EL_TERMS.length){const d=closeDay(gid,t);if(!d)break;out.push({t,lo,hi:d});lo=d;t++}
+  if(!out.length)return null;out.push({t,lo,hi:null});return out}
+const segIn=(sg,d)=>d?d>sg.lo&&(!sg.hi||d<=sg.hi):!sg.hi;
+// the day each tab was ticked as done in class, for one LS and group ({"activity#panel": day}); a step's day = the earliest tab holding it
+function tickDays(ls,g){let dm=(((S.D&&S.D.ls||{})[ls]||{}).done||{})[g]||{};try{if(S.D&&S.D.tkOk){const m=doneMap(planX(ls,g));if(Object.keys(m).length)dm=m}}catch(e){}return dm}
+const stepDay=(dm,id,k)=>{const a=byId(id);if(!a)return null;const secs=secOf(a).map(z=>z[0]);if(!secs.length)return dm[id+"#"]||null;
+  return secs.filter(sec=>sec===k||elSecSteps(a,sec).includes(k)).map(sec=>dm[id+"#"+sec]).filter(Boolean).sort()[0]||null};
+const uniqSteps=st=>{const o=new Map();st.forEach(x=>o.set(x[0]+"|"+x[1],x));return [...o.values()]};
+const gvSteps=g=>uniqSteps(g.gv?g.gv.parts.flatMap(x=>x.first||x.time||[]):[]);
+const crSteps=(g,c)=>uniqSteps([...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])]);
+// the steps of a piece of a daily-work block (gv: the whole block; other: its criterion)
+const segSteps=(it,c)=>it.b.id==="gv"?gvSteps(it.g):crSteps(it.g,c);
+// S.seg = {sg, dm} while a mark is worked out for one side: gvBlock and otherCrit only use the steps (and class games) of that side
+const segOn=(id,k)=>!S.seg||segIn(S.seg.sg,stepDay(S.seg.dm,id,k));
+const segShare=(steps,sg,dm)=>steps.length?steps.filter(([id,k])=>segIn(sg,stepDay(dm,id,k))).length/steps.length:sg.hi?0:1;
+const segName=sg=>sg.hi?(sg.lo?ELWeek.date(ELWeek.add(sg.lo,1))+"–"+ELWeek.date(sg.hi):"done by "+ELWeek.date(sg.hi)):"rest, after "+ELWeek.date(sg.lo);
+function segSplit(it,gid){if(it.b.id!=="gv"&&it.b.id!=="other")return [it];const segs=termSegs(it.term,gid);if(!segs)return [it];
+  const dm=tickDays(it.l.id,gid);
+  return segs.map(sg=>{const pcs=it.pcs.map(p=>{const f=segShare(segSteps(it,p.c),sg,dm),m=p.m;
+      return Object.assign({},p,{w:p.w*f,f,m:m?s=>withS("seg",{sg,dm},()=>m(s)):m})}).filter(p=>p.w>1e-9);
+    const w=pcs.reduce((a,p)=>a+p.w,0);return {...it,b:Object.assign({},it.b,{name:it.b.name+" · "+segName(sg),w:Math.round(w*10)/10,w0:it.b.w}),pcs,term:sg.t,seg:sg}}).filter(x=>x.pcs.length)}
+// ---- 📏 How daily work counts, per term (Roger, 17 Nov 2026: "there must be an option to say that the work of the formative assessment
+// counts as we said before or only counts if they [have] done it or not. So next term I can decide only by pressing a button"). teams/{group}
+// .formative = {t2: "done"} (every group at once); default (no value) = "score", as before. In a "done" term, a learning-path step that
+// counts by its score (first try of checkpoints and recall warm-ups, auto steps of other competences with a score) counts 10 when done and,
+// like any missing step, 0 only when ticked in class and its day has passed; a class game played in that term counts 10 (taking part, not
+// the % right). Steps that already count as done on time stay the same. A step's term = the term of the day its tab was ticked in the Time
+// plan (else its due day, else today), moved on past a closed term's close day (🔒 Close term). Changes the LS mark and the term marks.
+const formMode=(g,n)=>((((S.D&&S.D.tm)||{})[g]||{}).formative||{})["t"+n]==="done"?"done":"score";
+const fmAny=()=>Object.values((S.D&&S.D.tm)||{}).some(x=>x&&x.formative&&Object.values(x.formative).includes("done"));
+let TDC={};const tickDaysC=(ls,g)=>{const k=ls+"|"+g,c=TDC[k];if(c&&Date.now()-c.t<4000)return c.dm;const dm=tickDays(ls,g);TDC[k]={t:Date.now(),dm};return dm};
+function dayTerm(d,g){const nT=EL_TERMS.length;let n=1;while(n<nT){const end=closeDay(g,n)||EL_TERMS[n-1].end;if(end&&d>end)n++;else break}return n}
+const stepMode=(id,k,g)=>{if(!g||!fmAny())return "score";const d=stepDay(tickDaysC(S.ls,g),id,k)||dueStep(id,k,g)||ELWeek.today();return formMode(g,dayTerm(d,g))};
+// the score of a step that counts its first try, or 10 if done in a "done" term
+const firstV=(u,id,k,g)=>{const f=firstOf(u,id,k);if(stepMode(id,k,g)!=="done")return pct(f);return f&&f.max||doneAt(u,id,k)?10:null};
+// 🔒 / 📏 in the Students' progress term bar
+function termTools(grp){const n=+String(S.term).slice(1),nowN=termOf(ELWeek.today())||1,T=EL_TERMS[n-1];if(!T||!grp)return "";const c=closeDay(grp.id,n),m=formMode(grp.id,n);
+  const cl=n<=nowN&&n<EL_TERMS.length?`<button class="chip ${c?"on":""}" data-do="tclose" data-g="${grp.id}" data-n="${n}" title="${c?`${esc(T.en)} is closed for ${esc(grp.name)} on ${esc(ELWeek.date(c))}: only what was ticked done by then counts in it, the rest is in ${esc(EL_TERMS[n].en)}. Click to change the day or reopen it`:`Close ${esc(T.en)} for ${esc(grp.name)}: its mark counts only what you ticked done in the Time plan, the rest of the learning paths goes to ${esc(EL_TERMS[n].en)}`}">🔒 ${c?`${esc(T.en)} closed · ${esc(ELWeek.date(c))}`:`Close ${esc(T.en)}…`}</button>`:"";
+  const fm=`<span class="muted" style="margin-left:10px" title="How the learning-path steps that have a score count in ${esc(T.en)}, in every group">Daily work in ${esc(T.en)}:</span> `
+    +`<button class="chip ${m==="score"?"on":""}" data-do="tform" data-n="${n}" data-v="score" title="As until now: checkpoints and recall warm-ups count their first-try score, class games their % right, the rest done on time">scores count</button>`
+    +`<button class="chip ${m==="done"?"on":""}" data-do="tform" data-n="${n}" data-v="done" title="Only done or not: every step counts 10 when done (0 only once it is ticked in class and its day has passed) and a class game they took part in counts 10; scores do not count">only done or not</button>`;
+  return `<div class="bar lsbar">${cl}${fm}<button class="chip" style="margin-left:10px" data-do="yearview" title="Each student's term and year marks, by competence">📆 Term and year marks</button></div>`}
+async function tformSet(n,v){const ps=GR.map(g=>{const t=S.D.tm[g.id]=S.D.tm[g.id]||{};t.formative=Object.assign({},t.formative,{["t"+n]:v==="done"?"done":null});
+    return put(["teams",g.id],{formative:{["t"+n]:v==="done"?"done":DEMO?null:F.deleteField()}})}).filter(Boolean);
+  TDC={};render();try{await Promise.all(ps);lsResync()}catch(e){alert("Could not save it: "+e.message)}}
+// after a change in how terms count: the student board's stored marks of the group on screen, for every LS of its course
+function lsResync(){const g=GR.find(x=>x.id===S.g);if(!g)return;const o=S.ls;try{EL_LS.filter(l=>l.course===g.course).forEach(l=>{S.ls=l.id;try{progSync()}catch(e){console.warn("resync",l.id,e)}})}finally{S.ls=o}}
+// the Close term dialog: the close day, what counts in the term and what moves on, and each student's term marks before and after
+function tclosePanel(gid,n,day){const grp=GR.find(g=>g.id===gid),T=EL_TERMS[n-1],N=EL_TERMS[n];if(!grp||!T||!N)return;const cur=((S.D.tm[gid]||{}).closed||{})["t"+n]||null,today=ELWeek.today();
+  day=day||cur||(T.end&&today>T.end?T.end:today);
+  const lss=EL_LS.filter(l=>l.course===grp.course),studs=Object.values(S.P||{}).filter(s=>s&&s.uid&&s.group===gid&&!s.tester).sort(byName);
+  const calc=d=>withS("closeTry",{g:gid,n,day:d},()=>{const items=lss.flatMap(l=>lsItems(l,gid)),o={};
+    studs.forEach(s=>{const R=marksOf(s,items).filter(r=>!r.tr);o[s.uid]=[byComp(R.filter(r=>r.it.term===n)).mark,byComp(R.filter(r=>r.it.term===n+1)).mark]});return {o,items}});
+  const A=calc(null),B=calc(day);
+  // what counts in the term and what moves on, per LS and learning path (the daily-work steps by the day their tab was ticked)
+  const moved=B.items.filter(it=>it.seg),lsBox=lss.map(l=>{const its=moved.filter(it=>it.l===l&&it.b.id==="gv");if(!its.length)return "";
+    const dm=tickDays(l.id,gid),sg={t:n,lo:n>1?closeDay(gid,n-1)||"":"",hi:day},by=new Map(),ci=x=>cat.indexOf(x.a);gvSteps(its[0].g).forEach(([id,k])=>{const x=by.get(id)||{a:byId(id),in:0,n:0};x.n++;if(segIn(sg,stepDay(dm,id,k)))x.in++;by.set(id,x)});
+    const nm=a=>esc(String((a||{}).title||"").split(/[:(]/)[0].trim()),li=xs=>xs.length?`<ul style="margin:4px 0;padding-left:18px">${xs.join("")}</ul>`:`<p class="muted">Nothing.</p>`;
+    const xs=[...by.values()].filter(x=>x.a).sort((x,y)=>ci(x)-ci(y)),inT=xs.filter(x=>x.in).map(x=>`<li>${nm(x.a)} <small class="muted">${x.in===x.n?"all":x.in+" of "+x.n} steps</small></li>`),
+      out=xs.filter(x=>x.in<x.n).map(x=>`<li>${nm(x.a)} <small class="muted">${x.in?x.n-x.in+" of "+x.n:"all"} steps</small></li>`);
+    const w0=its[0].b.w0,wi=(moved.find(it=>it.l===l&&it.b.id==="gv"&&it.term===n)||{b:{w:0}}).b.w;
+    return `<div class="ycard"><b>${lsLabel(l)}</b><p class="muted">Daily work ${w0} % of the LS: <b>${f1(wi)} %</b> in ${esc(T.en)} + <b>${f1(w0-wi)} %</b> in ${esc(N.en)}</p>`
+      +`<div style="display:flex;gap:16px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>✔ Counts in ${esc(T.en)}</b>${li(inT)}</div><div style="flex:1;min-width:200px"><b>→ Goes to ${esc(N.en)}</b>${li(out)}</div></div></div>`}).join("");
+  const late=B.items.filter(it=>it.term===n&&(it.b.id==="exam"||it.b.id==="fp")&&it.date&&it.date>day).map(it=>`<li>${lsLabel(it.l).replace(/ · .*/,"")} · ${esc(it.b.name)} (${esc(ELWeek.date(it.date))}): after the close day, it still counts in ${esc(T.en)} as the plan says.</li>`);
+  const dif=(a,b)=>a==null||b==null||Math.abs(a-b)<0.05?"":`<small style="color:${b>a?"#15803d":"#b91c1c"}">${b>a?"▲":"▼"} ${f1(Math.abs(b-a))}</small>`;
+  const rows=studs.map(s=>{const [a1,a2]=A.o[s.uid]||[],[b1,b2]=B.o[s.uid]||[];return `<tr><td class="stu">${name(s)}</td><td>${f1(a1)}</td><td class="first"><b>${f1(b1)}</b> ${dif(a1,b1)}</td><td>${f1(a2)}</td><td><b>${f1(b2)}</b> ${dif(a2,b2)}</td></tr>`}).join("");
+  dlg(`<h3>🔒 ${cur?"":"Close "}${esc(T.en)}${cur?" closed":""} · ${esc(grp.name)}</h3>`
+    +`<p class="muted">${esc(T.en)}'s mark counts only the learning-path tabs you ticked as done in the Time plan on or before the close day. Tabs ticked later, or not ticked yet, go to ${esc(N.en)}, with their share of the daily work: each term gets the part of the weight that its steps are. Exams and final products stay in the term the plan says. Each LS's own mark does not change. You can change the day or reopen it at any time.</p>`
+    +`<p><label>Close day <input type="date" data-do="tcday" data-g="${gid}" data-n="${n}" value="${esc(day)}"></label>${T.end?` <small class="muted">${esc(T.en)} ends on ${esc(ELWeek.date(T.end))}</small>`:""}</p>`
+    +(lsBox?`<div class="ycards">${lsBox}</div>`:`<p class="muted">No learning-path work of ${esc(T.en)} moves on: everything in it was ticked by then (or this term has no daily work).</p>`)
+    +(late.length?`<ul class="muted">${late.join("")}</ul>`:"")
+    +`<h4>Term marks · ${esc(grp.name)} <small class="muted">· missing work ${S.zero?"counts 0":"not counted yet"}, as in the whole-year view</small></h4>`
+    +`<div class="wrap"><table><thead><tr><th class="stu">Student</th><th>${esc(T.en)}<br><small class="muted">open</small></th><th class="first">${esc(T.en)}<br><small class="muted">closed ${esc(ELWeek.date(day))}</small></th><th>${esc(N.en)} so far<br><small class="muted">open</small></th><th>${esc(N.en)} so far<br><small class="muted">after</small></th></tr></thead><tbody>${rows||`<tr><td colspan="5" class="muted">No students.</td></tr>`}</tbody></table></div>`
+    +`<div class="row"><button class="p" data-do="tcsave" data-g="${gid}" data-n="${n}" data-d="${esc(day)}">🔒 ${cur?"Save the close day":"Close "+esc(T.en)} (${esc(ELWeek.date(day))})</button>${cur?`<button class="g" data-do="tcopen" data-g="${gid}" data-n="${n}">🔓 Reopen ${esc(T.en)}</button>`:""}</div>`,true)}
+async function tcloseSet(gid,n,day){const t=S.D.tm[gid]=S.D.tm[gid]||{};t.closed=Object.assign({},t.closed,{["t"+n]:day||null});if(!day)delete t.closed["t"+n];
+  const w=put(["teams",gid],{closed:{["t"+n]:day||(DEMO?null:F.deleteField())}});$("#dlg").close();TDC={};render();
+  try{if(w)await w;if(gid===S.g)lsResync()}catch(e){alert("Could not save it: "+e.message)}}
 // "By how much it is worked" (Roger, 30 Oct 2026: "is it true that we do so little listening?"): each competence's share of an LS is how many
 // steps of its activities work on its criteria (EL_STEP_CRITERIA; a step with two criteria counts half for each), so listening, practised
 // in every learning path, weighs what it is worked and not only its exam section. Only the competences the LS assesses share its 100; the
@@ -3140,8 +3245,9 @@ function yearView(grp,studs){
     const best=withS("term",t.id,()=>ptBestOk(grp.id)),pts=n<=now,ga=avg(live.map(s=>byComp(R[s.uid].filter(f)).mark).filter(v=>v!=null));
     const extra={n:pts?2:1,head:`<th class="first">${esc(t.en)} mark</th>${pts?`<th title="Points bonus of this term (Points box): only with all the work done">+ Points</th>`:""}`,
       row:s=>{const m=byComp(R[s.uid].filter(f)).mark,b=pts?termBonus(s,t,best):null;return `<td class="first tot"><b>${f1(m)}</b> ${deg(elDegree(m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}`}};
-    const head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${ga==null?"":" · group average "+f1(ga)}</small>`;
-    const body=(its.length?`<h3>Competences in ${esc(t.en)}</h3>${compBar(shareOf(its),grpAvg(f))}`:"")+`<div class="ycards">${cards}</div>`
+    const cd=closeDay(grp.id,n),head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${cd?" · 🔒 closed on "+esc(ELWeek.date(cd)):""}${ga==null?"":" · group average "+f1(ga)}</small>`;
+    const cbtn=n<=now&&n<EL_TERMS.length?`<p><button class="g" data-do="tclose" data-g="${grp.id}" data-n="${n}">🔒 ${cd?`Closed on ${esc(ELWeek.date(cd))}: change or reopen`:`Close ${esc(t.en)}…`}</button> <small class="muted">${cd?`Only the learning-path work ticked done by then counts here; the rest is in ${esc(EL_TERMS[n].en)}.`:`Counts only what you ticked done in the Time plan; the rest of the learning paths goes to ${esc(EL_TERMS[n].en)}.`}</small></p>`:"";
+    const body=cbtn+(its.length?`<h3>Competences in ${esc(t.en)}</h3>${compBar(shareOf(its),grpAvg(f))}`:"")+`<div class="ycards">${cards}</div>`
       +(its.length?table(r=>f(r),"t"+n,extra)+trTable(f,"t"+n):`<p class="muted">Nothing assessed in this term yet.</p>`);
     return `<div class="box yterm ${n===now?"ynow":""}">${fold("yt"+n,head,body)}</div>`}).join("");
   const tn=EL_TERMS.map((t,i)=>i+1).filter(n=>items.some(it=>it.term===n));
@@ -5395,6 +5501,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     ptterm:()=>{S.term=k.t;render()},
     lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=false;S.stuBoth=false;if(S.place==="students")S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
+    tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?EL_LS.filter(l=>l.course===g.course&&"t"+lsTerm(l)===k.t):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},
@@ -5428,6 +5536,7 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
     else if(k.tt==="from"||k.tt==="to"){const o=d.off[+k.i],v=t.value;if(v){if(k.tt==="from"){o[0]=v;if(o[1]<v)o[1]=v}else{o[1]=v;if(o[0]>v)o[0]=v}}}
     render();return}
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
+  if(k.do==="tcday"&&/^\d{4}-\d\d-\d\d$/.test(t.value))tclosePanel(k.g,+k.n,t.value);
   if(k.do==="ls"){S.year=t.value===YEAR;if(!S.year)S.ls=t.value;render()}
   if(k.do==="qals"){S.qa.ls=t.value;S.qa.g="all";S.qa.f.act="all";render()}
   if(k.do==="qaf"){S.qa.f[k.f]=t.value;S.qa.f.all=false;render()}
