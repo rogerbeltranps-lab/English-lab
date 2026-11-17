@@ -144,8 +144,8 @@ async function startGroup(){
 
 /* ---------- the round ---------- */
 async function startGame(g){quiet=false;H.note="";try{sessionStorage.removeItem("elGame")}catch(e){}   // the class game board's game in this tab is over
-  H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.t0=0;H.hr={};H.feed=[];H.lx={};H.cp=null;H.rw={};H.ups=[];savedSid=0;keep();G.music("lobby");await startGroup()}
-function go(){H.phase="play";H.t0=Date.now();H.end=H.t0+H.mins*60e3;keep();G.music("think");G.fx("next");publish(true);draw()}
+  H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.t0=0;H.hr={};H.feed=[];H.lx={};H.cp=null;H.rw={};H.ups=[];savedSid=0;keep();G.music(SR?"spaceLobby":"lobby");await startGroup()}
+function go(){H.phase="play";H.t0=Date.now();H.end=H.t0+H.mins*60e3;keep();G.music(SR?"spaceThink":"think");G.fx("next");publish(true);draw()}
 function more(){H.end=Math.max(H.end,Date.now())+2*60e3;keep();publish(true);draw()}
 function finish(){if(H.phase!=="play")return;H.phase="end";H.end=Math.min(H.end,Date.now());const t=totals();H.cp=t.n?Math.round(t.r/t.n*100):null;
   keep();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700);publish(true);saveResults();draw()}
@@ -319,7 +319,7 @@ async function loadLP(){if(!H.games.length)return;const L=await CB.load(H.games.
 A.onAuthStateChanged(auth,async u=>{
   H.user=u;H.teacher=!!u&&TEACHERS.includes((u.email||"").toLowerCase());
   if(H.teacher&&H.games.length&&!H.L){draw();await loadLP()}
-  if(H.teacher&&H.L&&H.g&&H.sid){if(H.phase==="lobby")G.music("lobby");else if(H.phase==="play")G.music("think");startGroup()}
+  if(H.teacher&&H.L&&H.g&&H.sid){if(H.phase==="lobby")G.music(SR?"spaceLobby":"lobby");else if(H.phase==="play")G.music(SR?"spaceThink":"think");startGroup()}
   // from the class game board's 🕵️ Code Breakers choice (&g=<group>&go=1): the lobby for that group at once, once (the address forgets it)
   else if(H.teacher&&H.L&&!H.sid&&URLP.get("go")==="1"){const g=URLP.get("g")||"",ok=(window.EL_GROUPS||[]).some(x=>x.id===g&&x.course===meta().course);
     URLP.delete("go");URLP.delete("g");history.replaceState(null,"","?"+URLP.toString());if(ok)return startGame(g)}
