@@ -1410,7 +1410,16 @@ function lockPad(){const b=document.getElementById("el-lock"),c=document.getElem
     st.textContent="body.el-lockpad{padding-top:var(--el-lock-h,0px)}body.el-lockpad .topbar{top:var(--el-lock-h,0px)!important}body.el-lockpad .elrail{top:var(--el-lock-h,0px)!important}body.el-lockpad .ellpside{top:calc(var(--el-lock-h,0px) + 70px);max-height:calc(100vh - var(--el-lock-h,0px) - 80px)}";document.head.append(st)}
   if(R.style.getPropertyValue("--el-lock-h")!==h+"px")R.style.setProperty("--el-lock-h",h+"px");
   if(document.body.classList.contains("el-lockpad")!==!!h)document.body.classList.toggle("el-lockpad",!!h)}
-function lockBar(){lockBar0();lockPad()}
+function lockBar(){lockBar0();lockPad();lockTell()}
+// section-next.js: "Next section →" / "Next Learning Path →" hide while 🎓 class mode or the teacher's 🔒 would not let the student go there
+// (the click only met the 🔒 message and students took it for "I can't hand it in": 2ESOB, 17 Nov 2026). Same rules as the click guard below.
+window.elNextBlocked=p=>{if(!lockHere())return false;let t=document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');
+  if(t&&t.classList.contains("el-sec-hide")){const ts=[...document.querySelectorAll(".tab[data-panel]")];t=ts.slice(ts.indexOf(t)+1).find(x=>!x.classList.contains("el-sec-hide"));if(!t)return false;p=t.dataset.panel}
+  return LOCK.cm?!cmTabOk(p):!!LOCK.p&&p!==LOCK.p&&p!==lockFrom};
+window.elLeaveBlocked=h=>{if(!lockHere())return false;let u;try{u=new URL(h,location.href)}catch(e){return false}
+  return !(LOCK.cm&&cmEn(LOCK).some(x=>new URL(x.u,ROOT).pathname===u.pathname))};
+function lockTell(){let k="";try{k=lockHere()?JSON.stringify([LOCK.cm?cmHere(LOCK).map(x=>x.p||""):LOCK.p||"",lockFrom||"",cmEn(LOCK).map(x=>x.u)]):""}catch(e){}
+  if(lockTell.k===k)return;lockTell.k=k;document.dispatchEvent(new Event("el-lock"))}
 function lockBar0(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
   const ca=lockCa(),cur=curPanel(),g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
