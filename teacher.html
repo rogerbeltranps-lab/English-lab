@@ -190,6 +190,9 @@ details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 
 body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)}body.tp2on #tabs,body.tp2on #mtbar,body.tp2on #classnow,body.tp2on #loadbar{display:none!important}
 .tp2bar{position:sticky;top:0;z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:rgba(248,250,252,.96);backdrop-filter:blur(8px);padding:6px 0 8px;border-bottom:1px solid #e2e8f0;margin-bottom:10px}.tp2bar b{font-size:1.05rem}@media(min-width:641px){.tp2bar{padding-right:calc(var(--fsw,0px) + 14px)}}@media(hover:hover) and (min-width:641px){body.tp2on #fsctl:not(.on):not(.peek):not(:focus-within){opacity:0;pointer-events:none;transform:translateY(-8px)}body.tp2on #fsctl{transition:opacity .15s,transform .15s}body.tp2on #fsctl:not(.on):not(.peek):not(:focus-within)+#fspeek{display:block}}
 #fspeek{display:none;position:fixed;top:8px;right:0;z-index:999;background:#eef2ff;border:1px solid #c7d2fe;border-right:0;border-radius:10px 0 0 10px;padding:2px 6px 2px 8px;font-size:12px;line-height:18px;color:#4338ca;cursor:default;box-shadow:0 1px 4px #0001}.tp2bar .sp{flex:1}
+/* ⛶ Full screen on an iPad (Roger, 17 Nov 2026: Safari left full screen on every downward swipe): body.tpfoc, the focus view, gives the
+   board the room Safari's own full screen would: no page heading, LS switch, long hint, Student/Class buttons or bottom bar. */
+@media(min-width:641px){body.tpfoc #main>.ph,body.tpfoc #main>.lsbar,body.tpfoc #fsctl,body.tpfoc #fspeek,body.tpfoc #el-cloud-bar,body.tpfoc .tp2bar>.muted{display:none!important}body.tpfoc{padding-top:6px;padding-bottom:0!important}body.tpfoc .tp2bar{padding-right:0}}
 .tp2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
 .tp2col{min-width:0;background:#fff;border:1px solid #e2e8f0;border-top:5px solid #16a34a;border-radius:16px;padding:8px 10px}.tp2col.c4eso{border-top-color:#2563eb}.tp2col>h2{margin:2px 0 8px;font-size:1.2rem}
 .tp2 .agbars{grid-template-columns:1fr;gap:6px}.tp2 .agw{grid-template-columns:220px minmax(0,1fr);gap:10px}.tp2 .agdays{grid-template-columns:1fr}.tp2 .agl{padding:10px}
@@ -3701,7 +3704,11 @@ function tp2Btns(){const by={};GR.forEach(g=>(by[g.course]=by[g.course]||[]).pus
 // on a phone (Roger, 8 Nov 2026, iPhone: "The full screen button doesn't work": Safari on an iPhone has no full screen for pages) the
 // button is a focus view instead: body.tpfoc hides the tab bar, the group switch, the Student/Class buttons and the page heading
 // (shared/css/el-phone.css, section 8), the board keeps the whole screen; the same button (✕ Exit full screen), ✕ Close or Esc leave it.
-const tp2Phone=()=>matchMedia("(max-width:640px)").matches;
+// iPad (Roger, 17 Nov 2026: "if I'm in full screen and I scroll down by touching the screen, it exits full screen"): Safari on an iPad
+// leaves a page's full screen on any downward swipe (its own "swipe down to close" gesture, which a page cannot stop), so on an iPad
+// (and an iPhone) the button is the same focus view, which a swipe never closes. tp2Phone() also says yes there.
+const elIOS=()=>/iP(ad|hone|od)/.test(navigator.userAgent)||navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1;
+const tp2Phone=()=>matchMedia("(max-width:640px)").matches||elIOS();
 function tp2Foc(){const on=!!(S.tp2foc&&document.querySelector("#main .tp2"));if(!on)S.tp2foc=false;document.body.classList.toggle("tpfoc",on);
   const b=document.querySelector('#main .tp2bar [data-do="tp2fs"]');if(b)b.textContent=on?"✕ Exit full screen":"⛶ Full screen"}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.tp2foc&&!document.getElementById("dlg").open){S.tp2foc=false;tp2Foc()}});
@@ -4236,12 +4243,13 @@ function gz(k){const z=S.gzZ||1;
 let gzT=0;window.addEventListener("resize",()=>{if(S.gz!=="fit")return;clearTimeout(gzT);gzT=setTimeout(gzApply,120)});
 // ⛶ Full screen for the Learning paths and activities table (Roger, 7 Nov 2026: "a button to see this table full screen"). The box covers
 // the whole window (body.gfs) and the browser goes full screen too when it allows it; names and headers stay sticky inside the table.
-// Esc (the browser leaving full screen, or the key when it stayed in the window) or ✕ Exit full screen go back. No re-render, so the
+// Esc (the browser leaving full screen, or the key when it stayed in the window) or ✕ Exit full screen go back. On an iPad only the box
+// covers the window (Safari leaves a page's full screen on any downward swipe, Roger 17 Nov 2026), so scrolling the table never closes it. No re-render, so the
 // table keeps its scroll; a later render (live refresh) keeps it on through S.gfs.
 function gfs(on){S.gfs=on;const box=document.querySelector("#main .lpall");document.body.classList.toggle("gfs",!!(on&&box));
   const b=box&&box.querySelector("[data-do=gfs]");if(b){b.textContent=on?"✕ Exit full screen":"⛶ Table full screen";b.title=on?"Back to the dashboard (Esc)":"Show this table on the whole screen"}
   const d=document,fe=d.fullscreenElement||d.webkitFullscreenElement;
-  if(on&&!fe){const r=d.documentElement.requestFullscreen||d.documentElement.webkitRequestFullscreen;if(r)try{const x=r.call(d.documentElement);if(x&&x.catch)x.catch(()=>{});S.gfsB=true}catch(e){}}
+  if(on&&!fe&&!elIOS()){const r=d.documentElement.requestFullscreen||d.documentElement.webkitRequestFullscreen;if(r)try{const x=r.call(d.documentElement);if(x&&x.catch)x.catch(()=>{});S.gfsB=true}catch(e){}}
   if(!on&&fe&&S.gfsB){const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}
   if(!on)S.gfsB=false;if(S.gz==="fit")requestAnimationFrame(gzApply)}
 ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.gfs&&S.gfsB){S.gfsB=false;gfs(false)}}));
