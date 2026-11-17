@@ -249,7 +249,7 @@ html.elb-lock{overflow:hidden}
       busy = false; go(d.t, all, all ? .22 + .45 * (1 - d.p) : .18 + .35 * d.p);
     };
     book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop);
-    // only the book's own capture ending (Roger, 17 Nov 2026: "the books can't be turned with the fingers"): on an iPad Safari gives a finger's
+    // only the book's own capture ending (Roger, 17 Nov 2026: "the books can't be turned with the fingers"): the browser (iPad and Chromebook alike) gives a finger's
     // pointer to the page button it touched (implicit capture), so when the drag takes it over, that button's lostpointercapture bubbles up
     // here; taking it for the finger letting go made every swipe fall back at once
     book.addEventListener('lostpointercapture', e => { if (e.target === book) drop(e); });
