@@ -139,3 +139,9 @@ export function report({en,save,teacher,where:at}){
   d.addEventListener("close",()=>d.remove());
   document.body.append(d);d.showModal();
 }
+
+// Roger, 8 Nov 2026 ("read it straightaway … fix it and answer the student"): once the report is saved, the school Apps Script
+// (tools/notify/school-mail.gs, action "problem") starts the scheduled task that reads new reports, checked with the student's own
+// sign-in; fire and forget, nothing shown, nothing read. Without it the task still runs every hour.
+export const FIXER_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
+export const wakeFixer=u=>{try{u.getIdToken().then(t=>fetch(FIXER_URL,{method:"POST",mode:"no-cors",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:t,action:"problem"})})).catch(()=>{})}catch(e){}};

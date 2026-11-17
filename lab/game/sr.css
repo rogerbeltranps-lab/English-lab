@@ -68,3 +68,10 @@ body.cb.sr .cbsimtag{background:var(--hk2)}
 .cbpod .cbpav .srrk{width:2.8em;height:2.8em}.p1 .cbpav .srrk{width:3.4em;height:3.4em}
 @media (prefers-reduced-motion: reduce){body.cb.sr::before,.srfl,.srpadhero .srrk{animation:none}}
 .srlab{font-size:.7em;opacity:.75;letter-spacing:.08em;text-transform:uppercase;margin-top:-.15em}
+.srmet{display:block;margin-top:.25em;font-size:.72em;color:#fca5a5}
+
+/* 💻 Lighter on the students' Chromebooks (4 ESO B, 17 Nov 2026: two Chromebooks shut down during the first Space rescue): the drifting
+   stars repainted the whole screen 60 times a second (an animated background on a full-screen layer), so on the player (body.play) the
+   stars stand still and the launch pad rocket doesn't hover; the board on the projector keeps them. */
+body.play.cb.sr::before{animation:none}
+body.play .srpadhero .srrk{animation:none}

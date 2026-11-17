@@ -11,6 +11,7 @@ import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestor
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "../../shared/js/el-firebase.js";
 import {signIn} from "../../shared/js/el-signin.js";
 import {cbPlayer} from "./cb-play.js";
+import {report,wakeFixer} from "../../shared/js/el-report.js";
 
 const G=window.ELGame,{esc,md,pic}=G;
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
@@ -44,7 +45,7 @@ function cmBack(){if(cmGone||!cmFree())return;cmGone=true;try{localStorage.remov
   const u=new URL("../../"+x.go.u,location.href);u.hash=x.go.p||"";
   bye=true;Promise.resolve(saveNotes()).finally(()=>location.replace(u.href))}
 const top=()=>`<div class="top">${(!gameOn()||x.phase==="end")&&!cmOn()?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
-  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
+  ${repBtn()}<button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
 const page=(h,cls)=>{app$.innerHTML=top()+`<div class="main"><div class="center ${cls||""}"><div>${h}</div></div></div>`};
 
 function draw(){
@@ -56,6 +57,8 @@ function draw(){
   const sr=!!(x&&gameOn()&&x.mode==="cb"&&x.cb&&x.cb.th==="sr");   // 🚀 Space rescue = Code Breakers with another story (sr.js)
   document.body.classList.toggle("cb",!!(x&&gameOn()&&x.mode==="cb"));document.body.classList.toggle("sr",sr);
   if(gameOn()&&x.mode==="cb"){if(mySid!==x.sid)return page(sr?`<div class="emo pop">🚀</div><p class="big">Space rescue</p>`:`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p>`);return cb().draw()}
+  // 🏁 the teacher ended the class from the board (cm-after.js: ce, no class mode, no full screen)
+  if(!gameOn()&&x&&+x.ce>=(+x.sid||0)&&!cmOn())return page(`<div class="emo pop">🏁</div><p class="big">${esc(T("The class is over. See you next time!","S'ha acabat la classe. Fins a la propera!"))}</p>`);
   if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p>${cmWait||'<p class="mid">The game opens here by itself.</p>'}`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
   if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved
@@ -167,13 +170,30 @@ app$.addEventListener("click",async e=>{
     return}
   const b=e.target.closest("[data-do]");if(!b)return;
   if(b.dataset.do==="mute"){G.sound(!G.sound());draw()}
+  if(b.dataset.do==="report")reportIt(b.dataset.kind);
   if(b.dataset.do==="signin"){try{await signIn({auth,A,domain:DOMAINS[0]})}catch(err){console.warn("sign in",err)}}
 });
+
+// ⚠️ Report a problem inside the game (Roger, 17 Nov 2026: "in a game students must be able to report problems"): the same Problem
+// window as the bottom bar of the other pages (el-report.js; this page has no bottom bar), saved the same way (problems/{id}, a screenshot
+// in problemShots/{id}) and starting the same instant task (wakeFixer). It also says which game and, in Code Breakers / Space rescue, the
+// question on screen and the student's last answer (cb-play.js where()), so "a correct answer is marked wrong" can be checked.
+const repBtn=()=>user&&group&&!isT()?`<button class="btn ghost rep" data-do="report" title="${esc(T("Report a problem","Avisa d'un problema"))}" aria-label="${esc(T("Report a problem","Avisa d'un problema"))}">⚠️</button>`:"";
+function reportIt(kind){if(!user||!group||isT())return;
+  const title=(x&&x.title)||"Class game",w=x&&x.mode==="cb"&&CBP?CBP.where():(x&&x.q&&x.q.text?"Q: "+x.q.text:"");
+  report({en:CA!=="1",where:("🎮 "+title+(w?" › "+w:"")).slice(0,120),save:o=>{
+    const {shot,shotFrom}=o,r=S.doc(S.collection(db,"problems")),b=S.writeBatch(db);delete o.shot;delete o.shotFrom;
+    if(w)o.text=(o.text+"\n\n["+w+"]").slice(0,1000);
+    b.set(r,Object.assign(o,{uid:user.uid,email:(user.email||"").toLowerCase(),name:user.displayName||"",group,ls:null,activity:("game "+((x&&x.cb&&x.cb.decks)||[]).join("+")).slice(0,120),route:null,shot:shot?shotFrom:null,created:S.serverTimestamp()}));
+    if(shot)b.set(S.doc(db,"problemShots",r.id),{uid:user.uid,img:shot,created:S.serverTimestamp()});
+    return b.commit().then(res=>{wakeFixer(user);return res})}});
+  // from the ✗ screen's "⚠️ I think my answer was right": that kind is already ticked
+  const k=kind&&document.querySelector('dialog[open] input[name="el-rep"][value="'+kind+'"]');if(k)k.click()}
 
 // 🕵️ Code Breakers (Roger, 11 Nov 2026): live/{group}.mode "cb" = each student at their own pace; cb-play.js draws the screen
 function cb(){if(!CBP)CBP=cbPlayer({S,G,esc,md,pic,T,lang:()=>CA,app$,user:()=>user,x:()=>x,ref:()=>ref,mySid:()=>mySid,saved:()=>joined,first,
   cmWait:()=>cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"",
-  active:()=>gameOn()&&mySid===x.sid});return CBP}
+  active:()=>gameOn()&&mySid===x.sid,repBtn});return CBP}
 // A new game: start with no answers; the same game again (a reload): keep mine.
 async function join(){
   if(!ref||!gameOn()||x.sid===mySid||join.busy===x.sid)return;const sid=join.busy=x.sid;

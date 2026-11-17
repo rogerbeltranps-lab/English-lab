@@ -59,11 +59,11 @@ const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%6
 function top(){const [rk,of]=st?rank():[0,0],sh=st&&st.sh>now(),p=x().phase;
   if(SR())return `<div class="top cbtop srtop"><span class="pill cbme">${X.rocket(CB.avatar(em()),{size:40})}<span>${esc(ctx.first())}<small>${esc(T("Rocket pilot","Pilot de coet"))}</small></span></span><span class="pill cbbits">⛽ <b id="cbb">${st?myBits():0}</b></span><span class="pill srres" id="srrs">🧑‍🚀 ${st?myRes():0}</span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
     <span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt" title="${esc(T("Oxygen","Oxigen"))}">🫧 ${fmt(left())}</span>`:""}
-    <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>${st?`<div class="srwayw" id="srway">${X.way(myBits(),st.rs)}</div>`:""}`;
+    ${ctx.repBtn?ctx.repBtn():""}<button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>${st?`<div class="srwayw" id="srway">${X.way(myBits(),st.rs)}</div>`:""}`;
   const lk=myLook();
   return `<div class="top cbtop"><span class="pill cbme">${AV.svg(lk,{mini:true,size:40})}<span>${esc(ctx.first())}<small>${esc(AV.RANKS[lk.r-1].n)}</small></span></span><span class="pill cbbits">💾 <b id="cbb">${st?myBits():0}</b></span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
     ${sh?`<span class="pill cbsh" id="cbsh">🛡️ ${fmt(st.sh-now())}</span>`:""}<span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt">⏱ ${fmt(left())}</span>`:""}
-    <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`}
+    ${ctx.repBtn?ctx.repBtn():""}<button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`}
 function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.querySelector("#cbb");if(!b)return;
   const v=String(myBits());if(b.textContent!==v){b.textContent=v;b.parentNode.classList.remove("bump");void b.parentNode.offsetWidth;b.parentNode.classList.add("bump")}
   if(SR()){const w=app$.querySelector("#srway");if(w&&w.dataset.k!==v+":"+st.rs){w.dataset.k=v+":"+st.rs;w.innerHTML=X.way(+v,st.rs)}const rs=t.querySelector("#srrs");if(rs)rs.textContent="🧑‍🚀 "+myRes()}
@@ -149,7 +149,8 @@ function fbView(key){const qu=qOf(st.last.key),sim=st.last.sim,wait=now()+(st.la
   const btn=sim?`<button class="btn go wait" data-cb="sim" data-until="${wait}" disabled>🔁 ${esc(T("Try a similar question","Prova una pregunta semblant"))}<span class="wl"></span></button>`
     :`<button class="btn go wait" data-cb="next" data-until="${wait}" disabled>${esc(T("Next question ▶","Següent pregunta ▶"))}<span class="wl"></span></button>`;
   put(key,`<div class="res no cbres"><div class="pop cbfb"><div class="mark">✗</div><p class="big">${esc(st.last.second?T("Not this one either","Aquesta tampoc"):T("Not this time","Aquesta no"))}</p>
-    <p class="mid">${qu.write?`${esc(T("You wrote","Has escrit"))}: <s>${esc(st.last.text)}</s><br>`:""}${esc(T("The answer","La resposta"))}: <b>${qu.write?esc(qu.write[0]):md(qu.options[0])}</b></p>
+    <p class="mid">${esc(qu.write?T("You wrote","Has escrit"):T("You chose","Has triat"))}: <s>${esc(st.last.text)}</s><br>${esc(T("The answer","La resposta"))}: <b>${qu.write?esc(qu.write[0]):md(qu.options[0])}</b></p>
+    ${ctx.repBtn&&ctx.repBtn()?`<p><button class="btn ghost cbrepw" data-do="report" data-kind="marking">⚠️ ${esc(T("I think my answer was right","Crec que la meva resposta era correcta"))}</button></p>`:""}
     ${qu.why?`<p class="mid cbwhy">💡 ${md(qu.why)}</p>`:""}${st.last.second?`<p class="mid">💪 ${esc(T("Keep going: you'll see it again later.","Continua: ja hi tornaràs a sortir."))}</p>`:thHtml(qu)}<p>${btn}</p></div></div>`)}
 
 // 👕 the locker (lobby only): what I won, to wear; what I could still win, greyed out. Ranks come from XP; the crates from my % right.
@@ -174,7 +175,7 @@ function srPodsView(key){const f=st.file,L2=X.POD_LOOK;
   const card=j=>{if(!f)return `<button class="cbfile srpod slidein" style="animation-delay:${j*.08}s" data-cb="file" data-j="${j}"><span class="fe">📦</span><span>${"ABC"[j]}</span></button>`;
     const r=f.all[j],[e]=L2[r.k];return `<div class="cbfile srpod open ${j===f.j?"mine pop":"dim"} k-${r.k}"><span class="fe">${e}</span><span>${r.k==="meteor"?"−":"+"}${r.n}</span></div>`};
   const P=f&&f.pl?X.PLANETS[f.pl-1]:null,g=f&&f.got;
-  const msg=!f?"✓ "+esc(T("Correct! Choose a cargo pod","Correcte! Tria un contenidor")):g.k==="meteor"?`☄️ ${esc(T("A meteor!","Un meteorit!"))} −${g.n}`
+  const msg=!f?"✓ "+esc(T("Correct! Choose a cargo pod","Correcte! Tria un contenidor")):g.k==="meteor"?`✓ ${esc(T("Your answer was right!","La resposta era correcta!"))} <span class="srmet">☄️ ${esc(T("But a meteor hit the rocket","Però un meteorit ha tocat el coet"))}: −${g.n} ⛽</span>`
     :g.k==="turbo"?`🚀 ${esc(T("Turbo!","Turbo!"))} +${g.n}`:g.k==="tank"?`🛢️ ${esc(T("A big tank!","Un dipòsit gran!"))} +${g.n}`:`⛽ ${esc(T("Fuel!","Combustible!"))} +${g.n}`;
   put(key,center(`<p class="big">${msg}</p>${P?`<div class="srsave pop">${X.planet(P,64)}<span>🧑‍🚀 ${esc(T("You reached "+P.n+" and rescued an astronaut!","Has arribat a "+P.n+" i has rescatat un astronauta!"))}</span></div>`:""}<div class="cbfiles">${[0,1,2].map(card).join("")}</div>
     ${f?`<p><button class="btn go" data-cb="next">${esc(T("Next question ▶","Següent pregunta ▶"))}</button></p>`:""}`));
@@ -182,7 +183,9 @@ function srPodsView(key){const f=st.file,L2=X.POD_LOOK;
 function srOpen(j){const cur=myBits(),all=[0,1,2].map(()=>X.pod(st.r,null,cur)),got=Object.assign({},all[j]),was=myRes();
   st.e+=got.k==="meteor"?-got.n:got.n;const now_=X.reached(myBits()),pl=now_>was?now_:0;st.rs=Math.max(st.rs||0,now_);
   st.file={j,all,got,pl};pend.cb.lx={k:got.k,n:got.n||0,at:now(),...(pl?{pl}:{})};
-  G.fx(got.k==="meteor"?"wrong":pl||got.k==="turbo"?"fanfare":"right");if(pl||got.k==="turbo")G.confetti();
+  // ☄️ a meteor is bad luck after a RIGHT answer (4 ESO B, 17 Nov 2026: a student who answered right heard the wrong-answer buzzer and
+  // saw "−30", and thought the game had marked them wrong): its own sound, and the screen still says the answer was right
+  G.fx(got.k==="meteor"?"meteor":pl||got.k==="turbo"?"fanfare":"right");if(pl||got.k==="turbo")G.confetti();
   save(got.k!=="fuel"||!!pl);draw()}
 
 /* ---------- the 3 files ---------- */
@@ -288,7 +291,11 @@ app$.addEventListener("click",e=>{if(!st||x().mode!=="cb")return;const b=e.targe
 });
 app$.addEventListener("submit",e=>{if(!st||x().mode!=="cb"||!e.target.closest(".cbw"))return;e.preventDefault();
   const v=String(e.target.querySelector("input").value||"").replace(/\s+/g," ").trim().slice(0,60);if(!v)return;const qu=qOf(st.cur);answer(v,CB.isRight(qu,v))});
-addEventListener("keydown",e=>{if(!st||x().mode!=="cb")return;if(e.key==="Enter"&&scr!=="q"){const b=app$.querySelector('[data-cb="next"].btn.go,[data-cb="sim"],[data-cb="hack"]');if(b&&!e.target.closest("input")){e.preventDefault();b.click()}}});
+addEventListener("keydown",e=>{if(!st||x().mode!=="cb")return;if(e.key==="Enter"&&scr!=="q"){const b=app$.querySelector('[data-cb="next"].btn.go,[data-cb="sim"],[data-cb="hack"]');if(b&&!e.target.closest("input,textarea,dialog")){e.preventDefault();b.click()}}});
 clearInterval(tick);tick=setInterval(()=>{if(st&&x().mode==="cb"&&ctx.active())draw()},1000);
-return {draw,flush};
+// ⚠️ for a problem report (play.js): the question on screen (or the last one answered) and what the student answered
+function where(){if(!st)return "";const k=scr==="q"?st.cur:st.last&&st.last.key,qu=k&&qOf(k);if(!qu)return "";
+  const a=st.last&&st.last.key===k?` · answered: "${st.last.text}" ${st.last.ok?"✓":"✗"}`:"";
+  return `${k} · ${CB.plain(qu.q).replace(/\s+/g," ").slice(0,140)}${a}`}
+return {draw,flush,where};
 }

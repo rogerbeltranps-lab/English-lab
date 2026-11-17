@@ -83,6 +83,7 @@ const FX={
   right:t=>[523,659,784,1047].forEach((f,i)=>tone(t+i*.09,f,i===3?.7:.18,"triangle",.3)),
   wrong:t=>{tone(t,330,.3,"sawtooth",.12,null,294);tone(t+.3,247,.6,"sawtooth",.12,null,185)},
   fanfare:t=>{[[523,0],[659,.14],[784,.28],[1047,.42]].forEach(([f,s])=>tone(t+s,f,.2,"square",.08));[523,659,784,1047].forEach(f=>tone(t+.6,f,1.4,"triangle",.14));hiss(t+.6,1.2,.15,6000)},
+  meteor:t=>{hiss(t,.5,.3,700,null,.8);kick(t+.08);tone(t+.08,180,.35,"triangle",.2,null,110)},   // ☄️ Space rescue: a thud, not the wrong buzzer
   drum:t=>{for(let i=0;i<22;i++)hiss(t+i*.07,.06,.08+i*.012,900,null,.6);kick(t+1.6);hiss(t+1.6,1.4,.3,6000)},
 };
 function fx(n){if(!on()||!FX[n])return;const a=ac();if(!a)return;try{FX[n](a.currentTime+.02)}catch(e){}}
@@ -94,14 +95,16 @@ function sound(v){
 }
 
 /* ---------- confetti ---------- */
+// 💻 on the students' Chromebooks (body.play, 17 Nov 2026: two shut down during a game) a lighter shower: fewer pieces, shorter, never two at once
 function confetti(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const lite=document.body.classList.contains("play");if(lite&&document.querySelector("canvas.confetti"))return;
   const c=document.createElement("canvas");c.className="confetti";document.body.append(c);
-  const x=c.getContext("2d"),W=c.width=innerWidth,H=c.height=innerHeight,col=["#e8384f","#2f7de1","#ffc83d","#2ea84a","#ffffff","#b67cff"];
-  const P=Array.from({length:160},()=>({x:Math.random()*W,y:-20-Math.random()*H*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:col[Math.floor(Math.random()*col.length)]}));
+  const x=c.getContext("2d"),W=c.width=innerWidth,H=c.height=innerHeight,col=["#e8384f","#2f7de1","#ffc83d","#2ea84a","#ffffff","#b67cff"],T=lite?2600:4200;
+  const P=Array.from({length:lite?60:160},()=>({x:Math.random()*W,y:-20-Math.random()*H*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:col[Math.floor(Math.random()*col.length)]}));
   const t0=performance.now();
   (function f(t){x.clearRect(0,0,W,H);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
-    t-t0<4200?requestAnimationFrame(f):c.remove()})(t0);
+    t-t0<T?requestAnimationFrame(f):c.remove()})(t0);
 }
 function bg(){const d=document.createElement("div");d.className="bgfx";d.setAttribute("aria-hidden","true");
   d.innerHTML=Array.from({length:14},(_,i)=>`<i style="left:${(i*7.3+3)%100}%;width:${40+(i*17)%70}px;height:${40+(i*17)%70}px;animation-duration:${14+(i*5)%16}s;animation-delay:-${(i*3.7)%18}s"></i>`).join("");

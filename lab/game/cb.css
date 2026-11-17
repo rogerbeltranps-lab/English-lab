@@ -138,3 +138,9 @@ button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
 .cbup .cbav{width:1.7em;height:1.7em}
 @media (prefers-reduced-motion: reduce){.cbhero.up .cbav{animation:none}}
 .cbendr>*:not(.cbline):not(.cbcrate){align-self:center}
+
+/* 💻 Lighter on the students' Chromebooks (17 Nov 2026): no floating shapes behind the player in Code Breakers and Space rescue (each
+   student plays for 5–15 minutes on their own screen; the board keeps them) */
+body.play.cb .bgfx{display:none}
+/* ⚠️ on the ✗ screen (17 Nov 2026): small, under the answer, so it is seen without scrolling past the theory */
+.cbfb .cbrepw{font-size:clamp(13px,1.3vw,16px);padding:.3em .9em;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.5)}

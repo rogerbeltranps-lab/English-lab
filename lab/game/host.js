@@ -34,10 +34,12 @@ import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,TEACHERS} from "../../shared/js/el-firebase.js";
+import {cmAfter} from "./cm-after.js";
 
 const G=window.ELGame,{esc,md,pic}=G,$=s=>document.querySelector(s);
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=$("#app");G.bg();
+const CA=cmAfter({S,db});   // 🎓 Class mode / 🏁 End the class on the end screen (cm-after.js)
 const URLP=new URLSearchParams(location.search);
 // The Learning Path the teacher came from (Roger, 30 Oct 2026): ?from= on the page's Start button, else the page that linked here
 // (not the dashboard, which has its own button). Kept in this tab, so it survives choosing another game, a reload and the end.
@@ -295,7 +297,7 @@ function otherGame(qs){let newer=false,older=false;qs.forEach(d=>{const x=d.data
   if(newer){stepAside();return true}if(older&&Date.now()-reAt>5000){reAt=Date.now();live()}return false}
 // offBy: the game whose board was closed or reloaded (pagehide) turned live/{group} off; if that was this board while a newer game was on,
 // the newer game is turned on again (the newer board's writes remove offBy, so a game that really ended stays off)
-async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",H.g),d=await S.getDoc(r),x=d.exists()?d.data():null;if(!(x&&+x.sid>H.sid))return false;
+async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",H.g),d=await S.getDoc(r),x=d.exists()?d.data():null;CA.see(H.g,x);if(!(x&&+x.sid>H.sid))return false;
   if(x.on===false&&+x.offBy===H.sid)await S.setDoc(r,{on:true,offBy:S.deleteField(),at:S.serverTimestamp()},{merge:true});return true}catch(e){console.warn("live",e);return false}}
 async function stepAside(){if(!H.g||!H.sid)return;const gn=groupName(H.g);clearInterval(liveBeat);if(ansStop)ansStop();ansStop=null;whoStop();G.music("");
   if(H.phase!=="lobby")try{await saveResults()}catch(e){console.warn("results",e)}   // what they answered still counts
@@ -475,6 +477,15 @@ async function startGame(g,again){
 }
 // ■ End and Finish also send a group in class mode back to the class (cmBack, as 🎓 Back to class mode; Roger, 16 Nov 2026: "students
 // couldn't leave the game once finished"): ending the game is the teacher saying so. Out of class mode cmBack changes nothing.
+// 🎓 Class mode / 🏁 End the class after the game (cm-after.js; Roger, 17 Nov 2026): class mode on for the group (this tab or another one)
+// → 🎓 Back to class mode as before; else cm-after.js. The results are saved first.
+let afBusy="";
+async function afterGame(kind){const g=H.g;if(!g||afBusy)return;
+  if(kind==="cm"&&cmGroup()===g)return backToClass();
+  afBusy=kind;draw();try{await saveResults()}catch(e){console.warn("results",e)}
+  if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined,tp:null,deck:H.deck0||H.deck});keep();
+  try{await(kind==="cm"?CA.toClass(g):CA.endClass(g))}catch(e){afBusy="";H.err="⚠ Not saved: "+e.message;draw()}}
 function endGame(){
   const g=H.g;saveResults();if(g)S.setDoc(S.doc(db,"live",g),{on:false,cmBack:Date.now(),at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e));if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
   Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined,tp:null,deck:H.deck0||H.deck});keep();draw();
@@ -546,7 +557,7 @@ function draw(){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${tot?G.ring(right/tot*100,"the class got right","170px"):""}<div style="flex:0 1 auto"><h1 class="logo pop" style="margin:0">🏁 Well done!</h1><p class="sub">Every right answer is +1 point.</p></div></div>
       ${rank.length?"":`<p class="card msg" style="margin:1em auto">No right answers this time. Next time!</p>`}<div class="podium"${rank.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(nameOf(x.em))}<br><span class="sc">${x.n} right</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
-      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${backBtn()}</p></div></div></div>`;return}
+      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a></p><p class="cmafter">${CA.btns(H.g,afBusy)}</p></div></div></div>`;return}
   if(!isQ(s)&&!isN(s)){
     const bl=blocks(s),n=s.step?Math.max(1,H.step):bl.length,ca=[].concat(s.ca||[]);
     const block=(l,k)=>blockHtml(l,k>=n?' style="visibility:hidden"':"",s.step&&k===n-1&&k>0?" pop":"");
@@ -647,6 +658,8 @@ app$.addEventListener("click",async e=>{
   if(d==="who"){WHO.open=!WHO.open;drawTop()}
   if(d==="end"){if(Date.now()-endArm<3000)endGame();else{endArm=Date.now();b.textContent="Tap again to end";setTimeout(()=>{if(b.isConnected)b.textContent="■ End"},3000)}}
   if(d==="finish")endGame();
+  if(d==="cmclass")afterGame("cm");
+  if(d==="cmendclass")afterGame("end");
   if(d==="cmback"){if(cmPlaying()&&Date.now()-cmArm>=3000){cmArm=Date.now();draw();setTimeout(()=>{if(Date.now()-cmArm>=3000)draw()},3100)}else backToClass()}
   if(d==="again"){const g=H.g;startGame(g,true)}
   if(d==="rp"){H.rp=!H.rp;keep();draw()}
