@@ -87,7 +87,7 @@
     const c = who.course || course0 || (curLs || "").split("-")[0];
     const dash = ROOT + "teacher.html" + (c ? "?course=" + c + (curLs ? "&ls=" + encodeURIComponent(curLs) : "") : "");
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
-    const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return i >= 0 ? "LS" + (i + 1) : "LS"; })();
+    const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return (cl[i] || {}).personal ? "✦" : i >= 0 ? "LS" + (i + 1) : "LS"; })();   // a personal LS (Towards Nativeness) has no number
     const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "")
       : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "games";
     const L = [];

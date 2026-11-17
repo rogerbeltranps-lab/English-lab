@@ -78,12 +78,16 @@ window.EL_LS=[
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
   {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",shadowingIntro:111.1,story:{title:"Lantern Night",pro:true,pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
   {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",shadowingIntro:116.8,story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
+  // 🎓 Towards Nativeness (Roger, 17 Nov 2026): Roger's own C1 → C2 course, done as a student with the tester account. A hidden 4 ESO LS
+  // (keep it hidden on the dashboard: students never see it); personal:true keeps it out of the LS numbering.
+  ,{id:"4eso-towards-nativeness",course:"4eso",title:"Towards Nativeness",personal:true}
 ];
 // The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
 // The number is the LS's place in its course in EL_LS (LS1 first).
 // elLsNum(l) = "LS2": menus show it in the icon box instead of 📚 (Roger, 7 Nov 2026: "instead of the book emoji").
-window.elLsNum=l=>{if(!l)return "";const i=(window.EL_LS||[]).filter(x=>x.course===l.course).findIndex(x=>x.id===l.id);return i>=0?"LS"+(i+1):""};
-window.elLsName=l=>{if(!l)return "";const c=(window.EL_LS||[]).filter(x=>x.course===l.course),i=c.findIndex(x=>x.id===l.id);return (i>=0?"LS"+(i+1)+" · ":"")+String(l.title||"").replace(/^\S+ · /,"")};
+// A personal LS (personal:true, e.g. Roger's own Towards Nativeness) has no number and never shifts the numbers of the course's real LSs.
+window.elLsNum=l=>{if(!l||l.personal)return "";const i=(window.EL_LS||[]).filter(x=>x.course===l.course&&!x.personal).findIndex(x=>x.id===l.id);return i>=0?"LS"+(i+1):""};
+window.elLsName=l=>{if(!l)return "";const c=(window.EL_LS||[]).filter(x=>x.course===l.course&&!x.personal),i=l.personal?-1:c.findIndex(x=>x.id===l.id);return (i>=0?"LS"+(i+1)+" · ":"")+String(l.title||"").replace(/^\S+ · /,"")};
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
   const A=(course,file,title,criteria,keys,points,o)=>(a=>(a.mode=a.mode||(a.graded&&!a.manual?"once":"practice"),a))(Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,graded:true},o||{}));
@@ -145,9 +149,26 @@ window.EL_CATALOG=(function(){
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
       ];
+    })(),
+    ...(function(){
+      // 🎓 Towards Nativeness (Roger's own course, 4eso/towards-nativeness/, docs in AGENTS.md). Not graded: practice for one adult student.
+      const L=(file,title,key,points,o)=>A("4eso",file,title,[],[key],points,Object.assign({id:"4eso/tn-"+file.replace(".html",""),ls:"4eso-towards-nativeness",path:"4eso/towards-nativeness/"+file,graded:false},o||{}));
+      return [
+        L("talking-to-your-tech.html","Talking to your tech","tnTech",10,{steps:[["write","Writing"],["talk","Speaking"],["talk2","Speak again"]]}),
+        L("getting-things-done.html","Getting things done","tnDone",10,{steps:[["write","Writing"],["talk","Speaking"],["talk2","Speak again"]]}),
+        L("telling-the-story.html","Telling the story of your app","tnStory",10,{steps:[["write","Writing"],["talk","Speaking"],["talk2","Speak again"]]}),
+        L("writing-like-a-teacher.html","Writing like a teacher","tnTeacher",10,{steps:[["write","Writing"],["talk","Speaking"],["talk2","Speak again"]]}),
+        L("my-latest-mistakes.html","My latest mistakes","tnMistakes",8,{})
+      ];
     })()
   ];
 })();
+// 🎓 Personal LSs (personal:true in EL_LS, e.g. Roger's own Towards Nativeness, 17 Nov 2026) exist only for the teacher and the tester
+// account (el_who.role, saved by el-cloud.js): for everybody else the LS and its activities are not in EL_LS / EL_CATALOG at all, so no
+// student list, menu, notebook chapter, "latest LS of the course" or route ever picks it up, even if its status were changed by mistake.
+(function(){let r=null;try{r=(JSON.parse(localStorage.getItem("el_who")||"null")||{}).role}catch(e){}
+  if(r==="teacher"||r==="tester")return;const P=new Set(window.EL_LS.filter(l=>l.personal).map(l=>l.id));if(!P.size)return;
+  window.EL_LS=window.EL_LS.filter(l=>!P.has(l.id));window.EL_CATALOG=window.EL_CATALOG.filter(a=>!P.has(a.ls))})();
 // Number of distinct completed actions (truthy keys inside any "done" map) in a synced localStorage state string.
 window.elDone=function(str,skip){skip=skip||[];const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d]&&!skip.includes(d))s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s.size};
 // Points of an activity from the current localStorage (capped at the activity's total).

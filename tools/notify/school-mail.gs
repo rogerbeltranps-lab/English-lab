@@ -42,6 +42,12 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  20. v31 (Roger, 17 Nov 2026, Towards Nativeness: "speaking task should be corrected instantly and then I would need to answer a new task
+//      out of my mistakes"): a recording whose meta.coach is "c2" (only the Towards Nativeness pages send it) gets a C2 coach prompt
+//      instead of the kind A2 one: every grammar or idiom slip as {said, natural, why} and a new task built from those mistakes
+//      ({questions, use}). Answer adds {fixes, next}; the page shows them at once and 🔁 Speak again asks the new task. Same model and cost.
+//      Only Roger's two accounts get it. Writing too (the Wednesday run skips tester accounts): {idToken, action: "coach_write", text, task}
+//      → {ok, fixes, corrected, well_done, next: {task, use}}, also only for Roger's accounts.
 //  19. v30 (Roger, 17 Nov 2026: "I want to be able to listen to the audio in the web when I press them and see the feedback. In my iPad
 //      it got me to the Drive file and it didn't work"): new action {idToken (teacher), action: "audio_get", fileId} → {ok, mime, name,
 //      data (base64)}: the dashboard plays a student's Speaking or Talk recording inside the page, next to the correction, instead of
@@ -109,6 +115,7 @@ function doPost(e) {
   let m;
   try { m = JSON.parse(e.postData.contents); } catch (x) { return out({ok: false, error: "bad request"}); }
   if (m.action === "audio") return out(saveAudio(m));
+  if (m.action === "coach_write") return out(coachWrite(m));
   if (m.action === "video_start") return out(videoStart(m));
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
@@ -251,8 +258,11 @@ function saveAudio(m) {
   const stamp = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd HH.mm");
   const file = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data), mime, stamp + " · " + clean(name) + " · " + page + " · " + clean(meta.title || meta.step) + "." + ext));
   file.setDescription(JSON.stringify({email: who.email, group: meta.group || "", page: meta.page || "", step: meta.step || "", level: meta.level || "", secs: m.secs || null}));
-  const g = transcribe(data, mime, meta);
-  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes, eur: g.eur || null};
+  // v31: only Roger's own accounts get the C2 coach (Roger, 17 Nov 2026: "I only want my stuff to be corrected straight away"); students
+  // always get the usual transcript and kind notes, corrected on Wednesday, whatever their page sends.
+  const ME = [TEACHER, "roger.beltran@ietramuntana.cat"].indexOf(who.email) >= 0;
+  const g = meta.coach === "c2" && ME ? coachC2(data, mime, meta) : transcribe(data, mime, meta);
+  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes, eur: g.eur || null, fixes: g.fixes || null, next: g.next || null};
 }
 
 // v30: a recording for the dashboard's in-page player (action "audio_get", see 19 above). Only files inside AUDIO_FOLDER (directly or
@@ -310,6 +320,81 @@ function transcribe(data, mime, meta) {
       const notes = [["Task", o.task], ["Pronunciation", o.pronunciation], ["Well done", o.well_done], ["Next time", o.next_time]]
         .filter(x => s(x[1])).map(x => x[0] + ": " + s(x[1])).join("\n");
       return {tr: s(o.transcript).slice(0, 6000), notes: notes.slice(0, 3000), eur};
+    } catch (x) {}
+  }
+  return none;
+}
+
+// v31: Roger's writing in Towards Nativeness, corrected at once (the Wednesday run leaves tester accounts out): grammar and idiom only,
+// the text corrected with the fewest changes, and a short new writing task built from the mistakes. Only Roger's two accounts.
+function coachWrite(m) {
+  const who = signedIn(m.idToken);
+  if (!who || [TEACHER, "roger.beltran@ietramuntana.cat"].indexOf(who.email) < 0) return {ok: false, error: "only for Roger"};
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return {ok: false, error: "no key"};
+  const text = String(m.text || "").slice(0, 8000);
+  if (!text.trim()) return {ok: false, error: "no text"};
+  const ask = [
+    "You are an English coach. The writer is Roger, a Catalan-speaking English teacher with C1 English who wants to write like a native speaker (C2).",
+    "The task: \"" + String(m.task || "").slice(0, 1500) + "\".",
+    "Correct ONLY grammar and idiom: every place where a native speaker would write it differently (Catalan or Spanish calques, prepositions, word order, articles, countable/uncountable nouns, verb patterns, tenses, collocations, unnatural phrasing). Ignore typos, spelling, capitals and punctuation. Do not change what is already natural.",
+    "Answer in JSON with these keys:",
+    "fixes: an array (at most 15, the most important first) of {said: his exact words (only the part that changes, with a few words around it), natural: the native version of that part, why: the rule in at most 12 words};",
+    "corrected: his whole text with only those changes made;",
+    "well_done: one natural, native-like phrase he wrote (quote it);",
+    "next_task: a short new writing task (60 to 100 words) on a related topic that can only be done naturally with the corrected forms;",
+    "use: an array of 3 to 6 short corrected chunks from fixes to use in next_task.",
+    "His text:", text
+  ].join("\n");
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
+  try {
+    const r = UrlFetchApp.fetch(url, {method: "post", contentType: "application/json", muteHttpExceptions: true,
+      payload: JSON.stringify({contents: [{parts: [{text: ask}]}], generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+    if (r.getResponseCode() !== 200) return {ok: false, error: "Roig is busy, try again"};
+    const j = JSON.parse(r.getContentText());
+    const eur = addUsage(GEMINI_MODEL, "text", j);
+    const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+    const o = JSON.parse(t), s = v => String(v || "").trim();
+    const fixes = (Array.isArray(o.fixes) ? o.fixes : []).slice(0, 15).map(f => ({said: s(f.said).slice(0, 300), natural: s(f.natural).slice(0, 300), why: s(f.why).slice(0, 200)})).filter(f => f.said && f.natural);
+    return {ok: true, fixes, corrected: s(o.corrected).slice(0, 9000), well_done: s(o.well_done).slice(0, 300),
+      next: s(o.next_task) ? {task: s(o.next_task).slice(0, 600), use: (Array.isArray(o.use) ? o.use : []).map(s).filter(Boolean).slice(0, 6).map(u => u.slice(0, 120))} : null, eur};
+  } catch (x) { return {ok: false, error: "Roig could not read the answer"}; }
+}
+
+// v31: the C2 coach for Towards Nativeness (Roger's own course, Roger is the student). Grammar and idiom only, never pronunciation or
+// hesitations; every slip with the native version; then a NEW task (3 questions on a related topic) that can only be answered naturally
+// by reusing the corrected forms. {tr, notes, fixes: [{said, natural, why}], next: {questions: [], use: []}, eur}; empty without a key.
+function coachC2(data, mime, meta) {
+  const none = {tr: "", notes: "", fixes: null, next: null};
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return none;
+  meta = meta || {};
+  const ask = [
+    "You are an English coach. The speaker is Roger, a Catalan-speaking English teacher with C1 English who wants to sound like a native speaker (C2). This is a recording of him answering speaking questions.",
+    "The questions he was asked: \"" + String(meta.task || meta.title || "").slice(0, 1500) + "\". A computer voice may read the questions in the recording: leave it out.",
+    "Correct ONLY grammar and idiom: every place where a native speaker would say it differently (Catalan or Spanish calques, prepositions, word order, questions, articles, countable/uncountable nouns, verb patterns like want someone to, tenses, collocations, unnatural phrasing). Ignore pronunciation, accent, hesitations, false starts, fillers and self-corrections. Do not correct what is already natural.",
+    "Answer in JSON with these keys:",
+    "transcript: exactly what he says, word for word, keeping his mistakes;",
+    "fixes: an array (at most 12, the most important first) of {said: his exact words (only the part that changes, with a few words around it), natural: how a native speaker would say that part, why: the rule in at most 12 words};",
+    "well_done: one natural, native-like phrase he used (quote it);",
+    "next_questions: an array of 3 NEW speaking questions on a related but different topic, each written so that answering it naturally needs the corrected forms from fixes (if there are no fixes, use more advanced idiomatic language);",
+    "use: an array of 3 to 6 short corrected chunks from fixes that he must use when answering next_questions."
+  ].join("\n");
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
+  for (const mt of [mime, mime === "audio/webm" ? "video/webm" : null].filter(Boolean)) {
+    try {
+      const r = UrlFetchApp.fetch(url, {method: "post", contentType: "application/json", muteHttpExceptions: true,
+        payload: JSON.stringify({contents: [{parts: [{inline_data: {mime_type: mt, data}}, {text: ask}]}],
+          generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+      if (r.getResponseCode() !== 200) continue;
+      const j = JSON.parse(r.getContentText());
+      const eur = addUsage(GEMINI_MODEL, "audio", j);
+      const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+      const o = JSON.parse(t), s = v => String(v || "").trim();
+      const fixes = (Array.isArray(o.fixes) ? o.fixes : []).slice(0, 12).map(f => ({said: s(f.said).slice(0, 300), natural: s(f.natural).slice(0, 300), why: s(f.why).slice(0, 200)})).filter(f => f.said && f.natural);
+      const next = {questions: (Array.isArray(o.next_questions) ? o.next_questions : []).map(s).filter(Boolean).slice(0, 3).map(q => q.slice(0, 400)),
+        use: (Array.isArray(o.use) ? o.use : []).map(s).filter(Boolean).slice(0, 6).map(u => u.slice(0, 120))};
+      const notes = ["Corrections:"].concat(fixes.map(f => "- " + f.said + " → " + f.natural + (f.why ? " (" + f.why + ")" : "")))
+        .concat(s(o.well_done) ? ["Well done: " + s(o.well_done)] : []).join("\n");
+      return {tr: s(o.transcript).slice(0, 6000), notes: notes.slice(0, 3000), fixes, next: next.questions.length ? next : null, eur};
     } catch (x) {}
   }
   return none;

@@ -144,7 +144,7 @@
      button that started it. A Speaking or Talk hand-in then calls elMic.upload({btn, step, title}): the school Apps Script
      (tools/notify/school-mail.gs, action "audio") checks the student's sign-in, saves it in the teacher's Drive (Teacher Studio ›
      04_Students › Speaking recordings › group) and answers {ok, id, secs, tr}: tr = a transcript made from the audio by Gemini when the
-     script has a key. Nothing is uploaded unless the student hands in; one recording is uploaded once. ---------- */
+     script has a key (meta.coach 'c2', Towards Nativeness only: also {fixes, next}, the instant C2 correction and the next task). Nothing is uploaded unless the student hands in; one recording is uploaded once. ---------- */
   let clip = null;
   const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
   const MAX_BYTES = 6e6;
@@ -171,7 +171,7 @@
     if (c.res) return c.res;                                         // handed in again with the same recording
     if (c.blob.size > MAX_BYTES) return { ok: false, error: 'too long' };
     const body = { idToken: await u.getIdToken(), action: 'audio', mime: c.mime, secs: c.secs, data: await b64(c.blob),
-      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', task: String(meta.task || '').replace(/\s+/g, ' ').trim().slice(0, 1500), group: (C.group && C.group()) || '', at: c.at } };
+      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', task: String(meta.task || '').replace(/\s+/g, ' ').trim().slice(0, 1500), coach: meta.coach || '', group: (C.group && C.group()) || '', at: c.at } };
     const r = await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) });
     const j = await r.json();
     if (j && j.ok) { c.res = j; cantDone(); }   // a recording reached the teacher: the microphone works now
