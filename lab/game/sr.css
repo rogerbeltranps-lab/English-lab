@@ -1,0 +1,70 @@
+/* 🚀 Space rescue (sr.js, Roger 17 Nov 2026): the Code Breakers round with a space look, on top of game.css and cb.css: deep space, stars,
+   gold and cyan. The board (spacerescue.html) and the player (play.html while live/{group}.cb.th is "sr": body.cb.sr). */
+body.cb.sr{--stage:#070b22;--stage2:#1b1f5e;--hk:#fbbf24;--hk2:#67e8f9;background:radial-gradient(110% 80% at 80% 0%,#3b1d6e 0%,transparent 55%),radial-gradient(120% 90% at 10% 100%,#0e3a5e 0%,transparent 60%),var(--stage)}
+body.cb.sr #el-fs{background:#070b22!important}
+body.cb.sr .bgfx{display:none}
+body.cb.sr::before{opacity:.9;background:
+  radial-gradient(1.5px 1.5px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 27% 72%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 44% 34%,#fde68a 50%,transparent 51%),
+  radial-gradient(1px 1px at 58% 84%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 71% 22%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 86% 61%,#a5f3fc 50%,transparent 51%),
+  radial-gradient(1.5px 1.5px at 93% 9%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 6% 52%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 36% 8%,#fff 50%,transparent 51%),
+  radial-gradient(1.5px 1.5px at 64% 50%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 79% 92%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 19% 90%,#fde68a 50%,transparent 51%);
+  background-size:420px 300px;animation:srstars 90s linear infinite}
+@keyframes srstars{to{background-position:-420px 0}}
+body.cb.sr .btn.go{background:var(--hk);color:#2a1a00}
+body.cb.sr .cbtop .pill{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4)}
+body.cb.sr .cbfile{background:#141a46;border-color:rgba(103,232,249,.5);box-shadow:0 0 22px rgba(103,232,249,.18),inset 0 -6px 0 rgba(0,0,0,.3)}
+body.cb.sr .cbfile.k-meteor.mine{border-color:#f87171;box-shadow:0 0 34px rgba(248,113,113,.6)}
+body.cb.sr .cbrank{background:rgba(14,19,60,.9);border-color:rgba(103,232,249,.35);box-shadow:0 0 30px rgba(103,232,249,.12)}
+body.cb.sr .cbev{background:rgba(14,19,60,.92)}
+body.cb.sr .cbsimtag{background:var(--hk2)}
+
+/* the rocket (sr.js rocket): points up; .tilt / .side fly to the right */
+.srrk{flex:none;vertical-align:middle;overflow:visible}
+.srrk.tilt,.srrk.side{transform:rotate(90deg)}
+.srfl{transform-origin:50% 80%;animation:srfl .18s ease-in-out infinite alternate}@keyframes srfl{to{transform:scaleY(1.25)}}
+.srpl{flex:none;vertical-align:middle;overflow:visible}
+
+/* player: the top bar's rocket and 🧑‍🚀, then the journey strip (never over the question) */
+.srtop .pill.cbme .srrk{width:2.1em;height:2.1em;margin:-.2em 0}
+.srres{font-weight:700}
+.srwayw{padding:0 clamp(18px,3vw,40px);margin:2px 0 4px;position:relative;z-index:1}
+.srway{position:relative;height:30px;margin:0 12px}
+.srline{position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden}
+.srline i{display:block;height:100%;background:linear-gradient(90deg,var(--hk2),var(--hk));transition:width .8s}
+.srstop{position:absolute;top:50%;transform:translate(-50%,-50%);display:flex;opacity:.55;filter:saturate(.6)}
+.srstop.ok,.srstop.e{opacity:1;filter:none}
+.srsaved{position:absolute;right:-9px;top:-9px;font-size:13px;line-height:1}
+.srme{position:absolute;top:50%;transform:translate(-50%,-50%);transition:left .8s cubic-bezier(.2,.9,.3,1.2);z-index:2;filter:drop-shadow(0 0 6px rgba(251,191,36,.7))}
+.srpadhero .srrk{width:min(170px,26vh);height:auto;animation:srhover 2.4s ease-in-out infinite}@keyframes srhover{50%{transform:translateY(-8px)}}
+.srsave{display:flex;align-items:center;justify-content:center;gap:.6em;margin:.2em auto .4em;padding:.4em 1em;border-radius:16px;max-width:900px;
+  background:rgba(251,191,36,.14);border:2px solid var(--hk);font-size:clamp(18px,2vw,26px);font-weight:600}
+.srsaved2{display:flex;flex-wrap:wrap;gap:.5em;justify-content:center;max-width:320px}
+.srsaved2 span{display:flex;flex-direction:column;align-items:center;font-size:.8em}
+.cbend .cbhero .srrk{width:min(170px,26vh);height:auto}
+
+/* board */
+.sub.srstory{max-width:46em;margin:.7em auto .2em}
+.names.srpad .cbnm .srrk{width:1.6em;height:1.6em}
+.srox{display:flex;flex-direction:column;align-items:center;gap:.25em}
+.srbar{display:block;width:min(30em,40vw);height:.7em;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;border:1px solid rgba(103,232,249,.4)}
+.srbar i{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#67e8f9);transition:width .5s linear}
+.cbtime.low+.srbar i{background:linear-gradient(90deg,#ef4444,#f87171)}
+.srmap{display:flex;flex-direction:column;gap:.05em}
+.srplay .cbcols{grid-template-columns:minmax(0,2.3fr) minmax(0,1fr)}
+.srrow{display:grid;grid-template-columns:1.4em minmax(4.5em,7em) 1fr 4.4em 2.6em;align-items:center;gap:.5em;font-size:1em;min-height:1.9em}
+.srrow .rk{opacity:.7;text-align:right}.srrow .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srrow:nth-child(2) .nm{color:var(--gold)}
+.srrow .bt{text-align:right;color:var(--hk);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}.srrow .rs{white-space:nowrap;font-size:.9em}
+.srtrk{position:relative;height:1.9em;margin:0 1.2em}
+.srtrk::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed rgba(255,255,255,.18)}
+.srdot{position:absolute;top:50%;width:.55em;height:.55em;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.25)}
+.srdot.ok{background:var(--hk2);box-shadow:0 0 8px var(--hk2)}
+.srgo{position:absolute;top:50%;transform:translate(-50%,-50%);transition:left .8s cubic-bezier(.2,.9,.3,1.2);line-height:0}
+.srgo .srrk{width:1.9em;height:1.9em}
+.srhead{min-height:3.2em;align-items:end}.srhead .srtrk::before{display:none}
+.srpm{position:absolute;bottom:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;line-height:1}
+.srpm .srpl{width:1.6em;height:1.6em}.srpm small{font-size:.55em;opacity:.85;white-space:nowrap}
+.srmore{margin:.3em 0 0;text-align:center}
+.cbpod .cbpav .srrk{width:2.8em;height:2.8em}.p1 .cbpav .srrk{width:3.4em;height:3.4em}
+@media (prefers-reduced-motion: reduce){body.cb.sr::before,.srfl,.srpadhero .srrk{animation:none}}
+.srlab{font-size:.7em;opacity:.75;letter-spacing:.08em;text-transform:uppercase;margin-top:-.15em}
