@@ -210,9 +210,9 @@
     box.hidden = false; if (main) main.hidden = true; if (foot) foot.hidden = true;
     const CN = { "2eso": "2 ESO", "4eso": "4 ESO" };
     const row = l => {
-      const n = list.indexOf(l) + 1, k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
+      const n = l.personal ? "✦" : "LS" + (list.filter(x => !x.personal).indexOf(l) + 1), k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
       const chip = !known && !cur ? "" : cur ? `<span class="ch now">${t("Ara", "Now")}</span>` : s === "closed" ? `<span class="ch cl">${t("Tancada · per repassar", "Closed · to review")}</span>` : s === "hidden" ? `<span class="ch hd">Hidden</span>` : `<span class="ch op">${t("Oberta", "Open")}</span>`;
-      return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">LS${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
+      return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
     };
     const order = vis.slice().sort((a, b) => (b.id === now) - (a.id === now));
     box.innerHTML = `<div class="elall-in"><h1>${t("Les meves Learning Situations", "My Learning Situations")}</h1>`
