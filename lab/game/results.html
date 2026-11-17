@@ -101,7 +101,7 @@ const pct=(a,b)=>b?Math.round(a/b*100):null,show=v=>v==null?"–":v+" %";
 const day=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})};
 const short=t=>String(t||"").replace(/^(Vocabulary|Grammar) · /,"");
 // a game's name starts with its learning path, "LP2 · Vocabulary · …" (decks/index.js elGameName, Roger 7 Nov 2026), saved results too
-const nm=x=>(window.elGameName?elGameName(x):x.title)+(x.cb?" · 🕵️ Code Breakers":"");
+const nm=x=>(window.elGameName?elGameName(x):x.title)+(x.cb?(x.th==="sr"?" · 🚀 Space rescue":" · 🕵️ Code Breakers"):"");
 // 🕵️ Code Breakers rounds (x.cb, lab/game/cb-host.js): each student answers at their own pace, so a student's % is over the questions THEY
 // answered (s.a) and a question counts only for the students who answered it (s.ans has it)
 const den=(x,s)=>x.cb?s.a||0:x.done,asked=(x,s,n)=>!x.cb||!!(s.ans&&s.ans[n]!=null);

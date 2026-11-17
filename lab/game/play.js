@@ -53,8 +53,9 @@ function draw(){
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
   if(cmFree()){cmBack();return page(`<div class="emo pop">🎓</div><p class="big">${esc(T("Back to the class…","Tornem a la classe…"))}</p>`)}
   const cmWait=cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"";
-  document.body.classList.toggle("cb",!!(x&&gameOn()&&x.mode==="cb"));
-  if(gameOn()&&x.mode==="cb"){if(mySid!==x.sid)return page(`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p>`);return cb().draw()}
+  const sr=!!(x&&gameOn()&&x.mode==="cb"&&x.cb&&x.cb.th==="sr");   // 🚀 Space rescue = Code Breakers with another story (sr.js)
+  document.body.classList.toggle("cb",!!(x&&gameOn()&&x.mode==="cb"));document.body.classList.toggle("sr",sr);
+  if(gameOn()&&x.mode==="cb"){if(mySid!==x.sid)return page(sr?`<div class="emo pop">🚀</div><p class="big">Space rescue</p>`:`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p>`);return cb().draw()}
   if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p>${cmWait||'<p class="mid">The game opens here by itself.</p>'}`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
   if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved

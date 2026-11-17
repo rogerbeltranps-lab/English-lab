@@ -8,12 +8,16 @@
 // 🧑‍💻 Hacker avatars (cb-av.js, Roger 13 Nov 2026): their hacker sits only inside the name pill of the top bar while they play (never over
 // the question or the answers); big in the lobby (with the 👕 locker: cb.wear = what they choose to wear) and on the end screen, where
 // the board's cb.rw[pid] says what they won. Their own cbAv/{email} is read once per round; cb.bs = their best run of right answers.
+// 🚀 Space rescue (sr.js, Roger 17 Nov 2026): when live/{group}.cb.th is "sr", the same round with no password, hacks or hacker: their
+// rocket (their animal at the window), a journey strip under the top bar (Earth, the planets, their rocket), 3 cargo pods after a right
+// answer (⛽ fuel, 🛢️ big tank, 🚀 turbo, ☄️ meteor), cb.rs = the planets reached (astronauts rescued, never lost), the time as 🫧 oxygen.
 export function cbPlayer(ctx){
-const {S,G,esc,md,pic,T,app$}=ctx,CB=window.ELCB,AV=window.ELCBAV;
+const {S,G,esc,md,pic,T,app$}=ctx,CB=window.ELCB,AV=window.ELCBAV,X=window.ELSR;
 let avDoc=null;
 let L=null,loading=null,st=null,sid=0,scr="",scrKey="",pend={a:{},cb:{}},flushT=0,seenHr=null,toastT=0,news=null,tick=0,fbTimer=0;
 const em=()=>(ctx.user().email||"").toLowerCase(),me=()=>CB.pid(em()),x=()=>ctx.x()||{},C=()=>x().cb||{};
 const now=()=>Date.now(),left=()=>Math.max(0,(+C().end||0)-now());
+const SR=()=>C().th==="sr"&&!!X,NAME=()=>SR()?"Space rescue":"Code Breakers";
 const over=()=>x().phase==="end"||x().phase==="play"&&+C().end&&left()<=0;
 const plMine=()=>{const pl=Object.assign({},C().pl||{});pl[me()]=Object.assign({},pl[me()]||{},{e:st?st.e:0});return pl};
 const myBits=()=>CB.score(me(),plMine(),C().hr);
@@ -22,7 +26,7 @@ function rank(){const all=Object.keys(Object.assign({},C().pl||{},{[me()]:1})).m
 const qOf=k=>L&&L.byKey[k];
 
 /* ---------- saving: my own answers doc ---------- */
-function save(now_){Object.assign(pend.cb,{e:st.e,n:st.n,r:st.r,i:st.i,lp:st.lp,bs:st.bs||0});clearTimeout(flushT);flushT=setTimeout(flush,now_?0:3000)}
+function save(now_){Object.assign(pend.cb,{e:st.e,n:st.n,r:st.r,i:st.i,lp:st.lp,bs:st.bs||0},SR()?{rs:st.rs||0}:{});clearTimeout(flushT);flushT=setTimeout(flush,now_?0:3000)}
 function flush(){clearTimeout(flushT);const r=ctx.ref();if(!r||!st||ctx.mySid()!==sid)return;
   const d={sid,at:S.serverTimestamp()};if(Object.keys(pend.a).length)d.a=pend.a;if(Object.keys(pend.cb).length)d.cb=pend.cb;pend={a:{},cb:{}};
   S.setDoc(r,d,{merge:true}).catch(e=>{console.warn("code breakers",e);pend.a=Object.assign(d.a||{},pend.a);pend.cb=Object.assign(d.cb||{},pend.cb);flushT=setTimeout(flush,5000)})}
@@ -35,12 +39,13 @@ async function start(){
   got.byKey={};got.pool.forEach(q=>got.byKey[q.key]=q);L=got;
   const sv=ctx.saved()||{},c=sv.cb||{},seed=CB.hash(em()+":"+sid);
   st={seed,order:CB.order(L.pool,seed),a:Object.assign({},sv.a||{}),e:+c.e||0,n:+c.n||0,r:+c.r||0,i:+c.i||0,lp:+c.lp||0,pw:c.pw||"",ws:Array.isArray(c.ws)&&c.ws.length?c.ws:CB.pwFor(em(),L.words).map(w=>w.w),
-    sh:+c.sh||0,hk:Object.keys(c.h||{}).length,cur:null,last:null,sim:null,skip:new Set(),lockUntil:0,bs:+c.bs||0,wear:c.wear&&typeof c.wear==="object"?c.wear:null};
+    sh:+c.sh||0,rs:+c.rs||0,hk:Object.keys(c.h||{}).length,cur:null,last:null,sim:null,skip:new Set(),lockUntil:0,bs:+c.bs||0,wear:c.wear&&typeof c.wear==="object"?c.wear:null};
+  if(SR())st.pw="sr";   // 🚀 no password in Space rescue
   // my hacker: one read per round (only the board writes it)
-  try{const r=ctx.ref();if(r){const d=await S.getDoc(S.doc(r.firestore,"cbAv",em()));avDoc=d.exists()?d.data():{}}}catch(e){console.warn("hacker",e);avDoc=avDoc||{}}
+  if(!SR())try{const r=ctx.ref();if(r){const d=await S.getDoc(S.doc(r.firestore,"cbAv",em()));avDoc=d.exists()?d.data():{}}}catch(e){console.warn("hacker",e);avDoc=avDoc||{}}
   if(x().sid!==sid)return;
   if(st.lp)st.order=CB.order(L.pool,seed+st.lp*101);
-  if(!c.ws)pend.cb.ws=st.ws;
+  if(!c.ws&&!SR())pend.cb.ws=st.ws;
   scr=st.pw?"q":"pw";draw();
 }
 // the next question in my list, past the ones I already got as a 🔁 similar question in this round of the list
@@ -52,13 +57,17 @@ function nextQ(){if(!st.order.length)return null;
 /* ---------- screens ---------- */
 const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 function top(){const [rk,of]=st?rank():[0,0],sh=st&&st.sh>now(),p=x().phase;
+  if(SR())return `<div class="top cbtop srtop"><span class="pill cbme">${X.rocket(CB.avatar(em()),{size:40})}<span>${esc(ctx.first())}<small>${esc(T("Rocket pilot","Pilot de coet"))}</small></span></span><span class="pill cbbits">⛽ <b id="cbb">${st?myBits():0}</b></span><span class="pill srres" id="srrs">🧑‍🚀 ${st?myRes():0}</span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
+    <span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt" title="${esc(T("Oxygen","Oxigen"))}">🫧 ${fmt(left())}</span>`:""}
+    <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>${st?`<div class="srwayw" id="srway">${X.way(myBits(),st.rs)}</div>`:""}`;
   const lk=myLook();
   return `<div class="top cbtop"><span class="pill cbme">${AV.svg(lk,{mini:true,size:40})}<span>${esc(ctx.first())}<small>${esc(AV.RANKS[lk.r-1].n)}</small></span></span><span class="pill cbbits">💾 <b id="cbb">${st?myBits():0}</b></span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
     ${sh?`<span class="pill cbsh" id="cbsh">🛡️ ${fmt(st.sh-now())}</span>`:""}<span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt">⏱ ${fmt(left())}</span>`:""}
     <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`}
 function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.querySelector("#cbb");if(!b)return;
   const v=String(myBits());if(b.textContent!==v){b.textContent=v;b.parentNode.classList.remove("bump");void b.parentNode.offsetWidth;b.parentNode.classList.add("bump")}
-  const tm=t.querySelector("#cbt");if(tm){tm.textContent="⏱ "+fmt(left());tm.classList.toggle("low",left()<30e3)}
+  if(SR()){const w=app$.querySelector("#srway");if(w&&w.dataset.k!==v+":"+st.rs){w.dataset.k=v+":"+st.rs;w.innerHTML=X.way(+v,st.rs)}const rs=t.querySelector("#srrs");if(rs)rs.textContent="🧑‍🚀 "+myRes()}
+  const tm=t.querySelector("#cbt");if(tm){tm.textContent=(SR()?"🫧 ":"⏱ ")+fmt(left());tm.classList.toggle("low",left()<30e3)}
   const rk=t.querySelector("#cbrk");if(rk&&st){const [a,b2]=rank();rk.textContent=`#${a} / ${b2}`}
   const sh=t.querySelector("#cbsh");if(sh){if(st.sh>now())sh.textContent="🛡️ "+fmt(st.sh-now());else sh.remove()}}
 // what I wear: my cbAv + what I chose in the 👕 locker; at the end, the board's new look (with what I just won)
@@ -72,10 +81,12 @@ function waitCheck(){const t=now();let next=0;
     else{b.disabled=true;const l=b.querySelector(".wl");if(l)l.textContent=" ⏳ "+Math.ceil((u-t)/1000);next=next?Math.min(next,u):u}});
   if(next)setTimeout(waitCheck,Math.min(1000,next-t+20))}
 function center(h){return `<div class="center"><div>${h}</div></div>`}
+const myRes=()=>Math.max(st&&st.rs||0,X?X.reached(myBits()):0);
 
 function draw(){
   if(x().sid!==sid&&!loading)loading=start().catch(e=>console.warn("code breakers",e)).finally(()=>{loading=null});
-  if(!st){if(scrKey!=="load")put("load",center(`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p><p class="mid">${esc(T("Loading the questions…","Carregant les preguntes…"))}</p>`));return}
+  document.body.classList.toggle("sr",SR());
+  if(!st){if(scrKey!=="load")put("load",center(`<div class="emo pop">${SR()?"🚀":"🕵️"}</div><p class="big">${NAME()}</p><p class="mid">${esc(T("Loading the questions…","Carregant les preguntes…"))}</p>`));return}
   hrCheck();
   if(x().phase==="lobby"&&scr!=="pw"&&!st.pw)scr="pw";
   if(over()){flush();return endView()}
@@ -93,7 +104,7 @@ function pwView(key){
     <p class="mid">${esc(T("Other players must guess it to hack you. Choose the word you think is hardest!","Els altres l'han d'endevinar per hackejar-te. Tria la paraula que creguis més difícil!"))}</p>
     <div class="cbpw">${ws.map(w=>`<button class="btn cbword${st.pw===w?" on":""}" data-cb="pw" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>`));
 }
-function lobbyWait(){const lk=myLook(),key="lobby:"+st.pw+":"+JSON.stringify(lk);if(key===scrKey)return liveTop();
+function lobbyWait(){if(SR())return srLobby();const lk=myLook(),key="lobby:"+st.pw+":"+JSON.stringify(lk);if(key===scrKey)return liveTop();
   put(key,center(`<div class="cbhero pop">${AV.svg(lk,{size:170})}<div><b>${esc(AV.RANKS[lk.r-1].n)}</b> <small>· ${esc(T("rank","rang"))} ${lk.r} / 10</small></div>
     <button class="btn ghost" data-cb="locker">👕 ${esc(T("My hacker","El meu hacker"))}</button></div><p class="big">${esc(T("You're in","Ja hi ets"))}, ${esc(ctx.first())}!</p>
     <p class="mid">🔒 ${esc(T("Your password","La teva contrasenya"))}: <b class="cbkey">${esc(st.pw)}</b> <button class="btn ghost" data-cb="repw">${esc(T("Change","Canvia"))}</button></p>
@@ -154,8 +165,28 @@ function lockerView(){const lk=myLook(),doc=avDoc||{},xp=+doc.xp||0,nx=AV.RANKS[
     <div class="cbslots">${AV.SLOTS.map(([s,label,items,tier])=>`<div><h4>${esc(label)} <span style="color:${AV.TIERS[tier].c}">· ${esc(AV.TIERS[tier].n)}</span></h4><div class="cbits">${(s!=="v"?[""]:[]).concat(Object.keys(items)).map(k=>cell(s,k,tier)).join("")}</div></div>`).join("")}
       <p class="cbhow">${esc(T("Better results, better crates: under 50 % a visor, 50–74 % a paint, 75–89 % a pet, 90 % or more an effect. Beat your best % for a better one!","Millors resultats, millors premis: menys del 50 % una visera, 50–74 % una pintura, 75–89 % una mascota, 90 % o més un efecte. Supera el teu millor % i en tindràs un de millor!"))}</p></div></div>`)}
 
+/* ---------- 🚀 Space rescue: the launch pad and the 3 cargo pods ---------- */
+function srLobby(){const key="lobby:sr";if(key===scrKey)return liveTop();
+  put(key,center(`<div class="srpadhero pop">${X.rocket(CB.avatar(em()),{size:170})}</div><p class="big">${esc(T("You're in","Ja hi ets"))}, ${esc(ctx.first())}!</p>
+    <p class="mid">🧑‍🚀 ${esc(T("Astronauts are stranded on the planets. Answer right to fuel your rocket: each planet you reach rescues an astronaut. Be quick: your oxygen is the time!","Hi ha astronautes atrapats als planetes. Encerta per omplir el dipòsit del coet: a cada planeta que arribis rescates un astronauta. Afanya't: l'oxigen és el temps!"))}</p>
+    <p class="mid">⏳ ${esc(T("Wait for the launch.","Espera l'enlairament."))}</p>`))}
+function srPodsView(key){const f=st.file,L2=X.POD_LOOK;
+  const card=j=>{if(!f)return `<button class="cbfile srpod slidein" style="animation-delay:${j*.08}s" data-cb="file" data-j="${j}"><span class="fe">📦</span><span>${"ABC"[j]}</span></button>`;
+    const r=f.all[j],[e]=L2[r.k];return `<div class="cbfile srpod open ${j===f.j?"mine pop":"dim"} k-${r.k}"><span class="fe">${e}</span><span>${r.k==="meteor"?"−":"+"}${r.n}</span></div>`};
+  const P=f&&f.pl?X.PLANETS[f.pl-1]:null,g=f&&f.got;
+  const msg=!f?"✓ "+esc(T("Correct! Choose a cargo pod","Correcte! Tria un contenidor")):g.k==="meteor"?`☄️ ${esc(T("A meteor!","Un meteorit!"))} −${g.n}`
+    :g.k==="turbo"?`🚀 ${esc(T("Turbo!","Turbo!"))} +${g.n}`:g.k==="tank"?`🛢️ ${esc(T("A big tank!","Un dipòsit gran!"))} +${g.n}`:`⛽ ${esc(T("Fuel!","Combustible!"))} +${g.n}`;
+  put(key,center(`<p class="big">${msg}</p>${P?`<div class="srsave pop">${X.planet(P,64)}<span>🧑‍🚀 ${esc(T("You reached "+P.n+" and rescued an astronaut!","Has arribat a "+P.n+" i has rescatat un astronauta!"))}</span></div>`:""}<div class="cbfiles">${[0,1,2].map(card).join("")}</div>
+    ${f?`<p><button class="btn go" data-cb="next">${esc(T("Next question ▶","Següent pregunta ▶"))}</button></p>`:""}`));
+  const b=app$.querySelector(".btn.go");if(b)b.focus()}
+function srOpen(j){const cur=myBits(),all=[0,1,2].map(()=>X.pod(st.r,null,cur)),got=Object.assign({},all[j]),was=myRes();
+  st.e+=got.k==="meteor"?-got.n:got.n;const now_=X.reached(myBits()),pl=now_>was?now_:0;st.rs=Math.max(st.rs||0,now_);
+  st.file={j,all,got,pl};pend.cb.lx={k:got.k,n:got.n||0,at:now(),...(pl?{pl}:{})};
+  G.fx(got.k==="meteor"?"wrong":pl||got.k==="turbo"?"fanfare":"right");if(pl||got.k==="turbo")G.confetti();
+  save(got.k!=="fuel"||!!pl);draw()}
+
 /* ---------- the 3 files ---------- */
-function filesView(key){const f=st.file;
+function filesView(key){if(SR())return srPodsView(key);const f=st.file;
   const card=(j)=>{if(!f)return `<button class="cbfile slidein" style="animation-delay:${j*.08}s" data-cb="file" data-j="${j}"><span class="fe">📁</span><span>${"ABC"[j]}</span></button>`;
     const r=f.all[j],[e,n]=CB.FILE_LOOK[r.k];return `<div class="cbfile open ${j===f.j?"mine pop":"dim"} k-${r.k}"><span class="fe">${e}</span><span>${r.k==="bits"?"+"+r.n:esc(n)}</span></div>`};
   const msg=f?fileMsg(f.got):"";
@@ -164,7 +195,7 @@ function filesView(key){const f=st.file;
   const b=app$.querySelector(".btn.go");if(b)b.focus()}
 function fileMsg(g){const t={bits:`💾 +${g.n} bits!`,double:`⚡ ${T("Double!","Doble!")} +${g.n}`,shield:`🛡️ ${T("Firewall on for 90 s","Tallafoc actiu 90 s")}`,
   virus:`🦠 ${T("Virus!","Virus!")} −${g.n}`,hack:`💻 ${T("Hack!","Hack!")}`};return esc(t[g.k]||"")}
-function openFile(j){if(st.file)return;
+function openFile(j){if(st.file)return;if(SR())return srOpen(j);
   const canHack=others().some(p=>p.s>0&&!guarded(p)),cur0=myBits(),all=[0,1,2].map(()=>CB.reward(st.r,canHack,null,cur0)),got=Object.assign({},all[j]),cur=myBits();
   if(got.k==="double"){got.n=cur;st.e+=got.n}
   else if(got.k==="virus"){got.n=Math.round(cur*CB.VIRUS);st.e-=got.n}
@@ -215,7 +246,7 @@ function toast(h,bad){news={h,bad,until:now()+5000};const w=app$.querySelector("
   clearTimeout(toastT);toastT=setTimeout(()=>{news=null;const n=document.getElementById("cbnews");if(n)n.remove()},5000)}
 
 // the end: my hacker (left) and the round (right): bits, place, % right, then what my hacker won (cb.rw, from the board a moment later)
-function endView(){const [rk,of]=rank(),rw=(C().rw||{})[me()],key="end:"+myBits()+":"+rk+":"+(x().cp??"")+":"+(rw?rw.xp:"-");if(key===scrKey)return;
+function endView(){if(SR())return srEnd();const [rk,of]=rank(),rw=(C().rw||{})[me()],key="end:"+myBits()+":"+rk+":"+(x().cp??"")+":"+(rw?rw.xp:"-");if(key===scrKey)return;
   if(!scrKey.startsWith("end")){G.fx("fanfare");if(rk&&rk<=3)G.confetti()}
   if(rw&&!scrKey.includes(":"+rw.xp)&&rw.r1>rw.r0)setTimeout(()=>{G.fx("reveal");G.confetti()},600);
   const pc=st.n?Math.round(st.r/st.n*100):0,lk=myLook(),xp=rw?rw.xp:+(avDoc&&avDoc.xp)||0,cur=AV.RANKS[lk.r-1],nx=AV.RANKS[lk.r];
@@ -228,6 +259,16 @@ function endView(){const [rk,of]=rank(),rw=(C().rw||{})[me()],key="end:"+myBits(
       <div><b>${esc(cur.n)}</b> <small>· ${esc(T("rank","rang"))} ${lk.r} / 10</small></div><div class="cbxp"><i style="width:${nx?Math.round((xp-cur.xp)/(nx.xp-cur.xp)*100):100}%"></i></div><small>${xp} XP${nx?` · ${nx.xp-xp} ${esc(T("to","per a"))} ${esc(nx.n)}`:""}</small></div>
     <div class="cbendr"><p class="big">${rk===1?"🏆":rk&&rk<=3?"🥈":"⏱"} ${esc(T("Time's up!","S'ha acabat el temps!"))}</p>
       <p class="mid">💾 <b>${myBits()} bits</b> · #${rk} / ${of} · ✓ ${st.r} / ${st.n} (${pc} %)</p>${won}
+      ${typeof x().cp==="number"?G.ring(x().cp,"👥 "+T("The class got right","La classe ha encertat"),"min(16vh,120px)"):""}${ctx.cmWait()}</div></div>`)}
+
+// 🚀 the end: my rocket and the planets I reached (left), the round (right): fuel, place, % right, the class's ring
+function srEnd(){const [rk,of]=rank(),n=myRes(),key="end:sr:"+myBits()+":"+rk+":"+(x().cp??"");if(key===scrKey)return;
+  if(!scrKey.startsWith("end")){G.fx("fanfare");if(rk&&rk<=3)G.confetti()}
+  const pc=st.n?Math.round(st.r/st.n*100):0,nx=X.next(myBits());
+  put(key,`<div class="cbend"><div class="cbhero">${X.rocket(CB.avatar(em()),{size:170})}<div class="srsaved2">${X.PLANETS.slice(0,n).map(p=>`<span title="${esc(p.n)}">${X.planet(p,40)}<small>${esc(p.n)}</small></span>`).join("")||`<small>${esc(T("No planet reached this time","Aquesta vegada cap planeta"))}</small>`}</div></div>
+    <div class="cbendr"><p class="big">${rk===1?"🏆":rk&&rk<=3?"🥈":"🫧"} ${esc(T("Out of oxygen!","S'ha acabat l'oxigen!"))}</p>
+      <p class="mid">🧑‍🚀 <b>${esc(n===1?T("1 astronaut rescued","1 astronauta rescatat"):T(n+" astronauts rescued",n+" astronautes rescatats"))}</b></p>
+      <p class="mid">⛽ <b>${myBits()}</b> · #${rk} / ${of} · ✓ ${st.r} / ${st.n} (${pc} %)</p>${nx&&st.n?`<p class="mid">🎯 ${esc(T("Next planet","Proper planeta"))}: <b>${esc(nx.n)}</b></p>`:""}
       ${typeof x().cp==="number"?G.ring(x().cp,"👥 "+T("The class got right","La classe ha encertat"),"min(16vh,120px)"):""}${ctx.cmWait()}</div></div>`)}
 
 /* ---------- taps and keys ---------- */

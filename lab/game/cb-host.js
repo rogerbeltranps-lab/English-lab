@@ -20,12 +20,16 @@
 // 🧑‍💻 Hacker avatars (cb-av.js, Roger 13 Nov 2026): the board reads the group's cbAv docs when the round starts (one query), shows each
 // player's hacker (pl[pid].hv) and, at the end, gives each student their XP, crate and badges (cbAv/{email}, same batch as the results) and
 // tells their Chromebook what they won (cb.rw[pid]).
+// 🚀 Space rescue (sr.js, Roger 17 Nov 2026: a third choice next to 🎮 Quiz and 🕵️ Code Breakers): spacerescue.html runs this same board
+// with body.sr: cb.th = "sr", no passwords, hacks or hacker avatars; the bits are the rocket's fuel, pl[pid].rs = the planets (astronauts)
+// it reached, cb.t0 = when the oxygen (the time) started. The results are the same Code Breakers results, with th: "sr".
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,TEACHERS} from "../../shared/js/el-firebase.js";
 
-const G=window.ELGame,CB=window.ELCB,AV=window.ELCBAV,{esc,md}=G,$=s=>document.querySelector(s);
+const G=window.ELGame,CB=window.ELCB,AV=window.ELCBAV,X=window.ELSR,{esc,md}=G,$=s=>document.querySelector(s);
+const SR=document.body.classList.contains("sr")&&!!X,NAME=SR?"🚀 Space rescue":"🕵️ Code Breakers",EMO=SR?"🚀":"🕵️";
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=$("#app");G.bg();
 const URLP=new URLSearchParams(location.search);
@@ -33,7 +37,7 @@ const BACK=(()=>{const lp=u=>{try{const x=new URL(u,location.href);return x.orig
   let b=lp(URLP.get("from")||"")||lp(document.referrer);try{if(b)sessionStorage.setItem("elCbBack",b);else b=sessionStorage.getItem("elCbBack")||""}catch(e){}return b})();
 const CMT=(()=>{try{const o=JSON.parse(sessionStorage.getItem("el_cm")||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}})();
 const MINS=[5,8,10,15];
-const ss={get(){try{return JSON.parse(sessionStorage.getItem("elCB")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem("elCB",JSON.stringify(v))}catch(e){}}};
+const ss={get(){try{return JSON.parse(sessionStorage.getItem(SR?"elSR":"elCB")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem(SR?"elSR":"elCB",JSON.stringify(v))}catch(e){}}};
 
 // the learning path: its two games (decks/index.js, same course, LS and learning path)
 function lpGames(key,deck,only){const L=window.EL_GAMES||[];if(only){const o=L.find(x=>x.id===only);return o?[o]:[]}let d=deck&&L.find(x=>x.id===deck);
@@ -49,8 +53,8 @@ const H={user:null,teacher:false,tp:tpOf(URLP.get("tp")),rn:+URLP.get("rn")||0,r
 const saved=ss.get();
 const idsOf=gs=>gs.map(d=>d.id).join(",");
 const savedGames=s=>s.ids?s.ids.split(",").map(id=>(window.EL_GAMES||[]).find(x=>x.id===id)).filter(Boolean):lpGames(s.lp);
-if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.games.length||idsOf(H.games)===idsOf(savedGames(saved))&&(!URLP.get("tp")||URLP.get("tp")===(saved.tp||"")))){H.games=savedGames(saved);H.tp=tpOf(saved.tp);H.rn=+saved.rn||0;H.rs=+saved.rs||0;Object.assign(H,{g:saved.g,sid:saved.sid,phase:saved.phase,end:saved.end,mins:saved.mins||8,hr:saved.hr||{}})}
-const keep=()=>ss.set(H.sid?{ids:idsOf(H.games),tp:tpStr(H.tp),rn:H.rn,rs:H.rs,g:H.g,sid:H.sid,phase:H.phase,end:H.end,mins:H.mins,hr:H.hr}:null);
+if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.games.length||idsOf(H.games)===idsOf(savedGames(saved))&&(!URLP.get("tp")||URLP.get("tp")===(saved.tp||"")))){H.games=savedGames(saved);H.tp=tpOf(saved.tp);H.rn=+saved.rn||0;H.rs=+saved.rs||0;Object.assign(H,{g:saved.g,sid:saved.sid,phase:saved.phase,end:saved.end,t0:+saved.t0||0,mins:saved.mins||8,hr:saved.hr||{}})}
+const keep=()=>ss.set(H.sid?{ids:idsOf(H.games),tp:tpStr(H.tp),rn:H.rn,rs:H.rs,g:H.g,sid:H.sid,phase:H.phase,end:H.end,t0:H.t0||0,mins:H.mins,hr:H.hr}:null);
 // one game alone (?game=): its name; the vocabulary game of its learning path gives the passwords when it is a grammar game
 const one=()=>H.games.length===1;
 // the 🔁 review games: the grammar games of the ticked points that are not this round's
@@ -59,7 +63,7 @@ const wordDecks=()=>H.games.some(d=>d.kind==="vocab")||!H.games.length?[]:lpGame
 const meta=()=>H.games[0]||{};
 const lpName=()=>meta().lp||"";
 const gameName=()=>one()?elGameName(H.games[0]):lpName();
-const title=()=>"🕵️ Code Breakers · "+(gameName()||"");
+const title=()=>NAME+" · "+(gameName()||"");
 const groupName=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).name||g;
 const nameOf=em=>H.names[em]||em.split("@")[0];
 const lsId=()=>{const m=meta(),nm=String(m.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
@@ -72,7 +76,8 @@ const byPid=()=>{const m={};Object.keys(H.players).forEach(em=>m[CB.pid(em)]=em)
 function pl(){const out={};Object.entries(H.players).forEach(([em,p])=>{const c=p.cb||{},w=(H.L&&H.L.words||[]).find(z=>z.w===c.pw);
   const lk=AV.look(H.av[em],c.wear),hv={r:lk.r};["v","p","pt","fx"].forEach(k=>{if(lk[k])hv[k]=lk[k]});
   out[CB.pid(em)]={nm:nameOf(em),av:CB.avatar(em),hv,e:+c.e||0,ws:Array.isArray(c.ws)?c.ws.slice(0,3):[],c:w?w.c:"",sh:+c.sh||0,n:+c.n||0,r:+c.r||0,pw:!!c.pw}});
-  Object.keys(out).forEach(id=>out[id].s=CB.score(id,out,H.hr));return out}
+  Object.keys(out).forEach(id=>out[id].s=CB.score(id,out,H.hr));
+  if(SR)Object.entries(H.players).forEach(([em,p])=>{const o=out[CB.pid(em)];delete o.hv;delete o.ws;o.rs=Math.max(+(p.cb||{}).rs||0,X.reached(o.s))});return out}
 // every new hack attempt (cb.h in the players' docs), oldest first: right password and no firewall → steals ELCB.HACK of the target's bits
 function judge(){const P=byPid(),todo=[];
   Object.entries(H.players).forEach(([em,p])=>{const h=(p.cb||{}).h||{},f=CB.pid(em);Object.entries(h).forEach(([k,v])=>{const id=f+"_"+k;if(!H.hr[id]&&v&&v.t)todo.push({id,f,...v})})});
@@ -90,6 +95,8 @@ function judge(){const P=byPid(),todo=[];
   keep();return true}
 function feedFiles(){Object.entries(H.players).forEach(([em,p])=>{const l=(p.cb||{}).lx;if(!l||!l.at||(H.lx[em]||0)>=l.at)return;const first=H.lx[em]===undefined;H.lx[em]=l.at;if(first&&Date.now()-l.at>8e3)return;
   const n=`<b>${esc(nameOf(em))}</b>`;
+  if(SR){const P=X.PLANETS[(+l.pl||0)-1];if(P)say(`🧑‍🚀 ${n} reached <b>${esc(P.n)}</b> and rescued an astronaut!`,"hack");
+    if(l.k==="turbo")say(`🚀 ${n} found a turbo: +${l.n} fuel!`,"good");else if(l.k==="meteor")say(`☄️ A meteor hit ${n}: −${l.n} fuel`,"bad");else if(l.k==="tank"&&l.n>=60)say(`🛢️ ${n} found a big tank: +${l.n} fuel`,"good");return}
   if(l.k==="double")say(`⚡ ${n} doubled their bits: +${l.n}!`,"good");else if(l.k==="virus")say(`🦠 ${n} caught a virus: −${l.n}`,"bad");
   else if(l.k==="shield")say(`🛡️ ${n} turned on a firewall`,"shield");else if(l.k==="bits"&&l.n>=60)say(`💾 ${n} found ${l.n} bits!`,"good")})}
 function say(h,k){H.feed.unshift({h,k,at:Date.now()});H.feed=H.feed.slice(0,8)}
@@ -100,7 +107,7 @@ function publish(soon){
   if(!H.g||!H.sid||quiet)return;clearTimeout(pubT);const wait=soon?250:Math.max(0,4000-(Date.now()-pubAt));
   pubT=setTimeout(()=>{if(!H.g||!H.sid||quiet)return;pubAt=Date.now();const P=pl();Object.values(P).forEach(p=>delete p.pw);
     const D=S.deleteField(),data={on:true,game:true,mode:"cb",deck:location.pathname,title:title(),sid:H.sid,phase:H.phase,i:0,qn:0,qt:0,keys:{},at:S.serverTimestamp(),
-      cb:{decks:H.games.map(d=>d.id),...(H.tp?{rv:rvIds(),tp:H.tp,rn:H.rn,rs:H.rs}:{}),wd:wordDecks(),lp:lpName(),end:H.end,pl:P,hr:H.hr,rw:H.phase==="end"?H.rw:{}},q:D,th:D,ok:D,nt:D,offBy:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
+      cb:{...(SR?{th:"sr",t0:H.t0||0}:{}),decks:H.games.map(d=>d.id),...(H.tp?{rv:rvIds(),tp:H.tp,rn:H.rn,rs:H.rs}:{}),wd:wordDecks(),lp:lpName(),end:H.end,pl:P,hr:H.hr,rw:H.phase==="end"?H.rw:{}},q:D,th:D,ok:D,nt:D,offBy:D,cp:H.phase==="end"&&H.cp!=null?H.cp:D};
     S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()})},wait)}
 function liveOff(g,by){if(g)S.setDoc(S.doc(db,"live",g),Object.assign({on:false,at:S.serverTimestamp()},by?{offBy:by}:{}),{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g,H.sid)});
@@ -125,7 +132,7 @@ async function startGroup(){
     const pts={};pt.forEach(d=>{if(keys.has(d.id))pts[d.id]=+d.data()[H.term]||0});Object.assign(H,{names,pts})}
   catch(e){console.warn("game",e);H.err="⚠ Could not read the group: "+e.message}
   // the group's hackers (one query: a read per student who has played before)
-  try{const av={};(await S.getDocs(S.query(S.collection(db,"cbAv"),S.where("group","==",g)))).forEach(d=>av[d.id]=d.data());H.av=av}catch(e){console.warn("hackers",e);H.av={}}
+  if(!SR)try{const av={};(await S.getDocs(S.query(S.collection(db,"cbAv"),S.where("group","==",g)))).forEach(d=>av[d.id]=d.data());H.av=av}catch(e){console.warn("hackers",e);H.av={}}
   if(ansStop)ansStop();
   ansStop=S.onSnapshot(S.collection(db,"live",g,"answers"),qs=>{if(otherGame(qs))return;const before=Object.keys(H.players).length,P={};
     qs.forEach(d=>{const x=d.data();if(x.sid===H.sid)P[d.id]={a:x.a||{},cb:x.cb||{}}});H.players=P;
@@ -135,8 +142,8 @@ async function startGroup(){
 
 /* ---------- the round ---------- */
 async function startGame(g){quiet=false;H.note="";try{sessionStorage.removeItem("elGame")}catch(e){}   // the class game board's game in this tab is over
-  H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.hr={};H.feed=[];H.lx={};H.cp=null;H.rw={};H.ups=[];savedSid=0;keep();G.music("lobby");await startGroup()}
-function go(){H.phase="play";H.end=Date.now()+H.mins*60e3;keep();G.music("think");G.fx("next");publish(true);draw()}
+  H.g=g;H.sid=Date.now();H.phase="lobby";H.end=0;H.t0=0;H.hr={};H.feed=[];H.lx={};H.cp=null;H.rw={};H.ups=[];savedSid=0;keep();G.music("lobby");await startGroup()}
+function go(){H.phase="play";H.t0=Date.now();H.end=H.t0+H.mins*60e3;keep();G.music("think");G.fx("next");publish(true);draw()}
 function more(){H.end=Math.max(H.end,Date.now())+2*60e3;keep();publish(true);draw()}
 function finish(){if(H.phase!=="play")return;H.phase="end";H.end=Math.min(H.end,Date.now());const t=totals();H.cp=t.n?Math.round(t.r/t.n*100):null;
   keep();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700);publish(true);saveResults();draw()}
@@ -164,12 +171,12 @@ async function saveResults(){
     const stu=Object.entries(M).map(([e,x])=>{const mineQ=qs.filter(q=>x[q.key]);if(!mineQ.length)return null;const ans={};mineQ.forEach(q=>ans[q.n]=said(x[q.key]));
       return {e,r:mineQ.filter(q=>x[q.key].ok).length,a:mineQ.length,miss:mineQ.filter(q=>!x[q.key].ok).map(q=>q.n),ans}}).filter(Boolean);
     const key=H.g+"_"+(H.sid+gi);
-    const doc={group:H.g,course:gm.course||"",deck:gm.id,title:dk.title,kind:gm.kind||dk.kind,ls:gm.ls||"",lp:gm.lp||"",mode:"cb",cb:true,sid:H.sid+gi,day,term:H.term,at:now,
+    const doc={group:H.g,course:gm.course||"",deck:gm.id,title:dk.title,kind:gm.kind||dk.kind,ls:gm.ls||"",lp:gm.lp||"",mode:"cb",cb:true,...(SR?{th:"sr"}:{}),sid:H.sid+gi,day,term:H.term,at:now,
       qn:all.length,done:qs.length,qs:qs.map(q=>{const all=Object.values(M).map(x=>x[q.key]).filter(Boolean);return Object.assign({n:q.n,q:CB.plain(q.q).slice(0,160),ok:okText(q),right:all.filter(z=>z.ok).length,of:all.length},q.d?{d:q.d}:{})}),nts:[],stu,...(H.tp&&gm===gGame?{tp:H.tp}:{})};
     w.set(S.doc(db,"gameResults",key),doc);
     stu.forEach(x=>{const pn={},px={},miss=x.miss.map(n=>{const q=qs.find(z=>z.n===n);return Object.assign({n,q:CB.plain(q.q).slice(0,160),a:x.ans[n]||"",ok:okText(q),p:q.p||""},q.d?{d:q.d,dp:q.dp||""}:{})});
       qs.filter(q=>M[x.e][q.key]).forEach(q=>{if(q.d){if(q.dp)(px[q.d]=px[q.d]||{})[q.dp]=(px[q.d][q.dp]||0)+1}else if(q.p)pn[q.p]=(pn[q.p]||0)+1});
-      (mine[x.e]=mine[x.e]||{})[key]={deck:gm.id,title:dk.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid+gi,r:x.r,of:x.a,pn,miss,mode:"cb",...(Object.keys(px).length?{px}:{})}})});
+      (mine[x.e]=mine[x.e]||{})[key]={deck:gm.id,title:dk.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid+gi,r:x.r,of:x.a,pn,miss,mode:"cb",...(SR?{th:"sr"}:{}),...(Object.keys(px).length?{px}:{})}})});
   Object.entries(mine).forEach(([e,games])=>w.set(S.doc(db,"myGames",e),{games,updated:now},{merge:true}));
   // +1 term point per right answer (the same points as the class game); the group's best over the student list only
   const right={};Object.entries(M).forEach(([e,x])=>{const r=Object.values(x).filter(z=>z.ok).length;if(r)right[e]=r});
@@ -181,7 +188,7 @@ async function saveResults(){
 }
 
 // 🧑‍💻 each student's XP, crate and badges (cb-av.js award), saved in the same batch; their Chromebook shows what they won (cb.rw)
-function hackers(w,M,now){const R=rankList(),rw={},ups=[];
+function hackers(w,M,now){if(SR){H.rw={};H.ups=[];publish(true);return}const R=rankList(),rw={},ups=[];
   Object.entries(H.players).forEach(([em,p])=>{const c=p.cb||{},id=CB.pid(em),m=M[em]||{},n=Object.keys(m).length,r=Object.values(m).filter(z=>z.ok).length;
     const hr=Object.values(H.hr),place=R.findIndex(z=>z.id===id)+1;
     const A=AV.award(H.av[em],{n,r,place,players:R.length,bs:+c.bs||0,hk:hr.filter(h=>h.f===id&&h.ok).length,bl:hr.filter(h=>h.t===id&&h.blk&&!h.pr).length,group:H.g});
@@ -201,29 +208,31 @@ async function backToClass(){const g=CMT&&CMT.g;if(!g)return;if(H.phase==="play"
 
 /* ---------- screens ---------- */
 const back=()=>CMT&&CMT.g===H.g&&H.sid?`<button class="btn cm" data-do="cmback">🎓 Back to class mode</button> `:BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
-function top(){return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🕵️ ${Object.keys(H.players).length}</span><span class="pill lpn">${esc(gameName())}</span><span class="sp"></span>
+function top(){return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">${EMO} ${Object.keys(H.players).length}</span><span class="pill lpn">${esc(gameName())}</span><span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}<button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
-  ${H.phase==="play"?`<button class="btn ghost" data-do="more" title="Two more minutes">+2 min</button>`:""}${H.phase!=="end"?back():""}<button class="btn ghost" data-do="end">${Date.now()-endArm<3000?(H.phase==="play"?"Tap again: end now":"Tap again to close"):"■ End"}</button></div>`}
+  ${H.phase==="play"?`<button class="btn ghost" data-do="more" title="Two more minutes">${SR?"🫧 ":""}+2 min</button>`:""}${H.phase!=="end"?back():""}<button class="btn ghost" data-do="end">${Date.now()-endArm<3000?(H.phase==="play"?"Tap again: end now":"Tap again to close"):"■ End"}</button></div>`}
 function rankList(){const P=pl();return Object.entries(P).map(([id,p])=>({id,...p})).sort((a,b)=>b.s-a.s||a.nm.localeCompare(b.nm))}
 function draw(){
-  if(!H.user){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🕵️ Code Breakers</h2><p>This is the teacher's board. Sign in with the teacher's account.</p><p><button class="btn go" data-do="signin">Sign in with Google</button></p></div></div>`;return}
-  if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🕵️ Code Breakers</h2><p>This is the teacher's board. When your teacher starts the game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a></p></div></div>`;return}
+  if(!H.user){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>${NAME}</h2><p>This is the teacher's board. Sign in with the teacher's account.</p><p><button class="btn go" data-do="signin">Sign in with Google</button></p></div></div>`;return}
+  if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>${NAME}</h2><p>This is the teacher's board. When your teacher starts the game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a></p></div></div>`;return}
   if(!H.games.length){   // choose a learning path
     const L=window.EL_GAMES||[],lps=[];L.forEach(d=>{const k=lpKeyOf(d);if(!/-lp[1-3]$/.test(k))return;if(!lps.some(x=>x.k===k))lps.push({k,d})});
     const by=c=>lps.filter(x=>x.d.course===c).sort((a,b)=>(a.d.ls+a.d.lp).localeCompare(b.d.ls+b.d.lp,"en",{numeric:true}));
     // each learning path: 📚 its vocabulary game, 🧩 its grammar game, or both in one round (Roger, 16 Nov 2026: any game as Code Breakers)
     const opts=x=>lpGames(x.k).map(d=>`<button class="btn cbone" data-do="game" data-id="${esc(d.id)}">${d.kind==="vocab"?"📚 Vocabulary":"🧩 Grammar"}</button>`).join("")+`<button class="btn cbone" data-do="lp" data-k="${esc(x.k)}">📚 + 🧩 Both</button>`;
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🕵️ Code Breakers</h1><p class="sub">Choose a game: the vocabulary, the grammar or both of a learning path, each student at their own pace.</p>
-      <div class="courses">${["2eso","4eso"].map(c=>`<section class="course"><h2>${c==="2eso"?"2 ESO":"4 ESO"}</h2><div class="picks">${by(c).map(x=>`<div class="cblp"><span class="e">🕵️</span><span class="nm">${esc(x.d.lp)}<br><small style="opacity:.7">${esc(x.d.ls)}</small></span><span class="cbopts">${opts(x)}</span></div>`).join("")}</div></section>`).join("")}</div>
-      <p>${back()}<a class="btn ghost" href="host.html">🎮 Class games</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${NAME}</h1><p class="sub">Choose a game: the vocabulary, the grammar or both of a learning path, each student at their own pace.</p>
+      <div class="courses">${["2eso","4eso"].map(c=>`<section class="course"><h2>${c==="2eso"?"2 ESO":"4 ESO"}</h2><div class="picks">${by(c).map(x=>`<div class="cblp"><span class="e">${EMO}</span><span class="nm">${esc(x.d.lp)}<br><small style="opacity:.7">${esc(x.d.ls)}</small></span><span class="cbopts">${opts(x)}</span></div>`).join("")}</div></section>`).join("")}</div>
+      <p>${back()}<a class="btn ghost" href="${SR?"codebreakers.html":"spacerescue.html"}">${SR?"🕵️ Code Breakers":"🚀 Space rescue"}</a> <a class="btn ghost" href="host.html">🎮 Class games</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(!H.L){app$.innerHTML=`<div class="center"><p>Loading the questions…</p></div>`;return}
   if(H.phase==="pick"||!H.g){const gs=(window.EL_GROUPS||[]).filter(g=>g.course===meta().course),n=H.L.pool.length,nx=H.L.pool.filter(q=>q.extra).length;
     const quiz=one()?`<a class="btn ghost" href="host.html?deck=${encodeURIComponent(H.games[0].id)}${BACK?"&from="+encodeURIComponent(BACK):""}">🎮 Play it as a quiz instead</a> `:"";
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🕵️ Code Breakers</h1>${H.note?`<p class="card msg cbnote pop">${esc(H.note)}</p>`:""}<p class="sub"><b>${esc(gameName())}</b> · ${esc(meta().ls||"")}<br>${one()?"":H.games.map(d=>esc(d.title)).join(" + ")+" · "}${n} questions${nx?` (${nx} new ones first)`:""}${H.tp?` · 🧩 only the grammar points you ticked${rvIds().length?", with 🔁 review":""}`:""} · no theory</p>
-      <p class="sub">Each student answers at their own pace. A right answer opens a file: 💾 bits, ⚡ double, 🛡️ firewall, 🦠 virus or 💻 hack (steal bits by cracking a player's password). Only the % right counts for their marks.</p>
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${NAME}</h1>${H.note?`<p class="card msg cbnote pop">${esc(H.note)}</p>`:""}<p class="sub"><b>${esc(gameName())}</b> · ${esc(meta().ls||"")}<br>${one()?"":H.games.map(d=>esc(d.title)).join(" + ")+" · "}${n} questions${nx?` (${nx} new ones first)`:""}${H.tp?` · 🧩 only the grammar points you ticked${rvIds().length?", with 🔁 review":""}`:""} · no theory</p>
+      <p class="sub">${SR?"Each student answers at their own pace. A right answer opens a cargo pod (⛽ fuel, 🛢️ big tank, 🚀 turbo or ☄️ meteor) that flies their rocket from planet to planet: each planet they reach rescues an astronaut. The time is their 🫧 oxygen. Only the % right counts for their marks."
+        :"Each student answers at their own pace. A right answer opens a file: 💾 bits, ⚡ double, 🛡️ firewall, 🦠 virus or 💻 hack (steal bits by cracking a player's password). Only the % right counts for their marks."}</p>
       <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
       <p>${back()}${quiz}<button class="btn ghost" data-do="lps">← Other games</button> <a class="btn ghost" href="host.html">🎮 Class games</a></p></div></div>`;return}
   const R=rankList();
+  if(SR)return drawSR(R);
   if(H.phase==="lobby"){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%"><h1 class="logo pop">🕵️ Code Breakers</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook and <b>choose your secret password</b>.</div><div class="count">🕵️ ${R.length} player${R.length===1?"":"s"}</div></div>
@@ -244,7 +253,34 @@ function draw(){
     <div class="cbcols"><div class="card cbrank">${rows||'<p class="muted">Nobody has bits yet…</p>'}</div>
       <div class="cbfeed">${H.feed.map((f,i)=>`<div class="cbev ${f.k}${i===0&&Date.now()-f.at<3000?" pop":""}">${f.h}</div>`).join("")||'<div class="cbev">💻 Hacks, viruses and firewalls show up here.</div>'}</div></div></div>`;
 }
-function drawTime(){const e=$("#cbtime");if(e){e.textContent="⏱ "+fmt(left());e.classList.toggle("low",left()<30e3)}}
+function drawTime(){const e=$("#cbtime");if(e){e.textContent=(SR?"🫧 ":"⏱ ")+fmt(left());e.classList.toggle("low",left()<30e3)}
+  const o=$("#srox");if(o)o.style.width=oxy()+"%"}
+// 🚀 Space rescue's board: the lobby (rockets on the launch pad), the race (oxygen, each rocket on its way past the planets, the news) and
+// the end (podium, the astronauts the class rescued)
+const oxy=()=>{const t=Math.max(1,H.end-(H.t0||H.end-H.mins*60e3));return Math.max(0,Math.min(100,left()/t*100))};
+const rescued=R=>R.reduce((t,p)=>t+(p.rs||0),0);
+function drawSR(R){const rk=(p,s)=>X.rocket(p.av,{size:s});
+  if(H.phase==="lobby"){
+    app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%"><h1 class="logo pop">🚀 Space rescue</h1>
+      <div class="join"><div class="card">💻 Sign in on your Chromebook: <b>your rocket is on the launch pad</b>.</div><div class="count">🚀 ${R.length} rocket${R.length===1?"":"s"}</div></div>
+      <p class="sub srstory">Astronauts are stranded on the planets. Answer right to fuel your rocket and rescue them before the oxygen runs out!</p>
+      <div class="cbmins"><span>🫧 Oxygen:</span>${MINS.map(m=>`<button class="btn${m===H.mins?" go":" ghost"}" data-do="mins" data-m="${m}">${m} min</button>`).join("")}<button class="btn go" data-do="go" style="font-size:1.2em">Launch 🚀</button></div>
+      <div class="names srpad">${R.map(p=>`<span class="cbnm">${rk(p,34)} ${esc(p.nm)}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div></div></div></div>`;return}
+  const t=totals(),res=rescued(R);
+  if(H.phase==="end"){const ek=H.sid+":"+R.map(p=>p.id+":"+p.s+":"+p.rs).join(",")+":"+t.n+":"+H.err+":"+endArm;if(ek===lastEnd&&app$.querySelector(".cbpod"))return;lastEnd=ek;
+    const pod=[R[1],R[0],R[2]],cls=["p2","p1","p3"],medal=["🥈","🥇","🥉"];
+    app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
+      <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${t.n?G.ring(t.r/t.n*100,"the class got right","150px"):""}<div><h1 class="logo pop" style="margin:0">🫧 Out of oxygen!</h1><p class="sub">🧑‍🚀 The class rescued <b>${res}</b> astronaut${res===1?"":"s"} · ${t.n} answers · ${t.r} right · every right answer is +1 point</p></div></div>
+      <div class="podium cbpod"${R.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm"><span class="cbpav">${rk(x,k===1?76:62)}</span>${esc(x.nm)}<br><span class="sc">⛽ ${x.s} · 🧑‍🚀 ${x.rs}</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
+      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${back()}</p></div></div></div>`;return}
+  // the race: every rocket on the same map as the Chromebooks' strip (Earth, then one equal step per planet)
+  const at=f=>X.pos(f).toFixed(1);
+  const marks=`<span class="srpm" style="left:0">${X.planet(X.EARTH,30)}<small>Earth</small></span>`+X.PLANETS.map((p,i)=>`<span class="srpm" style="left:${X.stop(i).toFixed(1)}%" title="${esc(p.n)}">${X.planet(p,30)}<small>${esc(p.n)}</small></span>`).join("");
+  const rows=R.slice(0,12).map((p,k)=>`<div class="srrow"><span class="rk">${k+1}</span><span class="nm">${esc(p.nm)}</span><span class="srtrk">${X.PLANETS.map((q,i)=>`<i class="srdot${p.s>=q.at||i<p.rs?" ok":""}" style="left:${X.stop(i).toFixed(1)}%"></i>`).join("")}<span class="srgo" style="left:${at(p.s)}%">${X.rocket(p.av,{size:40,flame:true,cls:"side"})}</span></span><span class="bt">⛽ ${p.s}</span><span class="rs">${p.rs?"🧑‍🚀 "+p.rs:""}</span></div>`).join("");
+  app$.innerHTML=top()+`<div class="main cbplay srplay"><div class="cbhead"><div class="srox"><div class="cbtime${left()<30e3?" low":""}" id="cbtime">🫧 ${fmt(left())}</div><span class="srbar" title="Oxygen"><i id="srox" style="width:${oxy()}%"></i></span><small class="srlab">Oxygen</small></div>
+      <div class="cbstat">🧑‍🚀 <b>${res}</b> rescued · <b>${t.n}</b> answers · <b>${t.n?Math.round(t.r/t.n*100):0} %</b> right</div></div>
+    <div class="cbcols"><div class="card cbrank srmap"><div class="srrow srhead"><span></span><span class="nm"></span><span class="srtrk">${marks}</span><span></span><span></span></div>${rows||'<p class="muted">The rockets are getting ready…</p>'}${R.length>12?`<p class="muted srmore">+ ${R.length-12} more rockets</p>`:""}</div>
+      <div class="cbfeed">${H.feed.map((f,i)=>`<div class="cbev ${f.k}${i===0&&Date.now()-f.at<3000?" pop":""}">${f.h}</div>`).join("")||'<div class="cbev">🧑‍🚀 Rescues, turbos and meteors show up here.</div>'}</div></div></div>`}
 
 let endArm=0,lastEnd="";
 app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if(!b)return;const d=b.dataset.do;
