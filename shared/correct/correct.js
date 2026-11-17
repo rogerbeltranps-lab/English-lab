@@ -93,7 +93,7 @@ function gSend(){
   else if(after){const B=gBoxes(),hs=[...new Set(B.flatMap(b=>[X.norm(textOf(b.en)),b.ca?X.norm(textOf(b.ca)):""]).filter(Boolean))];
     v={u,p:GP,k:-1,x:1,l:GV,hs,at:Date.now()};key=u+"|gx|"+GV+"|"+hs.length}
   if(key===rtLast)return Promise.resolve();rtLast=key;
-  return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("grammar together",e));
+  return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{mergeFields:["rt"]}).catch(e=>console.warn("grammar together",e));
 }
 // one gap-fill sentence: the sentence (its gaps filled when shown), the answer, the levels that have it with their number, the rule
 function gram(s,open){
@@ -267,6 +267,9 @@ function readAll(){
    chat, l: level, h: the text, at}, written only when the paragraph or the level changes (one small write a paragraph, not a sentence; the students' pages already listen to live/{group},
    el-cloud.js rtFollow); null when the reading is left or the screen closes */
 let rtLast="";
+// rt is written whole (mergeFields), never merged into the one already there (2ESO B, 17 Nov 2026: "students can't take notes" in 💬
+// Expressions together): a merge kept the x:1 of an earlier ⏱ Your turn when the teacher went back to the explanation, so every Chromebook
+// stayed in Your turn and the notes whiteboard never opened. Same for the reading's x and c.
 function rtSend(){
   if(!G)return Promise.resolve();
   if(GRAM)return gSend();
@@ -285,14 +288,14 @@ function rtSend(){
     :s.per.filter(p=>!p.none).map(p=>({q:P1(p.q),a:P1(p.ans),h:sn(p)})),w:s.kind==="shared"?s.per.map(p=>({r:p.r,n:p.num,h:sn(p)})):[]}:null;
   if(after){const tx=X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL),v={u:LS+"/"+LPF+".html",k:-1,x:1,l:RL,h:tx.chat?tx.units.map(u=>esc(u.who)+": "+esc(u.s)).join("<br>"):tx.html,c,at:Date.now()},key=v.u+"|x|"+v.l+"|"+(c?at+"|"+(c.s?1:0):"");
     if(key===rtLast)return Promise.resolve();rtLast=key;
-    return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("read together",e))}
+    return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{mergeFields:["rt"]}).catch(e=>console.warn("read together",e))}
   // h: the text read together, which every Chromebook shows instead of its own level's text until the reading is left (Roger, 12 Nov
   // 2026: "but again, the text is not the same for everyone"); a chat goes as the page's own messages (4 ESO Getting started)
   const h=!on?"":B.chat?X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL).units.map(u=>`<div class="msg ${esc(u.who.toLowerCase())}"><b>${esc(u.who)}</b>${esc(u.s)}</div>`).join("")
     :X.byLevel(LP.panels.find(p=>p.id==="read").media.text,RL)||"";
   const v=on?{u:LS+"/"+LPF+".html",k:st[RP]?st[RP].b:-1,n:B.list.length,chat:B.chat,l:RL,h,at:Date.now()}:null,key=v?v.u+"|"+v.k+"|"+v.n+"|"+v.l:"";
   if(key===rtLast)return Promise.resolve();rtLast=key;
-  return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("read together",e));
+  return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{mergeFields:["rt"]}).catch(e=>console.warn("read together",e));
 }
 const mmss=n=>Math.floor(n/60)+":"+String(n%60).padStart(2,"0");
 function turn(){
