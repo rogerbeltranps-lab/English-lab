@@ -1307,7 +1307,18 @@ var LS2 = (function () {
   const recFields = r => [r.tr ? { l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 } : null,
     r.notes ? { l: 'Notes from the recording (task and pronunciation)', v: String(r.notes).slice(0, 3000), rec: 1 } : null].filter(Boolean);
   const handRec = (btn, id, title, task) => !window.elMic || !elMic.upload ? Promise.resolve(null)
-    : elMic.upload({ btn, step: id, title, level, task }).then(r => r && r.ok ? { audio: Object.assign({ id: r.id, s: r.secs || null }, r.eur != null ? { eur: r.eur } : {}), f: recFields(r) } : null, () => null);
+    : elMic.upload({ btn, step: id, title, level, task, coach: 'c2' }).then(r => r && r.ok ? { audio: Object.assign({ id: r.id, s: r.secs || null }, r.eur != null ? { eur: r.eur } : {}), f: recFields(r), tr: r.tr || '', fixes: r.fixes || null, next: r.next || null } : null, () => null);
+  /* ⚡ Instant correction (Towards Nativeness, Roger 17 Nov 2026: "speaking task should be corrected instantly and then I would need to answer
+     a new task out of my mistakes"): every recording goes up with coach 'c2', so Roig (school script v31, coachC2) answers at once with
+     the slips ({said, natural, why}) and a new task built from them ({questions, use}). Kept in state.speak[talk_route] as fix / next / tr
+     and shown right under the hand-in; 🔁 Speak again (p.redo) asks next.questions instead of the same ones. Without an answer (no key, the
+     script not yet on v31) nothing changes: the Wednesday correction still comes. */
+  const instantCard = sp => !sp || !(sp.fix || sp.next) ? '' : '<div class="section-card" style="border-left:5px solid var(--accent,#7c3aed)"><h3>⚡ Roig’s instant correction</h3>' +
+    (sp.fix && sp.fix.length ? '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.95rem"><thead><tr><th style="text-align:left;padding:6px">You said</th><th style="text-align:left;padding:6px">A native speaker says</th></tr></thead><tbody>' +
+      sp.fix.map(f => '<tr style="border-top:1px solid var(--line,#e2e8f0)"><td style="padding:6px;vertical-align:top"><s>' + esc(f.said) + '</s></td><td style="padding:6px;vertical-align:top"><strong>' + esc(f.natural) + '</strong>' + (f.why ? '<br><span class="tiny">' + esc(f.why) + '</span>' : '') + '</td></tr>').join('') + '</tbody></table></div>'
+      : '<p>No grammar or idiom slips this time. 🎉</p>') +
+    (sp.tr ? '<details class="draft-box"><summary>What you said (transcript)</summary><p>' + esc(sp.tr) + '</p></details>' : '') +
+    (sp.next && sp.next.questions && sp.next.questions.length ? '<p class="instruction">Your next task is ready in <strong>🔁 Speak again</strong>: new questions that need these corrected forms.</p>' : '') + '</div>';
   const recSecs = btn => window.elMic && elMic.recSecs ? elMic.recSecs(btn) : 0;
   const cantRow = (host, id, title) => { if (host && window.elMic && elMic.cant) host.append(elMic.cant({ step: id, title })); };
   function downloadWav() { if (!recUrl) return; const a = document.createElement('a'); a.href = recUrl; a.download = 'ls2-lp' + LP.n + '-' + level + '.wav'; document.body.appendChild(a); a.click(); a.remove(); }
@@ -1429,10 +1440,12 @@ var LS2 = (function () {
         const draw = () => { const ix = pool.map((_, i) => i); for (let i = ix.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ix[i], ix[j]] = [ix[j], ix[i]]; } return ix.slice(0, p.pick); };
         if (p.redo) sp.qs = first && Array.isArray(first.qs) ? first.qs.slice() : null;
         else if (p.pick && !(Array.isArray(sp.qs) && sp.qs.length && sp.qs.every(i => pool[i]))) { sp.qs = draw(); save(); }
-        const qs = Array.isArray(sp.qs) ? sp.qs.map(i => pool[i]).filter(Boolean) : pool;
+        const fresh = p.redo && first && first.next && Array.isArray(first.next.questions) && first.next.questions.length ? first.next : null;   // ⚡ the new task from the first try's mistakes
+        const qs = fresh ? fresh.questions.map(q => ({ q: esc(q) })) : Array.isArray(sp.qs) ? sp.qs.map(i => pool[i]).filter(Boolean) : pool;
         if (p.redo) { const card = document.createElement('div'); card.className = 'section-card'; card.style.borderLeft = '5px solid var(--accent,#315f9f)';
           const name = esc(tx((LP.panels.find(x => x.id === p.redo) || {}).tab || 'the first try'));
-          card.innerHTML = first && first.qs ? '<h3>🔁 Same questions, better answers</h3><p class="instruction">These are the questions you answered in <a href="#' + p.redo + '">' + name + '</a>. Open that tab and read the correction of your first try: every mistake, the better version and why. Then answer the same questions again, using the corrected forms on purpose.</p>'
+          card.innerHTML = fresh ? '<h3>🔁 A new task, built from your mistakes</h3><p class="instruction">Roig wrote these questions from your first try in <a href="#' + p.redo + '">' + name + '</a>: answering them naturally needs the forms you got wrong. Use these on purpose:</p><p>' + (fresh.use || []).map(u => '<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:99px;background:var(--c-soft,#f5f3ff);font-weight:700">' + esc(u) + '</span>').join('') + '</p>'
+            : first && first.qs ? '<h3>🔁 Same questions, better answers</h3><p class="instruction">These are the questions you answered in <a href="#' + p.redo + '">' + name + '</a>. Open that tab and read the correction of your first try: every mistake, the better version and why. Then answer the same questions again, using the corrected forms on purpose.</p>'
             : '<h3>🔁 Do the first try first</h3><p class="instruction">This step repeats the questions of <a href="#' + p.redo + '">' + name + '</a>. Hand that one in, read its correction, then come back here.</p>';
           const host = $('#' + id); if (host) host.insertBefore(card, host.querySelector('.section-card')); }
         if (p.pick && !p.redo && !(state.steps[id] && state.done[id])) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn secondary'; b.textContent = '🎲 New questions';
@@ -1443,6 +1456,8 @@ var LS2 = (function () {
           (ca() ? q.q + (q.ca ? ' <span class="tiny">(' + q.ca + ')</span>' : '') : '<details style="display:inline-block;vertical-align:middle"><summary>' + 'Show the question' + '</summary>' + q.q + '</details>') + '</li>').join('');
         qs.forEach((q, i) => { $('[data-tq="' + id + i + '"]').onclick = () => sayLine(q.q, ca() ? 0.85 : 0.95); });
         const msg = $('#' + id + 'Msg'), min = (p.min || { beginners: 15, insecure: 25, safe: 50, daring: 70, native: 40 })[level] || 30;
+        const showInstant = () => { let box = $('#' + id + 'Instant'); if (!box) { box = document.createElement('div'); box.id = id + 'Instant'; const host = $('#' + id); if (host) host.append(box); } box.innerHTML = instantCard(sp); };
+        showInstant();
         const text = () => qs.map((q, i) => q.q + ' — ' + ((sp.notes || [])[i] || '').trim()).join('\n');
         if (nat) {
           sp.notes = sp.notes || [];
@@ -1505,8 +1520,10 @@ var LS2 = (function () {
           sending = true; msg.className = 'feedback'; msg.textContent = ca() ? 'Enviant la gravació al professor…' : 'Sending your recording to your teacher…';
           const r = await handRec(id + 'Start', id, title, task); sending = false;
           if (!r) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.' : 'Your recording could not be sent. Try again in a moment.'; return; }
-          state.steps[id] = { level, title, ty: null, audio: r.audio, f: r.f.length ? r.f : [{ l: ca() ? 'Transcripció' : 'Transcript', v: '' }], rate: [], avg: null, comment: '', date }; complete(id); save();
-          msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregada ✓ El professor et tornarà la correcció aquí mateix.' : 'Handed in ✓ Your teacher’s correction will appear right here.') + ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
+          state.steps[id] = { level, title, ty: null, audio: r.audio, f: r.f.length ? r.f : [{ l: ca() ? 'Transcripció' : 'Transcript', v: '' }], rate: [], avg: null, comment: '', date };
+          if (r.fixes || r.next) { sp.fix = r.fixes || []; sp.next = r.next || null; sp.tr = r.tr || ''; }
+          complete(id); save(); showInstant();
+          msg.className = 'feedback ok'; msg.textContent = (r.fixes || r.next ? 'Handed in ✓ Roig’s correction is just below.' : (ca() ? 'Entregada ✓ El professor et tornarà la correcció aquí mateix.' : 'Handed in ✓ Your teacher’s correction will appear right here.')) + ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
         };
       }
     };
