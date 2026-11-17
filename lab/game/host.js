@@ -12,8 +12,10 @@
 //                   q:{text, img, opts} (a question) or q:{text, img, write:true} (a written one), th:{title, img} (a theory slide),
 //                   ok (once shown: the right option, or the answer to show for a written one)}
 // The board keeps its place in this tab (sessionStorage), so a reload goes on with the same game.
-// 🎮 Quiz or 🕵️ Code Breakers (Roger, 16 Nov 2026: "make grammar and vocabulary games as hackers too … so I choose hackers or Kahoot"): after
-// choosing a game, the teacher chooses how to play it (kept in this browser, el_game_fmt) and then the group. Quiz = this board; Code Breakers
+// 🎮 Quiz or 🕵️ Code Breakers (Roger, 16 Nov 2026: "make grammar and vocabulary games as hackers too … so I choose hackers or Kahoot"): the
+// teacher chooses how to play it (kept in this browser, el_game_fmt) on a small switch beside Start, after the group and the points (Roger,
+// 17 Nov 2026: "it's very complicated to choose the type of game … I open the grammar or the vocab game, I choose the group and then the
+// item that will be in the game. and I start": no separate step for it; the last one used stays chosen). Quiz = this board; Code Breakers
 // = codebreakers.html?game=<deck>&g=<group>&go=1 (cb-host.js), that game alone, each student at their own pace. Both save the same results
 // (gameResults + myGames, +1 point per right answer), so the marks read them the same way.
 // 🔒 One game per group (Roger, 16 Nov 2026: the board showed the quiz while the Chromebooks showed Code Breakers): live/{group} belongs to
@@ -527,16 +529,15 @@ function draw(){
       return `<button class="btn deckbtn slidein" data-do="lsgame" data-ls="${esc(id)}" data-kind="${kind}"><span class="e">${kind==="vocab"?"📚":"🧩"}</span><span>${kind==="vocab"?"Vocabulary":"Grammar"} · ${esc(String(l).split(" · ")[0])}<br><small style="opacity:.7">${ds.map(d=>esc(lpNum(d))).join(" · ")}: tick the points you've done</small>${pl}</span></button>`};loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
       return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${lsCard(c,l,"grammar")}${lsCard(c,l,"vocab")}</div>`).join("")}</section>`}).join("");
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then play it as a 🎮 Quiz, as 🕵️ Code Breakers or as 🚀 Space rescue. All games are at Safe level. Each LS has one 🧩 grammar game and one 📚 vocabulary game: you tick the points you've done.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then the group, then tick what goes in it and start.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.tg&&!H.g){drawPoints();return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
-    const cb=ownPace(),sr=fmt()==="sr",lpN=String(meta().lp||"").split(" · ")[0],fb=(f,c,t)=>`<button class="btn ${c}${fmt()===f?" on":" off"}" role="radio" aria-checked="${fmt()===f}" data-do="fmt" data-f="${f}">${t}</button>`;
+    const cb=ownPace(),lpN=String(meta().lp||"").split(" · ")[0];
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(boardName())}</h1>${H.note?`<p class="card msg pop" style="margin:.4em auto 1em">${esc(H.note)}</p>`:""}
-      <div class="fmt" role="radiogroup" aria-label="How to play it"><span>How do you want to play it?</span><button class="btn${cb?" ghost":" go on"}" role="radio" aria-checked="${!cb}" data-do="fmt" data-f="quiz">🎮 Quiz</button>${fb("cb","cbbtn","🕵️ Code Breakers")}${fb("sr","srbtn","🚀 Space rescue")}</div>
-      <p class="sub">${sr?`Questions only, no theory. <b>Each student at their own pace</b> on their Chromebook: a right answer fuels their rocket (⛽ fuel, 🚀 turbo, ☄️ meteor…) and each planet they reach rescues an astronaut before the 🫧 oxygen (the time) runs out. Only the % right counts for their marks.`:cb?`Questions only, no theory. <b>Each student at their own pace</b> on their Chromebook: a right answer opens a file (💾 bits, 🛡️ firewall, 💻 hack…). Only the % right counts for their marks.`:`${H.lsg?"Questions on the points you tick":qList().length+" questions"}, no theory. <b>Everyone answers the same question</b>, on the board. Every right answer is +1 point.`}<br>Start it for a group: its students are taken into it.</p>
-      <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn deckbtn${sr?" srbtn":cb?" cbbtn":" go"}" data-do="group" data-g="${g.id}">${cb?paceIcon():"▶"} ${esc(g.name)}${PL&&!cb?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
+      <p class="sub" style="font-size:1.25em"><b>Which group?</b></p>
+      <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn deckbtn go" data-do="group" data-g="${g.id}">${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
       ${cb&&lpN&&!H.lsg&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn ghost" href="${pacePage()}?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">${paceIcon()} ${esc(lpN)} with both games in one round <small style="opacity:.75;margin-left:.3em">(vocabulary + grammar)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
@@ -601,6 +602,8 @@ function draw(){
     ${rev&&s.why?`<div class="card why pop">💡 ${md(s.why)}</div>`:""}${tiles(s,H.i,rev)}</div>`;
 }
 
+// 🎮 / 🕵️ / 🚀 how to play it: a small switch beside Start (the last one used stays chosen in this browser, el_game_fmt)
+const fmtSwitch=()=>`<span class="fsw" role="radiogroup" aria-label="How to play it">${[["quiz","🎮","Quiz: everyone answers the same question, on the board"],["cb","🕵️","Code Breakers: each student at their own pace"],["sr","🚀","Space rescue: each student at their own pace"]].map(([f,i,t])=>`<button class="${fmt()===f?"on":""}" role="radio" aria-checked="${fmt()===f}" data-do="fmt" data-f="${f}" title="${t}">${i} ${t.split(":")[0]}</button>`).join("")}</span>`;
 // 🧩 Which grammar? for the group H.tg: every grammar point of the course's grammar games, by LS and learning path, ticked by the Time plan
 function drawPoints(){
   const g=H.tg,cb=ownPace(),head=`<h1 class="logo pop">${esc(boardName())}</h1>`,what=kindOf()==="vocab"?"vocabulary":"grammar";
@@ -619,11 +622,11 @@ function drawPoints(){
       ${rows(d,me)}${x&&RAW[x.id]?rows(x,me):""}</div>`};
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
-    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class (Time plan) or a game you played. Untick what you haven't taught yet: it gets no questions. The coloured % = how the class did on it the last time it was asked${GP[gpKey(g)]?"":" (loading…)"}.${H.lsg?` The newest learning path ticked gets all its questions; each earlier point gets 🔁 review questions.`:` Tick earlier points to review them.`}</p>
+    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class. Untick what you haven't taught yet. % = how the class did last time${GP[gpKey(g)]?"":" (loading…)"}.</p>
     <div class="tpcols">${lsList.map(l=>`<section class="course tpls">${l?`<h3>${esc(l)}</h3>`:""}${gDecks().filter(d=>(d.ls||"")===l).map(lp).join("")}</section>`).join("")}</div>
     <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
       <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · "+paceIcon()+" each at their own pace":""}`}</b>
-      <button class="btn ${fmt()==="sr"?"srbtn":cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?paceIcon():"▶"} Start for ${esc(groupName(g))}</button></div>
+      ${fmtSwitch()}<button class="btn ${fmt()==="sr"?"srbtn":cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?paceIcon():"▶"} Start for ${esc(groupName(g))}</button></div>
     <p>${backBtn()}<button class="btn ghost" data-do="tpback">← Groups</button></p></div></div>`;
 }
 
