@@ -46,6 +46,8 @@
 //      out of my mistakes"): a recording whose meta.coach is "c2" (only the Towards Nativeness pages send it) gets a C2 coach prompt
 //      instead of the kind A2 one: every grammar or idiom slip as {said, natural, why} and a new task built from those mistakes
 //      ({questions, use}). Answer adds {fixes, next}; the page shows them at once and 🔁 Speak again asks the new task. Same model and cost.
+//      Only Roger's two accounts get it. Writing too (the Wednesday run skips tester accounts): {idToken, action: "coach_write", text, task}
+//      → {ok, fixes, corrected, well_done, next: {task, use}}, also only for Roger's accounts.
 //  19. v30 (Roger, 17 Nov 2026: "I want to be able to listen to the audio in the web when I press them and see the feedback. In my iPad
 //      it got me to the Drive file and it didn't work"): new action {idToken (teacher), action: "audio_get", fileId} → {ok, mime, name,
 //      data (base64)}: the dashboard plays a student's Speaking or Talk recording inside the page, next to the correction, instead of
@@ -113,6 +115,7 @@ function doPost(e) {
   let m;
   try { m = JSON.parse(e.postData.contents); } catch (x) { return out({ok: false, error: "bad request"}); }
   if (m.action === "audio") return out(saveAudio(m));
+  if (m.action === "coach_write") return out(coachWrite(m));
   if (m.action === "video_start") return out(videoStart(m));
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
@@ -320,6 +323,41 @@ function transcribe(data, mime, meta) {
     } catch (x) {}
   }
   return none;
+}
+
+// v31: Roger's writing in Towards Nativeness, corrected at once (the Wednesday run leaves tester accounts out): grammar and idiom only,
+// the text corrected with the fewest changes, and a short new writing task built from the mistakes. Only Roger's two accounts.
+function coachWrite(m) {
+  const who = signedIn(m.idToken);
+  if (!who || [TEACHER, "roger.beltran@ietramuntana.cat"].indexOf(who.email) < 0) return {ok: false, error: "only for Roger"};
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return {ok: false, error: "no key"};
+  const text = String(m.text || "").slice(0, 8000);
+  if (!text.trim()) return {ok: false, error: "no text"};
+  const ask = [
+    "You are an English coach. The writer is Roger, a Catalan-speaking English teacher with C1 English who wants to write like a native speaker (C2).",
+    "The task: \"" + String(m.task || "").slice(0, 1500) + "\".",
+    "Correct ONLY grammar and idiom: every place where a native speaker would write it differently (Catalan or Spanish calques, prepositions, word order, articles, countable/uncountable nouns, verb patterns, tenses, collocations, unnatural phrasing). Ignore typos, spelling, capitals and punctuation. Do not change what is already natural.",
+    "Answer in JSON with these keys:",
+    "fixes: an array (at most 15, the most important first) of {said: his exact words (only the part that changes, with a few words around it), natural: the native version of that part, why: the rule in at most 12 words};",
+    "corrected: his whole text with only those changes made;",
+    "well_done: one natural, native-like phrase he wrote (quote it);",
+    "next_task: a short new writing task (60 to 100 words) on a related topic that can only be done naturally with the corrected forms;",
+    "use: an array of 3 to 6 short corrected chunks from fixes to use in next_task.",
+    "His text:", text
+  ].join("\n");
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
+  try {
+    const r = UrlFetchApp.fetch(url, {method: "post", contentType: "application/json", muteHttpExceptions: true,
+      payload: JSON.stringify({contents: [{parts: [{text: ask}]}], generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+    if (r.getResponseCode() !== 200) return {ok: false, error: "Roig is busy, try again"};
+    const j = JSON.parse(r.getContentText());
+    const eur = addUsage(GEMINI_MODEL, "text", j);
+    const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+    const o = JSON.parse(t), s = v => String(v || "").trim();
+    const fixes = (Array.isArray(o.fixes) ? o.fixes : []).slice(0, 15).map(f => ({said: s(f.said).slice(0, 300), natural: s(f.natural).slice(0, 300), why: s(f.why).slice(0, 200)})).filter(f => f.said && f.natural);
+    return {ok: true, fixes, corrected: s(o.corrected).slice(0, 9000), well_done: s(o.well_done).slice(0, 300),
+      next: s(o.next_task) ? {task: s(o.next_task).slice(0, 600), use: (Array.isArray(o.use) ? o.use : []).map(s).filter(Boolean).slice(0, 6).map(u => u.slice(0, 120))} : null, eur};
+  } catch (x) { return {ok: false, error: "Roig could not read the answer"}; }
 }
 
 // v31: the C2 coach for Towards Nativeness (Roger's own course, Roger is the student). Grammar and idiom only, never pronunciation or
