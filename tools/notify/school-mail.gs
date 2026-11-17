@@ -42,6 +42,10 @@
 //      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
 //      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
+//  19. v30 (Roger, 17 Nov 2026: "I want to be able to listen to the audio in the web when I press them and see the feedback. In my iPad
+//      it got me to the Drive file and it didn't work"): new action {idToken (teacher), action: "audio_get", fileId} → {ok, mime, name,
+//      data (base64)}: the dashboard plays a student's Speaking or Talk recording inside the page, next to the correction, instead of
+//      opening Drive. Only the teacher may ask, and only for a file in AUDIO_FOLDER (Speaking recordings or one of its group folders).
 //  18. v29 (Roger, 14 Nov 2026: "que els alumnes no vegin la hora en que els envio els missatges"): emails to students sent between 21:00
 //      and 7:30 (Madrid) wait here until 7:30, so Gmail never shows a late hour. The dashboard asks the teacher first and sends at (the
 //      7:30 in ms: hold until then) or now: true ("Send now anyway"); anything else to a school address in those hours (a scheduled
@@ -119,6 +123,7 @@ function doPost(e) {
   if (m.action === "fp_auto_setup") return out(m.idToken && isTeacher(m.idToken) ? fpaSetup(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_auto_list") return out(m.idToken && isTeacher(m.idToken) ? fpaList(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "audio_get") return out(m.idToken && isTeacher(m.idToken) ? audioGet(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
@@ -248,6 +253,24 @@ function saveAudio(m) {
   file.setDescription(JSON.stringify({email: who.email, group: meta.group || "", page: meta.page || "", step: meta.step || "", level: meta.level || "", secs: m.secs || null}));
   const g = transcribe(data, mime, meta);
   return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes, eur: g.eur || null};
+}
+
+// v30: a recording for the dashboard's in-page player (action "audio_get", see 19 above). Only files inside AUDIO_FOLDER (directly or
+// in a group folder), so the teacher's sign-in cannot be used to read anything else from this school account's Drive.
+function audioGet(m) {
+  const id = String(m.fileId || "");
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the recording could not be opened"}; }
+  let inside = false;
+  for (const ps = f.getParents(); ps.hasNext() && !inside;) {
+    const p = ps.next();
+    if (p.getId() === AUDIO_FOLDER) inside = true;
+    else for (const qs = p.getParents(); qs.hasNext();) if (qs.next().getId() === AUDIO_FOLDER) inside = true;
+  }
+  if (!inside) return {ok: false, error: "that file is not a speaking recording"};
+  if (f.getSize() > 9e6) return {ok: false, error: "the recording is too long to play here"};
+  const b = f.getBlob();
+  return {ok: true, mime: b.getContentType() || "audio/webm", name: f.getName(), data: Utilities.base64Encode(b.getBytes())};
 }
 
 // Gemini listens to the recording (Roger, 8 Nov 2026: "gemini can give feedback itself with a proper prompt per each activity, we need him
