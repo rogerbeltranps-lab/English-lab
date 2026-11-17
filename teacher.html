@@ -2616,22 +2616,31 @@ const wxDoc=u=>WX.docs[u]||null;
 const wxNorm=s=>String(s||"").toLowerCase().replace(/[’‘`´]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:…→]/g," ").replace(/\s+/g," ").trim();
 const wxAcc=(K,id)=>{const k=(K||{})[id];return k?(k.a||[]).concat(k.extra||[]):null};
 const wxOk=(K,id,v)=>{const acc=wxAcc(K,id),x=wxNorm(v);return !!(acc&&x&&acc.some(a=>wxNorm(a)===x))};
-const WXSEC=[["listening","Listening","🎧"],["reading","Reading","📖"],["vocabulary","Vocabulary","📚"],["grammar","Grammar","🧩"]];
+const WXSEC=[["listening","Listening","🎧"],["reading","Reading","📖"],["vocabulary","Vocabulary","📚"],["grammar","Grammar","🧩"]];   // marked with the key
+// ✍️ Writing (Roger, 17 Nov 2026 "add writing"): the student's text (order.writing, one id), marked by the teacher with a 5.1 level in the
+// student's dialog: the level and the points (NA 8 · AS 15 · AN 23 · AE 30 of 30, scaled to the section) go straight into results/{ls}__assessment
+const WXLV={NA:8/30,AS:15/30,AN:23/30,AE:1};
+const wxWid=d=>((d.order||{}).writing||[])[0]||null;
+const wxWords=v=>(String(v||"").trim().match(/[A-Za-zÀ-ÿ’'0-9-]+/g)||[]).length;
+const wxW=(u,ls,d)=>{const e=exOf(ls);if(!e||!e.sections.some(x=>x[0]==="writing"))return null;const x=res(u,asId(ls)),sc=(x.sections||{}).writing,id=d&&wxWid(d),txt=id?String((d.answers||{})[id]||""):"";
+  return {max:secMax(e,"writing"),score:sc&&sc.score!=null?+sc.score:null,level:((x.levels||{}).writing||{})["5.1"]||null,id,txt,words:wxWords(txt)}};
 // marks of one exam (any answers map: the final one or a copy taken at an exit): per section right/n and points of the section's maximum
 function wxMark(d,K,ls,answers){const e=exOf(ls),A=answers||d.answers||{},out={sec:{},score:0,max:0,known:true};
   WXSEC.forEach(([k])=>{const ids=(d.order||{})[k]||[],mx=secMax(e,k),right=ids.filter(id=>{if(!wxAcc(K,id))out.known=false;return wxOk(K,id,A[id])}).length;
     const sc=ids.length?Math.round(right/ids.length*mx*100)/100:0;out.sec[k]={right,n:ids.length,score:sc,max:mx};out.score+=sc;out.max+=mx});
+  const w=d.uid?wxW(d.uid,ls,d):null;if(w){out.w=w;if(w.score!=null||!w.words){out.score+=w.score||0;out.max+=w.max}else out.partial=true}   // a blank writing counts 0   // not marked yet: the mark is without the writing (*)
   out.mark=out.max?out.score/out.max*10:null;return out}
 // what going out changed: the answers at the first exit against the final ones (each question: before, after, right before / after)
 function wxAssess(d,K,ls){const sn=(d.snaps||[])[0];if(!sn)return null;const A=d.answers||{},B=sn.answers||{},ch=[];
   WXSEC.forEach(([k])=>((d.order||{})[k]||[]).forEach(id=>{const b=B[id]||"",a=A[id]||"";if(wxNorm(b)!==wxNorm(a))ch.push({id,sec:k,before:b,after:a,okB:wxOk(K,id,b),okA:wxOk(K,id,a)})}));
+  const wid=wxWid(d);if(wid&&String(B[wid]||"").trim()!==String(A[wid]||"").trim())ch.push({id:wid,sec:"writing",before:B[wid]||"",after:A[wid]||"",w:true});
   const m0=wxMark(d,K,ls,B),m1=wxMark(d,K,ls,A);return {ch,gained:ch.filter(c=>c.okA&&!c.okB).length,lost:ch.filter(c=>c.okB&&!c.okA).length,mark0:m0.mark,mark1:m1.mark}}
 const wxOpen=(ls,gid)=>!!((((S.D.ls[ls]||{}).webExam||{})[gid]||{}).open);
 const wxSt=(d,open)=>!d?"none":d.status==="done"?"done":d.status==="out"?"out":open?"in":"stopped";
 const wxMin=(a,b)=>{const x=Date.parse(a),y=Date.parse(b);return isNaN(x)||isNaN(y)?null:Math.round((y-x)/6e3)/10};
 const hm=s=>String(s||"").slice(11,16);
 async function wxLoad(ls){const c=wxCfg(ls);if(!c||DEMO)return;WX.busy=true;WX.ls=ls;
-  try{const q=await ALL("exams",1),o={};q.forEach(x=>{const d=x.data();if(d.key===c.key)o[up(x)]=d});WX.docs=o;WX.ls=ls;WX.at=Date.now()}catch(e){console.warn("web exams",e)}
+  try{const q=await ALL("exams",1),o={};q.forEach(x=>{const d=x.data();if(d.key===c.key)o[up(x)]=Object.assign(d,{uid:up(x)})});WX.docs=o;WX.ls=ls;WX.at=Date.now()}catch(e){console.warn("web exams",e)}
   WX.busy=false;render()}
 // the exam questions and texts (the page's data file), for the students' reports
 const wxData=c=>window.EL_EXAM&&EL_EXAM.key===c.key?Promise.resolve(EL_EXAM):new Promise(r=>{const s=document.createElement("script");s.src=c.page.replace(/[^/]*$/,"")+"data/exam.js";s.onload=()=>r(window.EL_EXAM||null);s.onerror=()=>r(null);document.head.append(s)});
@@ -2641,9 +2650,11 @@ function wxReport(d,K,ls,X){const e=exOf(ls),P=X&&X.papers[d.paper],qs=[];let n=
     ids.forEach(id=>{const it=P&&P.sections[k].find(x=>x.id===id)||{},mine=String((d.answers||{})[id]||""),ok=wxOk(K,id,mine);
       qs.push({q:++n,part,pts,ok,got:ok?pts:0,text:it.q||(K[id]||{}).q||"",mine,right:(wxAcc(K,id)||[""])[0]})})});
   const A=X&&X.audio||{};
-  return {full:true,web:true,questions:qs,exam:{listening:{about:A.about||"",text:(A.script||[]).map(([w,s])=>w+": "+s).join("\n")},reading:{title:"Text A and Text B",body:P?wxPlain(P.text):""}}}}
+  const wid=wxWid(d),wt=wid&&P&&(P.sections.writing||[]).find(x=>x.id===wid),txt=wid?String((d.answers||{})[wid]||"").trim():"";
+  return Object.assign({full:true,web:true,questions:qs,exam:Object.assign({listening:{about:A.about||"",text:(A.script||[]).map(([w,s])=>w+": "+s).join("\n")},reading:{title:"Text A and Text B",body:P?wxPlain(P.text):""}},
+    wt?{writing:{title:"Writing",task:wt.q,points:wt.frame?["Frame: "+wt.frame]:[]}}:{})},wid?{writing:{original:txt||"(blank)"}}:{})}
 function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls),open=wxOpen(ls,grp.id);
-  if(WX.ls!==ls&&!WX.busy){if(DEMO){WX.docs=DEMO.ex||{};WX.ls=ls;WX.at=Date.now()}else wxLoad(ls)}
+  if(WX.ls!==ls&&!WX.busy){if(DEMO){WX.docs=DEMO.ex||{};Object.entries(WX.docs).forEach(([u,d])=>d.uid=u);WX.ls=ls;WX.at=Date.now()}else wxLoad(ls)}
   const on=studs.filter(s=>s.uid),docs=on.map(s=>wxDoc(s.uid)),n=k=>docs.filter(d=>wxSt(d,open)===k).length;
   const link=new URL(c.page,location.href).href;
   const head=`<div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:8px;margin:6px 0">`
@@ -2654,30 +2665,43 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
     +(n("done")+n("out")+n("stopped")?`<button data-wx="save">📥 Save marks (${n("done")+n("out")+n("stopped")})</button>`:"")+`</div>`;
   const note=`<p class="muted">${K?"":'<b style="color:#dc2626">⚠ The answer key is not in the database yet (cpKeys/'+esc(c.key)+'): marks can\'t be worked out.</b> '}Students open the link (🔗 Copy the link, then put it in a 📣 Announcement or on the screen) when you say so, while it is 🟢 open: Starter and Base get the Base paper, Core and Plus the Core one, version A or B by account, everything shuffled. If a student leaves full screen the exam stops (⛔): type your password on their Chromebook to let them back in. ${WX.at?"Read at "+new Date(WX.at).toTimeString().slice(0,5)+".":"Reading…"} <b>📥 Save marks</b> puts the finished exams in 📊 Assessment details and on the students' boards (the exams still running are left out until they turn them in or you close the exam).</p>`;
   const st=d=>({none:'<span class="muted">Not started</span>',in:"✍️ Working",out:"⛔ Stopped (left)",stopped:"⏹ Not turned in (closed)",done:"✅ Turned in"})[wxSt(d,open)];
-  const row=s=>{if(!s.uid)return "";const d=wxDoc(s.uid);if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="9">${st(null)}</td></tr>`;
-    const m=K?wxMark(d,K,ls):null,as=K?wxAssess(d,K,ls):null,ex=(d.exits||[]).length,back=(d.exits||[]).filter(x=>x.back).length,saved=(res(s.uid,asId(ls)).sections||{}).listening;
+  const row=s=>{if(!s.uid)return "";const d=wxDoc(s.uid);if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="10">${st(null)}</td></tr>`;
+    const m=K?wxMark(d,K,ls):null,w=wxW(s.uid,ls,d),as=K?wxAssess(d,K,ls):null,ex=(d.exits||[]).length,back=(d.exits||[]).filter(x=>x.back).length,saved=(res(s.uid,asId(ls)).sections||{}).listening;
     return `<tr data-wx="dlg" data-u="${s.uid}" style="cursor:pointer" title="Click: every answer, and what changed after an exit"><td class="n">${name(s)}</td><td style="white-space:nowrap">${esc((d.paper||"").replace("base","Base").replace("core","Core"))}</td><td>${st(d)}${saved?' <small class="muted" title="Saved in 📊 Assessment details">💾</small>':""}</td>`
-      +WXSEC.map(([k])=>`<td>${m?m.sec[k].right+"/"+m.sec[k].n:"–"}</td>`).join("")+`<td><b>${m?f1(m.mark):"–"}</b></td>`
+      +WXSEC.map(([k])=>`<td>${m?m.sec[k].right+"/"+m.sec[k].n:"–"}</td>`).join("")+(w?`<td>${w.score!=null?`<b>${f1(w.score)}</b>${w.level?` <small class="muted">${w.level}</small>`:""}`:w.words?`<span style="color:#b45309;white-space:nowrap" title="Click the row to mark it">✍️ ${w.words} w.</span>`:'<span class="muted">blank</span>'}</td>`:"")
+      +`<td><b>${m?f1(m.mark):"–"}</b>${m&&m.partial?'<small class="muted" title="Without the writing: not marked yet">*</small>':""}</td>`
       +`<td>${ex?`🚪 ${ex}${back?` · 🔓 ${back}`:""}${(d.glances||[]).length?` · 👀 ${d.glances.length}`:""}${d.tries?` · 🔑✗${d.tries}`:""}`:(d.glances||[]).length?`👀 ${d.glances.length}`:'<span class="muted">–</span>'}</td>`
       +`<td>${as?(as.ch.length?`${as.gained?`<b style="color:#b45309">⚠️ +${as.gained} right</b>`:""} ${as.ch.length} changed`:"no change"):'<span class="muted">–</span>'}</td></tr>`};
   return `<div class="box">${fold("wxbox",`🖥 Web exam · ${esc(grp.name)} · ${n("done")} turned in${n("in")?` · ${n("in")} working`:""}${n("out")?` · <span style="color:#b91c1c">${n("out")} stopped</span>`:""}`,head+note
-    +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Paper</th><th>State</th>${WXSEC.map(([k,nm,ic])=>`<th>${ic} ${nm}<br><small class="muted">/${secMax(exOf(ls),k)}</small></th>`).join("")}<th>Exam<br><small class="muted">/10</small></th><th>Exits</th><th>After coming back</th></tr></thead><tbody>${studs.map(row).join("")}</tbody></table></div>`
-    +`<p class="muted">🚪 exits (left full screen, another tab or app, closed the page) · 🔓 let back in with the password · 👀 looked away for less than 2 s · 🔑✗ wrong passwords typed. <b>After coming back</b> compares the answers saved when they first left with the final ones: ⚠️ +n = answers that became right after coming back.</p>`,"",true)}</div>`}
+    +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Paper</th><th>State</th>${WXSEC.map(([k,nm,ic])=>`<th>${ic} ${nm}<br><small class="muted">/${secMax(exOf(ls),k)}</small></th>`).join("")}${wxW("",ls)?`<th>✍️ Writing<br><small class="muted">/${secMax(exOf(ls),"writing")}</small></th>`:""}<th>Exam<br><small class="muted">/10</small></th><th>Exits</th><th>After coming back</th></tr></thead><tbody>${studs.map(row).join("")}</tbody></table></div>`
+    +`<p class="muted">🚪 exits (left full screen, another tab or app, closed the page) · 🔓 let back in with the password · 👀 looked away for less than 2 s · 🔑✗ wrong passwords typed. <b>After coming back</b> compares the answers saved when they first left with the final ones: ⚠️ +n = answers that became right after coming back. <b>✍️ Writing:</b> click a student to read the text and give it a 5.1 level (the points go in by themselves); <b>*</b> = the mark without the writing, until you mark it.</p>`,"",true)}</div>`}
 function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=K?wxMark(d,K,ls):null,as=K?wxAssess(d,K,ls):null;
   const ex=(d.exits||[]).map((x,i)=>`<li>${hm(x.at)} · ${esc({fullscreen:"left full screen",left:"another tab, window or app",reload:"closed or reloaded the page"}[x.why]||x.why)}${x.back?` · back at ${hm(x.back)} (${wxMin(x.at,x.back)} min out)`:" · <b>never came back</b>"}</li>`).join("");
-  const chg=as&&as.ch.length?`<table><tr><th>Question</th><th>At the exit</th><th>Final</th></tr>${as.ch.map(c=>`<tr><td style="text-align:left">${esc((K[c.id]||{}).q||c.id)}</td><td>${esc(c.before)||'<span class="muted">blank</span>'} ${c.okB?"✓":"✗"}</td><td>${esc(c.after)||'<span class="muted">blank</span>'} ${c.okA?"✓":"✗"}${c.okA&&!c.okB?" ⚠️":""}</td></tr>`).join("")}</table>
+  const chg=as&&as.ch.length?`<table><tr><th>Question</th><th>At the exit</th><th>Final</th></tr>${as.ch.map(c=>c.w?`<tr><td style="text-align:left">✍️ Writing</td><td>${wxWords(c.before)} words</td><td>${wxWords(c.after)} words ⚠️<br><small class="muted">the text changed after coming back: compare it below</small></td></tr>`:`<tr><td style="text-align:left">${esc((K[c.id]||{}).q||c.id)}</td><td>${esc(c.before)||'<span class="muted">blank</span>'} ${c.okB?"✓":"✗"}</td><td>${esc(c.after)||'<span class="muted">blank</span>'} ${c.okA?"✓":"✗"}${c.okA&&!c.okB?" ⚠️":""}</td></tr>`).join("")}</table>
     <p class="muted">Mark with the answers they had when they first left: <b>${f1(as.mark0)}</b> · final mark: <b>${f1(as.mark1)}</b>. The log of every change after coming back: ${(d.changes||[]).length} line(s).</p>`:as?`<p>Nothing changed after coming back.</p>`:"";
   const rows=WXSEC.map(([k,nm,ic])=>`<tr><th colspan="4" style="text-align:left">${ic} ${nm}${m?` · ${m.sec[k].right}/${m.sec[k].n} · ${f1(m.sec[k].score)}/${m.sec[k].max}`:""}</th></tr>`+((d.order||{})[k]||[]).map((id,i)=>{const v=(d.answers||{})[id]||"",ok=K&&wxOk(K,id,v);
     return `<tr><td>${i+1}</td><td style="text-align:left">${esc((K&&K[id]||{}).q||id)}</td><td><b>${esc(v)||'<span class="muted">(blank)</span>'}</b> ${K?ok?"✓":"✗":""}${K&&!ok?`<br><small class="muted">${esc((wxAcc(K,id)||[]).join(" / "))}</small>`:""}</td><td>${K&&!ok&&wxNorm(v)?`<button class="g" data-wx="acc" data-u="${u}" data-i="${esc(id)}" data-v="${esc(v)}" title="Accept this answer for every student">✓ Accept</button>`:""}</td></tr>`}).join("")).join("");
   dlg(`<h3>🖥 Web exam · ${name(s)}</h3><p class="muted">${esc(d.paper)} · started ${hm(d.started)}${d.listenDone?` · listening locked ${hm(d.listenDone)}`:""} · ${esc(wxSt(d,wxOpen(ls,s.group)))}${d.done?" at "+hm(d.done):""}${m?` · <b>${f1(m.mark)}/10</b>`:""}</p>`
     +(ex?`<h4>🚪 Exits</h4><ul>${ex}</ul>`:"<p>🚪 No exits.</p>")+((d.glances||[]).length?`<p class="muted">👀 Looked away for less than 2 s: ${d.glances.map(g=>hm(g.at)+" ("+Math.round(g.ms/100)/10+" s)").join(", ")}</p>`:"")+(d.tries?`<p class="muted">🔑 Wrong passwords typed: ${d.tries}</p>`:"")
-    +(as?`<h4>After coming back</h4>${chg}`:"")+`<h4>Answers</h4><table>${rows}</table>`
+    +(as?`<h4>After coming back</h4>${chg}`:"")+wxWBox(u,ls,d)+`<h4>Answers</h4><table>${rows}</table>`
     +`<div class="row"><button class="g" data-wx="reset" data-u="${u}" title="Delete this exam: the student starts again from zero (new paper order)">↺ Let them start again</button></div>`,true)}
+// the writing in the student's dialog: the task, the text (and the text when they first left, if it changed), the 5.1 level buttons
+function wxWBox(u,ls,d){const w=wxW(u,ls,d);if(!w||!w.id)return "";const X=window.EL_EXAM&&EL_EXAM.key===(wxCfg(ls)||{}).key?EL_EXAM:null,
+    it=X&&X.papers[d.paper]&&(X.papers[d.paper].sections.writing||[]).find(x=>x.id===w.id),sn=(d.snaps||[])[0],before=sn?String((sn.answers||{})[w.id]||""):null;
+  if(!X)wxData(wxCfg(ls)).then(x=>{if(x&&$("#dlg")&&$("#dlg").open&&!$("#dlg [data-wtask]"))wxDlg(u,ls)});
+  const ind=((G()||{}).ind||{})["5.1"]||[];
+  return `<h4>✍️ Writing · ${w.words} words${w.score!=null?` · <b>${f1(w.score)}/${w.max}</b>`:""}</h4>`
+    +(it?`<p class="muted" data-wtask style="white-space:pre-wrap">${esc(it.q)}${it.frame?"\nFrame: "+esc(it.frame):""} (at least ${it.min} words)</p>`:"")
+    +`<div style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(w.txt.trim())||'<span class="muted">(blank)</span>'}</div>`
+    +(before!=null&&before.trim()!==w.txt.trim()?`<details style="margin-top:6px"><summary>⚠️ The text when they first left (${wxWords(before)} words)</summary><div style="white-space:pre-wrap;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(before.trim())||'<span class="muted">(blank)</span>'}</div></details>`:"")
+    +`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:8px"><span class="muted">5.1 level:</span>${EL_DEGREES.map((l,i)=>`<button class="lv ${w.level===l?"on":""}" data-wx="wlv" data-u="${u}" data-l="${l}" title="${esc(l+" = "+f1(WXLV[l]*w.max)+"/"+w.max+(ind[i]?": "+ind[i]:""))}" style="${w.level===l?"background:"+LVCOL[l]+";border-color:"+LVCOL[l]:""}">${l}</button>`).join("")}<small class="muted">NA ${f1(WXLV.NA*w.max)} · AS ${f1(WXLV.AS*w.max)} · AN ${f1(WXLV.AN*w.max)} · AE ${w.max}</small></div>`}
 async function wxSave(ls,grp,studs){const c=wxCfg(ls),K=wxKey(ls),open=wxOpen(ls,grp.id);if(!K)return alert("The answer key is not in the database yet.");
   const X=await wxData(c),todo=studs.filter(s=>s.uid&&wxDoc(s.uid)&&["done","out","stopped"].includes(wxSt(wxDoc(s.uid),open)));
   const had=todo.filter(s=>Object.keys(res(s.uid,asId(ls)).sections||{}).length).length;
-  if(!confirm(`Save the web exam marks of ${todo.length} student(s) in ${grp.name}?${had?`\n\n${had} already have exam marks: they are replaced.`:""}\n\nStudents see their marks and their exam, question by question, on their board.`))return;
+  const nw=todo.filter(s=>{const w=wxW(s.uid,ls,wxDoc(s.uid));return w&&w.words&&w.score==null}).length;
+  if(!confirm(`Save the web exam marks of ${todo.length} student(s) in ${grp.name}?${had?`\n\n${had} already have exam marks: they are replaced (a writing you marked stays).`:""}${nw?`\n\n${nw} writing(s) not marked yet: their mark shows once you give the level.`:""}\n\nStudents see their marks and their exam, question by question, on their board.`))return;
   const ps=todo.map(s=>{const d=wxDoc(s.uid),m=wxMark(d,K,ls),sections={};WXSEC.forEach(([k])=>sections[k]={score:m.sec[k].score,max:m.sec[k].max});
+    if(m.w&&m.w.score==null&&!m.w.words)sections.writing={score:0,max:m.w.max};   // a blank writing is 0; a written one keeps the level you gave it (or waits for one)
     return patch(s.uid,asId(ls),{sections,version:d.paper.startsWith("core")?"safe":"insecure",webPaper:d.paper,report:wxReport(d,K,ls,X)})});
   act(Promise.all(ps))}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!b||!S.D)return;const k=b.dataset,ls=S.ls,grp=GR.find(g=>g.id===S.g),c=wxCfg(ls);if(!c||!grp)return;
@@ -2689,6 +2713,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
     copy:async()=>{try{await navigator.clipboard.writeText(k.v);b.textContent="✓ Copied"}catch(x){prompt("Copy the link:",k.v)}},
     save:()=>wxSave(ls,grp,studs),
     dlg:()=>wxDlg(k.u,ls),
+    wlv:()=>{const d=wxDoc(k.u),w=wxW(k.u,ls,d);if(!w)return;const sc=Math.round(WXLV[k.l]*w.max*10)/10;
+      quick(patch(k.u,asId(ls),{sections:{writing:{score:sc,max:w.max}},levels:{writing:{"5.1":k.l}}}));render();wxDlg(k.u,ls)},
     acc:()=>{const K=wxKey(ls),it=K&&K[k.i];if(!it)return;it.extra=[...new Set((it.extra||[]).concat(k.v))];
       Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).catch(x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
     reset:()=>{if(!confirm("Delete this student's exam? They start again from zero, with a new order. Their answers are lost."))return;$("#dlg").close();

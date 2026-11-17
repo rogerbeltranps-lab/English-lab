@@ -13,7 +13,7 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const [src] = process.argv.slice(2).filter(a => !a.startsWith("--"));
 if (!src) { console.error("Usage: node tools/web-exam/build.mjs <source.mjs>"); process.exit(1); }
 const S = (await import(pathToFileURL(path.resolve(src)).href)).default;
-const SECTIONS = ["listening", "reading", "vocabulary", "grammar"];
+const SECTIONS = ["listening", "reading", "vocabulary", "grammar", "writing"];   // writing: a free text the teacher marks with a level (no key)
 const folder = { "2eso-free-time-live": "2eso/free-time-live" }[S.ls];
 if (!folder) throw new Error("Unknown LS " + S.ls);
 const out = path.join(ROOT, folder, "data", "exam.js");
@@ -31,7 +31,8 @@ const sortO = o => o.slice().sort((a, b) => a.localeCompare(b, "en", { sensitivi
 for (const [p, P] of Object.entries(S.papers)) {
   papers[p] = { text: P.text, sections: {} };
   for (const s of SECTIONS) {
-    papers[p].sections[s] = P[s].map(it => {
+    papers[p].sections[s] = (P[s] || []).map(it => {
+      if (it.t === "write") return Object.assign({ id: it.id, t: "write", q: it.q, min: it.min, max: it.max }, it.frame ? { frame: it.frame } : {});
       if (keys[it.id]) throw new Error("Duplicate id " + it.id);
       keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : it.a, q: it.q, s, p };
       if (it.t === "mc" && new Set(it.o).size !== it.o.length) throw new Error("Repeated option in " + it.id);
@@ -40,7 +41,9 @@ for (const [p, P] of Object.entries(S.papers)) {
     });
   }
 }
-const data = { key: S.key, ls: S.ls, audio: S.audio, pass, papers };
+// games for students who finish early: practice only, so their answers can be public (the right option is the first in the source)
+const games = S.games ? { words: S.games.words, quiz: S.games.quiz.map(x => ({ q: x.q, o: sortO(x.o), a: x.o[0] })) } : null;
+const data = Object.assign({ key: S.key, ls: S.ls, audio: S.audio, pass, papers }, games ? { games } : {});
 fs.writeFileSync(out, "/* Web exam " + S.key + " (shared/js/el-web-exam.js): built by tools/web-exam/build.mjs from a source kept outside the repo.\n" +
   "   No answers here: the key is in cpKeys/" + S.key + " (teacher only). pass = a PBKDF2 hash of the re-entry password, never the password. */\n" +
   "window.EL_EXAM = " + JSON.stringify(data, null, 1) + ";\n");

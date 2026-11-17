@@ -19,9 +19,9 @@
 (function () {
   const X = window.EL_EXAM; if (!X) return;
   const FS = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-  const SECS = ['listening', 'reading', 'vocabulary', 'grammar'];
-  const ICON = { listening: '🎧', reading: '📖', vocabulary: '📚', grammar: '🧩', review: '✅' };
-  const NAME = { listening: ['Listening', 'Listening'], reading: ['Reading', 'Reading'], vocabulary: ['Vocabulari', 'Vocabulary'], grammar: ['Gramàtica', 'Grammar'], review: ['Revisa i entrega', 'Review and turn in'] };
+  const SECS = ['listening', 'reading', 'vocabulary', 'grammar', 'writing'];   // writing: free text, marked by the teacher
+  const ICON = { listening: '🎧', reading: '📖', vocabulary: '📚', grammar: '🧩', writing: '✍️', review: '✅' };
+  const NAME = { listening: ['Listening', 'Listening'], reading: ['Reading', 'Reading'], vocabulary: ['Vocabulari', 'Vocabulary'], grammar: ['Gramàtica', 'Grammar'], writing: ['Writing', 'Writing'], review: ['Revisa i entrega', 'Review and turn in'] };
   const GRACE = 2000, FS_GRACE = 300, SAVE_MS = 4000;
   const D = document, E = D.documentElement, $ = s => D.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -36,8 +36,9 @@
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   const paperOf = lvl => (lvl === 'safe' || lvl === 'daring' || lvl === 'native' ? 'core' : 'base');
   const P = () => X.papers[S.paper];
-  const items = s => P().sections[s];
+  const items = s => P().sections[s] || [];
   const byId = id => { for (const s of SECS) { const it = items(s).find(x => x.id === id); if (it) return it; } return null; };
+  const words = v => (String(v || '').trim().match(/[A-Za-zÀ-ÿ’'0-9-]+/g) || []).length;
   const answered = s => items(s).filter(it => String(S.answers[it.id] || '').trim()).length;
   const now = () => new Date().toISOString();
   const fsOk = () => !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
@@ -79,6 +80,9 @@
   .wx-opt.on{border-color:#1f6b52;background:#e2f3ea;font-weight:800}.wx-opt:disabled{cursor:default}
   .wx-in{margin-top:9px;width:100%;max-width:460px;padding:9px 11px;border:2px solid #d8e6df;border-radius:10px;font:inherit;box-sizing:border-box}
   .wx-in:focus{border-color:#1f6b52;outline:none}.wx-in:disabled{background:#f1f5f3}
+  .wx-ta{margin-top:9px;width:100%;padding:11px 13px;border:2px solid #d8e6df;border-radius:12px;font:inherit;line-height:1.6;box-sizing:border-box;resize:vertical}
+  .wx-ta:focus{border-color:#1f6b52;outline:none}.wx-ta:disabled{background:#f1f5f3}
+  .wx-frame{margin-top:9px;background:#f4f8f6;border:1px dashed #9cc3b2;border-radius:10px;padding:8px 12px;line-height:1.6}.wx-wc{margin-top:6px;font-size:.88rem;color:#4b5d56;font-weight:700}
   .wx-read{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
   .wx-text{position:sticky;top:64px;background:#fff;border:1px solid #d8e6df;border-radius:14px;padding:14px 16px;line-height:1.7;max-height:calc(100vh - 90px);overflow:auto;-webkit-user-select:none;user-select:none}
   .wx-text p{margin:0 0 12px}
@@ -167,7 +171,7 @@
   function intro() {
     const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pl + '-A'].sections[s].length, 0);
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · LS2 · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
-      '<p>' + t('Té 4 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b> i <b>🧩 Gramàtica</b>. ', 'It has 4 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b> and <b>🧩 Grammar</b>. ') + t(n + ' preguntes en total.', n + ' questions in total.') + '</p>' +
+      '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
       '<ul class="wx-rules"><li>' + t('El <b>Listening</b> es fa primer: el professor posa l’àudio dues vegades. Quan acabi, prem <b>Listening acabat</b>: després ja no pots canviar aquestes respostes.', '<b>Listening</b> comes first: your teacher plays the audio twice. When it ends, press <b>Listening finished</b>: after that you can’t change those answers.') + '</li>' +
       '<li>' + t('Després pots anar d’una part a l’altra i canviar les respostes tantes vegades com vulguis.', 'Then you can move between the parts and change your answers as often as you like.') + '</li>' +
       '<li>' + t('Al final, a <b>✅ Revisa i entrega</b>, veuràs totes les respostes i les que tens en blanc. Llavors prem <b>🏁 Entrega</b>.', 'At the end, in <b>✅ Review and turn in</b>, you see all your answers and any blanks. Then press <b>🏁 Turn in</b>.') + '</li></ul>' +
@@ -229,11 +233,16 @@
       return '<button class="wx-tab' + (S.sec === s ? ' on' : '') + '" data-sec="' + s + '"' + (dis ? ' disabled title="' + esc(t('Primer acaba el Listening', 'Finish the Listening first')) + '"' : '') + '>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + cnt + '</button>'; }).join('');
     tb.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => { if (b.disabled) return; S.sec = b.dataset.sec; keep(); draw(); });
   }
+  const wcText = (w, min) => '✍️ ' + w + ' ' + t('paraules', 'words') + (min && w < min ? ' · ' + t('mínim', 'at least') + ' ' + min : ' ✓');
   function qHtml(it, i, lockedSec) {
     const v = S.answers[it.id], blank = !String(v || '').trim();
     let body;
     if (it.t === 'mc') { const ord = (S.opts && S.opts[it.id]) || it.o.map((_, k) => k);
       body = '<div class="wx-opts">' + ord.map(k => { const o = it.o[k]; return '<button type="button" class="wx-opt' + (v === o ? ' on' : '') + '" data-q="' + it.id + '" data-v="' + esc(o) + '"' + (lockedSec ? ' disabled' : '') + ' aria-pressed="' + (v === o) + '">' + esc(o) + '</button>'; }).join('') + '</div>'; }
+    else if (it.t === 'write') { const w = words(v);
+      body = (it.frame ? '<div class="wx-frame"><b>' + t('Pauta', 'Frame') + ':</b> ' + esc(it.frame) + '</div>' : '') +
+        '<textarea class="wx-ta" data-q="' + it.id + '" maxlength="1500" rows="9" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('El teu text', 'Your text')) + '">' + esc(v || '') + '</textarea>' +
+        '<div class="wx-wc" data-wc="' + it.id + '" data-min="' + (it.min || 0) + '">' + wcText(w, it.min) + '</div>'; }
     else body = '<input class="wx-in" type="text" data-q="' + it.id + '" value="' + esc(v || '') + '" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('La teva resposta', 'Your answer')) + '">';
     return '<div class="wx-q' + (blank ? ' blank' : '') + '" id="q-' + it.id + '"><div class="wx-qt"><span class="wx-n">' + (i + 1) + '.</span>' + esc(it.q) + '</div>' + body + '</div>';
   }
@@ -245,7 +254,8 @@
     const lead = { listening: t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
       reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
       vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
-      grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.') }[s];
+      grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.'),
+      writing: t('Escriu el text a la casella. Fes frases completes i revisa-les abans d’entregar.', 'Write your text in the box. Use full sentences and check them before you turn in.') }[s];
     const qs = list.map((it, i) => qHtml(it, i, ro)).join('');
     let html = '<div class="wx-sec"><h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + '</h2><p class="wx-lead">' + lead + '</p>';
     if (s === 'listening' && mode === 'teacher' && X.audio) html += '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · ' + t('Només el veu el professor: posa-ho dues vegades al projector.', 'Only you see this: play it twice on the projector.') + '<br><audio controls preload="none" src="' + esc(X.audio.src) + '"></audio></div>';
@@ -260,6 +270,8 @@
       b.querySelectorAll('.wx-opt').forEach(x => x.onclick = () => { set(x.dataset.q, x.dataset.v); b.querySelectorAll('.wx-opt[data-q="' + x.dataset.q + '"]').forEach(y => { y.classList.toggle('on', y === x); y.setAttribute('aria-pressed', y === x); }); x.closest('.wx-q').classList.remove('blank'); });
       b.querySelectorAll('.wx-in').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 80)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim()); };
         x.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const all = [...b.querySelectorAll('.wx-in')], k = all.indexOf(x); if (all[k + 1]) all[k + 1].focus(); } }; });
+      b.querySelectorAll('.wx-ta').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 1500)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim());
+        const wc = b.querySelector('[data-wc="' + x.dataset.q + '"]'); if (wc) wc.textContent = wcText(words(x.value), +wc.dataset.min); }; });
     }
     const nx = $('#wxNext'); if (nx) nx.onclick = () => { S.sec = next; keep(); draw(); wrap.scrollTop = 0; };
     const ld = $('#wxLDone'); if (ld) ld.onclick = () => {
@@ -269,7 +281,7 @@
       $('#wxLYes').onclick = () => { S.listenDone = now(); S.sec = 'reading'; touch(); draw(); wrap.scrollTop = 0; save(); };
       setTimeout(() => { const y = $('#wxLYes'); if (y) y.disabled = false; }, 1500);
     };
-    if (scrollTo) { const q = D.getElementById('q-' + scrollTo); if (q) { q.scrollIntoView({ block: 'center' }); const f = q.querySelector('input'); if (f && !f.disabled) f.focus(); q.style.boxShadow = '0 0 0 3px #f59e0b'; setTimeout(() => { q.style.boxShadow = ''; }, 1800); } }
+    if (scrollTo) { const q = D.getElementById('q-' + scrollTo); if (q) { q.scrollIntoView({ block: 'center' }); const f = q.querySelector('input,textarea'); if (f && !f.disabled) f.focus(); q.style.boxShadow = '0 0 0 3px #f59e0b'; setTimeout(() => { q.style.boxShadow = ''; }, 1800); } }
   }
   function set(id, v) {
     if (S.status !== 'in' || mode === 'view') return;
@@ -288,7 +300,7 @@
     const blanks = SECS.reduce((x, s) => x + items(s).length - answered(s), 0);
     const rows = SECS.map(s => '<tr><th colspan="3">' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + (s === 'listening' && S.listenDone ? ' · 🔒' : '') + '</th></tr>' +
       S.order[s].map((id, i) => { const it = items(s).find(x => x.id === id), v = S.answers[id];
-        return '<tr class="' + (String(v || '').trim() ? '' : 'blank') + '"><td>' + (i + 1) + '</td><td>' + esc(it.q) + '</td><td>' + (String(v || '').trim() ? '<b>' + esc(v) + '</b>' : '<span style="color:#b45309;font-weight:800">' + t('en blanc', 'blank') + '</span>') +
+        return '<tr class="' + (String(v || '').trim() ? '' : 'blank') + '"><td>' + (i + 1) + '</td><td>' + (it.t === 'write' ? t('El teu text', 'Your text') : esc(it.q)) + '</td><td>' + (String(v || '').trim() ? (it.t === 'write' ? '<b>' + words(v) + ' ' + t('paraules', 'words') + '</b> · <span style="color:#4b5d56">' + esc(String(v).trim().slice(0, 90)) + (String(v).trim().length > 90 ? '…' : '') + '</span>' : '<b>' + esc(v) + '</b>') : '<span style="color:#b45309;font-weight:800">' + t('en blanc', 'blank') + '</span>') +
           (s === 'listening' && S.listenDone && mode !== 'teacher' ? '' : ' <button class="go" data-go="' + s + '|' + id + '">' + t('canvia', 'change') + '</button>') + '</td></tr>'; }).join('')).join('');
     b.innerHTML = '<div class="wx-sec wx-rev"><h2>✅ ' + NAME.review[ca ? 0 : 1] + '</h2><p class="wx-lead">' + t('Revisa totes les respostes. Prem <b>canvia</b> per anar a una pregunta.', 'Check all your answers. Press <b>change</b> to go to a question.') + '</p><div class="wx-sum">' + sum + '</div>' +
       '<table><tbody>' + rows + '</tbody></table>' +
@@ -312,9 +324,11 @@
     if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
   }
   function handedIn() {
-    root.innerHTML = '<div class="wx-card"><h2>✓ ' + t('Examen entregat', 'Exam turned in') + '</h2><p>' + t('Molt bé! Les teves respostes s’han enviat al professor.', 'Well done! Your answers have reached your teacher.') + ' ' + t('Veuràs la nota al teu tauler quan el professor la publiqui.', 'You will see your mark on your board when your teacher shares it.') + '</p>' + testerReset() + '</div>';
-    bindReset();
+    root.innerHTML = '<div class="wx-card"><h2>✓ ' + t('Examen entregat', 'Exam turned in') + '</h2><p>' + t('Molt bé! Les teves respostes s’han enviat al professor.', 'Well done! Your answers have reached your teacher.') + ' ' + t('Veuràs la nota al teu tauler quan el professor la publiqui.', 'You will see your mark on your board when your teacher shares it.') + '</p>' + testerReset() + '</div><div id="wxGames"></div>';
+    bindReset(); games();
   }
+  // 🎮 games while the others finish (el-exam-games.js; practice only, points kept in this browser)
+  function games() { const g = $('#wxGames'); if (g && X.games && window.ELExamGames) ELExamGames.mount(g, { words: X.games.words, quiz: X.games.quiz, ca, store: 'el_examgames_' + X.key + '_' + (me ? me.uid : 'preview') }); }
   function closedNow() {
     unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); S.status = 'done'; keep();
     root.innerHTML = '<div class="wx-card"><h2>🔒 ' + t('El professor ha tancat l’examen', 'Your teacher has closed the exam') + '</h2><p>' + t('S’han desat les respostes fins a ', 'Your answers were saved up to ') + esc((S.cloudAt || S.started || '').slice(11, 16)) + '.</p></div>';
@@ -361,7 +375,8 @@
     root.innerHTML = '<div class="wx-card"><h2>📝 Exam preview (teacher)</h2>' + (note ? '<p class="wx-done">' + esc(note) + '</p>' : '') +
       '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A or B from their account, with the questions and options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
       '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') + '</p>' +
-      '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button></p></div>';
+      '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button>' + (X.games ? ' <button class="wx-btn sec" id="wxTryGames">🎮 Try the games (after turning in)</button>' : '') + '</p></div><div id="wxGames"></div>';
+    const tg = $('#wxTryGames'); if (tg) tg.onclick = () => { tg.disabled = true; games(); $('#wxGames').scrollIntoView({ behavior: 'smooth' }); };
     root.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const paper = b.dataset.p;
       const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
