@@ -1242,7 +1242,7 @@ function qnOpen(){
     "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
   const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
   const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
-  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
+  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href&&!lockHere()?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
   w.querySelector(".qn-w").textContent="📍 "+where;
   document.body.append(w);QN.w=w;
   const st=s2=>{const x=QN.w&&QN.w.querySelector(".qn-st");if(x)x.textContent=s2};
@@ -1421,6 +1421,9 @@ document.addEventListener("click",e=>{if(!lockHere())return;
     const en=cmEn(LOCK);lockToast(en.length>1?(lockCa()?"🔒 Ara pots treballar a: ":"🔒 Now you can work on: ")+en.map(x=>x.n||x.p).join(", "):(lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
   const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;let u;try{u=new URL(a.href,location.href)}catch(x){return}
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
+  // 📓 in class mode: the notebook is another page, so it opens as a ✍ quick note over this one and is saved into the notebook
+  // (problem report, 2ESOB, 17 Nov 2026: "when we are listening to the teacher we can't take notes")
+  if(a.id==="el-nbfab"){e.preventDefault();e.stopImmediatePropagation();if(!qnOpen())lockToast();return}
   if(LOCK.cm&&u.origin===location.origin&&cmEn(LOCK).some(x=>new URL(x.u,ROOT).pathname===u.pathname))return;   // another step the teacher opened
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
