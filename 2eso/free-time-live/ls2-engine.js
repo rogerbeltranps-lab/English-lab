@@ -404,7 +404,7 @@ var LS2 = (function () {
     const st = document.createElement('style'); st.id = 'el-one-css';
     st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
-      '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}';
+      '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}';
     document.head.appendChild(st);
   }
   const oneBtn = (prefix, i) => '<button class="btn secondary el-one" type="button" data-one="' + prefix + '" data-i="' + i + '" title="' + (ca() ? 'Comprova només aquesta pregunta' : 'Check only this question') + '">✓ ' + (ca() ? 'Comprova' : 'Check') + '</button>';
@@ -522,7 +522,7 @@ var LS2 = (function () {
     $('#' + id + 'Check').onclick = () => { if (one) allIx(items).forEach(i => chk(id).add(i)); check(true, null); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true); };
     if (one) {
       const go = i => {
-        if (!(i >= 0 && i < items.length) || nbFrozen(id)) return;
+        if (!(i >= 0 && i < items.length) || (nbFrozen(id) && one.includes(i))) return;   // ➕ extra practice stays open in the notebook look
         const v = vals(items, prefix);
         if (!filledV(v[i])) return check(false, [i]);   // "Type an answer": nothing is marked or saved
         chk(id).add(i); check(true, [i]); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true);
@@ -553,8 +553,11 @@ var LS2 = (function () {
   // a notebook filled question by question (nb.c) is frozen only once every counted question is in it; until then the activity stays open
   const nbFrozen = id => { const nb = state.nb && state.nb[id], S = NBS[id];
     return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(nb && Array.isArray(nb.v)) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
+  /* ➕ Extra practice stays open (problem report, 4ESOB, 17 Nov 2026: "no puc fer les opcionals"): a frozen notebook freezes only the
+     counted questions, so the optional extras below them can still be typed and checked one by one. Marks never change (firsts: need only). */
   function nbLock(id, listId, on) {
-    const l = $('#' + listId); if (l) { l.inert = on; l.classList.toggle('el-nbink', on); }
+    const l = $('#' + listId), S = NBS[id], x = !!(on && l && S && S.one && l.querySelector(':scope>.question.gx'));
+    if (l) { l.inert = on && !x; l.classList.toggle('el-nbink', on); l.querySelectorAll(':scope>.question').forEach(q => { q.inert = x && !q.classList.contains('gx'); }); }
     const c = $('#' + id + 'Check'); if (c) c.style.display = on ? 'none' : '';
   }
   function nbShow(S) {
