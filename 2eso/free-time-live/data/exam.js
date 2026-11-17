@@ -419,9 +419,10 @@ window.EL_EXAM = {
      {
       "id": "bA-w01",
       "t": "write",
-      "q": "Estàs en un lloc de temps lliure (el parc, la platja, un partit, la pista de gel…) i escrius un post per al blog de la classe (40–60 paraules). Explica: on ets i amb qui, quin temps fa, què està fent la gent ara mateix (2 o 3 frases amb Present Continuous), què porteu posat i què fas normalment allà i amb quina freqüència (Present Simple + usually / every… / on Saturdays).",
+      "q": "You are at a free-time place (the park, the beach, a match, the ice rink…). Write a post for the class blog (40–60 words). Say: where you are and who with, the weather, what people are doing right now (2 or 3 sentences: is / are + -ing), what you are wearing, and what you usually do there and how often (usually / every… / on Saturdays).",
       "min": 40,
       "max": 70,
+      "ca": "Ets en un lloc de temps lliure (el parc, la platja, un partit, la pista de gel…). Escriu un post per al blog de la classe (40–60 paraules). Explica: on ets i amb qui, quin temps fa, què està fent la gent ara mateix (2 o 3 frases: is / are + -ing), què portes posat i què fas normalment allà i amb quina freqüència (usually / every… / on Saturdays).",
       "frame": "Today I’m at ___ with ___. It’s ___ (sunny / cold / windy…). Right now ___ is ___-ing and ___ are ___-ing. I’m wearing ___. I usually ___ on ___ / every ___."
      }
     ]
@@ -802,9 +803,10 @@ window.EL_EXAM = {
      {
       "id": "bB-w01",
       "t": "write",
-      "q": "Escriu un missatge a un amic o amiga (40–60 paraules) des d’una activitat de temps lliure (un partit, una classe de ball, el parc d’skate…). Explica: on ets, quin temps fa, què estan fent tu i els altres ara mateix (2 o 3 frases amb Present Continuous), què portes posat i què fas normalment el cap de setmana i amb quina freqüència (Present Simple).",
+      "q": "Write a message to a friend (40–60 words) from a free-time activity (a match, a dance class, the skate park…). Say: where you are, the weather, what you and the others are doing right now (2 or 3 sentences: am / is / are + -ing), what you are wearing, and what you usually do at the weekend and how often.",
       "min": 40,
       "max": 70,
+      "ca": "Escriu un missatge a un amic o amiga (40–60 paraules) des d’una activitat de temps lliure (un partit, una classe de ball, el parc d’skate…). Explica: on ets, quin temps fa, què esteu fent tu i els altres ara mateix (2 o 3 frases: am / is / are + -ing), què portes posat i què fas normalment el cap de setmana i amb quina freqüència.",
       "frame": "Hi ___! I’m at ___ now. It’s ___. My friends are ___-ing and I’m ___-ing. I’m wearing ___. At the weekend I usually ___. I ___ once / twice a week."
      }
     ]
@@ -1137,7 +1139,8 @@ window.EL_EXAM = {
       "t": "write",
       "q": "You are at a free-time place or event (a match, the ice rink, the beach, a concert…). Write a post for the class blog (60–80 words): where you are and who with, the weather, what people are doing right now (three or four Present Continuous sentences), what you are wearing or using, and what you usually do there and how often (Present Simple + adverbs or expressions of frequency).",
       "min": 60,
-      "max": 100
+      "max": 100,
+      "ca": "Ets en un lloc o esdeveniment de temps lliure (un partit, la pista de gel, la platja, un concert…). Escriu un post per al blog de la classe (60–80 paraules): on ets i amb qui, quin temps fa, què està fent la gent ara mateix (3 o 4 frases en Present Continuous), què portes posat o fas servir, i què fas normalment allà i amb quina freqüència (Present Simple + adverbis o expressions de freqüència)."
      }
     ]
    }
@@ -1469,7 +1472,8 @@ window.EL_EXAM = {
       "t": "write",
       "q": "Write a message to a friend (60–80 words) from a free-time activity (a match, a dance class, the skate park…): where you are, the weather, what you and the others are doing right now (three or four Present Continuous sentences), what you are wearing, and your usual free-time week (what you do and how often: Present Simple + adverbs or expressions of frequency).",
       "min": 60,
-      "max": 100
+      "max": 100,
+      "ca": "Escriu un missatge a un amic o amiga (60–80 paraules) des d’una activitat de temps lliure (un partit, una classe de ball, el parc d’skate…): on ets, quin temps fa, què esteu fent tu i els altres ara mateix (3 o 4 frases en Present Continuous), què portes posat, i com és la teva setmana de temps lliure (què fas i amb quina freqüència: Present Simple + adverbis o expressions de freqüència)."
      }
     ]
    }

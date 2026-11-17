@@ -13,7 +13,7 @@
      back is logged (changes), so the dashboard shows whether going out changed anything.
    - The answers save to students/{uid}/exams/{key} as they go (a few seconds after a change), so nothing is lost if a Chromebook dies.
      A student can start only while the teacher has opened the exam for the group (ls/{ls}.webExam[group].open, dashboard 📝 Exams).
-   - Text can't be copied or pasted (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
+   - Page text can't be copied, and nothing from outside can be pasted; students can copy and paste their own text inside their boxes (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
      saves them (dashboard → results/{ls}__assessment, as every exam).
    The teacher (and window.EL_EXAM_PREVIEW) sees a preview with every paper and the audio, and nothing is saved. */
 (function () {
@@ -82,7 +82,7 @@
   .wx-in:focus{border-color:#1f6b52;outline:none}.wx-in:disabled{background:#f1f5f3}
   .wx-ta{margin-top:9px;width:100%;padding:11px 13px;border:2px solid #d8e6df;border-radius:12px;font:inherit;line-height:1.6;box-sizing:border-box;resize:vertical}
   .wx-ta:focus{border-color:#1f6b52;outline:none}.wx-ta:disabled{background:#f1f5f3}
-  .wx-frame{margin-top:9px;background:#f4f8f6;border:1px dashed #9cc3b2;border-radius:10px;padding:8px 12px;line-height:1.6}.wx-wc{margin-top:6px;font-size:.88rem;color:#4b5d56;font-weight:700}
+  .wx-frame{margin-top:9px;background:#f4f8f6;border:1px dashed #9cc3b2;border-radius:10px;padding:8px 12px;line-height:1.6}.wx-ca{margin-top:6px;color:#4b5d56;font-size:.94rem;line-height:1.5;font-style:italic}.wx-wc{margin-top:6px;font-size:.88rem;color:#4b5d56;font-weight:700}
   .wx-read{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
   .wx-text{position:sticky;top:64px;background:#fff;border:1px solid #d8e6df;border-radius:14px;padding:14px 16px;line-height:1.7;max-height:calc(100vh - 90px);overflow:auto;-webkit-user-select:none;user-select:none}
   .wx-text p{margin:0 0 12px}
@@ -178,7 +178,7 @@
       '<div class="wx-warn"><b>⚠️ ' + t('Important', 'Important') + '</b><ul class="wx-rules">' +
       (fsOk() ? '<li><b>' + t('Es fa a pantalla completa.', 'It runs in full screen.') + '</b> ' + t('Si surts de la pantalla completa, <b>l’examen s’acaba</b> i queda bloquejat amb les respostes que tinguis. Només el professor el pot tornar a obrir.', 'If you leave full screen, <b>your exam is over</b> and locks with the answers you have. Only your teacher can open it again.') + '</li>' : '') +
       '<li>' + t('No canviïs de pestanya, de finestra ni d’aplicació, i no tanquis ni recarreguis la pàgina: també <b>acaba l’examen</b>.', 'Don’t change to another tab, window or app, and don’t close or reload the page: that also <b>ends your exam</b>.') + '</li>' +
-      '<li>' + t('No es pot copiar ni enganxar. Sense apunts, traductor, IA ni companys.', 'No copying or pasting. No notes, translator, AI or classmates.') + '</li>' +
+      '<li>' + t('No es pot copiar ni enganxar res de fora (només el teu propi text dins de les teves respostes). Sense apunts, traductor, IA ni companys.', 'You can’t copy or paste anything from outside (only your own text inside your answers). No notes, translator, AI or classmates.') + '</li>' +
       '<li>' + t('Les respostes es desen soles mentre treballes.', 'Your answers save by themselves as you work.') + '</li></ul></div>' +
       '<label style="display:flex;gap:8px;align-items:center;font-weight:700;margin:12px 0"><input type="checkbox" id="wxRead"> ' + t('He llegit les instruccions', 'I have read the rules') + '</label>' +
       '<button class="wx-btn" id="wxStart" disabled>' + t('Comença l’examen', 'Start the exam') + '</button></div>';
@@ -209,7 +209,12 @@
     wrap = D.createElement('div'); wrap.className = 'wx-run'; D.body.appendChild(wrap);
     wrap.innerHTML = '<div class="wx-top"><b class="wx-t">📝 ' + t('Examen', 'Exam') + ' LS2 · ' + (S.paper.startsWith('core') ? 'Core' : 'Base') + '</b><div class="wx-tabs" id="wxTabs"></div><span class="wx-saved" id="wxSaved"></span></div><div class="wx-body" id="wxBody"></div>';
     draw();
-    ['copy', 'cut', 'paste', 'drop', 'contextmenu', 'dragstart'].forEach(ev => on(wrap, ev, e => e.preventDefault()));
+    // nothing from the page can be copied, and nothing from outside pasted; inside their own answer boxes students can copy, cut and paste
+    // their OWN text (Roger, 17 Nov 2026, as on the rest of the site: el-nocopy.js lets a paste through only when it is text they copied
+    // from their boxes on this page). No right-click menu at all in the exam.
+    const box = e => !!(e.target && e.target.closest && e.target.closest('.wx-in,.wx-ta'));
+    ['copy', 'cut', 'paste', 'drop', 'dragstart'].forEach(ev => on(wrap, ev, e => { if (!box(e)) e.preventDefault(); }));
+    on(wrap, 'contextmenu', e => e.preventDefault());
     if (mode !== 'student' && mode !== 'teacher') return;
     if (mode === 'teacher') return;
     // Esc: a warning instead of leaving (Chrome locks it; holding it down still leaves full screen, and that stops the exam)
@@ -233,15 +238,15 @@
       return '<button class="wx-tab' + (S.sec === s ? ' on' : '') + '" data-sec="' + s + '"' + (dis ? ' disabled title="' + esc(t('Primer acaba el Listening', 'Finish the Listening first')) + '"' : '') + '>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + cnt + '</button>'; }).join('');
     tb.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => { if (b.disabled) return; S.sec = b.dataset.sec; keep(); draw(); });
   }
-  const wcText = (w, min) => '✍️ ' + w + ' ' + t('paraules', 'words') + (min && w < min ? ' · ' + t('mínim', 'at least') + ' ' + min : ' ✓');
+  const wcText = (w, min) => '✍️ ' + w + ' words' + (min && w < min ? ' · at least ' + min : ' ✓');   // the writing is in English for every level (Roger, 17 Nov 2026)
   function qHtml(it, i, lockedSec) {
     const v = S.answers[it.id], blank = !String(v || '').trim();
     let body;
     if (it.t === 'mc') { const ord = (S.opts && S.opts[it.id]) || it.o.map((_, k) => k);
       body = '<div class="wx-opts">' + ord.map(k => { const o = it.o[k]; return '<button type="button" class="wx-opt' + (v === o ? ' on' : '') + '" data-q="' + it.id + '" data-v="' + esc(o) + '"' + (lockedSec ? ' disabled' : '') + ' aria-pressed="' + (v === o) + '">' + esc(o) + '</button>'; }).join('') + '</div>'; }
     else if (it.t === 'write') { const w = words(v);
-      body = (it.frame ? '<div class="wx-frame"><b>' + t('Pauta', 'Frame') + ':</b> ' + esc(it.frame) + '</div>' : '') +
-        '<textarea class="wx-ta" data-q="' + it.id + '" maxlength="1500" rows="9" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('El teu text', 'Your text')) + '">' + esc(v || '') + '</textarea>' +
+      body = (it.ca ? '<div class="wx-ca"><b>Català:</b> ' + esc(it.ca) + '</div>' : '') + (it.frame ? '<div class="wx-frame"><b>Frame:</b> ' + esc(it.frame) + '</div>' : '') +
+        '<textarea class="wx-ta" data-q="' + it.id + '" maxlength="1500" rows="9" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="Your text">' + esc(v || '') + '</textarea>' +
         '<div class="wx-wc" data-wc="' + it.id + '" data-min="' + (it.min || 0) + '">' + wcText(w, it.min) + '</div>'; }
     else body = '<input class="wx-in" type="text" data-q="' + it.id + '" value="' + esc(v || '') + '" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('La teva resposta', 'Your answer')) + '">';
     return '<div class="wx-q' + (blank ? ' blank' : '') + '" id="q-' + it.id + '"><div class="wx-qt"><span class="wx-n">' + (i + 1) + '.</span>' + esc(it.q) + '</div>' + body + '</div>';
@@ -255,7 +260,7 @@
       reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
       vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
       grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.'),
-      writing: t('Escriu el text a la casella. Fes frases completes i revisa-les abans d’entregar.', 'Write your text in the box. Use full sentences and check them before you turn in.') }[s];
+      writing: 'Write your text in the box. Use full sentences and check them before you turn in.' }[s];
     const qs = list.map((it, i) => qHtml(it, i, ro)).join('');
     let html = '<div class="wx-sec"><h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + '</h2><p class="wx-lead">' + lead + '</p>';
     if (s === 'listening' && mode === 'teacher' && X.audio) html += '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · ' + t('Només el veu el professor: posa-ho dues vegades al projector.', 'Only you see this: play it twice on the projector.') + '<br><audio controls preload="none" src="' + esc(X.audio.src) + '"></audio></div>';

@@ -32,7 +32,7 @@ for (const [p, P] of Object.entries(S.papers)) {
   papers[p] = { text: P.text, sections: {} };
   for (const s of SECTIONS) {
     papers[p].sections[s] = (P[s] || []).map(it => {
-      if (it.t === "write") return Object.assign({ id: it.id, t: "write", q: it.q, min: it.min, max: it.max }, it.frame ? { frame: it.frame } : {});
+      if (it.t === "write") return Object.assign({ id: it.id, t: "write", q: it.q, min: it.min, max: it.max }, it.ca ? { ca: it.ca } : {}, it.frame ? { frame: it.frame } : {});
       if (keys[it.id]) throw new Error("Duplicate id " + it.id);
       keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : it.a, q: it.q, s, p };
       if (it.t === "mc" && new Set(it.o).size !== it.o.length) throw new Error("Repeated option in " + it.id);
