@@ -1812,7 +1812,11 @@ onAuthStateChanged(auth,async u=>{
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
   // another student, and this student's own work comes back from the cloud (pull).
-  if(u&&learner(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
+  // ✦ The teacher in Towards Nativeness (tnMe) is never wiped: this browser is theirs, and its course keys are their own answers, maybe made
+  // before the page saved them (Roger's report, 17 Nov 2026: "I don't see the activity I just did", an activity done on the cached old page
+  // was wiped on the first load of the new one). They are still marked unsaved (el_dirty), so the pull keeps them and the gate sends them;
+  // snapshot() sends only the course's own keys, never what teacher mode left here.
+  if(u&&learner(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(!tnMe(u))wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
