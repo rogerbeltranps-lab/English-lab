@@ -547,7 +547,7 @@ function gardenHtml(ls,info){
     const ds=doneSet(a),gs=tabGroups(a,visSteps(a,info).filter(k=>!(a.skip||[]).includes(k))),r=order.length?L.lps.find(x=>x.id===a.id):null,n=r&&r.n||"";
     return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional?"bonus":"lp",
       plants:gs.map(g=>{const id=panelOf(a,g[0]),k=g.filter(x=>ds.has(x)).length;
-        return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
+        return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),later:g.every(x=>secOff(a,info,x)),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
   if(!beds.length)return "";
   return elGarden({ls:window.elLsNum?elLsNum(ls):"",beds,store:"el_garden_"+(AS||(U&&U.uid)||"me")+"_"+ls.id,save:!AS},{en:EN})}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
