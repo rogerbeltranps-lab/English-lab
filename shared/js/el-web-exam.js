@@ -434,6 +434,10 @@
       t('L’examen s’ha aturat i les respostes que tenies s’han desat.', 'Your exam has stopped and the answers you had are saved.') + '</p><p><b>' + t('Aixeca la mà: només el professor pot deixar-te tornar a l’examen.', 'Put your hand up: only your teacher can let you go back to the exam.') + '</b></p>' +
       '<p style="margin-top:18px"><input type="password" id="wxPw" autocomplete="off" placeholder="' + esc(t('Contrasenya del professor', 'Teacher’s password')) + '"> <button class="wx-btn" id="wxPwGo">🔓 ' + t('Torna a l’examen', 'Back to the exam') + '</button></p><p class="err" id="wxPwErr"></p></div>';
     D.body.appendChild(L);
+    // when they are back on this page (still locked) the time is logged too, so the teacher sees how long they were really away
+    // and how long they then waited for the password (Roger, 17 Nov 2026: "I want to know the time he's been out")
+    const seen = () => { const l = S.exits[S.exits.length - 1]; if (!l || l.ret || l.back || D.hidden || !D.hasFocus()) return; l.ret = now(); keep(); save(); };
+    on(window, 'focus', seen); on(D, 'visibilitychange', seen); setTimeout(seen, 800);
     const go = async () => { const inp = $('#wxPw'), err = $('#wxPwErr'), btn = $('#wxPwGo'); if (btn.disabled) return;
       if ((S.wait || 0) > Date.now()) { err.textContent = t('Espera uns segons…', 'Wait a few seconds…'); return; }
       btn.disabled = true; err.textContent = '';
