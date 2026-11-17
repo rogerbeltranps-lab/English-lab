@@ -105,7 +105,7 @@
 .gd-drop{animation:gdbob 1.4s ease-in-out infinite}.gdb a.gd-th{animation:gdsag 3s ease-in-out infinite}
 @keyframes gdsag{50%{transform:rotate(-4deg)}}
 .gd-fresh{animation:gdgrow .9s cubic-bezier(.3,1.6,.5,1) both}.gd-fresh::before{content:"";position:absolute;left:50%;top:0;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:radial-gradient(#fde04788,transparent 70%);animation:gdglow 2.4s ease-out both;pointer-events:none}
-.gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
+.gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly+.gd-bfly{right:auto;left:34px}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
 .gd-bob{display:block;animation:gdbob2 1.1s ease-in-out infinite alternate}.gd-bfly svg{width:24px;height:19px;display:block}
 .gd-w{transform-origin:10px 8px;animation:gdflap .22s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
 .gdn-key{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;padding:6px 16px 9px;font-size:12.5px;color:#365314;background:#f7fee7cc;border-top:1px solid #d9f99d}
@@ -136,13 +136,15 @@
     const ST={bloom:t("fet ✓","done ✓"),bud:t("començat: acaba'l perquè floreixi","started: finish it to make it bloom"),sprout:t("encara per fer","not done yet"),
       thirsty:t("💧 té set: ja ho vam fer a classe, acaba-ho per regar-la","💧 thirsty: we did it in class, finish it to water it")};
     const KN={vocab:t("Vocabulari","Vocabulary"),grammar:t("Gramàtica","Grammar"),read:"Reading",listen:"Listening",speak:"Speaking",write:"Writing",recall:"Recall",fp:t("Producte final","Final product"),bonus:t("Opcional","Optional"),other:""};
-    let bi=0;
+    // 🦋 a butterfly for every 5 flowers in a bed (at most 2) and always one on a finished bed (Roger, 17 Nov 2026: "I don't see the
+    // butterflies": only finished beds had one, so most students had none yet)
+    let bi=0;const nBf=(b,done)=>{const f=b.plants.filter(p=>p.st==="bloom").length;return Math.min(2,Math.max(done&&b.plants.length>1?1:0,Math.floor(f/5)))};
     const beds=G.beds.map(b=>{const done=b.plants.every(p=>p.st==="bloom"),head=`${b.label?b.label+" · ":""}${b.title}`;
       if(b.kind==="cp"){const p=b.plants[0],st=b.plants.every(x=>x.st==="bloom")?"bloom":b.plants.some(x=>x.st==="thirsty")?"thirsty":b.plants.some(x=>x.st!=="sprout")?"bud":"sprout";
         return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
         return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
-      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${done&&b.plants.length>1?BFLY(BCOL[bi%BCOL.length],bi++):""}</div>`}).join("");
+      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
     const full=all.length>0&&n.bloom===all.length,nf=fresh.size;
     const head=full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
       :n.thirsty?(n.thirsty===1?t("1 planta té set: acaba l'activitat per regar-la","1 plant is thirsty: finish it to water it"):t(`${n.thirsty} plantes tenen set: acaba-les per regar-les`,`${n.thirsty} plants are thirsty: finish them to water them`))
@@ -150,7 +152,7 @@
       :t("Acaba la teva primera activitat i hi sortirà la primera flor","Finish your first activity and your first flower will bloom");
     const key=[["vocab",t("Vocabulari","Vocabulary")],["grammar",t("Gramàtica","Grammar")],["read","Reading"],["listen","Listening"],["speak","Speaking"],["write","Writing"],["recall","Recall"]]
       .map(([k,l])=>`<span>${plantSvg(k,"bloom")}${l}</span>`).join("")
-      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span>`;
+      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span><span>🦋 ${t("cada 5 flors d'un bancal","every 5 flowers in a bed")}</span>`;
     return `<section class="gdn" id="garden" aria-label="${t("El meu jardí","My garden")}"><div class="gdn-h">${SUN}<div class="gdn-t"><span class="gdn-k">🌱 ${t("El meu jardí","My garden")}${G.ls?" · "+esc(G.ls):""}</span><b class="${n.thirsty&&!full?"thirst":""}">${head}</b></div>`
       +`<div class="gdn-st">${nf?`<span class="new">🎉 +${nf} ${nf===1?t("flor nova","new flower"):t("flors noves","new flowers")}</span>`:""}<span title="${t("Activitats fetes","Activities done")}">🌼 ${n.bloom} ${n.bloom===1?t("flor","flower"):t("flors","flowers")}</span>`
       +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">💧 ${n.thirsty} ${t("amb set","thirsty")}</span>`:"")
