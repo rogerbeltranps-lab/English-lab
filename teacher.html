@@ -244,6 +244,8 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 window.TN_LS=(window.EL_LS||[]).filter(l=>l.personal);window.TN_CAT=(window.EL_CATALOG||[]).filter(a=>TN_LS.some(l=>l.id===a.ls));
 window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window.EL_CATALOG||[]).filter(a=>!TN_CAT.includes(a));</script>
 <script src="shared/js/el-route-names.js" defer></script>
+<script src="shared/js/el-garden.js" defer></script>
+<script src="4eso/towards-nativeness/tn-garden.js" defer></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
@@ -2274,9 +2276,11 @@ function lssPage(){
 let TND=null;
 function tnLoad(){if(TND)return;TND={busy:true,lp:{}};const keep=window.LP,base="4eso/towards-nativeness/",
     js=src=>new Promise(r=>{const s=document.createElement("script");s.src=src;s.onload=()=>r(true);s.onerror=()=>r(false);document.head.append(s)});
-  (async()=>{await js(base+"data/shadow.js");
-    for(const a of (window.TN_CAT||[])){window.LP=null;await js(base+"data/"+a.path.split("/").pop().replace(/\.html$/,".js"));if(window.LP&&window.LP.key)TND.lp[window.LP.key]=window.LP}
-    window.LP=keep;TND.busy=false;if(S.g==="tn")render()})()}
+  (async()=>{if(window.TNGarden)TND.lp=await TNGarden.load(base);   // the course's own loader (4eso/towards-nativeness/tn-garden.js)
+    else{await js(base+"data/shadow.js");
+      for(const a of (window.TN_CAT||[])){window.LP=null;await js(base+"data/"+a.path.split("/").pop().replace(/\.html$/,".js"));if(window.LP&&window.LP.key)TND.lp[window.LP.key]=window.LP}
+      window.LP=keep}
+    TND.busy=false;if(S.g==="tn")render()})()}
 const TN_CATS=[["📍","Prepositions"],["🅰️","Articles"],["🔀","Word order"],["⏳","Tenses and verb forms"],["🧩","Word choice and idiom"]];
 const TN_PREP=new Set("in on at to for of from with by about into onto over under through during since until till per off out up down across along among between within without".split(" "));
 function tnKind(f){const w=s=>String(s||"").toLowerCase().replace(/[’']/g,"'").match(/[a-z']+/g)||[],a=w(f.said),b=w(f.natural),why=String(f.why||"").toLowerCase(),
@@ -2335,6 +2339,8 @@ function tnPage(){tnLoad();
   return head+`<p><a class="lsgo" href="${esc(L.course+"/"+L.id.slice(L.course.length+1)+"/index.html")}" target="_blank" rel="noopener">Open the course ↗</a></p>`
     +`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 16px">${tile(DN+"/"+TOT,"steps done",plural(rows.filter(r=>r.dn).length,"learning path")+" started")+tile(FT==null?"–":FT+" %","right first time","in the exercises with a score")
       +tile(fixes.length,"slips corrected",`${sp} speaking · ${wr} writing`)+tile(learn.length,"sentences to learn","from ✨ Make it idiomatic")+tile(day(last),"last time","you worked on it")}</div>`
+    // 🌱 your garden (Roger, 17 Nov 2026: "I want to have a garden too"): the same one as on the course home, from the account above
+    +(window.TNGarden?TNGarden.html(TND.lp,k=>(rows.find(r=>r.k===k)||{}).o||{},"4eso/towards-nativeness/",null):"")
     +lpTable+kindBox+lastBox+learnBox+fluBox+stBox;
 }
 /* ---- 📊 Class results (Roger, 13 Nov 2026: "I need to see the statistic right away but also somewhere else to assess my performance"):

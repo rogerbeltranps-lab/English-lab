@@ -64,6 +64,8 @@
           </section>
         </div>
       </div>
+      <!-- 🌱 My garden (Roger, 17 Nov 2026: "I want to have a garden too"): tn-garden.js -->
+      <div id="tnGarden"></div>
     </section>
 
     <div data-ls-lists hidden>
@@ -141,6 +143,14 @@
 <script src="../../shared/js/el-exam.js"></script>
 <script src="../../shared/js/el-notebook.js"></script>
 <script src="../../shared/js/el-notes.js"></script>
+<script src="../../shared/js/el-sound.js"></script>
+<script src="../../shared/js/el-garden.js"></script>
+<script src="tn-garden.js"></script>
+<script>/* 🌱 the garden of this browser's progress (el-cloud.js brings the saved progress in and reloads the page) */
+(function(){const box=document.getElementById("tnGarden");if(!box||!window.TNGarden)return;
+  const get=k=>{try{return JSON.parse(localStorage.getItem(k)||"{}")}catch(e){return {}}};let lps=null;
+  const draw=()=>{if(lps)box.innerHTML=TNGarden.html(lps,get,"","el_garden_tn")};
+  TNGarden.load("").then(l=>{lps=l;draw()});addEventListener("pageshow",e=>{if(e.persisted)draw()})})();</script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>
