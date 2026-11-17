@@ -389,7 +389,10 @@
     const B = document.body, was = B.classList.contains("elslpfs");
     if (on === undefined) on = was;
     if (on && !was) {
-      if (!fsDoc()) { const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
+      // not on an iPad (Roger, 17 Nov 2026): Safari there leaves a page's full screen on any downward swipe, and this view with it;
+      // the view alone already hides the menu, the top bar and the left column, and a swipe never closes it
+      const ios = /iP(ad|hone|od)/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+      if (!fsDoc() && !ios) { const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
         try { const r = rq && rq.call(E); fsMine = !!rq; if (r && r.catch) r.catch(() => { fsMine = false; }); } catch (e) { fsMine = false; } }
     }
     if (!on && was) {
