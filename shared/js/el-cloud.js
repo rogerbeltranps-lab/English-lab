@@ -97,6 +97,11 @@ const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
 // Kept in this browser only (el_view), so it needs no rules change; "" = tester view, everything open.
 const viewGroup=u=>{if(!isTester(u))return null;const g=localStorage.getItem("el_view");return (window.EL_GROUPS||[]).some(x=>x.id===g)?g:null};
 const seesAll=u=>isTester(u)&&!viewGroup(u);
+// ✦ A personal LS (Towards Nativeness, el-catalog.js personal:true) is the teacher's own course (Roger, 17 Nov 2026: "My teacher account
+// too"): there the teacher's account works as a learner that sees everything, like a tester (saves, pulls, its own notebook), not in teacher mode.
+const tnLs=()=>!!lsId&&!!((window.EL_LS||[]).find(l=>l.id===lsId)||{}).personal;
+const tnMe=u=>isTeacher(u)&&!AS&&tnLs();
+const learner=u=>isStudent(u)||tnMe(u);
 // In a group's view the tester can also pick a level (Roger, 1 Nov 2026: "see how each level sees it"): el_view_level, this browser only.
 // "" = the route saved on the tester's own account. It replaces the route everywhere through window.EL_VIEW_LEVEL (elRouteOf, el-catalog.js).
 const viewLevel=u=>{const g=viewGroup(u);if(!g)return null;const l=localStorage.getItem("el_view_level"),c=((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
@@ -129,7 +134,10 @@ let actId=m?m[1]+"/"+relPath.split("/").pop().replace(".html",""):null;
 const resKey=a=>a.replace("/","__");
 
 // Keys of learning paths locked for the student's group are never sent (firestore.rules refuses them; the cloud copy stays as it is).
-const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k)&&!lockedKeys.includes(k))o[k]=localStorage.getItem(k)}return o};
+// ✦ the teacher as a learner (tnMe): only this LS's own keys, never what teacher mode left in this browser
+// (its activities' keys, their …Level, and tnProducts: every Towards Nativeness key starts with "tn")
+const tnKey=k=>/^tn[A-Z]/.test(k)||(window.EL_CATALOG||[]).some(a=>a.ls===lsId&&(a.keys||[]).some(x=>k.startsWith(x)));
+const snapshot=()=>{const o={},only=user&&tnMe(user);for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k)&&!lockedKeys.includes(k)&&(!only||tnKey(k)))o[k]=localStorage.getItem(k)}return o};
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 
 // "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
@@ -177,7 +185,7 @@ function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESU
 // Nothing is sent before this page has pulled the student's progress: a save made while signing in (a slow connection) would
 // otherwise send this browser's older copy over the answers saved from another device.
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||noSync||!pulled)return;
+  if(!user||!learner(user)||syncing||frozen||!lsId||noSync||!pulled)return;
   clearTimeout(timer);
   timer=setTimeout(send,1500);
 }
@@ -328,11 +336,11 @@ async function gate(u){
   if(!u&&!AS){signInBlock();return}   // signed out: the Sign in screen at once (it came after reading the LS, the same way)
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
+  if(isTeacher(u)&&!AS&&!tnMe(u)){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
-  else if(!u||!isStudent(u)){signInBlock();return}
-  const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
-  if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
+  else if(!u||!learner(u)){signInBlock();return}
+  const tester=!AS&&(seesAll(u)||tnMe(u)),vg=!AS&&viewGroup(u);
+  if(tester&&!tnMe(u))banner("Test account: you see every LS and activity.","#7c3aed");
   if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
   // The student's level: one per course, the same in every LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
@@ -1804,7 +1812,7 @@ onAuthStateChanged(auth,async u=>{
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
   // another student, and this student's own work comes back from the cloud (pull).
-  if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
+  if(u&&learner(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}

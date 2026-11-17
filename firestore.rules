@@ -285,7 +285,8 @@ service cloud.firestore {
       match /progress/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create, update: if signedIn() && request.auth.uid == uid
-          && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester());
+          && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester() || isTeacher());
+        // isTeacher: the teacher's OWN progress (uid is theirs), for the personal LS they do as a learner (✦ Towards Nativeness, Roger 17 Nov 2026)
       }
       // route (level): only the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark; 30 Oct 2026: students never choose one).
       // A student can only ask for another route from their board: request (any route but Pro), an optional reason and requestedAt.
