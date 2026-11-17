@@ -157,8 +157,11 @@
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
         return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
       return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
-    const full=all.length>0&&n.bloom===all.length,nf=fresh.size;
+    // 🐦 everything done = every activity the student can do now is done (Roger, 17 Nov 2026: "make sure birds show up when everything is
+    // done"): the optional sample exam and tabs kept for a later class (🏫 read-only, p.later) never hold the birds back
+    const must=all.filter(p=>p.bed.kind!=="bonus"),full=must.length>0&&must.every(p=>p.st==="bloom"),allDone=must.length>0&&must.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty"),nf=fresh.size;
     const head=full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
+      :allDone?t("Ho has fet tot, de moment! 🐦 La resta creixerà quan ho fem a classe","You've done everything for now! 🐦 The rest will grow when we do it in class")
       :n.thirsty?(n.thirsty===1?t("1 planta té set: acaba l'activitat per regar-la","1 plant is thirsty: finish it to water it"):t(`${n.thirsty} plantes tenen set: acaba-les per regar-les`,`${n.thirsty} plants are thirsty: finish them to water them`))
       :n.bloom?t("El teu jardí creix: cada activitat que acabes fa néixer una flor","Your garden is growing: every activity you finish makes a flower bloom")
       :t("Acaba la teva primera activitat i hi sortirà la primera flor","Finish your first activity and your first flower will bloom");
@@ -169,5 +172,5 @@
       +`<div class="gdn-st">${nf?`<span class="new">🎉 +${nf} ${nf===1?t("flor nova","new flower"):t("flors noves","new flowers")}</span>`:""}<span title="${t("Activitats fetes","Activities done")}">🌼 ${n.bloom} ${n.bloom===1?t("flor","flower"):t("flors","flowers")}</span>`
       +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">💧 ${n.thirsty} ${t("amb set","thirsty")}</span>`:"")
       +(n.bud+n.sprout?`<span title="${t("Activitats obertes per fer o començades","Open activities not finished yet")}">🌱 ${n.bud+n.sprout} ${t("creixent","growing")}</span>`:"")+`</div></div>`
-      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div>${FREE.map(([x,y],i)=>`<span class="gd-free" style="left:${x}%;top:${y}px">${BFLY(BCOL[(i+2)%BCOL.length],bi++)}</span>`).join("")}</div>${full?BIRDS:""}<div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
+      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div>${FREE.map(([x,y],i)=>`<span class="gd-free" style="left:${x}%;top:${y}px">${BFLY(BCOL[(i+2)%BCOL.length],bi++)}</span>`).join("")}</div>${allDone?BIRDS:""}<div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
 })();
