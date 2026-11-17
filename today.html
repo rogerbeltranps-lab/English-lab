@@ -287,6 +287,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-sound.js"></script>
+<script src="shared/js/el-garden.js"></script>
 <script type="module">
 // Student board: the same grid the teacher sees, for this student only (one row).
 // Language (Roger, 25 Oct 2026): Catalan for Insecure, English for Safe and Daring, by the student's route in the LS on screen
@@ -529,8 +530,25 @@ function homeHtml(lss,ls,info){
   // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
   // estigui on està el requadre blau")
   const gc=gamesCard(ls);
-  if(/class="hal games nbk"/.test(gc))return `<div class="hgrid nbswap"><div class="hl">${alerts}${gc}</div><div class="hr">${cont}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx);
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gc}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
+  // 🌱 My garden right under them, before the current LS (Roger, 17 Nov 2026): gardenHtml
+  if(/class="hal games nbk"/.test(gc))return `<div class="hgrid nbswap"><div class="hl">${alerts}${gc}</div><div class="hr">${cont}<div class="tiles">${tiles}</div></div></div>`+gardenHtml(ls,info)+lsNowHtml(ls,info,nx);
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gc}<div class="tiles">${tiles}</div></div></div>`+gardenHtml(ls,info)+lsNowHtml(ls,info,nx)}
+// 🌱 My garden (Roger, 17 Nov 2026: "Gardens to have all the tasks done (not always homework)"; shared/js/el-garden.js): every tab of the
+// current LS is a plant, in a bed per open learning path (a tree per recall checkpoint, pumpkins for the final product). Bloom = the tab
+// is done, bud = started, sprout = not started, thirsty 💧 = on ✅ To do (done in class, not finished: the same tabs as the To do count).
+// Only open paths and the tabs the student can see (visSteps), never locked ones; LS1 has none. No new reads: what the board already has.
+function gardenHtml(ls,info){
+  if(!window.elGarden||!ls||only(ls.id)||all()||!D.me.group||(window.elLsNum&&elLsNum(ls)==="LS1"))return "";
+  const {p,gi}=planOf(ls),dr=(gi>=0&&p&&(p._dropped||{})[gi])||[],L=lshGet(ls),fp=hasFp(ls)?fpAct(ls).id:null;
+  const thirsty=new Set();todoItems([ls]).forEach(x=>{if(!x.tabs.length)thirsty.add(x.a.id+"#*");x.tabs.forEach(([id])=>thirsty.add(x.a.id+"#"+id))});
+  const order=L&&L.lps?L.lps.map(r=>r.id):[],at=id=>{const i=order.indexOf(id);return i<0?999:i};
+  const beds=EL_CATALOG.filter(a=>a.ls===ls.id&&!dr.includes(a.id)&&canDo(a,info)).sort((x,y)=>at(x.id)-at(y.id)).map(a=>{
+    const ds=doneSet(a),gs=tabGroups(a,visSteps(a,info).filter(k=>!(a.skip||[]).includes(k))),r=order.length?L.lps.find(x=>x.id===a.id):null,n=r&&r.n||"";
+    return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional?"bonus":"lp",
+      plants:gs.map(g=>{const id=panelOf(a,g[0]),k=g.filter(x=>ds.has(x)).length;
+        return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
+  if(!beds.length)return "";
+  return elGarden({ls:window.elLsNum?elLsNum(ls):"",beds,store:"el_garden_"+(AS||(U&&U.uid)||"me")+"_"+ls.id,save:!AS},{en:EN})}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
