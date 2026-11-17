@@ -1064,53 +1064,77 @@ var LS2 = (function () {
     state.steps[p.id] = { level, title: tx(p.title), w: p.type === 'writing' ? 1 : undefined, ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
     complete(p.id); save();
   }
-  /* ⚡ Instant writing correction (Towards Nativeness, Roger 17 Nov 2026: "I only want my stuff corrected straight away"; the Wednesday
-     run leaves tester accounts out, so Roger's writing would never be corrected): right after the hand-in, the text goes to the school
-     script (v31, action coach_write, only Roger's accounts) and Roig answers at once: the slips {said, natural, why}, the text corrected,
-     one thing done well and a short new task built from the mistakes, which Roger writes right here and gets corrected the same way.
-     state.coach[id] = {fix, corrected, well, next: {task, use}, nextText, r2: {fix, corrected, well}, err}. */
+  /* ✍️ Claude corrects Roger's writing (Roger, 17 Nov 2026: "I only want Gemini, Roig, to correct my speakings, the text I want … corrected by
+     you"; before, Roig corrected it at once through the school script's coach_write, now gone). The hand-in, or the short new task, is
+     marked state.coach[id] = {sent, task} (or c.nextSent) and asks the school script (action tn_mark, only Roger's accounts) to start the
+     scheduled task "English Lab: mark and correct", which reads it with tools/marking/marks.mjs tn-ready and saves Claude's correction in
+     results/{activity}.tnCoach[id] (and [id + "_2"] for the new task): {fix: [{said, natural, why}], corrected, well, next: {task, use}, at}.
+     The page polls ELCloud.results while it waits (every 45 s, 25 minutes at most; ↻ Check now any time). Only what is really off or
+     sounds non-native is corrected (Roger, 17 Nov 2026). Same table, corrected text, well done and new task as before. */
   const COACH_RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';   // the school script (as el-mic.js)
-  async function coachWrite(text, task) {
+  const actId = () => { const a = (window.EL_CATALOG || []).find(x => (x.keys || [])[0] === LP.key); return a ? a.id : null; };
+  async function askClaude() {
     const C = window.ELCloud, u = C && C.auth && C.auth.currentUser;
     if (!u) return { ok: false, error: 'Sign in first.' };
-    try { const r = await fetch(COACH_RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify({ idToken: await u.getIdToken(), action: 'coach_write', text, task: String(task || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1500) }) });
+    try { const r = await fetch(COACH_RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify({ idToken: await u.getIdToken(), action: 'tn_mark', at: new Date().toISOString() }) });
       return await r.json(); } catch (e) { return { ok: false, error: 'No connection. Try again.' }; }
+  }
+  async function claudeAnswer(id) {
+    const C = window.ELCloud, a = actId(); if (!C || !C.results || !a) return null;
+    try { const r = (await C.results(true))[a.replace('/', '__')] || {}; return (r.tnCoach || {})[id] || null; } catch (e) { return null; }
   }
   const fixTable = fix => fix && fix.length ? '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.95rem"><thead><tr><th style="text-align:left;padding:6px">You wrote</th><th style="text-align:left;padding:6px">A native speaker writes</th></tr></thead><tbody>' +
     fix.map(f => '<tr style="border-top:1px solid var(--line,#e2e8f0)"><td style="padding:6px;vertical-align:top"><s>' + esc(f.said) + '</s></td><td style="padding:6px;vertical-align:top"><strong>' + esc(f.natural) + '</strong>' + (f.why ? '<br><span class="tiny">' + esc(f.why) + '</span>' : '') + '</td></tr>').join('') + '</tbody></table></div>'
-    : '<p>No grammar or idiom slips. 🎉</p>';
+    : '<p>Nothing sounds off: a native speaker could have written this. 🎉</p>';
+  const waitCard = (id, c, sent) => '<p class="instruction">✍️ Sent to Claude ' + new Date(sent).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '. The correction appears here in a few minutes.</p>' +
+    (c.err ? '<p class="feedback no">' + esc(c.err) + '</p>' : '') + '<div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + id + 'Check">↻ Check now</button>' +
+    (c.err ? ' <button class="btn" type="button" id="' + id + 'Again">Ask again</button>' : '') + '</div>';
+  const polls = {};
+  // the school script starts the task at most once every 10 minutes ({ok, already: when the last one started}): say when to ask again
+  const hm = t => new Date(t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const asked = (c, r) => { c.err = !r || !r.ok ? (r && r.error) || 'Could not reach Claude. Try again.'
+    : r.already ? 'Claude started correcting at ' + hm(r.already) + ' and may pick this up too. If it doesn’t arrive, tap Ask again after ' + hm(Date.parse(r.already) + 10 * 60e3) + '.' : null; };
   function coachBox(p, getText) {
     let box = $('#' + p.id + 'Instant'); if (!box) { box = document.createElement('div'); box.id = p.id + 'Instant'; const host = $('#' + p.id); if (host) host.append(box); }
-    state.coach = state.coach || {}; const c = state.coach[p.id];
+    state.coach = state.coach || {};
     const handed = !!(state.steps || {})[p.id];
     if (!handed) { box.innerHTML = ''; return; }
-    if (!c || (!c.fix && c.err)) {
-      box.innerHTML = '<div class="section-card" style="border-left:5px solid var(--accent,#7c3aed)"><h3>⚡ Roig’s instant correction</h3><p class="instruction">' + (c && c.err ? esc(c.err) : 'Not corrected yet.') + '</p><div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + p.id + 'Coach">⚡ Correct it now</button></div></div>';
-      $('#' + p.id + 'Coach').onclick = async () => { const b = $('#' + p.id + 'Coach'); b.disabled = true; b.textContent = 'Roig is reading…';
-        const r = await coachWrite(getText(), byLevel(p.task));
-        state.coach[p.id] = r && r.ok ? { fix: r.fixes || [], corrected: r.corrected || '', well: r.well_done || '', next: r.next || null } : { err: (r && r.error) || 'Something went wrong. Try again.' };
-        save(); coachBox(p, getText); };
-      return;
-    }
+    let c = state.coach[p.id];
+    if (!c || !c.sent && !c.fix) { c = state.coach[p.id] = { sent: new Date().toISOString(), task: String(byLevel(p.task) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1500) }; save(); askClaude().then(r => { asked(c, r); if (c.err) { save(); coachBox(p, getText); } }); }
+    const redraw = () => coachBox(p, getText);
+    // waiting for Claude: poll the saved correction, then keep it in the page's state
+    const want = !c.fix ? p.id : c.nextSent && !c.r2 ? p.id + '_2' : null;
+    if (want && !polls[want]) { const t0 = Date.now(); polls[want] = setInterval(async () => { const r = await claudeAnswer(want);
+      if (r || Date.now() - t0 > 25 * 60e3) { clearInterval(polls[want]); delete polls[want]; }
+      if (r) { if (want === p.id) Object.assign(c, { fix: r.fix || [], corrected: r.corrected || '', well: r.well || '', next: r.next || null, err: null }); else c.r2 = { fix: r.fix || [], corrected: r.corrected || '', well: r.well || '' }; save(); redraw(); } }, 45e3); }
+    const bind = () => {
+      const ck = $('#' + p.id + 'Check'); if (ck) ck.onclick = async () => { ck.disabled = true; ck.textContent = 'Checking…'; const r = await claudeAnswer(want);
+        if (r) { if (want === p.id) Object.assign(c, { fix: r.fix || [], corrected: r.corrected || '', well: r.well || '', next: r.next || null, err: null }); else c.r2 = { fix: r.fix || [], corrected: r.corrected || '', well: r.well || '' }; save(); }
+        else { ck.textContent = 'Not yet: ↻ Check now'; ck.disabled = false; return; } redraw(); };
+      const ag = $('#' + p.id + 'Again'); if (ag) ag.onclick = async () => { ag.disabled = true; c.err = null; save(); asked(c, await askClaude()); save(); redraw(); };
+    };
+    const head = '<div class="section-card" style="border-left:5px solid var(--accent,#7c3aed)"><h3>✍️ Claude’s correction</h3>';
+    if (!c.fix) { box.innerHTML = head + waitCard(p.id, c, c.sent) + '</div>'; bind(); return; }
     const r2 = c.r2;
-    box.innerHTML = '<div class="section-card" style="border-left:5px solid var(--accent,#7c3aed)"><h3>⚡ Roig’s instant correction</h3>' + fixTable(c.fix) +
+    box.innerHTML = head + fixTable(c.fix) +
       (c.corrected ? '<details class="draft-box"><summary>Your text, corrected</summary><p style="white-space:pre-wrap">' + esc(c.corrected) + '</p></details>' : '') +
       (c.well ? '<p><strong>Well done:</strong> ' + esc(c.well) + '</p>' : '') + '</div>' +
       (c.next && c.next.task ? '<div class="section-card"><h3>✍️ Now a short task from your mistakes</h3><p class="instruction">' + esc(c.next.task) + '</p>' +
         ((c.next.use || []).length ? '<p>' + c.next.use.map(u => '<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:99px;background:var(--c-soft,#f5f3ff);font-weight:700">' + esc(u) + '</span>').join('') + '</p>' : '') +
         '<textarea id="' + p.id + 'Next" placeholder="Write here…" style="min-height:7em"></textarea>' +
-        '<div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + p.id + 'NextGo">⚡ Correct it</button></div><p class="feedback" id="' + p.id + 'NextMsg"></p>' +
-        (r2 ? '<h3>Roig’s correction</h3>' + fixTable(r2.fix) + (r2.corrected ? '<details class="draft-box"><summary>Your text, corrected</summary><p style="white-space:pre-wrap">' + esc(r2.corrected) + '</p></details>' : '') + (r2.well ? '<p><strong>Well done:</strong> ' + esc(r2.well) + '</p>' : '') : '') +
+        (c.nextSent ? '' : '<div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + p.id + 'NextGo">✍️ Send it to Claude</button></div>') + '<p class="feedback" id="' + p.id + 'NextMsg"></p>' +
+        (c.nextSent && !r2 ? waitCard(p.id, c, c.nextSent) : '') +
+        (r2 ? '<h3>Claude’s correction</h3>' + fixTable(r2.fix) + (r2.corrected ? '<details class="draft-box"><summary>Your text, corrected</summary><p style="white-space:pre-wrap">' + esc(r2.corrected) + '</p></details>' : '') + (r2.well ? '<p><strong>Well done:</strong> ' + esc(r2.well) + '</p>' : '') : '') +
         '</div>' : '');
+    bind();
     const nt = $('#' + p.id + 'Next'); if (!nt) return;
-    nt.value = c.nextText || ''; nt.oninput = () => { c.nextText = nt.value; save(); };
-    $('#' + p.id + 'NextGo').onclick = async () => { const m = $('#' + p.id + 'NextMsg'), b = $('#' + p.id + 'NextGo');
+    nt.value = c.nextText || ''; if (c.nextSent) { nt.readOnly = true; nt.style.background = '#eef2f7'; } else nt.oninput = () => { c.nextText = nt.value; save(); };
+    const go = $('#' + p.id + 'NextGo'); if (go) go.onclick = async () => { const m = $('#' + p.id + 'NextMsg');
       if (realWords(nt.value) < 30) { m.className = 'feedback no'; m.textContent = 'Write at least 30 words first.'; return; }
-      b.disabled = true; m.className = 'feedback'; m.textContent = 'Roig is reading…';
-      const r = await coachWrite(nt.value.trim(), c.next.task);
-      if (!r || !r.ok) { b.disabled = false; m.className = 'feedback no'; m.textContent = (r && r.error) || 'Something went wrong. Try again.'; return; }
-      c.r2 = { fix: r.fixes || [], corrected: r.corrected || '', well: r.well_done || '' }; save(); coachBox(p, getText); };
+      c.nextText = nt.value.trim(); c.nextSent = new Date().toISOString(); c.err = null; save();
+      asked(c, await askClaude()); save(); redraw(); };
   }
+
 
   function teacherBtn() { return ca() ? 'Entrega al professor' : 'Hand it in to my teacher'; }
   // Every writing panel hands in to the teacher (Roger, 1 Nov 2026: "Desa i corregeix amb IA no hauria de sortir ja que ho corregeixes
@@ -1210,7 +1234,7 @@ var LS2 = (function () {
         if (toTeacher(p)) {
           if (!confirm(ca() ? 'Vols entregar el text al professor? Un cop entregat, ja no el podràs canviar.' : 'Hand your text in to your teacher? Once you hand it in, you can’t change it.')) return;
           handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); reopened[p.id] = false; lock();
-          state.coach = state.coach || {}; delete state.coach[p.id]; coachBox(p, () => handedText(p.id) || ta.value.trim()); $('#' + p.id + 'Coach') && $('#' + p.id + 'Coach').click(); return;
+          state.coach = state.coach || {}; delete state.coach[p.id]; coachBox(p, () => handedText(p.id) || ta.value.trim()); return;
         }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());

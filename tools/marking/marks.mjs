@@ -165,7 +165,56 @@ async function ticksOf(grp){const t=(doc(await api("GET",DOCS+"teacherPlan/"+grp
 const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsWith("--"))),args=rest.filter(x=>!x.startsWith("--"));
 const grpOf=id=>{const g=W.EL_GROUPS.find(x=>x.id===id);if(!g)throw new Error("No group "+id);return g};
 const momentOf=(aid,step)=>{const a=W.EL_CATALOG.find(x=>x.id===aid),m=a&&moments(a.ls).find(x=>x.a===aid&&x.step===step);if(!m)throw new Error("No marking step "+aid+" · "+step);return m};
-if(cmd==="ready"){const today=W.ELWeek.today();
+// ✍️ Towards Nativeness (Roger's own C1 → C2 course, a personal LS; Roger, 17 Nov 2026: "I only want Gemini, Roig, to correct my speakings,
+// the text I want … corrected by you" and "only correct me when sth is really off or non-native like"). His writing hand-ins (and the short
+// new task after each correction) are marked by the page as state.coach[step] = {sent, task} / {nextSent, nextText} and the page asks the
+// school script (tn_mark) to start this scheduled task. tn-ready lists what is waiting and says whether this run is only for him (MODE);
+// tn-apply saves Claude's correction in students/{uid}/results/{activity}.tnCoach[step] (and [step + "_2"] for the new task), which the
+// page polls and shows in the same tab. Only Roger's own accounts (the testers and the teacher), never students.
+async function tnItems(){
+  const c2=vm.createContext({console,localStorage:{getItem:k=>k==="el_who"?'{"role":"tester"}':null}});c2.window=c2;   // the personal LS stays in this copy
+  vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js/el-catalog.js"),"utf8"),c2,{filename:"el-catalog.js"});
+  const P=new Set(c2.EL_LS.filter(l=>l.personal).map(l=>l.id)),acts=c2.EL_CATALOG.filter(a=>P.has(a.ls));
+  const TEACH=JSON.parse((/TEACHERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]);
+  const me=studs.filter(s=>isTester(s)||TEACH.includes((s.email||"").toLowerCase())),out=[];
+  for(const s of me)for(const a of acts){const rk=a.id.replace("/","__");
+    const pg=doc(await once("p|"+s.uid+"|"+a.ls,()=>api("GET",DOCS+`students/${s.uid}/progress/${a.ls}`)))||{},res=doc(await once("r|"+s.uid+"|"+rk,()=>api("GET",DOCS+`students/${s.uid}/results/${rk}`)))||{};
+    let st={};try{st=JSON.parse((pg.data||{})[a.keys[0]]||"{}")}catch(e){}
+    const done=res.tnCoach||{};
+    for(const [id,c] of Object.entries(st.coach||{})){if(!c)continue;const h=((st.steps||{})[id]||{}),text=((h.f||[])[0]||{}).v;
+      if(c.sent&&!c.fix&&!done[id]&&text)out.push({uid:s.uid,aid:a.id,ls:a.ls,title:a.title,step:id,task:c.task||h.title||"",text,at:c.sent});
+      if(c.nextSent&&c.nextText&&!done[id+"_2"])out.push({uid:s.uid,aid:a.id,ls:a.ls,title:a.title,step:id+"_2",task:(c.next||{}).task||"",use:(c.next||{}).use||[],text:c.nextText,at:c.nextSent,second:true})}}
+  return out.sort((x,y)=>String(x.at).localeCompare(String(y.at))).map((x,i)=>Object.assign(x,{code:"T"+(i+1)}))}
+const fsvA=x=>Array.isArray(x)?{arrayValue:{values:x.map(fsvA)}}:x&&typeof x==="object"?{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,fsvA(v)]))}}:fsv(x);
+if(cmd==="tn-ready"){const its=await tnItems(),m=doc(await api("GET",DOCS+"settings/marking"))||{},run=m.run||{},rq=(m.request||{}).at;
+  // a run the teacher asked for (✏️ Correct everything waiting now) or the Wednesday one does everything; any other start came from his course
+  const madrid=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Madrid"})),wed=madrid.getDay()===3&&madrid.getHours()>=13&&madrid.getHours()<18;
+  const asked=rq&&(!run.started||String(rq)>String(run.started));
+  console.log(wed||asked?"MODE: FULL RUN (the Wednesday run or ✏️ Correct everything waiting now): do every step, the Towards Nativeness one too."
+    :"MODE: TOWARDS NATIVENESS ONLY (started from Roger's own course): correct only what is below, then stop. Do not run ready, fb-ready, sheets or audit.");
+  if(!its.length){console.log("No Towards Nativeness writing waiting.");process.exit(0)}
+  console.log(`\nTOWARDS NATIVENESS · Roger's own writing, ${its.length} piece(s). Roger is a Catalan-speaking English teacher (C1) who wants to write like a native-like everyday user, NOT an expert.
+RULES: correct ONLY what is really wrong or sounds non-native to an ordinary native speaker (Catalan/Spanish calques, prepositions, word order,
+questions, articles, countable nouns, verb patterns like want someone to, tenses, collocations a native would never use). NEVER offer a nicer,
+more formal or more idiomatic alternative for anything a native could naturally write. Ignore typos, spelling, punctuation and capitals (he types
+fast). Fewer fixes is fine; none is fine. Write in English, to him ("you"), short and warm.
+ANSWER FORMAT: a JSON array in a file in your scratchpad, one object per code:
+  {"code":"T1","fix":[{"said":"his exact words (only the part that changes, a few words around it)","natural":"how a native writes that part","why":"the rule in at most 12 words"}],
+   "corrected":"his whole text with only those changes","well":"one native-like phrase he used, quoted",
+   "next":{"task":"a short new writing task (60-120 words to write) on a related everyday topic that needs the corrected forms","use":["3 to 6 corrected chunks"]}}
+  (no "next" for a NEW TASK piece). Then: node tools/marking/marks.mjs tn-apply <file> --apply
+`);
+  for(const x of its)console.log(`--- ${x.code} · ${x.title} · ${x.second?"NEW TASK (his answer to the short task after a correction)":"writing"} · handed in ${x.at}\nTask: ${x.task}${x.use&&x.use.length?"\nChunks to use: "+x.use.join(" · "):""}\nText:\n${x.text}\n`)}
+else if(cmd==="tn-apply"){const its=await tnItems(),ans=JSON.parse(fs.readFileSync(args[0],"utf8")),now=new Date().toISOString(),s=v=>String(v||"").trim();let n=0;
+  for(const a of ans){const x=its.find(i=>i.code===a.code);if(!x){console.log("? no piece "+a.code);continue}
+    const v={fix:(Array.isArray(a.fix)?a.fix:[]).map(f=>({said:s(f.said),natural:s(f.natural),why:s(f.why)})).filter(f=>f.said&&f.natural),corrected:s(a.corrected),well:s(a.well),at:now};
+    if(!x.second&&a.next&&s(a.next.task))v.next={task:s(a.next.task),use:(Array.isArray(a.next.use)?a.next.use:[]).map(s).filter(Boolean).slice(0,6)};
+    console.log(`${x.code} · ${x.title} · ${x.step}: ${v.fix.length} fix(es)${v.next?" + new task":""}`);n++;
+    if(flags.has("--apply"))await api("PATCH",DOCS+`students/${x.uid}/results/${x.aid.replace("/","__")}?`+["ls","activity","updated",fp("tnCoach",x.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(x.ls),activity:fsv(x.aid),updated:{timestampValue:now},tnCoach:fsvA({[x.step]:v})}})}
+  const left=its.filter(i=>!ans.some(a=>a.code===i.code)).map(i=>i.code);
+  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${n} correction(s)${left.length?" · NOT ANSWERED: "+left.join(", "):""}`)}
+else if(cmd==="ready"){const today=W.ELWeek.today();
   if(!flags.has("--no-run")){const mk=doc(await api("GET",DOCS+"settings/marking"))||{},rq=Date.parse((mk.request||{}).at||"")||0,st=Date.parse((mk.run||{}).started||"")||0,via=rq>st?"request":"schedule";
     await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run",{fields:{run:fsv({started:new Date().toISOString(),via})}});console.log("RUN started ("+(via==="request"?"asked from the dashboard":"scheduled")+")")}
   for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
@@ -242,4 +291,4 @@ else if(cmd==="comments"||cmd==="answer"){const its=await comments();
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
     if(NEW&&flags.has("--apply"))await cmtDone();
     console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.filter(x=>x.kind==="ANSWER").length} answers · ${r.rows.filter(x=>x.kind==="FORYOU").length} for the teacher · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}}
-else{console.log("Usage: node tools/marking/marks.mjs ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}
+else{console.log("Usage: node tools/marking/marks.mjs tn-ready | tn-apply <answer file> [--apply] | ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}
