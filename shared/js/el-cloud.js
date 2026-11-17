@@ -5,6 +5,7 @@ import "./el-route-names.js";
 import {signIn} from "./el-signin.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report,wakeFixer} from "./el-report.js";
+import {awayWatch,awayCount} from "./el-away.js";   // 🎓 leaving the class page (other windows, tabs, apps)
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
@@ -574,7 +575,7 @@ function fsPanel(getG,redraw,owns){
   P.hm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
   // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once)
   P.roll=()=>elClassRoll(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here,P.ro[P.G]||[]);
-  P.why=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+P.hm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+P.hm(y.seen):y.why==="lost"?"lost connection · since "+P.hm(y.seen):"not connected";
+  P.why=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+P.hm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+P.hm(y.seen)+elAwayNote(y.left):y.why==="lost"?"lost connection · since "+P.hm(y.seen):"not connected";
   const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField});
   // the ✅ Correct together frame starts under the strip (h px), back to the top when the strip goes
   function frTop(h){const fr=document.getElementById("el-correct");if(!fr)return;const t=h?h+"px":"0px";if(fr.style.top!==t){fr.style.top=t;fr.style.height=h?"calc(100vh - "+h+"px)":"100vh"}}
@@ -1486,8 +1487,9 @@ const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
 const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));   // FSG is refreshed every second
 function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;return !ownFs()}
-async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
-  try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
+// fsLeft(false): a leave of the page (el-away.js below), not of the full screen; every write carries both counts of this class (n, aw/awMs)
+async function fsLeft(fs=true){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+(fs?1:0);if(fs)fsSS(k,String(n));const c=awayCount(FSG.at);
+  try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n,aw:c.aw,awMs:c.awMs},{merge:true})}catch(e){console.warn("full screen",e)}}
 function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.lock(["Escape"]).catch(()=>{})}catch(e){}},
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
@@ -1519,6 +1521,16 @@ const fsOk=()=>!fsWanted()||fsIs();let fsOkWas=null;
 function hereTick(){if(!fsOnG())return;const k=fsOk();if(k!==fsOkWas&&fsOkWas!==null&&document.visibilityState==="visible"){fsOkWas=k;hereBeat(false);return}fsOkWas=k;
   if(document.visibilityState==="visible"&&Date.now()-beatAt>=(window.EL_BEAT_MS||60e3))hereBeat(false)}
 document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document.visibilityState==="hidden"){if(!fsBye)hereBeat(true)}else hereBeat(false)});
+// 🎓 Other windows, tabs and apps during the class (Roger, 17 Nov 2026: "And the same in class mode or when students have class"; el-away.js):
+// while the group's class is on (the timetable or class mode: fsOnG), leaving the page for another window or app covers it ("Come back to the
+// class!"), coming back needs a tap on 🎓 Back to the class (it puts the full screen back too), and each leave is counted in
+// live/{group}/fsLeft/{email}.aw/.awMs (one write per leave). While away the "here" beat says off (the dashboard: screen closed or another
+// window). Not on the exam, checkpoints or the sample exam (their own lock), nor for the teacher's student view.
+let awOff=false;
+awayWatch({FD,ca:lockCa,z:2147483003,key:()=>FSG&&FSG.at,
+  on:()=>!!(user&&isStudent(user)&&!AS&&myGroup&&fsOnG()&&!ownFs()&&!window.EL_EXAM_LOCK),
+  off:x=>{if(x){if(!awOff&&FD.visibilityState==="visible"){awOff=true;hereBeat(true)}}else if(awOff){awOff=false;hereBeat(false)}},
+  back:()=>fsLeft(false),fsNeed:()=>fsWanted()&&!fsIs(),fsGo});
 const fsChanged=()=>{fsCheck();hereTick()},FSEV=["fullscreenchange","webkitfullscreenchange"];FSEV.forEach(t=>FD.addEventListener(t,fsChanged));
 // in class.html the listeners are on its document: taken off when this page goes (the frame's next page adds its own)
 if(inShell){addEventListener("pagehide",()=>FSEV.forEach(t=>FD.removeEventListener(t,fsChanged)));addEventListener("pageshow",e=>{if(e.persisted)FSEV.forEach(t=>FD.addEventListener(t,fsChanged))})}

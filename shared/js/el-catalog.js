@@ -485,6 +485,10 @@ window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here
 // Who left, for the teacher's panels (Roger, 9 Nov 2026: "I need to know who disconnects, and I need their names to be there … even when
 // we are watching a video"): gone = out now (out of full screen, screen closed, lost connection), back = left full screen in this class and
 // came back. Both stay named on the dashboard panel (#fsctl) and the class tab's panel (el-cloud.js #el-fsfloat), also when made small.
+// 🎓 how often and how long a student left the class page for another window, tab or app (fsLeft.aw/.awMs, shared/js/el-away.js):
+// " · ↗ left the page 3× (1 min 5 s)", or "" when they never did
+window.elAwayNote=l=>{if(!l||!(+l.aw>0))return "";const s=Math.max(1,Math.round((+l.awMs||0)/1000));
+  return " · ↗ left the page "+(+l.aw)+"× ("+(s<60?s+" s":Math.floor(s/60)+" min"+(s%60?" "+s%60+" s":""))+")"};
 window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[]).filter(y=>y.left),never:(w.out||[]).filter(y=>y.why==="never")});
 // One short line of counts, names only on a tap (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen! And during the games
 // students played to log in and out so that their name appeared. I only need … who is in the class and who is not and see the numbers
@@ -504,7 +508,7 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
   let list="";
   if(o.open==="in")list=box(w.inn.length?'<div style="color:#166534">✓ <b>In ('+w.inn.length+'):</b> '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b">Nobody is in yet: they tap their screen to go full screen.</div>');
   else if(o.open==="left")list=box((gone.length?gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+why(y)+'</div>').join(""):'<div style="color:#64748b">Nobody has left.</div>')
-    +(back.length?'<div style="color:#c2410c;margin-top:4px">↩ <b>Left and came back ('+back.length+'):</b> '+back.map(y=>'<b>'+E(y.name)+'</b> <small>('+(y.left.n>1?y.left.n+'×, last ':'')+hm(y.left.at)+')</small>').join(", ")+'</div>':""));
+    +(back.length?'<div style="color:#c2410c;margin-top:4px">↩ <b>Left and came back ('+back.length+'):</b> '+back.map(y=>'<b>'+E(y.name)+'</b> <small>('+[y.left.n>0?'⛶ full screen'+(y.left.n>1?' '+y.left.n+'×':''):'',elAwayNote(y.left).slice(3),'last '+hm(y.left.at)].filter(Boolean).join(', ')+')</small>').join(", ")+'</div>':""));
   else if(o.open==="nh")list=av.html?box(av.html):box(never.length?'<div style="color:#475569">⚪ <b>Not here ('+never.length+'):</b> '+never.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b">Everybody is connected.</div>');
   return {line,list}};
 // 🎬 Videos under the panel: a video's own ⛶ full screen would hide the page and the panel with it, so on a teacher page with the panel
