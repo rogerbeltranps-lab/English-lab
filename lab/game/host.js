@@ -431,7 +431,7 @@ const hm=t=>{const d=new Date(ms(t));return ms(t)?String(d.getHours()).padStart(
 function who(){if(!H.sid||H.phase==="end"||H.phase==="pick")return {active:false,inn:[],out:[],n:0};
   const x={game:true,on:true,phase:"q",sid:H.sid,at:Date.now(),title:H.deck&&gName()},left=WHO.left.filter(y=>ms(y.at)>=H.sid).map(y=>Object.assign({},y,{pull:H.sid}));
   return elClassRoll(x,left,Object.entries(WHO.here).map(([e,y])=>Object.assign({e},y)),Object.keys(H.names).map(e=>({e,name:H.names[e]})))}
-const why=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${hm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${hm(y.seen)}`:y.why==="lost"?`lost connection · since ${hm(y.seen)}`:"not in the game";
+const why=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${hm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${hm(y.seen)}${elAwayNote(y.left)}`:y.why==="lost"?`lost connection · since ${hm(y.seen)}`:"not in the game";
 // only the top bar is drawn again (the slide underneath keeps its animation)
 function drawTop(){const t=app$.querySelector(".top");if(t&&H.g&&H.sid)t.outerHTML=top()}
 setInterval(drawTop,15e3);   // a beat missed for EL_HERE_MS

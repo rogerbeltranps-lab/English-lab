@@ -12,6 +12,7 @@ import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "../../shared/js/el-firebase.js";
 import {signIn} from "../../shared/js/el-signin.js";
 import {cbPlayer} from "./cb-play.js";
 import {report,wakeFixer} from "../../shared/js/el-report.js";
+import {awayWatch,awayCount} from "../../shared/js/el-away.js";   // 🎓 leaving the game for other windows, tabs, apps
 
 const G=window.ELGame,{esc,md,pic}=G;
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
@@ -233,8 +234,9 @@ const pullKey=()=>fsOnG(x&&x.fs)?x.fs.at:x&&x.sid;
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
 let fsWas=false,bye=false;addEventListener("beforeunload",()=>{bye=true});addEventListener("pagehide",()=>{bye=true});   // ← Back: not leaving
 const fsWanted=()=>!!(user&&group&&!isT()&&fsCan()&&(gameOn()&&x.phase!=="end"||cmOn()));   // in class mode it stays on after the game too
-function fsLeft(){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+1;ss(k,String(n));
-  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n},{merge:true}).catch(e=>console.warn("full screen",e))}
+// fsLeft(false): a leave of the page (el-away.js below), not of the full screen; every write carries both counts (n, aw/awMs)
+function fsLeft(fs=true){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+(fs?1:0);if(fs)ss(k,String(n));const c=awayCount(pk);
+  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n,aw:c.aw,awMs:c.awMs},{merge:true}).catch(e=>console.warn("full screen",e))}
 function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.lock(["Escape"]).catch(()=>{})}catch(e){}},
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
@@ -258,6 +260,13 @@ fsOnCh(()=>fsCheck());
 let beatAt=0,beatSid=0;
 function beat(off){if(!user||!group||isT())return;beatAt=Date.now();
   S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off,fs:!fsWanted()||fsIs()}).catch(e=>console.warn("here",e))}
+// 🎓 Other windows, tabs and apps during the game (Roger, 17 Nov 2026; el-away.js, as on the other pages of the class in el-cloud.js): the
+// player is covered ("Come back to the class!"), coming back needs a tap, and each leave is counted in live/{group}/fsLeft/{email}.aw/.awMs.
+let awOff=false;
+awayWatch({FD,ca:()=>CA==="1",z:60,key:pullKey,
+  on:()=>!!(user&&group&&!isT()&&(gameOn()&&x.phase!=="end"||cmOn())),
+  off:y=>{if(!gameOn()||x.phase==="end")return;if(y){if(!awOff&&FD.visibilityState==="visible"){awOff=true;beat(true)}}else if(awOff){awOff=false;beat(false)}},
+  back:()=>fsLeft(false),fsNeed:()=>fsWanted()&&!fsIs(),fsGo});
 let okWas=null;   // in or out of full screen: sent at once when it changes
 document.addEventListener("visibilitychange",()=>{if(!gameOn()||x.phase==="end")return;if(document.visibilityState==="hidden"){if(!bye)beat(true)}else beat(false)});
 function hereTick(){if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
