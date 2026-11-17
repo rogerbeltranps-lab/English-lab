@@ -1242,7 +1242,7 @@ function qnOpen(){
     "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
   const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
   const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
-  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href&&!lockHere()?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
+  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href&&!(lockHere()&&!LOCK.cm)?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
   w.querySelector(".qn-w").textContent="📍 "+where;
   document.body.append(w);QN.w=w;
   const st=s2=>{const x=QN.w&&QN.w.querySelector(".qn-st");if(x)x.textContent=s2};
@@ -1423,6 +1423,9 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
   // 📓 in class mode: the notebook is another page, so it opens as a ✍ quick note over this one and is saved into the notebook
   // (problem report, 2ESOB, 17 Nov 2026: "when we are listening to the teacher we can't take notes")
+  // 📓 My notebook in class mode is always allowed (Roger, 17 Nov 2026: "when students are in class mode, I want them to be able to go to
+  // their notebooks and do whatever they want"): the LS page's #notes opens; cmGo keeps them there with a ↩ Back to the class button
+  if(LOCK.cm&&nbLink(u))return;
   if(a.id==="el-nbfab"){e.preventDefault();e.stopImmediatePropagation();if(!qnOpen())lockToast();return}
   if(LOCK.cm&&u.origin===location.origin&&cmEn(LOCK).some(x=>new URL(x.u,ROOT).pathname===u.pathname))return;   // another step the teacher opened
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
@@ -1544,6 +1547,22 @@ function goMove(url,name,back,secs,icon){const was=document.getElementById("el-g
   const iv=setInterval(()=>{n--;if(n<=0)leave();else tick()},1000);
   go.onclick=e=>{e.preventDefault();leave()};
 }
+/* 📓 The notebook during class mode (Roger, 17 Nov 2026: "when students are in class mode, I want them to be able to go to their notebooks
+   and do whatever they want"): the 📓 button (or any link to an LS page's #notes) opens the whole notebook, and class mode does not send them
+   back while it is open. A ↩ button at the bottom says where the teacher is and takes them there (the step the teacher is on, their work
+   saved first). When the teacher moves, the button names the new place; closing the notebook (#notes left) sends them back as before. */
+const nbLink=u=>{try{return u.origin===location.origin&&u.hash==="#notes"&&/\/(2|4)eso\/[^/]+\/(index\.html)?$/.test(u.pathname)}catch(e){return false}};
+const nbHere=()=>nbLink(new URL(location.href));
+function cmNbBar(g){let b=document.getElementById("el-cm-nb");
+  if(!g||!g.cm||!nbHere()||!user||!isStudent(user)||AS){if(b)b.remove();return}
+  const ca=lockCa(),x=cmEn(g)[0];if(!x)return;
+  if(!b){b=document.createElement("button");b.type="button";b.id="el-cm-nb";
+    b.style.cssText="position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:2147482000;max-width:min(460px,calc(100vw - 90px));padding:12px 20px;border:0;border-radius:999px;background:#0f766e;color:#fff;font:800 15px system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer;text-align:left";
+    b.onclick=()=>{const y=LOCK&&LOCK.cm?cmEn(LOCK)[0]:null;if(y)cmJump(y)};document.body.append(b)}
+  const t="🎓 "+(ca?"Torna a la classe":"Back to the class")+(x.n?" · "+x.n:"")+" →";if(b.textContent!==t)b.textContent=t;
+  b.title=ca?"El professor és aquí. La teva llibreta queda desada.":"Your teacher is here. Your notebook stays saved."}
+// the notebook closed (#notes left) while class mode lasts: back to the class, as from any other page
+addEventListener("hashchange",()=>{if(LOCK&&LOCK.cm&&elCmOn(LOCK)&&!nbHere())cmGo(LOCK);else if(LOCK&&LOCK.cm)cmNbBar(LOCK)});
 // 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever you
 // are in the LS. When we go to class mode, a new tab is opened so that I can check other stuff"). live/{group}.go = {cm: true, u, p, pn, t,
 // at, s, lock, until} (elCmOn in el-catalog.js), written by the teacher's class tab each time it moves (cmTeacher below). On the student's
@@ -1552,6 +1571,8 @@ function goMove(url,name,back,secs,icon){const was=document.getElementById("el-g
 // and are sent back). While it lasts they are kept there like a pull-up (lock: links that leave the page and the other tabs are blocked).
 // Not out of a recall checkpoint, the sample exam or a followed presentation. It ends with ⏹ Stop or the end of the class (until).
 function cmGo(g){
+  if(nbHere()){cmNbBar(g);return}   // 📓 in their notebook: they stay, the ↩ button takes them back
+  cmNbBar(null);
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
   if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search)||!LOCK)return;
   const url=cmUrl(g),k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
