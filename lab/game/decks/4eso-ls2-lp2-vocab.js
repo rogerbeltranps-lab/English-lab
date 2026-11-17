@@ -7,10 +7,11 @@ ELGameDeck({
   title:"Vocabulary · Celebrations around the world",
   slides:[
     {theory:"Traditions: what people do",ex:true,point:"Tradition verbs (gather, exchange gifts…)",tab:"vocabEx",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
-      "**get together** / **gather** (meet as a group) · **share a meal** · **exchange gifts** · **make a wish**",
+      "**get together** / **gather** (meet as a group) · **have a get-together** (a meeting of family or friends) · **share a meal** · **exchange gifts** · **make a wish**",
       "**take part in** (participate) · **look forward to** (feel excited about something that is coming)",
       "**pass down** (give to the next generation) · **mark an occasion** (show that a day is special)"]},
     {q:"On New Year's Eve, families ___ for a big reunion dinner.",img:"🧧",options:["get together","get on","get up","get over"],why:"**get together** = meet as a group."},
+    {q:"On Sunday we ___ a big family get-together at my grandparents' house.",img:"🏠",options:["have","make","do","take"],why:"**have a get-together** (a noun, with a hyphen) = meet as a family or as friends."},
     {q:"The recipe for panellets is passed ___ from grandparents to grandchildren.",img:"👵",write:["down"],why:"**pass down** = give to the next generation."},
     {q:"At midnight we eat twelve grapes and ___ a wish for the new year.",img:"🍇",options:["make","do","have","take"],why:"**make a wish**."},
     {q:"At Diwali families exchange ___ and share sweets. (g...)",img:"🎁",write:["gifts","presents"],why:"**exchange gifts** = give and get presents."},
