@@ -61,9 +61,19 @@ function rcGet(uid){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null")
 function rcPut(uid,d,t){try{origSet.call(localStorage,RC+uid,JSON.stringify({t:t||Date.now(),d}))}catch(e){}}
 // fresh: read from the server (the board), otherwise the copy in this browser while it is younger than 30 minutes.
 function myResults(uid,fresh){
-  const c=!fresh&&rcGet(uid);if(c)return Promise.resolve(c);
-  return once("rs:"+uid,async()=>{const d={};(await getDocs(collection(db,"students",uid,"results"))).forEach(x=>d[x.id]=x.data());rcPut(uid,plain(d));return d});
+  const c=!fresh&&rcGet(uid);if(c)return Promise.resolve(c).then(held);
+  return once("rs:"+uid,async()=>{const d={};(await getDocs(collection(db,"students",uid,"results"))).forEach(x=>d[x.id]=x.data());rcPut(uid,plain(d));return d}).then(held);
 }
+// Exam results held back (Roger, 17 Nov 2026, the web exam: "we release the results automatically 4 days later"): a record with
+// showFrom (an ISO time, written by the dashboard's 📥 Save marks and tools/web-exam/writing.mjs) shows no exam marks, report or writing
+// level before that time; the board says when they come out (held). The continuous-assessment progress stays. On read, so the copy in
+// this browser opens by itself when the day comes.
+function held(d){const now=Date.now(),o={};
+  for(const [k,r] of Object.entries(d||{})){if(!(r&&r.showFrom&&now<Date.parse(r.showFrom))){o[k]=r;continue}
+    const c=Object.assign({},r);delete c.sections;delete c.report;delete c.version;delete c.webPaper;
+    if(c.levels){c.levels=Object.assign({},c.levels);delete c.levels.writing}c.held=r.showFrom;o[k]=c}
+  return o}
+window.elHeld=held;
 // A result this page saved: put into the copy too (the server's time is unknown here, so "updated" stays out).
 function rcSaved(uid,id,data){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null");if(!c)return;const o=Object.assign({},data);delete o.updated;
   c.d[id]=Object.assign(c.d[id]||{},plain(o));rcPut(uid,c.d,c.t)}catch(e){}}
@@ -132,7 +142,7 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{}};
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{},webExam:d.webExam||{}};
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
 // sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.

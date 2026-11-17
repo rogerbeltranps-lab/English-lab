@@ -327,6 +327,31 @@ service cloud.firestore {
         allow delete: if isTester() && request.auth.uid == uid;
         allow write: if isTeacher();
       }
+      // 📝 web exams (shared/js/el-web-exam.js; Roger, 17 Nov 2026): the student's one exam per LS, saved as they go. They can start and
+      // change it only while the teacher has it open for their group (ls/{ls}.webExam[group].open) and until they turn it in (status
+      // 'done'). The paper and the start never change, and the copies of the answers saved at each exit (snaps, for the teacher's check
+      // of what changed after coming back) can only grow: the old ones must stay exactly as they were. Marks come from the dashboard.
+      match /exams/{key} {
+        function exOpen(ls) { return lsOpen(ls) && lsForMe(ls, uid)
+          && get(/databases/$(database)/documents/ls/$(ls)).data.get('webExam', {}).get(rosterGroup(), {}).get('open', false) == true; }
+        function exOk() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['ls','key','paper','level','group','order','answers','started','listenDone','status','exits','glances','changes','snaps','tries','done','updated'])
+            && d.key == key && d.updated == request.time && d.status in ['in', 'out', 'done']
+            && d.answers is map && d.answers.size() <= 120 && d.order is map
+            && d.exits is list && d.exits.size() <= 30 && d.snaps is list && d.snaps.size() <= 30
+            && d.changes is list && d.changes.size() <= 300 && d.glances is list && d.glances.size() <= 60
+            && (exOpen(d.ls) || isTester());
+        }
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create: if signedIn() && request.auth.uid == uid && exOk() && request.resource.data.snaps.size() == 0;
+        allow update: if signedIn() && request.auth.uid == uid && exOk() && resource.data.status != 'done'
+          && request.resource.data.ls == resource.data.ls && request.resource.data.paper == resource.data.paper && request.resource.data.started == resource.data.started
+          && request.resource.data.snaps.size() >= resource.data.snaps.size()
+          && (resource.data.snaps.size() == 0 || request.resource.data.snaps[0:resource.data.snaps.size()] == resource.data.snaps);
+        allow delete: if isTester() && request.auth.uid == uid;
+        allow write: if isTeacher();
+      }
       // 📝 notes from the class games (Roger, 6 Nov 2026: "Take your notes" slide, lab/game/play.js; shown on the LS home page,
       // shared/js/el-notes.js): notes/{deck} = {ls, course, deck, title, lp, parts:{p<k>:{topic, text, at}}, updated}. Their own; the teacher reads.
       match /notes/{deck} {
@@ -348,6 +373,9 @@ service cloud.firestore {
       }
     }
     match /{path=**}/checkpoints/{key} {
+      allow read: if isTeacher();
+    }
+    match /{path=**}/exams/{key} {
       allow read: if isTeacher();
     }
     match /{path=**}/results/{rid} {

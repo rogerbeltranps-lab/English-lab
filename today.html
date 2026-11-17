@@ -337,6 +337,7 @@ async function load(u){
   const mail=(AS?D.me.email||"":u.email||"").toLowerCase();
   D.me.name=D.me.name||(AS?mail:u.displayName||u.email);
   if(!AS&&ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
+  if(AS&&window.elHeld)D.rs=elHeld(D.rs);   // the teacher sees the board as the student does: exam results held until their day (el-cloud.js)
   elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
   await Promise.all([
     F.getDoc(F.doc(db,"points",mail)).then(p=>{if(p.exists())D.pt=p.data()}).catch(()=>{}),
@@ -827,7 +828,7 @@ function cpView(ls,info){
     return `<div class="cpc ${k}"><h3>🎯 ${esc(nm)}${sc?`<span class="cps">${sc.score} / ${sc.max}</span>`:""}</h3>${body}</div>`};
   return `<div class="fhead"><h2>🎯 ${t("Els meus checkpoints","My checkpoints")} <small>· ${lsName(ls)}</small></h2><p>${t("Primer hi veuràs la teva puntuació. Després, les preguntes, les teves respostes i la correcció: repassa el que has fallat.","First you see your score. Then the questions, your answers and the corrections: review what you got wrong.")}</p></div>`
     +(L.length?`<div class="cpl">${L.map(card).join("")}</div>`:`<div class="box fv"><p class="muted">${t("Encara no hi ha checkpoints.","No checkpoints yet.")}</p></div>`)}
-function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
+function examSub(ls){if((D.rs[ls.id+"/assessment"]||{}).held)return t("resultats aviat","results soon");const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
 function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="week")return `<div class="tabbody">${studyBox(ls)+practiceBox(ls)+weekBox(ls,info)||`<p class="muted">${t("Aquesta LS no té pla setmanal.","This LS has no week plan.")}</p>`}</div>`;
   if(tab==="fp"&&hasFp(ls))return `<div class="tabbody t-fp">${fpView(ls,info)}</div>`;
@@ -1124,6 +1125,8 @@ function examView(ls){const id=ls.id,g=(window.EL_GRADING||{})[id];if(!g||!g.exa
   else{const w=(g.blocks.find(b=>b.id==="exam")||{}).w;
     head=`<div class="box fv" id="exam"><div class="lphead"><div>${fvHead("📝",t("Examen final","Final exam"))}${ver}${bonus}<p class="fvlead" style="margin-bottom:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
   if(!got.length){const p=(window.EL_PLAN||{})[id],ex=ELWeek.exam(p,ELWeek.col(p,D.me.group));
+    const hd=x.held?new Date(x.held):null,hday=hd?hd.toLocaleDateString(t("ca-ES","en-GB"),{weekday:"long",day:"numeric",month:"long"}):"";
+    if(hd)return head+`<div class="box fv notyet">📝 <b>${t("Examen corregit.","Your exam is marked.")}</b> ${t(`Els resultats sortiran aquí el ${hday}: la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.`,`Your results come out here on ${hday}: the mark of each part, the criteria, the questions to review and your corrected writing.`)}</div>`;
     return head+`<div class="box fv notyet">📝 <b>${t("Encara no tens els resultats de l'examen.","Your exam results are not here yet.")}</b> ${ex?t(`Examen: ${when(ex)}. `,`Exam: ${when(ex)}. `):""}${t("Quan el professor l'hagi corregit, aquí veuràs la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.","When your teacher has marked it, you will see here the mark of each part, the criteria, the questions to review and your writing corrected.")}</div>`}
   return head+examParts(e,sc)+examCrit(e,sc,f)+examQuestions(rep)+examWriting(rep,e)+examReview(rep)}
 // My LS mark so far (Roger, 2 Nov 2026: "students should see their progress"): each block of EL_GRADING[ls] with its share and my mark
