@@ -43,9 +43,10 @@ export async function corrections({list,seen,save,here,root,en,name}){
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
   const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
-    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work
+    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work.
+    // An answer whose at is still to come is not shown yet (Roger, 17 Nov 2026: answers go out from 8:00 to 18:00, 2 hours after the comment).
     for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
-      const text=[((r.answers||{})[step]||{}).t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
+      const an=(r.answers||{})[step]||{},text=[!(Date.parse(an.at)>Date.now())&&an.t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
       if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);

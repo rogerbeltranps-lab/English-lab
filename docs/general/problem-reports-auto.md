@@ -7,6 +7,13 @@ informed though via mail, with an important subject."
 This file is the routine of the scheduled task **"English Lab: problem reports"** (a fresh Claude session in the English Lab cloud
 environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool is `tools/problems/auto.mjs`.
 
+**Never straight away, never by name (Roger, 17 Nov 2026):** "please don't answer straight away; always answer from 8-18 and after 2 hours
+since u receive the message o report, don't use their names or surnames since sometimes it feels like AI". The run still works at once,
+but `auto.mjs fixed` and `marks.mjs answer` save the student's card or answer with a later time (`tools/problems/reply-time.mjs`: at least
+2 hours after the report or comment, inside 08:00-18:00 Madrid time); the student sees it only from then and the tool prints when. Never
+pass `--now` (only Roger can ask for it, in a thread). Never write the student's first name or surnames in `--msg`, `--reply` or an
+answer, not even "Hola …": start with the answer itself. The tools refuse a text that uses them; write it again without them.
+
 On the site and in anything Roger reads (`--note`, `--todo`, emails), call yourself **Beltran**, never Claude, and call Gemini **Roig** (Roger, 16 Nov 2026; AGENTS.md).
 
 ## When it runs
