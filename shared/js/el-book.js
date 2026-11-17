@@ -21,7 +21,7 @@
 .elb-stage{display:flex;justify-content:center;padding:18px 8px 10px;background:var(--desk);border-radius:16px;perspective:2600px}
 .elb-book{position:relative;width:calc(var(--pw)*2);height:var(--ph);box-shadow:0 18px 40px rgba(0,0,0,.28);border-radius:3px;background:var(--paper)}
 .elb.single .elb-book{width:var(--pw)}
-.elb-book{touch-action:pan-y;user-select:none;-webkit-user-select:none}.elb.zoom .elb-book{touch-action:auto}
+.elb-book{touch-action:pan-y;user-select:none;-webkit-user-select:none}.elb-q{touch-action:pan-y}.elb.zoom .elb-book,.elb.zoom .elb-q{touch-action:auto}
 .elb-hit.prev,.elb-hit.next{cursor:grab}.elb-hit:active{cursor:grabbing}
 .elb-page,.elb-leaf{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--paper)}
 .elb-page img,.elb-face img{display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
@@ -248,7 +248,11 @@ html.elb-lock{overflow:hidden}
       const all = e.type !== 'pointercancel' && !back && (d.p > .25 || flick);
       busy = false; go(d.t, all, all ? .22 + .45 * (1 - d.p) : .18 + .35 * d.p);
     };
-    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop); book.addEventListener('lostpointercapture', drop);
+    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop);
+    // only the book's own capture ending (Roger, 17 Nov 2026: "the books can't be turned with the fingers"): the browser (iPad and Chromebook alike) gives a finger's
+    // pointer to the page button it touched (implicit capture), so when the drag takes it over, that button's lostpointercapture bubbles up
+    // here; taking it for the finger letting go made every swipe fall back at once
+    book.addEventListener('lostpointercapture', e => { if (e.target === book) drop(e); });
     // let go anywhere: outside the book, outside the page's frame (the preview), or the window losing the mouse
     const dropAny = e => { if (drag && (!e || e.pointerId == null || e.pointerId === drag.id)) drop({ type: 'pointerup', pointerId: drag.id, timeStamp: e && e.timeStamp || performance.now() }); };
     const mUp = e => dropAny({ timeStamp: e.timeStamp }), wBlur = () => dropAny();
@@ -259,7 +263,9 @@ html.elb-lock{overflow:hidden}
       if (!full) zoom = false;
       el.classList.toggle('full', full); document.documentElement.classList.toggle('elb-lock', full);
       bf.textContent = full ? '✕ ' + T(ca, 'Tanca', 'Close') : '⤢ ' + T(ca, 'Pantalla completa', 'Full screen');
-      const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
+      // not on an iPad (as the Time plan, #667): Safari there leaves a page's full screen on any downward swipe, so the book's own cover is it
+      const E = document.documentElement, ios = /iP(ad|hone|od)/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      const rq = ios ? null : E.requestFullscreen || E.webkitRequestFullscreen;
       try {
         if (full && !fsEl() && rq) { fsMine = true; const r = rq.call(E); if (r && r.catch) r.catch(() => { fsMine = false; }); }
         else if (!full && !keepFs && fsMine && fsEl()) { fsMine = false; (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
