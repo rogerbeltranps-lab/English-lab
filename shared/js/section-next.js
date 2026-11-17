@@ -1,7 +1,20 @@
-/* "Mark section as done" button at the end of each Learning Path section.
+/* "Next section →" button at the end of each Learning Path section.
    It only works when the section's activities are done, then opens the next section; otherwise it says what is missing.
-   Progress itself is still recorded by each page's own activities. */
+   It records nothing: progress is saved by each page's own activities (a tab is done as soon as its work is saved).
+   It was called "Mark section as done" and students took it for handing in: in 🎓 class mode the next tab is locked, the click
+   met the 🔒 message and they reported "it doesn't let me mark it as done" (2ESOB, 17 Nov 2026). Roger, 17 Nov 2026, chose
+   "Next section →", hidden while 🎓 class mode / the teacher's 🔒 does not let the student go there.
+   LS1 keeps its old wording (leave LS1 alone): its learning paths are the pages that load ls1-lp.js. */
 var sectionNext = {
+  ls1: () => !!document.querySelector('script[src*="ls1-lp.js"]'),
+  // el-cloud.js tells whether the teacher's 🎓 class mode / 🔒 keeps the student off that tab or page (and sends "el-lock" when that changes)
+  blocked(fn, arg) { try { return !!(window[fn] && window[fn](arg)); } catch (e) { return false; } },
+  hideStyle() {
+    if (document.getElementById('el-sn-css')) return;
+    const st = document.createElement('style'); st.id = 'el-sn-css';
+    st.textContent = '.section-next.el-sn-off{display:none!important}';
+    document.head.appendChild(st);
+  },
   init(config) {
     const tabs = [...document.querySelectorAll('.tab')];
     const order = tabs.map(t => t.dataset.panel);
@@ -30,14 +43,17 @@ var sectionNext = {
           : 'Not yet: finish this section’s activities first. ') + detail;
       });
       buttons.push(reset => {
-        button.textContent = ca() ? 'Marca la secció com a feta' : 'Mark section as done';
+        button.textContent = sectionNext.ls1() ? (ca() ? 'Marca la secció com a feta' : 'Mark section as done') : (ca() ? 'Següent secció →' : 'Next section →');
+        card.classList.toggle('el-sn-off', sectionNext.blocked('elNextBlocked', next));
         const ready = !!cfg.done();
         button.setAttribute('aria-disabled', ready ? 'false' : 'true');
         button.style.opacity = ready ? '' : '.55';
         if (reset) message.textContent = '';
       });
     });
+    sectionNext.hideStyle();
     const refresh = reset => buttons.forEach(f => f(reset === true));
+    document.addEventListener('el-lock', () => refresh());
     // Re-check after any activity so the button looks available as soon as the section is done.
     ['click', 'input', 'change'].forEach(type => document.addEventListener(type, () => setTimeout(refresh, 60)));
     document.querySelectorAll('.route').forEach(r => r.addEventListener('click', () => setTimeout(() => refresh(true), 0)));
@@ -109,10 +125,16 @@ var sectionNext = {
     panel.appendChild(card);
     const main = card.querySelector('.main'), message = card.querySelector('.feedback'), confirmBox = card.querySelector('.confirm');
     const yes = card.querySelector('.confirm-yes'), no = card.querySelector('.confirm-no'), question = card.querySelector('.q');
+    const lsName = () => { const b = document.querySelector('.topbar .brand>a.elback'); return (b && (b.dataset.ls || b.textContent) || '').trim(); };
+    const dest = () => (nextOpt() || { value: 'index.html' }).value;
+    sectionNext.hideStyle();
     const labels = () => {
-      main.textContent = ca()
+      if (sectionNext.ls1()) main.textContent = ca()
         ? (nextOpt() ? 'Marca la secció com a feta i continua amb el següent Learning Path' : 'Marca la secció com a feta i torna a My Real Routine')
         : (nextOpt() ? 'Mark section as done and continue to the next Learning Path' : 'Mark section as done and return to My Real Routine');
+      else main.textContent = nextOpt() ? (ca() ? 'Següent Learning Path →' : 'Next Learning Path →')
+        : (ca() ? 'Torna a ' : 'Back to ') + (lsName() || (ca() ? 'la pàgina de la LS' : 'the LS page')) + ' →';
+      card.classList.toggle('el-sn-off', sectionNext.blocked('elLeaveBlocked', dest()));
       question.textContent = ca()
         ? 'Has acabat i revisat totes les activitats d’aquesta secció?'
         : 'Have you finished and checked all the activities in this section?';
@@ -135,7 +157,9 @@ var sectionNext = {
       yes.focus();
     });
     no.addEventListener('click', () => { confirmBox.hidden = true; });
-    yes.addEventListener('click', () => { location.href = (nextOpt() || { value: 'index.html' }).value; });
+    yes.addEventListener('click', () => { location.href = dest(); });
+    document.addEventListener('el-lock', () => labels());
+    addEventListener('load', () => setTimeout(labels, 0));   // the LS name in the top bar (el-app.js) may come after this
     ['click', 'input', 'change'].forEach(type => document.addEventListener(type, () => setTimeout(labels, 60)));
     document.querySelectorAll('.route,.tab').forEach(r => r.addEventListener('click', () => setTimeout(() => { labels(); confirmBox.hidden = true; message.textContent = ''; }, 0)));
     labels();
