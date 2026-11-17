@@ -75,6 +75,11 @@
   const BFLY=(c,i)=>`<span class="gd-bfly f${i%3}" style="animation-delay:-${(i*4.3).toFixed(1)}s" aria-hidden="true"><span class="gd-bob">${svg(20,16,`<g class="gd-w"><path d="M10 8 C6 1 0 2 1.5 7 C2.4 9.6 6 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C6.4 9.4 3 12 5 14.4 C7 16 9.4 12 10 8.4Z" fill="${c[1]}"/>`
     +`<path d="M10 8 C14 1 20 2 18.5 7 C17.6 9.6 14 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C13.6 9.4 17 12 15 14.4 C13 16 10.6 12 10 8.4Z" fill="${c[1]}"/></g><rect x="9.3" y="5" width="1.4" height="8" rx=".7" fill="#1f2937"/><path d="M9.6 5.2 L8.4 2.4 M10.4 5.2 L11.6 2.4" stroke="#1f2937" stroke-width=".5"/>`)}</span></span>`;
   const BCOL=[["#f472b6","#fb7185"],["#facc15","#fb923c"],["#60a5fa","#a78bfa"],["#34d399","#2dd4bf"],["#f97316","#fbbf24"]];
+  // 🐦 birds fly across the garden when every activity is done (Roger, 17 Nov 2026: "if they do everything they see birds")
+  const BIRD=(c,d)=>`<span class="gd-bird" style="--c:${c};--d:${d}" aria-hidden="true"><span class="gd-bbob">${svg(30,22,`<path d="M7 11.4 L0.6 7 L1.6 14.4Z" fill="${d}"/><ellipse cx="13" cy="12.4" rx="8.4" ry="5.6" fill="${c}"/>`
+    +`<ellipse cx="14.6" cy="14.6" rx="5.2" ry="3" fill="#fff" opacity=".55"/><circle cx="21" cy="8.4" r="4.4" fill="${c}"/><path d="M24.8 7.6 L29.2 8.8 L24.8 10.2Z" fill="#f59e0b"/>`
+    +`<circle cx="22.4" cy="7.6" r="1" fill="#111827"/><circle cx="22.7" cy="7.3" r=".35" fill="#fff"/><path class="gd-bw" d="M8.4 10.6 Q12.4 1.6 18.4 9.4 Q13.6 12.6 8.4 10.6Z" fill="${d}"/>`)}</span></span>`;
+  const BIRDS=BIRD("#3b82f6","#1d4ed8")+BIRD("#ef4444","#b91c1c")+BIRD("#facc15","#ca8a04");
   const RAINBOW=svg(200,60,["#ef4444","#f97316","#facc15","#22c55e","#3b82f6","#8b5cf6"].map((c,i)=>`<path d="M${10+i*4} 60 A${90-i*4} ${54-i*4} 0 0 1 ${190-i*4} 60" stroke="${c}" stroke-width="4" fill="none" opacity=".55"/>`).join(""),"gd-rainbow");
   const SUN=svg(40,40,`<g class="gd-rays">${Array.from({length:10},(_,i)=>`<path d="M20 2.5 L20 7.5" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" transform="rotate(${i*36} 20 20)"/>`).join("")}</g><circle cx="20" cy="20" r="9.5" fill="#fcd34d"/><circle cx="20" cy="20" r="9.5" fill="none" stroke="#f59e0b" stroke-width="1"/>`
     +`<circle cx="16.8" cy="18.6" r="1.1" fill="#92400e"/><circle cx="23.2" cy="18.6" r="1.1" fill="#92400e"/><path d="M16.6 22.4 Q20 25.6 23.4 22.4" stroke="#92400e" stroke-width="1.2" fill="none" stroke-linecap="round"/>`,"gd-sun");
@@ -107,6 +112,11 @@
 .gd-fresh{animation:gdgrow .9s cubic-bezier(.3,1.6,.5,1) both}.gd-fresh::before{content:"";position:absolute;left:50%;top:0;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:radial-gradient(#fde04788,transparent 70%);animation:gdglow 2.4s ease-out both;pointer-events:none}
 .gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly+.gd-bfly{right:auto;left:34px}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
 .gd-bob{display:block;animation:gdbob2 1.1s ease-in-out infinite alternate}.gd-bfly svg{width:24px;height:19px;display:block}
+.gd-free{position:absolute;width:0;height:0;z-index:4}.gd-free .gd-bfly{top:0;right:auto;left:0}
+.gd-bird{position:absolute;left:-40px;width:30px;height:22px;z-index:6;pointer-events:none;animation:gdbird 13s linear infinite}.gd-bird svg{width:30px;height:22px;display:block}
+.gd-bird:nth-of-type(1){top:58px}.gd-bird:nth-of-type(2){top:96px;animation-duration:17s;animation-delay:-6s}.gd-bird:nth-of-type(3){top:40px;animation-duration:21s;animation-delay:-13s}
+.gd-bbob{display:block;animation:gdbbob 1.6s ease-in-out infinite alternate}.gd-bw{transform-origin:13px 10px;animation:gdbw .28s ease-in-out infinite alternate}
+@keyframes gdbird{to{left:calc(100% + 40px)}}@keyframes gdbbob{to{transform:translateY(-8px) rotate(-4deg)}}@keyframes gdbw{to{transform:scaleY(-.7)}}
 .gd-w{transform-origin:10px 8px;animation:gdflap .22s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
 .gdn-key{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;padding:6px 16px 9px;font-size:12.5px;color:#365314;background:#f7fee7cc;border-top:1px solid #d9f99d}
 .gdn-key span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}.gdn-key svg{width:13px;height:22px}.gdn-key .gd-tree{width:16px;height:22px}.gdn-key b{font-weight:800;margin-right:2px}
@@ -138,6 +148,8 @@
     const KN={vocab:t("Vocabulari","Vocabulary"),grammar:t("Gramàtica","Grammar"),read:"Reading",listen:"Listening",speak:"Speaking",write:"Writing",recall:"Recall",fp:t("Producte final","Final product"),bonus:t("Opcional","Optional"),other:""};
     // 🦋 a butterfly for every 5 flowers in a bed (at most 2) and always one on a finished bed (Roger, 17 Nov 2026: "I don't see the
     // butterflies": only finished beds had one, so most students had none yet)
+    // 🦋 three butterflies always fly over every garden (Roger, 17 Nov 2026: "there should be always butterflies"), more with the flowers
+    const FREE=[[16,26],[50,70],[82,20]];
     let bi=0;const nBf=(b,done)=>{const f=b.plants.filter(p=>p.st==="bloom").length;return Math.min(2,Math.max(done&&b.plants.length>1?1:0,Math.floor(f/5)))};
     const beds=G.beds.map(b=>{const done=b.plants.every(p=>p.st==="bloom"),head=`${b.label?b.label+" · ":""}${b.title}`;
       if(b.kind==="cp"){const p=b.plants[0],st=b.plants.every(x=>x.st==="bloom")?"bloom":b.plants.some(x=>x.st==="thirsty")?"thirsty":b.plants.some(x=>x.st!=="sprout")?"bud":"sprout";
@@ -152,10 +164,10 @@
       :t("Acaba la teva primera activitat i hi sortirà la primera flor","Finish your first activity and your first flower will bloom");
     const key=[["vocab",t("Vocabulari","Vocabulary")],["grammar",t("Gramàtica","Grammar")],["read","Reading"],["listen","Listening"],["speak","Speaking"],["write","Writing"],["recall","Recall"]]
       .map(([k,l])=>`<span>${plantSvg(k,"bloom")}${l}</span>`).join("")
-      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span><span>🦋 ${t("cada 5 flors d'un bancal","every 5 flowers in a bed")}</span>`;
+      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span><span>🐦 ${t("ho has fet tot","everything done")}</span>`;
     return `<section class="gdn" id="garden" aria-label="${t("El meu jardí","My garden")}"><div class="gdn-h">${SUN}<div class="gdn-t"><span class="gdn-k">🌱 ${t("El meu jardí","My garden")}${G.ls?" · "+esc(G.ls):""}</span><b class="${n.thirsty&&!full?"thirst":""}">${head}</b></div>`
       +`<div class="gdn-st">${nf?`<span class="new">🎉 +${nf} ${nf===1?t("flor nova","new flower"):t("flors noves","new flowers")}</span>`:""}<span title="${t("Activitats fetes","Activities done")}">🌼 ${n.bloom} ${n.bloom===1?t("flor","flower"):t("flors","flowers")}</span>`
       +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">💧 ${n.thirsty} ${t("amb set","thirsty")}</span>`:"")
       +(n.bud+n.sprout?`<span title="${t("Activitats obertes per fer o començades","Open activities not finished yet")}">🌱 ${n.bud+n.sprout} ${t("creixent","growing")}</span>`:"")+`</div></div>`
-      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div></div><div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
+      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div>${FREE.map(([x,y],i)=>`<span class="gd-free" style="left:${x}%;top:${y}px">${BFLY(BCOL[(i+2)%BCOL.length],bi++)}</span>`).join("")}</div>${full?BIRDS:""}<div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
 })();
