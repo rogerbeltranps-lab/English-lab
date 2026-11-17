@@ -303,9 +303,10 @@
   const here=()=>location.hash==="#notes";
   document.addEventListener("ellshome",()=>{if(data&&exCtx)exBuild();else if(here()||data)draw()});
   window.addEventListener("hashchange",()=>{if(here())load()});
+  // ✦ in a personal LS (Towards Nativeness) the teacher is the learner: their own notebook, not the teacher's view (Roger, 17 Nov 2026)
   function setWho(u){
     const C=window.ELCloud,AS=C&&C.viewing;
-    who=!u?null:AS?{as:true,uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group,name:AS.name||""}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true,name:u.displayName||""};
+    who=!u?null:AS?{as:true,uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group,name:AS.name||""}:C.isTeacher(u)&&!((window.EL_LS||[]).find(l=>l.id===LS)||{}).personal?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true,name:u.displayName||""};
     data=null;mg=null;tPlayed=null;tInfo=null;tEx=null;exCtx=null;if(here())load();else draw();loadMg();
   }
   if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as",as:D.role==="as",name:D.name||"",group:D.group||""};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
