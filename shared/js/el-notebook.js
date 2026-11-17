@@ -259,7 +259,7 @@ window.ELNotebook = (function () {
     if (G.exam) {
       const e = G.exam, x = rs[H.LS + '/assessment'] || {}, sc = x.sections || {}, r = x.report || {};
       const got = e.sections.filter(([k]) => sc[k] && sc[k].score != null);
-      const max = got.reduce((n, [k, , mx]) => n + (+(sc[k].max || mx || e.max)), 0), mark = max ? got.reduce((n, [k]) => n + (+sc[k].score), 0) / max * 10 : null;
+      const max = got.reduce((n, [k, , mx]) => n + (+(sc[k].max || mx || e.max)), 0), mark = max ? (window.elBoosted || (m => m))(got.reduce((n, [k]) => n + (+sc[k].score), 0) / max * 10, window.elExamBoost ? elExamBoost(e, x) : 1) : null;   // the harder exam ×1.2 (el-grading.js)
       let h = `<div class="nb-postit k-exam">🎯 ${t('Examen final', 'Final exam')}${ex.exam ? `<small>${esc(H.exDay(ex.exam))}</small>` : ''}</div>`;
       if (!got.length) h += `<p class="nb-pencil">${t('Quan el professor l\'hagi corregit, aquí hi tindràs la nota de cada part, les preguntes que cal revisar corregides i el teu writing corregit.', 'Once your teacher has marked it, you\'ll find here the mark of each part, the questions to review corrected and your writing corrected.')}</p>`;
       else {
