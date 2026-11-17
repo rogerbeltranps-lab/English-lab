@@ -26,6 +26,11 @@
   const D = document, E = D.documentElement, $ = s => D.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const PV = window.EL_EXAM_PREVIEW || null;
+  // 📝 on the exam page a student is not moved by class mode, a class game or a pull-up (el-cloud.js reads EL_EXAM_LOCK; Roger, 17 Nov 2026:
+  // "Elunei will take the exam during class mode, there mustn't be any problem"). Set before el-cloud.js runs; off on "not open yet" and
+  // after turning in, so class mode takes them on again. The page never stays inside class.html (the class full screen): it has its own.
+  window.EL_EXAM_LOCK = true;
+  try { if (!PV && window.parent !== window && window.frameElement && window.frameElement.id === 'el-shell') window.parent.location.replace(location.href); } catch (e) {}
   let fs = null; const fsLib = async () => PV && PV.fs ? PV.fs : fs || (fs = await import(FS));
   const C = () => window.ELCloud;
   let ca = true; const t = (c, e) => ca ? c : e;
@@ -102,6 +107,7 @@
   .wx-esc{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:11px;padding:9px 14px;font-weight:700;max-width:90vw}
   .wx-teacher{background:#eef6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin:0 0 12px}
   .wx-teacher audio{width:100%;max-width:520px;margin-top:6px}
+  .wx-au{background:#fff7ed;border-color:#fdba74}.wx-au .wx-btn{margin-top:8px}.wx-aubar{display:inline-block;vertical-align:middle;width:200px;max-width:40vw;height:10px;border-radius:6px;background:#fed7aa;overflow:hidden;margin:8px 8px 0}.wx-aubar i{display:block;height:100%;width:0;background:#ea580c}
   `;
   D.head.appendChild(css);
 
@@ -126,7 +132,7 @@
   const isOpen = (l, g) => { const w = (((l || {}).webExam || {})[g] || {}); return !!w.open && (!Array.isArray(w.only) || !!(me && me.email && w.only.includes(String(me.email).toLowerCase()))); };
   const payload = F => ({ ls: X.ls, key: X.key, paper: S.paper, level: S.level, group: S.group || null, order: S.order, answers: S.answers, started: S.started,
     listenDone: S.listenDone || null, status: S.status, exits: S.exits.slice(0, 30), glances: S.glances.slice(-60), changes: S.changes.slice(-300),
-    snaps: S.snaps.slice(0, 30), tries: S.tries || 0, done: S.done || null, updated: F.serverTimestamp() });
+    snaps: S.snaps.slice(0, 30), tries: S.tries || 0, plays: S.plays || 0, done: S.done || null, updated: F.serverTimestamp() });
   function keep() { S.at = Date.now(); local.set(S); }
   function touch() { keep(); dirty = true; clearTimeout(saveT); saveT = setTimeout(save, SAVE_MS); mark(t('Desant…', 'Saving…')); }
   async function save() {
@@ -153,6 +159,7 @@
     const base = loc && loc.started && loc.paper && (!d || (loc.at || 0) > cloudMs) ? loc : d;
     if (base && base.started) {
       S = Object.assign({ exits: [], glances: [], changes: [], snaps: [], answers: {} }, base, { group: base.group || group });
+      S.plays = Math.max(+(loc && loc.started === S.started && loc.plays) || 0, +(d && d.plays) || 0);   // listening plays used: never fewer than either copy
       // the exam was running when the page closed or reloaded: that is leaving it, so it locks (a reload in the first seconds with
       // nothing answered, as when the site reloads itself once after signing in, only asks to go back to full screen)
       if (S.status === 'in') {
@@ -167,8 +174,9 @@
     intro();
   }
   function notOpen() {
+    window.EL_EXAM_LOCK = false;
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('L’examen encara no està obert', 'The exam is not open yet') + '</h2><p>' + t('El professor l’obrirà a classe. Quan t’ho digui, prem el botó.', 'Your teacher will open it in class. When they tell you, press the button.') + '</p><button class="wx-btn" id="wxAgain">🔄 ' + t('Torna-ho a mirar', 'Check again') + '</button></div>';
-    $('#wxAgain').onclick = async () => { $('#wxAgain').disabled = true; try { lsDoc = await readLs(); } catch (e) {} if (isOpen(lsDoc, S.group)) intro(); else { $('#wxAgain').disabled = false; $('#wxAgain').textContent = '🔄 ' + t('Encara no. Torna-ho a mirar', 'Not yet. Check again'); } };
+    $('#wxAgain').onclick = async () => { $('#wxAgain').disabled = true; try { lsDoc = await readLs(); } catch (e) {} if (isOpen(lsDoc, S.group)) { window.EL_EXAM_LOCK = true; intro(); } else { $('#wxAgain').disabled = false; $('#wxAgain').textContent = '🔄 ' + t('Encara no. Torna-ho a mirar', 'Not yet. Check again'); } };
   }
   let tPaper = null;   // 🧪 the paper the tester chose
   function intro() {
@@ -223,7 +231,7 @@
   async function begin() {
       if (S && S.started) return;
       const pl = paperOf(S.level), v = hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);
-      const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
+      const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
       await goFull(); keep(); run(); save();
@@ -291,14 +299,16 @@
     if (s === 'review') return review(b);
     const ids = S.order[s], list = ids.map(id => items(s).find(x => x.id === id)).filter(Boolean), lockL = s === 'listening' && !!S.listenDone && mode !== 'teacher';
     const ro = mode === 'view' || lockL;
-    const lead = { listening: t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
+    const lead = { listening: selfAu() ? t('Posa l’àudio tu mateix (el pots escoltar ' + X.audio.plays + ' vegades) i tria la resposta correcta.', 'Play the audio yourself (you can listen to it ' + X.audio.plays + ' times) and choose the right answer.')
+        : t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
       reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
       vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
       grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.'),
       writing: 'Write your text in the box. Use full sentences and check them before you turn in.' }[s];
     const qs = list.map((it, i) => qHtml(it, i, ro)).join('');
     let html = '<div class="wx-sec"><h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + '</h2><p class="wx-lead">' + lead + '</p>';
-    if (s === 'listening' && mode === 'teacher' && X.audio) html += '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · ' + t('Només el veu el professor: posa-ho dues vegades al projector.', 'Only you see this: play it twice on the projector.') + '<br>' + (X.audio.src ? '<audio controls preload="none" src="' + esc(X.audio.src) + '"></audio>' : '') + (X.audio.link ? ' <a href="' + esc(X.audio.link) + '" target="_blank" rel="noopener">🔊 ' + t('Obre l’àudio', 'Open the audio') + ' ↗</a>' : '') + '</div>';
+    if (s === 'listening' && mode === 'teacher' && X.audio) html += '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · ' + (X.audio.plays ? t('L’alumne el posa ell mateix (' + X.audio.plays + ' vegades com a màxim, sense pausa ni tornar enrere).', 'The student plays it herself or himself (' + X.audio.plays + ' times at most, no pause, no rewind).') : t('Només el veu el professor: posa-ho dues vegades al projector.', 'Only you see this: play it twice on the projector.')) + '<br>' + (X.audio.src ? '<audio controls preload="none" src="' + esc(X.audio.src) + '"></audio>' : '') + (X.audio.link ? ' <a href="' + esc(X.audio.link) + '" target="_blank" rel="noopener">🔊 ' + t('Obre l’àudio', 'Open the audio') + ' ↗</a>' : '') + '</div>';
+    if (s === 'listening' && selfAu() && !lockL && mode === 'student') html += auHtml();
     if (lockL) html += '<div class="wx-done">🔒 ' + t('Listening acabat: aquestes respostes ja no es poden canviar.', 'Listening finished: these answers can’t be changed any more.') + '</div>';
     html += s === 'reading' ? '<div class="wx-read"><div class="wx-text">' + P().text + '</div><div>' + qs + '</div></div>' : qs;
     const next = SECS[SECS.indexOf(s) + 1] || 'review';
@@ -313,15 +323,43 @@
       b.querySelectorAll('.wx-ta').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 1500)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim());
         const wc = b.querySelector('[data-wc="' + x.dataset.q + '"]'); if (wc) wc.textContent = wcText(words(x.value), +wc.dataset.min); }; });
     }
+    const ab = $('#wxAuGo'); if (ab) ab.onclick = auPlay;
     const nx = $('#wxNext'); if (nx) nx.onclick = () => { S.sec = next; keep(); draw(); wrap.scrollTop = 0; };
     const ld = $('#wxLDone'); if (ld) ld.onclick = () => {
       const left = items('listening').length - answered('listening'), sure = $('#wxLSure');
       ld.hidden = true; sure.innerHTML = '<div class="wx-sure"><p><b>⚠️ ' + t('Has acabat el Listening?', 'Have you finished the Listening?') + '</b><br>' + (left ? t('Tens <b>' + left + '</b> pregunt' + (left === 1 ? 'a' : 'es') + ' en blanc. ', 'You have <b>' + left + '</b> blank question' + (left === 1 ? '' : 's') + '. ') : '') + t('Després ja no podràs canviar aquestes respostes.', 'After this you can’t change these answers.') + '</p><button class="wx-btn sec" id="wxLNo">← ' + t('No, encara no', 'No, not yet') + '</button> <button class="wx-btn" id="wxLYes" disabled>' + t('Sí, continua', 'Yes, go on') + '</button></div>';
       $('#wxLNo').onclick = () => { sure.innerHTML = ''; ld.hidden = false; };
-      $('#wxLYes').onclick = () => { S.listenDone = now(); S.sec = 'reading'; touch(); draw(); wrap.scrollTop = 0; save(); };
+      $('#wxLYes').onclick = () => { auStop(); S.listenDone = now(); S.sec = 'reading'; touch(); draw(); wrap.scrollTop = 0; save(); };
       setTimeout(() => { const y = $('#wxLYes'); if (y) y.disabled = false; }, 1500);
     };
     if (scrollTo) { const q = D.getElementById('q-' + scrollTo); if (q) { q.scrollIntoView({ block: 'center' }); const f = q.querySelector('input,textarea'); if (f && !f.disabled) f.focus(); q.style.boxShadow = '0 0 0 3px #f59e0b'; setTimeout(() => { q.style.boxShadow = ''; }, 1800); } }
+  }
+  // 🔊 the student plays the listening herself, at most X.audio.plays times, with no pause and no rewind (Roger, 17 Nov 2026: Elunei's
+  // make-up exam, alone, with no projector). A play counts as soon as it starts (S.plays, saved, never goes down: firestore.rules);
+  // leaving the exam while it plays stops it and that play is used. Only when the exam data has audio.plays and an audio.src.
+  let AU = null;
+  const selfAu = () => !!(X.audio && X.audio.src && X.audio.plays > 0);
+  function auStop() { if (!AU) return; const a = AU; AU = null; try { a.pause(); } catch (e) {} }
+  function auHtml() { const max = X.audio.plays, n = S.plays || 0, left = Math.max(0, max - n);
+    return '<div class="wx-teacher wx-au" id="wxAu">⚠️ <b>' + t('Només pots posar l’àudio ' + max + ' vegades. Quan comença, no el pots aturar ni tornar enrere.', 'You can only play the audio ' + max + ' times. Once it starts, you can’t pause it or rewind it.') + '</b><br>' +
+      '<button class="wx-btn" id="wxAuGo"' + (AU || !left ? ' disabled' : '') + '>' + (AU ? '🔊 ' + t('Sonant… (' + n + ' de ' + max + ')', 'Playing… (' + n + ' of ' + max + ')')
+        : left ? '▶ ' + t('Posa l’àudio (' + (n + 1) + ' de ' + max + ')', 'Play the audio (' + (n + 1) + ' of ' + max + ')') : '🔇 ' + t('Ja l’has escoltat ' + max + ' vegades', 'You have listened to it ' + max + ' times')) + '</button>' +
+      '<span class="wx-aubar"><i id="wxAuBar"></i></span><span id="wxAuTime"></span></div>'; }
+  function auBox() { const b = $('#wxAu'); if (!b) return; const x = D.createElement('div'); x.innerHTML = auHtml(); b.replaceWith(x.firstChild); const g = $('#wxAuGo'); if (g) g.onclick = auPlay; }
+  function auPlay() {
+    if (AU || (S.plays || 0) >= X.audio.plays || S.status !== 'in' || S.listenDone || mode !== 'student') return;
+    const a = new Audio(X.audio.src); a.preload = 'auto'; AU = a;
+    S.plays = (S.plays || 0) + 1; touch(); save();
+    const mm = x => Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0');
+    a.ontimeupdate = () => { if (AU !== a) return; const bar = $('#wxAuBar'), tm = $('#wxAuTime'); if (bar && a.duration) bar.style.width = (100 * a.currentTime / a.duration) + '%'; if (tm && a.duration) tm.textContent = mm(a.currentTime) + ' / ' + mm(a.duration); };
+    a.onended = () => { if (AU === a) { AU = null; auBox(); } };
+    a.onpause = () => { if (AU === a && !a.ended) a.play().catch(() => {}); };   // a headphone or keyboard media key: it goes on
+    a.onseeking = () => {};
+    try { if (navigator.mediaSession) ['pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack'].forEach(k => { try { navigator.mediaSession.setActionHandler(k, () => {}); } catch (e) {} }); } catch (e) {}
+    a.play().then(auBox, e => {   // it never started (no sound file, blocked): that play is given back
+      console.warn('exam audio', e); if (AU !== a) return; AU = null; S.plays = Math.max(0, S.plays - 1); touch(); auBox();
+      const b = $('#wxAuTime'); if (b) b.textContent = ' ⚠️ ' + t('No s’ha pogut posar. Torna-ho a provar o avisa el professor.', 'It could not play. Try again or tell your teacher.'); });
+    auBox();
   }
   function set(id, v) {
     if (S.status !== 'in' || mode === 'view') return;
@@ -364,6 +402,7 @@
     if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
   }
   function handedIn() {
+    window.EL_EXAM_LOCK = false;
     root.innerHTML = '<div class="wx-card"><h2>✓ ' + t('Examen entregat', 'Exam turned in') + '</h2><p>' + t('Molt bé! Les teves respostes s’han enviat al professor.', 'Well done! Your answers have reached your teacher.') + ' ' + t('Veuràs la nota al teu tauler quan el professor la publiqui.', 'You will see your mark on your board when your teacher shares it.') + '</p>' + testerReset() + '</div><div id="wxGames"></div>';
     bindReset(); games();
   }
@@ -377,12 +416,12 @@
   // ---------- leaving: the exam stops and locks ----------
   async function exitNow(why) {
     if (S.status !== 'in' || mode !== 'student') return;
-    unbind(); const at = S.pendingExit || now(); delete S.pendingExit;
+    auStop(); unbind(); const at = S.pendingExit || now(); delete S.pendingExit;
     S.status = 'out'; S.exits.push({ at, why }); S.snaps.push({ at, answers: Object.assign({}, S.answers) });
     keep(); if (wrap) wrap.remove(); wrap = null; locked(); save();
   }
   function locked() {
-    unbind(); exitFull(); if (wrap) { wrap.remove(); wrap = null; }
+    auStop(); unbind(); exitFull(); if (wrap) { wrap.remove(); wrap = null; }
     const why = (S.exits[S.exits.length - 1] || {}).why;
     root.innerHTML = '';
     const L = D.createElement('div'); L.className = 'wx-lock';
@@ -409,16 +448,51 @@
       return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('') === p.h; } catch (e) { console.warn('exam password', e); return false; }
   }
 
+  // ---------- 🎓 class mode on the exam (the class tab) ----------
+  // Class mode on the exam day opens this page on the class tab (dashboard cmTarget, or 📝 Exam on the 📋 Today agenda). Here it turns exam
+  // mode on for the group (ls/{ls}.webExam[group] and live/{group}.exam, as the dashboard's 📝 Exam mode): every student is taken to the exam,
+  // reads the rules and waits in full screen; ▶ Start begins it for everyone, 🔒 Close ends it. A make-up for some students (.only, set on
+  // the dashboard) stays as it is. The class audio plays here, on the projector (Roger, 17 Nov 2026: "when I go class mode they should all go").
+  const cmGroup = () => { try { const o = JSON.parse(sessionStorage.getItem('el_cm') || 'null'); return o && o.g && Date.now() < o.until ? o.g : null; } catch (e) { return null; } };
+  const pageRel = () => location.pathname.split('/').slice(-3).join('/');
+  async function classPanel(g, box) {
+    const gn = ((window.EL_GROUPS || []).find(x => x.id === g) || {}).name || g;
+    const F = await fsLib(), db = C().db, lsRef = F.doc(db, 'ls', X.ls), liveRef = F.doc(db, 'live', g);
+    const write = (w, live) => Promise.all([F.setDoc(lsRef, { webExam: { [g]: w } }, { merge: true }), F.setDoc(liveRef, { exam: live }, { merge: true })]);
+    let w = {}; try { const d = await F.getDoc(lsRef); w = ((d.exists() ? d.data() : {}).webExam || {})[g] || {}; } catch (e) { console.warn('exam class', e); }
+    const fresh = w.at && Date.now() - Date.parse(w.at) < 3 * 3600e3;
+    if (!(w.open && w.mode && fresh)) {   // exam mode on for the group, unless it is already on (a reload of this tab, or started)
+      const at = new Date().toISOString(), only = w.open && Array.isArray(w.only) ? w.only : null;
+      w = { open: true, mode: true, go: null, only, at };
+      try { await write(w, { on: true, href: pageRel(), ls: X.ls, only, at: Date.now(), go: null }); } catch (e) { box.innerHTML = '<p class="wx-warn">✗ Exam mode could not start: ' + esc(e.message || e) + '</p>'; return; }
+    }
+    const draw = msg => {
+      const started = !!w.go, au = X.audio && X.audio.src && !X.audio.plays;
+      box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 📝 Exam mode' + (w.only ? ' · ' + w.only.length + ' student' + (w.only.length === 1 ? '' : 's') : '') + '</h2>' +
+        (started ? '<p class="wx-done">▶ The exam has started (' + new Date(w.go).toTimeString().slice(0, 5) + '). Students who arrive now press Start themselves.</p>'
+          : '<p>Every student of ' + esc(gn) + (w.only ? ' on the list' : '') + ' with the site open is taken to the exam: they read the rules and wait in full screen. Explain the rules, then press <b>▶ Start</b>: it starts for everyone at once.</p>') +
+        '<p>' + (started ? '' : '<button class="wx-btn" id="wxCmGo">▶ Start the exam</button> ') + '<button class="wx-btn sec" id="wxCmEnd">🔒 Close the exam</button></p>' +
+        (au ? '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · play it twice on the projector<br><audio controls preload="auto" src="' + esc(X.audio.src) + '"></audio></div>' : '') +
+        (msg ? '<p class="wx-warn">' + esc(msg) + '</p>' : '');
+      const go = $('#wxCmGo'); if (go) go.onclick = async () => { go.disabled = true; const t = Date.now();
+        try { await write(Object.assign({}, w, { go: t }), { on: true, href: pageRel(), ls: X.ls, only: w.only || null, at: Date.parse(w.at) || t, go: t }); w.go = t; draw(); } catch (e) { go.disabled = false; draw('✗ Not started: ' + (e.message || e)); } };
+      $('#wxCmEnd').onclick = async () => { if (!confirm('Close the exam for ' + gn + '?\n\nStudents still writing can no longer save. Close it only when everyone has turned in.')) return;
+        try { await write({ open: false, mode: false, go: null, only: null, at: new Date().toISOString() }, null); w = {}; box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 🔒 Exam closed</h2><p>Exam mode is over: class mode goes on as usual.</p>'; } catch (e) { draw('✗ Not closed: ' + (e.message || e)); } };
+    };
+    draw();
+  }
+
   // ---------- the teacher (preview) and the student view ----------
   function teacherPick(note) {
     ca = false;
     root.innerHTML = '<div class="wx-card"><h2>📝 Exam preview (teacher)</h2>' + (note ? '<p class="wx-done">' + esc(note) + '</p>' : '') +
-      '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A or B from their account, with the questions and options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
+      '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A or B from their account, with the questions in order (as in the audio and the texts) and the options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
       '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') + '</p>' +
       '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button>' + (X.games ? ' <button class="wx-btn sec" id="wxTryGames">🎮 Try the games (after turning in)</button>' : '') + '</p></div><div id="wxGames"></div>';
     const tg = $('#wxTryGames'); if (tg) tg.onclick = () => { tg.disabled = true; games(); $('#wxGames').scrollIntoView({ behavior: 'smooth' }); };
+    const cg = !PV && cmGroup(); if (cg && !$('#wxCm')) { const box = D.createElement('div'); box.className = 'wx-card'; box.id = 'wxCm'; box.style.borderColor = '#4338ca'; box.innerHTML = '<p>Loading exam mode…</p>'; root.prepend(box); classPanel(cg, box).catch(e => { box.innerHTML = '<p class="wx-warn">✗ ' + esc(e.message || e) + '</p>'; }); }
     root.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const paper = b.dataset.p;
-      const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
+      const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { paper, level: paper.startsWith('core') ? 'safe' : 'insecure', order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [] };
       ca = paper.startsWith('base'); run(); });

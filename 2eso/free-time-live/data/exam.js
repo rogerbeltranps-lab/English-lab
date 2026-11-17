@@ -71,21 +71,21 @@ window.EL_EXAM = {
      {
       "id": "bA-l03",
       "t": "mc",
-      "q": "What are the players doing before the match starts?",
-      "o": [
-       "They’re drinking water.",
-       "They’re eating sandwiches.",
-       "They’re warming up."
-      ]
-     },
-     {
-      "id": "bA-l04",
-      "t": "mc",
       "q": "What is the Green Team wearing?",
       "o": [
        "a new white uniform",
        "green T-shirts and black shorts",
        "green tracksuits"
+      ]
+     },
+     {
+      "id": "bA-l04",
+      "t": "mc",
+      "q": "What are the players doing before the match starts?",
+      "o": [
+       "They’re drinking water.",
+       "They’re eating sandwiches.",
+       "They’re warming up."
       ]
      },
      {
@@ -455,6 +455,16 @@ window.EL_EXAM = {
      {
       "id": "bB-l03",
       "t": "mc",
+      "q": "What’s the weather like outside?",
+      "o": [
+       "It’s cold and rainy.",
+       "It’s cold but sunny.",
+       "It’s hot and sunny."
+      ]
+     },
+     {
+      "id": "bB-l04",
+      "t": "mc",
       "q": "How does Marc get two points?",
       "o": [
        "He passes the ball to Júlia.",
@@ -463,37 +473,7 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "bB-l04",
-      "t": "mc",
-      "q": "Who is Júlia?",
-      "o": [
-       "a reporter on the radio",
-       "the captain of the Green Team",
-       "the coach of the Blue Team"
-      ]
-     },
-     {
       "id": "bB-l05",
-      "t": "mc",
-      "q": "What is the score at half-time?",
-      "o": [
-       "six to two",
-       "two to six",
-       "two to two"
-      ]
-     },
-     {
-      "id": "bB-l06",
-      "t": "mc",
-      "q": "When are Emma and Sam coming back?",
-      "o": [
-       "at the end of the match",
-       "in ten minutes",
-       "in two minutes"
-      ]
-     },
-     {
-      "id": "bB-l07",
       "t": "mc",
       "q": "How is Marc playing today?",
       "o": [
@@ -503,13 +483,33 @@ window.EL_EXAM = {
       ]
      },
      {
+      "id": "bB-l06",
+      "t": "mc",
+      "q": "Who is Júlia?",
+      "o": [
+       "a reporter on the radio",
+       "the captain of the Green Team",
+       "the coach of the Blue Team"
+      ]
+     },
+     {
+      "id": "bB-l07",
+      "t": "mc",
+      "q": "What is the score at half-time?",
+      "o": [
+       "six to two",
+       "two to six",
+       "two to two"
+      ]
+     },
+     {
       "id": "bB-l08",
       "t": "mc",
-      "q": "Which two teams are playing?",
+      "q": "When are Emma and Sam coming back?",
       "o": [
-       "the Blue Team and the Green Team",
-       "the Blue Team and the Red Team",
-       "the Green Team and the White Team"
+       "at the end of the match",
+       "in ten minutes",
+       "in two minutes"
       ]
      }
     ],
@@ -829,46 +829,6 @@ window.EL_EXAM = {
      {
       "id": "cA-l02",
       "t": "mc",
-      "q": "What are the players doing before the match starts?",
-      "o": [
-       "They’re drinking water.",
-       "They’re eating sandwiches.",
-       "They’re warming up."
-      ]
-     },
-     {
-      "id": "cA-l03",
-      "t": "mc",
-      "q": "How many students are watching the match?",
-      "o": [
-       "about twenty",
-       "about two hundred",
-       "about two thousand"
-      ]
-     },
-     {
-      "id": "cA-l04",
-      "t": "mc",
-      "q": "Who is Júlia?",
-      "o": [
-       "a reporter on the radio",
-       "the captain of the Green Team",
-       "the coach of the Blue Team"
-      ]
-     },
-     {
-      "id": "cA-l05",
-      "t": "mc",
-      "q": "What is the score at half-time?",
-      "o": [
-       "six to two",
-       "two to six",
-       "two to two"
-      ]
-     },
-     {
-      "id": "cA-l06",
-      "t": "mc",
       "q": "Which sentence is TRUE?",
       "o": [
        "The Blue Team is wearing a new white uniform.",
@@ -877,7 +837,17 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "cA-l07",
+      "id": "cA-l03",
+      "t": "mc",
+      "q": "What are the players doing before the match starts?",
+      "o": [
+       "They’re drinking water.",
+       "They’re eating sandwiches.",
+       "They’re warming up."
+      ]
+     },
+     {
+      "id": "cA-l04",
       "t": "mc",
       "q": "Why is it very noisy in the sports hall?",
       "o": [
@@ -887,13 +857,43 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "cA-l08",
+      "id": "cA-l05",
+      "t": "mc",
+      "q": "How many students are watching the match?",
+      "o": [
+       "about twenty",
+       "about two hundred",
+       "about two thousand"
+      ]
+     },
+     {
+      "id": "cA-l06",
       "t": "mc",
       "q": "Marc usually plays as a defender. And today?",
       "o": [
        "Today he isn’t playing.",
        "Today he’s playing as a defender again.",
        "Today he’s playing as a forward, and it’s working."
+      ]
+     },
+     {
+      "id": "cA-l07",
+      "t": "mc",
+      "q": "Who is Júlia?",
+      "o": [
+       "a reporter on the radio",
+       "the captain of the Green Team",
+       "the coach of the Blue Team"
+      ]
+     },
+     {
+      "id": "cA-l08",
+      "t": "mc",
+      "q": "What is the score at half-time?",
+      "o": [
+       "six to two",
+       "two to six",
+       "two to two"
       ]
      }
     ],
@@ -1182,6 +1182,16 @@ window.EL_EXAM = {
      {
       "id": "cB-l04",
       "t": "mc",
+      "q": "Which sentence is NOT true?",
+      "o": [
+       "It’s sunny outside.",
+       "Some students are eating sandwiches.",
+       "The crowd is cheering."
+      ]
+     },
+     {
+      "id": "cB-l05",
+      "t": "mc",
       "q": "What number is Marc?",
       "o": [
        "eleven",
@@ -1190,7 +1200,7 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "cB-l05",
+      "id": "cB-l06",
       "t": "mc",
       "q": "What happens when Júlia shoots?",
       "o": [
@@ -1200,7 +1210,7 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "cB-l06",
+      "id": "cB-l07",
       "t": "mc",
       "q": "What is the coach doing at half-time?",
       "o": [
@@ -1210,23 +1220,13 @@ window.EL_EXAM = {
       ]
      },
      {
-      "id": "cB-l07",
+      "id": "cB-l08",
       "t": "mc",
       "q": "When are Emma and Sam coming back?",
       "o": [
        "at the end of the match",
        "in ten minutes",
        "in two minutes"
-      ]
-     },
-     {
-      "id": "cB-l08",
-      "t": "mc",
-      "q": "Which sentence is NOT true?",
-      "o": [
-       "It’s sunny outside.",
-       "Some students are eating sandwiches.",
-       "The crowd is cheering."
       ]
      }
     ],

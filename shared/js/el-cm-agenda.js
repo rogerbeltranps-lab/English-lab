@@ -82,7 +82,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag .crt{display:block;margin:-2px 0 6px auto;padding:3px 10px;border:1.5px solid #86efac;border-radius:999px;background:#f0fdf4;color:#166534;font:700 13px system-ui,sans-serif;cursor:pointer}#el-cmag .crt:hover{border-color:#16a34a}
 #el-cmag.dock .crt{font-size:12px;padding:2px 8px}
 #el-cmag .it.nt{background:#fef9c3;border-color:#fde047;cursor:default}#el-cmag .it.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6;cursor:pointer}
-#el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
+#el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag button.it.ex{cursor:pointer}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
 #el-cmag .m{flex:none;border:1.5px solid #60a5fa;border-radius:999px;padding:1px 9px;font-size:14px;color:#1d4ed8;background:#fff}
 #el-cmag .it.now .m{border-color:#fff}#el-cmag .msg{color:#64748b;font-weight:500;margin:6px 2px}#el-cmag .err{color:#b91c1c}
 #el-cmag.dock{position:static;width:auto;max-height:none;overflow:visible;flex:none;box-shadow:none;border-width:1.5px;border-radius:14px;padding:10px;font-size:14px;margin:0}
@@ -140,7 +140,7 @@ export function isOpen(){return !!box}
 export function close(){if(box){box.remove();box=null}clearInterval(placeT);want(false)}
 // the scripts and the agendas, also with the panel closed: the class tab needs today's steps for live/{group}.go (plan)
 let ready=null;
-const scripts=()=>Promise.all([load("shared/js/el-sections.js",()=>window.EL_SECTIONS),load("shared/js/el-plan.js",()=>window.EL_PLAN),load("shared/js/el-week.js",()=>window.ELWeek),load("lab/game/decks/index.js",()=>window.EL_GAMES)]);
+const scripts=()=>Promise.all([load("shared/js/el-sections.js",()=>window.EL_SECTIONS),load("shared/js/el-plan.js",()=>window.EL_PLAN),load("shared/js/el-week.js",()=>window.ELWeek),load("lab/game/decks/index.js",()=>window.EL_GAMES),load("shared/js/el-grading.js",()=>window.EL_GRADING)]);
 export function init(){return ready||(ready=(async()=>{await scripts();L=await agendas();await bookOpen()})().catch(e=>{ready=null;throw e}))}
 // ⚡ I've finished (Roger, 12 Nov 2026: fast finishers go on with "the book section"): the 📖 Book learning path of each LS with steps
 // today. Class mode opens it for the group (rules level, so the answers save; ensureOpen, once) and names it on live/{group}.go.ff; the
@@ -246,7 +246,9 @@ async function draw(){if(!box)return;
   if(ADD)return drawAdd();
   const its=[];let body="",tot=0,nTab=0;
   L.forEach(x=>{const ag=x.ag,mn=it=>+((ag.min||{})[D+"|"+it])||0;
-    if(ag.exam===D)body+=`<div class="it ex">📝 Exam</div>`;
+    // 📝 the exam day: an LS with a web exam opens it here (exam mode for the group, el-web-exam.js on the class tab; Roger, 17 Nov 2026)
+    const xp=(((window.EL_GRADING||{})[x.ls.id]||{}).exam||{}).web;
+    if(ag.exam===D)body+=live&&xp&&xp.page?`<button class="it ex" data-ex="${E(xp.page)}" title="Open the exam: every student of ${E(C.gname)} is taken to it and waits for ▶ Start"><span>📝 Exam</span><span class="go gt">Go →</span></button>`:`<div class="it ex">📝 Exam</div>`;
     runs(ag,D).forEach(g=>{
       if(!g.a){g.its.forEach(it=>{const n=its.push({ls:x,it})-1,m=mn(it);tot+=m;const sh=it===SHD&&x.ls.shadowing;
         body+=`<${sh?"button":"div"} class="it ${sh?"shd":"nt"}" ${sh?`data-i="${n}" title="Play the unit's shadowing video here (students stay where they are)"`:""}>${m?`<span class="m">${m} min</span>`:""}<span>${E(it.slice(5))}</span>${sh?'<span class="go">▶</span>':""}</${sh?"button":"div"}>`});return}
@@ -284,6 +286,7 @@ function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];
     +`<p class="msg" style="margin-top:0">It goes on today's class on the Time plan, opens for ${E(C.gname)} and students can do it (👥).</p>`+(body||`<p class="msg">No learning paths found.</p>`);
   box._add=its}
 function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.wu)return warmOpen();
+  if(b.dataset.ex){location.href=new URL(b.dataset.ex,C.root).href;return}
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
   if(b.dataset.c!=null){const y=(box._its||[])[+b.dataset.c],r=y&&readingOf(y.a.path,y.p);if(r)openCorrect(C.root,Object.assign({tab:y.p,g:C.g},r));return}

@@ -957,9 +957,13 @@ function gamePush(u){
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
+    // 📝 a student in the web exam (el-web-exam.js sets EL_EXAM_LOCK while they wait for ▶ Start or take it) is never moved: not by class
+    // mode, a class game or a pull-up (Roger, 17 Nov 2026: Elunei takes her exam while the rest of the class is in class mode)
+    if(window.EL_EXAM_LOCK)return;
+    // exam mode first: a student called to the exam is not taken to a class game the others play
+    if(examPull(x&&x.exam))return;
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{try{sessionStorage.setItem(TOOK,JSON.stringify({p:location.pathname,at:Date.now()}))}catch(e){}location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    if(examPull(x&&x.exam))return;
     const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsKnown=true;fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
@@ -1465,7 +1469,8 @@ let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListen
 const inShell=(()=>{try{return window.parent!==window&&!!window.frameElement&&window.frameElement.id==="el-shell"&&window.parent.EL_SHELL===true}catch(e){return false}})();
 const FW=inShell?window.parent:window,SHELL=new URL("class.html",ROOT);
 let shellGo=false,fsKnown=false;   // fsKnown: the group's live doc has been read once on this page (gamePush)
-const ownFs=()=>{const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !!(h&&(h.checkpoint||/sample-exam$/.test(h.id)))};
+// a page with its own full screen: checkpoints, the sample exam and the web exam (el-web-exam.js, window.EL_EXAM): never inside class.html
+const ownFs=()=>{const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !!(h&&(h.checkpoint||/sample-exam$/.test(h.id)))||!!window.EL_EXAM};
 function shellLeave(){if(!inShell||shellGo)return;shellGo=true;fsBye=true;try{FW.location.replace(location.href)}catch(e){}}
 function shellEnter(){if(inShell||shellGo||window.top!==window||ownFs())return false;shellGo=true;fsBye=true;
   const u=new URL(SHELL);u.searchParams.set("u",location.pathname+location.search+location.hash);location.replace(u.href);return true}
@@ -1480,7 +1485,7 @@ function fsRefresh(){const was=FSG&&FSG.at;FSG=myGroup?elFsEff(FSL,TT):null;if((
 const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
 const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));   // FSG is refreshed every second
-function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
+function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;return !ownFs()}
 async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
   try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
 function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.lock(["Escape"]).catch(()=>{})}catch(e){}},
@@ -1860,7 +1865,7 @@ onAuthStateChanged(auth,async u=>{
 // (DIRTY). Not on the dashboard, recall checkpoints, the sample exam or a followed presentation.
 const elDayNow=()=>{try{return new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"})}catch(e){return new Date().toDateString()}},elLoadDay=elDayNow();
 async function newDayReload(){if(document.hidden||reloading||elDayNow()===elLoadDay||/\/teacher\.html$/.test(location.pathname)||/[?&]live=/.test(location.search)
-    ||/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname))return;
+    ||/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname)||window.EL_EXAM)return;
   reloading=true;try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("new day",e)}location.reload()}
 document.addEventListener("visibilitychange",newDayReload);window.addEventListener("focus",newDayReload);setInterval(newDayReload,5*60e3);
 

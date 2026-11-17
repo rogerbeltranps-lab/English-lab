@@ -1076,6 +1076,9 @@ function lpBox(ls,grp){
 const cmOf=gid=>{const x=FSW.g===gid&&FSW.x&&FSW.x.go;return elCmOn(x)?x:null};
 // where class mode starts: the page of the group's class session (its first learning path), else its current LS's home page
 function cmTarget(gid){const c=nextClass(gid),y=sessOf(gid,c&&c.date);
+  // 📝 the exam day on the Time plan of an LS with a web exam: class mode opens the exam (the class tab turns exam mode on there, every
+  // student of the group is taken to it and waits for ▶ Start; Roger, 17 Nov 2026: "when I go class mode they should all go to the exam")
+  {const n=ELWeek.now(gid),d=(c&&c.date)||ELWeek.today(),w=n&&n.p&&n.gi>=0&&ELWeek.exam(n.p,n.gi)===d&&(exOf(n.ls)||{}).web;if(w&&w.page)return {href:w.page,ls:n.ls}}
   if(y){const a=((dayTabs(y.x,y.l)[0]||lineActs(y.x,y.l)[0])||[])[0];if(a)return {href:a.path,ls:y.x.ls,a:a.id}}
   const n=ELWeek.now(gid),l=n&&EL_LS.find(z=>z.id===n.ls);return {href:l?l.course+"/"+l.id.slice(l.course.length+1)+"/index.html":"index.html"}}
 function cmStart(gid,href,ls,aid,p){const now=Date.now(),until=elClassEnd(gid,now)||now+70*60e3,t=href?{href,ls,a:aid}:cmTarget(gid),a=t.a&&byId(t.a);
@@ -2781,13 +2784,13 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
   // ls/{ls}.webExam[group] = {open, mode, go, only, at} (the exam page and firestore.rules read it); live/{group}.exam = {on, href, ls,
   // only, at, go} takes the students' open pages to the exam (el-cloud.js examPull) and starts the waiting ones (el-web-exam.js watchGo)
   const wxSet=(v,live)=>{const i=S.D.ls[ls]=S.D.ls[ls]||{};i.webExam=i.webExam||{};i.webExam[grp.id]=v;
-    act(Promise.all([put(["ls",ls],{webExam:{[grp.id]:v}}),live!==undefined?put(["live",grp.id],live?{exam:live,go:null}:{exam:null}):null]))};
+    act(Promise.all([put(["ls",ls],{webExam:{[grp.id]:v}}),live!==undefined?put(["live",grp.id],live?(live.only?{exam:live}:{exam:live,go:null}):{exam:null}):null]))};   // some students only: class mode goes on for the rest (Roger, 17 Nov 2026: Elunei in class mode)
   const mode=only=>{const at=new Date().toISOString();WX.pick=null;
     wxSet({open:true,mode:true,go:null,only,at},{on:true,href:c.page,ls,only,at:Date.now(),go:null})};
   ({mode:()=>{if(!confirm(`Exam mode for ${grp.name}?\n\nEvery student of ${grp.name} with the site open is taken to the exam. They read the rules and wait in full screen until you press ▶ Start. (Class mode stops.)`))return;mode(null)},
     pick:()=>{WX.pick=WX.pick===grp.id+ls?null:grp.id+ls;render()},
     modefor:()=>{const es=[...document.querySelectorAll(".wxPk:checked")].map(x=>x.value);if(!es.length)return alert("Tick at least one student.");
-      if(!confirm(`Exam mode only for ${es.length} student(s)?\n\nOnly they are taken to the exam and can start it; the rest of ${grp.name} still sees it closed.`))return;mode(es)},
+      if(!confirm(`Exam mode only for ${es.length} student(s)?\n\nOnly they are taken to the exam and can start it; the rest of ${grp.name} still sees it closed. Class mode goes on for the others, and nothing (class mode, a class game) takes these students out of the exam.`))return;mode(es)},
     go:()=>{const W=wxW0(ls,grp.id),t=Date.now();wxSet(Object.assign({},W,{open:true,go:t}),{on:true,href:c.page,ls,only:W.only||null,at:Date.parse(W.at)||t,go:t})},
     close:()=>{const W=wxW0(ls,grp.id);if(!confirm(W.mode&&!W.go?`End exam mode for ${grp.name}? Nobody has started yet.`:`Close the exam for ${grp.name}?\n\nNobody can start it or change answers any more. Exams not turned in keep the answers saved so far.`))return;
       wxSet({open:false,mode:false,go:null,only:null,at:new Date().toISOString()},null)},

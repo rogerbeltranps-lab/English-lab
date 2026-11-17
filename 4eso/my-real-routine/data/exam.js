@@ -4,7 +4,8 @@ window.EL_EXAM = {
  "key": "ls1Exam4ESO",
  "ls": "4eso-my-real-routine",
  "audio": {
-  "src": "",
+  "src": "audio/exam-listening.mp3",
+  "plays": 2,
   "link": "https://drive.google.com/file/d/1RiIU7Z-GU3voavQp0Zi_YYWMp4J3cw7q/view",
   "title": "My Real Routine · Listening (Nora and Leo)",
   "about": "Nora and Leo talk about their school-day routines.",
@@ -23,18 +24,18 @@ window.EL_EXAM = {
      {
       "id": "bm-l01",
       "t": "mc",
-      "q": "What does Leo eat for breakfast?",
+      "q": "What does Nora usually have for breakfast?",
       "o": [
-       "Bread and cheese.",
-       "Cereal and fruit.",
-       "Fruit and yoghurt.",
-       "Toast and eggs."
+       "Cereal and milk.",
+       "Eggs and tea.",
+       "Fruit and water.",
+       "Toast and orange juice."
       ]
      },
      {
       "id": "bm-l02",
       "t": "mc",
-      "q": "How does Nora travel to school?",
+      "q": "How does Leo get to school?",
       "o": [
        "By bus.",
        "By car.",
@@ -45,45 +46,45 @@ window.EL_EXAM = {
      {
       "id": "bm-l03",
       "t": "mc",
-      "q": "What does Nora have as a snack?",
+      "q": "When does Nora get home after school?",
       "o": [
-       "An apple.",
-       "Cereal.",
-       "Eggs.",
-       "Toast."
+       "At a quarter to six.",
+       "At five o’clock.",
+       "At four o’clock.",
+       "At half past four."
       ]
      },
      {
       "id": "bm-l04",
       "t": "mc",
-      "q": "When does Nora usually begin her homework?",
+      "q": "What does Nora do on Tuesdays and Thursdays?",
       "o": [
-       "At 4:15.",
-       "At 4:45.",
-       "At 5:00.",
-       "At 5:30."
+       "She cleans her room before dinner.",
+       "She goes for a walk after her homework.",
+       "She goes to the swimming pool.",
+       "She visits her grandmother."
       ]
      },
      {
       "id": "bm-l05",
       "t": "mc",
-      "q": "What does Leo do on Saturday mornings?",
+      "q": "When does Leo go to bed?",
       "o": [
-       "He reads in bed.",
-       "He runs errands with his dad.",
-       "He walks with his aunt.",
-       "He watches a film at school."
+       "At eleven o’clock.",
+       "At half past nine.",
+       "At midnight.",
+       "At ten o’clock."
       ]
      },
      {
       "id": "bm-l06",
       "t": "mc",
-      "q": "At what time does Nora turn in?",
+      "q": "How does Nora wind down in the evening?",
       "o": [
-       "At 10:15.",
-       "At 10:45.",
-       "At 11:00.",
-       "At 11:15."
+       "She calls a friend.",
+       "She listens to music.",
+       "She plays video games.",
+       "She reads in bed."
       ]
      }
     ],
@@ -378,67 +379,67 @@ window.EL_EXAM = {
      {
       "id": "cm-l01",
       "t": "mc",
-      "q": "How often does Leo pick up his sister?",
+      "q": "How long does Nora stay in bed after she wakes up?",
       "o": [
-       "Every school day.",
-       "Only on Sundays.",
-       "Three school days a week.",
-       "Two school days a week."
+       "Fifteen minutes.",
+       "Five minutes.",
+       "She gets up straight away.",
+       "Thirty minutes."
       ]
      },
      {
       "id": "cm-l02",
       "t": "mc",
-      "q": "What does Nora do during online study?",
+      "q": "How does Nora get to school during the week?",
       "o": [
-       "She takes a break every fifteen minutes.",
-       "She takes a break every forty minutes.",
-       "She takes a break every thirty minutes.",
-       "She takes a break every twenty-five minutes."
+       "She takes the bus with Leo every day.",
+       "She walks on Mondays and takes the bus on the other days.",
+       "She walks with a friend every day.",
+       "She walks: with a friend on two days and alone on the other three."
       ]
      },
      {
       "id": "cm-l03",
       "t": "mc",
-      "q": "What is different about their evening wind-down habits?",
+      "q": "What does Nora do on Fridays before dinner?",
       "o": [
-       "Nora goes for a walk, whereas Leo reads.",
-       "Nora listens to music, whereas Leo reads.",
-       "Nora reads, whereas Leo listens to music.",
-       "Nora watches videos, whereas Leo draws."
+       "She cleans her room.",
+       "She does the shopping.",
+       "She goes for a walk.",
+       "She watches TV."
       ]
      },
      {
       "id": "cm-l04",
       "t": "mc",
-      "q": "Which comparison of their bedtimes is accurate?",
+      "q": "How is Leo’s afternoon different from Nora’s?",
       "o": [
-       "Leo turns in one hour later than Nora.",
-       "Leo turns in thirty minutes later than Nora.",
-       "Nora turns in one hour later than Leo.",
-       "They both turn in at eleven."
+       "He does his homework after dinner, but Nora does hers before.",
+       "He gets home earlier and goes for a walk every day.",
+       "He gets home later and doesn’t usually go for walks on school days.",
+       "He has a snack, but Nora doesn’t."
       ]
      },
      {
       "id": "cm-l05",
       "t": "mc",
-      "q": "Which change does Leo actually want to make?",
+      "q": "Why is Leo sometimes tired at school?",
       "o": [
-       "Develop a more regular sleep routine.",
-       "Get home later on weekdays.",
-       "Replace the bus with a train.",
-       "Stop having breakfast before school."
+       "He doesn’t always get enough sleep.",
+       "He gets up too early.",
+       "He goes for long walks in the evening.",
+       "He walks to school every day."
       ]
      },
      {
       "id": "cm-l06",
       "t": "mc",
-      "q": "How much later does Leo leave for school than Nora?",
+      "q": "What does Leo want to change?",
       "o": [
-       "Fifteen minutes.",
-       "Five minutes.",
-       "Ten minutes.",
-       "Thirty minutes."
+       "He wants to go to bed later.",
+       "He wants to limit his screen time.",
+       "He wants to stop having breakfast.",
+       "He wants to take the bus with Nora."
       ]
      }
     ],
