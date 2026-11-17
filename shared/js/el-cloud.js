@@ -4,7 +4,7 @@ import "./el-copyright.js";
 import "./el-route-names.js";
 import {signIn} from "./el-signin.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
-import {report} from "./el-report.js";
+import {report,wakeFixer} from "./el-report.js";
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
@@ -764,11 +764,7 @@ const reportProblem=(u,x)=>{const tch=isTeacher(u)&&!AS;return report({en:repEn(
   b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:tch?((cmRead()||{}).g||null):myGroup||null,ls:lsId,activity:actId,route:tch?null:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()},tch?{teacher:true}:{}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
   return b.commit().then(r=>{wakeFixer(u);return r})}})};
-// Roger, 8 Nov 2026 ("read it straightaway … fix it and answer the student"): once the report is saved, the school Apps Script
-// (tools/notify/school-mail.gs, action "problem") starts the scheduled task that reads new reports, checked with the student's own
-// sign-in; fire and forget, nothing shown, nothing read. Without it the task still runs every hour.
-const FIXER_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
-const wakeFixer=u=>{try{u.getIdToken().then(t=>fetch(FIXER_URL,{method:"POST",mode:"no-cors",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:t,action:"problem"})})).catch(()=>{})}catch(e){}};
+// wakeFixer (el-report.js): once the report is saved, the instant task that reads new reports starts (also from the class game player).
 
 // Suggestions to improve the site (bottom bar "💡 Idea"): suggestions/{id}, read only by the teacher in the dashboard. Same language as the Problem window.
 function suggest(u){

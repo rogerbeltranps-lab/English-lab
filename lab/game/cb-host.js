@@ -27,11 +27,13 @@ import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,TEACHERS} from "../../shared/js/el-firebase.js";
+import {cmAfter} from "./cm-after.js";
 
 const G=window.ELGame,CB=window.ELCB,AV=window.ELCBAV,X=window.ELSR,{esc,md}=G,$=s=>document.querySelector(s);
 const SR=document.body.classList.contains("sr")&&!!X,NAME=SR?"🚀 Space rescue":"🕵️ Code Breakers",EMO=SR?"🚀":"🕵️";
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=$("#app");G.bg();
+const CA=cmAfter({S,db});   // 🎓 Class mode / 🏁 End the class on the end screen (cm-after.js)
 const URLP=new URLSearchParams(location.search);
 const BACK=(()=>{const lp=u=>{try{const x=new URL(u,location.href);return x.origin===location.origin&&!/\/lab\/game\//.test(x.pathname)&&!/\/teacher\.html$/.test(x.pathname)?x.pathname+x.search:""}catch(e){return ""}};
   let b=lp(URLP.get("from")||"")||lp(document.referrer);try{if(b)sessionStorage.setItem("elCbBack",b);else b=sessionStorage.getItem("elCbBack")||""}catch(e){}return b})();
@@ -119,7 +121,7 @@ function otherGame(qs){let newer=false,older=false;qs.forEach(d=>{const x=d.data
   if(newer){stepAside();return true}if(older&&Date.now()-reAt>5000){reAt=Date.now();publish(true)}return false}
 // offBy: the game whose board was closed or reloaded (pagehide) turned live/{group} off; if that was this board while a newer game was on,
 // the newer game is turned on again (the newer board's writes remove offBy, so a game that really ended stays off)
-async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",H.g),d=await S.getDoc(r),x=d.exists()?d.data():null;if(!(x&&+x.sid>H.sid))return false;
+async function taken(){if(!H.g||!H.sid)return false;try{const r=S.doc(db,"live",H.g),d=await S.getDoc(r),x=d.exists()?d.data():null;CA.see(H.g,x);if(!(x&&+x.sid>H.sid))return false;
   if(x.on===false&&+x.offBy===H.sid)await S.setDoc(r,{on:true,offBy:S.deleteField(),at:S.serverTimestamp()},{merge:true});return true}catch(e){console.warn("live",e);return false}}
 async function stepAside(){if(!H.g||!H.sid||quiet)return;const gn=groupName(H.g);quiet=true;clearTimeout(pubT);clearInterval(beat);if(ansStop)ansStop();ansStop=null;G.music("");
   if(H.phase==="play"){H.phase="end";H.end=Math.min(H.end,Date.now())}if(H.phase==="end")await saveResults().catch(e=>console.warn("results",e));   // what they answered still counts
@@ -199,6 +201,16 @@ function hackers(w,M,now){if(SR){H.rw={};H.ups=[];publish(true);return}const R=r
     else if(wear){const on={};["v","p","pt","fx"].forEach(k=>on[k]=wear[k]||"");w.set(S.doc(db,"cbAv",em),{on,group:H.g,at:now},{merge:true});H.av[em]=Object.assign({},H.av[em],{on})}});
   H.rw=rw;H.ups=ups;ups.forEach(u=>say(`⭐ <b>${esc(u.nm)}</b> is now a <b>${esc(AV.RANKS[u.r-1].n)}</b>!`,"hack"));publish(true)}
 
+/* ---------- 🎓 Class mode / 🏁 End the class after the game (cm-after.js; Roger, 17 Nov 2026) ---------- */
+// the class tab itself (sessionStorage el_cm) goes back to its page as before; any other board: cm-after.js. The results are saved first.
+let cmBusy="";
+async function afterGame(kind){const g=H.g;if(!g||cmBusy)return;
+  if(kind==="cm"&&CMT&&CMT.g===g)return backToClass();
+  cmBusy=kind;lastEnd="";draw();if(H.phase==="play")finish();
+  try{await saveResults()}catch(e){console.warn("results",e)}
+  quiet=true;clearTimeout(pubT);if(ansStop)ansStop();ansStop=null;clearInterval(beat);G.music("");Object.assign(H,{g:"",sid:0,phase:"pick",end:0,hr:{},players:{},feed:[]});keep();
+  try{await(kind==="cm"?CA.toClass(g):CA.endClass(g))}catch(e){cmBusy="";quiet=false;H.err="⚠ Not saved: "+e.message;draw()}}
+
 /* ---------- 🎓 back to class mode (as the class game board) ---------- */
 async function backToClass(){const g=CMT&&CMT.g;if(!g)return;if(H.phase==="play")finish();await saveResults();
   try{await S.setDoc(S.doc(db,"live",g),{cmBack:Date.now(),on:false,at:S.serverTimestamp()},{merge:true})}catch(e){H.err="⚠ The students were not sent back: "+e.message;draw();return}
@@ -247,7 +259,7 @@ function draw(){
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${t.n?G.ring(t.r/t.n*100,"the class got right","150px"):""}<div><h1 class="logo pop" style="margin:0">⏱ Time's up!</h1><p class="sub">${t.n} answers · ${t.r} right · every right answer is +1 point</p></div></div>
       <div class="podium cbpod"${R.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm"><span class="cbpav">${AV.svg(Object.assign({a:x.av},x.hv),{mini:true,size:k===1?72:60})}</span>${esc(x.nm)}<br><span class="sc">💾 ${x.s} bits</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
       ${H.ups.length?`<div class="cbups">${H.ups.map(u=>`<span class="cbup pop">${AV.svg(u.lk,{mini:true,size:40})} ⭐ <b>${esc(u.nm)}</b> → ${esc(AV.RANKS[u.r-1].n)}</span>`).join("")}</div>`:""}
-      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${back()}</p></div></div></div>`;return}
+      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a></p><p class="cmafter">${CA.btns(H.g,cmBusy)}</p></div></div></div>`;return}
   app$.innerHTML=top()+`<div class="main cbplay"><div class="cbhead"><div class="cbtime${left()<30e3?" low":""}" id="cbtime">⏱ ${fmt(left())}</div>
       <div class="cbstat"><b>${t.n}</b> answers · <b>${t.n?Math.round(t.r/t.n*100):0} %</b> right</div></div>
     <div class="cbcols"><div class="card cbrank">${rows||'<p class="muted">Nobody has bits yet…</p>'}</div>
@@ -272,7 +284,7 @@ function drawSR(R){const rk=(p,s)=>X.rocket(p.av,{size:s});
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${t.n?G.ring(t.r/t.n*100,"the class got right","150px"):""}<div><h1 class="logo pop" style="margin:0">🫧 Out of oxygen!</h1><p class="sub">🧑‍🚀 The class rescued <b>${res}</b> astronaut${res===1?"":"s"} · ${t.n} answers · ${t.r} right · every right answer is +1 point</p></div></div>
       <div class="podium cbpod"${R.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm"><span class="cbpav">${rk(x,k===1?76:62)}</span>${esc(x.nm)}<br><span class="sc">⛽ ${x.s} · 🧑‍🚀 ${x.rs}</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
-      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${back()}</p></div></div></div>`;return}
+      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a></p><p class="cmafter">${CA.btns(H.g,cmBusy)}</p></div></div></div>`;return}
   // the race: every rocket on the same map as the Chromebooks' strip (Earth, then one equal step per planet)
   const at=f=>X.pos(f).toFixed(1);
   const marks=`<span class="srpm" style="left:0">${X.planet(X.EARTH,30)}<small>Earth</small></span>`+X.PLANETS.map((p,i)=>`<span class="srpm" style="left:${X.stop(i).toFixed(1)}%" title="${esc(p.n)}">${X.planet(p,30)}<small>${esc(p.n)}</small></span>`).join("");
@@ -298,6 +310,8 @@ app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if
   if(d==="finish")endGame();
   if(d==="again"){const g=H.g;endGame(true);startGame(g)}
   if(d==="cmback")backToClass();
+  if(d==="cmclass")afterGame("cm");
+  if(d==="cmendclass")afterGame("end");
 });
 addEventListener("keydown",e=>{if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}});
 async function loadLP(){if(!H.games.length)return;const L=await CB.load(H.games.map(d=>d.id),wordDecks(),{rv:rvIds(),tp:H.tp,n:H.rn,seed:H.rs});L.byKey={};L.pool.forEach(q=>L.byKey[q.key]=q);H.L=L}
