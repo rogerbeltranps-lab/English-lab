@@ -855,12 +855,38 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
 // in Drive, signed in as the teacher. No Firestore reads: it comes with the hand-in.
 const audioUrl=(id,p)=>"https://drive.google.com/file/d/"+encodeURIComponent(id)+"/"+(p||"view");
 const audioA=x=>x&&x.audio&&x.audio.id?` <a class="au" href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""}" style="text-decoration:none">🔊</a>`:"";
-const audioBox=x=>x&&x.audio&&x.audio.id?`<p><b>🔊 Recording</b>${x.audio.s?` <small class="muted">(${x.audio.s} s)</small>`:""} · <a href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener">open in Drive</a></p><iframe src="${audioUrl(x.audio.id,"preview")}" style="width:100%;height:90px;border:0" allow="autoplay"></iframe>`:"";
+// ▶ Played inside the page (Roger, 17 Nov 2026: "I want to be able to listen to the audio in the web when I press them and see the feedback.
+// In my iPad it got me to the Drive file and it didn't work"): the Drive preview needs Google's cookies inside another site, which Safari
+// blocks, and the recordings are WebM/Opus, which Safari's own player does not play. So the school script (v30, action "audio_get") sends
+// the file to the teacher's dashboard, the browser decodes it (Web Audio decodes WebM/Opus on iPad too) and it plays as a plain WAV in a
+// normal player, which iPad, Chromebook and every browser play (and it plays with the iPad's silent switch on). Kept per file while the
+// page is open; an old school script or an error leaves the "open in Drive" link. No Firestore reads.
+const audioBox=x=>x&&x.audio&&x.audio.id?`<div class="aubox"><p style="margin:0 0 4px"><b>🔊 Recording</b>${x.audio.s?` <small class="muted">(${x.audio.s} s)</small>`:""} · <a href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener">open in Drive</a></p><div data-au="${esc(x.audio.id)}"><small class="muted">⏳ Loading the recording…</small></div></div>`:"";
+const AUD={};   // Drive file id → Promise of a blob URL the <audio> can play
+let audCtx=null;
+function audWav(buf){   // AudioBuffer → mono 16-bit WAV Blob
+  const n=buf.length,ch=buf.numberOfChannels,sr=buf.sampleRate,out=new DataView(new ArrayBuffer(44+n*2)),w=(o,t)=>{for(let i=0;i<t.length;i++)out.setUint8(o+i,t.charCodeAt(i))};
+  const cs=[];for(let c=0;c<ch;c++)cs.push(buf.getChannelData(c));
+  w(0,"RIFF");out.setUint32(4,36+n*2,true);w(8,"WAVE");w(12,"fmt ");out.setUint32(16,16,true);out.setUint16(20,1,true);out.setUint16(22,1,true);
+  out.setUint32(24,sr,true);out.setUint32(28,sr*2,true);out.setUint16(32,2,true);out.setUint16(34,16,true);w(36,"data");out.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){let v=0;for(let c=0;c<ch;c++)v+=cs[c][i];v=Math.max(-1,Math.min(1,v/ch));out.setInt16(44+i*2,v<0?v*0x8000:v*0x7fff,true)}
+  return new Blob([out],{type:"audio/wav"})}
+function audLoad(id){return AUD[id]||(AUD[id]=(async()=>{
+  const j=await fpgCall({action:"audio_get",fileId:id}),bin=atob(j.data||""),b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  try{const C=window.AudioContext||window.webkitAudioContext;audCtx=audCtx||new C();
+    const buf=await new Promise((ok,no)=>{const p=audCtx.decodeAudioData(b.buffer.slice(0),ok,no);if(p&&p.catch)p.catch(no)});
+    return URL.createObjectURL(audWav(buf))}
+  catch(e){console.warn("recording: decode",e);return URL.createObjectURL(new Blob([b],{type:j.mime||"audio/webm"}))}
+})().catch(e=>{delete AUD[id];throw e}))}
+function audMount(root){(root||document).querySelectorAll("[data-au]:not([data-aon])").forEach(el=>{el.dataset.aon="1";const id=el.dataset.au;
+  audLoad(id).then(u=>{el.innerHTML=`<audio controls preload="auto" src="${u}" style="width:100%;max-width:520px;height:44px"></audio>`;
+    el.querySelector("audio").addEventListener("error",()=>{el.innerHTML=`<small class="muted">⚠️ This browser cannot play the recording here: use “open in Drive” above.</small>`})})
+  .catch(e=>{el.innerHTML=`<small class="muted">⚠️ The recording could not be loaded here (${esc(String(e.message||e).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v30"))}): use “open in Drive” above.</small>`})})}
 // 🔇 no recording (Roger, 16 Nov 2026: "why don't I see the audio here?" on a Speaking handed in Sun 8 Nov at 18:00): recordings are only
 // kept since PR #444 (Sun 8 Nov, 19:45); before that, and when an upload did not reach Drive, the hand-in has no x.audio. Say so instead of nothing.
 const REC_FROM="2026-11-08T18:45:00Z";
 const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
-const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+audioA(((pstate(u,a)||{}).steps||{})[k])};
+const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+(x=>x&&x.audio&&x.audio.id?` <span class="au" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""} and see the correction" style="cursor:pointer">🔊</span>`:"")(((pstate(u,a)||{}).steps||{})[k])};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
 // the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
 // the corrected text), with the writing log; ⚠️ copy? opens the To do's Check dialog (the reason, the writing log, Accept or Redo in
@@ -4273,7 +4299,7 @@ function gfs(on){S.gfs=on;const box=document.querySelector("#main .lpall");docum
   if(!on)S.gfsB=false;if(S.gz==="fit")requestAnimationFrame(gzApply)}
 ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.gfs&&S.gfsB){S.gfsB=false;gfs(false)}}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.gfs&&!$("#dlg").open){e.preventDefault();gfs(false)}});
-function dlg(html,wide){$("#dlg").style.maxWidth=wide?"820px":"";$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
+function dlg(html,wide){$("#dlg").style.maxWidth=wide?"820px":"";$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal();audMount($("#dlgc"))}
 let redraw=null;   // the open assessment dialog, drawn again after a one-click change (typed text, open sections and scroll are kept)
 function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const f=()=>[...c.querySelectorAll("textarea,input:not([type=checkbox])")],vals=f().map(e=>e.value),op=[...c.querySelectorAll("details")].map(x=>x.open),top=d.scrollTop;
   redraw();const now=f();if(now.length===vals.length)now.forEach((e,i)=>e.value=vals[i]);[...c.querySelectorAll("details")].forEach((x,i)=>{if(op[i]!=null)x.open=op[i]});d.scrollTop=top}
