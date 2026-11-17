@@ -57,10 +57,12 @@ const backBtn=()=>cmGroup()?cmBtn()+" ":BACK?`<a class="btn ghost" href="${esc(B
 // go back to the class page, play.js) and takes this tab back to the page and tab it came from, still in class mode (el_cm_last).
 // A board opened in another tab while the group is in class mode (live/{group}.go, read once when the game starts) gets the button too:
 // it sends the students back and closes this tab (or goes to the class page if the browser keeps it open).
-const CMT=(()=>{try{const o=JSON.parse(sessionStorage.getItem("el_cm")||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}})();
+// the class tab's class mode (sessionStorage el_cm), only while it lasts: checked every time, not once when the board opened (17 Nov 2026,
+// 2 ESO A: class mode ended at 13:00 with the class time while the game ran, and 🎓 then took the tab back to the page out of class mode)
+const CMT0=(()=>{try{return JSON.parse(sessionStorage.getItem("el_cm")||"null")}catch(e){return null}})(),cmt=()=>CMT0&&CMT0.g&&Date.now()<CMT0.until?CMT0:null;
 let CMG=null,CMGg="",cmArm=0,cmBusy=false;
-const cmGroup=()=>CMT?CMT.g:CMGg&&window.elCmOn&&elCmOn(CMG)?CMGg:"";
-function cmHome(){let x=null;if(CMT){try{x=JSON.parse(sessionStorage.getItem("el_cm_last")||"null")}catch(e){}}else x=CMG;
+const cmGroup=()=>cmt()?cmt().g:CMGg&&window.elCmOn&&elCmOn(CMG)?CMGg:"";
+function cmHome(){let x=null;if(cmt()){try{x=JSON.parse(sessionStorage.getItem("el_cm_last")||"null")}catch(e){}}else x=CMG;
   if(!x||!x.u)return new URL(BACK||"../../teacher.html",location.href).href;
   const u=new URL("../../"+x.u,location.href);u.hash=x.p||"";return u.href}
 const cmPlaying=()=>!!(H.sid&&H.phase!=="end");
@@ -72,7 +74,7 @@ async function backToClass(){const g=cmGroup();if(!g||cmBusy)return;cmBusy=true;
   const w={cmBack:Date.now()};if(sid&&was===g)Object.assign(w,{on:false,at:S.serverTimestamp()});
   try{await S.setDoc(S.doc(db,"live",g),w,{merge:true});if(sid&&was&&was!==g)await S.setDoc(S.doc(db,"live",was),{on:false,at:S.serverTimestamp()},{merge:true})}
   catch(e){cmBusy=false;H.err="⚠ The students were not sent back: "+e.message;draw();return}
-  const to=cmHome();if(CMT){location.href=to;return}
+  const to=cmHome();if(cmt()){location.href=to;return}
   try{window.close()}catch(e){}setTimeout(()=>{location.href=to},400)}
 const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem("elGame",JSON.stringify(v))}catch(e){}}};
 
@@ -305,7 +307,7 @@ async function stepAside(){if(!H.g||!H.sid)return;const gn=groupName(H.g);clearI
 async function startGroup(){
   if(await taken())return stepAside();
   const g=H.g;H.err="";H.players={};
-  if(!CMT)S.getDoc(S.doc(db,"live",g)).then(d=>{CMG=d.exists()&&d.data().go||null;CMGg=g;if(cmGroup())draw()}).catch(e=>console.warn("class mode",e));
+  if(!cmt())S.getDoc(S.doc(db,"live",g)).then(d=>{CMG=d.exists()&&d.data().go||null;CMGg=g;if(cmGroup())draw()}).catch(e=>console.warn("class mode",e));
   try{
     const [ro,pt]=await Promise.all([S.getDocs(S.query(S.collection(db,"roster"),S.where("group","==",g))),S.getDocs(S.collection(db,"points"))]);
     const names={},keys=new Set();

@@ -37,7 +37,9 @@ const CA=cmAfter({S,db});   // 🎓 Class mode / 🏁 End the class on the end s
 const URLP=new URLSearchParams(location.search);
 const BACK=(()=>{const lp=u=>{try{const x=new URL(u,location.href);return x.origin===location.origin&&!/\/lab\/game\//.test(x.pathname)&&!/\/teacher\.html$/.test(x.pathname)?x.pathname+x.search:""}catch(e){return ""}};
   let b=lp(URLP.get("from")||"")||lp(document.referrer);try{if(b)sessionStorage.setItem("elCbBack",b);else b=sessionStorage.getItem("elCbBack")||""}catch(e){}return b})();
-const CMT=(()=>{try{const o=JSON.parse(sessionStorage.getItem("el_cm")||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}})();
+// the class tab's class mode (sessionStorage el_cm), only while it lasts: checked every time, not once when the board opened (17 Nov 2026,
+// 2 ESO A: class mode ended at 13:00 with the class time while the game ran, and 🎓 then took the tab back to the page out of class mode)
+const CMT0=(()=>{try{return JSON.parse(sessionStorage.getItem("el_cm")||"null")}catch(e){return null}})(),cmt=()=>CMT0&&CMT0.g&&Date.now()<CMT0.until?CMT0:null;
 const MINS=[5,8,10,15];
 const ss={get(){try{return JSON.parse(sessionStorage.getItem(SR?"elSR":"elCB")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem(SR?"elSR":"elCB",JSON.stringify(v))}catch(e){}}};
 
@@ -205,21 +207,21 @@ function hackers(w,M,now){if(SR){H.rw={};H.ups=[];publish(true);return}const R=r
 // the class tab itself (sessionStorage el_cm) goes back to its page as before; any other board: cm-after.js. The results are saved first.
 let cmBusy="";
 async function afterGame(kind){const g=H.g;if(!g||cmBusy)return;
-  if(kind==="cm"&&CMT&&CMT.g===g)return backToClass();
+  if(kind==="cm"&&cmt()&&cmt().g===g)return backToClass();
   cmBusy=kind;lastEnd="";draw();if(H.phase==="play")finish();
   try{await saveResults()}catch(e){console.warn("results",e)}
   quiet=true;clearTimeout(pubT);if(ansStop)ansStop();ansStop=null;clearInterval(beat);G.music("");Object.assign(H,{g:"",sid:0,phase:"pick",end:0,hr:{},players:{},feed:[]});keep();
   try{await(kind==="cm"?CA.toClass(g):CA.endClass(g))}catch(e){cmBusy="";quiet=false;H.err="⚠ Not saved: "+e.message;draw()}}
 
 /* ---------- 🎓 back to class mode (as the class game board) ---------- */
-async function backToClass(){const g=CMT&&CMT.g;if(!g)return;if(H.phase==="play")finish();await saveResults();
+async function backToClass(){const g=cmt()&&cmt().g;if(!g)return;if(H.phase==="play")finish();await saveResults();
   try{await S.setDoc(S.doc(db,"live",g),{cmBack:Date.now(),on:false,at:S.serverTimestamp()},{merge:true})}catch(e){H.err="⚠ The students were not sent back: "+e.message;draw();return}
   let x=null;try{x=JSON.parse(sessionStorage.getItem("el_cm_last")||"null")}catch(e){}
   Object.assign(H,{g:"",sid:0,phase:"pick"});keep();
   const u=x&&x.u?new URL("../../"+x.u,location.href):new URL(BACK||"../../teacher.html",location.href);if(x&&x.p)u.hash=x.p;location.href=u.href}
 
 /* ---------- screens ---------- */
-const back=()=>CMT&&CMT.g===H.g&&H.sid?`<button class="btn cm" data-do="cmback">🎓 Back to class mode</button> `:BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
+const back=()=>cmt()&&cmt().g===H.g&&H.sid?`<button class="btn cm" data-do="cmback">🎓 Back to class mode</button> `:BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
 function top(){return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">${EMO} ${Object.keys(H.players).length}</span><span class="pill lpn">${esc(gameName())}</span><span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}<button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
   ${H.phase==="play"?`<button class="btn ghost" data-do="more" title="Two more minutes">${SR?"🫧 ":""}+2 min</button>`:""}${H.phase!=="end"?back():""}<button class="btn ghost" data-do="end">${Date.now()-endArm<3000?(H.phase==="play"?"Tap again: end now":"Tap again to close"):"■ End"}</button></div>`}

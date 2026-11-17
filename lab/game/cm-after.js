@@ -3,7 +3,7 @@
 // - 🎓 Class mode: class mode still on for the group in another tab → the students go back to its page (cmBack, as 🎓 Back to class mode)
 //   and this tab closes. Class mode off (stopped, or the class time ran out during the game, as 4 ESO B on 17 Nov 2026: class mode ended at
 //   10:30 and the game ran to 10:30:20) → it starts again in this tab (?elcm=, el-cloud.js cmTeacher) at the page it was on before the game
-//   (live/{group}.go, as this board last read it), until the end of the class by the timetable (live/{group}.tt) or 70 minutes; the students
+//   (live/{group}.go, as this board last read it), until the end of the class by the timetable (live/{group}.tt; at least 15 minutes) or 70 minutes; the students
 //   waiting on the end screen follow it (play.js cmFree: a newer go.at). Nothing known → the dashboard, with its own 🎓 Class mode.
 //   (The class tab itself, sessionStorage el_cm, keeps its own 🎓 Back to class mode: the boards call that instead.)
 // - 🏁 End the class: as ⏹ Stop class mode on the dashboard (go: null, fs: null: no class mode, no full screen) with the game off and
@@ -20,7 +20,7 @@ export function cmAfter({S,db}){
       const off=(tt.off||[]).some(o=>{const [a,b]=String(o).split("/");return a<=ymd&&ymd<=(b||a)});
       const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes(),len=+tt.len||60;
       if(!off)for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
-        if(m>=s-5&&m<s+len){const e=new Date(d);e.setHours(0,0,0,0);return e.getTime()+(s+len)*60e3}}}
+        if(m>=s-5&&m<s+len){const e=new Date(d);e.setHours(0,0,0,0);return Math.max(e.getTime()+(s+len)*60e3,now+15*60e3)}}}   // at least 15 minutes
     return now+70*60e3}
   const page=(u,p)=>{const x=new URL("../../"+u,location.href);if(p)x.hash=p;return x};
   function lastPage(g){const go=seen[g]&&seen[g].go;if(go&&go.u)return {u:go.u,p:go.p||""};
