@@ -47,7 +47,10 @@
   const words = v => (String(v || '').trim().match(/[A-Za-zÀ-ÿ’'0-9-]+/g) || []).length;
   const answered = s => items(s).filter(it => String(S.answers[it.id] || '').trim()).length;
   const now = () => new Date().toISOString();
-  const fsOk = () => !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
+  // iPad/iPhone: Safari leaves a page's full screen on any swipe down, so the exam would lock while scrolling (Roger, 17 Nov 2026,
+  // testing on his iPad). There it runs without full screen; leaving the tab or app still locks it.
+  const IOS = /iP(ad|hone|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const fsOk = () => !IOS && !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
   const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
   const goFull = () => { try { if (!fsOk()) return Promise.resolve();
     const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
@@ -211,7 +214,8 @@
   // while the teacher has exam mode on (ls/{ls}.webExam[group].mode) and has not pressed ▶ Start yet, a student who has read the rules
   // goes to full screen and waits here; ▶ Start (live/{group}.exam.go, read live) starts everyone's exam at once. Arriving after it, the
   // usual Start button. Leaving full screen while waiting changes nothing (the exam has not started): the button takes them back.
-  const waitMode = () => { const w = (((lsDoc || {}).webExam || {})[S.group] || {}); return !PV && !isTester() && !!w.mode && !w.go; };
+  // the tester waits too while their group's exam mode is on, to see what students see (Roger, 17 Nov 2026)
+  const waitMode = () => { const w = (((lsDoc || {}).webExam || {})[S.group] || {}); return !PV && !!w.mode && !w.go; };
   let liveOff = null, goNow = false;
   async function watchGo() { if (liveOff || PV || !S.group) return;
     try { const F = await fsLib(); liveOff = F.onSnapshot(F.doc(C().db, 'live', S.group), s => { const x = s.exists() ? s.data() : null, e = x && x.exam;
@@ -221,7 +225,7 @@
     root.innerHTML = '<div class="wx-card" id="wxWait" style="text-align:center"><h2>⏳ ' + (goNow ? t('Ja pots començar!', 'You can start now!') : t('Espera el professor', 'Wait for your teacher')) + '</h2>' +
       '<p>' + (goNow ? t('El professor ha començat l’examen.', 'Your teacher has started the exam.') : t('Quan el professor premi <b>Comença</b>, l’examen començarà sol per a tothom.', 'When your teacher presses <b>Start</b>, the exam starts by itself for everyone.')) + '</p>' +
       (goNow ? '<button class="wx-btn" id="wxGoNow">▶ ' + t('Comença l’examen', 'Start the exam') + '</button>'
-        : full ? '<p class="wx-done">✓ ' + t('Estàs a pantalla completa. No en surtis.', 'You are in full screen. Don’t leave it.') + '</p>'
+        : full ? '<p class="wx-done">✓ ' + (fsOk() ? t('Estàs a pantalla completa. No en surtis.', 'You are in full screen. Don’t leave it.') : t('A punt. No surtis d’aquesta pàgina.', 'Ready. Don’t leave this page.')) + '</p>'
         : '<button class="wx-btn" id="wxBackFs">⛶ ' + t('Torna a la pantalla completa', 'Back to full screen') + '</button>') + '</div>';
     const b = $('#wxBackFs'); if (b) b.onclick = () => goFull().then(waiting);
     const g = $('#wxGoNow'); if (g) g.onclick = () => begin();
@@ -435,8 +439,9 @@
     L.innerHTML = '<div class="box"><h1>⛔ ' + t('Has sortit de l’examen', 'You left the exam') + '</h1><p>' +
       (why === 'fullscreen' ? t('Has sortit de la pantalla completa.', 'You left full screen.') : why === 'reload' ? t('La pàgina s’ha tancat o recarregat.', 'The page was closed or reloaded.') : t('Has canviat de pestanya, de finestra o d’aplicació.', 'You changed to another tab, window or app.')) + ' ' +
       t('L’examen s’ha aturat i les respostes que tenies s’han desat.', 'Your exam has stopped and the answers you had are saved.') + '</p><p><b>' + t('Aixeca la mà: només el professor pot deixar-te tornar a l’examen.', 'Put your hand up: only your teacher can let you go back to the exam.') + '</b></p>' +
-      '<p style="margin-top:18px"><input type="password" id="wxPw" autocomplete="off" placeholder="' + esc(t('Contrasenya del professor', 'Teacher’s password')) + '"> <button class="wx-btn" id="wxPwGo">🔓 ' + t('Torna a l’examen', 'Back to the exam') + '</button></p><p class="err" id="wxPwErr"></p></div>';
+      '<p style="margin-top:18px"><input type="password" id="wxPw" autocomplete="off" placeholder="' + esc(t('Contrasenya del professor', 'Teacher’s password')) + '"> <button class="wx-btn" id="wxPwGo">🔓 ' + t('Torna a l’examen', 'Back to the exam') + '</button></p><p class="err" id="wxPwErr"></p>' + testerReset() + '</div>';
     D.body.appendChild(L);
+    { const r = L.querySelector('#wxReset'); if (r) r.onclick = async () => { auStop(); unbind(); L.remove(); try { const F = await fsLib(); await F.deleteDoc(ref(F)); } catch (e) { console.warn(e); } local.del(); S = { group: S.group, level: S.level }; try { lsDoc = await readLs(); } catch (e) {} intro(); }; }
     // when they are back on this page (still locked) the time is logged too, so the teacher sees how long they were really away
     // and how long they then waited for the password (Roger, 17 Nov 2026: "I want to know the time he's been out")
     const seen = () => { const l = S.exits[S.exits.length - 1]; if (!l || l.ret || l.back || D.hidden || !D.hasFocus()) return; l.ret = now(); keep(); save(); };
