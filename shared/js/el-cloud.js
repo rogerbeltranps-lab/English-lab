@@ -964,7 +964,6 @@ function gamePush(u){
     if(examPull(x&&x.exam))return;
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{try{sessionStorage.setItem(TOOK,JSON.stringify({p:location.pathname,at:Date.now()}))}catch(e){}location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    if(examPull(x&&x.exam))return;
     const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsKnown=true;fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
