@@ -55,10 +55,14 @@
   const BUD=(k)=>{if(k==="fp")return mound+`<path d="M3 37 Q7 34 10 36" stroke="${STEM}" stroke-width="1.1" fill="none"/><path d="M5 34.6 q-2.2 -3 .4 -4.6 q2 1.8 -.4 4.6z" fill="${LEAF}"/><ellipse cx="13.4" cy="35" rx="3.6" ry="3.2" fill="#84cc16"/><path d="M13.4 32 q.3 -1.6 1.6 -2" stroke="${STEM}" stroke-width="1.1" fill="none"/>`;
     if(k==="recall")return mound+`<path d="M11 38.6 L11.4 33 L12.6 33 L13 38.6Z" fill="#fef3c7"/><path d="M8 34 Q8 28.6 12 28.6 Q16 28.6 16 34Z" fill="#f87171"/><circle cx="10.6" cy="31.4" r=".8" fill="#fff"/>`;
     const [c,d]=COL[k]||COL.other;return stem(14)+leaves(31)+`<ellipse cx="12" cy="12.6" rx="2.8" ry="4.3" fill="${k==="vocab"?"#f1f5f9":c}" stroke="${d}" stroke-width=".5"/><path d="M9.2 13.4 Q12 19.2 14.8 13.4 L12 16.6Z" fill="${LEAF}"/>`};
+  // thirsty (on ✅ To do): dry cracked soil, a brown plant bent over with its flower hanging, and a big 💧 in a bubble above it (Roger,
+  // 17 Nov 2026: "I don't see the thirsty flowers": they must stand out from the rest at a glance)
   const THIRSTY=(k)=>{const [c]=COL[k]||COL.other;
-    return mound+`<path d="M12 38.5 Q11.6 24 14.6 18.6 Q17.6 14.4 18.4 20.4" stroke="#8a8f3c" stroke-width="1.6" fill="none" stroke-linecap="round"/>`
-      +`<path d="M12 33 q-5.4 1.4 -6.8 5.4 q4.6 -1.2 6.8 -3.6z" fill="#a8a24a"/><path d="M12.6 29 q4.4 .8 5.4 5.4 q-4.4 -1.6 -5.4 -3.6z" fill="#b5a642"/>`
-      +`<ellipse cx="18.4" cy="22.6" rx="2.2" ry="3.2" fill="${k==="vocab"?"#e7e5e4":c}" opacity=".55" stroke="#78716c" stroke-width=".4"/>`+`<g transform="translate(1 4)">${DROP}</g>`};
+    return `<ellipse cx="12" cy="38.6" rx="8.5" ry="2.2" fill="#d6b88a"/><path d="M6 38.4 l2 -.9 1.2 .8 M14.6 38.2 l1.6 -.8 1.8 .9 M10.6 39.4 l1 -1" stroke="#8b6b3d" stroke-width=".5" fill="none"/>`
+      +`<path d="M12 38.5 Q11.4 27 14.4 22.2 Q17.6 17.6 18.6 24.6" stroke="#8b6b3d" stroke-width="1.7" fill="none" stroke-linecap="round"/>`
+      +`<path d="M11.8 34 q-5.4 .4 -7 4.4 q4.8 -.2 7 -3z" fill="#a16207"/><path d="M12.4 30.6 q4.6 .4 5.8 4.8 q-4.4 -1.2 -5.8 -3.4z" fill="#b45309"/>`
+      +`<path d="M15.6 25.6 Q18.6 23.4 21.4 25.8 Q20.6 30.6 18.6 31.2 Q16.4 30.6 15.6 25.6Z" fill="${k==="vocab"?"#d6d3d1":c}" opacity=".7" stroke="#78350f" stroke-width=".5"/>`
+      +`<g class="gd-drop"><circle cx="7.4" cy="8" r="7" fill="#fff" stroke="#0284c7" stroke-width="1"/><path d="M7.4 2.6C7.4 2.6 4.2 7 4.2 9a3.2 3.2 0 0 0 6.4 0C10.6 7 7.4 2.6 7.4 2.6Z" fill="#0ea5e9"/><ellipse cx="6.2" cy="8.8" rx=".8" ry="1.3" fill="#e0f2fe"/></g>`};
   const plantSvg=(k,st)=>svg(24,40,st==="bloom"?(BLOOM[k]||BLOOM.other)():st==="bud"?BUD(k):st==="thirsty"?THIRSTY(k):SPROUT(),"gd-svg");
   // a recall checkpoint is a tree (viewBox 0 0 40 56, the ground at y 54)
   const treeSvg=st=>svg(40,56,st==="bloom"
@@ -66,7 +70,7 @@
         +`<circle cx="20" cy="22" r="12" fill="#16a34a"/><circle cx="11" cy="28" r="8" fill="#15803d"/><circle cx="29" cy="28" r="8" fill="#15803d"/><circle cx="20" cy="14" r="8.5" fill="#22c55e"/><circle cx="16" cy="18" r="4" fill="#4ade80" opacity=".6"/>`
         +[[13,25],[26,21],[20,30],[29,30],[17,13]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2" fill="#dc2626"/><circle cx="${x-.6}" cy="${y-.6}" r=".6" fill="#fecaca"/>`).join("")
       :`<ellipse cx="20" cy="54.6" rx="8" ry="2" fill="#5b3a1a" opacity=".55"/><path d="M20 54.6 ${st==="thirsty"?"Q20 44 23 39":"L20 36"}" stroke="#92400e" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
-        +(st==="thirsty"?`<path d="M23 39 q4 -1 6 3 q-4 1 -6 -3z M22 42 q-4 0 -5.4 4 q4 .4 5.4 -4z" fill="#a8a24a"/><g transform="translate(6 18)">${DROP}</g>`
+        +(st==="thirsty"?`<path d="M23 39 q4 -1 6 3 q-4 1 -6 -3z M22 42 q-4 0 -5.4 4 q4 .4 5.4 -4z" fill="#a8a24a"/><g transform="translate(8 12) scale(1.3)"><circle cx="7.4" cy="8" r="7" fill="#fff" stroke="#0284c7" stroke-width="1"/><path d="M7.4 2.6C7.4 2.6 4.2 7 4.2 9a3.2 3.2 0 0 0 6.4 0C10.6 7 7.4 2.6 7.4 2.6Z" fill="#0ea5e9"/></g>`
           :`<path d="M20 41 q-6 -1 -7 -7 q5.6 0 7 5z" fill="${LEAF}"/><path d="M20 38 q6 -1 7 -7 q-5.6 0 -7 5z" fill="${LEAF2}"/>`+(st==="bud"?`<circle cx="20" cy="33.4" r="3.6" fill="#22c55e"/>`:"")),"gd-tree");
   const BFLY=(c,i)=>`<span class="gd-bfly f${i%3}" style="animation-delay:-${(i*4.3).toFixed(1)}s" aria-hidden="true"><span class="gd-bob">${svg(20,16,`<g class="gd-w"><path d="M10 8 C6 1 0 2 1.5 7 C2.4 9.6 6 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C6.4 9.4 3 12 5 14.4 C7 16 9.4 12 10 8.4Z" fill="${c[1]}"/>`
     +`<path d="M10 8 C14 1 20 2 18.5 7 C17.6 9.6 14 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C13.6 9.4 17 12 15 14.4 C13 16 10.6 12 10 8.4Z" fill="${c[1]}"/></g><rect x="9.3" y="5" width="1.4" height="8" rx=".7" fill="#1f2937"/><path d="M9.6 5.2 L8.4 2.4 M10.4 5.2 L11.6 2.4" stroke="#1f2937" stroke-width=".5"/>`)}</span></span>`;
@@ -77,7 +81,7 @@
   const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
   const CSS=`
 .gdn{margin:22px 0 4px;border-radius:20px;border:1px solid #bbf7d0;background:linear-gradient(180deg,#ecfccb,#d9f99d);overflow:hidden;position:relative;box-shadow:0 6px 18px #16653414}
-.gdn-h{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:10px 18px 8px 16px;position:relative;min-height:46px;background:linear-gradient(180deg,#e0f2fe,#f0f9ff)}
+.gdn-h{z-index:5;display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:10px 18px 8px 16px;position:relative;min-height:46px;background:linear-gradient(180deg,#e0f2fe,#f0f9ff)}
 .gdn-h .gd-sun{width:40px;height:40px;flex:none}.gdn-h .gd-rays{transform-origin:20px 20px;animation:gdspin 30s linear infinite}
 .gdn-t{display:flex;flex-direction:column;min-width:0;flex:1 1 300px}.gdn-k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#166534}
 .gdn-t b{font-size:17px;line-height:1.25;color:#14532d}.gdn-t b.thirst{color:#0c4a6e}
@@ -98,9 +102,10 @@
 .gdb a:hover,.gdb a:focus-visible,.gdt a:hover,.gdt a:focus-visible{transform:scale(1.35);z-index:3;outline:none}.gdb a:focus-visible .gd-svg,.gdt a:focus-visible svg{filter:drop-shadow(0 0 2px #2563eb)}
 .gdt{position:relative;display:flex;flex-direction:column;align-items:center}.gdt a{width:36px;height:50px}.gdt .gd-tree{width:36px;height:50px;display:block}
 .gdt .gds{margin:-2px 0 0;align-self:center}.gdt .gds::after{display:none}
-.gd-drop{animation:gdbob 1.8s ease-in-out infinite}
+.gd-drop{animation:gdbob 1.4s ease-in-out infinite}.gdb a.gd-th{animation:gdsag 3s ease-in-out infinite}
+@keyframes gdsag{50%{transform:rotate(-4deg)}}
 .gd-fresh{animation:gdgrow .9s cubic-bezier(.3,1.6,.5,1) both}.gd-fresh::before{content:"";position:absolute;left:50%;top:0;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:radial-gradient(#fde04788,transparent 70%);animation:gdglow 2.4s ease-out both;pointer-events:none}
-.gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
+.gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly+.gd-bfly{right:auto;left:34px}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
 .gd-bob{display:block;animation:gdbob2 1.1s ease-in-out infinite alternate}.gd-bfly svg{width:24px;height:19px;display:block}
 .gd-w{transform-origin:10px 8px;animation:gdflap .22s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
 .gdn-key{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;padding:6px 16px 9px;font-size:12.5px;color:#365314;background:#f7fee7cc;border-top:1px solid #d9f99d}
@@ -131,13 +136,15 @@
     const ST={bloom:t("fet ✓","done ✓"),bud:t("començat: acaba'l perquè floreixi","started: finish it to make it bloom"),sprout:t("encara per fer","not done yet"),
       thirsty:t("💧 té set: ja ho vam fer a classe, acaba-ho per regar-la","💧 thirsty: we did it in class, finish it to water it")};
     const KN={vocab:t("Vocabulari","Vocabulary"),grammar:t("Gramàtica","Grammar"),read:"Reading",listen:"Listening",speak:"Speaking",write:"Writing",recall:"Recall",fp:t("Producte final","Final product"),bonus:t("Opcional","Optional"),other:""};
-    let bi=0;
+    // 🦋 a butterfly for every 5 flowers in a bed (at most 2) and always one on a finished bed (Roger, 17 Nov 2026: "I don't see the
+    // butterflies": only finished beds had one, so most students had none yet)
+    let bi=0;const nBf=(b,done)=>{const f=b.plants.filter(p=>p.st==="bloom").length;return Math.min(2,Math.max(done&&b.plants.length>1?1:0,Math.floor(f/5)))};
     const beds=G.beds.map(b=>{const done=b.plants.every(p=>p.st==="bloom"),head=`${b.label?b.label+" · ":""}${b.title}`;
       if(b.kind==="cp"){const p=b.plants[0],st=b.plants.every(x=>x.st==="bloom")?"bloom":b.plants.some(x=>x.st==="thirsty")?"thirsty":b.plants.some(x=>x.st!=="sprout")?"bud":"sprout";
         return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
-        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
-      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${done&&b.plants.length>1?BFLY(BCOL[bi%BCOL.length],bi++):""}</div>`}).join("");
+        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
+      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
     const full=all.length>0&&n.bloom===all.length,nf=fresh.size;
     const head=full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
       :n.thirsty?(n.thirsty===1?t("1 planta té set: acaba l'activitat per regar-la","1 plant is thirsty: finish it to water it"):t(`${n.thirsty} plantes tenen set: acaba-les per regar-les`,`${n.thirsty} plants are thirsty: finish them to water them`))
@@ -145,7 +152,7 @@
       :t("Acaba la teva primera activitat i hi sortirà la primera flor","Finish your first activity and your first flower will bloom");
     const key=[["vocab",t("Vocabulari","Vocabulary")],["grammar",t("Gramàtica","Grammar")],["read","Reading"],["listen","Listening"],["speak","Speaking"],["write","Writing"],["recall","Recall"]]
       .map(([k,l])=>`<span>${plantSvg(k,"bloom")}${l}</span>`).join("")
-      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span>`;
+      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span><span>🦋 ${t("cada 5 flors d'un bancal","every 5 flowers in a bed")}</span>`;
     return `<section class="gdn" id="garden" aria-label="${t("El meu jardí","My garden")}"><div class="gdn-h">${SUN}<div class="gdn-t"><span class="gdn-k">🌱 ${t("El meu jardí","My garden")}${G.ls?" · "+esc(G.ls):""}</span><b class="${n.thirsty&&!full?"thirst":""}">${head}</b></div>`
       +`<div class="gdn-st">${nf?`<span class="new">🎉 +${nf} ${nf===1?t("flor nova","new flower"):t("flors noves","new flowers")}</span>`:""}<span title="${t("Activitats fetes","Activities done")}">🌼 ${n.bloom} ${n.bloom===1?t("flor","flower"):t("flors","flowers")}</span>`
       +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">💧 ${n.thirsty} ${t("amb set","thirsty")}</span>`:"")
