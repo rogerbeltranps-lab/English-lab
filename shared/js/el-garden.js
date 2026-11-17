@@ -76,7 +76,7 @@
     +`<path d="M10 8 C14 1 20 2 18.5 7 C17.6 9.6 14 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C13.6 9.4 17 12 15 14.4 C13 16 10.6 12 10 8.4Z" fill="${c[1]}"/></g><rect x="9.3" y="5" width="1.4" height="8" rx=".7" fill="#1f2937"/><path d="M9.6 5.2 L8.4 2.4 M10.4 5.2 L11.6 2.4" stroke="#1f2937" stroke-width=".5"/>`)}</span></span>`;
   const BCOL=[["#f472b6","#fb7185"],["#facc15","#fb923c"],["#60a5fa","#a78bfa"],["#34d399","#2dd4bf"],["#f97316","#fbbf24"]];
   // 🐦 birds fly across the garden when every activity is done (Roger, 17 Nov 2026: "if they do everything they see birds")
-  const BIRD=(c,d)=>`<span class="gd-bird" style="--c:${c};--d:${d}" aria-hidden="true"><span class="gd-bbob">${svg(30,22,`<path d="M7 11.4 L0.6 7 L1.6 14.4Z" fill="${d}"/><ellipse cx="13" cy="12.4" rx="8.4" ry="5.6" fill="${c}"/>`
+  const BIRD=(c,d)=>`<span class="gd-bird" style="--c:${c};--d:${d}" aria-hidden="true" title="🐦"><span class="gd-bbob">${svg(30,22,`<path d="M7 11.4 L0.6 7 L1.6 14.4Z" fill="${d}"/><ellipse cx="13" cy="12.4" rx="8.4" ry="5.6" fill="${c}"/>`
     +`<ellipse cx="14.6" cy="14.6" rx="5.2" ry="3" fill="#fff" opacity=".55"/><circle cx="21" cy="8.4" r="4.4" fill="${c}"/><path d="M24.8 7.6 L29.2 8.8 L24.8 10.2Z" fill="#f59e0b"/>`
     +`<circle cx="22.4" cy="7.6" r="1" fill="#111827"/><circle cx="22.7" cy="7.3" r=".35" fill="#fff"/><path class="gd-bw" d="M8.4 10.6 Q12.4 1.6 18.4 9.4 Q13.6 12.6 8.4 10.6Z" fill="${d}"/>`)}</span></span>`;
   const BIRDS=BIRD("#3b82f6","#1d4ed8")+BIRD("#ef4444","#b91c1c")+BIRD("#facc15","#ca8a04");
@@ -113,7 +113,7 @@
 .gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly+.gd-bfly{right:auto;left:34px}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
 .gd-bob{display:block;animation:gdbob2 1.1s ease-in-out infinite alternate}.gd-bfly svg{width:24px;height:19px;display:block}
 .gd-free{position:absolute;width:0;height:0;z-index:4}.gd-free .gd-bfly{top:0;right:auto;left:0}
-.gd-bird{position:absolute;left:-40px;width:30px;height:22px;z-index:6;pointer-events:none;animation:gdbird 13s linear infinite}.gd-bird svg{width:30px;height:22px;display:block}
+.gd-bird{position:absolute;left:-40px;width:30px;height:22px;z-index:6;cursor:pointer;animation:gdbird 13s linear infinite}.gd-bird svg{width:30px;height:22px;display:block}
 .gd-bird:nth-of-type(1){top:58px}.gd-bird:nth-of-type(2){top:96px;animation-duration:17s;animation-delay:-6s}.gd-bird:nth-of-type(3){top:40px;animation-duration:21s;animation-delay:-13s}
 .gd-bbob{display:block;animation:gdbbob 1.6s ease-in-out infinite alternate}.gd-bw{transform-origin:13px 10px;animation:gdbw .28s ease-in-out infinite alternate}
 @keyframes gdbird{to{left:calc(100% + 40px)}}@keyframes gdbbob{to{transform:translateY(-8px) rotate(-4deg)}}@keyframes gdbw{to{transform:scaleY(-.7)}}
@@ -133,6 +133,12 @@
 @media (max-width:600px){.gdn-h{padding:10px 12px 8px;gap:8px 10px}.gdn-h .gd-sun{width:32px;height:32px}.gdn-t{flex:1 1 200px}.gdn-t b{font-size:16px}.gdn-st{margin-left:0}.gdn-lawn{padding:6px 8px 10px}.gdn-beds{gap:10px 8px}}`;
   function css(){if(document.getElementById("gdn-css"))return;const s=document.createElement("style");s.id="gdn-css";s.textContent=CSS;document.head.appendChild(s)}
   const FRESH={};
+  // 🐦 the birds whistle when they fly in, once per page (Roger, 17 Nov 2026: "when birds appear I want them to whistle"; ELSound in
+  // el-sound.js, Web Audio, no sound file; muted when the student muted sounds). Browsers only allow sound after a tap or a key on the
+  // page, so it waits for the first one. Clicking a bird makes it chirp again.
+  let sang=false;
+  const sing=()=>{if(sang||!window.ELSound||!ELSound.soon)return;sang=true;setTimeout(()=>ELSound.soon("birds"),600)};
+  addEventListener("click",e=>{const b=e.target&&e.target.closest&&e.target.closest(".gd-bird");if(b&&window.ELSound)ELSound.play("chirp")});
   // G = {ls: "LS2", beds: [{id, label, title, kind: "lp"|"cp"|"fp"|"bonus", plants: [{key, id, name, href, st: "sprout"|"bud"|"bloom"|"thirsty"}]}], store, save}
   window.elGarden=function(G,o){css();const en=!!(o&&o.en),t=(ca,e)=>en?e:ca;
     const all=G.beds.flatMap(b=>b.plants.map(p=>Object.assign({bed:b},p)));
@@ -143,6 +149,7 @@
       if(G.save!==false)try{localStorage.setItem(G.store,JSON.stringify(now))}catch(e){}
       setTimeout(()=>{FRESH[G.store].clear()},6000)}
     const fresh=FRESH[G.store]||new Set();
+    if(G.beds.some(b=>b.kind!=="bonus")&&G.beds.filter(b=>b.kind!=="bonus").every(b=>b.plants.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty")))sing();
     const ST={bloom:t("fet ✓","done ✓"),bud:t("començat: acaba'l perquè floreixi","started: finish it to make it bloom"),sprout:t("encara per fer","not done yet"),
       thirsty:t("💧 té set: ja ho vam fer a classe, acaba-ho per regar-la","💧 thirsty: we did it in class, finish it to water it")};
     const KN={vocab:t("Vocabulari","Vocabulary"),grammar:t("Gramàtica","Grammar"),read:"Reading",listen:"Listening",speak:"Speaking",write:"Writing",recall:"Recall",fp:t("Producte final","Final product"),bonus:t("Opcional","Optional"),other:""};
