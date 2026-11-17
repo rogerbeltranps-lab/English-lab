@@ -255,7 +255,10 @@ function saveAudio(m) {
   const stamp = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd HH.mm");
   const file = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data), mime, stamp + " · " + clean(name) + " · " + page + " · " + clean(meta.title || meta.step) + "." + ext));
   file.setDescription(JSON.stringify({email: who.email, group: meta.group || "", page: meta.page || "", step: meta.step || "", level: meta.level || "", secs: m.secs || null}));
-  const g = meta.coach === "c2" ? coachC2(data, mime, meta) : transcribe(data, mime, meta);
+  // v31: only Roger's own accounts get the C2 coach (Roger, 17 Nov 2026: "I only want my stuff to be corrected straight away"); students
+  // always get the usual transcript and kind notes, corrected on Wednesday, whatever their page sends.
+  const ME = [TEACHER, "roger.beltran@ietramuntana.cat"].indexOf(who.email) >= 0;
+  const g = meta.coach === "c2" && ME ? coachC2(data, mime, meta) : transcribe(data, mime, meta);
   return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes, eur: g.eur || null, fixes: g.fixes || null, next: g.next || null};
 }
 
