@@ -186,13 +186,16 @@ async function tnItems(){
       if(c.nextSent&&c.nextText&&!done[id+"_2"])out.push({uid:s.uid,aid:a.id,ls:a.ls,title:a.title,step:id+"_2",task:(c.next||{}).task||"",use:(c.next||{}).use||[],text:c.nextText,at:c.nextSent,second:true})}}
   return out.sort((x,y)=>String(x.at).localeCompare(String(y.at))).map((x,i)=>Object.assign(x,{code:"T"+(i+1)}))}
 const fsvA=x=>Array.isArray(x)?{arrayValue:{values:x.map(fsvA)}}:x&&typeof x==="object"?{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,fsvA(v)]))}}:fsv(x);
-if(cmd==="tn-ready"){const its=await tnItems(),m=doc(await api("GET",DOCS+"settings/marking"))||{},run=m.run||{},rq=(m.request||{}).at;
-  // a run the teacher asked for (✏️ Correct everything waiting now) or the Wednesday one does everything; any other start came from his course
+// Which run is this? The Wednesday one or one the teacher asked for (✏️ Correct everything waiting now) does everything; any other start came
+// from his own course (tn_mark), so only his writing is corrected. The scheduled task's prompt can't be changed from a thread, so `ready`,
+// and `fb-ready` check this themselves: `ready` prints his pieces first, and in a TN-only run neither lists student work (`audit` only reads).
+async function tnFull(){const m=doc(await api("GET",DOCS+"settings/marking"))||{},run=m.run||{},rq=(m.request||{}).at;
   const madrid=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Madrid"})),wed=madrid.getDay()===3&&madrid.getHours()>=13&&madrid.getHours()<18;
-  const asked=rq&&(!run.started||String(rq)>String(run.started));
-  console.log(wed||asked?"MODE: FULL RUN (the Wednesday run or ✏️ Correct everything waiting now): do every step, the Towards Nativeness one too."
-    :"MODE: TOWARDS NATIVENESS ONLY (started from Roger's own course): correct only what is below, then stop. Do not run ready, fb-ready, sheets or audit.");
-  if(!its.length){console.log("No Towards Nativeness writing waiting.");process.exit(0)}
+  return !!(wed||(rq&&(!run.started||String(rq)>String(run.started))))}
+const TN_ONLY="MODE: TOWARDS NATIVENESS ONLY (started from Roger's own course): correct only his writing below with tn-apply, then stop. Nothing is READY for students in this run: do not run sheets (fb-ready prints nothing; audit only reports).";
+async function tnPrint(full){const its=await tnItems();
+  console.log(full?"MODE: FULL RUN (the Wednesday run or ✏️ Correct everything waiting now): do every step, the Towards Nativeness one too.":TN_ONLY);
+  if(!its.length){console.log("No Towards Nativeness writing waiting."+(full?"":" If his course has just asked, wait 60 seconds and run tn-ready again (up to 3 times)."));return}
   console.log(`\nTOWARDS NATIVENESS · Roger's own writing, ${its.length} piece(s). Roger is a Catalan-speaking English teacher (C1) who wants to write like a native-like everyday user, NOT an expert.
 RULES: correct ONLY what is really wrong or sounds non-native to an ordinary native speaker (Catalan/Spanish calques, prepositions, word order,
 questions, articles, countable nouns, verb patterns like want someone to, tenses, collocations a native would never use). NEVER offer a nicer,
@@ -203,8 +206,10 @@ ANSWER FORMAT: a JSON array in a file in your scratchpad, one object per code:
    "corrected":"his whole text with only those changes","well":"one native-like phrase he used, quoted",
    "next":{"task":"a short new writing task (60-120 words to write) on a related everyday topic that needs the corrected forms","use":["3 to 6 corrected chunks"]}}
   (no "next" for a NEW TASK piece). Then: node tools/marking/marks.mjs tn-apply <file> --apply
+  tn-apply only writes tnCoach in Roger's own results: that is part of this marking run (Roger, 17 Nov 2026) and allowed.
 `);
   for(const x of its)console.log(`--- ${x.code} · ${x.title} · ${x.second?"NEW TASK (his answer to the short task after a correction)":"writing"} · handed in ${x.at}\nTask: ${x.task}${x.use&&x.use.length?"\nChunks to use: "+x.use.join(" · "):""}\nText:\n${x.text}\n`)}
+if(cmd==="tn-ready")await tnPrint(await tnFull());
 else if(cmd==="tn-apply"){const its=await tnItems(),ans=JSON.parse(fs.readFileSync(args[0],"utf8")),now=new Date().toISOString(),s=v=>String(v||"").trim();let n=0;
   for(const a of ans){const x=its.find(i=>i.code===a.code);if(!x){console.log("? no piece "+a.code);continue}
     const v={fix:(Array.isArray(a.fix)?a.fix:[]).map(f=>({said:s(f.said),natural:s(f.natural),why:s(f.why)})).filter(f=>f.said&&f.natural),corrected:s(a.corrected),well:s(a.well),at:now};
@@ -214,7 +219,9 @@ else if(cmd==="tn-apply"){const its=await tnItems(),ans=JSON.parse(fs.readFileSy
       {fields:{ls:fsv(x.ls),activity:fsv(x.aid),updated:{timestampValue:now},tnCoach:fsvA({[x.step]:v})}})}
   const left=its.filter(i=>!ans.some(a=>a.code===i.code)).map(i=>i.code);
   console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${n} correction(s)${left.length?" · NOT ANSWERED: "+left.join(", "):""}`)}
-else if(cmd==="ready"){const today=W.ELWeek.today();
+else if(cmd==="ready"){const today=W.ELWeek.today(),full=await tnFull();
+  console.log("STEP 0 · TOWARDS NATIVENESS (Roger's own writing; do it first)");await tnPrint(full);console.log("\nSTUDENTS");
+  if(!full){console.log("Nothing READY: this run is only for Roger's own course. Skip the sheets, correct his writing above, and finish.");process.exit(0)}
   if(!flags.has("--no-run")){const mk=doc(await api("GET",DOCS+"settings/marking"))||{},rq=Date.parse((mk.request||{}).at||"")||0,st=Date.parse((mk.run||{}).started||"")||0,via=rq>st?"request":"schedule";
     await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run",{fields:{run:fsv({started:new Date().toISOString(),via})}});console.log("RUN started ("+(via==="request"?"asked from the dashboard":"scheduled")+")")}
   for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
@@ -244,6 +251,7 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
   {const run=(doc(await api("GET",DOCS+"settings/marking"))||{}).run||{},st=Date.parse(run.started||"")||0,dn=Date.parse(run.done||"")||0;   // the end of a run (see the top)
     if(st&&dn<st&&Date.now()-st<12*3600e3){await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run.done",{fields:{run:fsv({done:new Date().toISOString()})}});console.log("RUN done")}}
   if(problems.length)process.exitCode=2}
+else if(cmd==="fb-ready"&&!(await tnFull()))console.log("Nothing to correct: this run is only for Roger's own course (Towards Nativeness).");
 else if(cmd==="fb-ready"){   // pieces waiting for a correction without a level, per group, activity and step
   for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course)){const t=await fbTodo(grp,a);for(const [step,rows] of Object.entries(t))console.log(["FEEDBACK",grp.id,a.id,step,rows.length+" to correct"].join(" · "))}}
 else if(cmd==="fb-sheet"){const [gid,aid,step]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid),rows=a?(await fbTodo(grp,a))[step]||[]:[];
