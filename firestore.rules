@@ -332,8 +332,10 @@ service cloud.firestore {
       // 'done'). The paper and the start never change, and the copies of the answers saved at each exit (snaps, for the teacher's check
       // of what changed after coming back) can only grow: the old ones must stay exactly as they were. Marks come from the dashboard.
       match /exams/{key} {
-        function exOpen(ls) { return lsOpen(ls) && lsForMe(ls, uid)
-          && get(/databases/$(database)/documents/ls/$(ls)).data.get('webExam', {}).get(rosterGroup(), {}).get('open', false) == true; }
+        // .only = [emails]: a make-up exam opened for some students of the group only (Roger, 17 Nov 2026: Elunei's LS1 exam)
+        function exGrp(ls) { return get(/databases/$(database)/documents/ls/$(ls)).data.get('webExam', {}).get(rosterGroup(), {}); }
+        function exOpen(ls) { return lsOpen(ls) && lsForMe(ls, uid) && exGrp(ls).get('open', false) == true
+          && (exGrp(ls).get('only', null) == null || myEmail() in exGrp(ls).only); }
         function exOk() {
           let d = request.resource.data;
           return d.keys().hasOnly(['ls','key','paper','level','group','order','answers','started','listenDone','status','exits','glances','changes','snaps','tries','done','updated'])

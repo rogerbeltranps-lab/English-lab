@@ -2683,6 +2683,7 @@ function wxMark(d,K,ls,answers){const e=exOf(ls),A=answers||d.answers||{},out={s
   WXSEC.forEach(([k])=>{const ids=(d.order||{})[k]||[],mx=secMax(e,k),right=ids.filter(id=>{if(!wxAcc(K,id))out.known=false;return wxOk(K,id,A[id])}).length;
     const sc=ids.length?Math.round(right/ids.length*mx*100)/100:0;out.sec[k]={right,n:ids.length,score:sc,max:mx};out.score+=sc;out.max+=mx});
   const w=d.uid?wxW(d.uid,ls,d):null;if(w){out.w=w;if(w.score!=null||!w.words){out.score+=w.score||0;out.max+=w.max}else out.partial=true}   // a blank writing counts 0   // not marked yet: the mark is without the writing (*)
+  if(!w&&exOf(ls).sections.some(x=>!WXSEC.some(y=>y[0]===x[0])))out.partial=true;   // LS1: the writing (wtask…) is marked apart (tools/exam-marks)
   out.mark=out.max?out.score/out.max*10:null;return out}
 // what going out changed: the answers at the first exit against the final ones (each question: before, after, right before / after)
 function wxAssess(d,K,ls){const sn=(d.snaps||[])[0];if(!sn)return null;const A=d.answers||{},B=sn.answers||{},ch=[];
@@ -2690,6 +2691,7 @@ function wxAssess(d,K,ls){const sn=(d.snaps||[])[0];if(!sn)return null;const A=d
   const wid=wxWid(d);if(wid&&String(B[wid]||"").trim()!==String(A[wid]||"").trim())ch.push({id:wid,sec:"writing",before:B[wid]||"",after:A[wid]||"",w:true});
   const m0=wxMark(d,K,ls,B),m1=wxMark(d,K,ls,A);return {ch,gained:ch.filter(c=>c.okA&&!c.okB).length,lost:ch.filter(c=>c.okB&&!c.okA).length,mark0:m0.mark,mark1:m1.mark}}
 const wxOpen=(ls,gid)=>!!((((S.D.ls[ls]||{}).webExam||{})[gid]||{}).open);
+const wxW0=(ls,gid)=>(((S.D.ls[ls]||{}).webExam||{})[gid])||{};   // {open, mode, go, only, at}
 const wxSt=(d,open)=>!d?"none":d.status==="done"?"done":d.status==="out"?"out":open?"in":"stopped";
 const wxMin=(a,b)=>{const x=Date.parse(a),y=Date.parse(b);return isNaN(x)||isNaN(y)?null:Math.round((y-x)/6e3)/10};
 const hm=s=>String(s||"").slice(11,16);
@@ -2708,16 +2710,26 @@ function wxReport(d,K,ls,X){const e=exOf(ls),P=X&&X.papers[d.paper],qs=[];let n=
   return Object.assign({full:true,web:true,questions:qs,exam:Object.assign({listening:{about:A.about||"",text:(A.script||[]).map(([w,s])=>w+": "+s).join("\n")},reading:{title:"Text A and Text B",body:P?wxPlain(P.text):""}},
     wt?{writing:{title:"Writing",task:wt.q,points:wt.frame?["Frame: "+wt.frame]:[]}}:{})},wid?{writing:{original:txt||"(blank)"}}:{})}
 function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls),open=wxOpen(ls,grp.id);
+  // a make-up exam (Roger, 17 Nov 2026: Elunei's LS1 exam): open only for students listed by email (ls/{ls}.webExam[group].only); students
+  // offered for it = those with no exam mark yet and no web exam started
+  const W=wxW0(ls,grp.id),only=Array.isArray(W.only)?W.only:[],late=studs.filter(s=>s.uid&&s.email&&!wxDoc(s.uid)&&!Object.keys(res(s.uid,asId(ls)).sections||{}).length);
+  const who=only.map(e=>{const x=studs.find(s=>String(s.email||"").toLowerCase()===e);return x?name(x):esc(e)}).join(", ");
   if(WX.ls!==ls&&!WX.busy){if(DEMO){WX.docs=DEMO.ex||{};Object.entries(WX.docs).forEach(([u,d])=>d.uid=u);WX.ls=ls;WX.at=Date.now()}else wxLoad(ls)}
   const on=studs.filter(s=>s.uid),docs=on.map(s=>wxDoc(s.uid)),n=k=>docs.filter(d=>wxSt(d,open)===k).length;
   const link=new URL(c.page,location.href).href;
   const head=`<div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:8px;margin:6px 0">`
-    +(open?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">🟢 Open for ${esc(grp.name)}</span><button class="g" data-wx="close">🔒 Close the exam</button>`
-      :`<span style="background:#f1f5f9;color:#334155;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Closed for ${esc(grp.name)}</span><button data-wx="open">🟢 Open the exam for ${esc(grp.name)}</button>`)
+    +(!open?`<span style="background:#f1f5f9;color:#334155;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Closed for ${esc(grp.name)}</span><button data-wx="mode">📝 Exam mode for ${esc(grp.name)}</button><button class="g" data-wx="pick">👤 Only some students…</button>`
+      :W.mode&&!W.go?`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">📝 Exam mode${only.length?" · only "+who:" · "+esc(grp.name)}: students are coming to the exam and wait in full screen</span><button data-wx="go" style="background:#166534;color:#fff;border-color:#166534">▶ Start the exam</button><button class="g" data-wx="close">⏹ End exam mode</button>`
+      :`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">🟢 ${W.go?"Started at "+new Date(W.go).toTimeString().slice(0,5)+" · ":""}${only.length?"only "+who:"open for "+esc(grp.name)}</span><button class="g" data-wx="close">🔒 Close the exam</button>`)
     +`<a class="g" href="${esc(link)}" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 12px;border:1px solid #cbd5e1;border-radius:10px">👁 Preview and 🔊 audio</a>`
     +`<button class="g" data-wx="copy" data-v="${esc(link)}">🔗 Copy the link</button><button class="g" data-wx="refresh">🔄 Refresh</button>`
     +(n("done")+n("out")+n("stopped")?`<button data-wx="save">📥 Save marks (${n("done")+n("out")+n("stopped")})</button>`:"")+`</div>`;
-  const note=`<p class="muted">${K?"":'<b style="color:#dc2626">⚠ The answer key is not in the database yet (cpKeys/'+esc(c.key)+'): marks can\'t be worked out.</b> '}Students open the link (🔗 Copy the link, then put it in a 📣 Announcement or on the screen) when you say so, while it is 🟢 open: Starter and Base get the Base paper, Core and Plus the Core one, version A or B by account, everything shuffled. If a student leaves full screen the exam stops (⛔): type your password on their Chromebook to let them back in. ${WX.at?"Read at "+new Date(WX.at).toTimeString().slice(0,5)+".":"Reading…"} <b>📥 Save marks</b> puts the finished exams in 📊 Assessment details and on the students' boards, where they show <b>4 days after the exam, at 8:00</b> (the exams still running are left out until they turn them in or you close the exam).</p>`;
+  // 👤 a make-up exam for some students (Roger, 17 Nov 2026: "I must be able to go one student and make him do an exam, or some students"):
+  // ticked by default = those with no exam mark and no web exam yet
+  const pick=!open&&WX.pick===grp.id+ls?`<div class="box" style="margin:6px 0;padding:10px 12px;background:#f8fafc"><b>👤 Who does the exam?</b> <span class="muted">Only they are taken to it and can start it; the rest of ${esc(grp.name)} sees it closed.</span>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0">${studs.filter(s=>s.uid&&s.email).map(s=>`<label style="white-space:nowrap"><input type="checkbox" class="wxPk" value="${esc(String(s.email).toLowerCase())}"${late.includes(s)?" checked":""}> ${name(s)}${late.includes(s)?"":` <small class="muted">${wxDoc(s.uid)?"(web exam done)":"(has a mark)"}</small>`}</label>`).join("")}</div>
+    <button data-wx="modefor">📝 Exam mode for the ticked students</button> <button class="g" data-wx="pick">Cancel</button></div>`:"";
+  const note=`<p class="muted">${K?"":'<b style="color:#dc2626">⚠ The answer key is not in the database yet (cpKeys/'+esc(c.key)+'): marks can\'t be worked out.</b> '}<b>📝 Exam mode</b> takes every student of the group with the site open to the exam (👤 or only the students you tick): they read the rules and wait in full screen; you explain, then <b>▶ Start the exam</b> starts it for all of them at once. Anyone who arrives later starts it with the Start button. Starter and Base get the Base paper, Core and Plus the Core one, with the questions and options shuffled. If a student leaves full screen the exam stops (⛔): type your password on their Chromebook to let them back in. ${WX.at?"Read at "+new Date(WX.at).toTimeString().slice(0,5)+".":"Reading…"} <b>📥 Save marks</b> puts the finished exams in 📊 Assessment details and on the students' boards, where they show <b>4 days after the exam, at 8:00</b> (the exams still running are left out until they turn them in or you close the exam).</p>`;
   const st=d=>({none:'<span class="muted">Not started</span>',in:"✍️ Working",out:"⛔ Stopped (left)",stopped:"⏹ Not turned in (closed)",done:"✅ Turned in"})[wxSt(d,open)];
   const row=s=>{if(!s.uid)return "";const d=wxDoc(s.uid);if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="10">${st(null)}</td></tr>`;
     const m=K?wxMark(d,K,ls):null,w=wxW(s.uid,ls,d),as=K?wxAssess(d,K,ls):null,ex=(d.exits||[]).length,back=(d.exits||[]).filter(x=>x.back).length,saved=(res(s.uid,asId(ls)).sections||{}).listening;
@@ -2726,7 +2738,7 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
       +`<td><b>${m?f1(m.mark):"–"}</b>${m&&m.partial?'<small class="muted" title="Without the writing: not marked yet">*</small>':""}</td>`
       +`<td>${ex?`🚪 ${ex}${back?` · 🔓 ${back}`:""}${(d.glances||[]).length?` · 👀 ${d.glances.length}`:""}${d.tries?` · 🔑✗${d.tries}`:""}`:(d.glances||[]).length?`👀 ${d.glances.length}`:'<span class="muted">–</span>'}</td>`
       +`<td>${as?(as.ch.length?`${as.gained?`<b style="color:#b45309">⚠️ +${as.gained} right</b>`:""} ${as.ch.length} changed`:"no change"):'<span class="muted">–</span>'}</td></tr>`};
-  return `<div class="box">${fold("wxbox",`🖥 Web exam · ${esc(grp.name)} · ${n("done")} turned in${n("in")?` · ${n("in")} working`:""}${n("out")?` · <span style="color:#b91c1c">${n("out")} stopped</span>`:""}`,head+note
+  return `<div class="box">${fold("wxbox",`🖥 Web exam · ${esc(grp.name)} · ${n("done")} turned in${n("in")?` · ${n("in")} working`:""}${n("out")?` · <span style="color:#b91c1c">${n("out")} stopped</span>`:""}`,head+pick+note
     +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Paper</th><th>State</th>${WXSEC.map(([k,nm,ic])=>`<th>${ic} ${nm}<br><small class="muted">/${secMax(exOf(ls),k)}</small></th>`).join("")}${wxW("",ls)?`<th>✍️ Writing<br><small class="muted">/${secMax(exOf(ls),"writing")}</small></th>`:""}<th>Exam<br><small class="muted">/10</small></th><th>Exits</th><th>After coming back</th></tr></thead><tbody>${studs.concat(Object.values(S.P||{}).filter(s=>s.tester&&s.uid&&wxDoc(s.uid)&&!studs.includes(s))).map(row).join("")}</tbody></table></div>`
     +`<p class="muted">🚪 exits (left full screen, another tab or app, closed the page) · 🔓 let back in with the password · 👀 looked away for less than 2 s · 🔑✗ wrong passwords typed. <b>After coming back</b> compares the answers saved when they first left with the final ones: ⚠️ +n = answers that became right after coming back. <b>✍️ Writing:</b> click a student to read the text and give it a 5.1 level (the points go in by themselves); <b>*</b> = the mark without the writing, until you mark it.</p>`,"",true)}</div>`}
 function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=K?wxMark(d,K,ls):null,as=K?wxAssess(d,K,ls):null;
@@ -2766,9 +2778,19 @@ async function wxSave(ls,grp,studs){const c=wxCfg(ls),K=wxKey(ls),open=wxOpen(ls
   act(Promise.all(ps))}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!b||!S.D)return;const k=b.dataset,ls=S.ls,grp=GR.find(g=>g.id===S.g),c=wxCfg(ls);if(!c||!grp)return;
   const studs=Object.values(S.P).filter(s=>s.group===S.g&&!s.away&&!s.tester);
-  ({open:()=>{const i=S.D.ls[ls]=S.D.ls[ls]||{};i.webExam=i.webExam||{};i.webExam[grp.id]={open:true,at:new Date().toISOString()};act(put(["ls",ls],{webExam:{[grp.id]:{open:true,at:new Date().toISOString()}}}))},
-    close:()=>{if(!confirm(`Close the exam for ${grp.name}?\n\nNobody can start it or change answers any more. Exams not turned in keep the answers saved so far.`))return;
-      const i=S.D.ls[ls]=S.D.ls[ls]||{};i.webExam=i.webExam||{};i.webExam[grp.id]={open:false,at:new Date().toISOString()};act(put(["ls",ls],{webExam:{[grp.id]:{open:false,at:new Date().toISOString()}}}))},
+  // ls/{ls}.webExam[group] = {open, mode, go, only, at} (the exam page and firestore.rules read it); live/{group}.exam = {on, href, ls,
+  // only, at, go} takes the students' open pages to the exam (el-cloud.js examPull) and starts the waiting ones (el-web-exam.js watchGo)
+  const wxSet=(v,live)=>{const i=S.D.ls[ls]=S.D.ls[ls]||{};i.webExam=i.webExam||{};i.webExam[grp.id]=v;
+    act(Promise.all([put(["ls",ls],{webExam:{[grp.id]:v}}),live!==undefined?put(["live",grp.id],live?{exam:live,go:null}:{exam:null}):null]))};
+  const mode=only=>{const at=new Date().toISOString();WX.pick=null;
+    wxSet({open:true,mode:true,go:null,only,at},{on:true,href:c.page,ls,only,at:Date.now(),go:null})};
+  ({mode:()=>{if(!confirm(`Exam mode for ${grp.name}?\n\nEvery student of ${grp.name} with the site open is taken to the exam. They read the rules and wait in full screen until you press ▶ Start. (Class mode stops.)`))return;mode(null)},
+    pick:()=>{WX.pick=WX.pick===grp.id+ls?null:grp.id+ls;render()},
+    modefor:()=>{const es=[...document.querySelectorAll(".wxPk:checked")].map(x=>x.value);if(!es.length)return alert("Tick at least one student.");
+      if(!confirm(`Exam mode only for ${es.length} student(s)?\n\nOnly they are taken to the exam and can start it; the rest of ${grp.name} still sees it closed.`))return;mode(es)},
+    go:()=>{const W=wxW0(ls,grp.id),t=Date.now();wxSet(Object.assign({},W,{open:true,go:t}),{on:true,href:c.page,ls,only:W.only||null,at:Date.parse(W.at)||t,go:t})},
+    close:()=>{const W=wxW0(ls,grp.id);if(!confirm(W.mode&&!W.go?`End exam mode for ${grp.name}? Nobody has started yet.`:`Close the exam for ${grp.name}?\n\nNobody can start it or change answers any more. Exams not turned in keep the answers saved so far.`))return;
+      wxSet({open:false,mode:false,go:null,only:null,at:new Date().toISOString()},null)},
     refresh:()=>{WX.ls=null;wxLoad(ls)},
     copy:async()=>{try{await navigator.clipboard.writeText(k.v);b.textContent="✓ Copied"}catch(x){prompt("Copy the link:",k.v)}},
     save:()=>wxSave(ls,grp,studs),

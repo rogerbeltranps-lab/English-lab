@@ -940,6 +940,17 @@ const cmHold=x=>{if(!x||!x.game||!x.sid||!elCmOn(x.go)||!x.go.lock)return false;
 // 2026). The first page after the game keeps the note through its own reload after the pull and forgets it when it is left.
 const TOOK="el_game_took",LOADED=Date.now();
 addEventListener("pagehide",()=>{if(reloading)return;try{const o=JSON.parse(sessionStorage.getItem(TOOK)||"null");if(o&&o.at<LOADED)sessionStorage.removeItem(TOOK)}catch(e){}});
+// 📝 Exam mode (Roger, 17 Nov 2026: "I want to go exam mode, and when I do that all students get pulled up"): the dashboard writes
+// live/{group}.exam = {on, href, ls, only, at, go}: every open page of the group's students (only those listed in .only, for a make-up
+// exam of some students) goes to the exam page after the usual short notice that saves their work, and is kept there while it lasts.
+// Pages of the exam itself stay (el-web-exam.js reads .go for ▶ Start). Class mode and pull-ups wait until the teacher ends exam mode.
+function examPull(e){
+  if(!e||!e.on||!e.href||!user||!isStudent(user)||AS)return false;
+  const at=e.at&&e.at.toMillis?e.at.toMillis():+e.at||0;if(at&&Date.now()-at>3*3600e3)return false;   // a forgotten one
+  if(Array.isArray(e.only)&&!e.only.includes(String(user.email||"").toLowerCase()))return false;
+  const url=new URL(e.href,ROOT);if(location.pathname===url.pathname)return true;
+  if(inShell){try{FW.location.replace(url.href)}catch(x){location.href=url.href}return true}
+  goMove(url,lockCa()?"📝 L’examen":"📝 The exam",false,3,"📝");return true}
 function gamePush(u){
   if(stopGame){stopGame();stopGame=null}
   if(!u||!isStudent(u)||!myGroup||onGame)return;
@@ -948,6 +959,7 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{try{sessionStorage.setItem(TOOK,JSON.stringify({p:location.pathname,at:Date.now()}))}catch(e){}location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
+    if(examPull(x&&x.exam))return;
     const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsKnown=true;fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
