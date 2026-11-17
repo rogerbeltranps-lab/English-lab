@@ -255,7 +255,8 @@
   let chCache=null;
   async function chBuild(k){
     const cur=(window.EL_LS||[]).find(l=>l.id===LS);if(!cur)return null;
-    const list=(window.EL_LS||[]).filter(l=>l.course===cur.course),me=list.indexOf(cur);if(list.length<2)return null;
+    const list=(window.EL_LS||[]).filter(l=>l.course===cur.course&&!l.personal===!cur.personal),me=list.indexOf(cur);   // a personal LS (✦ Towards Nativeness) is a notebook of its own
+   if(list.length<2)return null;
     const key=(who&&who.uid)+"|"+ca()+"|"+exCtx.level;if(chCache&&chCache.key===key)return chCache.chs;
     const C=window.ELCloud,gid=exCtx.gid,mine=mg||(D&&D.myGames)||{},out=[];
     for(const L of list){
