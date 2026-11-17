@@ -162,6 +162,8 @@ window.LP = {
       min: { daring: 250 },
       checklist: { daring: ['four parts: idea, start, problems, now', '12 expressions from the vocabulary, in the right form', 'pronoun objects in the middle of phrasal verbs (figure it out)', 'two past perfect and two present perfect verbs', 'the right pattern after look forward to, end up and recommend', 'no calque from the warm-up'] } },
 
+    { id: 'fluency', type: 'fluency', tab: '⏱ 4 / 3 / 2 fluency', title: 'Fluency: the same story three times, each time faster', pill: 'Before Speaking', from: 'talk',
+      intro: 'Choose one of the Speaking questions and answer it three times in a row: 2 minutes, then 1½, then 1 (or the classic 4 / 3 / 2). The same ideas, less time each round: your chunks get automatic. Don’t correct yourself, keep going. Then do 🎙 Speaking.' },
     { id: 'talk', type: 'talk', tab: '🎙 Speaking', title: 'Speaking: random questions about your story', pill: '4 random questions',
       intro: 'You get 4 random questions from a pool of 12. Answer like a storyteller, about 45 seconds each, without reading. Your recording goes to your teacher, who sends back the correction here.',
       task: 'Tell real stories. Move between past simple, past continuous, past perfect and present perfect, and use at least four expressions from the vocabulary.',

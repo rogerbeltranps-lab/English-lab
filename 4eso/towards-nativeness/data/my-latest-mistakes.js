@@ -203,7 +203,20 @@ window.TN_PREPS = [
     const sh = (window.TN_SHADOW || {})['mistakes_' + b.id];
     if (sh) panels.push({ id: 'shadow_' + b.id, type: 'shadow', tab: '🗣 Shadowing · ' + b.date, title: 'Shadowing: your sentences, said the native way', pill: 'Listen and repeat', clip: sh });
   });
-  // 📍 always the second step, right after the newest 🔍 Spot it
+  /* 🗓 This week's mix (Roger approved, 17 Nov 2026): spaced, interleaved retrieval. 12 mistakes drawn from EVERY list so far (and the
+     📍 sentences), a new draw every Monday (ISO week, seeded, so the same 12 all week on every device). The id changes every week, so it
+     is a new step each week; older weeks stay done. Step 3, after 📍. */
+  const week = (d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+    const y = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() + 'w' + String(Math.ceil(((t - y) / 864e5 + 1) / 7)).padStart(2, '0'); })(new Date());
+  let seed = [...week].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+  const poolW = B.flatMap(b => b.items).map(m => ({ q: gap(m.s, m.bad) + ' <span class="tiny">(you wrote: <s>' + m.bad + '</s>)</span>', a: fixArr(m), en: m.why.replace(/<[^>]+>/g, '') }))
+    .concat(window.TN_PREPS || []);
+  for (let i = poolW.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [poolW[i], poolW[j]] = [poolW[j], poolW[i]]; }
+  if (poolW.length) panels.splice(1, 0, { id: 'week_' + week, type: 'typed', tab: '🗓 This week’s mix', title: 'This week’s mix: 12 mistakes from all your lists', pill: 'New every Monday',
+    intro: 'Old and new mistakes, mixed: remembering a fix after a few days is what makes it stick. Do it once a week (Friday is a good day). If you get one wrong, it is still a habit: say the right sentence aloud three times.',
+    items: poolW.slice(0, 12) });
+  // 📍 always the second step, right after the newest 🔍 Spot it (so 🗓 ends up third)
   if (window.TN_PREPS) panels.splice(1, 0, { id: 'preps', type: 'typed', tab: '📍 in / on / at', title: 'in / on / at: your own sentences', pill: 'Your weak spot',
     intro: '<strong>on</strong> = things you look at, like a surface: on the list, on the website, on the screen, on my phone, on GitHub. <strong>in</strong> = things you put something inside: in the table, in the document, in the email, in the notebook, in the inbox, in class mode, in LS2. <strong>at</strong> = a point: at the top, at the end, at Starter level. <strong>to</strong> = movement: add to, apply to, upload to. Type the missing word.',
     items: window.TN_PREPS });

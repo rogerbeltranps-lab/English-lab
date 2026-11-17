@@ -1,5 +1,5 @@
 /* Towards Nativeness (Roger's own C1 → C2 course, a hidden LS in 4 ESO; copied from the Seasons & Celebrations engine on 17 Nov 2026, plus
-   🎲 random Talk questions (p.pick), 🔁 Speak again (p.redo) and 🎬 movie dictation (R.movie), ✨ Make it idiomatic (R.idiom)): renders a Learning Path from window.LP.
+   🎲 random Talk questions (p.pick), 🔁 Speak again (p.redo) and 🎬 movie dictation (R.movie), ✨ Make it idiomatic (R.idiom), ⏱ 4/3/2 fluency (R.fluency)): renders a Learning Path from window.LP.
    Content lives in each page; this file only holds the activity types, scoring and progress.
    Routes are cumulative: an item with r:"safe" is shown to Safe and Daring. Auto-corrected steps
    complete once every question is answered and checked, whatever the score (Roger, 6 Nov 2026; was 80 %); the recall warm-up completes when submitted and keeps the first attempt. */
@@ -1512,6 +1512,63 @@ var LS2 = (function () {
     };
   };
 
+  /* ⏱ 4 / 3 / 2 fluency (Towards Nativeness, Roger 17 Nov 2026: "look up the theory about learning English to see if there's anything else
+     we could do"): Nation & Maurice's 4/3/2 technique, task repetition. Roger tells the same thing three times, each time with less time
+     (p.rounds seconds, default 120 / 90 / 60 for the phone; 🐢 the classic 4 / 3 / 2 minutes as an option), so the third go has to come out
+     faster and smoother: chunks get automatic. The topic is one question drawn from the pool of the panel named in p.from (the Speaking
+     step's partner questions) or p.topics. Each round can be recorded on the device (MediaRecorder, never uploaded, gone on reload) so he
+     can hear the first and the last go. Done after three rounds and a self-rating: state.fluency[id] = {qi, n, rate, long}. */
+  R.fluency = p => {
+    const pool = (p.from ? ((LP.panels.find(x => x.id === p.from) || {}).partner || []).map(x => tx(x.q)) : []).concat(p.topics || []);
+    return {
+      html: '<div class="section-card">' + (p.intro ? '' : '<p class="instruction">Tell the same story three times. Each round is shorter, so you have to say the same things faster and more smoothly. Don’t stop to correct yourself: keep talking.</p>') +   // p.intro is already shown above the step
+        '<div class="question"><p class="tiny">Your topic</p><p class="q-title" id="' + p.id + 'Topic"></p><div class="actions" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="btn secondary" type="button" id="' + p.id + 'New">🎲 Another topic</button><button class="btn secondary" type="button" id="' + p.id + 'Long"></button></div></div></div>' +
+        '<div class="section-card"><div id="' + p.id + 'Rounds"></div><div class="record-status" id="' + p.id + 'Msg"></div></div>' +
+        '<div class="section-card"><h3>Was round 3 smoother than round 1?</h3><div class="actions" style="justify-content:flex-start;gap:8px;flex-wrap:wrap" role="group">' +
+        [['3', '😀 Much smoother'], ['2', '🙂 A bit'], ['1', '😕 Not really']].map(r => '<button class="btn secondary" type="button" data-fl-rate="' + r[0] + '">' + r[1] + '</button>').join('') +
+        '</div><p class="feedback" id="' + p.id + 'Done"></p></div>',
+      bind() {
+        state.fluency = state.fluency || {}; const sv = state.fluency[p.id] = state.fluency[p.id] || { n: 0 };
+        if (sv.qi == null || sv.qi >= pool.length) { sv.qi = Math.floor(Math.random() * Math.max(1, pool.length)); save(); }
+        const secs = () => sv.long ? [240, 180, 120] : (p.rounds || [120, 90, 60]);
+        const clips = []; let timer = null, rec = null, stream = null, left = 0, cur = -1;
+        const fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+        const draw = () => {
+          $('#' + p.id + 'Topic').textContent = pool[sv.qi] || '';
+          $('#' + p.id + 'Long').textContent = sv.long ? '⚡ Shorter rounds (2 / 1½ / 1 min)' : '🐢 Classic 4 / 3 / 2 minutes';
+          $('#' + p.id + 'Rounds').innerHTML = secs().map((s, i) => '<div class="question"><div class="actions" style="justify-content:flex-start;align-items:center;gap:8px;flex-wrap:wrap"><strong>Round ' + (i + 1) + ' · ' + fmt(s) + '</strong>' +
+            '<button class="btn' + (i === Math.min(sv.n, 2) ? '' : ' secondary') + '" type="button" data-fl-go="' + i + '"' + (i > sv.n ? ' disabled' : '') + '>' + (cur === i ? '■ Stop' : (i < sv.n ? '↺ Again' : '▶ Start')) + '</button>' +
+            '<span class="tiny" id="' + p.id + 'T' + i + '">' + (i < sv.n ? '✓ done' : '') + '</span></div>' +
+            '<div style="height:8px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin:6px 0"><i id="' + p.id + 'B' + i + '" style="display:block;height:100%;width:' + (i < sv.n ? 100 : 0) + '%;background:var(--accent,#7c3aed)"></i></div>' +
+            (clips[i] ? '<audio controls src="' + clips[i] + '" style="width:100%"></audio>' : '') + '</div>').join('');
+          $$('#' + p.id + ' [data-fl-go]').forEach(b => b.onclick = () => cur === +b.dataset.flGo ? stop(true) : start(+b.dataset.flGo));
+          $$('#' + p.id + ' [data-fl-rate]').forEach(b => { const on = String(sv.rate) === b.dataset.flRate; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); });
+          $('#' + p.id + 'Done').textContent = sv.n >= 3 ? (sv.rate ? '✓ Done. Next time, try the classic 4 / 3 / 2 or another topic.' : 'Rate how round 3 went to finish.') : 'Do the three rounds in a row.';
+        };
+        async function start(i) {
+          if (cur >= 0) stop(false); cur = i; left = secs()[i]; const total = left;
+          try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); const parts = [], r = rec = new MediaRecorder(stream);
+            r.ondataavailable = e => parts.push(e.data); r.onstop = () => { if (parts.length) { clips[i] = URL.createObjectURL(new Blob(parts, { type: r.mimeType || 'audio/webm' })); draw(); } }; r.start();
+            $('#' + p.id + 'Msg').textContent = 'Recording round ' + (i + 1) + ' on this device only. Speak now.';
+          } catch (e) { rec = null; $('#' + p.id + 'Msg').textContent = 'No microphone: just speak along with the timer.'; }
+          draw(); beep();
+          timer = setInterval(() => { left--; const t = $('#' + p.id + 'T' + i), b = $('#' + p.id + 'B' + i); if (t) t.textContent = fmt(Math.max(0, left)) + ' left'; if (b) b.style.width = (100 * (total - left) / total) + '%'; if (left <= 0) stop(true); }, 1000);
+        }
+        function stop(finished) {
+          clearInterval(timer); timer = null; const i = cur; cur = -1;
+          try { if (rec && rec.state !== 'inactive') rec.stop(); } catch (e) {} if (stream) stream.getTracks().forEach(t => t.stop()); rec = null; stream = null;
+          if (finished && i === sv.n) { sv.n = i + 1; save(); beep(); }
+          $('#' + p.id + 'Msg').textContent = finished ? (i < 2 ? 'Time! Now round ' + (i + 2) + ': the same story, less time.' : 'Time! Listen to round 1 and round 3: hear the difference?') : '';
+          draw(); if (sv.n >= 3 && sv.rate) complete(p.id);
+        }
+        $('#' + p.id + 'New').onclick = () => { if (cur >= 0) stop(false); sv.qi = (sv.qi + 1 + Math.floor(Math.random() * Math.max(1, pool.length - 1))) % Math.max(1, pool.length); sv.n = 0; delete sv.rate; clips.length = 0; save(); draw(); };
+        $('#' + p.id + 'Long').onclick = () => { if (cur >= 0) stop(false); sv.long = !sv.long; save(); draw(); };
+        $$('#' + p.id + ' [data-fl-rate]').forEach(b => b.onclick = () => { if (sv.n < 3) { $('#' + p.id + 'Done').textContent = 'Do the three rounds first.'; return; } sv.rate = +b.dataset.flRate; save(); draw(); complete(p.id); });
+        draw();
+      }
+    };
+  };
+
   /* ✨ Make it idiomatic (Towards Nativeness, Roger 17 Nov 2026: "one of the main aims is to sound more idiomatic so you also can create an
      activity to transform my sentences into more idiomatic ones, apart from spotting the mistakes"). p.items = [{s: Roger's own sentence
      (understandable, but built in Catalan), a: [natural versions], why: one short note}]. Roger rewrites the WHOLE sentence; an exact
@@ -1522,7 +1579,7 @@ var LS2 = (function () {
   R.idiom = p => {
     const its = p.items || [];
     return {
-      html: '<div class="section-card"><p class="instruction">' + (p.intro || 'Your own sentences: clear, but built in Catalan. Rewrite each one the way a native speaker would say it. Change as much as you need.') + '</p></div>' +
+      html: (p.intro ? '' : '<div class="section-card"><p class="instruction">Your own sentences: clear, but built in Catalan. Rewrite each one the way a native speaker would say it. Change as much as you need.</p></div>') +   // p.intro is already shown above the step
         its.map((it, i) => '<div class="question" id="' + p.id + 'Q' + i + '"><p class="q-title"><strong>' + (i + 1) + '.</strong> <span class="tiny">You wrote:</span> “' + esc(it.s) + '”</p>' +
           '<textarea class="typed" id="' + p.id + i + '" rows="2" autocomplete="off" spellcheck="false" style="width:100%;min-height:3.2em;font:inherit;padding:10px;border-radius:12px;box-sizing:border-box" placeholder="Say it like a native speaker"></textarea>' +
           '<div class="actions" style="justify-content:flex-start;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn secondary" type="button" data-id-mic="' + i + '"' + (SRC() ? '' : ' hidden') + '>🎙 Say it</button><button class="btn secondary" type="button" data-id-chk="' + i + '">✓ Check</button><span class="tiny" id="' + p.id + 'h' + i + '"></span></div>' +

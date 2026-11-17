@@ -157,6 +157,8 @@ window.LP = {
       min: { daring: 150 },
       checklist: { daring: ['on with devices and platforms, at with places on the screen', 'still and yet in the right place', 'take (not bring) for links and buttons', 'two questions with the auxiliary before the subject', 'at least one indirect question', 'three phrasal verbs from the vocabulary'] } },
 
+    { id: 'fluency', type: 'fluency', tab: '⏱ 4 / 3 / 2 fluency', title: 'Fluency: the same story three times, each time faster', pill: 'Before Speaking', from: 'talk',
+      intro: 'Choose one of the Speaking questions and answer it three times in a row: 2 minutes, then 1½, then 1 (or the classic 4 / 3 / 2). The same ideas, less time each round: your chunks get automatic. Don’t correct yourself, keep going. Then do 🎙 Speaking.' },
     { id: 'talk', type: 'talk', tab: '🎙 Speaking', title: 'Speaking: random questions about your tech', pill: '4 random questions',
       intro: 'You get 4 random questions from a pool of 12. The computer asks them one by one while you record. Answer fully, like in a conversation (about 40 seconds each). Your recording goes to your teacher, who sends back the correction here.',
       task: 'Answer naturally: give an example, a reason and a detail for each question. Try to use on / at / in correctly, still / yet, and at least two expressions from the vocabulary (figure out, it turns out, that did the trick…).',

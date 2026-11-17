@@ -165,6 +165,8 @@ window.LP = {
       min: { daring: 180 },
       checklist: { daring: ['subject line and a clear opening sentence', 'English school words only (next school year, the school, master document…)', 'a / an by sound (an LS)', 'these + plural, criterion / criteria', 'feedback, info, code with no a', 'compounds and ’s instead of chains of of'] } },
 
+    { id: 'fluency', type: 'fluency', tab: '⏱ 4 / 3 / 2 fluency', title: 'Fluency: the same story three times, each time faster', pill: 'Before Speaking', from: 'talk',
+      intro: 'Choose one of the Speaking questions and answer it three times in a row: 2 minutes, then 1½, then 1 (or the classic 4 / 3 / 2). The same ideas, less time each round: your chunks get automatic. Don’t correct yourself, keep going. Then do 🎙 Speaking.' },
     { id: 'talk', type: 'talk', tab: '🎙 Speaking', title: 'Speaking: random questions about your teaching', pill: '4 random questions',
       intro: 'You get 4 random questions from a pool of 12. Answer like you would at a teachers’ conference, about 45 seconds each. Your recording goes to your teacher, who sends back the correction here.',
       task: 'Use English school words (next school year, staff meeting, head of department, hand in, mark…), get every article and plural right, and give examples.',
