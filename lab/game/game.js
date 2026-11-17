@@ -4,7 +4,8 @@
 //   shuffle(n,seed) the order of n options for one question of one game (the same on every reload)
 //   norm(text)      a written answer made comparable: lower case, straight apostrophes, single spaces, no full stop at the end
 //   right(text,ok)  whether a written answer is one of the accepted answers ok (already normalised, as the board publishes them)
-//   music(name)     background music, made with the Web Audio API (no files): "lobby", "think" or "" (stop); only the board plays it
+//   music(name)     background music, made with the Web Audio API (no files): "lobby", "think", "spaceLobby", "spaceThink" (🚀 Space rescue)
+//                   or "" (stop); only the board plays it
 //   fx(name)        a sound effect: join, tap, next, reveal, right, wrong, fanfare, drum
 //   sound(on)       sound on or off in this browser (kept as el_game_sound); sound() says which
 //   confetti()      a burst of confetti
@@ -64,7 +65,27 @@ const SONGS={
       if(s%2===0)tone(t,hz(r-24),d*.9,"triangle",.26,m);
       if(s%4===1)tone(t,hz(tn[(s>>2)%3]+12),d*1.2,"sine",.09,m);
       if(s===0)tn.forEach(n=>tone(t,hz(n),d*15,"triangle",.025,m));}},
+  // 🚀 Space rescue (Roger, 17 Nov 2026: "a space version of the music", he listens first): slow pads, a twinkling arpeggio with echoes,
+  // a sonar ping, a soft deep pulse
+  spaceLobby:{bpm:84,chords:[[50,1],[58,0],[53,0],[60,0]],
+    step(t,s,ch,d,m){const [r,mi]=ch,tn=[r,r+(mi?3:4),r+7,r+12,r+(mi?15:16),r+19];
+      if(s===0)tn.slice(0,3).forEach(n=>pad(t,hz(n),d*16,.035,m));
+      if(s===0||s===10)tone(t,hz(r-24),d*5,"sine",.3,m);
+      if(s%2===0){const n=hz(tn[[0,2,4,3,5,3,2,1][s/2]]+12);tone(t,n,d*2.5,"sine",.06,m);tone(t+d*3,n,d*2.5,"sine",.022,m)}
+      if(s===12)tone(t,hz(r+36),d*6,"sine",.025,m);
+      if(s===8)hiss(t,d*6,.04,600,m,.4);}},
+  spaceThink:{bpm:100,chords:[[57,1],[53,0],[50,1],[52,0]],
+    step(t,s,ch,d,m){const [r,mi]=ch,tn=[r,r+(mi?3:4),r+7,r+12];
+      if(s%8===0)kick(t,m);
+      if(s%2===0)tone(t,hz(r-24),d*1.4,"triangle",.24,m);
+      if(s%4===2)hiss(t,.04,.07,9000,m);
+      if(s%2===1)tone(t,hz(tn[(s>>1)%4]+12),d*.9,"sine",.055,m);
+      if(s===0)tn.slice(0,3).forEach(n=>pad(t,hz(n),d*16,.022,m));
+      if(s===4){tone(t,1568,d*8,"sine",.05,m);tone(t+d*3,1568,d*6,"sine",.018,m)}}},
 };
+// a soft pad: a slow swell and a slow fade (two detuned sines)
+function pad(t,f,d,v,dest){[0,4].forEach(c=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=f;o.detune.value=c;
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+d*.35);g.gain.linearRampToValueAtTime(.0001,t+d);o.connect(g).connect(dest||out);o.start(t);o.stop(t+d+.05)})}
 let song=null,mGain=null,timer=null,next=0,step=0;
 function music(name){
   const a=ac();if(!a)return;
