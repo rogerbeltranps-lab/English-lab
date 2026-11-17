@@ -239,6 +239,10 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 <div id="pdf"></div>
 <script>window.EL_RAW_OPEN=true;   /* the dashboard sees and writes the open switches as they are; students see the Time plan's days too (elPlanLater) */</script>
 <script src="shared/js/el-catalog.js"></script>
+<script>/* ✦ a personal LS (Roger's own Towards Nativeness, personal:true) is its own section of the dashboard (✦ in the side menu, tnPage),
+   not one more LS of its course: everything else here works on EL_LS / EL_CATALOG without it. */
+window.TN_LS=(window.EL_LS||[]).filter(l=>l.personal);window.TN_CAT=(window.EL_CATALOG||[]).filter(a=>TN_LS.some(l=>l.id===a.ls));
+window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window.EL_CATALOG||[]).filter(a=>!TN_CAT.includes(a));</script>
 <script src="shared/js/el-route-names.js" defer></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
@@ -312,7 +316,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -347,8 +351,8 @@ let RAW=null,AT={all:0,g:{}},cacheT=null;const FRESH=new Set();
 const saveCache=()=>{clearTimeout(cacheT);cacheT=setTimeout(()=>{if(RAW)CACHE.put({v:1,at:AT,raw:plainT(RAW)})},800)};
 const ALL=(n,group)=>F.getDocs(group?F.collectionGroup(db(),n):F.collection(db(),n)),up=r=>r.ref.parent.parent.id;
 async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies:{}},soft=(name,p,f)=>p.then(f).catch(e=>console.warn(name,e));
-  const lsI=Promise.all(EL_LS.map(l=>ELCloud.lsInfo(l.id)));
-  await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>L.ls[l.id]=a[i])),   // in the catalogue's order, as before
+  const LSA=EL_LS.concat(window.TN_LS||[]),lsI=Promise.all(LSA.map(l=>ELCloud.lsInfo(l.id)));   // ✦ the personal LS too: its status shows on its page
+  await Promise.all([lsI.then(a=>LSA.forEach((l,i)=>L.ls[l.id]=a[i])),   // in the catalogue's order, as before
     soft("teacherPlan",ALL("teacherPlan"),q=>{q.forEach(t=>L.tk[t.id]=t.data());L.tkOk=true}),   // tkOk: the ticks really came in (doneSync)
     soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())L.cuts=c.data()}),
     // 🗓 the teacher's timetable (settings/timetable; ttApply): none yet = the one in el-plan.js, saved there the first time
@@ -1258,6 +1262,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
+    +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
@@ -1565,11 +1570,14 @@ function render0(){
     +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
     +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
     +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
-    +`<button class="nv" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
+    +`<button class="nv" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`
+    // ✦ Roger's own course, as a section of its own (tnPage)
+    +((window.TN_LS||[]).length&&!DEMO?`<div class="sep"></div>`+nv("tn","✦ Towards Nativeness","","Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"):"");
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="cres"){$("#main").innerHTML=crPage();return}
+  if(S.g==="tn"){$("#main").innerHTML=tnPage();return}
   if(S.g!=="online")visUnwatch();
   if(S.g==="online"){$("#main").innerHTML=onlinePage();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
@@ -2255,6 +2263,79 @@ function lssPage(){
   return head("","",`🧭 Learning situations`,"Choose a course")
     +`<div class="tiles lsts">${LSC.map(([c,name])=>{const lss=EL_LS.filter(x=>x.course===c),cur=lss.filter(x=>nowIn(x).length);
       return `<a class="tile" href="#" data-do="place" data-p="c:${c}"><span class="ti"><b class="lsc">${name}</b><span class="tb">${plural(lss.length,"LS")}</span></span><span><small>${esc(GR.filter(g=>g.course===c).map(g=>g.name).join(" · "))}</small>${cur.length?`<small>Now: ${cur.map(x=>esc(elLsNum(x)+" · "+short(x))).join(", ")}</small>`:""}</span></a>`}).join("")}</div>`;
+}
+/* ---- ✦ Towards Nativeness (Roger, 17 Nov 2026: "can't I have on my dashboard somewhere on the left … and present it as a new section even
+   if it's not really a new section? With a new personal dashboard with the statistics of the LS"): Roger's own C1 → C2 course is still a
+   hidden LS of 4 ESO in the catalogue (personal:true), but the dashboard takes it out of 4 ESO (TN_LS / TN_CAT, set right after
+   el-catalog.js) and shows it here, on its own: progress of each learning path, first-try %, every slip Roig corrected at once (Speaking
+   and Writing, school script v31), the recurring ones by kind, the sentences marked "I'll learn this one" and the 4/3/2 rounds. Only
+   Roger's own accounts are read (the tester account and the teacher's own, people().tester). The panels' names and sentences come from
+   the course's own data files, read once when the page is first opened. Nothing is written except the LS status (Hidden / Open). */
+let TND=null;
+function tnLoad(){if(TND)return;TND={busy:true,lp:{}};const keep=window.LP,base="4eso/towards-nativeness/",
+    js=src=>new Promise(r=>{const s=document.createElement("script");s.src=src;s.onload=()=>r(true);s.onerror=()=>r(false);document.head.append(s)});
+  (async()=>{await js(base+"data/shadow.js");
+    for(const a of (window.TN_CAT||[])){window.LP=null;await js(base+"data/"+a.path.split("/").pop().replace(/\.html$/,".js"));if(window.LP&&window.LP.key)TND.lp[window.LP.key]=window.LP}
+    window.LP=keep;TND.busy=false;if(S.g==="tn")render()})()}
+const TN_CATS=[["📍","Prepositions"],["🅰️","Articles"],["🔀","Word order"],["⏳","Tenses and verb forms"],["🧩","Word choice and idiom"]];
+const TN_PREP=new Set("in on at to for of from with by about into onto over under through during since until till per off out up down across along among between within without".split(" "));
+function tnKind(f){const w=s=>String(s||"").toLowerCase().replace(/[’']/g,"'").match(/[a-z']+/g)||[],a=w(f.said),b=w(f.natural),why=String(f.why||"").toLowerCase(),
+    diff=a.filter(x=>!b.includes(x)).concat(b.filter(x=>!a.includes(x)));
+  if(/preposition/.test(why)||diff.some(x=>TN_PREP.has(x)))return 0;
+  if(/\barticle/.test(why)||diff.some(x=>x==="a"||x==="an"||x==="the"))return 1;
+  if(/word order|order|position|before the|after the|goes (before|after)/.test(why)||(diff.length===0&&a.join(" ")!==b.join(" ")))return 2;
+  if(/tense|perfect|past|present|continuous|progressive|future|conditional|infinitive|gerund|-ing|verb form|modal|passive|third person|agreement/.test(why)
+    ||diff.some(x=>/^(will|'ll|have|has|had|been|was|were|did|do|does|am|is|are|be|being|would|'d|'ve|'s|'re)$/.test(x)))return 3;
+  return 4}
+function tnPage(){tnLoad();
+  const L=(window.TN_LS||[])[0],id=L&&L.id,info=(S.D.ls||{})[id]||{},st=info.status||"hidden";
+  const head=`<div class="ph"><h1 class="pt">✦ Towards Nativeness</h1><div class="sub">Your own C1 → C2 course: what you have done, what Roig corrected and the mistakes that keep coming back. Only you see it.</div></div>`;
+  if(!L)return head+`<div class="box"><p class="muted">The course is not in the catalogue.</p></div>`;
+  const acts=window.TN_CAT||[],mine=Object.values(S.P||{}).filter(s=>s.tester&&s.uid&&!String(s.uid).startsWith("ro:"));
+  const pg=u=>((S.D.pg[u]||{})[id])||{},parse=(u,k)=>{try{return JSON.parse(pg(u)[k]||"{}")||{}}catch(e){return {}}},nDone=o=>Object.values(o.done||{}).filter(Boolean).length;
+  // each learning path from the account that has done most of it (Roger works as the tester; the teacher's own account may have tried it too)
+  const rows=acts.map(a=>{const k=a.keys[0];let best=null;mine.forEach(s=>{const o=parse(s.uid,k);if(!best||nDone(o)>nDone(best.o))best={s,o}});
+    const o=best?best.o:{},lp=TND.lp[k],panels=lp?lp.panels.filter(p=>p&&p.id):[],done=o.done||{},tot=panels.length||a.points,dn=panels.length?panels.filter(p=>done[p.id]).length:Math.min(nDone(o),a.points);
+    const tr=Object.values(o.tries||{}).filter(t=>t&&t.max),ft=tr.length?Math.round(100*tr.reduce((x,t)=>x+t.score,0)/tr.reduce((x,t)=>x+t.max,0)):null;
+    const at=Object.values(o.doneAt||{}).filter(Boolean).sort().pop()||null;
+    return {a,k,o,lp,panels,dn,tot,ft,at,who:best&&nDone(best.o)?best.s:null}});
+  const pname=(r,pid)=>{const p=r.panels.find(x=>x.id===String(pid).replace(/_(beginners|insecure|safe|daring|native)$/,""));return p?String(p.tab||p.title||pid).replace(/<[^>]+>/g,""):pid};
+  // every slip Roig corrected at once: Speaking (state.speak[panel_route].fix) and Writing (state.coach[panel].fix, then .r2.fix)
+  const fixes=[];rows.forEach(r=>{const o=r.o,day=pid=>((o.doneAt||{})[String(pid).replace(/_(beginners|insecure|safe|daring|native)$/,"")]||r.at||"");
+    Object.entries(o.speak||{}).forEach(([pid,sp])=>(sp&&sp.fix||[]).forEach(f=>fixes.push(Object.assign({src:"🎙",where:pname(r,pid),lp:r.a.title,at:day(pid)},f))));
+    Object.entries(o.coach||{}).forEach(([pid,c])=>{(c&&c.fix||[]).forEach(f=>fixes.push(Object.assign({src:"✍️",where:pname(r,pid),lp:r.a.title,at:day(pid)},f)));
+      (c&&c.r2&&c.r2.fix||[]).forEach(f=>fixes.push(Object.assign({src:"✍️",where:pname(r,pid)+" · new task",lp:r.a.title,at:day(pid)},f)))})});
+  fixes.forEach(f=>f.kind=tnKind(f));
+  const norm=s=>String(s||"").toLowerCase().replace(/[’']/g,"'").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim(),again={};
+  fixes.forEach(f=>{const n=norm(f.natural);if(n)(again[n]=again[n]||[]).push(f)});
+  const rep=Object.values(again).filter(x=>x.length>1).sort((x,y)=>y.length-x.length);
+  // ✨ Make it idiomatic: the sentences marked ✗ "I'll learn this one" (state.idiom[panel].r[i] = 0)
+  const tag=x=>String(x||"").replace(/<[^>]+>/g,""),learn=[];rows.forEach(r=>Object.entries(r.o.idiom||{}).forEach(([pid,sv])=>{const p=r.panels.find(x=>x.id===pid);Object.entries((sv&&sv.r)||{}).forEach(([i,v])=>{if(v===0&&p&&p.items&&p.items[i])learn.push({s:tag(p.items[i].s),a:tag((p.items[i].a||[])[0]),why:tag(p.items[i].why),lp:r.a.title})})}));
+  const flu=[];rows.forEach(r=>Object.entries(r.o.fluency||{}).forEach(([pid,v])=>{if(v&&(v.n||v.rate))flu.push({lp:r.a.title,n:v.n||0,rate:v.rate||null,long:!!v.long})}));
+  const DN=rows.reduce((x,r)=>x+r.dn,0),TOT=rows.reduce((x,r)=>x+r.tot,0),tr=rows.filter(r=>r.ft!=null),FT=tr.length?Math.round(tr.reduce((x,r)=>x+r.ft,0)/tr.length):null,
+    last=rows.map(r=>r.at).filter(Boolean).sort().pop(),day=s=>s?new Date(s).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"–";
+  const bar=(n,t,c)=>`<span style="display:inline-block;vertical-align:middle;width:110px;height:9px;border-radius:9px;background:#e2e8f0;overflow:hidden;margin-right:8px"><span style="display:block;height:100%;width:${t?Math.round(100*n/t):0}%;background:${c||"#7c3aed"}"></span></span>`;
+  const tile=(n,lab,sub)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px"><b style="display:block;font-size:26px;line-height:1.1;color:#7c3aed">${n}</b><b style="display:block">${lab}</b>${sub?`<small class="muted">${sub}</small>`:""}</div>`;
+  const sp=fixes.filter(f=>f.src==="🎙").length,wr=fixes.length-sp;
+  const stBox=`<div class="box"><h2>Who can see it</h2><p><b>Students never see it</b>, whatever its status: for a student account the site leaves this course out of every list and menu, and the page itself answers “This LS is not for your group”. You open it with the tester account (or your own).</p>`
+    +`<p><span class="badge" style="background:${STCOL[st]}">Status: ${LS_INFO[st][0]}</span> ${st==="hidden"?`<span class="muted">Hidden too, for extra safety: testers and you still open it.</span>`:`<button data-do="tnst" data-s="hidden" title="Set the LS to Hidden: you and the tester account still open it">🙈 Set it to Hidden</button>`}</p></div>`;
+  if(TND.busy&&!rows.some(r=>r.dn))return head+`<div class="box"><p class="muted">Loading your course…</p></div>`+stBox;
+  const lpTable=`<div class="box"><h2>Learning paths</h2><div class="qwrap"><table class="mat"><tr><th>Learning path</th><th>Done</th><th title="Your first try in the exercises with a score">First try</th><th>Last</th></tr>`
+    +rows.map(r=>`<tr><td><a href="${esc(r.a.path)}" target="_blank" rel="noopener" title="Open it in a new tab">${esc(r.a.title)} ↗</a>${r.who&&r.who.teacher?` <small class="muted">your own account</small>`:""}</td><td style="white-space:nowrap">${bar(r.dn,r.tot)}<small>${r.dn}/${r.tot}</small></td><td>${r.ft==null?"–":r.ft+" %"}</td><td class="muted">${day(r.at)}</td></tr>`).join("")
+    +`</table></div><p class="muted">Done = steps finished (✔ on the page). First try = your first answer in Spot the mistake, Fix it, Translate and the 📍 prepositions.</p></div>`;
+  const kinds=TN_CATS.map((c,i)=>({c,i,list:fixes.filter(f=>f.kind===i)})).filter(x=>x.list.length).sort((x,y)=>y.list.length-x.list.length),mx=Math.max(1,...kinds.map(x=>x.list.length));
+  const fixRow=f=>`<tr><td style="vertical-align:top"><s>${esc(f.said)}</s></td><td style="vertical-align:top"><b>${esc(f.natural)}</b>${f.why?`<br><small class="muted">${esc(f.why)}</small>`:""}</td><td class="muted" style="vertical-align:top">${esc(f.lp)}<br><small>${esc(f.where)}</small></td></tr>`;
+  const kindBox=`<div class="box"><h2>Your recurring mistakes</h2>${fixes.length?`<p class="muted">Every slip Roig corrected at once in your Speaking and Writing, by kind. Tap a kind to see them.</p>`
+    +kinds.map(x=>`<details data-k="tnk${x.i}" ${S.open.has("tnk"+x.i)?"open":""} style="margin:6px 0"><summary style="cursor:pointer"><span style="display:inline-block;min-width:13em">${x.c[0]} ${x.c[1]}</span>${bar(x.list.length,mx,x.i===0?"#dc2626":"#7c3aed")}<b>${x.list.length}</b></summary><div class="qwrap"><table class="mat">${x.list.map(fixRow).join("")}</table></div></details>`).join("")
+    +(rep.length?`<h3>Said wrong more than once</h3><ul>${rep.slice(0,10).map(x=>`<li><b>${esc(x[0].natural)}</b> <small class="muted">× ${x.length} · you said “${esc(x[0].said)}”</small></li>`).join("")}</ul>`:"")
+    :`<p class="muted">Nothing yet. Hand in a Speaking or a Writing in any learning path: Roig corrects it at once and every slip lands here, sorted by kind (prepositions, articles, word order, tenses, word choice).</p>`}</div>`;
+  const lastBox=fixes.length?`<div class="box"><h2>Roig's corrections</h2><div class="qwrap"><table class="mat"><tr><th>You said / wrote</th><th>A native speaker says</th><th>Where</th></tr>${fixes.slice().sort((x,y)=>String(y.at).localeCompare(String(x.at))).slice(0,30).map(fixRow).join("")}</table></div></div>`:"";
+  const learnBox=`<div class="box"><h2>Sentences to learn <small class="muted">· ${learn.length}</small></h2>${learn.length?`<div class="qwrap"><table class="mat"><tr><th>The sentence</th><th>The natural way</th></tr>${learn.map(x=>`<tr><td><s>${esc(x.s)}</s><br><small class="muted">${esc(x.lp)}</small></td><td><b>${esc(x.a)}</b>${x.why?`<br><small class="muted">${esc(x.why)}</small>`:""}</td></tr>`).join("")}</table></div>`:`<p class="muted">The ones you mark ✗ “I'll learn this one” in ✨ Make it idiomatic show up here.</p>`}</div>`;
+  const fluBox=flu.length?`<div class="box"><h2>⏱ 4 / 3 / 2 fluency</h2><ul>${flu.map(x=>`<li>${esc(x.lp)}: ${x.n>=3?"three rounds done":plural(x.n,"round")}${x.long?" (classic 4/3/2)":""}${x.rate?` · you rated it <b>${"★".repeat(x.rate)}${"☆".repeat(Math.max(0,4-x.rate))}</b>`:""}</li>`).join("")}</ul></div>`:"";
+  return head+`<p><a class="lsgo" href="${esc(L.course+"/"+L.id.slice(L.course.length+1)+"/index.html")}" target="_blank" rel="noopener">Open the course ↗</a></p>`
+    +`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 16px">${tile(DN+"/"+TOT,"steps done",plural(rows.filter(r=>r.dn).length,"learning path")+" started")+tile(FT==null?"–":FT+" %","right first time","in the exercises with a score")
+      +tile(fixes.length,"slips corrected",`${sp} speaking · ${wr} writing`)+tile(learn.length,"sentences to learn","from ✨ Make it idiomatic")+tile(day(last),"last time","you worked on it")}</div>`
+    +lpTable+kindBox+lastBox+learnBox+fluBox+stBox;
 }
 /* ---- 📊 Class results (Roger, 13 Nov 2026: "I need to see the statistic right away but also somewhere else to assess my performance"):
    every ✅ Correct together lesson (Grammar or Reading, shared/correct/correct.js) saved from ⏱ Your turn on, in classResults/{group}_{ls}_{lp}_{tab}_{day}:
@@ -5528,6 +5609,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>(redraw||(()=>cellPanel(u,a.id)))())},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
+    tnst:()=>{const L=(window.TN_LS||[])[0];if(L)act(api.ls(L.id,{status:k.s}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
     ptterm:()=>{S.term=k.t;render()},
