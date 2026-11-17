@@ -834,8 +834,9 @@ var LS2 = (function () {
           if (only && !only.includes(i)) return;
           if (q.guess) { fb.textContent = c ? guessSaved(p) : (ca() ? 'Tria una resposta.' : 'Choose an answer.'); fb.className = 'feedback ' + (c ? 'ok' : 'no'); return; }
           if (ok) score++;
-          fb.textContent = q.ex && c ? (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex)
-            : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
+          // the explanation is our own data and may hold <strong> (Roger, 17 Nov 2026: "take <strong>on</strong>" showed as text)
+          if (q.ex && c) fb.innerHTML = (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex);
+          else fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
         if (count) firsts(p.id, p.id, p.items, items, all, marked(items, p.id, only), g, i => !items[i].guess);

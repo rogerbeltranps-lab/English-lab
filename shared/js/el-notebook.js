@@ -436,7 +436,7 @@ window.ELNotebook = (function () {
   // 📚 the chapters (Roger, 13 Nov 2026: "Notebooks should have chapters call LS1 (Name) LS2 (Name)"): one chapter per LS of the course,
   // each on its LS page (#notes); the chapter name is "LS2 (Seasons & Celebrations)"
   const chapName = l => `${window.elLsNum ? elLsNum(l) : ''} (${String(l.title || '').replace(/^[^·]*·\s*/, '')})`;
-  const chapters = () => { const me0 = (window.EL_LS || []).find(l => l.id === H.LS); return me0 ? (window.EL_LS || []).filter(l => l.course === me0.course) : []; };
+  const chapters = () => { const me0 = (window.EL_LS || []).find(l => l.id === H.LS); return me0 ? (window.EL_LS || []).filter(l => l.course === me0.course && !l.personal === !me0.personal) : []; };   // a personal LS has a notebook of its own
 
   // 🎬 Final products (Roger, 13 Nov 2026: "Final products missing here"): a tab of its own beside ✨ Summary, one part per LS with
   // its mark, the teacher's feedback and the rubric with the student's level underlined (the part examBlocks makes), a side post-it per LS
