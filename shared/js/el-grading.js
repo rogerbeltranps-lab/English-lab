@@ -143,7 +143,10 @@ window.EL_GRADING={
       blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar, vocabulary and skills",w:35},{id:"other",name:"Other competences",w:5}],   // 2 Nov 2026 (Roger): daily work 40 %, shared by the amount of work (checkpoints a bit more: the only scored, uncopyable part)
       key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
       other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
-      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
+      // The exam is on the site (Roger, 17 Nov 2026: shared/js/el-web-exam.js, 2eso/free-time-live/exam.html; web.key = the cpKeys doc and
+      // the students/{uid}/exams doc): only what both groups did by then (LP1 and LP2), no writing; each section weighs as much as it was worked in class.
+      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",25,["4.1"]],["vocabulary","Vocabulary",40,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]]],max:10,
+        web:{key:"ls2Exam2ESO",page:"2eso/free-time-live/exam.html"}},
       // One-click levels per student; the vlog is individual, so there are no group moments. "edit" (step 4) is where the vlog itself is marked (3.2, CD2 2.2).
       // Learning-path steps with a level (Reading log, Listening chart, Research card / Fact file) are atOnce (Roger, 7 Nov 2026: "why is that
       // tick needed?"): marked in the Wednesday run after each hand-in, with no Time plan tick (students can only hand in what the teacher opened).
@@ -192,7 +195,7 @@ window.EL_GRADING={
         "4.2":{e:[[LP4,"factfile"],[FP,"source"]]},
         "6.2":{e:[[LP4,"factfile"],[FP,"factfile"]]},
         "3.2":{e:[[FP,"edit"]]},
-        "5.1":{e:[["exam","writing"],[FP,"script"]]},
+        "5.1":{e:[{exam:"vocabulary"},{exam:"grammar"},[FP,"script"]]},
         "CD2 2.2":{e:[[FP,"edit"]]},
         "CD4 4.5":{e:[[FP,"tips"]]}
       },

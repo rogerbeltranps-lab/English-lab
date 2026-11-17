@@ -1,0 +1,387 @@
+/* Web exams (Roger, 17 Nov 2026: "Like the checkpoints, students will do it on the web… if they exit full screen the exam is over, but
+   if I want it, I want to be able to allow students to go back to the exam… I introduce a password… it's important that they can check
+   their answers before turning in the exam… questions according to their level… randomized… 2 versions of each level").
+   The page (e.g. 2eso/free-time-live/exam.html) has window.EL_EXAM (data/exam.js, built by tools/web-exam/build.mjs): the questions of
+   four papers (base-A, base-B, core-A, core-B) and NO answers; the key is in cpKeys/{key}.web (teacher only), marked on the dashboard.
+   - Starter and Base take the base paper, Core and Plus the core one (the student's route); version A or B comes from the account, so
+     classmates get different papers; the questions of each section and the options of each question are shuffled per student.
+   - Sections: 🎧 Listening first (the teacher plays the audio twice for the class; once a student presses "Listening finished" those
+     answers are locked), then 📖 Reading, 📚 Vocabulary, 🧩 Grammar in any order, and ✅ Review: every answer, blanks in red, before 🏁 Turn in.
+   - Full screen. Leaving it (or another tab, window or app for more than 2 s, or closing / reloading the page) STOPS the exam: a lock screen
+     with the answers saved. Only the teacher's password opens it again (a PBKDF2 hash in the data, never the password). Each exit saves a
+     copy of the answers at that moment (snaps, which firestore.rules never let the student change), and every answer changed after coming
+     back is logged (changes), so the dashboard shows whether going out changed anything.
+   - The answers save to students/{uid}/exams/{key} as they go (a few seconds after a change), so nothing is lost if a Chromebook dies.
+     A student can start only while the teacher has opened the exam for the group (ls/{ls}.webExam[group].open, dashboard 📝 Exams).
+   - Text can't be copied or pasted (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
+     saves them (dashboard → results/{ls}__assessment, as every exam).
+   The teacher (and window.EL_EXAM_PREVIEW) sees a preview with every paper and the audio, and nothing is saved. */
+(function () {
+  const X = window.EL_EXAM; if (!X) return;
+  const FS = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+  const SECS = ['listening', 'reading', 'vocabulary', 'grammar'];
+  const ICON = { listening: '🎧', reading: '📖', vocabulary: '📚', grammar: '🧩', review: '✅' };
+  const NAME = { listening: ['Listening', 'Listening'], reading: ['Reading', 'Reading'], vocabulary: ['Vocabulari', 'Vocabulary'], grammar: ['Gramàtica', 'Grammar'], review: ['Revisa i entrega', 'Review and turn in'] };
+  const GRACE = 2000, FS_GRACE = 300, SAVE_MS = 4000;
+  const D = document, E = D.documentElement, $ = s => D.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const PV = window.EL_EXAM_PREVIEW || null;
+  let fs = null; const fsLib = async () => PV && PV.fs ? PV.fs : fs || (fs = await import(FS));
+  const C = () => window.ELCloud;
+  let ca = true; const t = (c, e) => ca ? c : e;
+  let S = null, me = null, mode = 'student', off = [], saveT = null, dirty = false, busy = false, lsDoc = null;
+
+  // ---------- helpers ----------
+  function hash32(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  const paperOf = lvl => (lvl === 'safe' || lvl === 'daring' || lvl === 'native' ? 'core' : 'base');
+  const P = () => X.papers[S.paper];
+  const items = s => P().sections[s];
+  const byId = id => { for (const s of SECS) { const it = items(s).find(x => x.id === id); if (it) return it; } return null; };
+  const answered = s => items(s).filter(it => String(S.answers[it.id] || '').trim()).length;
+  const now = () => new Date().toISOString();
+  const fsOk = () => !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
+  const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
+  const goFull = () => { try { if (!fsOk()) return Promise.resolve();
+    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
+    if (isFull()) { lock(); return Promise.resolve(); }
+    const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E); return r && r.then ? r.then(lock, () => {}) : (lock(), Promise.resolve()); } catch (e) { return Promise.resolve(); } };
+  const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
+  const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };
+  const unbind = () => { off.forEach(f => f()); off = []; };
+  const LK = () => 'el_webexam_' + X.key + '_' + (me ? me.uid : 'preview');
+  const local = { get() { try { return JSON.parse(localStorage.getItem(LK()) || 'null'); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(LK(), JSON.stringify(v)); } catch (e) {} }, del() { try { localStorage.removeItem(LK()); } catch (e) {} } };
+
+  // ---------- the page ----------
+  const root = D.getElementById('exam'); if (!root) return;
+  const css = D.createElement('style');
+  css.textContent = `
+  #exam{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+  .wx-card{background:#fff;border:1px solid #d8e6df;border-radius:18px;padding:18px 20px;box-shadow:0 10px 30px rgba(31,107,82,.08);margin:14px 0}
+  .wx-card h2{margin:0 0 10px;color:#174d3d}.wx-card h3{margin:14px 0 6px;color:#174d3d}
+  .wx-rules{line-height:1.6;padding-left:20px;margin:6px 0}.wx-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:12px 0}
+  .wx-btn{border:0;border-radius:12px;padding:11px 18px;font:inherit;font-weight:800;background:#1f6b52;color:#fff;cursor:pointer}
+  .wx-btn.sec{background:#fff;color:#174d3d;border:1px solid #c9dcd2}.wx-btn:disabled{opacity:.45;cursor:default}.wx-btn.red{background:#b42318}
+  .wx-run{position:fixed;inset:0;z-index:2147483000;background:#f4f8f6;overflow:auto;display:flex;flex-direction:column}
+  .wx-top{position:sticky;top:0;z-index:2;background:#174d3d;color:#fff;padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .wx-top b.wx-t{margin-right:8px;font-size:1.02rem}.wx-tabs{display:flex;flex-wrap:wrap;gap:6px}
+  .wx-tab{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-weight:700;cursor:pointer}
+  .wx-tab.on{background:#fff;color:#174d3d}.wx-tab:disabled{opacity:.45;cursor:not-allowed}.wx-tab small{font-weight:600;opacity:.85}
+  .wx-saved{margin-left:auto;font-size:.82rem;opacity:.85}
+  .wx-body{max-width:1180px;width:100%;margin:0 auto;padding:16px;box-sizing:border-box;flex:1}
+  .wx-sec h2{margin:4px 0 4px;color:#174d3d}.wx-lead{color:#4b5d56;margin:0 0 12px}
+  .wx-q{background:#fff;border:1px solid #d8e6df;border-radius:14px;padding:12px 14px;margin:10px 0;scroll-margin-top:80px}
+  .wx-q.blank{border-left:5px solid #f59e0b}.wx-q .wx-n{font-weight:800;color:#1f6b52;margin-right:6px}
+  .wx-qt{font-weight:650;line-height:1.5;-webkit-user-select:none;user-select:none}
+  .wx-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+  .wx-opt{border:2px solid #d8e6df;background:#fbfdfc;border-radius:11px;padding:8px 13px;font:inherit;text-align:left;cursor:pointer;color:#20312b}
+  .wx-opt.on{border-color:#1f6b52;background:#e2f3ea;font-weight:800}.wx-opt:disabled{cursor:default}
+  .wx-in{margin-top:9px;width:100%;max-width:460px;padding:9px 11px;border:2px solid #d8e6df;border-radius:10px;font:inherit;box-sizing:border-box}
+  .wx-in:focus{border-color:#1f6b52;outline:none}.wx-in:disabled{background:#f1f5f3}
+  .wx-read{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+  .wx-text{position:sticky;top:64px;background:#fff;border:1px solid #d8e6df;border-radius:14px;padding:14px 16px;line-height:1.7;max-height:calc(100vh - 90px);overflow:auto;-webkit-user-select:none;user-select:none}
+  .wx-text p{margin:0 0 12px}
+  @media(max-width:900px){.wx-read{grid-template-columns:1fr}.wx-text{position:static;max-height:none}}
+  .wx-nav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
+  .wx-done{background:#ecfdf3;border:1px solid #86efac;border-radius:12px;padding:10px 14px;margin:10px 0;font-weight:700;color:#166534}
+  .wx-rev table{width:100%;border-collapse:collapse;font-size:.95rem}.wx-rev td,.wx-rev th{border-bottom:1px solid #e3ece7;padding:7px 8px;text-align:left;vertical-align:top}
+  .wx-rev tr.blank td{background:#fff7ed}.wx-rev .go{border:0;background:none;color:#1f6b52;font-weight:800;cursor:pointer;text-decoration:underline;font:inherit}
+  .wx-sum{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}.wx-sum span{background:#fff;border:1px solid #d8e6df;border-radius:12px;padding:8px 12px;font-weight:700}
+  .wx-sum span.bad{border-color:#f5b971;background:#fff7ed}
+  .wx-sure{background:#fff4e5;border:2px solid #f5b971;border-radius:13px;padding:12px 16px;margin-top:12px}
+  .wx-lock{position:fixed;inset:0;z-index:2147483600;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center}
+  .wx-lock .box{max-width:560px}.wx-lock h1{font-size:1.8rem;margin:0 0 10px}.wx-lock p{line-height:1.6;color:#dbe4ee}
+  .wx-lock input{padding:11px 13px;border-radius:11px;border:0;font:inherit;width:240px;max-width:100%}.wx-lock .err{color:#fca5a5;font-weight:700;min-height:1.4em}
+  .wx-veil{position:fixed;inset:0;z-index:2147483500;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;text-align:center;padding:20px}
+  .wx-esc{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:11px;padding:9px 14px;font-weight:700;max-width:90vw}
+  .wx-teacher{background:#eef6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin:0 0 12px}
+  .wx-teacher audio{width:100%;max-width:520px;margin-top:6px}
+  `;
+  D.head.appendChild(css);
+
+  // ---------- start ----------
+  function boot() {
+    if (PV) { me = { uid: PV.uid || 'preview-uid' }; mode = PV.teacher ? 'teacher' : 'student'; return PV.teacher ? teacherPick() : student(PV.level || 'insecure', PV.group || '2ESOA'); }
+    root.innerHTML = '<div class="wx-card"><p>' + t('Carregant…', 'Loading…') + '</p></div>';
+    const go = u => { if (!u) return; me = u; const c = C();
+      if (c.isTeacher(u) && !c.viewing) { mode = 'teacher'; return teacherPick(); }
+      if (c.viewing) { mode = 'view'; me = c.viewing; }
+      c.levels().then(lv => student((window.elRouteOf ? elRouteOf(lv, X.ls).level : null) || 'insecure', c.viewing ? c.viewing.group : c.group()))
+        .catch(e => { console.warn('exam levels', e); student('insecure', c.group()); }); };
+    let n = 0; const wait = () => { const c = C(); if (c && c.onUser) c.onUser(u => u && go(u)); else if (n++ < 120) setTimeout(wait, 500); }; wait();
+  }
+
+  // ---------- the cloud ----------
+  const ref = F => F.doc(C().db, 'students', me.uid, 'exams', X.key);
+  async function readDoc() { if (PV) return PV.doc || null; const F = await fsLib(), s = await F.getDoc(ref(F)); return s.exists() ? s.data() : null; }
+  async function readLs() { if (PV) return PV.ls || { webExam: { [S && S.group || '2ESOA']: { open: true } } };
+    const F = await fsLib(), s = await F.getDoc(F.doc(C().db, 'ls', X.ls)); return s.exists() ? s.data() : {}; }
+  const isOpen = (l, g) => !!(((l || {}).webExam || {})[g] || {}).open;
+  const payload = F => ({ ls: X.ls, key: X.key, paper: S.paper, level: S.level, group: S.group || null, order: S.order, answers: S.answers, started: S.started,
+    listenDone: S.listenDone || null, status: S.status, exits: S.exits.slice(0, 30), glances: S.glances.slice(-60), changes: S.changes.slice(-300),
+    snaps: S.snaps.slice(0, 30), tries: S.tries || 0, done: S.done || null, updated: F.serverTimestamp() });
+  function keep() { S.at = Date.now(); local.set(S); }
+  function touch() { keep(); dirty = true; clearTimeout(saveT); saveT = setTimeout(save, SAVE_MS); mark(t('Desant…', 'Saving…')); }
+  async function save() {
+    clearTimeout(saveT); saveT = null; if (mode !== 'student') { dirty = false; return mark(''); }
+    if (busy) { saveT = setTimeout(save, 1000); return; }
+    busy = true; const was = dirty; dirty = false;
+    try { const F = await fsLib(); await F.setDoc(ref(F), payload(F)); S.cloudAt = now(); keep(); mark('✓ ' + t('Desat', 'Saved') + ' ' + new Date().toTimeString().slice(0, 5)); busy = false; return true; }
+    catch (e) { busy = false; dirty = dirty || was; console.warn('exam save', e);
+      if (e && /permission/i.test(String(e.code || e.message))) { try { const l = await readLs(); if (!isOpen(l, S.group) && S.status !== 'done') return closedNow(); } catch (x) {} }
+      mark('⚠️ ' + t('No s’ha pogut desar: es tornarà a provar', 'Not saved yet: trying again'), true); saveT = setTimeout(save, 8000); return false; }
+  }
+  function mark(txt, bad) { const el = $('#wxSaved'); if (el) { el.textContent = txt; el.style.color = bad ? '#fecaca' : ''; } }
+
+  // ---------- the student ----------
+  async function student(level, group) {
+    ca = paperOf(level) === 'base';
+    let d = null, l = null;
+    try { [d, l] = await Promise.all([readDoc(), readLs()]); } catch (e) { console.warn('exam read', e); }
+    lsDoc = l; const loc = local.get();
+    if (mode === 'view') return viewOnly(d);
+    if (d && d.status === 'done') { S = Object.assign({}, d); return handedIn(); }
+    // started here or on another device: the cloud copy, unless this browser has newer answers that never reached it
+    const cloudMs = d && d.updated ? (d.updated.toMillis ? d.updated.toMillis() : Date.parse(d.updated) || 0) : 0;
+    const base = loc && loc.started && loc.paper && (!d || (loc.at || 0) > cloudMs) ? loc : d;
+    if (base && base.started) {
+      S = Object.assign({ exits: [], glances: [], changes: [], snaps: [], answers: {} }, base, { group: base.group || group });
+      // the exam was running when the page closed or reloaded: that is leaving it, so it locks (a reload in the first seconds with
+      // nothing answered, as when the site reloads itself once after signing in, only asks to go back to full screen)
+      if (S.status === 'in') {
+        const fresh = !Object.keys(S.answers).length && !S.exits.length && Date.now() - Date.parse(S.started) < 20000;
+        if (fresh) return resume();
+        exitNow('reload'); return;
+      }
+      return S.status === 'out' ? locked() : resume();
+    }
+    S = { group, level, paper: null };
+    if (!isOpen(l, group) && !PV) return notOpen();
+    intro();
+  }
+  function notOpen() {
+    root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('L’examen encara no està obert', 'The exam is not open yet') + '</h2><p>' + t('El professor l’obrirà a classe. Quan t’ho digui, prem el botó.', 'Your teacher will open it in class. When they tell you, press the button.') + '</p><button class="wx-btn" id="wxAgain">🔄 ' + t('Torna-ho a mirar', 'Check again') + '</button></div>';
+    $('#wxAgain').onclick = async () => { $('#wxAgain').disabled = true; try { lsDoc = await readLs(); } catch (e) {} if (isOpen(lsDoc, S.group)) intro(); else { $('#wxAgain').disabled = false; $('#wxAgain').textContent = '🔄 ' + t('Encara no. Torna-ho a mirar', 'Not yet. Check again'); } };
+  }
+  function intro() {
+    const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pl + '-A'].sections[s].length, 0);
+    root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · LS2 · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
+      '<p>' + t('Té 4 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b> i <b>🧩 Gramàtica</b>. ', 'It has 4 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b> and <b>🧩 Grammar</b>. ') + t(n + ' preguntes en total.', n + ' questions in total.') + '</p>' +
+      '<ul class="wx-rules"><li>' + t('El <b>Listening</b> es fa primer: el professor posa l’àudio dues vegades. Quan acabi, prem <b>Listening acabat</b>: després ja no pots canviar aquestes respostes.', '<b>Listening</b> comes first: your teacher plays the audio twice. When it ends, press <b>Listening finished</b>: after that you can’t change those answers.') + '</li>' +
+      '<li>' + t('Després pots anar d’una part a l’altra i canviar les respostes tantes vegades com vulguis.', 'Then you can move between the parts and change your answers as often as you like.') + '</li>' +
+      '<li>' + t('Al final, a <b>✅ Revisa i entrega</b>, veuràs totes les respostes i les que tens en blanc. Llavors prem <b>🏁 Entrega</b>.', 'At the end, in <b>✅ Review and turn in</b>, you see all your answers and any blanks. Then press <b>🏁 Turn in</b>.') + '</li></ul>' +
+      '<div class="wx-warn"><b>⚠️ ' + t('Important', 'Important') + '</b><ul class="wx-rules">' +
+      (fsOk() ? '<li><b>' + t('Es fa a pantalla completa.', 'It runs in full screen.') + '</b> ' + t('Si surts de la pantalla completa, <b>l’examen s’acaba</b> i queda bloquejat amb les respostes que tinguis. Només el professor el pot tornar a obrir.', 'If you leave full screen, <b>your exam is over</b> and locks with the answers you have. Only your teacher can open it again.') + '</li>' : '') +
+      '<li>' + t('No canviïs de pestanya, de finestra ni d’aplicació, i no tanquis ni recarreguis la pàgina: també <b>acaba l’examen</b>.', 'Don’t change to another tab, window or app, and don’t close or reload the page: that also <b>ends your exam</b>.') + '</li>' +
+      '<li>' + t('No es pot copiar ni enganxar. Sense apunts, traductor, IA ni companys.', 'No copying or pasting. No notes, translator, AI or classmates.') + '</li>' +
+      '<li>' + t('Les respostes es desen soles mentre treballes.', 'Your answers save by themselves as you work.') + '</li></ul></div>' +
+      '<label style="display:flex;gap:8px;align-items:center;font-weight:700;margin:12px 0"><input type="checkbox" id="wxRead"> ' + t('He llegit les instruccions', 'I have read the rules') + '</label>' +
+      '<button class="wx-btn" id="wxStart" disabled>' + t('Comença l’examen', 'Start the exam') + '</button></div>';
+    $('#wxRead').onchange = e => { $('#wxStart').disabled = !e.target.checked; };
+    $('#wxStart').onclick = async () => {
+      $('#wxStart').disabled = true;
+      if (!PV) { try { lsDoc = await readLs(); } catch (e) {} if (!isOpen(lsDoc, S.group)) return notOpen(); }
+      const pl = paperOf(S.level), v = hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A', paper = PV && PV.paper || pl + '-' + v;
+      const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
+      const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
+      S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
+      await goFull(); keep(); run(); save();
+    };
+  }
+  function resume() {   // back in after the password, or a reload in the first seconds: full screen needs a click
+    if (fsOk() && !isFull() && !PV) {
+      root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Continua l’examen', 'Go on with the exam') + '</h2><p>' + t('Prem el botó per tornar a la pantalla completa.', 'Press the button to go back to full screen.') + '</p><button class="wx-btn" id="wxBack">⛶ ' + t('Continua a pantalla completa', 'Continue in full screen') + '</button></div>';
+      $('#wxBack').onclick = async () => { await goFull(); S.status = 'in'; keep(); run(); save(); };
+      return;
+    }
+    S.status = 'in'; keep(); run();
+  }
+
+  // ---------- running ----------
+  let wrap = null;
+  function run() {
+    unbind(); if (wrap) wrap.remove();
+    wrap = D.createElement('div'); wrap.className = 'wx-run'; D.body.appendChild(wrap);
+    wrap.innerHTML = '<div class="wx-top"><b class="wx-t">📝 ' + t('Examen', 'Exam') + ' LS2 · ' + (S.paper.startsWith('core') ? 'Core' : 'Base') + '</b><div class="wx-tabs" id="wxTabs"></div><span class="wx-saved" id="wxSaved"></span></div><div class="wx-body" id="wxBody"></div>';
+    draw();
+    ['copy', 'cut', 'paste', 'drop', 'contextmenu', 'dragstart'].forEach(ev => on(wrap, ev, e => e.preventDefault()));
+    if (mode !== 'student' && mode !== 'teacher') return;
+    if (mode === 'teacher') return;
+    // Esc: a warning instead of leaving (Chrome locks it; holding it down still leaves full screen, and that stops the exam)
+    on(D, 'keydown', e => { if (e.key !== 'Escape') return; e.preventDefault(); let w = $('.wx-esc'); if (!w) { w = D.createElement('div'); w.className = 'wx-esc'; wrap.appendChild(w); }
+      w.innerHTML = '⚠️ ' + t('Si surts de la pantalla completa, l’examen s’acaba. Per acabar, ves a <b>✅ Revisa i entrega</b>.', 'If you leave full screen, your exam is over. To finish, go to <b>✅ Review and turn in</b>.'); setTimeout(() => w && w.remove(), 6000); });
+    let away = 0, veil = null, wait = null;
+    const leave = full => { if (S.status !== 'in') return; if (away) { if (full) { clearTimeout(wait); wait = setTimeout(() => exitNow('fullscreen'), FS_GRACE); } return; }
+      away = Date.now(); veil = D.createElement('div'); veil.className = 'wx-veil'; veil.textContent = t('Torna a l’examen!', 'Come back to the exam!'); D.body.appendChild(veil);
+      wait = setTimeout(() => exitNow(full ? 'fullscreen' : 'left'), full ? FS_GRACE : GRACE); };
+    const back = () => { if (!away || S.status !== 'in') return; if (fsOk() && !isFull()) return; clearTimeout(wait); S.glances.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); away = 0; if (veil) veil.remove(); veil = null; touch(); };
+    on(window, 'blur', () => leave(false)); on(D, 'visibilitychange', () => D.hidden ? leave(false) : back()); on(window, 'focus', back);
+    const fsc = () => { if (isFull()) back(); else if (fsOk()) leave(true); };
+    on(D, 'fullscreenchange', fsc); on(D, 'webkitfullscreenchange', fsc);
+    on(window, 'pagehide', () => { if (S.status === 'in') { S.pendingExit = now(); keep(); } });
+    off.push(() => { clearTimeout(wait); if (veil) veil.remove(); });
+  }
+  function tabs() {
+    const tb = $('#wxTabs'); if (!tb) return;
+    tb.innerHTML = SECS.concat(['review']).map(s => { const dis = s !== 'listening' && !S.listenDone && mode !== 'teacher' && mode !== 'view';
+      const cnt = s === 'review' ? '' : ' <small>' + answered(s) + '/' + items(s).length + '</small>';
+      return '<button class="wx-tab' + (S.sec === s ? ' on' : '') + '" data-sec="' + s + '"' + (dis ? ' disabled title="' + esc(t('Primer acaba el Listening', 'Finish the Listening first')) + '"' : '') + '>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + cnt + '</button>'; }).join('');
+    tb.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => { if (b.disabled) return; S.sec = b.dataset.sec; keep(); draw(); });
+  }
+  function qHtml(it, i, lockedSec) {
+    const v = S.answers[it.id], blank = !String(v || '').trim();
+    let body;
+    if (it.t === 'mc') { const ord = (S.opts && S.opts[it.id]) || it.o.map((_, k) => k);
+      body = '<div class="wx-opts">' + ord.map(k => { const o = it.o[k]; return '<button type="button" class="wx-opt' + (v === o ? ' on' : '') + '" data-q="' + it.id + '" data-v="' + esc(o) + '"' + (lockedSec ? ' disabled' : '') + ' aria-pressed="' + (v === o) + '">' + esc(o) + '</button>'; }).join('') + '</div>'; }
+    else body = '<input class="wx-in" type="text" data-q="' + it.id + '" value="' + esc(v || '') + '" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('La teva resposta', 'Your answer')) + '">';
+    return '<div class="wx-q' + (blank ? ' blank' : '') + '" id="q-' + it.id + '"><div class="wx-qt"><span class="wx-n">' + (i + 1) + '.</span>' + esc(it.q) + '</div>' + body + '</div>';
+  }
+  function draw(scrollTo) {
+    tabs(); const b = $('#wxBody'); const s = S.sec;
+    if (s === 'review') return review(b);
+    const ids = S.order[s], list = ids.map(id => items(s).find(x => x.id === id)).filter(Boolean), lockL = s === 'listening' && !!S.listenDone && mode !== 'teacher';
+    const ro = mode === 'view' || lockL;
+    const lead = { listening: t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
+      reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
+      vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
+      grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.') }[s];
+    const qs = list.map((it, i) => qHtml(it, i, ro)).join('');
+    let html = '<div class="wx-sec"><h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + '</h2><p class="wx-lead">' + lead + '</p>';
+    if (s === 'listening' && mode === 'teacher' && X.audio) html += '<div class="wx-teacher">🔊 <b>' + esc(X.audio.title) + '</b> · ' + t('Només el veu el professor: posa-ho dues vegades al projector.', 'Only you see this: play it twice on the projector.') + '<br><audio controls preload="none" src="' + esc(X.audio.src) + '"></audio></div>';
+    if (lockL) html += '<div class="wx-done">🔒 ' + t('Listening acabat: aquestes respostes ja no es poden canviar.', 'Listening finished: these answers can’t be changed any more.') + '</div>';
+    html += s === 'reading' ? '<div class="wx-read"><div class="wx-text">' + P().text + '</div><div>' + qs + '</div></div>' : qs;
+    const next = SECS[SECS.indexOf(s) + 1] || 'review';
+    html += '<div class="wx-nav">' + (s === 'listening' && !S.listenDone && mode !== 'view'
+      ? '<button class="wx-btn" id="wxLDone">✅ ' + t('Listening acabat → continua', 'Listening finished → go on') + '</button><span id="wxLSure"></span>'
+      : '<button class="wx-btn" id="wxNext">' + t('Següent', 'Next') + ': ' + ICON[next] + ' ' + NAME[next][ca ? 0 : 1] + ' →</button>') + '</div></div>';
+    b.innerHTML = html;
+    if (!ro) {
+      b.querySelectorAll('.wx-opt').forEach(x => x.onclick = () => { set(x.dataset.q, x.dataset.v); b.querySelectorAll('.wx-opt[data-q="' + x.dataset.q + '"]').forEach(y => { y.classList.toggle('on', y === x); y.setAttribute('aria-pressed', y === x); }); x.closest('.wx-q').classList.remove('blank'); });
+      b.querySelectorAll('.wx-in').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 80)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim()); };
+        x.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const all = [...b.querySelectorAll('.wx-in')], k = all.indexOf(x); if (all[k + 1]) all[k + 1].focus(); } }; });
+    }
+    const nx = $('#wxNext'); if (nx) nx.onclick = () => { S.sec = next; keep(); draw(); wrap.scrollTop = 0; };
+    const ld = $('#wxLDone'); if (ld) ld.onclick = () => {
+      const left = items('listening').length - answered('listening'), sure = $('#wxLSure');
+      ld.hidden = true; sure.innerHTML = '<div class="wx-sure"><p><b>⚠️ ' + t('Has acabat el Listening?', 'Have you finished the Listening?') + '</b><br>' + (left ? t('Tens <b>' + left + '</b> pregunt' + (left === 1 ? 'a' : 'es') + ' en blanc. ', 'You have <b>' + left + '</b> blank question' + (left === 1 ? '' : 's') + '. ') : '') + t('Després ja no podràs canviar aquestes respostes.', 'After this you can’t change these answers.') + '</p><button class="wx-btn sec" id="wxLNo">← ' + t('No, encara no', 'No, not yet') + '</button> <button class="wx-btn" id="wxLYes" disabled>' + t('Sí, continua', 'Yes, go on') + '</button></div>';
+      $('#wxLNo').onclick = () => { sure.innerHTML = ''; ld.hidden = false; };
+      $('#wxLYes').onclick = () => { S.listenDone = now(); S.sec = 'reading'; touch(); draw(); wrap.scrollTop = 0; save(); };
+      setTimeout(() => { const y = $('#wxLYes'); if (y) y.disabled = false; }, 1500);
+    };
+    if (scrollTo) { const q = D.getElementById('q-' + scrollTo); if (q) { q.scrollIntoView({ block: 'center' }); const f = q.querySelector('input'); if (f && !f.disabled) f.focus(); q.style.boxShadow = '0 0 0 3px #f59e0b'; setTimeout(() => { q.style.boxShadow = ''; }, 1800); } }
+  }
+  function set(id, v) {
+    if (S.status !== 'in' || mode === 'view') return;
+    const was = S.answers[id] || '';
+    if (v === was) return;
+    if (S.exits.length) {   // changed after coming back: logged for the teacher (one line per question and visit, the latest value)
+      const n = S.exits.length, last = S.changes[S.changes.length - 1];
+      if (last && last.id === id && last.n === n) { last.to = v; last.at = now(); }
+      else S.changes.push({ id, from: was, to: v, at: now(), n });
+    }
+    if (v) S.answers[id] = v; else delete S.answers[id];
+    touch(); tabs();
+  }
+  function review(b) {
+    const sum = SECS.map(s => { const n = items(s).length, a = answered(s); return '<span class="' + (a < n ? 'bad' : '') + '">' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + ': ' + a + '/' + n + '</span>'; }).join('');
+    const blanks = SECS.reduce((x, s) => x + items(s).length - answered(s), 0);
+    const rows = SECS.map(s => '<tr><th colspan="3">' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + (s === 'listening' && S.listenDone ? ' · 🔒' : '') + '</th></tr>' +
+      S.order[s].map((id, i) => { const it = items(s).find(x => x.id === id), v = S.answers[id];
+        return '<tr class="' + (String(v || '').trim() ? '' : 'blank') + '"><td>' + (i + 1) + '</td><td>' + esc(it.q) + '</td><td>' + (String(v || '').trim() ? '<b>' + esc(v) + '</b>' : '<span style="color:#b45309;font-weight:800">' + t('en blanc', 'blank') + '</span>') +
+          (s === 'listening' && S.listenDone && mode !== 'teacher' ? '' : ' <button class="go" data-go="' + s + '|' + id + '">' + t('canvia', 'change') + '</button>') + '</td></tr>'; }).join('')).join('');
+    b.innerHTML = '<div class="wx-sec wx-rev"><h2>✅ ' + NAME.review[ca ? 0 : 1] + '</h2><p class="wx-lead">' + t('Revisa totes les respostes. Prem <b>canvia</b> per anar a una pregunta.', 'Check all your answers. Press <b>change</b> to go to a question.') + '</p><div class="wx-sum">' + sum + '</div>' +
+      '<table><tbody>' + rows + '</tbody></table>' +
+      (mode === 'view' ? '' : '<div class="wx-nav"><button class="wx-btn red" id="wxEnd">🏁 ' + t('Entrega l’examen', 'Turn in the exam') + '</button></div><div id="wxSure"></div>') + '</div>';
+    b.querySelectorAll('[data-go]').forEach(x => x.onclick = () => { const [s, id] = x.dataset.go.split('|'); S.sec = s; keep(); draw(id); });
+    const end = $('#wxEnd'); if (end) end.onclick = () => {
+      end.hidden = true; const sure = $('#wxSure');
+      sure.innerHTML = '<div class="wx-sure"><p><b>⚠️ ' + t('Vols entregar l’examen?', 'Turn in your exam?') + '</b><br>' + (blanks ? t('Tens <b>' + blanks + '</b> pregunt' + (blanks === 1 ? 'a' : 'es') + ' en blanc. ', 'You have <b>' + blanks + '</b> blank question' + (blanks === 1 ? '' : 's') + '. ') : t('Has contestat totes les preguntes. ', 'You have answered every question. ')) + t('Quan l’entreguis, ja no el podràs canviar.', 'Once you turn it in, you can’t change it.') + '</p><button class="wx-btn sec" id="wxNo">← ' + t('No, continua', 'No, go on') + '</button> <button class="wx-btn red" id="wxYes" disabled>' + t('Sí, entrega-ho', 'Yes, turn it in') + '</button></div>';
+      $('#wxNo').onclick = () => { sure.innerHTML = ''; end.hidden = false; };
+      $('#wxYes').onclick = () => turnIn();
+      setTimeout(() => { const y = $('#wxYes'); if (y) y.disabled = false; }, 2000);
+      $('#wxNo').focus();
+    };
+  }
+  async function turnIn() {
+    if (mode === 'teacher') { unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); return teacherPick(t('Prova acabada: no s’ha desat res.', 'Preview finished: nothing was saved.')); }
+    S.status = 'done'; S.done = now(); keep(); unbind();
+    const yes = $('#wxYes'); if (yes) { yes.disabled = true; yes.textContent = t('Enviant…', 'Sending…'); }
+    const ok = await save();
+    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); return; }
+    if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
+  }
+  function handedIn() {
+    root.innerHTML = '<div class="wx-card"><h2>✓ ' + t('Examen entregat', 'Exam turned in') + '</h2><p>' + t('Molt bé! Les teves respostes s’han enviat al professor.', 'Well done! Your answers have reached your teacher.') + ' ' + t('Veuràs la nota al teu tauler quan el professor la publiqui.', 'You will see your mark on your board when your teacher shares it.') + '</p>' + testerReset() + '</div>';
+    bindReset();
+  }
+  function closedNow() {
+    unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); S.status = 'done'; keep();
+    root.innerHTML = '<div class="wx-card"><h2>🔒 ' + t('El professor ha tancat l’examen', 'Your teacher has closed the exam') + '</h2><p>' + t('S’han desat les respostes fins a ', 'Your answers were saved up to ') + esc((S.cloudAt || S.started || '').slice(11, 16)) + '.</p></div>';
+  }
+
+  // ---------- leaving: the exam stops and locks ----------
+  async function exitNow(why) {
+    if (S.status !== 'in' || mode !== 'student') return;
+    unbind(); const at = S.pendingExit || now(); delete S.pendingExit;
+    S.status = 'out'; S.exits.push({ at, why }); S.snaps.push({ at, answers: Object.assign({}, S.answers) });
+    keep(); if (wrap) wrap.remove(); wrap = null; locked(); save();
+  }
+  function locked() {
+    unbind(); exitFull(); if (wrap) { wrap.remove(); wrap = null; }
+    const why = (S.exits[S.exits.length - 1] || {}).why;
+    root.innerHTML = '';
+    const L = D.createElement('div'); L.className = 'wx-lock';
+    L.innerHTML = '<div class="box"><h1>⛔ ' + t('Has sortit de l’examen', 'You left the exam') + '</h1><p>' +
+      (why === 'fullscreen' ? t('Has sortit de la pantalla completa.', 'You left full screen.') : why === 'reload' ? t('La pàgina s’ha tancat o recarregat.', 'The page was closed or reloaded.') : t('Has canviat de pestanya, de finestra o d’aplicació.', 'You changed to another tab, window or app.')) + ' ' +
+      t('L’examen s’ha aturat i les respostes que tenies s’han desat.', 'Your exam has stopped and the answers you had are saved.') + '</p><p><b>' + t('Aixeca la mà: només el professor pot deixar-te tornar a l’examen.', 'Put your hand up: only your teacher can let you go back to the exam.') + '</b></p>' +
+      '<p style="margin-top:18px"><input type="password" id="wxPw" autocomplete="off" placeholder="' + esc(t('Contrasenya del professor', 'Teacher’s password')) + '"> <button class="wx-btn" id="wxPwGo">🔓 ' + t('Torna a l’examen', 'Back to the exam') + '</button></p><p class="err" id="wxPwErr"></p></div>';
+    D.body.appendChild(L);
+    const go = async () => { const inp = $('#wxPw'), err = $('#wxPwErr'), btn = $('#wxPwGo'); if (btn.disabled) return;
+      if ((S.wait || 0) > Date.now()) { err.textContent = t('Espera uns segons…', 'Wait a few seconds…'); return; }
+      btn.disabled = true; err.textContent = '';
+      const ok = await checkPw(inp.value); btn.disabled = false;
+      if (!ok) { S.tries = (S.tries || 0) + 1; if (S.tries % 3 === 0) S.wait = Date.now() + 20000; touch(); inp.value = ''; err.textContent = t('Contrasenya incorrecta.', 'Wrong password.'); return; }
+      const last = S.exits[S.exits.length - 1]; if (last) last.back = now();
+      await goFull(); L.remove(); S.status = 'in'; keep(); run(); save(); };
+    $('#wxPwGo').onclick = go; $('#wxPw').onkeydown = e => { if (e.key === 'Enter') go(); };
+    setTimeout(() => { const i = $('#wxPw'); if (i) i.focus(); }, 50);
+  }
+  async function checkPw(pw) {
+    const p = X.pass; if (!p || !pw) return false;
+    try { const enc = new TextEncoder(), k = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+      const salt = new Uint8Array(p.salt.match(/../g).map(h => parseInt(h, 16)));
+      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: p.it, hash: 'SHA-256' }, k, 256);
+      return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('') === p.h; } catch (e) { console.warn('exam password', e); return false; }
+  }
+
+  // ---------- the teacher (preview) and the student view ----------
+  function teacherPick(note) {
+    ca = false;
+    root.innerHTML = '<div class="wx-card"><h2>📝 Exam preview (teacher)</h2>' + (note ? '<p class="wx-done">' + esc(note) + '</p>' : '') +
+      '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A or B from their account, with the questions and options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
+      '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') + '</p>' +
+      '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button></p></div>';
+    root.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const paper = b.dataset.p;
+      const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
+      const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
+      S = { paper, level: paper.startsWith('core') ? 'safe' : 'insecure', order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [] };
+      ca = paper.startsWith('base'); run(); });
+    $('#wxTryLock').onclick = () => { S = S || { exits: [], answers: {} }; S.exits = [{ at: now(), why: 'fullscreen' }]; S.status = 'out'; ca = false;
+      locked(); const L = $('.wx-lock .box'); const x = D.createElement('p'); x.innerHTML = '<button class="wx-btn sec" id="wxLockOut">Close this test</button>'; L.appendChild(x);
+      $('#wxLockOut').onclick = () => { $('.wx-lock').remove(); teacherPick(); };
+      const go = $('#wxPwGo'); go.onclick = async () => { const ok = await checkPw($('#wxPw').value); $('#wxPwErr').textContent = ok ? '✓ Right password: the student would go back to the exam.' : 'Wrong password.'; $('#wxPwErr').style.color = ok ? '#86efac' : ''; }; };
+  }
+  function viewOnly(d) {
+    if (!d) { root.innerHTML = '<div class="wx-card"><p>👁 ' + t('Aquest alumne encara no ha començat l’examen.', 'This student has not started the exam.') + '</p></div>'; return; }
+    S = Object.assign({ exits: [], glances: [], changes: [], snaps: [], answers: {} }, d); S.sec = 'review'; ca = S.paper.startsWith('base');
+    root.innerHTML = '<div class="wx-card"><p>👁 Student view · ' + esc(S.paper) + ' · ' + esc(S.status) + '</p></div>'; run();
+  }
+  const isTester = () => !!(!PV && C() && C().user && C().isTester(C().user));
+  const testerReset = () => isTester() || (PV && PV.tester) ? '<p><button class="wx-btn sec" id="wxReset">🧪 Tester: start again</button></p>' : '';
+  function bindReset() { const b = $('#wxReset'); if (!b) return;
+    b.onclick = async () => { try { if (!PV) { const F = await fsLib(); await F.deleteDoc(ref(F)); } } catch (e) { console.warn(e); } local.del(); S = { group: S.group, level: S.level }; intro(); }; }
+  // the lock screen of a student who never came back also offers the tester reset
+  window.ELWebExam = { get state() { return S; }, exitNow, checkPw, save };
+  boot();
+})();
