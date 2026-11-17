@@ -161,14 +161,16 @@
       return S.status === 'out' ? locked() : resume();
     }
     S = { group, level, paper: null };
-    if (!isOpen(l, group) && !PV) return notOpen();
+    if (!isOpen(l, group) && !PV && !isTester()) return notOpen();   // the tester can try it while it is closed (Roger, 17 Nov 2026)
     intro();
   }
   function notOpen() {
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('L’examen encara no està obert', 'The exam is not open yet') + '</h2><p>' + t('El professor l’obrirà a classe. Quan t’ho digui, prem el botó.', 'Your teacher will open it in class. When they tell you, press the button.') + '</p><button class="wx-btn" id="wxAgain">🔄 ' + t('Torna-ho a mirar', 'Check again') + '</button></div>';
     $('#wxAgain').onclick = async () => { $('#wxAgain').disabled = true; try { lsDoc = await readLs(); } catch (e) {} if (isOpen(lsDoc, S.group)) intro(); else { $('#wxAgain').disabled = false; $('#wxAgain').textContent = '🔄 ' + t('Encara no. Torna-ho a mirar', 'Not yet. Check again'); } };
   }
+  let tPaper = null;   // 🧪 the paper the tester chose
   function intro() {
+    if (tPaper) { S.level = tPaper.startsWith('core') ? 'safe' : 'insecure'; ca = tPaper.startsWith('base'); }
     const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pl + '-A'].sections[s].length, 0);
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · LS2 · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
       '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
@@ -181,12 +183,16 @@
       '<li>' + t('No es pot copiar ni enganxar res de fora (només el teu propi text dins de les teves respostes). Sense apunts, traductor, IA ni companys.', 'You can’t copy or paste anything from outside (only your own text inside your answers). No notes, translator, AI or classmates.') + '</li>' +
       '<li>' + t('Les respostes es desen soles mentre treballes.', 'Your answers save by themselves as you work.') + '</li></ul></div>' +
       '<label style="display:flex;gap:8px;align-items:center;font-weight:700;margin:12px 0"><input type="checkbox" id="wxRead"> ' + t('He llegit les instruccions', 'I have read the rules') + '</label>' +
-      '<button class="wx-btn" id="wxStart" disabled>' + t('Comença l’examen', 'Start the exam') + '</button></div>';
+      '<button class="wx-btn" id="wxStart" disabled>' + t('Comença l’examen', 'Start the exam') + '</button>' +
+      (isTester() ? '<div class="wx-warn" style="background:#eef6ff;border-color:#bfdbfe">🧪 <b>Tester</b>: you can do it while it is closed for the groups. Paper: ' +
+        Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-tp="' + p + '" style="margin:3px;padding:6px 11px' + ((tPaper || paperOf(S.level) + '-' + (hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A')) === p ? ';background:#174d3d;color:#fff' : '') + '">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') +
+        '<br><small>Everything works as for a student (full screen, lock, password, saving, turn in, games). Your try shows as 🧪 in the dashboard’s Web exam box, in every group (it is never saved with the marks). 🧪 Tester: start again, at the end, deletes it.</small></div>' : '') + '</div>';
+    root.querySelectorAll('[data-tp]').forEach(b => b.onclick = () => { tPaper = b.dataset.tp; intro(); });
     $('#wxRead').onchange = e => { $('#wxStart').disabled = !e.target.checked; };
     $('#wxStart').onclick = async () => {
       $('#wxStart').disabled = true;
-      if (!PV) { try { lsDoc = await readLs(); } catch (e) {} if (!isOpen(lsDoc, S.group)) return notOpen(); }
-      const pl = paperOf(S.level), v = hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A', paper = PV && PV.paper || pl + '-' + v;
+      if (!PV && !isTester()) { try { lsDoc = await readLs(); } catch (e) {} if (!isOpen(lsDoc, S.group)) return notOpen(); }
+      const pl = paperOf(S.level), v = hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A', paper = PV && PV.paper || tPaper || pl + '-' + v;
       const order = {}; SECS.forEach(s => order[s] = shuffle(X.papers[paper].sections[s].map(x => x.id)));
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
