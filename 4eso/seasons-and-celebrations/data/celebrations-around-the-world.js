@@ -74,35 +74,42 @@ window.LP = {
               row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.', 'disfressar-se de')),
                 card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.', 'donar a') + ex('I <b>get presents from</b> my grandparents.', 'rebre de')),
                 card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'sense to!') + ex('We <b>eat together</b> on 25 December.'))) +
-              mistakes('Compte!', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')),
+              row(card('teal', '🏠 have a get-together', ex('We <b>have a get-together</b> at my grandparents’ house.', 'fem una trobada') + ex('There’s a big family <b>get-together</b> at Christmas.') +
+                small('<b>a get-together</b> (amb guionet) = una trobada de família o d’amics. El verb és <b>get together</b> (sense guionet): <em>We get together at Christmas.</em>'), 480)) +
+              mistakes('Compte!', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.'), bad('We make a get-together.', 'We <b>have</b> a get-together.', '(fer → have)')),
             en: head('🧩', 'Words that go together', 'Some verbs take a little word after them. Learn them together, like one word.') +
               row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.')),
                 card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.') + ex('I <b>get presents from</b> my grandparents.')),
                 card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'no to!') + ex('We <b>eat together</b> on 25 December.'))) +
-              mistakes('Watch out', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.')) },
+              row(card('teal', '🏠 have a get-together', ex('We <b>have a get-together</b> at my grandparents’ house.') + ex('There’s a big family <b>get-together</b> at Christmas.') +
+                small('<b>a get-together</b> (with a hyphen) = a meeting of family or friends. The verb is <b>get together</b> (no hyphen): <em>We get together at Christmas.</em>'), 480)) +
+              mistakes('Watch out', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.'), bad('We make a get-together.', 'We <b>have</b> a get-together.')) },
           { r: 'safe', en: head('🔗', 'Verbs + little words (Safe words)', 'The little word is part of the verb: don’t change it.') +
               table([['Verb', 'What comes after', 'Example'], ['<b>take part in</b>', 'a noun', 'I <b>take part in</b> the parade.'], ['<b>look forward to</b>', 'a noun or <b>-ing</b>', 'I <b>look forward to</b> the holidays. · I <b>look forward to seeing</b> you.'], ['<b>get together</b> (with)', 'people', 'Families <b>get together</b> at Christmas.'], ['<b>pass down</b>', 'a tradition', 'Recipes are <b>passed down</b> from grandparents.'], ['<b>wish someone</b> a happy…', 'a person + a happy…', 'We <b>wish everyone a happy</b> new year.']]) +
               mistakes('Watch out', bad('take part on the parade', 'take part <b>in</b> the parade'), bad('I look forward to see you.', 'I look forward to <b>seeing</b> you.', '(to + -ing)')) }
         ];
       })(),
-      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (sense to) · <b>take part in</b> · <b>look forward to</b> + -ing', en: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (no to) · <b>take part in</b> · <b>look forward to</b> + -ing' } }],
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (sense to) · <b>have a get-together</b> · <b>take part in</b> · <b>look forward to</b> + -ing', en: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (no to) · <b>have a get-together</b> · <b>take part in</b> · <b>look forward to</b> + -ing' } }],
       items: [
         // Starter and Base
-        { p: 'ex', only: ['beginners', 'insecure'], opts: ['up', 'on', 'in'], q: 'At Carnival children dress ___.', a: ['up'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
         { p: 'ex', only: ['beginners', 'insecure'], opts: ['as', 'of', 'like'], q: 'I dressed up ___ a pirate.', a: ['as'], ca: 'disfressar-se de = dress up as.', en: 'dress up as.' },
         { p: 'ex', only: ['beginners', 'insecure'], opts: ['our grandparents', 'to our grandparents', 'at our grandparents'], q: 'We visit ___ at Christmas.', a: ['our grandparents'], ca: 'visit sense to.', en: 'visit: no to.' },
         { p: 'ex', only: ['beginners', 'insecure'], opts: ['to', 'from', 'at'], q: 'We give presents ___ our cousins.', a: ['to'], ca: 'donar a = give to.', en: 'give to.' },
         { p: 'ex', only: ['beginners', 'insecure'], opts: ['from', 'to', 'at'], q: 'I get presents ___ my grandparents.', a: ['from'], ca: 'rebre de = get from.', en: 'get from.' },
         { p: 'ex', only: ['beginners', 'insecure'], opts: ['together', 'with', 'all'], q: 'On 25 December the whole family eats ___.', a: ['together'], ca: 'menjar junts = eat together.', en: 'eat together.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['get-together', 'together', 'get'], q: 'At Christmas we have a big family ___.', a: ['get-together', 'get together'], ca: 'una trobada = a get-together.', en: 'a get-together = a family meeting.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['up', 'on', 'in'], q: 'At Carnival children dress ___.', a: ['up'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
         // Core and Plus
         { p: 'ex', r: 'safe', q: 'Hundreds of people take part ___ the parade.', a: ['in'], en: 'take part in.' },
         { p: 'ex', r: 'safe', q: 'I’m really looking forward ___ the holidays.', a: ['to'], en: 'look forward to.' },
         { p: 'ex', r: 'safe', q: 'I look forward to ___ you at the festival. (see)', a: ['seeing'], en: 'look forward to + -ing.' },
         { p: 'ex', r: 'safe', q: 'Families get ___ for a big meal at New Year.', a: ['together'], en: 'get together = meet as a group.' },
-        { p: 'ex', r: 'safe', q: 'This recipe is passed ___ from grandparents to grandchildren.', a: ['down'], en: 'pass down = give to the next generation.' },
+        { p: 'ex', r: 'safe', q: 'Every summer we have a big family ___ at my grandparents’ house. (get / together)', a: ['get-together', 'get together'], en: 'a get-together (noun) = a meeting of family or friends.' },
         { p: 'ex', r: 'safe', k: 'fix', q: '“We visit to our relatives.” → We ___ our relatives.', a: ['visit'], en: 'visit: no to.' },
+        { p: 'ex', r: 'safe', q: 'This recipe is passed ___ from grandparents to grandchildren.', a: ['down'], en: 'pass down = give to the next generation.' },
         // ➕ for every level (📘 Expressions together takes its 4 questions from these)
         { p: 'ex', opts: ['dress', 'wear', 'put'], q: 'Children ___ up as witches at Halloween.', a: ['dress'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
+        { p: 'ex', opts: ['have', 'make', 'do'], q: 'On Sunday we ___ a get-together with our cousins.', a: ['have'], ca: 'fer una trobada = have a get-together.', en: 'have a get-together.' },
         { p: 'ex', opts: ['wish', 'want', 'hope'], q: 'We ___ everyone a happy new year.', a: ['wish'], ca: 'desitjar = wish.', en: 'wish someone a happy…' },
         { p: 'ex', opts: ['in', 'on', 'at'], q: 'Do you take part ___ the Carnival parade?', a: ['in'], ca: 'participar en = take part in.', en: 'take part in.' },
         { p: 'ex', opts: ['visit', 'visit to', 'go'], q: 'We ___ our relatives in Girona every summer.', a: ['visit'], ca: 'visitar = visit (sense to).', en: 'visit: no to.' }
