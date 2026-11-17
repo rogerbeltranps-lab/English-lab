@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261116a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261117a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -1002,11 +1002,14 @@ window.ELNotebook = (function () {
       ? CH.map((c, i) => `<button type="button" class="nb-tab nb-ctab nb-ctop" data-chap="${i}" data-nbto="s:chap|${i}" title="${esc(chapName((window.EL_LS || []).find(l => l.id === c.LS) || {}))}">📚 ${lsNum(c)}</button>`)
         .concat(CH.flatMap((c, i) => subTabs(i)), [`<button type="button" class="nb-tab nb-fptab" data-nbto="s:fps|${CH.length - 1}">🎬 ${t('Productes finals', 'Final products')}</button>`, `<button type="button" class="nb-tab nb-sumtab" data-nbto="s:sum|${CH.length - 1}">✨ ${t('Resum de gram. i vocab.', 'Gram & Vocab summary')}</button>`])
       : subTabs(0)).join('');
+    // 📘 the cover, first in the bar (Roger, 17 Nov 2026: "I want students to be able to go see their cover when they are in their notebook"),
+    // in class mode too (the same notebook): a jump like the other tabs, marked while the cover is on the screen
+    const cvTab = `<button type="button" class="nb-tab nb-cvtab" data-nbto="s:cover|0" title="${t('Ves a la portada de la llibreta', 'Go to the cover of my notebook')}">📘 ${t('Portada', 'Cover')}</button>`;
     const plain = document.documentElement.classList.contains(PLAIN);
     let rings = ''; for (let i = 0; i < 14; i++) rings += '<span class="nb-ring"></span>';
     const MKS = [['hl-y', '<span class="pad-hlb" style="background:var(--nb-hl-y)"></span>', 'Subratllador groc', 'Yellow highlighter'], ['hl-g', '<span class="pad-hlb" style="background:var(--nb-hl-g)"></span>', 'Subratllador verd', 'Green highlighter'], ['hl-p', '<span class="pad-hlb" style="background:var(--nb-hl-p)"></span>', 'Subratllador rosa', 'Pink highlighter'], ['hl-b', '<span class="pad-hlb" style="background:var(--nb-hl-b)"></span>', 'Subratllador blau', 'Blue highlighter'], ['hl-o', '<span class="pad-hlb" style="background:var(--nb-hl-o)"></span>', 'Subratllador taronja', 'Orange highlighter'],
       ['ul', '<span class="nb-ul pad-l">U</span>', 'Subratlla', 'Underline'], ['ulw', '<span class="nb-ulw pad-l">U</span>', 'Subratlla ondulat', 'Wavy underline'], ['circ', '<span class="nb-circ pad-l">o</span>', 'Encercla', 'Circle'], ['x', '🧽', 'Treu les marques', 'Take the marks off']];
-    box.innerHTML = `<div class="nb"><div class="nb-bar" role="navigation" aria-label="${t('Pestanyes de la llibreta', 'Notebook tabs')}">${tabs}<span class="nb-sp"></span>`
+    box.innerHTML = `<div class="nb"><div class="nb-bar" role="navigation" aria-label="${t('Pestanyes de la llibreta', 'Notebook tabs')}">${cvTab}${tabs}<span class="nb-sp"></span>`
       + (H.own ? `<button type="button" class="nb-tool nb-undo" title="${t('Desfés el darrer canvi (Ctrl+Z)', 'Undo your last change (Ctrl+Z)')}"${UNDO.some(e => !undoSame(e)) ? '' : ' disabled'} aria-label="${t('Desfés', 'Undo')}">↶</button><button type="button" class="nb-tool nb-hlbar" title="${t('Subratlla en colors: com es fa', 'Highlight in colours: how to')}" aria-label="${t('Subratlla', 'Highlight')}">🖍</button><button type="button" class="nb-tool nb-pibar" title="${t('Enganxa un post-it en aquesta pàgina per prendre notes mentre estudies', 'Stick a post-it on this page to take notes while you study')}" aria-label="${t('Post-it', 'Post-it')}">🟨</button><span class="nb-saved nb-pencil" role="status"></span>` : '')
       + `<span class="nb-pwrap"><button type="button" class="nb-tool nb-printbtn" aria-expanded="false">🖨 ${t('Imprimeix', 'Print')}</button><div class="nb-pmenu" hidden><b>🖨 ${t('Què vols imprimir?', 'What do you want to print?')}</b>`
       + `<label class="nb-pcov"><input type="checkbox" checked> 📘 ${t('Amb la portada', 'With the cover')}</label>`
