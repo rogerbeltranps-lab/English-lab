@@ -31,15 +31,18 @@ window.EL_GRADING={
   // 4ESO (Roger, 30 Oct 2026: "exams broken down by criteria"): criteria as on the exam (Models A–D) and his "Notes per criteri" sheet;
   // the writing is split into its rubric rows (C1 task 8, C2 grammar 4, C3 vocabulary 4 → 5.1; C4 organisation 4 → 5.2). Vocabulary
   // is evidence for both 4.1 and 5.1, so a criterion score (elExamByCrit) is not a share of the exam mark: the exam mark stays points / 10.
-  ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:75},{id:"fp",name:"Final product",w:25}],only:true,
-    exam:{sections,max:10,boost:{daring:1.2}},fp:{a:c+"/final-product",mark:true}});   // boost: the Daring version ×1.2 (elExamBoost)
+  ...(function(){const e=(c,sections,web)=>({blocks:[{id:"exam",name:"Final exam",w:75},{id:"fp",name:"Final product",w:25}],only:true,
+    exam:Object.assign({sections,max:10,boost:{daring:1.2}},web?{web}:{}),fp:{a:c+"/final-product",mark:true}});   // boost: the Daring version ×1.2 (elExamBoost)
     // 2ESO (Roger, 30 Oct 2026): its exam cover gives criteria per item type: vocabulary choose 4.1, complete 5.1; grammar choose 5.1 and 4.1,
     // complete 5.1; writing as in 4ESO. So vocabulary (28) and grammar (32) are split into their choose and complete parts.
     return {"2eso-my-real-routine":e("2eso",[["listening","Listening",10,["2.1"]],["reading","Reading",10,["4.1"]],["vchoose","Vocabulary · choose",16,["4.1"]],["vcomplete","Vocabulary · complete",12,["5.1"]],
         ["gchoose","Grammar · choose",14,["5.1","4.1"]],["gcomplete","Grammar · complete",18,["5.1"]],
         ["wtask","Writing · task",8,["5.1"]],["wgrammar","Writing · grammar",4,["5.1"]],["wvocab","Writing · vocabulary",4,["5.1"]],["worg","Writing · organisation",4,["5.2"]]]),
       "4eso-my-real-routine":e("4eso",[["listening","Listening",10,["2.1"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",28,["4.1","5.1"]],["grammar","Grammar",32,["5.1"]],
-        ["wtask","Writing · task",8,["5.1"]],["wgrammar","Writing · grammar",4,["5.1"]],["wvocab","Writing · vocabulary",4,["5.1"]],["worg","Writing · organisation",4,["5.2"]]])}})(),
+        ["wtask","Writing · task",8,["5.1"]],["wgrammar","Writing · grammar",4,["5.1"]],["wvocab","Writing · vocabulary",4,["5.1"]],["worg","Writing · organisation",4,["5.2"]]],
+        // the make-up exam on the site (Roger, 17 Nov 2026: Elunei and anyone who missed it): 4eso/my-real-routine/exam.html, same listening; the writing is
+        // marked with the C1–C4 rubric into wtask/wgrammar/wvocab/worg (tools/exam-marks), not in the web exam box
+        {key:"ls1Exam4ESO",page:"4eso/my-real-routine/exam.html"})}})(),
   // 4ESO LS2: docs/4eso/ls2-seasons-and-celebrations/grading.md (approved by Roger, 24 Oct 2026); indicators from its indicators.md
   "4eso-seasons-and-celebrations":(function(){
     const LP1="4eso/ls2-getting-started",LP2="4eso/ls2-celebrations-around-the-world",LP3="4eso/ls2-where-traditions-come-from",LP4="4eso/ls2-research-it-right",
