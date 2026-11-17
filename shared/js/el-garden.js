@@ -68,8 +68,8 @@
       :`<ellipse cx="20" cy="54.6" rx="8" ry="2" fill="#5b3a1a" opacity=".55"/><path d="M20 54.6 ${st==="thirsty"?"Q20 44 23 39":"L20 36"}" stroke="#92400e" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
         +(st==="thirsty"?`<path d="M23 39 q4 -1 6 3 q-4 1 -6 -3z M22 42 q-4 0 -5.4 4 q4 .4 5.4 -4z" fill="#a8a24a"/><g transform="translate(6 18)">${DROP}</g>`
           :`<path d="M20 41 q-6 -1 -7 -7 q5.6 0 7 5z" fill="${LEAF}"/><path d="M20 38 q6 -1 7 -7 q-5.6 0 -7 5z" fill="${LEAF2}"/>`+(st==="bud"?`<circle cx="20" cy="33.4" r="3.6" fill="#22c55e"/>`:"")),"gd-tree");
-  const BFLY=c=>`<span class="gd-bfly" aria-hidden="true">${svg(20,16,`<g class="gd-w"><path d="M10 8 C6 1 0 2 1.5 7 C2.4 9.6 6 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C6.4 9.4 3 12 5 14.4 C7 16 9.4 12 10 8.4Z" fill="${c[1]}"/>`
-    +`<path d="M10 8 C14 1 20 2 18.5 7 C17.6 9.6 14 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C13.6 9.4 17 12 15 14.4 C13 16 10.6 12 10 8.4Z" fill="${c[1]}"/></g><rect x="9.3" y="5" width="1.4" height="8" rx=".7" fill="#1f2937"/><path d="M9.6 5.2 L8.4 2.4 M10.4 5.2 L11.6 2.4" stroke="#1f2937" stroke-width=".5"/>`)}</span>`;
+  const BFLY=(c,i)=>`<span class="gd-bfly f${i%3}" style="animation-delay:-${(i*4.3).toFixed(1)}s" aria-hidden="true"><span class="gd-bob">${svg(20,16,`<g class="gd-w"><path d="M10 8 C6 1 0 2 1.5 7 C2.4 9.6 6 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C6.4 9.4 3 12 5 14.4 C7 16 9.4 12 10 8.4Z" fill="${c[1]}"/>`
+    +`<path d="M10 8 C14 1 20 2 18.5 7 C17.6 9.6 14 9.4 10 8Z" fill="${c[0]}"/><path d="M10 8.4 C13.6 9.4 17 12 15 14.4 C13 16 10.6 12 10 8.4Z" fill="${c[1]}"/></g><rect x="9.3" y="5" width="1.4" height="8" rx=".7" fill="#1f2937"/><path d="M9.6 5.2 L8.4 2.4 M10.4 5.2 L11.6 2.4" stroke="#1f2937" stroke-width=".5"/>`)}</span></span>`;
   const BCOL=[["#f472b6","#fb7185"],["#facc15","#fb923c"],["#60a5fa","#a78bfa"],["#34d399","#2dd4bf"],["#f97316","#fbbf24"]];
   const RAINBOW=svg(200,60,["#ef4444","#f97316","#facc15","#22c55e","#3b82f6","#8b5cf6"].map((c,i)=>`<path d="M${10+i*4} 60 A${90-i*4} ${54-i*4} 0 0 1 ${190-i*4} 60" stroke="${c}" stroke-width="4" fill="none" opacity=".55"/>`).join(""),"gd-rainbow");
   const SUN=svg(40,40,`<g class="gd-rays">${Array.from({length:10},(_,i)=>`<path d="M20 2.5 L20 7.5" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" transform="rotate(${i*36} 20 20)"/>`).join("")}</g><circle cx="20" cy="20" r="9.5" fill="#fcd34d"/><circle cx="20" cy="20" r="9.5" fill="none" stroke="#f59e0b" stroke-width="1"/>`
@@ -100,14 +100,19 @@
 .gdt .gds{margin:-2px 0 0;align-self:center}.gdt .gds::after{display:none}
 .gd-drop{animation:gdbob 1.8s ease-in-out infinite}
 .gd-fresh{animation:gdgrow .9s cubic-bezier(.3,1.6,.5,1) both}.gd-fresh::before{content:"";position:absolute;left:50%;top:0;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:radial-gradient(#fde04788,transparent 70%);animation:gdglow 2.4s ease-out both;pointer-events:none}
-.gd-bfly{position:absolute;top:-16px;right:6px;width:20px;height:16px;z-index:4;pointer-events:none;animation:gdfly 7s ease-in-out infinite}.gd-bfly svg{width:20px;height:16px;display:block}
-.gd-w{transform-origin:10px 8px;animation:gdflap .35s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
+.gd-bfly{position:absolute;top:-20px;right:12px;width:24px;height:19px;z-index:4;pointer-events:none;animation:gdfa 18s ease-in-out infinite}.gd-bfly.f1{animation-name:gdfb;animation-duration:21s}.gd-bfly.f2{animation-name:gdfc;animation-duration:16s}
+.gd-bob{display:block;animation:gdbob2 1.1s ease-in-out infinite alternate}.gd-bfly svg{width:24px;height:19px;display:block}
+.gd-w{transform-origin:10px 8px;animation:gdflap .22s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
 .gdn-key{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;padding:6px 16px 9px;font-size:12.5px;color:#365314;background:#f7fee7cc;border-top:1px solid #d9f99d}
 .gdn-key span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}.gdn-key svg{width:13px;height:22px}.gdn-key .gd-tree{width:16px;height:22px}.gdn-key b{font-weight:800;margin-right:2px}
 @keyframes gdbob{50%{transform:translateY(2px)}}@keyframes gdspin{to{transform:rotate(360deg)}}
 @keyframes gdgrow{0%{transform:scale(.1)}100%{transform:scale(1)}}@keyframes gdglow{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(2.2)}}
 @keyframes gdpop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
-@keyframes gdfly{0%,100%{transform:translate(0,0) rotate(-6deg)}25%{transform:translate(-14px,-6px) rotate(8deg)}50%{transform:translate(-26px,2px) rotate(-4deg)}75%{transform:translate(-10px,-8px) rotate(6deg)}}
+/* the butterflies fly around the garden and land on a flower now and then (Roger, 17 Nov 2026: "can you make the butterflies fly?") */
+@keyframes gdfa{0%,100%{transform:translate(0,0) rotate(0)}12%{transform:translate(-60px,-34px) rotate(-22deg)}25%{transform:translate(-130px,6px) rotate(-8deg)}31%{transform:translate(-130px,8px) rotate(0)}40%{transform:translate(-70px,-48px) rotate(18deg)}55%{transform:translate(70px,-26px) rotate(22deg)}68%{transform:translate(150px,6px) rotate(8deg)}74%{transform:translate(150px,8px) rotate(0)}86%{transform:translate(70px,-42px) rotate(-16deg)}}
+@keyframes gdfb{0%,100%{transform:translate(0,0) rotate(0)}15%{transform:translate(90px,-44px) rotate(24deg)}30%{transform:translate(210px,4px) rotate(10deg)}37%{transform:translate(210px,6px) rotate(0)}50%{transform:translate(110px,-56px) rotate(-20deg)}64%{transform:translate(-50px,2px) rotate(-12deg)}71%{transform:translate(-50px,4px) rotate(0)}85%{transform:translate(-100px,-46px) rotate(-18deg)}}
+@keyframes gdfc{0%,100%{transform:translate(0,0) rotate(0)}18%{transform:translate(-50px,-56px) rotate(-24deg)}34%{transform:translate(50px,-62px) rotate(20deg)}46%{transform:translate(90px,2px) rotate(10deg)}53%{transform:translate(90px,4px) rotate(0)}70%{transform:translate(-20px,-38px) rotate(-14deg)}84%{transform:translate(-110px,2px) rotate(-8deg)}91%{transform:translate(-110px,4px) rotate(0)}}
+@keyframes gdbob2{to{transform:translateY(-5px)}}
 @keyframes gdflap{to{transform:scaleX(.45)}}@keyframes gdtw{50%{transform:scale(.4);opacity:.5}}
 @media (prefers-reduced-motion:reduce){.gdn *{animation:none!important;transition:none!important}}
 @media (max-width:600px){.gdn-h{padding:10px 12px 8px;gap:8px 10px}.gdn-h .gd-sun{width:32px;height:32px}.gdn-t{flex:1 1 200px}.gdn-t b{font-size:16px}.gdn-st{margin-left:0}.gdn-lawn{padding:6px 8px 10px}.gdn-beds{gap:10px 8px}}`;
@@ -132,7 +137,7 @@
         return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
         return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
-      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${done&&b.plants.length>1?BFLY(BCOL[bi++%BCOL.length]):""}</div>`}).join("");
+      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${done&&b.plants.length>1?BFLY(BCOL[bi%BCOL.length],bi++):""}</div>`}).join("");
     const full=all.length>0&&n.bloom===all.length,nf=fresh.size;
     const head=full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
       :n.thirsty?(n.thirsty===1?t("1 planta té set: acaba l'activitat per regar-la","1 plant is thirsty: finish it to water it"):t(`${n.thirsty} plantes tenen set: acaba-les per regar-les`,`${n.thirsty} plants are thirsty: finish them to water them`))
