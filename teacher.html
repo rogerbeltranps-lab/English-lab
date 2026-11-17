@@ -387,6 +387,10 @@ async function loadStudent(u){const sub=n=>F.getDocs(F.collection(db(),"students
 // One group: its students and list entries (by group), their points, the team, and each student's work
 async function loadGroup(gid){const q=(n)=>F.getDocs(F.query(F.collection(db(),n),F.where("group","==",gid)));
   const [st,ro,tm]=await Promise.all([q("students"),q("roster").catch(e=>{RAW.roErr=true;console.warn("roster",e);return null}),F.getDoc(F.doc(db(),"teams",gid)).catch(()=>null)]);
+  // a student or list entry deleted since the last copy goes (Roger, 17 Nov 2026: Unai still on the list after his account was removed)
+  const gone=Object.values(RAW.st).filter(s=>s.group===gid&&!st.docs.some(d=>d.id===s.uid)).map(s=>s.uid);
+  gone.forEach(u=>{delete RAW.st[u];delete RAW.rs[u];delete RAW.lv[u];delete RAW.pg[u];delete RAW.cp[u]});
+  if(ro)Object.keys(RAW.ro).filter(id=>RAW.ro[id].group===gid&&!ro.docs.some(d=>d.id===id)).forEach(id=>{delete RAW.ro[id];delete RAW.pt[id]});
   st.forEach(s=>RAW.st[s.id]=Object.assign({uid:s.id},s.data()));if(ro)ro.forEach(r=>RAW.ro[r.id]=r.data());if(tm&&tm.exists())RAW.tm[gid]=tm.data();
   const uids=Object.values(RAW.st).filter(s=>s.group===gid).map(s=>s.uid),ids=Object.keys(RAW.ro).filter(id=>RAW.ro[id].group===gid);
   await Promise.all([...uids.map(loadStudent),...ids.map(id=>F.getDoc(F.doc(db(),"points",id)).then(d=>{if(d.exists())RAW.pt[id]=d.data();else delete RAW.pt[id]}).catch(()=>{}))]);

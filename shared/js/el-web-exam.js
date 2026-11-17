@@ -22,7 +22,7 @@
   const SECS = ['listening', 'reading', 'vocabulary', 'grammar', 'writing'];   // writing: free text, marked by the teacher
   const ICON = { listening: '🎧', reading: '📖', vocabulary: '📚', grammar: '🧩', writing: '✍️', review: '✅' };
   const NAME = { listening: ['Listening', 'Listening'], reading: ['Reading', 'Reading'], vocabulary: ['Vocabulari', 'Vocabulary'], grammar: ['Gramàtica', 'Grammar'], writing: ['Writing', 'Writing'], review: ['Revisa i entrega', 'Review and turn in'] };
-  const GRACE = 2000, FS_GRACE = 300, SAVE_MS = 4000;
+  const GRACE = 400, FS_GRACE = 300, SAVE_MS = 4000;   // leaving is not allowed at all (Roger, 17 Nov 2026): 0.4 s only covers a stray blur
   const D = document, E = D.documentElement, $ = s => D.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const PV = window.EL_EXAM_PREVIEW || null;
@@ -263,11 +263,15 @@
     // Esc: a warning instead of leaving (Chrome locks it; holding it down still leaves full screen, and that stops the exam)
     on(D, 'keydown', e => { if (e.key !== 'Escape') return; e.preventDefault(); let w = $('.wx-esc'); if (!w) { w = D.createElement('div'); w.className = 'wx-esc'; wrap.appendChild(w); }
       w.innerHTML = '⚠️ ' + t('Si surts de la pantalla completa, l’examen s’acaba. Per acabar, ves a <b>✅ Revisa i entrega</b>.', 'If you leave full screen, your exam is over. To finish, go to <b>✅ Review and turn in</b>.'); setTimeout(() => w && w.remove(), 6000); });
+    // Any switch to another tab, window, desktop/Space or app locks the exam (Roger, 17 Nov 2026: a quick swipe to another full-screen
+    // window used to count only as a "glance"). A hidden page or a window that loses focus locks if it is not back
+    // within 0.4 s (that only absorbs a stray blur/focus flicker, e.g. 0.1 s when full screen comes back; his swipes took 0.7-1.9 s).
     let away = 0, veil = null, wait = null;
-    const leave = full => { if (S.status !== 'in') return; if (away) { if (full) { clearTimeout(wait); wait = setTimeout(() => exitNow('fullscreen'), FS_GRACE); } return; }
+    const out = why => { clearTimeout(wait); wait = null; exitNow(why); };
+    const leave = full => { if (S.status !== 'in') return; if (away) { if (full) { clearTimeout(wait); wait = setTimeout(() => out('fullscreen'), FS_GRACE); } return; }
       away = Date.now(); veil = D.createElement('div'); veil.className = 'wx-veil'; veil.textContent = t('Torna a l’examen!', 'Come back to the exam!'); D.body.appendChild(veil);
-      wait = setTimeout(() => exitNow(full ? 'fullscreen' : 'left'), full ? FS_GRACE : GRACE); };
-    const back = () => { if (!away || S.status !== 'in') return; if (fsOk() && !isFull()) return; clearTimeout(wait); S.glances.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); away = 0; if (veil) veil.remove(); veil = null; touch(); };
+      wait = setTimeout(() => { if (!full && D.hasFocus() && !D.hidden) return back(); out(full ? 'fullscreen' : 'left'); }, full ? FS_GRACE : GRACE); };
+    const back = () => { if (!away || S.status !== 'in') return; if (D.hidden || (fsOk() && !isFull())) return; clearTimeout(wait); S.glances.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); away = 0; if (veil) veil.remove(); veil = null; touch(); };
     on(window, 'blur', () => leave(false)); on(D, 'visibilitychange', () => D.hidden ? leave(false) : back()); on(window, 'focus', back);
     const fsc = () => { if (isFull()) back(); else if (fsOk()) leave(true); };
     on(D, 'fullscreenchange', fsc); on(D, 'webkitfullscreenchange', fsc);
