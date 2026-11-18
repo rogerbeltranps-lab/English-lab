@@ -65,7 +65,8 @@ if(INSTANT){
   if(autoFixed.length){
     const ns=autoFixed.filter(x=>!x.teacher).length,out=["Beltran fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself"+(ns?" and answered the student"+(ns>1?"s":"")+" for you":"")+":",""];
     autoFixed.forEach(x=>{out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🔧 "+String(x.auto.note||"").trim());
-      const m=(x.msgs||[]).filter(y=>y.fix).pop();out.push(x.teacher?"   👨‍🏫 Your own report: hard reload the page (Ctrl+Shift+R) to see it fixed.":"   💬 The student got: ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
+      const m=(x.msgs||[]).filter(y=>y.fix).pop();const go=x.auto.go>Date.now()?new Date(x.auto.go).toLocaleString("en-GB",{timeZone:"Europe/Madrid",weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";   // held: 8:00-18:00, 2 hours after the report (reply-time.mjs)
+      out.push(x.teacher?"   👨‍🏫 Your own report: hard reload the page (Ctrl+Shift+R) to see it fixed.":"   💬 The student "+(go?"gets, on "+go+":":"got:")+" ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
     out.push("Check them or reopen one: "+SITE+"teacher.html#probs","","—","Only technical problems are fixed automatically; everything else stays in ⚠️ Problem reports for you. Students do not see this email.");
     await sendMail("⚠️ IMPORTANT · English Lab: "+n(autoFixed.length,"problem report","problem reports")+" fixed automatically",out.join("\n"))}
   console.log("New since the last check: "+probs.length+" problem report(s), "+ideas.length+" idea(s), "+answers.length+" answer(s), "+autoFixed.length+" fixed automatically.");   // counts only: the log is public

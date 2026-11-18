@@ -19,6 +19,10 @@
 //        mark Roger already recalculated), "nobug" (the site works as it should: the answer explains it), "you" (Roger must do something:
 //        --todo says what, in one short line). --reply = the suggested answer to the student (≤1000 characters, Roger's voice, the report's
 //        language, never AI): the dashboard shows it with a one-click send button. Run it again on the same report to change it.
+// Never straight away (Roger, 17 Nov 2026: "always answer from 8-18 and after 2 hours since u receive the message o report, don't use their
+// names or surnames since sometimes it feels like AI"): `fixed` saves the card with at = tools/problems/reply-time.mjs replyAt(report time)
+// (problemReplies.at, the msgs entry's go and auto.go: el-cloud.js shows the card only from then, the dashboard says when); --now sends at
+// once, only when Roger asks for it. --msg and --reply are refused if they use the student's name or surnames.
 // Without --apply it only prints what it would write. Sign-in: FIREBASE_SERVICE_ACCOUNT (the cloud environment's secret, can write).
 // Reads: one list of problems (a few dozen documents) + one screenshot per new report. Personal data stays in Firestore and the session.
 import fs from "node:fs";
@@ -27,6 +31,7 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
+import {replyAt,whenText,namesIn} from "./reply-time.mjs";
 
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../.."),PROJECT="english-lab-ietm",MSG_MAX=1000;
 const [cmd,id,...rest]=process.argv.slice(2),flag=f=>rest.includes(f)||process.argv.includes(f),opt=f=>{const i=rest.indexOf(f);return i>=0?rest[i+1]:null};
@@ -85,7 +90,9 @@ if(cmd==="fixed"||cmd==="leave"){
   if(x.fixed)throw new Error("Report "+id+" is already marked as fixed: nothing to do.");
   const note=String(opt("--note")||"").trim().slice(0,500),now=new Date().toISOString();
   if(cmd==="leave"&&!note)throw new Error("leave needs --note \"why Roger should look at it\"");
-  const writes=[];
+  const writes=[],NOW=flag("--now"),go=NOW?0:replyAt(Date.parse(x.created||"")||Date.now());
+  const named=namesIn([opt("--msg"),opt("--reply")].filter(Boolean).join(" "),[x.name||""]);
+  if(named.length&&!x.teacher)throw new Error("Don't use the student's name or surnames in --msg / --reply (Roger, 17 Nov 2026: it feels like AI). Found: "+named.join(", ")+". Write it again without them.");
   if(cmd==="leave"){
     const status=opt("--status")||"you",reply=String(opt("--reply")||"").trim().slice(0,MSG_MAX),todo=String(opt("--todo")||"").trim().slice(0,200);
     if(!["fixed","nobug","you"].includes(status))throw new Error("--status must be fixed, nobug or you");
@@ -99,13 +106,13 @@ if(cmd==="fixed"||cmd==="leave"){
   }else{
     const msg=String(opt("--msg")||"").trim().slice(0,MSG_MAX),en=!!x.route&&!elCa(x.route);
     const reply={uid:x.uid,kind:"fixed",what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String((/^(com estudiar|how to study)$/i.test(x.section||"")?"":x.section)||x.title||"").slice(0,200),en};   // "How to study" = the folded Study guide (reports before PR #290), not where they were
-    if(msg)reply.msg=msg;
+    if(msg)reply.msg=msg;if(go)reply.at=go;   // at: the student's page shows the card only from then (el-cloud.js)
     writes.push({update:{name:BASE+"/problemReplies/"+id,fields:Object.fromEntries(Object.entries(reply).map(([k,v])=>[k,fsv(v)]))},
       updateTransforms:[{fieldPath:"created",setToServerValue:"REQUEST_TIME"}]});
-    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
-    if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv({text:msg,at:now,rid:id,fix:true})]}}];
+    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg}:{},go?{go}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
+    if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv(Object.assign({text:msg,at:now,rid:id,fix:true},go?{go}:{}))]}}];
     writes.push(w);
-    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg):""));
+    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg):"")+"\nThe student sees it "+(go?"from "+whenText(go)+" (Madrid time)":"straight away (--now)"));
   }
   console.log("Report "+id+" ("+(x.name||"?")+", "+(x.group||"")+"): "+(cmd==="fixed"?"marked fixed":"left for Roger")+(note?" · note: "+note:""));
   if(!flag("--apply")){console.log("(dry run: add --apply to save)");process.exit(0)}
@@ -114,5 +121,5 @@ if(cmd==="fixed"||cmd==="leave"){
   process.exit(0);
 }
 
-console.log("Usage: node tools/problems/auto.mjs open [--all] | fixed <id> [--msg \"...\"] [--note \"...\"] [--apply] | leave <id> --status nobug|you|fixed --note \"...\" --reply \"...\" [--todo \"...\"] [--apply]");
+console.log("Usage: node tools/problems/auto.mjs open [--all] | fixed <id> [--msg \"...\"] [--note \"...\"] [--now] [--apply] | leave <id> --status nobug|you|fixed --note \"...\" --reply \"...\" [--todo \"...\"] [--apply]");
 process.exit(1);

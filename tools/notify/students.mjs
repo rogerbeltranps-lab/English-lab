@@ -24,7 +24,7 @@ if(!TEST&&!DRY&&TODAY<"2026-11-08"){console.log("Students' emails start on Sunda
 const wd=new Date(TODAY+"T12:00").getDay(),MON=WK.add(TODAY,wd===0?1:wd===6?2:(8-wd)%7||7);   // the next Monday
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]);
 const CA_ROUTES=["beginners","insecure"];
-const db=await firestore(),weekAgo=new Date(Date.now()-7*864e5).toISOString(),recent=d=>d&&new Date(d)>=new Date(weekAgo);
+const db=await firestore(),weekAgo=new Date(Date.now()-7*864e5).toISOString(),recent=d=>d&&new Date(d)>=new Date(weekAgo)&&new Date(d)<=new Date();   // not yet: an answer held until later
 
 const roster=Object.fromEntries(await db.list("roster"));
 const studs=(await db.list("students")).map(([uid,s])=>{const em=String(s.email||"").toLowerCase(),r=roster[em]||{};return {uid,email:em,group:r.group||s.group,first:r.first||String(s.name||"").split(/[ ,]/).filter(Boolean).pop()||""}})
@@ -47,7 +47,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   for(const [,r] of await db.list("students/"+s.uid+"/results")){const a=act(r.activity),title=a?a.title:r.activity||"";
     Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.t&&recent(x.at))news.push(T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k))});
     if(recent(r.updated))Object.keys(r.replies||{}).forEach(k=>{const m=(r.marked||{})[k];if(!m||recent(m))news.push(T("Correcció: ","Correction: ")+title+" · "+stepName(a,k))})}
-  const pr=pReplies.filter(x=>x.uid===s.uid);if(pr.length)news.push(T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""));
+  const pr=pReplies.filter(x=>x.uid===s.uid&&!(x.at>Date.now()));if(pr.length)news.push(T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""));
   const uniq=[...new Set(news)];
   if(!tasks.length&&!uniq.length){skipped++;continue}
   const out=[T("Hola ","Hi ")+s.first+",","",T("Això és el que tens aquesta setmana a English Lab:","This is your English Lab week:"),""];
