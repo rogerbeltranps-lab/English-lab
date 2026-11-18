@@ -125,7 +125,6 @@ html.el-nb-plain .nb-idx .lp>a{font-size:17px}
   .nb-spread{grid-template-columns:minmax(0,1fr)}
   .nb-spine,.nb-page.r{display:none}
   .nb-page.l{border-radius:0 10px 10px 10px;grid-column:1}
-  .nb-paper{padding-left:62px;padding-right:12px}
   .nb-tab{padding:6px 10px 8px;font-size:17px}
   .nb-tool{padding:5px 8px}
 }
@@ -226,8 +225,6 @@ html.el-wb-on #el-nbfab{display:none}
 .nb-stitle:hover,.nb-stitle:focus{border-bottom-color:#9aa3ad}
 html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-sans);font-size:20px}
 .nb-saved{align-self:center;margin:0 6px 6px 0;font-size:17px}
-/* the pages are filled a little short of the paper's foot (el-notebook.js layout, SLACK), so a slightly shorter book keeps them */
-.nb-spread.nb-flowing .nb-paper{bottom:var(--nb-slack,0px)}
 .nb-page .pad-tools{margin:6px 0 30px -14px}
 @media (max-width:899px){.nb-page .pad-tools{margin-left:-8px}}
 
@@ -331,7 +328,7 @@ html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plai
 .nb-stab{pointer-events:auto;writing-mode:vertical-rl;border:0;border-radius:0 8px 8px 0;padding:10px 4px 10px 6px;font:700 17px/1 var(--nb-hand);color:#2b2b2b;cursor:pointer;box-shadow:2px 1px 3px rgba(0,0,0,.12);max-height:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transform:translateX(-6px);transition:transform .15s}
 .nb-stab.on,.nb-stab:hover{transform:none}
 .nb-stab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
-@media (min-width:900px){.nb-spread{margin-right:30px}}
+@media (min-width:900px){.nb-stage{padding-right:30px}}
 @media (max-width:899px){.nb-side{display:none}}
 @media print{.nb-side{display:none!important}}
 /* 🟨 notes as post-its */
@@ -471,7 +468,6 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 /* 🏠 My board */
 .nb .nb-home{text-decoration:none;font-weight:600;white-space:nowrap}
 @media (max-width:640px){.nb .nb-home .nb-hlab{display:none}}
-@media (max-width:640px){.nb-cv1::after{display:none}}
 
 /* the cover's first-try rings (as on the board's My progress) */
 .nb-fr-rings{background:#fff;color:#26303d;border-radius:12px;padding:10px 14px 12px;margin:4px 3% 0;box-shadow:0 3px 10px rgba(0,0,0,.35);display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
@@ -487,7 +483,6 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-ring.d-AE b{color:#1b5e20}.nb-fr-ring.d-AN b{color:#33691e}.nb-fr-ring.d-AS b{color:#8a6d00}.nb-fr-ring.d-NA b{color:#b71c1c}
 .nb-fr-ring b{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 17px/1 var(--nb-sans,system-ui,sans-serif)!important;color:#26303d}
 .nb-fr-res small{font-weight:500;color:#c7d3ea;font-size:15px}
-@media (max-width:640px){.nb-fr-rings{gap:10px 8px;padding:10px 10px 12px}.nb-fr-rg{flex-direction:column;text-align:center;gap:4px}.nb-fr-rg>span:last-child{align-items:center}.nb-fr-rg b{font-size:14px}.nb-fr-rg small{font-size:12px}.nb-fr-ring{width:50px;height:50px}.nb-fr-ring b{width:38px;height:38px;font-size:15px!important}}
 /* ⭐ My results after the cover: notebook paper (Roger: "This should be notebook like not like a cover"), heading in pen, cards like glued slips */
 .nb-fr-more .nb-fr-res{font:700 29px/32px var(--nb-hand);color:var(--nb-black,#1f2733);letter-spacing:0;margin:0 0 6px}
 .nb-fr-more .nb-fr-res small{font:600 22px var(--nb-hand);color:var(--nb-ink)}
@@ -500,7 +495,6 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-num span{font:600 13px/1.25 var(--nb-sans,system-ui,sans-serif);color:#26303d}
 .nb-fr-num small{font:12px/1.25 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
 @media print{.nb-fr-rings,.nb-fr-nums,.nb-fr-num,.nb-fr-ring{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-@media (max-width:640px){.nb-fr-nums{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}.nb-fr-num b{font-size:19px}.nb-fr-num span{font-size:12px}}
 /* 🖨 while printing, the pages are measured on a sheet: one page, 700 x 1020 px, fills an A4 sheet (the page's 10 mm at the top, the
    copyright line at the foot) so nothing that would fit goes on to the next sheet (Roger: "the last paragraph could've fitted on the same page") */
 @page nbsheet{margin:0 10mm 12mm}
@@ -527,16 +521,6 @@ html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px;padding-bottom:10px
 .nb-fr-num b{font-size:19px}
 .nb-fr-num span{font-size:11.5px}
 .nb-fr-num small{font-size:10.5px}
-@media (max-width:640px){
-  .nb-fr-rings{grid-template-columns:repeat(4,1fr)}
-  .nb-fr-rings .nb-fr-rh,.nb-fr-rings .nb-fr-rh~.nb-fr-rh{grid-column:1/-1;grid-row:auto}
-  .nb-fr-rings .nb-fr-rg,.nb-fr-rings .nb-fr-rg:nth-of-type(n){grid-row:auto;grid-column:auto}
-  .nb-fr-rings .nb-fr-ring{width:40px;height:40px}.nb-fr-rings .nb-fr-ring b{width:30px;height:30px;font-size:13px!important}
-  .nb-fr-rings .nb-fr-rg b{font-size:12px}.nb-fr-rings .nb-fr-rg small{font-size:10.5px}
-  .nb-fr-nums{grid-template-columns:repeat(3,1fr)}.nb-fr-num b{font-size:16px}.nb-fr-num small{display:none}
-  .nb-fr-rings .nb-fr-rg small{line-height:1.2}.nb-fr-rings{gap:2px 4px;padding:6px 8px 8px}.nb-fr-label{margin-bottom:10px}
-  .nb-cvbtn span{display:none}.nb-cvbtn{padding:6px 9px;right:-8px}
-}
 .nb-fr-rings .nb-fr-rg b i{display:block;font-style:normal}
 .nb-fr-rings .nb-fr-rg>span:last-child{max-width:100%;min-width:0}
 /* the printed cover: its label and statistics spread over the whole sheet, no empty half */
@@ -608,7 +592,7 @@ a.nb-tdo.nb-tdgo:hover,a.nb-tdo.nb-tdgo:focus-visible{transform:rotate(-3deg) sc
 .nb-lside .nb-tab.nb-lt:nth-child(5n+1){--lt:#ffe082}.nb-lside .nb-tab.nb-lt:nth-child(5n+2){--lt:#b3e5fc}.nb-lside .nb-tab.nb-lt:nth-child(5n+3){--lt:#c5e1a5}.nb-lside .nb-tab.nb-lt:nth-child(5n+4){--lt:#ffccbc}.nb-lside .nb-tab.nb-lt:nth-child(5n){--lt:#e1bee7}
 .nb-lside .nb-tab.nb-lt[aria-current="true"],.nb-lside .nb-tab.nb-lt:hover{transform:rotate(180deg);padding-bottom:12px}
 .nb-lside .nb-tab.nb-lt[aria-current="true"]{font-weight:800;box-shadow:-2px 1px 3px rgba(0,0,0,.12),inset -4px 0 0 #1f3c73}
-@media (min-width:900px){.nb-spread:has(.nb-lside){margin-left:32px}.nb-tab.nb-ctop{display:none}}
+@media (min-width:900px){.nb-stage:has(.nb-lside){padding-left:32px}.nb-tab.nb-ctop{display:none}}
 @media (max-width:899px){.nb-lside{display:none}}
 @media print{.nb-lside{display:none!important}}
 /* a whole year of LSs: the tabs share the edge (never cut off); from 5 LSs on only "LS5" shows, the name is in the tooltip */
@@ -677,3 +661,19 @@ html.el-nb-plain .nb-fpi textarea,html.el-nb-plain .nb-fpi-t{font-size:15px;line
 @media print{.nb-ifl{display:none!important}}
 .nb-edit>.nb-notes,.nb-edit .nb-ied{min-height:32px}
 @media (max-width:899px){.nb-ifl{padding:3px 4px;gap:4px}.nb-ifl .pad-tb{min-width:28px;height:30px;padding:0 3px}.nb-ifl .pad-g{padding-right:2px}}
+
+/* 📐 One page size for everyone (Roger, 18 Nov 2026: "It has a predetermined size, a reasonable one and it adapts to the user's view by
+   getting bigger or smaller but not distributing the activities"): every page is --nb-pw x --nb-ph (a Chromebook's page), so the same
+   notebook has the same pages on every screen; the book is only scaled to fit the space it has (.nb-stage, el-notebook.js fit()). Zoom,
+   the top bar on two rows, the iPad keyboard or the ⚠️ window never move anything any more. Two pages side by side from 900 px, one below. */
+.nb{--nb-pw:620px;--nb-ph:660px}
+.nb-stage{position:relative;flex:1;min-height:0;min-width:0;box-sizing:border-box}
+html:not(.nb-prlay) .nb-stage>.nb-spread{position:absolute;left:0;top:0;flex:none;margin:0;width:calc(var(--nb-pw) * 2 + 30px);height:var(--nb-ph);
+  grid-template-columns:var(--nb-pw) 30px var(--nb-pw);transform-origin:0 0;transform:var(--nb-tf,none)}
+@media (max-width:899px){html:not(.nb-prlay) .nb-stage>.nb-spread{width:var(--nb-pw);grid-template-columns:var(--nb-pw)}}
+html.nb-prlay .nb-stage{flex:none;padding:0}
+@media print{.nb-stage{display:block;position:static;padding:0}.nb-stage>.nb-spread{position:static!important;transform:none!important}}
+/* ✍ a note keeps the room it had (Roger, 18 Nov 2026: "If the user erases their notes, the beginning of the following note doesn't change") */
+.nb-npad{display:block}
+/* ⬜ an activity not done yet keeps room for the answers' corrections and the feedback (Roger, 18 Nov 2026) */
+.nb-resv{display:block;height:32px}
