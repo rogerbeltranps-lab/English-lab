@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261117a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261118a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -136,8 +136,10 @@ window.ELNotebook = (function () {
       : `<s class="nb-giv nb-x">${pen(x.given) || '&nbsp;—&nbsp;'}</s> <span class="nb-fix in">${pen(x.right)}</span>`;
     const li = x => {
       const q = String(x.q || ''), mark = x.guess ? '' : x.ok ? '<i class="nb-tick">✓</i>' : '<i class="nb-cross">✗</i>';
-      if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}</li>`;
-      return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}</li>`;
+      // 💬 the feedback of that question (the step's explanation, our own data) in the teacher's green pen under it
+      const ex = x.ex ? `<span class="nb-ex">${x.ex}</span>` : '';
+      if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}${ex}</li>`;
+      return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}${ex}</li>`;
     };
     const pc = w.of ? w.right / w.of : 1;
     return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;

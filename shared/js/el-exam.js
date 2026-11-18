@@ -112,7 +112,7 @@ window.ELExam = (function () {
     const qs = rec.q.map((qi, j) => {
       const it = list[qi]; if (!it || typeof it !== 'object') return null;
       const mc = Array.isArray(it.o), a = (rec.a || [])[j];
-      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess };
+      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: tx(it.ex || it.why || '') };   // ex: the feedback the step gave after ✓ Check (Roger, 18 Nov 2026: "the feedback is very important and it must appear")
     }).filter(Boolean);
     if (!qs.length) return null;
     const scored = qs.filter(x => !x.guess);
