@@ -85,7 +85,12 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
 // the LS game (🧩 Grammar · LSn / 📚 Vocabulary · LSn): {ls: EL_LS id, kind}; H.deckId is then its newest learning path's game
 const lsGames=(ls,kind)=>(window.EL_GAMES||[]).filter(d=>(d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar"))===kind&&lsOf(d)===ls).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));
-const LSG0=(()=>{const ls=URLP.get("ls"),k=URLP.get("kind");return ls&&/^(grammar|vocab)$/.test(k||"")&&lsGames(ls,k).length?{ls,kind:k}:null})();
+// A learning path's own game (host.html?deck= only: the 🎮 buttons on the learning path pages, 📓 ▶ Play, Materials) opens as its LS game
+// too, so every way in is the same 3 steps: group → points → Start, with 🎮/🕵️/🚀 beside Start (Roger, 18 Nov 2026, 4 ESO B: "yesterday we
+// agreed on another way of choosing the games", PR #687; the LP3 page's buttons still opened the old boards)
+const LSG0=(()=>{let ls=URLP.get("ls"),k=URLP.get("kind");
+  if(!ls){const d=(window.EL_GAMES||[]).find(x=>x.id===URLP.get("deck"));if(d&&d.lp){ls=lsOf(d);k=d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar")}}
+  return ls&&/^(grammar|vocab)$/.test(k||"")&&lsGames(ls,k).length?{ls,kind:k}:null})();
 const H={user:null,teacher:false,lsg:LSG0,deckId:URLP.get("deck")||(LSG0?lsGames(LSG0.ls,LSG0.kind).slice(-1)[0].id:""),deck:null,deck0:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:"",tg:"",tp:null,tsel:null};
 const saved=tab.get();
 if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp,tp:saved.tp||null,rvn:saved.rvn});
