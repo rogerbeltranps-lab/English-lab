@@ -154,7 +154,7 @@ body.ellp2 .lp-body{display:block!important}
 /* no overscroll-behavior:contain on the steps column: with it, a finger (iPad) or the wheel on the column, once the column was at its
    top, could not bring the page back up, so the top of the step stayed hidden under the top bar (Roger, iPad, 16 Nov 2026: "the screen
    doesn't go up to the top"); now the page moves on when the column has nothing more to scroll */
-.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin;scrollbar-gutter:stable}
+.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-x:hidden;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin;scrollbar-gutter:stable}
 /* the class tab on the projector: no scrollbar on the steps column (the wheel still scrolls it), so nothing moves beside the lesson
    (teacher's report, 4ESOA, 13 Nov 2026: "the bar is moving … like flickering" = this scrollbar). Everywhere else its place is kept
    (scrollbar-gutter:stable), so the column no longer flickers when its height is right at the edge: scrollbar on, text wraps, scrollbar off… */
@@ -370,3 +370,10 @@ body.elslpfs .panel-head h2{font-size:clamp(1.9rem,2.8vw,2.5rem)!important}
 .elslpbar button:disabled{opacity:.4;cursor:default}
 .elslpbar button.nx{background:var(--accent,#315f9f);border-color:var(--accent,#315f9f);color:#fff}
 .elslpbar button.nx:hover:not(:disabled){background:var(--dark,#234777);color:#fff}
+
+/* iPad (Roger, 17-18 Nov 2026: "I can't scroll up to the very top" / "if I leave it it moves down"): on a tablet the page no longer
+   bounces past its top or bottom, so a pull down at the top stops there instead of showing an empty grey gap and springing back; and the
+   sticky columns (the steps column above, the LS home's side menu) are measured on the screen that is really visible (dvh: Safari's
+   100vh is the height with its toolbar hidden, so with the toolbar showing their last part sat below the screen). Phones and computers
+   are unchanged. */
+@media (min-width:641px) and (hover:none) and (pointer:coarse){html{overscroll-behavior-y:none}}
