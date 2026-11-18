@@ -31,7 +31,8 @@ export function cmAfter({S,db}){
     await S.setDoc(S.doc(db,"live",g),w,{merge:true});
     if(on){const go=seen[g].go;try{window.close()}catch(e){}setTimeout(()=>{location.href=page(go.u,go.p).href},400);return}
     if(!last){location.href=dash();return}
-    const u=page(last.u,last.p);u.searchParams.set("elcm",g+"."+until(g));location.href=u.href}
+    const u=page(last.u,last.p);u.searchParams.set("elcm",g+"."+until(g)+".g");   // .g: no warm-up again (el-cloud.js)
+    location.href=u.href}
   // 🏁 End the class
   async function endClass(g){if(!g)return;const now=Date.now();
     await S.setDoc(S.doc(db,"live",g),{go:null,fs:null,on:false,cmBack:now,ce:now,at:S.serverTimestamp()},{merge:true});

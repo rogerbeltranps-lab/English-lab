@@ -3970,7 +3970,7 @@ const wuDecks=(x,d)=>{const ag=agOf(x),G=(window.EL_GAMES||[]).filter(g=>g.kind=
   on(d);if(!ids.length)Object.keys(ag.days||{}).filter(z=>z<d).sort().reverse().some(z=>{on(z);return ids.length});return ids};
 let wuLoad=null;
 function wuRow(x,d){if(!wuOn(agOf(x),d))return "";
-  if(!window.ELWu){if(!wuLoad)wuLoad=import("./shared/js/el-warmup.js?v=20261114").then(m=>{window.ELWu=m;render()}).catch(e=>console.warn("warm-up",e));return ""}
+  if(!window.ELWu){if(!wuLoad)wuLoad=import("./shared/js/el-warmup.js?v=20261118").then(m=>{window.ELWu=m;render()}).catch(e=>console.warn("warm-up",e));return ""}
   const ds=wuDecks(x,d),G=window.EL_GAMES||[],lps=[...new Set(ds.map(id=>String((G.find(g=>g.id===id)||{}).lp||"").split(" · ")[0]).filter(Boolean))];
   const pre=ds.length?ds:acts(x.ls).flatMap(a=>gamesOf(a).filter(z=>!isCb(z[0])).map(z=>z[2].id)),say=ELWu.sayFor(x.gid,pre,d)||[];
   return `<div class="agwu" title="Class mode opens with it, before anything else: the saying of the day, then a quick whole-class game (Hangman, Word order, Spot the mistake or No vowels, a different one each class)${lps.length?" with the words of "+esc(lps.join(" + ")):""}">`
