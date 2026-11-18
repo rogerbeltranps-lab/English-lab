@@ -226,6 +226,8 @@ html.el-wb-on #el-nbfab{display:none}
 .nb-stitle:hover,.nb-stitle:focus{border-bottom-color:#9aa3ad}
 html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-sans);font-size:20px}
 .nb-saved{align-self:center;margin:0 6px 6px 0;font-size:17px}
+/* the pages are filled a little short of the paper's foot (el-notebook.js layout, SLACK), so a slightly shorter book keeps them */
+.nb-spread.nb-flowing .nb-paper{bottom:var(--nb-slack,0px)}
 .nb-page .pad-tools{margin:6px 0 30px -14px}
 @media (max-width:899px){.nb-page .pad-tools{margin-left:-8px}}
 
