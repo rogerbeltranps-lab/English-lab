@@ -17,7 +17,7 @@ function walk(o, src) {
   })));
   Object.values(o).forEach(x => walk(x, src));
 }
-for (const ls of ['2eso/free-time-live', '4eso/seasons-and-celebrations']) {
+for (const ls of ['2eso', '4eso'].flatMap(c => fs.readdirSync(path.join(ROOT, c)).map(d => c + '/' + d)).filter(d => fs.existsSync(path.join(ROOT, d, 'data')))) {
   for (const sub of ['data', 'data/native']) {
     const dir = path.join(ROOT, ls, sub); if (!fs.existsSync(dir)) continue;
     for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.js'))) {

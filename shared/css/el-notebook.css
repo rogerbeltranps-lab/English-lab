@@ -226,6 +226,8 @@ html.el-wb-on #el-nbfab{display:none}
 .nb-stitle:hover,.nb-stitle:focus{border-bottom-color:#9aa3ad}
 html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-sans);font-size:20px}
 .nb-saved{align-self:center;margin:0 6px 6px 0;font-size:17px}
+/* the pages are filled a little short of the paper's foot (el-notebook.js layout, SLACK), so a slightly shorter book keeps them */
+.nb-spread.nb-flowing .nb-paper{bottom:var(--nb-slack,0px)}
 .nb-page .pad-tools{margin:6px 0 30px -14px}
 @media (max-width:899px){.nb-page .pad-tools{margin-left:-8px}}
 
@@ -321,6 +323,7 @@ html.el-nb-plain .nb-postit{font-size:18px}
 .nb-x{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
 .nb-tick,.nb-cross{font-style:normal;font:700 24px/1 var(--nb-teacher);color:var(--nb-red);margin-left:4px}
 .nb-tick{color:var(--nb-green)}
+.nb-ex{display:block;margin:2px 0 6px;font:400 17px/1.45 var(--nb-teacher);color:var(--nb-green)}.nb-ex strong,.nb-ex b{font-weight:700}   /* 💬 the feedback under each answer */
 .nb-arrow{color:var(--nb-pencil)}
 html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plain .nb-fix{font-size:14px}
 /* 📌 the sections of the learning path on the screen, sticking out of the book's right edge */

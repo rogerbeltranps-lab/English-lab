@@ -123,11 +123,32 @@ window.ELExam = (function () {
     const qs = rec.q.map((qi, j) => {
       const it = list[qi]; if (!it || typeof it !== 'object') return null;
       const mc = Array.isArray(it.o), a = (rec.a || [])[j];
-      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess };
+      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, !!(rec.ok || [])[j], a, tx) };
     }).filter(Boolean);
     if (!qs.length) return null;
     const scored = qs.filter(x => !x.guess);
     return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+  }
+  /* 💬 the feedback line the step showed under that question after ✓ Check (Roger, 18 Nov 2026: "All the activities done in class should
+     have the feedback that appears in the normal menu in the notebook"), as ls2-engine.js writes it: a typed question "Correct!" or
+     "Not yet. " + its rule (it.en / it.ca); a choice question "Correct! / Not yet. " + its explanation (it.ex), or without one the
+     learningSupport.evidence line (its Catalan hint it.h for Starter/Base). The right answer itself is already written in the notebook. */
+  function pageFb(p, it, mc, ok, a, tx) {
+    const ca = tx({ ca: '1', en: '0' }) === '1', T = (c, e) => ca ? c : e;
+    const ex = tx(it.ex || it.why || ''), why = tx(it.en || it.ca ? { en: it.en, ca: it.ca } : '');
+    const blank = a == null || String(a).trim() === '';
+    if (mc) {
+      if (blank) return T('No vas triar cap resposta.', 'You didn\'t choose an answer.');
+      if (ex) return (ok ? T('Correcte! ', 'Correct! ') : T('Encara no. ', 'Not yet. ')) + ex;
+      // learningSupport.evidence (learning-path-support.js, not loaded on the LS home): its words, kept the same
+      const listen = !!(p.media && (p.media.audio || p.media.youtube));
+      if (ok) return T('Correcte!', 'Correct!');
+      return ca ? 'Encara no. ' + (it.h || (listen ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'))
+        : 'Try again. ' + (listen ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.' : 'Re-read the text, find the sentence that answers the question and compare it with each option.');
+    }
+    if (ok) return it.own ? T('Molt bé! El professor pot llegir la teva frase.', 'Well done! Your teacher can read your sentence.') : T('Correcte!', 'Correct!') + (why || ex ? ' ' + (why || ex) : '');
+    if (blank) return T('No vas escriure cap resposta.', 'You didn\'t type an answer.') + (why ? ' ' + why : '');
+    return T('Encara no. ', 'Not yet. ') + (why || ex);
   }
   // the questions of an activity not done yet, at the student's route, without answers: {task, qs: [{q, o: options in a fixed order}]}
   function toDo(p, level, tx) {

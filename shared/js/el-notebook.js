@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261117a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261118b', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -136,8 +136,10 @@ window.ELNotebook = (function () {
       : `<s class="nb-giv nb-x">${pen(x.given) || '&nbsp;—&nbsp;'}</s> <span class="nb-fix in">${pen(x.right)}</span>`;
     const li = x => {
       const q = String(x.q || ''), mark = x.guess ? '' : x.ok ? '<i class="nb-tick">✓</i>' : '<i class="nb-cross">✗</i>';
-      if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}</li>`;
-      return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}</li>`;
+      // 💬 the feedback of that question (the step's explanation, our own data) in the teacher's green pen under it
+      const ex = x.ex ? `<span class="nb-ex">${x.ex}</span>` : '';
+      if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}${ex}</li>`;
+      return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}${ex}</li>`;
     };
     const pc = w.of ? w.right / w.of : 1;
     return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
@@ -806,6 +808,9 @@ window.ELNotebook = (function () {
     const fa = document.activeElement, fd = fa && fa.closest && fa.closest('.nb-spread .nb-fpi'), fk = fd && fa.tagName === 'TEXTAREA' ? { n: fd.dataset.n, ci: fd.dataset.ci, s: fa.selectionStart, e: fa.selectionEnd } : null;
     sp.querySelectorAll('.nb-page,.nb-leaf').forEach(p => p.remove()); pages = []; T0 = null;
     const tpl = document.createElement('template'), keepCi = H.ci || 0;
+    // the pages are filled SLACK px short of the paper's foot, so a book a little shorter later (the top bar on two rows, "Saving…" in
+    // it, the current tab taller) keeps the same pages instead of moving everything on (the watch below)
+    const slack = printing() ? 0 : SLACK; sp.style.setProperty('--nb-slack', slack + 'px'); sp.classList.add('nb-flowing');
     secs.forEach((s, si) => {
       use(s.ci || 0); const M = MK(), n0 = pages.length;
       tpl.innerHTML = s.head + s.blocks.map(b => `<div class="nb-blk${b.note || b.own ? ' nb-note' : ''}" data-b="${b.id}">${b.html}</div>`).join('') + (s.foot || '');
@@ -817,7 +822,7 @@ window.ELNotebook = (function () {
       flow(sp, tpl.content, si);
       for (let i = n0; i < pages.length; i++) pages[i].el.dataset.ci = s.ci || 0;
     });
-    use(keepCi);
+    use(keepCi); sp.classList.remove('nb-flowing');
     // empty pieces left behind when a part moved on to the next page
     sp.querySelectorAll('.nb-cont,.nb-blk,.nb-slip,.nb-game,ul,.nb-notes,.nb-mine').forEach(e => { if (!e.textContent.trim() && !e.querySelector('svg,table,img,input,button,.nb-edit') && !e.closest('.nb-edit')) e.remove(); });
     root.classList.toggle('nb-own', !!H.own);
@@ -839,7 +844,7 @@ window.ELNotebook = (function () {
     sp.querySelectorAll('.nb-page').forEach(p => { const i = +p.dataset.i; p.setAttribute('aria-label', t('Pàgina', 'Page') + ' ' + (i + 1)); });
     const pl = root.querySelector('.nb-plist'); if (pl) pl.innerHTML = pages.map((p, i) => `<label><input type="checkbox" value="${i}"> <b>${i + 1}</b> ${esc(pname(p))}</label>`).join('');
     const pa = root.querySelector('[data-nbpr="all"]'); if (pa) pa.textContent = t('Tota la llibreta', 'The whole notebook') + ` (${pages.length})`;
-    laid = W + 'x' + Hh + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
+    laid = W + 'x' + Hh + (document.documentElement.classList.contains(PLAIN) ? 'p' : ''); laidW = W; laidH = Hh;
     LOC = { secStart, blkPage, keepCi };
     // back to the same place
     if (typeof keep === 'number') pg = keep;
@@ -1069,24 +1074,40 @@ window.ELNotebook = (function () {
   });
   const printing = () => PRN || matchMedia('print').matches;
   // laid out again when the book's size changes (window, Chromebook rotated, fonts loaded), not while the student types in it
-  let RO = null;
+  // (Roger, 18 Nov 2026, iPad: "the index now is on another page … when I report this I see it well but when I go back to the notebook is
+  // wrong again", "I see a page distribution change when I zoom in and zoom out", and typing lagged in the ⚠️ window): every few pixels of
+  // height made all the pages again, so the same notebook came out on other pages. Now the pages stay as they are while the book is the
+  // same width and its height changes by little (up to SLACK shorter, up to GROW taller), and nothing is laid out again while the student
+  // types in a box or a window is open (the iPad keyboard shrinks the book): once it closes, the book is checked again.
+  // A real change of width (the browser's zoom, a rotated screen) still lays the pages out again: the lines are not the same any more.
+  let RO = null, laidW = 0, laidH = 0;
+  const SLACK = 34, GROW = 160;
+  const busy = () => { const a = document.activeElement;
+    return !!(a && a.closest && (a.closest('.nb-ed,.nb-ied,.nb-stitle,.nb-add') || (a !== document.body && a.matches('input:not([type=checkbox]):not([type=radio]):not([type=button]),textarea,select,[contenteditable]:not([contenteditable=false])'))))
+      || !!document.querySelector('dialog[open]'); };
+  function check() {
+    const sp = document.querySelector('.nb .nb-spread'); if (!sp || !RO) return;
+    const on = !!sp.getClientRects().length; document.documentElement.classList.toggle('el-nb-full', on);
+    if (printing()) return;
+    if (!on || !sp.clientWidth || !sp.clientHeight) return;
+    const W = sp.clientWidth, Hh = sp.clientHeight, p = document.documentElement.classList.contains(PLAIN) ? 'p' : '', k = W + 'x' + Hh + p;
+    if (k === laid) return;
+    if (laid && laid.endsWith('p') === !!p && Math.abs(W - laidW) <= 1 && Hh >= laidH - SLACK && Hh <= laidH + GROW) return;
+    if (busy()) return;
+    // nor while a note is open on the page (the pen still loading, not focused yet): the pages made again took it away and what the
+    // student typed went nowhere. Closing the note draws the pages again anyway.
+    if (ED && ED.inl) return;
+    clearTimeout(RO.t); RO.t = setTimeout(() => { if (!printing() && !(ED && ED.inl) && !busy()) layout(); }, laid ? 120 : 0);
+  }
   function watch(sp) {
     if (!window.ResizeObserver) return;
     if (RO) RO.disconnect();
-    RO = new ResizeObserver(() => {
-      const on = !!sp.getClientRects().length; document.documentElement.classList.toggle('el-nb-full', on);
-      if (printing()) return;
-      if (!on || !sp.clientWidth || !sp.clientHeight) return;
-      const k = sp.clientWidth + 'x' + sp.clientHeight + (document.documentElement.classList.contains(PLAIN) ? 'p' : '');
-      if (k === laid) return;
-      const a = document.activeElement; if (a && a.closest && a.closest('.nb-ed,.nb-ied,.nb-stitle,.nb-add')) return;
-      // nor while a note is open on the page (the pen still loading, not focused yet): the pages made again took it away and what the
-      // student typed went nowhere. Closing the note draws the pages again anyway.
-      if (ED && ED.inl) return;
-      clearTimeout(RO.t); RO.t = setTimeout(() => { if (!printing() && !(ED && ED.inl)) layout(); }, laid ? 120 : 0);
-    });
+    RO = new ResizeObserver(check);
     RO.observe(sp);
   }
+  // the box or the window closed (the keyboard goes away with it): the size the book has now
+  const recheck = () => { clearTimeout(recheck.t); recheck.t = setTimeout(check, 400); };
+  document.addEventListener('focusout', recheck); document.addEventListener('close', recheck, true);
   if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => { if (laid && !printing() && !ED && !drag && !T0) relayout(); });
 
 
