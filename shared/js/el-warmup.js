@@ -22,8 +22,11 @@ const GAMES=[
   {id:"vow",name:"No vowels",em:"🅰",how:"The vowels are gone. What's the word?"}];
 const ROUNDS=3,LIVES=8,K="el_wu";
 // 💬 Saying of the day (Roger, 13 Nov 2026: "can you add a proverb or saying like Deeds are your monuments"): one English saying at the
-// top of the warm-up, the same all day for the group (a hash of the day and the group), from the LS's topic first, else the general list;
+// top of the warm-up, the same all day for the group, from the LS's topic first, else the general list;
 // 💡 What does it mean? shows a simple meaning and the Catalan saying when there is one. Proverbs only (no quotes put in anyone's mouth).
+// Never the same as the group's last classes (Roger, 18 Nov 2026, 4 ESO B: "the saying was the same as yesterday": a hash of the day could
+// pick the same one two classes in a row): the sayings go round in a fixed order, one step per calendar day (two days one of the LS's topic,
+// then a general one), each group starting at its own place: the same saying comes back after 9 days at the soonest.
 const SAY_GEN=[
   ["Deeds are your monuments.","What you do is what people remember, not what you say.",""],
   ["Practice makes perfect.","The more you practise, the better you get.","La pràctica fa el mestre."],
@@ -55,9 +58,10 @@ const SAY_TOPIC={
     ["Variety is the spice of life.","Doing different things makes life fun.",""]]};
 const hash=t=>{let h=2166136261;for(const c of String(t)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
 // sayFor(group, class game ids, "YYYY-MM-DD"): the saying of that day; the teacher's 📅 Time plan shows it on each class day (teacher.html wuRow)
-export function sayFor(g,decks,day){const pre=String((decks||[])[0]||"").split("-").slice(0,2).join("-"),top=SAY_TOPIC[pre]||[],all=top.concat(SAY_GEN);
-  const d=day||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"}),h=hash(d+"|"+g);
-  return top.length&&h%3!==0?top[h%top.length]:all[h%all.length]}
+export function sayFor(g,decks,day){const pre=String((decks||[])[0]||"").split("-").slice(0,2).join("-"),top=SAY_TOPIC[pre]||[],gen=SAY_GEN;
+  const d=day||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"}),n=Math.round(Date.parse(d+"T12:00:00Z")/864e5)+hash(g)%997,at=(l,k)=>l[k%l.length];
+  if(!top.length)return at(gen,n);
+  return n%3?at(top,n-Math.floor(n/3)):at(gen,Math.floor(n/3))}   // two days of the topic's, then a general one
 const sayOfDay=o=>sayFor(o.g,o.decks);
 
 let root=null,box=null,S=null,keyH=null;

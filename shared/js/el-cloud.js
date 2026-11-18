@@ -1659,8 +1659,10 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
 const CM_K="el_cm";
 function cmRead(){try{const o=JSON.parse(sessionStorage.getItem(CM_K)||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}}
 const cmEnd=()=>{try{sessionStorage.removeItem(CM_K)}catch(e){}};
-(()=>{const sp=new URLSearchParams(location.search),v=sp.get("elcm");if(!v)return;const [g,u]=v.split(".");
-  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1");sessionStorage.setItem("el_cm_wu","1");sessionStorage.setItem("el_cm_mic","1");sessionStorage.removeItem("el_cm_mic_n")}catch(e){}   // 📋 today's agenda (and 🎙️ who can't record) shows when class mode starts
+// ?elcm=<group>.<until>.g = class mode started again after a class game (lab/game/cm-after.js): the warm-up and 🎙️ card were already shown
+// this class, so they do not open again (Roger, 18 Nov 2026, 4 ESO B, after a game: "the saying was the same")
+(()=>{const sp=new URLSearchParams(location.search),v=sp.get("elcm");if(!v)return;const [g,u,from]=v.split("."),again=from==="g";
+  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1");if(!again){sessionStorage.setItem("el_cm_wu","1");sessionStorage.setItem("el_cm_mic","1");sessionStorage.removeItem("el_cm_mic_n")}}catch(e){}   // 📋 today's agenda (and 🎙️ who can't record) shows when class mode starts
   sp.delete("elcm");history.replaceState(null,"",location.pathname+(sp.toString()?"?"+sp:"")+location.hash)})();
 let cmOn=false;
 function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=true;
