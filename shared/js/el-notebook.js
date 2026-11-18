@@ -122,7 +122,7 @@ window.ELNotebook = (function () {
     return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : xp ? '💬' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : xp ? t('Expressions junts', 'Expressions together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
-  const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬' };
+  const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬', fb: '💬' };
   // ✏️ the student's answers to an activity, their first try, corrected as a teacher would on paper (Roger, 13 Nov 2026: "with the
   // corrections made as if a corrector had marked them on top, only the first attempt"): their answer in blue pen in the sentence, a red
   // ✓ when it is right; when it is not, their answer crossed out in red with the right one written above it
@@ -141,6 +141,20 @@ window.ELNotebook = (function () {
     };
     const pc = w.of ? w.right / w.of : 1;
     return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
+  }
+  // 💬 the teacher's feedback on a step (el-exam.js fb: {text, corr, orig} or {many: […]}), in the notebook's hand (Roger, 18 Nov 2026):
+  // a writing correction (el-marking.js fbText: the comment, "✗ their words → right — why" lines, "✅ " + the corrected text with the
+  // changes in *…*) as the student's text with the changes marked, the mistakes with why, and the corrected text; any other answer as it is
+  function feedback(f) {
+    if (f.many) return f.many.map(feedback).join('');
+    const ls = String(f.text || '').split('\n'), rows = ls.filter(l => l.startsWith('✗ ')), fixed = (ls.find(l => l.startsWith('✅ ')) || '').slice(2).trim();
+    const note = ls.filter(l => !l.startsWith('✗ ') && !l.startsWith('✅ ')).join('\n').trim(), orig = String(f.orig || '').trim();
+    let h = `<div class="nb-slip nb-tfb"><h4>${f.corr ? '✏️ ' + t('La correcció del professor', 'Your teacher\'s correction') : '💬 ' + t('La resposta del professor', 'Your teacher\'s answer')}</h4>${note ? `<div class="ex-rule">${lines(note)}</div>` : ''}</div>`;
+    if (orig && fixed) h += `<div class="nb-work nb-wtext"><div class="nb-wh">📝 ${t('El meu text, corregit', 'My text, corrected')}</div>${wdiff(orig, fixed.replace(/\*/g, ''))}</div>`;
+    if (rows.length) h += `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves errades, corregides', 'My mistakes, corrected')}</div><ol class="nb-ans">${rows.map(l => { const m = /^✗ ([\s\S]+?) → ([\s\S]+?)(?: — ([\s\S]*))?$/.exec(l) || [null, l.slice(2), '', ''];
+      return `<li>${fix(m[1], m[2])}${m[3] ? `<small class="nb-why">${esc(m[3])}</small>` : ''}</li>`; }).join('')}</ol></div>`;
+    if (fixed) h += `<div class="nb-slip nb-wfix"><h4>✅ ${t('El text corregit', 'The corrected text')}</h4>${paras(esc(fixed).replace(/\*([^*\n]+)\*/g, '<b>$1</b>'))}</div>`;
+    return h;
   }
   // ⬜ an activity of a tab done in class that the student hasn't done yet: a "To do" note (Catalan for Starter/Base, as the rest of the
   // notebook) and its questions with a line to answer them, the options of a choice question in a fixed order (Roger, 13 Nov 2026)
@@ -215,28 +229,28 @@ window.ELNotebook = (function () {
         return row(r.name, /^\d/.test(r.c) ? r.c : '', r.w, cells, d ? ['AE', 'AN', 'AS', 'NA'].indexOf(d) : null, mark, p);
       }).join('');
   }
+  const paras = html => html.split(/\n\s*\n|\n/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
+  // a word-by-word diff of the student's text and the corrected one: kept words in pen, removed ones crossed out, new ones in green
+  const wdiff = (a, b) => {
+    const tok = x => x.replace(/\r/g, '').replace(/\n+/g, ' \u00b6 ').split(/[ \t]+/).filter(Boolean), A = tok(a), B = tok(b), n = A.length, m = B.length;
+    if (n * m > 400000) return paras(esc(a));
+    const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    const out = []; let i = 0, j = 0, del = [], ins = [];
+    const flush = () => { const d = del.filter(x => x !== '\u00b6'), s = ins.filter(x => x !== '\u00b6');
+      if (d.length) out.push(`<s class="nb-giv nb-x">${esc(d.join(' '))}</s>`); if (s.length) out.push(`<span class="nb-fix in">${esc(s.join(' '))}</span>`);
+      if (ins.includes('\u00b6')) out.push('\n'); del = []; ins = []; };
+    while (i < n || j < m) {
+      if (i < n && j < m && A[i] === B[j]) { flush(); out.push(A[i] === '\u00b6' ? '\n' : `<span class="nb-giv">${esc(A[i])}</span>`); i++; j++; }
+      else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) ins.push(B[j++]); else del.push(A[i++]);
+    }
+    flush();
+    return out.join(' ').split(/ ?\n ?/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
+  };
+  const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
   function examBlocks(ex) {
     const G = (window.EL_GRADING || {})[H.LS] || {}, rs = H.rs || {}, out = [];
     const stamp = v => v == null ? '' : `<span class="nb-stamp${v >= 8 ? ' ok' : ''}">${String(Math.round(v * 10) / 10).replace('.', ',')} / 10</span>`;
-    const paras = html => html.split(/\n\s*\n|\n/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
-    // a word-by-word diff of the student's text and the corrected one: kept words in pen, removed ones crossed out, new ones in green
-    const wdiff = (a, b) => {
-      const tok = x => x.replace(/\r/g, '').replace(/\n+/g, ' \u00b6 ').split(/[ \t]+/).filter(Boolean), A = tok(a), B = tok(b), n = A.length, m = B.length;
-      if (n * m > 400000) return paras(esc(a));
-      const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
-      for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
-      const out = []; let i = 0, j = 0, del = [], ins = [];
-      const flush = () => { const d = del.filter(x => x !== '\u00b6'), s = ins.filter(x => x !== '\u00b6');
-        if (d.length) out.push(`<s class="nb-giv nb-x">${esc(d.join(' '))}</s>`); if (s.length) out.push(`<span class="nb-fix in">${esc(s.join(' '))}</span>`);
-        if (ins.includes('\u00b6')) out.push('\n'); del = []; ins = []; };
-      while (i < n || j < m) {
-        if (i < n && j < m && A[i] === B[j]) { flush(); out.push(A[i] === '\u00b6' ? '\n' : `<span class="nb-giv">${esc(A[i])}</span>`); i++; j++; }
-        else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) ins.push(B[j++]); else del.push(A[i++]);
-      }
-      flush();
-      return out.join(' ').split(/ ?\n ?/).filter(x => x.trim()).map(x => `<p class="nb-wp">${x}</p>`).join('');
-    };
-    const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
     // 🎯 the recall checkpoints (Roger, 14 Nov 2026: "checkpoints should also appear in their notebook in a section like exams and final
     // product"): the same as 🎯 My checkpoints on My marks (today.html cpView). The score first; the questions, the student's answers and the
     // corrections once the teacher shows them or the whole class has done it (fb). Only the ones the student has done, in order. H.cp:
@@ -544,7 +558,8 @@ window.ELNotebook = (function () {
         pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.ex && !/^Expressions\b/.test(g.title) ? '💬 Expressions · ' : ''}${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
         else if (pt.todo) h += todo(pt.todo, lp.href ? lp.href.split('#')[0] + '#' + encodeURIComponent(pt.id) : '', pt.opt);
-        else if (!pt.terms.length && !pt.grammar.length) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
+        else if (!pt.terms.length && !pt.grammar.length && !pt.fb) h += `<p class="nb-pencil">✓ ${t('Fet a classe', 'Done in class')}</p>`;
+        if (pt.fb) h += feedback(pt.fb);
         blocks.push({ id: key + '-p-' + fk(pt.id), lock: !!pt.todo, l: ic + ' ' + nm + (pt.todo ? ` <span class="nb-tdo sm${pt.opt ? ' nb-opt' : ''}">${pt.opt ? t('Opcional', 'Optional') : t('Per fer', 'To do')}</span>` : ''), side: pt.name, kind: pt.kind, html: h });
       });
       // the class games and the whiteboard notes go after the part they belong to (vocabulary / grammar / reading), else at the end
