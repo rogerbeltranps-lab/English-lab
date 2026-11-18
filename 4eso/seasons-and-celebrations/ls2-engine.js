@@ -450,7 +450,7 @@ var LS2 = (function () {
     if (state.typing) delete state.typing[id + '_' + level];
     state.nb = state.nb || {}; const nb = state.nb[id];
     const F = C.filter(i => filledV(v[i]));   // the notebook keeps answers only (an empty question checked with "Check all" is not in it)
-    if (!nb) state.nb[id] = one ? { v: v.map((x, i) => F.includes(i) ? x : null), tries: tr, l: level, q: state.ans[id].q, c: F } : state.ans[id];
+    if (!nb || nbOff(id)) state.nb[id] = one ? { v: v.map((x, i) => F.includes(i) ? x : null), tries: tr, l: level, q: state.ans[id].q, c: F } : state.ans[id];
     else if (one && Array.isArray(nb.c) && nb.l === level && Array.isArray(nb.v)) F.forEach(i => { if (nb.c.includes(i)) return; nb.v[i] = v[i]; nb.c.push(i); Object.keys(tr).forEach(k => { if (new RegExp('^' + prefix + i + '(\\D|$)').test(k)) nb.tries[k] = tr[k]; }); });
     save();
   }
@@ -554,8 +554,13 @@ var LS2 = (function () {
      answers and results show only in the laptop look. el-app.js calls window.elNbRefresh() when the look changes. Marks never change. */
   const NBS = {};
   // a notebook filled question by question (nb.c) is frozen only once every counted question is in it; until then the activity stays open
+  /* a notebook record that holds none of this step's questions is not this step's first try (problem report, 4ESOA, 18 Nov 2026: "no em
+     deixa donar-li a Comprova"): the one-step Grammar kept before the split (LP.split) froze the new Past Simple / used to step, so
+     ✓ Check did nothing and nothing showed. Such a record never freezes the step, and the step's first real check replaces it. */
+  const nbOff = id => { const nb = state.nb && state.nb[id], S = NBS[id];
+    return !!(nb && Array.isArray(nb.q) && nb.q.length && S && Array.isArray(S.items) && !S.items.some(it => nb.q.includes(qid(it)))); };
   const nbFrozen = id => { const nb = state.nb && state.nb[id], S = NBS[id];
-    return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(nb && Array.isArray(nb.v)) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
+    return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(nb && Array.isArray(nb.v)) && !nbOff(id) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
   /* ➕ Extra practice stays open (problem report, 4ESOB, 17 Nov 2026: "no puc fer les opcionals"): a frozen notebook freezes only the
      counted questions, so the optional extras below them can still be typed and checked one by one. Marks never change (firsts: need only). */
   function nbLock(id, listId, on) {
