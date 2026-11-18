@@ -63,6 +63,22 @@
       +`<path d="M11.8 34 q-5.4 .4 -7 4.4 q4.8 -.2 7 -3z" fill="#a16207"/><path d="M12.4 30.6 q4.6 .4 5.8 4.8 q-4.4 -1.2 -5.8 -3.4z" fill="#b45309"/>`
       +`<path d="M15.6 25.6 Q18.6 23.4 21.4 25.8 Q20.6 30.6 18.6 31.2 Q16.4 30.6 15.6 25.6Z" fill="${k==="vocab"?"#d6d3d1":c}" opacity=".7" stroke="#78350f" stroke-width=".5"/>`
       +`<g class="gd-drop"><circle cx="7.4" cy="8" r="7" fill="#fff" stroke="#0284c7" stroke-width="1"/><path d="M7.4 2.6C7.4 2.6 4.2 7 4.2 9a3.2 3.2 0 0 0 6.4 0C10.6 7 7.4 2.6 7.4 2.6Z" fill="#0ea5e9"/><ellipse cx="6.2" cy="8.8" rx=".8" ry="1.3" fill="#e0f2fe"/></g>`};
+  // 🪰 a rotten garden (Roger, 18 Nov 2026: "if there's nothing done, I want that everything is like rotted and full of flies and a help
+  // sign"): nothing done yet (no flower, no bud) while some activities are already due (thirsty). The due plants rot, flies buzz, a HELP!
+  // sign that opens the first activity to do, a grey cloud instead of the sun; no butterflies or birds. One finished activity ends it.
+  const ROTTEN=()=>`<ellipse cx="13" cy="38.6" rx="9" ry="2.2" fill="#3f2a14" opacity=".65"/><path d="M11.5 38.5 Q10.4 31 14.6 29.6 Q19.6 28.4 20.4 34.4" stroke="#4a3a1a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`
+    +`<path d="M11.4 36.6 q-5.6 -.2 -7.6 2.2 q5 .6 7.6 -1z" fill="#57452a"/><ellipse cx="19.6" cy="35.6" rx="3.2" ry="2.4" fill="#4b2e14"/><circle cx="18.6" cy="35" r=".7" fill="#84a83c"/><circle cx="20.6" cy="36.2" r=".6" fill="#9cb04a"/><circle cx="20" cy="34.4" r=".45" fill="#84a83c"/>`
+    +`<g class="gd-stink"><path d="M7 27 q2 -2 0 -4 q-2 -2 0 -4 q2 -2 0 -4" stroke="#7c8a4e" stroke-width="1" fill="none" opacity=".75" stroke-linecap="round"/><path d="M15 23 q1.6 -1.6 0 -3.2 q-1.6 -1.6 0 -3.2" stroke="#7c8a4e" stroke-width=".9" fill="none" opacity=".6" stroke-linecap="round"/></g>`;
+  const DEADTREE=`<ellipse cx="20" cy="54.6" rx="10" ry="2" fill="#3f2a14" opacity=".6"/><path d="M18.4 54.6 L19.2 32 L20.8 32 L21.6 54.6Z" fill="#57452a"/><path d="M19.6 40 L13 31 L10 32 M20.2 36 L27 28 L30 29.6 M20 33 L17 24 M20.4 32 L23 23" stroke="#57452a" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M11 32.4 q-1 3 1 4" stroke="#4b2e14" stroke-width="1" fill="none"/>`;
+  const FLY=(i,x,y)=>`<span class="gd-fly" style="left:${x};top:${y}px;animation-delay:-${(i*.73).toFixed(2)}s;animation-duration:${(2.2+(i%4)*.45).toFixed(2)}s" aria-hidden="true">${svg(16,12,`<g class="gd-fw"><ellipse cx="6" cy="3.6" rx="3.4" ry="2.2" fill="#e0f2fe" opacity=".85" stroke="#94a3b8" stroke-width=".4" transform="rotate(-20 6 3.6)"/><ellipse cx="10" cy="3.6" rx="3.4" ry="2.2" fill="#e0f2fe" opacity=".85" stroke="#94a3b8" stroke-width=".4" transform="rotate(20 10 3.6)"/></g>`
+    +`<ellipse cx="8" cy="7.4" rx="3.4" ry="2.6" fill="#1f2937"/><circle cx="11.4" cy="6.6" r="1.9" fill="#111827"/><circle cx="12.2" cy="6" r=".8" fill="#b91c1c"/><path d="M6 9.6 l-1 2 M8 10 l0 2 M10 9.6 l1 2" stroke="#111827" stroke-width=".5"/>`)}</span>`;
+  // 🪱 worms crawl in the rotten garden (Roger, 18 Nov 2026: "I want everything to look rotten even worms")
+  const WORM=(i,x,b)=>`<span class="gd-worm" style="left:${x};bottom:${b}px;animation-delay:-${(i*1.3).toFixed(1)}s" aria-hidden="true"><span class="gd-wig">${svg(30,12,`<path d="M3 8 Q7 3 11 8 T19 8 T27 7" stroke="#c97b84" stroke-width="4.2" fill="none" stroke-linecap="round"/>`
+    +`<path d="M3 8 Q7 3 11 8 T19 8 T27 7" stroke="#e8a1a8" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".7" stroke-dasharray="1.2 2.4"/><circle cx="26.6" cy="6.4" r=".7" fill="#3f2a14"/>`)}</span></span>`;
+  const HELPSIGN=(en,href)=>`<a class="gd-help" href="${href}" title="${en?"Help your garden: do this activity first":"Ajuda el teu jardí: fes primer aquesta activitat"}">${svg(96,84,`<path d="M44 40 L44 84 L52 84 L52 40Z" fill="#6b4423"/><path d="M45.5 46 v34" stroke="#4a2f17" stroke-width="1"/>`
+    +`<g transform="rotate(-6 48 26)"><rect x="4" y="6" width="88" height="40" rx="5" fill="#a16207" stroke="#5b3a1a" stroke-width="2.5"/><path d="M8 18 H88 M8 32 H88" stroke="#854d0e" stroke-width="1" opacity=".6"/>`
+    +`<circle cx="11" cy="12" r="1.6" fill="#3f2a14"/><circle cx="85" cy="12" r="1.6" fill="#3f2a14"/><text x="48" y="36" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="25" fill="#fef3c7" stroke="#7f1d1d" stroke-width="1.2" letter-spacing="1">HELP!</text></g>`)}</a>`;
+  const CLOUD=svg(46,40,`<g class="gd-cloud"><circle cx="15" cy="22" r="9" fill="#94a3b8"/><circle cx="26" cy="17" r="11" fill="#a3aebf"/><circle cx="35" cy="24" r="8" fill="#94a3b8"/><rect x="8" y="22" width="32" height="9" rx="4.5" fill="#94a3b8"/></g><path d="M16 34 l-2 4 M24 34 l-2 4 M32 34 l-2 4" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"/>`,"gd-sun");
   const plantSvg=(k,st)=>svg(24,40,st==="bloom"?(BLOOM[k]||BLOOM.other)():st==="bud"?BUD(k):st==="thirsty"?THIRSTY(k):SPROUT(),"gd-svg");
   // a recall checkpoint is a tree (viewBox 0 0 40 56, the ground at y 54)
   const treeSvg=st=>svg(40,56,st==="bloom"
@@ -117,6 +133,20 @@
 .gd-bird:nth-of-type(1){top:58px}.gd-bird:nth-of-type(2){top:96px;animation-duration:17s;animation-delay:-6s}.gd-bird:nth-of-type(3){top:40px;animation-duration:21s;animation-delay:-13s}
 .gd-bbob{display:block;animation:gdbbob 1.6s ease-in-out infinite alternate}.gd-bw{transform-origin:13px 10px;animation:gdbw .28s ease-in-out infinite alternate}
 @keyframes gdbird{to{left:calc(100% + 40px)}}@keyframes gdbbob{to{transform:translateY(-8px) rotate(-4deg)}}@keyframes gdbw{to{transform:scaleY(-.7)}}
+.gdn.rot{border-color:#a8a29e;background:linear-gradient(180deg,#d6cfa8,#b9a878)}.gdn.rot .gdn-h{background:linear-gradient(180deg,#cbd5e1,#e2e8f0)}.gdn.rot .gdn-t b{color:#7f1d1d}.gdn.rot .gdn-k{color:#57452a}
+.gdn.rot .gdn-lawn{background:radial-gradient(circle at 20% 40%,#78716c33 0 2px,transparent 3px) 0 0/24px 20px,radial-gradient(circle at 70% 60%,#57452a22 0 1.5px,transparent 2.5px) 0 0/30px 24px}
+.gdn.rot .gdb a:not(.gd-rot) .gd-svg,.gdn.rot .gdt a .gd-tree{filter:saturate(.25) sepia(.45) brightness(.92)}.gdn.rot .gdn-key{background:#f5f0e1cc;border-top-color:#d6cfa8;color:#57452a}.gdn.rot .gdn-st span{border-color:#d6cfa8;color:#57452a}
+.gd-stink{animation:gdstink 2.4s ease-in-out infinite}@keyframes gdstink{0%{transform:translateY(2px);opacity:.2}50%{opacity:1}100%{transform:translateY(-4px);opacity:0}}
+.gd-fly{position:absolute;width:21px;height:16px;z-index:4;pointer-events:none;animation:gdbuzz 2.6s linear infinite}.gd-fly svg{width:21px;height:16px;display:block}
+.gd-fw{transform-origin:8px 5px;animation:gdfw .06s linear infinite alternate}@keyframes gdfw{to{transform:scaleY(.4)}}
+@keyframes gdbuzz{0%,100%{transform:translate(0,0)}12%{transform:translate(14px,-8px) rotate(20deg)}25%{transform:translate(4px,-16px) rotate(-30deg)}37%{transform:translate(-12px,-6px) rotate(10deg)}50%{transform:translate(-4px,6px) rotate(-15deg)}62%{transform:translate(12px,4px) rotate(25deg)}75%{transform:translate(-8px,-12px) rotate(-20deg)}87%{transform:translate(-14px,2px) rotate(15deg)}}
+a.gd-help{position:absolute;right:18px;bottom:2px;width:96px;height:84px;z-index:5;transform-origin:50% 100%;animation:gdhelp 2.8s ease-in-out infinite}a.gd-help svg{width:96px;height:84px;display:block}a.gd-help:hover{animation-play-state:paused;filter:drop-shadow(0 0 6px #fde047)}
+@keyframes gdhelp{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}.gd-cloud{animation:gdcloud 6s ease-in-out infinite alternate}@keyframes gdcloud{to{transform:translateX(3px)}}
+.gdn.rot .gdn-lawn{padding-right:124px}
+@media (max-width:600px){a.gd-help{width:72px;height:63px;right:6px}a.gd-help svg{width:72px;height:63px}.gdn.rot .gdn-lawn{padding-right:84px}}
+.gd-worm{position:absolute;width:30px;height:12px;z-index:3;pointer-events:none;animation:gdcrawl 9s ease-in-out infinite alternate}.gd-worm svg{width:30px;height:12px;display:block}
+.gd-wig{display:block;transform-origin:50% 70%;animation:gdwig .5s ease-in-out infinite alternate}@keyframes gdwig{to{transform:scaleX(.82) skewX(-8deg)}}@keyframes gdcrawl{to{transform:translateX(46px)}}
+.gdn.rot .gdb::after{background:radial-gradient(circle,#00000033 0 1px,transparent 1.6px) 0 0/7px 5px,linear-gradient(#4a3a26,#33261a)}.gdn.rot .gds{background:linear-gradient(#78716c,#57534e);box-shadow:0 1px 0 #44403c}
 .gd-w{transform-origin:10px 8px;animation:gdflap .22s ease-in-out infinite alternate}.gd-spark{transform-origin:20.4px 4.3px;animation:gdtw 1.6s ease-in-out infinite}
 .gdn-key{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;padding:6px 16px 9px;font-size:12.5px;color:#365314;background:#f7fee7cc;border-top:1px solid #d9f99d}
 .gdn-key span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}.gdn-key svg{width:13px;height:22px}.gdn-key .gd-tree{width:16px;height:22px}.gdn-key b{font-weight:800;margin-right:2px}
@@ -149,6 +179,7 @@
       if(G.save!==false)try{localStorage.setItem(G.store,JSON.stringify(now))}catch(e){}
       setTimeout(()=>{FRESH[G.store].clear()},6000)}
     const fresh=FRESH[G.store]||new Set();
+    const rot=n.bloom===0&&n.bud===0&&n.thirsty>0,firstTh=all.find(p=>p.st==="thirsty");
     if(G.beds.some(b=>b.kind!=="bonus")&&G.beds.filter(b=>b.kind!=="bonus").every(b=>b.plants.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty")))sing();
     const ST={bloom:t("fet ✓","done ✓"),bud:t("començat: acaba'l perquè floreixi","started: finish it to make it bloom"),sprout:t("encara per fer","not done yet"),
       thirsty:t("💧 té set: ja ho vam fer a classe, acaba-ho per regar-la","💧 thirsty: we did it in class, finish it to water it")};
@@ -160,24 +191,24 @@
     let bi=0;const nBf=(b,done)=>{const f=b.plants.filter(p=>p.st==="bloom").length;return Math.min(2,Math.max(done&&b.plants.length>1?1:0,Math.floor(f/5)))};
     const beds=G.beds.map(b=>{const done=b.plants.every(p=>p.st==="bloom"),head=`${b.label?b.label+" · ":""}${b.title}`;
       if(b.kind==="cp"){const p=b.plants[0],st=b.plants.every(x=>x.st==="bloom")?"bloom":b.plants.some(x=>x.st==="thirsty")?"thirsty":b.plants.some(x=>x.st!=="sprout")?"bud":"sprout";
-        return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
+        return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${rot&&st!=="bloom"?svg(40,56,DEADTREE,"gd-tree"):treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
-        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${plantSvg(k,p.st)}</a>`}).join("");
-      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
+        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${rot&&p.st!=="bloom"?" gd-rot":p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${rot&&p.st!=="bloom"?svg(24,40,ROTTEN(),"gd-svg"):plantSvg(k,p.st)}</a>`}).join("");
+      return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${rot?[FLY(bi++,"30%",-12),FLY(bi++,"68%",-6),b.plants.length>3?WORM(bi++,"12%",-3):"",b.plants.length>7?WORM(bi++,"55%",-4):""].join(""):Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
     // 🐦 everything done = every activity the student can do now is done (Roger, 17 Nov 2026: "make sure birds show up when everything is
     // done"): the optional sample exam and tabs kept for a later class (🏫 read-only, p.later) never hold the birds back
     const must=all.filter(p=>p.bed.kind!=="bonus"),full=must.length>0&&must.every(p=>p.st==="bloom"),allDone=must.length>0&&must.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty"),nf=fresh.size;
-    const head=full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
+    const head=rot?t("El teu jardí s'està podrint! 🪰 Fes les activitats que vam fer a classe per salvar-lo","Your garden is rotting! 🪰 Do the activities we did in class to save it"):full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
       :allDone?t("Ho has fet tot, de moment! 🐦 La resta creixerà quan ho fem a classe","You've done everything for now! 🐦 The rest will grow when we do it in class")
       :n.thirsty?(n.thirsty===1?t("1 planta té set: acaba l'activitat per regar-la","1 plant is thirsty: finish it to water it"):t(`${n.thirsty} plantes tenen set: acaba-les per regar-les`,`${n.thirsty} plants are thirsty: finish them to water them`))
       :n.bloom?t("El teu jardí creix: cada activitat que acabes fa néixer una flor","Your garden is growing: every activity you finish makes a flower bloom")
       :t("Acaba la teva primera activitat i hi sortirà la primera flor","Finish your first activity and your first flower will bloom");
     const key=[["vocab",t("Vocabulari","Vocabulary")],["grammar",t("Gramàtica","Grammar")],["read","Reading"],["listen","Listening"],["speak","Speaking"],["write","Writing"],["recall","Recall"]]
       .map(([k,l])=>`<span>${plantSvg(k,"bloom")}${l}</span>`).join("")
-      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${plantSvg("read","thirsty")}${t("té set","thirsty")}</span><span>🐦 ${t("ho has fet tot","everything done")}</span>`;
-    return `<section class="gdn" id="garden" aria-label="${t("El meu jardí","My garden")}"><div class="gdn-h">${SUN}<div class="gdn-t"><span class="gdn-k">🌱 ${t("El meu jardí","My garden")}${G.ls?" · "+esc(G.ls):""}</span><b class="${n.thirsty&&!full?"thirst":""}">${head}</b></div>`
+      +`<span>${treeSvg("bloom")}Checkpoint</span><span>${plantSvg("fp","bloom")}${t("Producte final","Final product")}</span><span>${plantSvg("vocab","sprout")}${t("per fer","to do")}</span><span>${rot?svg(24,40,ROTTEN(),"gd-svg")+t("es podreix","rotting"):plantSvg("read","thirsty")+t("té set","thirsty")}</span><span>🐦 ${t("ho has fet tot","everything done")}</span>`;
+    return `<section class="gdn${rot?" rot":""}" id="garden" aria-label="${t("El meu jardí","My garden")}"><div class="gdn-h">${rot?CLOUD:SUN}<div class="gdn-t"><span class="gdn-k">🌱 ${t("El meu jardí","My garden")}${G.ls?" · "+esc(G.ls):""}</span><b class="${n.thirsty&&!full?"thirst":""}">${head}</b></div>`
       +`<div class="gdn-st">${nf?`<span class="new">🎉 +${nf} ${nf===1?t("flor nova","new flower"):t("flors noves","new flowers")}</span>`:""}<span title="${t("Activitats fetes","Activities done")}">🌼 ${n.bloom} ${n.bloom===1?t("flor","flower"):t("flors","flowers")}</span>`
-      +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">💧 ${n.thirsty} ${t("amb set","thirsty")}</span>`:"")
-      +(n.bud+n.sprout?`<span title="${t("Activitats obertes per fer o començades","Open activities not finished yet")}">🌱 ${n.bud+n.sprout} ${t("creixent","growing")}</span>`:"")+`</div></div>`
-      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div>${FREE.map(([x,y],i)=>`<span class="gd-free" style="left:${x}%;top:${y}px">${BFLY(BCOL[(i+2)%BCOL.length],bi++)}</span>`).join("")}</div>${allDone?BIRDS:""}<div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
+      +(n.thirsty?`<span class="w" title="${t("Ja ho vam fer a classe i encara no ho has acabat","We did it in class and you haven't finished it yet")}">${rot?"🪰":"💧"} ${n.thirsty} ${rot?t("podrint-se","rotting"):t("amb set","thirsty")}</span>`:"")
+      +(!rot&&n.bud+n.sprout?`<span title="${t("Activitats obertes per fer o començades","Open activities not finished yet")}">🌱 ${n.bud+n.sprout} ${t("creixent","growing")}</span>`:"")+`</div></div>`
+      +`<div class="gdn-lawn">${full?RAINBOW:""}<div class="gdn-beds">${beds}</div>${rot?[[10,20],[28,60],[44,14],[60,52],[76,24]].map(([x,y])=>FLY(bi++,x+"%",y)).join("")+[["34%",8],["62%",14],["6%",4]].map(([x,b])=>WORM(bi++,x,b)).join("")+HELPSIGN(en,esc(firstTh.href)):FREE.map(([x,y],i)=>`<span class="gd-free" style="left:${x}%;top:${y}px">${BFLY(BCOL[(i+2)%BCOL.length],bi++)}</span>`).join("")}</div>${allDone?BIRDS:""}<div class="gdn-key"><b>${t("Què hi creix?","What grows here?")}</b>${key}</div></section>`};
 })();
