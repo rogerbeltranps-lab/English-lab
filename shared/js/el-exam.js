@@ -63,7 +63,8 @@ window.ELExam = (function () {
       if (pl.dropped.includes(a.id)) { dropped.push(a); continue; }
       const secs = (window.EL_SECTIONS || {})[a.id] || [], tabs = secs.filter(([id]) => done && done[a.id + '#' + id]).map(([id, name]) => ({ id, name, day: done[a.id + '#' + id] }));
       const st = mine0(a.id), tried = st && st.items && Object.keys(st.items).length;
-      if (!tabs.length && !(played && played[a.n]) && !tried) continue;
+      const fbAny = Object.values(Object.assign({}, (RS[a.id] || {}).replies, (RS[a.id] || {}).answers)).some(x => x && String(typeof x === 'object' ? x.t || '' : x).trim());
+      if (!tabs.length && !(played && played[a.n]) && !tried && !fbAny) continue;
       const LP = await lpData(a0.href, level === 'native', base);
       const panels = ((LP && LP.panels) || []).map(p => level === 'native' && LP.native && LP.native[p.id] ? Object.assign({ id: p.id }, LP.native[p.id]) : p);
       const on = new Set(tabs.map(x => x.id)), mine = panels.filter(p => on.has(p.id));
@@ -77,18 +78,28 @@ window.ELExam = (function () {
       mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
       // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
       // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
+      // 💬 the teacher's feedback on each step (Roger, 18 Nov 2026: "apart from the corrections, students should see their feedback"):
+      // results/{activity}.replies[step] (the writing, speaking and talk corrections, the answers to a hand-in) and answers[step].t (the
+      // answer to the student's comment), as el-corrections.js shows them at the top of the step's tab; levels never. A writing comes
+      // with the text the student handed in (state.steps[step].f[0].v). Steps with feedback but no panel go in one 💬 Feedback part.
+      const R = RS[a.id] || {}, fbOf = id => { const text = [((R.answers || {})[id] || {}).t, (R.replies || {})[id]].filter(x => x && String(x).trim()).join('\n\n');
+        if (!text) return null; const h = ((st && st.steps) || {})[id], pn = panels.find(x => x.id === id);
+        return { text, corr: !!((R.levels || {})[id] && Object.keys(R.levels[id]).length) || (!!(R.fbSig || {})[id] && id !== 'reflect'),
+          orig: pn && pn.type === 'writing' && h && h.f && h.f[0] ? String(h.f[0].v || '') : '' }; };
       panels.forEach(p => {
-        const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx);
-        if (!tab && !work) return;
+        const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx), fb = fbOf(p.id);
+        if (!tab && !work && !fb) return;
         // (Roger, 13 Nov 2026: "even if the students don't do the activities, they must appear in the notebook, not done, with a note
         // (to do / per fer, depending on the level), and the theory of the SLPs too"): a tab done in class that the student hasn't done
         // shows its questions, unanswered, under a "To do" note; its theory shows anyway
         const sd = (st && st.done) || {}, did = p.type === 'vocab' ? !!sd.practice : !!sd[p.id];
-        const todo = work || did || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
+        const todo = work || did || fb || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
         const exk = window.elExcused ? elExcused(a, RS[a.id]) : [], stp = window.elSecSteps ? elSecSteps(a, p.id) : [], opt = !!todo && stp.length > 0 && stp.every(k => exk.includes(k));
         parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
-          terms: termsOf(p), grammar: gramOf(p), work, todo, opt });
+          terms: termsOf(p), grammar: gramOf(p), work, todo, opt, fb });
       });
+      const left = [...new Set([...Object.keys(R.replies || {}), ...Object.keys(R.answers || {})])].filter(k => !panels.some(p => p.id === k)).map(k => fbOf(k)).filter(Boolean);
+      if (left.length) parts.push({ id: 'fb', name: ca ? 'Feedback del professor' : 'Your teacher\'s feedback', title: '', day: null, kind: 'fb', terms: [], grammar: [], work: null, todo: null, opt: false, fb: left.length > 1 ? { many: left } : left[0] });
       out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
     const sm = sample(doc);
@@ -112,11 +123,32 @@ window.ELExam = (function () {
     const qs = rec.q.map((qi, j) => {
       const it = list[qi]; if (!it || typeof it !== 'object') return null;
       const mc = Array.isArray(it.o), a = (rec.a || [])[j];
-      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: tx(it.ex || it.why || '') };   // ex: the feedback the step gave after ✓ Check (Roger, 18 Nov 2026: "the feedback is very important and it must appear")
+      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, !!(rec.ok || [])[j], a, tx) };
     }).filter(Boolean);
     if (!qs.length) return null;
     const scored = qs.filter(x => !x.guess);
     return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+  }
+  /* 💬 the feedback line the step showed under that question after ✓ Check (Roger, 18 Nov 2026: "All the activities done in class should
+     have the feedback that appears in the normal menu in the notebook"), as ls2-engine.js writes it: a typed question "Correct!" or
+     "Not yet. " + its rule (it.en / it.ca); a choice question "Correct! / Not yet. " + its explanation (it.ex), or without one the
+     learningSupport.evidence line (its Catalan hint it.h for Starter/Base). The right answer itself is already written in the notebook. */
+  function pageFb(p, it, mc, ok, a, tx) {
+    const ca = tx({ ca: '1', en: '0' }) === '1', T = (c, e) => ca ? c : e;
+    const ex = tx(it.ex || it.why || ''), why = tx(it.en || it.ca ? { en: it.en, ca: it.ca } : '');
+    const blank = a == null || String(a).trim() === '';
+    if (mc) {
+      if (blank) return T('No vas triar cap resposta.', 'You didn\'t choose an answer.');
+      if (ex) return (ok ? T('Correcte! ', 'Correct! ') : T('Encara no. ', 'Not yet. ')) + ex;
+      // learningSupport.evidence (learning-path-support.js, not loaded on the LS home): its words, kept the same
+      const listen = !!(p.media && (p.media.audio || p.media.youtube));
+      if (ok) return T('Correcte!', 'Correct!');
+      return ca ? 'Encara no. ' + (it.h || (listen ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'))
+        : 'Try again. ' + (listen ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.' : 'Re-read the text, find the sentence that answers the question and compare it with each option.');
+    }
+    if (ok) return it.own ? T('Molt bé! El professor pot llegir la teva frase.', 'Well done! Your teacher can read your sentence.') : T('Correcte!', 'Correct!') + (why || ex ? ' ' + (why || ex) : '');
+    if (blank) return T('No vas escriure cap resposta.', 'You didn\'t type an answer.') + (why ? ' ' + why : '');
+    return T('Encara no. ', 'Not yet. ') + (why || ex);
   }
   // the questions of an activity not done yet, at the student's route, without answers: {task, qs: [{q, o: options in a fixed order}]}
   function toDo(p, level, tx) {
