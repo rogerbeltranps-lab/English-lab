@@ -14,7 +14,7 @@ body.lsh{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;ba
 
 /* side menu: the board's (today.html .side / .nv) */
 .app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
-.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
+.side{position:sticky;top:0;height:100vh;height:100dvh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
 .side .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px;text-decoration:none}
 .nvs{display:flex;flex-direction:column;gap:8px}
 .nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}
