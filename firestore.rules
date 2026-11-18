@@ -284,9 +284,10 @@ service cloud.firestore {
       // progress is writable only while that LS is open, and never in a learning path locked for the student's group
       match /progress/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create, update: if signedIn() && request.auth.uid == uid
-          && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester() || isTeacher());
-        // isTeacher: the teacher's OWN progress (uid is theirs), for the personal LS they do as a learner (✦ Towards Nativeness, Roger 17 Nov 2026)
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && (isTeacher() || (signedIn() && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester())));
+        // isTeacher: the teacher's OWN progress (uid is theirs), for the personal LS they do as a learner (✦ Towards Nativeness, Roger 17 Nov 2026).
+        // Not inside signedIn(): that is school accounts only, and the teacher signs in with Gmail (18 Nov 2026: nothing of theirs was saved).
       }
       // route (level): only the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark; 30 Oct 2026: students never choose one).
       // A student can only ask for another route from their board: request (any route but Pro), an optional reason and requestedAt.
@@ -363,7 +364,7 @@ service cloud.firestore {
       // shared/js/el-notes.js): notes/{deck} = {ls, course, deck, title, lp, parts:{p<k>:{topic, text, at}}, updated}. Their own; the teacher reads.
       match /notes/{deck} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create, update: if signedIn() && request.auth.uid == uid
+        allow create, update: if (signedIn() || isTeacher()) && request.auth.uid == uid   // isTeacher: their own notebook in ✦ Towards Nativeness
           && request.resource.data.keys().hasOnly(['ls','course','deck','title','lp','parts','updated'])
           && request.resource.data.deck == deck && request.resource.data.parts is map && request.resource.data.parts.size() <= 20;
         allow delete: if signedIn() && request.auth.uid == uid;
