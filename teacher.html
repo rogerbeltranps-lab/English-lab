@@ -2854,9 +2854,14 @@ function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=
       return x!=null&&x!==false?`<small class="muted">accepted by you</small><br><button class="g" data-wx="unacc" data-u="${u}" data-i="${esc(id)}" data-v="${esc(x)}" title="Take this answer off the accepted ones, for every student">✗ Undo</button>`:""})()}</td></tr>`}).join("")).join("");
   dlg(`<h3>🖥 Web exam · ${name(s)}</h3><p class="muted">${esc(d.paper)} · started ${hm(d.started)}${d.listenDone?` · listening locked ${hm(d.listenDone)}`:""} · ${esc(wxSt(d,wxOpen(ls,s.group)))}${d.done?" at "+hm(d.done):""}${m?` · <b>${f1(m.mark)}/10</b>`:""}</p>`
     +(ex?`<h4>🚪 Exits</h4><ul>${ex}</ul>`:"<p>🚪 No exits.</p>")+((d.glances||[]).length?`<p class="muted">👀 Flickers under 0.4 s just after full screen started (not exits): ${d.glances.map(g=>hm(g.at)+" ("+Math.round(g.ms/100)/10+" s)").join(", ")}</p>`:"")+(d.tries?`<p class="muted">🔑 Wrong passwords typed: ${d.tries}</p>`:"")
-    +(as?`<h4>After coming back</h4>${chg}`:"")+wxWBox(u,ls,d)+`<h4>Answers</h4><table>${rows}</table>`
+    +(as?`<h4>After coming back</h4>${chg}`:"")+(wxWBox(u,ls,d)||wxWText(d))+`<h4>Answers</h4><table>${rows}</table>`
     +`<div class="row"><button class="g" data-wx="reset" data-u="${u}" title="Delete this exam: the student starts again from zero (new paper order)">↺ Let them start again</button></div>`,true)}
 // the writing in the student's dialog: the task, the text (and the text when they first left, if it changed), the 5.1 level buttons
+// LS1 web exams: the writing is marked apart with the C1–C4 rubric (wtask…, tools/exam-marks), so the box has no writing column; the
+// student's dialog still shows the text (Roger, 18 Nov 2026: "where's her writing")
+const wxWText=d=>{const id=wxWid(d);if(!id)return "";const t=String((d.answers||{})[id]||"").trim();
+  return `<h4>✍️ Writing · ${wxWords(t)} words</h4><p class="muted">Marked apart with the C1–C4 rubric (Writing · task, grammar, vocabulary, organisation), not in this box.</p>`
+    +`<div style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(t)||'<span class="muted">(blank)</span>'}</div>`};
 function wxWBox(u,ls,d){const w=wxW(u,ls,d);if(!w||!w.id)return "";const X=window.EL_EXAM&&EL_EXAM.key===(wxCfg(ls)||{}).key?EL_EXAM:null,
     it=X&&X.papers[d.paper]&&(X.papers[d.paper].sections.writing||[]).find(x=>x.id===w.id),sn=(d.snaps||[])[0],before=sn?String((sn.answers||{})[w.id]||""):null;
   if(!X)wxData(wxCfg(ls)).then(x=>{if(x&&$("#dlg")&&$("#dlg").open&&!$("#dlg [data-wtask]"))wxDlg(u,ls)});
