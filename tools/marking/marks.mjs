@@ -17,7 +17,7 @@
 //   node tools/marking/marks.mjs comments                                  the comments sheet: every student comment on a hand-in still
 //        waiting for an answer (ELMark.open, not handed to the teacher), all groups, with the hand-in and the content file to read
 //   node tools/marking/marks.mjs answer <answer file> [--apply]             saves the EL-ANSWERS v1 answer: ANSWER → answers[step] =
-//        {t, q, at} (the student sees it as the teacher's answer), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
+//        {t, q, at, made} (the student sees it as the teacher's answer from at: 8:00-18:00, 2 hours later; made = when it was written), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
 //   comments --new / answer <file> --new [--apply]   the same, only for the students who saved a new comment since the last instant run
 //        ("No new comments." and nothing else read when there is none): the instant run of "English Lab: problem reports (instant)"
 // The dashboard's ✏️ Corrections (Roger, 6 Nov 2026) shows when each piece was corrected and where the run is: fb-apply saves
@@ -34,6 +34,7 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
+import {replyAt,whenText,namesIn} from "../problems/reply-time.mjs";
 
 const PROJECT="english-lab-ietm",ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
 const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.env.EL_TODAY;   // a date for tests
@@ -292,9 +293,16 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
   console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · sent back automatically (mostly pasted): ${na} · possible copies for the teacher: ${nf-na} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="comments"||cmd==="answer"){const its=await comments();
   if(cmd==="comments"){console.log(its.length?W.ELMark.commentSheet({date:W.ELWeek.today(),items:its}):"No comments waiting for an answer.");if(NEW&&!its.length)await cmtDone()}
-  else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString();
-    for(const x of r.rows){const i=its.find(y=>y.id===x.id),f=x.kind==="ANSWER"?"answers":"ask",v=x.kind==="ANSWER"?{t:x.text,q:i.comment,at:now}:{why:x.text,q:i.comment,at:now};
-      console.log((flags.has("--apply")?"✓ ":"→ ")+x.id+" · "+x.code+" · "+i.aid+" · "+x.step+" · "+(x.kind==="ANSWER"?"answer: ":"🙋 for the teacher: ")+x.text);
+  // Never straight away (Roger, 17 Nov 2026: "always answer from 8-18 and after 2 hours since u receive the message o report, don't use their
+  // names or surnames since sometimes it feels like AI"): an ANSWER is saved now with at = replyAt(now) (≥ 2 hours after the comment, inside
+  // 08:00-18:00 Madrid), and el-corrections.js shows it to the student only from then; --now (only when Roger asks) sends at once. An answer
+  // with the student's name or surnames stops the whole file before anything is saved.
+  else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString(),NOW=process.argv.includes("--now");
+    const who=uid=>{const s=studs.find(y=>y.uid===uid)||{},ro=roster[(s.email||"").toLowerCase()]||{};return [s.name,ro.first,ro.surname1,ro.surname2,ro.name].filter(Boolean)};
+    const named=r.rows.filter(x=>x.kind==="ANSWER").map(x=>[x.id,namesIn(x.text,who(its.find(y=>y.id===x.id).uid))]).filter(([,w])=>w.length);
+    if(named.length)throw new Error("Don't use the student's name or surnames in an answer (Roger, 17 Nov 2026: it feels like AI). Write these again without them: "+named.map(([id,w])=>id+" ("+w.join(", ")+")").join(" · ")+". Nothing was saved.");
+    for(const x of r.rows){const i=its.find(y=>y.id===x.id),f=x.kind==="ANSWER"?"answers":"ask",go=NOW?now:new Date(replyAt(Date.now())).toISOString(),v=x.kind==="ANSWER"?{t:x.text,q:i.comment,at:go,made:now}:{why:x.text,q:i.comment,at:now};
+      console.log((flags.has("--apply")?"✓ ":"→ ")+x.id+" · "+x.code+" · "+i.aid+" · "+x.step+" · "+(x.kind==="ANSWER"?"answer (the student sees it "+(NOW?"now":"from "+whenText(Date.parse(go)))+"): ":"🙋 for the teacher: ")+x.text);
       if(flags.has("--apply"))await api("PATCH",DOCS+`students/${i.uid}/results/${i.aid.replace("/","__")}?`+["ls","activity","updated",fp(f,x.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
     if(NEW&&flags.has("--apply"))await cmtDone();

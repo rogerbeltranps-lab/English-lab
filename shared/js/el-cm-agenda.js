@@ -304,7 +304,8 @@ function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dat
   // the game opens in this class tab (Roger, 9 Nov 2026: "when we play a game I should be able to go to the class mode where I came
   // from"): the board's 🎓 Back to class mode brings the tab back to this page and tab, still in class mode (lab/game/host.js)
   // 🕵️ Code Breakers (Roger, 12 Nov 2026), "game:cb-<lp>": its own board, the same way back to the class
-  if(/^game:cb-/.test(x.p)){location.href=new URL("lab/game/codebreakers.html?lp="+encodeURIComponent(x.p.slice(8))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
+  // (an old item: since 18 Nov 2026 it opens the LS grammar game like the others; 🕵️ is the switch beside Start there, PR #687)
+  if(/^game:cb-/.test(x.p)){const id=x.p.slice(8)+"-grammar";location.href=new URL("lab/game/host.html?deck="+encodeURIComponent(id)+lsgQ(id)+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
   if(isGame(x.p)){location.href=new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+lsgQ(x.p.slice(5))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
   go(x,b)}
 const busy=async(b,f)=>{b.disabled=true;try{await f()}catch(err){console.warn("class mode",err);say("✗ Not saved: "+(err.code||err.message||err),true)}b.disabled=false;draw()};
