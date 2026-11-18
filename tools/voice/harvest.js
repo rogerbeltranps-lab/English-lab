@@ -17,7 +17,7 @@ function walk(o, src) {
   })));
   Object.values(o).forEach(x => walk(x, src));
 }
-for (const ls of ['2eso/free-time-live', '4eso/seasons-and-celebrations']) {
+for (const ls of ['2eso/free-time-live', '4eso/seasons-and-celebrations', '4eso/towards-nativeness']) {   // Towards Nativeness: Roger, 18 Nov 2026 "use Kokoro (heart) for flashcards"
   for (const sub of ['data', 'data/native']) {
     const dir = path.join(ROOT, ls, sub); if (!fs.existsSync(dir)) continue;
     for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.js'))) {

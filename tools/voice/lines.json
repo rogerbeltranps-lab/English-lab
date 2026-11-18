@@ -3330,165 +3330,189 @@
   "src": "4eso/seasons-and-celebrations/data/reflect.js"
  },
  {
-  "key": "570f26d4",
-  "text": "on 31 October",
-  "say": "on 31 October",
+  "key": "a5e682af",
+  "text": "Samhain was at the end of the harvest.",
+  "say": "Samhain was at the end of the harvest.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "fefb0292",
-  "text": "The Castanyada is on 31 October.",
-  "say": "The Castanyada is on 31 October.",
+  "key": "8682fc00",
+  "text": "feast",
+  "say": "feast",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "c572750c",
-  "text": "in November",
-  "say": "in November",
+  "key": "cf391dca",
+  "text": "The Pilgrims had a harvest feast in 1621.",
+  "say": "The Pilgrims had a harvest feast in 1621.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "0abeafd5",
-  "text": "Thanksgiving is in November.",
-  "say": "Thanksgiving is in November.",
+  "key": "5c8d0ff4",
+  "text": "bonfire",
+  "say": "bonfire",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "9fe1e014",
-  "text": "at Christmas",
-  "say": "at Christmas",
+  "key": "8f421b6e",
+  "text": "People used to light bonfires.",
+  "say": "People used to light bonfires.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "a8af8ac8",
-  "text": "We get together at Christmas.",
-  "say": "We get together at Christmas.",
+  "key": "577db5f5",
+  "text": "They wore masks to hide from the spirits.",
+  "say": "They wore masks to hide from the spirits.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "739583de",
-  "text": "at night",
-  "say": "at night",
+  "key": "7c1e7670",
+  "text": "carve",
+  "say": "carve",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "580a39fb",
-  "text": "The fireworks are at night.",
-  "say": "The fireworks are at night.",
+  "key": "ad956cf3",
+  "text": "We carve pumpkins at Halloween.",
+  "say": "We carve pumpkins at Halloween.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "e6db534d",
-  "text": "every year",
-  "say": "every year",
+  "key": "e05bb9db",
+  "text": "turnip",
+  "say": "turnip",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "03e09ba9",
-  "text": "the night before",
-  "say": "the night before",
+  "key": "d467ae22",
+  "text": "People used to carve turnips.",
+  "say": "People used to carve turnips.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "09229302",
-  "text": "We decorate the night before.",
-  "say": "We decorate the night before.",
+  "key": "d9b9523f",
+  "text": "pumpkin",
+  "say": "pumpkin",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "3252e4ea",
-  "text": "the first",
-  "say": "the first",
+  "key": "eff8d6e0",
+  "text": "Pumpkins are bigger and easier to carve.",
+  "say": "Pumpkins are bigger and easier to carve.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "afe330f8",
-  "text": "on the first of November",
-  "say": "on the first of November",
+  "key": "1aecbbaa",
+  "text": "roasted chestnuts",
+  "say": "roasted chestnuts",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "fa9b247d",
-  "text": "the twenty-fifth",
-  "say": "the twenty-fifth",
+  "key": "bd227945",
+  "text": "We eat roasted chestnuts at the Castanyada.",
+  "say": "We eat roasted chestnuts at the Castanyada.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "a6de7a48",
-  "text": "on the twenty-fifth of December",
-  "say": "on the twenty-fifth of December",
+  "key": "9846f701",
+  "text": "spirits",
+  "say": "spirits",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "bc6b14f9",
-  "text": "both… and…",
-  "say": "both, and",
+  "key": "3991c540",
+  "text": "People believed the spirits of the dead came back.",
+  "say": "People believed the spirits of the dead came back.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "c65d9dd6",
-  "text": "Both Diwali and Hanukkah use lights.",
-  "say": "Both Diwali and Hanukkah use lights.",
+  "key": "66074df1",
+  "text": "settlers",
+  "say": "settlers",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "73d20fa7",
-  "text": "similar to",
-  "say": "similar to",
+  "key": "902cbe06",
+  "text": "The Pilgrims were English settlers.",
+  "say": "The Pilgrims were English settlers.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "d32e7938",
-  "text": "It's similar to a harvest festival.",
-  "say": "It's similar to a harvest festival.",
+  "key": "89ea3431",
+  "text": "cemetery",
+  "say": "cemetery",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "3fac1442",
-  "text": "different from",
-  "say": "different from",
+  "key": "8811eb9e",
+  "text": "On All Saints' Day, many people visit the cemetery.",
+  "say": "On All Saints' Day, many people visit the cemetery.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "cc6f0251",
-  "text": "It's different from Christmas.",
-  "say": "It's different from Christmas.",
+  "key": "74f8baa6",
+  "text": "People say what they are grateful for.",
+  "say": "People say what they are grateful for.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "666989d8",
-  "text": "whereas",
-  "say": "whereas",
+  "key": "995fc0cf",
+  "text": "turkey",
+  "say": "turkey",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "550315e8",
-  "text": "Halloween is about costumes, whereas the Castanyada is about family.",
-  "say": "Halloween is about costumes, whereas the Castanyada is about family.",
+  "key": "6ce0fdcc",
+  "text": "Many families eat turkey at Thanksgiving.",
+  "say": "Many families eat turkey at Thanksgiving.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "2066cf06",
-  "text": "in the same way",
-  "say": "in the same way",
+  "key": "6377f0ff",
+  "text": "ancient",
+  "say": "ancient",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "ae6ee50c",
-  "text": "In the same way, we eat together.",
-  "say": "In the same way, we eat together.",
+  "key": "b8de2293",
+  "text": "Samhain is an ancient Celtic festival.",
+  "say": "Samhain is an ancient Celtic festival.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "60d97bd1",
-  "text": "unlike",
-  "say": "unlike",
+  "key": "a202eaab",
+  "text": "national holiday",
+  "say": "national holiday",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "1fc4d0aa",
-  "text": "Unlike Hanukkah, Diwali lasts five days.",
-  "say": "Unlike Hanukkah, Diwali lasts five days.",
+  "key": "43cee5f7",
+  "text": "Thanksgiving became a national holiday in 1863.",
+  "say": "Thanksgiving became a national holiday in 1863.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "f3ab1eb4",
+  "text": "make something official",
+  "say": "make something official",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "a921ad19",
+  "text": "Lincoln made Thanksgiving official.",
+  "say": "Lincoln made Thanksgiving official.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "657e094c",
+  "text": "a day of mourning",
+  "say": "a day of mourning",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "9ef9e24e",
+  "text": "For some Native Americans, it is a day of mourning.",
+  "say": "For some Native Americans, it is a day of mourning.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
@@ -3660,63 +3684,165 @@
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "c967d273",
-  "text": "contribute to",
-  "say": "contribute to",
+  "key": "f454deb3",
+  "text": "The children are excited about the fireworks.",
+  "say": "The children are excited about the fireworks.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "028a9391",
-  "text": "Everyone contributes to the meal.",
-  "say": "Everyone contributes to the meal.",
+  "key": "25a1eea4",
+  "text": "exciting",
+  "say": "exciting",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "75881d34",
-  "text": "depend on",
-  "say": "depend on",
+  "key": "83a57815",
+  "text": "The fireworks are exciting.",
+  "say": "The fireworks are exciting.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "4d977e2e",
-  "text": "The date depends on the moon.",
-  "say": "The date depends on the moon.",
+  "key": "eda17c15",
+  "text": "bored",
+  "say": "bored",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "38af2aef",
-  "text": "come from",
-  "say": "come from",
+  "key": "1dac47bf",
+  "text": "I'm bored: the speech is too long.",
+  "say": "I'm bored: the speech is too long.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "bf4fba1e",
-  "text": "Halloween comes from Samhain.",
-  "say": "Halloween comes from Samhain.",
+  "key": "b2a0fab4",
+  "text": "boring",
+  "say": "boring",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "3d911be0",
-  "text": "be known for",
-  "say": "be known for",
+  "key": "42a4ff63",
+  "text": "The speech is boring.",
+  "say": "The speech is boring.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "be3583ba",
-  "text": "Leicester is known for its Diwali lights.",
-  "say": "Leicester is known for its Diwali lights.",
+  "key": "720c3fd5",
+  "text": "tired",
+  "say": "tired",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "b93ed0ea",
-  "text": "be associated with",
-  "say": "be associated with",
+  "key": "3d41323b",
+  "text": "After the parade, we're tired.",
+  "say": "After the parade, we're tired.",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
-  "key": "e5e97bb7",
-  "text": "Pumpkins are associated with Halloween.",
-  "say": "Pumpkins are associated with Halloween.",
+  "key": "6437ef74",
+  "text": "tiring",
+  "say": "tiring",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "686f0ed7",
+  "text": "Dancing all night is tiring.",
+  "say": "Dancing all night is tiring.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "21220784",
+  "text": "interested (in)",
+  "say": "interested",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "53edfc7e",
+  "text": "I'm interested in old traditions.",
+  "say": "I'm interested in old traditions.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ced71285",
+  "text": "interesting",
+  "say": "interesting",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "6c96bdf1",
+  "text": "The story of Halloween is interesting.",
+  "say": "The story of Halloween is interesting.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "08826c95",
+  "text": "amazed",
+  "say": "amazed",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "0d2d9b09",
+  "text": "We were amazed by the Diwali lights.",
+  "say": "We were amazed by the Diwali lights.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "82bb9434",
+  "text": "amazing",
+  "say": "amazing",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "0e327c4e",
+  "text": "The Diwali lights are amazing.",
+  "say": "The Diwali lights are amazing.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "fdf9d899",
+  "text": "disappointed",
+  "say": "disappointed",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "4cf06eec",
+  "text": "I was disappointed: it rained all day.",
+  "say": "I was disappointed: it rained all day.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "a30306b0",
+  "text": "disappointing",
+  "say": "disappointing",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ccc0e49c",
+  "text": "The weather was disappointing.",
+  "say": "The weather was disappointing.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "f7372cda",
+  "text": "surprised",
+  "say": "surprised",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "727f0d47",
+  "text": "She was surprised by the presents.",
+  "say": "She was surprised by the presents.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ad6846bd",
+  "text": "surprising",
+  "say": "surprising",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "5ed221b4",
+  "text": "It's surprising that pumpkins were once turnips!",
+  "say": "It's surprising that pumpkins were once turnips!",
   "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
  },
  {
@@ -4842,6 +4968,1410 @@
   "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
  },
  {
+  "key": "808e60e2",
+  "text": "make changes (to)",
+  "say": "make changes",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "b241b7c1",
+  "text": "Don't make any changes without asking me.",
+  "say": "Don't make any changes without asking me.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "0384e422",
+  "text": "make a decision",
+  "say": "make a decision",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "f87f55dd",
+  "text": "We need to make a decision by Friday.",
+  "say": "We need to make a decision by Friday.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "f7c92e94",
+  "text": "make a mistake",
+  "say": "make a mistake",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "4d4c4a76",
+  "text": "Everyone makes mistakes.",
+  "say": "Everyone makes mistakes.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "18a65ede",
+  "text": "make an exam / a rubric / a guide",
+  "say": "make an exam, a rubric, a guide",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "bd6cc081",
+  "text": "Could you make a rubric for this writing?",
+  "say": "Could you make a rubric for this writing?",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "1f724e43",
+  "text": "make a sound",
+  "say": "make a sound",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "f4aaec62",
+  "text": "The app still makes a whistle sound.",
+  "say": "The app still makes a whistle sound.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "439fe6f4",
+  "text": "make it possible to",
+  "say": "make it possible to",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "e6156779",
+  "text": "Make it possible to download the PDF.",
+  "say": "Make it possible to download the PDF.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "566ec7eb",
+  "text": "do a test / an exercise",
+  "say": "do a test, an exercise",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "9deb3dd6",
+  "text": "Do a quick test before you merge.",
+  "say": "Do a quick test before you merge.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "081919b0",
+  "text": "do an activity",
+  "say": "do an activity",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "7af4ea2a",
+  "text": "We'll do the listening activity together.",
+  "say": "We'll do the listening activity together.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "396856cb",
+  "text": "do a good job",
+  "say": "do a good job",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "ce8f484f",
+  "text": "You did a great job with the dashboard.",
+  "say": "You did a great job with the dashboard.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "3a15a35d",
+  "text": "do the dishes / the shopping",
+  "say": "do the dishes, the shopping",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "77b8a549",
+  "text": "I'll do the shopping later.",
+  "say": "I'll do the shopping later.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "ddc87124",
+  "text": "I want you to + verb",
+  "say": "I want you to, verb",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "29503cb6",
+  "text": "I want you to check every page.",
+  "say": "I want you to check every page.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "716c4d9f",
+  "text": "ask someone to + verb",
+  "say": "ask someone to, verb",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "a6cf500f",
+  "text": "Ask every user to connect.",
+  "say": "Ask every user to connect.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "06302fbf",
+  "text": "allow someone to + verb",
+  "say": "allow someone to, verb",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "a0e35c2a",
+  "text": "It should allow you to mark it as done.",
+  "say": "It should allow you to mark it as done.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "f72b3cfc",
+  "text": "let someone + verb",
+  "say": "let someone, verb",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "83cab217",
+  "text": "Let students see their marks.",
+  "say": "Let students see their marks.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "34e6a637",
+  "text": "I'd like to",
+  "say": "I'd like to",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "8d59391c",
+  "text": "I'd like to check the web version.",
+  "say": "I'd like to check the web version.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "aedc2227",
+  "text": "I was wondering if",
+  "say": "I was wondering if",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "25648170",
+  "text": "I was wondering if you could help me.",
+  "say": "I was wondering if you could help me.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "fb499eaa",
+  "text": "Could you walk me through…?",
+  "say": "Could you walk me through, ?",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "72fc7c74",
+  "text": "Could you walk me through the setup?",
+  "say": "Could you walk me through the setup?",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "6eae7d07",
+  "text": "I'm attaching",
+  "say": "I'm attaching",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "27ac6e4e",
+  "text": "I'm attaching the grid with the criteria.",
+  "say": "I'm attaching the grid with the criteria.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "016b19cd",
+  "text": "I'm sending you",
+  "say": "I'm sending you",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "750f7ddd",
+  "text": "Here's the document I'm sending you.",
+  "say": "Here's the document I'm sending you.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "9290fb8e",
+  "text": "I've just uploaded",
+  "say": "I've just uploaded",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "4c9fd2c4",
+  "text": "I've just uploaded the photos.",
+  "say": "I've just uploaded the photos.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "7808b884",
+  "text": "I've attached",
+  "say": "I've attached",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "02774c7d",
+  "text": "I've attached three screenshots.",
+  "say": "I've attached three screenshots.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "027dace5",
+  "text": "get around to + -ing",
+  "say": "get around to doing",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "304067a2",
+  "text": "I never got around to fixing it.",
+  "say": "I never got around to fixing it.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "9fc61463",
+  "text": "put something off",
+  "say": "put something off",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "8519b6a2",
+  "text": "Don't put it off until June.",
+  "say": "Don't put it off until June.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "aa8cf16e",
+  "text": "chase someone up",
+  "say": "chase someone up",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "d787d59f",
+  "text": "I'll chase them up tomorrow.",
+  "say": "I'll chase them up tomorrow.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "80284221",
+  "text": "deal with",
+  "say": "deal with",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "b619a9af",
+  "text": "I'll deal with the emails later.",
+  "say": "I'll deal with the emails later.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "3278ab3a",
+  "text": "get it over with",
+  "say": "get it over with",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "a33ac751",
+  "text": "Let's just get it over with.",
+  "say": "Let's just get it over with.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "6a708276",
+  "text": "stick with it",
+  "say": "stick with it",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "6e2d83ea",
+  "text": "It's hard at first, but stick with it.",
+  "say": "It's hard at first, but stick with it.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "aee14791",
+  "text": "not sold on",
+  "say": "not sold on",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "e56429c7",
+  "text": "I'm not sold on the new design.",
+  "say": "I'm not sold on the new design.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "0093d45d",
+  "text": "a daunting task",
+  "say": "a daunting task",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "21bea973",
+  "text": "Marking 100 exams is a daunting task.",
+  "say": "Marking 100 exams is a daunting task.",
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "7aa46da0",
+  "text": "on my phone / on Windows / on GitHub",
+  "say": "on my phone, on Windows, on GitHub",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "8a6ab3d4",
+  "text": "It works on my laptop but not on my phone.",
+  "say": "It works on my laptop but not on my phone.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "93acd03f",
+  "text": "on the website / on the dashboard",
+  "say": "on the website, on the dashboard",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "7b6af0a7",
+  "text": "The new tab isn't showing on the dashboard.",
+  "say": "The new tab isn't showing on the dashboard.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "65baf40b",
+  "text": "in the browser / in the app / in Safari",
+  "say": "in the browser, in the app, in Safari",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "41fbc728",
+  "text": "It only happens in Safari.",
+  "say": "It only happens in Safari.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "af7dc430",
+  "text": "at the top / at the bottom / at the top right",
+  "say": "at the top, at the bottom, at the top right",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "3b9edf4a",
+  "text": "The button sits at the top right.",
+  "say": "The button sits at the top right.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "7a626569",
+  "text": "in section 2 / in the table / in full screen",
+  "say": "in section 2, in the table, in full screen",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "c77d3147",
+  "text": "Open the video in full screen.",
+  "say": "Open the video in full screen.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "9577cad0",
+  "text": "in class mode / at Starter level",
+  "say": "in class mode, at Starter level",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "24a73bf9",
+  "text": "Josué is at Starter level.",
+  "say": "Josué is at Starter level.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "dde34e4d",
+  "text": "hover over",
+  "say": "hover over",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "454da9c5",
+  "text": "Hover over the word to see its meaning.",
+  "say": "Hover over the word to see its meaning.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "317ae5d9",
+  "text": "scroll down to",
+  "say": "scroll down to",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "27bf18db",
+  "text": "Scroll down to the flashcards.",
+  "say": "Scroll down to the flashcards.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "995831a6",
+  "text": "add / apply something to",
+  "say": "add, apply something to",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "756aed9e",
+  "text": "Apply the changes to every learning path.",
+  "say": "Apply the changes to every learning path.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "ec7a3093",
+  "text": "rename X to Y",
+  "say": "rename X to Y",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "1871d694",
+  "text": "Rename \"Exàmens\" to \"Exams\".",
+  "say": "Rename \"Exàmens\" to \"Exams\".",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "e7e05e91",
+  "text": "take me to",
+  "say": "take me to",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "f0a2a415",
+  "text": "This link takes me to the wrong page.",
+  "say": "This link takes me to the wrong page.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "1737b5ed",
+  "text": "divide / split into",
+  "say": "divide, split into",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "5ba3cbbe",
+  "text": "Split the deck into two sets.",
+  "say": "Split the deck into two sets.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "19d29223",
+  "text": "it's taking ages / a long time",
+  "say": "it's taking ages, a long time",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "271716b1",
+  "text": "It's taking ages to load.",
+  "say": "It's taking ages to load.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "b58b426b",
+  "text": "it keeps crashing",
+  "say": "it keeps crashing",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "1c16cfbe",
+  "text": "The app keeps crashing on my iPhone.",
+  "say": "The app keeps crashing on my iPhone.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "f4eb3389",
+  "text": "it shuts down",
+  "say": "it shuts down",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "02e4cabc",
+  "text": "Two Chromebooks shut down in the middle of the game.",
+  "say": "Two Chromebooks shut down in the middle of the game.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "8f0ff072",
+  "text": "it's still not working",
+  "say": "it's still not working",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "11848bbb",
+  "text": "I've cleared the cache, but it's still not working.",
+  "say": "I've cleared the cache, but it's still not working.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "23edd592",
+  "text": "I haven't tried it yet",
+  "say": "I haven't tried it yet",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "a7078854",
+  "text": "I haven't tried it on Windows yet.",
+  "say": "I haven't tried it on Windows yet.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "6954d1c8",
+  "text": "a workaround",
+  "say": "a workaround",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "a8608da2",
+  "text": "Is there a workaround until it's fixed?",
+  "say": "Is there a workaround until it's fixed?",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "5cfb9e7d",
+  "text": "figure out",
+  "say": "figure out",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "10a49bef",
+  "text": "I can't figure out why it fails.",
+  "say": "I can't figure out why it fails.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "0657fe88",
+  "text": "pin down",
+  "say": "pin down",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "099b7479",
+  "text": "Let's pin down when it started.",
+  "say": "Let's pin down when it started.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "1a542ce7",
+  "text": "get to the bottom of",
+  "say": "get to the bottom of",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "fa6c24f6",
+  "text": "We need to get to the bottom of this bug.",
+  "say": "We need to get to the bottom of this bug.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "b0652d59",
+  "text": "work around",
+  "say": "work around",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "d2637842",
+  "text": "We worked around it with a second button.",
+  "say": "We worked around it with a second button.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "3c536111",
+  "text": "Let's iron out the last details.",
+  "say": "Let's iron out the last details.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "b4649c35",
+  "text": "walk someone through",
+  "say": "walk someone through",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "dd74a52f",
+  "text": "Could you walk me through it?",
+  "say": "Could you walk me through it?",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "90d6ae18",
+  "text": "it turns out (that)",
+  "say": "it turns out",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "808e4110",
+  "text": "It turns out the button was hidden behind the menu.",
+  "say": "It turns out the button was hidden behind the menu.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "1aa7446d",
+  "text": "that did the trick",
+  "say": "that did the trick",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "7d91457c",
+  "text": "Clearing the cache did the trick.",
+  "say": "Clearing the cache did the trick.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "241f9653",
+  "text": "be better at",
+  "say": "be better at",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "2645e396",
+  "text": "Is it better at writing?",
+  "say": "Is it better at writing?",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "0c84462b",
+  "text": "fail to do",
+  "say": "fail to do",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "0a08522a",
+  "text": "It failed to load the page.",
+  "say": "It failed to load the page.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "cfc763b8",
+  "text": "agree on (a thing) / with (a person)",
+  "say": "agree on, with",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "c88a354f",
+  "text": "Do you remember the prompt we agreed on?",
+  "say": "Do you remember the prompt we agreed on?",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "bc364be5",
+  "text": "explain something to someone",
+  "say": "explain something to someone",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "fc31107e",
+  "text": "Explain it to me again.",
+  "say": "Explain it to me again.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "d0c114c2",
+  "text": "ask someone something",
+  "say": "ask someone something",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "bdfe97ef",
+  "text": "I asked Claude the same question.",
+  "say": "I asked Claude the same question.",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "ac3e096c",
+  "text": "have access to",
+  "say": "have access to",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "f29d6090",
+  "text": "Do you have access to the Drive?",
+  "say": "Do you have access to the Drive?",
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "0b0fc534",
+  "text": "come up with an idea",
+  "say": "come up with an idea",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "700f7a87",
+  "text": "I came up with the idea on a train.",
+  "say": "I came up with the idea on a train.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "6266f43e",
+  "text": "be into something",
+  "say": "be into something",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "db37b191",
+  "text": "I've always been into technology.",
+  "say": "I've always been into technology.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "55818385",
+  "text": "come across a tool",
+  "say": "come across a tool",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "285c5a33",
+  "text": "I came across Claude Code by chance.",
+  "say": "I came across Claude Code by chance.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "57d5983b",
+  "text": "get into coding",
+  "say": "get into coding",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5c5c8b53",
+  "text": "I got into coding last summer.",
+  "say": "I got into coding last summer.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "1ca6d38c",
+  "text": "get something off the ground",
+  "say": "get something off the ground",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "0c2d5fcd",
+  "text": "It took weeks to get it off the ground.",
+  "say": "It took weeks to get it off the ground.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "8a8aec46",
+  "text": "get something up and running",
+  "say": "get something up and running",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "a8a10e21",
+  "text": "We got the site up and running in October.",
+  "say": "We got the site up and running in October.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "ff1e7052",
+  "text": "kick off with",
+  "say": "kick off with",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "4dca016d",
+  "text": "Every class kicks off with a game.",
+  "say": "Every class kicks off with a game.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "8a56ee12",
+  "text": "get the hang of it",
+  "say": "get the hang of it",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "50d9a744",
+  "text": "After a week I got the hang of it.",
+  "say": "After a week I got the hang of it.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "7f68cbad",
+  "text": "brush up on",
+  "say": "brush up on",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "893ba235",
+  "text": "I had to brush up on my JavaScript.",
+  "say": "I had to brush up on my JavaScript.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "da94c055",
+  "text": "Claude walked me through it.",
+  "say": "Claude walked me through it.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "34a95b93",
+  "text": "hit a wall",
+  "say": "hit a wall",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "0609d4ac",
+  "text": "In November we hit a wall.",
+  "say": "In November we hit a wall.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "7b8dee3b",
+  "text": "burn through credits",
+  "say": "burn through credits",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "05bd7558",
+  "text": "I burnt through my credits in two days.",
+  "say": "I burnt through my credits in two days.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "230e1768",
+  "text": "a close call",
+  "say": "a close call",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "1f9989ed",
+  "text": "Losing the database was a close call.",
+  "say": "Losing the database was a close call.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "d9ad8c0d",
+  "text": "get carried away",
+  "say": "get carried away",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "3fac5e29",
+  "text": "I got carried away and added too many features.",
+  "say": "I got carried away and added too many features.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "eaed025e",
+  "text": "second-guess yourself",
+  "say": "second-guess yourself",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "656aea58",
+  "text": "Stop second-guessing yourself.",
+  "say": "Stop second-guessing yourself.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "3826d669",
+  "text": "put up with",
+  "say": "put up with",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "12d1c4b3",
+  "text": "Students put up with a lot of bugs.",
+  "say": "Students put up with a lot of bugs.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "0d63cad0",
+  "text": "I stuck with it, and it paid off.",
+  "say": "I stuck with it, and it paid off.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "07d4734a",
+  "text": "soldier on",
+  "say": "soldier on",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "8b4262ba",
+  "text": "We soldiered on through the bugs.",
+  "say": "We soldiered on through the bugs.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5e8964c8",
+  "text": "cope with",
+  "say": "cope with",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "01df6c87",
+  "text": "The server couldn't cope with 50 students.",
+  "say": "The server couldn't cope with 50 students.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "7a05e15d",
+  "text": "stand up to",
+  "say": "stand up to",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5225e8f6",
+  "text": "You have to stand up to the doubters.",
+  "say": "You have to stand up to the doubters.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "66f6f69f",
+  "text": "take off",
+  "say": "take off",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "05ab6d1b",
+  "text": "The app really took off in November.",
+  "say": "The app really took off in November.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "14abfb93",
+  "text": "end up + -ing",
+  "say": "end up doing",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "9728fa90",
+  "text": "I ended up rebuilding the whole dashboard.",
+  "say": "I ended up rebuilding the whole dashboard.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "9207155d",
+  "text": "run itself",
+  "say": "run itself",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "75936afb",
+  "text": "Now the class almost runs itself.",
+  "say": "Now the class almost runs itself.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "b6c79d2a",
+  "text": "pick up on",
+  "say": "pick up on",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5aafe6eb",
+  "text": "Students picked up on every small change.",
+  "say": "Students picked up on every small change.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "f2e3d30e",
+  "text": "come across as",
+  "say": "come across as",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "09b96df4",
+  "text": "I don't want to come across as arrogant.",
+  "say": "I don't want to come across as arrogant.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5c6b0119",
+  "text": "show off",
+  "say": "show off",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "6bae35c3",
+  "text": "I'm not trying to show off.",
+  "say": "I'm not trying to show off.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "0614324a",
+  "text": "at the end of the day",
+  "say": "at the end of the day",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "4fe158f5",
+  "text": "At the end of the day, it's about the students.",
+  "say": "At the end of the day, it's about the students.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "0e0b648f",
+  "text": "what I'm getting at is",
+  "say": "what I'm getting at is",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "5ada019e",
+  "text": "What I'm getting at is that it saves time.",
+  "say": "What I'm getting at is that it saves time.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "c811d98b",
+  "text": "keep in mind (that)",
+  "say": "keep in mind",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "34e40ec1",
+  "text": "Keep in mind that it's free.",
+  "say": "Keep in mind that it's free.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "1749c296",
+  "text": "I'm not sold on",
+  "say": "I'm not sold on",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "a440d139",
+  "text": "I'm not sold on AI marking yet.",
+  "say": "I'm not sold on AI marking yet.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "6bcde0aa",
+  "text": "It seemed a daunting task at first.",
+  "say": "It seemed a daunting task at first.",
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "e44fe8c2",
+  "text": "next school year (el curs vinent)",
+  "say": "next school year",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "511387f0",
+  "text": "Next school year we'll have three groups.",
+  "say": "Next school year we'll have three groups.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "708a74d3",
+  "text": "the school (el centre)",
+  "say": "the school",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "bd2f37e4",
+  "text": "The school has a new timetable.",
+  "say": "The school has a new timetable.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "fe6490dc",
+  "text": "a master document (document mare)",
+  "say": "a master document",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "1b5f1df4",
+  "text": "All the LSs come from one master document.",
+  "say": "All the LSs come from one master document.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "f12a8bc4",
+  "text": "indicators (indicadors)",
+  "say": "indicators",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "9c6b94e3",
+  "text": "Each criterion has three indicators.",
+  "say": "Each criterion has three indicators.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "122fa165",
+  "text": "development / designing (elaboració)",
+  "say": "development, designing",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "b5c53411",
+  "text": "The development of each LS takes a month.",
+  "say": "The development of each LS takes a month.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "6eea0b78",
+  "text": "track progress (registrar el progrés)",
+  "say": "track progress",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "ee2aafa7",
+  "text": "The dashboard tracks their progress.",
+  "say": "The dashboard tracks their progress.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "b6e1d2e7",
+  "text": "adapt to (adaptar a)",
+  "say": "adapt to",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "bf80fcd5",
+  "text": "Adapt the LSs to what we've agreed.",
+  "say": "Adapt the LSs to what we've agreed.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "2fc70b0b",
+  "text": "2nd / 4th ESO (2n / 4t d'ESO)",
+  "say": "2nd, 4th ESO",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "09ba9809",
+  "text": "I teach 2nd and 4th ESO.",
+  "say": "I teach 2nd and 4th ESO.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "9277d0a4",
+  "text": "an email / emails",
+  "say": "an email, emails",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "e678281b",
+  "text": "I sent three emails.",
+  "say": "I sent three emails.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "f0e22785",
+  "text": "feedback (no a)",
+  "say": "feedback",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "2bb68335",
+  "text": "They get some feedback every week.",
+  "say": "They get some feedback every week.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "057bb632",
+  "text": "info / information (no a, no -s)",
+  "say": "info, information",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "16771b13",
+  "text": "There's too much info on that page.",
+  "say": "There's too much info on that page.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "ac5528ab",
+  "text": "code (no a)",
+  "say": "code",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "907f8ff4",
+  "text": "The idea is to have clean code.",
+  "say": "The idea is to have clean code.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "f88f1154",
+  "text": "stuff (no a)",
+  "say": "stuff",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "9ecc443e",
+  "text": "It's general stuff.",
+  "say": "It's general stuff.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "d6d1139b",
+  "text": "the audio files (not the audios)",
+  "say": "the audio files",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "fc074e6f",
+  "text": "The audio files are on the Drive.",
+  "say": "The audio files are on the Drive.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "7b87d289",
+  "text": "a criterion / two criteria",
+  "say": "a criterion, two criteria",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "b10027ee",
+  "text": "The criteria are on the rubric.",
+  "say": "The criteria are on the rubric.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "7c6cbe3f",
+  "text": "hand in",
+  "say": "hand in",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "ea2783c2",
+  "text": "Hand in the writing by Friday.",
+  "say": "Hand in the writing by Friday.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "26a72753",
+  "text": "cover a class",
+  "say": "cover a class",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "e8c86019",
+  "text": "Can you cover my 4th ESO class?",
+  "say": "Can you cover my 4th ESO class?",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "452e1d43",
+  "text": "a staff meeting",
+  "say": "a staff meeting",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "5e8e2004",
+  "text": "We've got a staff meeting at five.",
+  "say": "We've got a staff meeting at five.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "f6dac953",
+  "text": "the head of department",
+  "say": "the head of department",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "b81b1938",
+  "text": "I sent it to the head of department.",
+  "say": "I sent it to the head of department.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "a972736a",
+  "text": "a parents' evening",
+  "say": "a parents' evening",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "0b9fa666",
+  "text": "Parents' evening is next Thursday.",
+  "say": "Parents' evening is next Thursday.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "4392ada8",
+  "text": "the deadline",
+  "say": "the deadline",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "57848deb",
+  "text": "The deadline is Friday.",
+  "say": "The deadline is Friday.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "f11fb412",
+  "text": "mark / grade",
+  "say": "mark, grade",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "d62d64e4",
+  "text": "I've marked half the exams.",
+  "say": "I've marked half the exams.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "e61fb59f",
+  "text": "the exam guide (not the exam's guide)",
+  "say": "the exam guide",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "a25ee3c6",
+  "text": "Add a note to the exam guide.",
+  "say": "Add a note to the exam guide.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "333a0c0d",
+  "text": "the app's name (not the name of the app)",
+  "say": "the app's name",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "72a036dd",
+  "text": "The app's name is on the cover.",
+  "say": "The app's name is on the cover.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "1882f3ef",
+  "text": "my Linux terminal",
+  "say": "my Linux terminal",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "3eb15f89",
+  "text": "Open my Linux terminal.",
+  "say": "Open my Linux terminal.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "6f7bf9a7",
+  "text": "the Healthy Habits writing section",
+  "say": "the Healthy Habits writing section",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "4eb795b3",
+  "text": "The Healthy Habits writing section is new.",
+  "say": "The Healthy Habits writing section is new.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "48c005ee",
+  "text": "a given competence",
+  "say": "a given competence",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
+  "key": "98d0d535",
+  "text": "From a given competence, I design an objective.",
+  "say": "From a given competence, I design an objective.",
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ },
+ {
   "key": "e6ce3f11",
   "text": "shopping cart",
   "say": "shopping cart",
@@ -5292,12 +6822,6 @@
   "src": "2eso/my-real-routine/a-day-in-my-life.html"
  },
  {
-  "key": "0384e422",
-  "text": "make a decision",
-  "say": "make a decision",
-  "src": "2eso/my-real-routine/a-day-in-my-life.html"
- },
- {
   "key": "eab19ff0",
   "text": "make an effort",
   "say": "make an effort",
@@ -5313,12 +6837,6 @@
   "key": "c1155162",
   "text": "make friends",
   "say": "make friends",
-  "src": "2eso/my-real-routine/a-day-in-my-life.html"
- },
- {
-  "key": "f7c92e94",
-  "text": "make a mistake",
-  "say": "make a mistake",
   "src": "2eso/my-real-routine/a-day-in-my-life.html"
  },
  {
