@@ -65,9 +65,15 @@ if __name__ == '__main__':
                         while toks < k: toks += len(words(al[wi][0])[0][1]); wi += 1
                         we = wi; got = 0; need = len(norm(ch))
                         while got < need: got += len(words(al[we][0])[0][1]); we += 1
-                        t0, t1 = al[wi][1] - 0.08, al[we - 1][2] + 0.12
+                        # the first word was cut off (teacher report, 2ESOB, 19 Nov 2026): the aligner often marks a word's start late, so
+                        # start 0.25 s earlier when there is a pause before it (never before the end of the word before) and at least 0.15 s
+                        # earlier in connected speech, and play 0.25 s of silence first, so a speaker or projector that wakes up with the
+                        # sound does not eat the first word
+                        t0, t1 = al[wi][1] - 0.25, al[we - 1][2] + 0.12
+                        if wi > 0: t0 = max(t0, min(al[wi - 1][2] + 0.01, al[wi][1] - 0.15))
+                        t0 = max(t0, 0)
                         out = os.path.join(base, 'audio', 'tts', key(ch)); os.makedirs(os.path.dirname(out), exist_ok=True)
-                        af = 'afade=t=in:d=0.03,afade=t=out:st=%.2f:d=0.06,apad=pad_dur=0.25' % (t1 - t0 - 0.06)
+                        af = 'afade=t=in:d=0.02,afade=t=out:st=%.2f:d=0.06,adelay=250:all=1,apad=pad_dur=0.25' % (t1 - t0 - 0.06)
                         run('-ss', '%.3f' % t0, '-to', '%.3f' % t1, '-i', os.path.join(base, f), '-vn', '-af', af + ',loudnorm=I=-16:TP=-1.5', '-ac', '1', '-b:a', '96k', out + '.mp3')
                         run('-ss', '%.3f' % t0, '-to', '%.3f' % t1, '-i', os.path.join(base, f), '-vn', '-af', af + ',atempo=0.75,loudnorm=I=-16:TP=-1.5', '-ac', '1', '-b:a', '96k', out + '-slow.mp3')
                         n += 1
