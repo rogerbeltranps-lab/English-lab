@@ -269,8 +269,13 @@ window.EL_EXAM = {
      },
      {
       "id": "bA-v07",
-      "t": "gap",
-      "q": "I ___ friends in the square on Fridays. (quedar amb)"
+      "t": "mc",
+      "q": "I ___ friends in the square on Fridays.",
+      "o": [
+       "do",
+       "go",
+       "meet"
+      ]
      },
      {
       "id": "bA-v08",
@@ -279,8 +284,13 @@ window.EL_EXAM = {
      },
      {
       "id": "bA-v09",
-      "t": "gap",
-      "q": "On your bike, always wear a ___. (casc)"
+      "t": "mc",
+      "q": "On your bike, always wear a ___.",
+      "o": [
+       "cap",
+       "costume",
+       "helmet"
+      ]
      },
      {
       "id": "bA-v10",
@@ -294,8 +304,13 @@ window.EL_EXAM = {
      },
      {
       "id": "bA-v12",
-      "t": "gap",
-      "q": "It’s ___: look at the trees moving! (fa vent)"
+      "t": "mc",
+      "q": "It’s ___: look at the trees moving!",
+      "o": [
+       "snowing",
+       "sunny",
+       "windy"
+      ]
      },
      {
       "id": "bA-v13",
@@ -304,8 +319,13 @@ window.EL_EXAM = {
      },
      {
       "id": "bA-v14",
-      "t": "gap",
-      "q": "The football team wears a white ___. (uniforme)"
+      "t": "mc",
+      "q": "The football team wears a white ___.",
+      "o": [
+       "costume",
+       "helmet",
+       "uniform"
+      ]
      },
      {
       "id": "bA-v15",
@@ -342,7 +362,7 @@ window.EL_EXAM = {
      {
       "id": "bA-g02",
       "t": "gap",
-      "q": "My cousin ___ (watch) skating videos every night."
+      "q": "My cousin ___ (get) up at seven every day."
      },
      {
       "id": "bA-g03",
@@ -361,33 +381,43 @@ window.EL_EXAM = {
      },
      {
       "id": "bA-g05",
-      "t": "mc",
-      "q": "Choose the right sentence.",
-      "o": [
-       "I go skating usually on Saturdays.",
-       "I go usually skating on Saturdays.",
-       "I usually go skating on Saturdays."
-      ]
+      "t": "gap",
+      "q": "___ often do you go swimming? — Once a week."
      },
      {
       "id": "bA-g06",
-      "t": "gap",
-      "q": "Look! The children ___ (play) in the snow."
+      "t": "mc",
+      "q": "Look! The children ___ in the snow.",
+      "o": [
+       "are playing",
+       "is playing",
+       "playing"
+      ]
      },
      {
       "id": "bA-g07",
-      "t": "gap",
-      "q": "I ___ (watch) a match right now."
+      "t": "mc",
+      "q": "I ___ a match right now.",
+      "o": [
+       "am watching",
+       "is watching",
+       "watching"
+      ]
      },
      {
       "id": "bA-g08",
       "t": "gap",
-      "q": "She ___ (dance) in the show today."
+      "q": "They ___ (wear) green T-shirts today."
      },
      {
       "id": "bA-g09",
-      "t": "gap",
-      "q": "It ___ (not / rain) now. It’s sunny!"
+      "t": "mc",
+      "q": "It ___ now. It’s sunny!",
+      "o": [
+       "doesn’t rain",
+       "isn’t raining",
+       "not raining"
+      ]
      },
      {
       "id": "bA-g10",
@@ -402,7 +432,7 @@ window.EL_EXAM = {
      {
       "id": "bA-g11",
       "t": "gap",
-      "q": "Write the -ing form: swim → ___"
+      "q": "Write the -ing form: watch → ___"
      },
      {
       "id": "bA-g12",
@@ -648,8 +678,13 @@ window.EL_EXAM = {
      },
      {
       "id": "bB-v06",
-      "t": "gap",
-      "q": "I ___ pictures of animals in my free time. (dibuixar)"
+      "t": "mc",
+      "q": "I ___ pictures of animals in my free time.",
+      "o": [
+       "draw",
+       "listen",
+       "read"
+      ]
      },
      {
       "id": "bB-v07",
@@ -663,18 +698,33 @@ window.EL_EXAM = {
      },
      {
       "id": "bB-v09",
-      "t": "gap",
-      "q": "It’s hot, so I’m wearing ___ and a T-shirt. (pantalons curts)"
+      "t": "mc",
+      "q": "It’s hot, so I’m wearing ___ and a T-shirt.",
+      "o": [
+       "a helmet",
+       "a tracksuit",
+       "shorts"
+      ]
      },
      {
       "id": "bB-v10",
-      "t": "gap",
-      "q": "She’s training in the park in a warm ___. (xandall)"
+      "t": "mc",
+      "q": "Put on a ___: the sun is very strong.",
+      "o": [
+       "cap",
+       "costume",
+       "helmet"
+      ]
      },
      {
       "id": "bB-v11",
-      "t": "gap",
-      "q": "At the town fair, people wear ___. (disfresses)"
+      "t": "mc",
+      "q": "At the town fair, people wear ___.",
+      "o": [
+       "costumes",
+       "helmets",
+       "trainers"
+      ]
      },
      {
       "id": "bB-v12",
@@ -746,17 +796,22 @@ window.EL_EXAM = {
      {
       "id": "bB-g05",
       "t": "mc",
-      "q": "Choose the right sentence.",
+      "q": "___ often do you play football? — Every day.",
       "o": [
-       "She always is happy at the weekend.",
-       "She is always happy at the weekend.",
-       "She is happy always at the weekend."
+       "How",
+       "What",
+       "Where"
       ]
      },
      {
       "id": "bB-g06",
-      "t": "gap",
-      "q": "Look! Pol ___ (run) to the bus stop."
+      "t": "mc",
+      "q": "Look! Pol ___ to the bus stop.",
+      "o": [
+       "is runing",
+       "is running",
+       "running"
+      ]
      },
      {
       "id": "bB-g07",
@@ -765,13 +820,23 @@ window.EL_EXAM = {
      },
      {
       "id": "bB-g08",
-      "t": "gap",
-      "q": "I ___ (make) a cake at the moment."
+      "t": "mc",
+      "q": "I ___ a cake at the moment.",
+      "o": [
+       "am makeing",
+       "am making",
+       "making"
+      ]
      },
      {
       "id": "bB-g09",
-      "t": "gap",
-      "q": "We ___ (not / play) football now."
+      "t": "mc",
+      "q": "We ___ football now.",
+      "o": [
+       "aren’t playing",
+       "don’t playing",
+       "not playing"
+      ]
      },
      {
       "id": "bB-g10",
@@ -786,7 +851,7 @@ window.EL_EXAM = {
      {
       "id": "bB-g11",
       "t": "gap",
-      "q": "Write the -ing form: write → ___"
+      "q": "Write the -ing form: play → ___"
      },
      {
       "id": "bB-g12",
@@ -1003,7 +1068,7 @@ window.EL_EXAM = {
      {
       "id": "cA-v05",
       "t": "gap",
-      "q": "I don’t play football during the week, only ___ the weekend."
+      "q": "In my ___ time I draw comics. (fr...)"
      },
      {
       "id": "cA-v06",
@@ -1023,7 +1088,7 @@ window.EL_EXAM = {
      {
       "id": "cA-v09",
       "t": "gap",
-      "q": "It’s cold, so she’s training in a warm ___. (tr...)"
+      "q": "The players are wearing their new white ___. (u...)"
      },
      {
       "id": "cA-v10",
@@ -1033,7 +1098,7 @@ window.EL_EXAM = {
      {
       "id": "cA-v11",
       "t": "gap",
-      "q": "I can’t see the end of the street. It’s ___. (f...)"
+      "q": "Look at the trees moving! It’s very ___. (w...)"
      },
      {
       "id": "cA-v12",
@@ -1043,17 +1108,17 @@ window.EL_EXAM = {
      {
       "id": "cA-v13",
       "t": "gap",
-      "q": "Our team is in a basketball ___ with sixteen teams this weekend. (t...)"
+      "q": "How ___ do you play football? — Every day."
      },
      {
       "id": "cA-v14",
       "t": "gap",
-      "q": "Marc is a great player: he ___ a goal in every match. (s...)"
+      "q": "Take an umbrella: it’s ___. (r...)"
      },
      {
       "id": "cA-v15",
       "t": "gap",
-      "q": "Correct the mistake: “We won the other team 3–1.” → We ___ the other team 3–1."
+      "q": "Correct the mistake: “It’s sun today.” → It’s ___ today."
      },
      {
       "id": "cA-v16",
@@ -1085,7 +1150,7 @@ window.EL_EXAM = {
      {
       "id": "cA-g04",
       "t": "gap",
-      "q": "Order the words: always / she / late / is → ___"
+      "q": "I ___ go to bed late on school days. (never / 0 %)"
      },
      {
       "id": "cA-g05",
@@ -1100,12 +1165,12 @@ window.EL_EXAM = {
      {
       "id": "cA-g07",
       "t": "gap",
-      "q": "Why ___ the fans ___ (cheer)?"
+      "q": "Look! Pol ___ (skate) on the big ramp."
      },
      {
       "id": "cA-g08",
       "t": "gap",
-      "q": "Who ___ (win) the match at the moment?"
+      "q": "They ___ (wear) green T-shirts today."
      },
      {
       "id": "cA-g09",
@@ -1366,7 +1431,7 @@ window.EL_EXAM = {
      {
       "id": "cB-v11",
       "t": "gap",
-      "q": "It’s 31 ___ today: very hot! (d...)"
+      "q": "It’s ___ today: the clouds are grey. (cl...)"
      },
      {
       "id": "cB-v12",
@@ -1376,7 +1441,7 @@ window.EL_EXAM = {
      {
       "id": "cB-v13",
       "t": "gap",
-      "q": "There’s a music ___ in the park in July: three days of concerts! (f...)"
+      "q": "We go ___ the park after lunch."
      },
      {
       "id": "cB-v14",
@@ -1418,7 +1483,7 @@ window.EL_EXAM = {
      {
       "id": "cB-g04",
       "t": "gap",
-      "q": "Order the words: usually / we / skating / go / on Sundays → ___"
+      "q": "How ___ do you train? — Twice a week."
      },
      {
       "id": "cB-g05",
@@ -1428,12 +1493,12 @@ window.EL_EXAM = {
      {
       "id": "cB-g06",
       "t": "gap",
-      "q": "Look! The players ___ (warm) up."
+      "q": "I ___ (watch) a basketball match right now."
      },
      {
       "id": "cB-g07",
       "t": "gap",
-      "q": "What ___ you ___ (do) right now?"
+      "q": "Is Hugo playing football? — No, he ___."
      },
      {
       "id": "cB-g08",
