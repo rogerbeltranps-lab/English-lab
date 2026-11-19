@@ -19,7 +19,7 @@ var LS2 = (function () {
     ['recall-checkpoint-3.html', 'Recall checkpoint 3'],
     ['write-to-the-head-teacher.html', '6 · Write to the head teacher'],
     ['recall-checkpoint-4.html', 'Recall checkpoint 4'],
-    ['sample-exam.html', 'Sample exam'],
+    ['sample-exam.html', 'First exam'],
     ['celebration-day-proposal.html', '7 · Final product'],
     ['reflect.html', 'Reflect']
   ];

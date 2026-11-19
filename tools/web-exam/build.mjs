@@ -14,7 +14,7 @@ const [src] = process.argv.slice(2).filter(a => !a.startsWith("--"));
 if (!src) { console.error("Usage: node tools/web-exam/build.mjs <source.mjs>"); process.exit(1); }
 const S = (await import(pathToFileURL(path.resolve(src)).href)).default;
 const SECTIONS = ["listening", "reading", "vocabulary", "grammar", "writing"];   // writing: a free text the teacher marks with a level (no key)
-const FOLDERS = { "2eso-free-time-live": "2eso/free-time-live", "4eso-my-real-routine": "4eso/my-real-routine" }, folder = FOLDERS[S.ls];
+const FOLDERS = { "2eso-free-time-live": "2eso/free-time-live", "4eso-my-real-routine": "4eso/my-real-routine", "4eso-seasons-and-celebrations": "4eso/seasons-and-celebrations" }, folder = FOLDERS[S.ls];
 if (!folder) throw new Error("Unknown LS " + S.ls);
 const out = path.join(ROOT, folder, "data", "exam.js");
 // the password hash: PBKDF2-SHA256, 150 000 rounds, random salt (shared/js/el-web-exam.js checks it in the browser)

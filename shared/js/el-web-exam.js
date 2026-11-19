@@ -234,7 +234,7 @@
   D.addEventListener('webkitfullscreenchange', () => { if ($('#wxWait') && !goNow) waiting(); });
   async function begin() {
       if (S && S.started) return;
-      const pl = paperOf(S.level), v = hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);
+      const pl = paperOf(S.level), vs = ['A', 'B', 'C', 'D'].filter(x => X.papers[pl + '-' + x]), v = vs.length ? vs[hash32(String(me.uid) + X.key) % vs.length] : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);   // as many versions as the exam has (4ESO LS2: A, B, C; Roger 19 Nov 2026 "so that students can't copy")
       const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
