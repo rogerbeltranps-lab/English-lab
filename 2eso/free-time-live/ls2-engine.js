@@ -246,7 +246,9 @@ var LS2 = (function () {
     const K = { listen: ['🎧', 'Escolta i completa', 'Listen and complete'], pick: ['👆', 'Tria', 'Choose'], join: ['🔗', 'Uneix les dues frases', 'Join the two sentences'],
       change: ['🔄', 'Canvia la frase', 'Change the sentence'], fix: ['🔧', 'Troba l’error i corregeix-lo', 'Find the mistake and correct it'],
       own: ['✏️', 'El teu exemple', 'Your own example'], fill: ['✏️', 'Completa', 'Complete'] };
-    const k = K[m === 'listen' ? 'listen' : it.own ? 'own' : it.k && K[it.k] ? it.k : it.opts ? 'pick' : 'fill'];
+    const key = m === 'listen' ? 'listen' : it.own ? 'own' : it.k && K[it.k] ? it.k : it.opts ? 'pick' : 'fill';
+    if (key === 'pick' || key === 'fill') return '';   // 👆 Choose / ✏️ Complete are obvious from the question itself (Roger, 19 Nov 2026)
+    const k = K[key];
     return '<span class="gkind gk-' + (it.own ? 'own' : m === 'listen' ? 'listen' : it.k || (it.opts ? 'pick' : 'fill')) + '">' + k[0] + ' ' + (ca() ? k[1] : k[2]) + '</span>';
   }
   function partsCss() {
