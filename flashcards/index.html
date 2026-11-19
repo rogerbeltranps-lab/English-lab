@@ -30,4 +30,5 @@ $('addform').addEventListener('submit',e=>{e.preventDefault();let v=Object.fromE
 $('export').addEventListener('click',()=>{let payload={version:1,cards:all(),progress};let b=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download='my-word-lab-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)});
 $('import').addEventListener('click',()=>$('importfile').click());$('importfile').addEventListener('change',async e=>{try{let d=JSON.parse(await e.target.files[0].text()),items=Array.isArray(d)?d:d.cards;if(!Array.isArray(items)||!items.every(x=>x.id&&x.term&&x.definition))throw Error('Invalid flashcard format');const m=new Map(local.map(c=>[c.id,c]));items.forEach(c=>m.set(c.id,c));local=[...m.values()];save(KEY,local);if(d.progress&&typeof d.progress==='object'){progress={...progress,...d.progress};save(PROGRESS,progress)}$('message').textContent='Imported '+items.length+' cards successfully.';renderStats();renderList()}catch(err){$('message').textContent='Import failed: '+err.message}e.target.value=''});$('refresh').addEventListener('click',sync);renderStats();renderList();sync();
 })();
-</script></body></html>
+</script><script type="module" src="../shared/js/el-report-btn.js"></script>
+</body></html>
