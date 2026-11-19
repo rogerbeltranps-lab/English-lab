@@ -55,7 +55,10 @@ window.EL_GRADING={
       // Exam: a mark per section (score out of max) and the writing level. Exam mark = sum of scores / sum of maxes × 10.
       // Use of English (vocabulary, grammar) counts for reading and writing alike, 4.1 and 5.1, in both LS2s (Roger, 30 Oct 2026:
       // “even though students see that section as Use of English … the competences are reading and writing”).
-      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
+      // The exam is on the site (Roger, 19 Nov 2026: "a tailored exam so that they get good marks"; 4eso/seasons-and-celebrations/exam.html,
+      // like 2ESO LS2): only what both groups did (LP1, LP2, LP3 vocabulary + Past Simple / used to), same section weights as 2ESO LS2.
+      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",35,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",10,["5.1"]]],max:10,level:{step:"writing",c:"5.1"},
+        web:{key:"ls2Exam4ESO",page:"4eso/seasons-and-celebrations/exam.html"}},
       // Where the teacher gives one-click levels: activity + step + criteria. group: given once per final-product group and copied to each member.
       // Only the video is marked in groups (Roger, 25 Oct 2026): the research card (6.1) is a level per student in round 1.
       // c may be a pseudo criterion with its own indicators (teamwork, process). The final product rows are in the final product dialog.
