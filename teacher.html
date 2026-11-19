@@ -617,13 +617,19 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     // and I need to hard reload it … and it takes a bit to see the mark on the table")
     if(k[0]==="settings"&&/^fp__/.test(k[1]||"")&&k.length===2)return "skip";
     return null};
-  const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300||fs.some(f=>!f))return load();
-  const stu=new Set();
-  await Promise.all(ps.map(async(p,i)=>{if(fs[i]==="skip")return;if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
+  const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300)return load();
+  // a document with no read-back of its own (attendance, live/{group} of class mode and the timetable, checkpoint keys…): the light data is
+  // fetched again (load(), from this computer's copy), but only AFTER the documents that do have one are read back. Before, one such write
+  // left behind in TOUCHED (attendance, class mode write without act()) made the next save skip its own read-back: load() rebuilt the page
+  // from the copy, so a final product mark just saved showed the old one (Roger, 19 Nov 2026, 2ESO B: "Your marks saved: 0/10" for a 9/10
+  // that was in the database)
+  const light=fs.some(f=>!f),stu=new Set();
+  await Promise.all(ps.map(async(p,i)=>{if(!fs[i]||fs[i]==="skip")return;if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
     if(fs[i]==="stu"){stu.add(p.split("/")[1]);return}
     const d=await F.getDoc(F.doc(db(),...p.split("/")));fs[i](d.exists()?d.data():null)}));
-  saveCache();if(!stu.size)return D;
-  await Promise.all([...stu].map(loadStudent));return build(D)}
+  if(stu.size)await Promise.all([...stu].map(loadStudent));
+  if(light)return load();   // rebuilds from RAW, which now has what was read back (D.st/rs/lv/ro/pt/tm are RAW's own objects)
+  saveCache();return stu.size?build(D):D}
 // One-click assessment (levels, groups, exam marks, confirmed degrees): merged into results/{id} at once and on screen without reloading.
 // null deletes a field. id is an activity id, or the LS's own record (asId: exam marks, exam writing level, confirmed degrees).
 const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
@@ -1796,7 +1802,7 @@ function fpgZeroAll(a,us){const R=fpgRubric(a);if(!R)return;const ps=[];
     if(!(d&&d.manual&&d.draft)){fpgManual(u,a,why);d=FPG.d[a.id][u]}
     const x=d.draft;x.rows=R.rows.map((r,i)=>{const z=(x.rows||[])[i];return z&&z.level!=null?z:fpgNE(R)});if(!String(fpgTop(x)||"").trim())x.top=fpgNoTop(a,why);
     const o={feedback:fpgText(R,x)};if(R.kind==="mark"){const m=fpgMark(R,x);o.score=m==null?0:m;o.max=10}
-    d.approved=new Date().toISOString();ps.push(...fpgLevelPatches(u,a,R,x),fpgSave(a,u,d),api.result(u,a,o))});
+    d.approved=new Date().toISOString();fpgResLocal(u,a,o);ps.push(...fpgLevelPatches(u,a,R,x),fpgSave(a,u,d),api.result(u,a,o))});
   if(ps.length)act(Promise.all(ps))}
 document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="zeroall"]');if(!b)return;const a=cat.find(x=>x.id===b.dataset.a);if(!a)return;
   b.disabled=true;fpgZeroAll(a,b.dataset.us.split(","))});
@@ -1891,9 +1897,12 @@ function fpSide(u,a){const b=$("#fpside");if(!b||!a||b.dataset.a!==a.id||(u&&b.d
 function fpPick(u,a){FPG.sel=FPG.sel||{};FPG.sel[a.id]=u;const b=$("#fpside");if(!b||b.offsetParent===null)return false;
   document.querySelectorAll("table.fpt tbody tr[data-fpsel]").forEach(r=>r.classList.toggle("on",r.dataset.fpsel===u));b.dataset.u=u;b.innerHTML=fpSideH(u,a);return true}
 // ✅ Approve without the box: the same as the box's Approve + Save (levels, the mark, Gemini's comment with the ✔ ➜ lines)
+// the saved mark on screen at once (the table, "💾 Your marks saved: …"), before the write comes back: d.approved is set at once, so without
+// it the panel said "Your marks saved: 0/10" (the old 0 for nothing to mark) until the read-back (Roger, 19 Nov 2026)
+function fpgResLocal(u,a,o){if(DEMO)return;const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign({},r[a.id],{ls:a.ls,activity:a.id},o)}
 function fpgApproveNow(u,a,next){const R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],x=d&&d.draft;if(!R||!x||FPG.busy[u+"|"+a.id])return;
   const ps=fpgLevelPatches(u,a,R,x),o={feedback:fpgText(R,x)};if(R.kind==="mark"){const m=fpgMark(R,x);if(m!=null){o.score=m;o.max=10}}
-  d.approved=new Date().toISOString();ps.push(fpgSave(a,u,d));ps.push(api.result(u,a,o));ps.push(fpgLearn(u,a,R,d).catch(e=>console.warn("fp lesson",e)));
+  d.approved=new Date().toISOString();fpgResLocal(u,a,o);ps.push(fpgSave(a,u,d));ps.push(api.result(u,a,o));ps.push(fpgLearn(u,a,R,d).catch(e=>console.warn("fp lesson",e)));
   if(next||(FPG.sel||{})[a.id]===u)(FPG.sel=FPG.sel||{})[a.id]=fpNext(u,a);
   act(Promise.all(ps))}
 // ---- 🎯 Coverage (Roger, 6 Nov 2026: "another section where we can see if we have worked all the assessment criteria and competences
