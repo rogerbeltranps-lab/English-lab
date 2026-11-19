@@ -404,7 +404,11 @@ var LS2 = (function () {
     const st = document.createElement('style'); st.id = 'el-one-css';
     st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
-      '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}';
+      '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}' +
+      '.el-nbink .question.el-nbopen .el-one{display:inline-block!important}.el-nbfix{display:inline-block;margin-top:6px;padding:6px 14px!important;font-size:.9em!important;min-height:0!important}' +
+      '.el-nbwas{margin-top:4px;font-size:.92em;color:#5f6874}.el-nbwas s{text-decoration-color:#d32f2f;text-decoration-thickness:2px}.el-nbmark{display:block;margin-top:6px;font-weight:400}' +
+      'html.el-lpnb .lp-panels .panel .el-nbwas{font:400 19px/1.3 var(--nb-hand,cursive)}html.el-lpnb .lp-panels .panel .el-nbwas s{color:var(--nb-ink,#1f4fb5)}' +
+      'html.el-lpnb .lp-panels .panel .question.el-nbopen{outline:2px dashed var(--nb-ink,#1f4fb5);outline-offset:6px;border-radius:6px}';
     document.head.appendChild(st);
   }
   const oneBtn = (prefix, i) => '<button class="btn secondary el-one" type="button" data-one="' + prefix + '" data-i="' + i + '" title="' + (ca() ? 'Comprova només aquesta pregunta' : 'Check only this question') + '">✓ ' + (ca() ? 'Comprova' : 'Check') + '</button>';
@@ -522,7 +526,8 @@ var LS2 = (function () {
     $('#' + id + 'Check').onclick = () => { if (one) allIx(items).forEach(i => chk(id).add(i)); check(true, null); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true); };
     if (one) {
       const go = i => {
-        if (!(i >= 0 && i < items.length) || (nbFrozen(id) && one.includes(i))) return;   // ➕ extra practice stays open in the notebook look
+        if (!(i >= 0 && i < items.length)) return;
+        if (nbFrozen(id) && one.includes(i)) return nbRedo(id, i);   // ➕ extra practice stays open in the notebook look; a wrong answer opened with ✏️ is checked by nbRedo
         const v = vals(items, prefix);
         if (!filledV(v[i])) return check(false, [i]);   // "Type an answer": nothing is marked or saved
         chk(id).add(i); check(true, [i]); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true);
@@ -561,9 +566,11 @@ var LS2 = (function () {
   /* ➕ Extra practice stays open (problem report, 4ESOB, 17 Nov 2026: "no puc fer les opcionals"): a frozen notebook freezes only the
      counted questions, so the optional extras below them can still be typed and checked one by one. Marks never change (firsts: need only). */
   function nbLock(id, listId, on) {
-    const l = $('#' + listId), S = NBS[id], x = !!(on && l && S && S.one && l.querySelector(':scope>.question.gx'));
-    if (l) { l.inert = on && !x; l.classList.toggle('el-nbink', on); l.querySelectorAll(':scope>.question').forEach(q => { q.inert = x && !q.classList.contains('gx'); }); }
+    // one Check per question: each counted question is locked on its own (not the whole list), so ➕ extras and ✏️ Correct it stay usable
+    const l = $('#' + listId), S = NBS[id], per = !!(on && l && S && S.one);
+    if (l) { l.inert = on && !per; l.classList.toggle('el-nbink', on); l.querySelectorAll(':scope>.question').forEach(q => { q.inert = per && !q.classList.contains('gx'); }); }
     const c = $('#' + id + 'Check'); if (c) c.style.display = on ? 'none' : '';
+    nbFix(id, per);
   }
   function nbShow(S) {
     const { id, prefix, listId, items, check, src } = S, on = nbFrozen(id);
@@ -571,8 +578,87 @@ var LS2 = (function () {
     Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; });
     clearStep(id, listId);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
+    nbMerge(S, on && k);
     if (k) { fill(items, prefix, k.v); check(false, k.c); } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k);
+  }
+  /* ✏️ Correct a wrong answer in the notebook, one question at a time (Roger, 19 Nov 2026: "I want them to be able to redo the questions
+     one by one"). In the frozen notebook look every counted question answered wrong has its own "✏️ Correct it": it opens only that
+     question, the student answers it again and presses its ✓ Check, as often as they need (a typed answer shows after the second wrong
+     try, as in the laptop look). The correction stays in the notebook (state.nb[id].re, by question id: {v, t: tries, ok, at}) with the
+     first try crossed out under it. Nothing else changes: the mark is still the first check (state.items, state.tries), and 📓 My notebook
+     (first try) and the laptop look (state.ans, ↺ Practise again) never see the corrections. */
+  const nbRe = id => { const nb = state.nb && state.nb[id]; return nb && nb.re && typeof nb.re === 'object' ? nb.re : null; };
+  // k: the frozen notebook's answers (kept), or null. S.first keeps the first try; each saved correction is drawn on top of it.
+  function nbMerge(S, k) {
+    S.open = new Set(); S.first = k ? k.v.slice() : null;
+    const re = k && S.one && nbRe(S.id); if (!re) return;
+    S.items.forEach((it, i) => { const r = re[qid(it)]; if (!r || !S.one.includes(i) || !filledV(k.v[i])) return; k.v[i] = r.v; tries[S.prefix + i] = r.t || 0; });
+  }
+  const nbAns = (it, v) => it && it.o ? String(it.o[v] == null ? '' : it.o[v]) : esc(String(v == null ? '' : v));
+  // on: the notebook look is frozen; draws ✏️ Correct it under each wrong answer, the crossed-out first try and the mark note
+  function nbFix(id, on) {
+    const S = NBS[id], l = S && $('#' + S.listId); if (!l) return;
+    l.querySelectorAll('.el-nbfix,.el-nbwas').forEach(x => x.remove());
+    l.querySelectorAll(':scope>.question').forEach(q => { q.classList.remove('el-nbopen'); [...q.children].forEach(c => { c.inert = false; }); });
+    const r = $('#' + id + 'Result'), m = r && r.querySelector('.el-nbmark'); if (m) m.remove();
+    if (!on || !S.one) return;
+    if (!S.open) S.open = new Set();
+    if (!S.first) S.first = vals(S.items, S.prefix);   // frozen just now, with the last ✓ Check: what is on the page is the first try
+    const re = nbRe(id) || {}; let fixed = 0;
+    S.one.forEach(i => {
+      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q || !filledV(S.first[i])) return;
+      const was = re[qid(it)], open = S.open.has(i), wrong = f.classList.contains('no');
+      if (was) fixed++;
+      if (!wrong && !was && !open) return;   // right at the first try: it stays in pen
+      q.inert = false;
+      if (open) q.classList.add('el-nbopen'); else [...q.children].forEach(c => { c.inert = true; });
+      let at = f;
+      if (was || open) {
+        const w = document.createElement('div'); w.className = 'el-nbwas';
+        w.innerHTML = (ca() ? 'El teu primer intent (és el que compta per a la nota): ' : 'Your first try (this is what counts for your mark): ') + '<s>' + nbAns(it, S.first[i]) + '</s>';
+        f.after(w); at = w;
+      }
+      if (wrong && !open) {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'btn secondary el-nbfix';
+        b.textContent = '✏️ ' + (ca() ? 'Corregeix-la' : 'Correct it');
+        b.title = ca() ? 'Torna a fer només aquesta pregunta. La nota no canvia.' : 'Do only this question again. Your mark does not change.';
+        b.onclick = () => nbOpen(id, i);
+        at.after(b);
+      }
+    });
+    if (fixed && r && r.classList.contains('show')) {
+      const T = (state.tries || {})[id === 'vocab' ? 'practice' : id], n = T && T.max != null ? ' ' + T.score + ' / ' + T.max : '';
+      const s = document.createElement('span'); s.className = 'el-nbmark';
+      s.textContent = '✏️ ' + (ca() ? 'Has corregit ' + fixed + (fixed > 1 ? ' respostes' : ' resposta') + ' a la llibreta. La teva nota continua sent el primer intent' + (n ? ':' + n : '') + '.'
+        : 'You’ve corrected ' + fixed + (fixed > 1 ? ' answers' : ' answer') + ' in your notebook. Your mark is still your first try' + (n ? ':' + n : '') + '.');
+      r.appendChild(s);
+    }
+  }
+  // ✏️ Correct it: only that question opens, empty, with its own ✓ Check
+  function nbOpen(id, i) {
+    const S = NBS[id]; if (!S || !nbFrozen(id)) return;
+    if (!S.open) S.open = new Set(); S.open.add(i);
+    const it = S.items[i], f = $('#' + S.prefix + 'f' + i), box = $('#' + S.prefix + i);
+    if (it.o) $$('input[name="' + S.prefix + i + '"]').forEach(x => { x.checked = false; }); else if (box) box.value = '';
+    syncPicks();
+    if (f) { f.textContent = ''; f.className = 'feedback'; }
+    nbFix(id, true);
+    const t = it.o ? $('input[name="' + S.prefix + i + '"]') : box;
+    if (t) { try { t.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  // its ✓ Check (or Enter): shows the correction, saves it in the notebook; nothing counts for the mark
+  function nbRedo(id, i) {
+    const S = NBS[id]; if (!S || !S.open || !S.open.has(i)) return;
+    const v = vals(S.items, S.prefix)[i], f = $('#' + S.prefix + 'f' + i), key = S.prefix + i;
+    S.check(false, [i]);
+    if (!filledV(v)) return nbFix(id, true);   // "Type an answer": nothing is saved
+    const ok = !!(f && f.classList.contains('ok'));
+    if (!ok) { tries[key] = (tries[key] || 0) + 1; S.check(false, [i]); }
+    const nb = state.nb[id]; nb.re = nb.re || {};
+    nb.re[qid(S.items[i])] = { v, t: tries[key] || 0, ok: ok ? 1 : 0, at: new Date().toISOString() };
+    if (ok) S.open.delete(i);
+    save(); nbFix(id, true);
   }
   /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
      in their own notebook"): the first try is in 📓 My notebook (el-exam.js), and the link opens it at this step (el-cloud.js el_nb_at) */
