@@ -543,7 +543,10 @@ function blockHtml(l,hid,fresh){
 const tiles=(s,i,reveal)=>{const o=order(i),ok=okAt(i);
   return `<div class="tiles">${o.map((k,n)=>`<div class="tile t${n}${reveal&&n!==ok?" dim":""}"><span class="shp s${n}"></span><span class="tx">${md(s.options[k])}</span>${reveal&&n===ok?'<span class="mark">✓</span>':""}</div>`).join("")}</div>`};
 
-function draw(){
+// ↕ the long screens (the game list, the ticks) scroll inside the board (the page itself never scrolls: game.css body overflow hidden;
+// Roger, 19 Nov 2026: "I want this at the top, and I want to be able to scroll down in case a menu is long")
+function draw(){draw0();app$.classList.toggle("scroll",!!app$.querySelector(".tpwrap,.courses"))}
+function draw0(){
   if(!H.user){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🎮 Class game</h2><p>This is the teacher's board. Sign in with the teacher's account to start a game.</p><p><button class="btn go" data-do="signin">Sign in with Google</button></p></div></div>`;return}
   if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🎮 Class game</h2><p>This is the teacher's board. When your teacher starts a game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a> <button class="btn" data-do="signout">Sign out</button></p></div></div>`;return}
   if(!H.deck){
@@ -658,10 +661,10 @@ function drawPoints(){
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
     <p class="sub">${kindOf()==="mix"?"📚🧩":what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class. Untick what you haven't taught yet. % = how the class did last time${GP[gpKey(g)]?"":" (loading…)"}.</p>
-    <div class="tpcols">${meD?`<section class="course tpls tpnow"><h3>🎯 This game</h3>${lp(meD)}</section>`:""}${lsList.map(l=>{const ds=gDecks().filter(d=>(d.ls||"")===l&&d!==meD);return ds.length?`<section class="course tpls">${l?`<h3>${meD?"🔁 ":""}${esc(l)}${meD?" · review":""}</h3>`:""}${ds.map(lp).join("")}</section>`:""}).join("")}</div>
     <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
       <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · "+paceIcon()+" each at their own pace":""}`}</b>
       ${fmtSwitch()}<button class="btn ${fmt()==="sr"?"srbtn":cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?paceIcon():"▶"} Start for ${esc(groupName(g))}</button></div>
+    <div class="tpcols">${meD?`<section class="course tpls tpnow"><h3>🎯 This game</h3>${lp(meD)}</section>`:""}${lsList.map(l=>{const ds=gDecks().filter(d=>(d.ls||"")===l&&d!==meD);return ds.length?`<section class="course tpls">${l?`<h3>${meD?"🔁 ":""}${esc(l)}${meD?" · review":""}</h3>`:""}${ds.map(lp).join("")}</section>`:""}).join("")}</div>
     <p>${backBtn()}<button class="btn ghost" data-do="tpback">← Groups</button></p></div></div>`;
 }
 
