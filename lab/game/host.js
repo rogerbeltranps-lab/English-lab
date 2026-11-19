@@ -626,11 +626,13 @@ function drawPoints(){
     return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}>${gpTag(g,d,p)}<span class="tpt">${ex?"💬 <b>Expressions</b> · ":""}${esc(p.name)}</span><small>${[gpDay(g,d,p),why(p)].filter(Boolean).join(" · ")}</small></label>`).join("")};
   const lp=d=>{const me=d.id===A,x=exDeck(d);
     return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">${H.lsg?"All its questions":"This game"}</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
-      ${rows(d,me)}${x&&RAW[x.id]?rows(x,me):""}</div>`};
+      <div class="tprows">${rows(d,me)}${x&&RAW[x.id]?rows(x,me):""}</div></div>`};
+  // 👀 the learning path of this game first, full width (Roger, 18 Nov 2026: "I can't see LP3 well here"), the earlier ones below as review
+  const meD=gDecks().find(d=>d.id===A);
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
     <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class. Untick what you haven't taught yet. % = how the class did last time${GP[gpKey(g)]?"":" (loading…)"}.</p>
-    <div class="tpcols">${lsList.map(l=>`<section class="course tpls">${l?`<h3>${esc(l)}</h3>`:""}${gDecks().filter(d=>(d.ls||"")===l).map(lp).join("")}</section>`).join("")}</div>
+    <div class="tpcols">${meD?`<section class="course tpls tpnow"><h3>🎯 This game</h3>${lp(meD)}</section>`:""}${lsList.map(l=>{const ds=gDecks().filter(d=>(d.ls||"")===l&&d!==meD);return ds.length?`<section class="course tpls">${l?`<h3>${meD?"🔁 ":""}${esc(l)}${meD?" · review":""}</h3>`:""}${ds.map(lp).join("")}</section>`:""}).join("")}</div>
     <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
       <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · "+paceIcon()+" each at their own pace":""}`}</b>
       ${fmtSwitch()}<button class="btn ${fmt()==="sr"?"srbtn":cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?paceIcon():"▶"} Start for ${esc(groupName(g))}</button></div>
