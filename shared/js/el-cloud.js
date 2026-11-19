@@ -1142,8 +1142,8 @@ function gtBox(box,rt){
   if(!user||!isStudent(user)||AS)return;GTN.rt=rt;GTN.ca=lockCa();
   let f=document.getElementById("el-gt-notes");
   if(!f||!f.isConnected||f.previousElementSibling!==box){if(f)f.remove();f=document.createElement("div");f.id="el-gt-notes";f.className="section-card";
-    f.innerHTML=`<h3>📝 ${gtT("Pren apunts","Take your notes")}</h3><p class="instruction">${gtT("Copia el que vulguis de l'explicació i escriu 2 frases teves amb aquesta gramàtica. Ho trobaràs a 🎯 Què entra a l'examen, amb la data i l'explicació.","Copy what you want from the explanation and write 2 sentences of your own with this grammar. You'll find it in 🎯 What's in the exam, with the day and the explanation.")}</p>`+
-      `<textarea maxlength="3000" spellcheck="false" style="width:100%;min-height:130px;font:16px/1.5 system-ui,sans-serif;padding:10px;border-radius:10px;border:2px solid #cbd5e1;box-sizing:border-box" placeholder="${GTN.ca?"1. …&#10;2. …&#10;Per recordar: …":"1. …&#10;2. …&#10;To remember: …"}"></textarea><p class="tiny" id="el-gt-st"></p>`;
+    f.innerHTML=`<h3>📝 ${gtT("Pren apunts","Take your notes")}</h3><p class="instruction">${gtT("📓 L'explicació ja és a la teva llibreta: no la copiïs. Aquí pots escriure exemples teus o només les coses importants per recordar. És opcional.","📓 The explanation is already in your notebook: don't copy it. Here you can write your own examples or just the important things to remember. It's optional.")}</p>`+
+      `<textarea maxlength="3000" spellcheck="false" style="width:100%;min-height:130px;font:16px/1.5 system-ui,sans-serif;padding:10px;border-radius:10px;border:2px solid #cbd5e1;box-sizing:border-box" placeholder="${GTN.ca?"Exemple: …&#10;Per recordar: … (opcional)":"Example: …&#10;To remember: … (optional)"}"></textarea><p class="tiny" id="el-gt-st"></p>`;
     box.after(f);const ta=f.querySelector("textarea");ta.value=GTN.v;
     ta.addEventListener("input",()=>{GTN.v=ta.value;GTN.dirty=true;gtState("");clearTimeout(GTN.t);GTN.t=setTimeout(gtSave,2500)});
     // what they wrote before on this learning path (another day, another device) comes back: one read per page
