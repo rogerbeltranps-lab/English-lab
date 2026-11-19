@@ -2359,10 +2359,10 @@ function crLoad(){if(CRES)return;if(DEMO){CRES={list:(DEMO.classResults||[]).sli
   F.getDocs(F.query(F.collection(db(),"classResults"),F.orderBy("at","desc"),F.limit(80))).then(q=>{CRES={list:q.docs.map(d=>Object.assign({id:d.id},d.data()))};if(S.g==="cres")render()})
     .catch(e=>{console.warn("class results",e);CRES={list:[],err:true};if(S.g==="cres")render()})}
 function crPage(){crLoad();
-  const head=`<div class="ph"><h1>📊 Class results</h1><p class="sub">Grammar and reading corrected together (✅ Correct in class mode): who did it and the % right on their first check, lesson by lesson. Saved from ⏱ Your turn on.</p></div>`;
+  const head=`<div class="ph"><h1>📊 Class results</h1><p class="sub">Grammar and reading worked out together (🙌 Work it out together in class mode): who did it and the % right on their first check, lesson by lesson. Saved from ⏱ Your turn on.</p></div>`;
   if(CRES.busy)return head+`<div class="box"><p class="muted">Loading…</p></div>`;
   const L=CRES.list,gs=GR.filter(g=>L.some(x=>x.group===g.id)),gsel=gs.some(g=>g.id===S.cr.g)?S.cr.g:"all",show=L.filter(x=>gsel==="all"||x.group===gsel);
-  if(!L.length)return head+`<div class="box"><p class="muted">${CRES.err?"Could not read the class results.":"Nothing yet. Open ✅ Correct on a Grammar or Reading tab in class mode and go to ⏱ Your turn: from then on the lesson is saved here."}</p></div>`;
+  if(!L.length)return head+`<div class="box"><p class="muted">${CRES.err?"Could not read the class results.":"Nothing yet. Open 🙌 Work it out together on a Grammar or Reading tab in class mode and go to ⏱ Your turn: from then on the lesson is saved here."}</p></div>`;
   const byMail={};Object.values(S.P||{}).forEach(s=>{if(s.email)byMail[s.email.toLowerCase()]=s;if(s.rid)byMail[s.rid]=s});
   const nm=r=>{const s=byMail[r.e];return s?fullName(s):r.n||r.e},gname=id=>(GR.find(g=>g.id===id)||{}).name||id,LVN={beginners:"Starter",insecure:"Base",safe:"Core",daring:"Plus",native:"Pro"};
   const pc=x=>x==null?"–":x+" %",col=x=>x==null?"#cbd5e1":x>=80?"#16a34a":x>=50?"#d97706":"#dc2626";
