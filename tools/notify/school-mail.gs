@@ -52,6 +52,9 @@
 //      {idToken (Roger's accounts), action: "tn_mark", at} and starts the same scheduled task as ✏️ Correct everything waiting now
 //      (startMarking, at most once every 10 minutes), where Claude corrects it (tools/marking/marks.mjs tn-ready / tn-apply). The C2
 //      speaking coach now corrects only what is really wrong or sounds non-native, never a nicer version of what a native could say.
+//  22. v33 (Roger, 19 Nov 2026: "stop sending mails with the reports to my personal mail"): the emails this script sends to Roger itself
+//      (🎬 new final product video, the setup test) go to his school inbox TEACHER_MAIL (roger.beltran@ietramuntana.cat), never to
+//      his personal Gmail. TEACHER stays his English Lab sign-in for the teacher actions.
 //  19. v30 (Roger, 17 Nov 2026: "I want to be able to listen to the audio in the web when I press them and see the feedback. In my iPad
 //      it got me to the Drive file and it didn't work"): new action {idToken (teacher), action: "audio_get", fileId} → {ok, mime, name,
 //      data (base64)}: the dashboard plays a student's Speaking or Talk recording inside the page, next to the correction, instead of
@@ -88,7 +91,10 @@
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
 const KEY = "PUT-THE-KEY-HERE";
-const TEACHER = "roger.beltranps@gmail.com";
+const TEACHER = "roger.beltranps@gmail.com";   // the teacher's English Lab sign-in (who may use the teacher actions)
+// v33 (Roger, 19 Nov 2026: "stop sending mails with the reports to my personal mail"): every email this script sends to Roger goes to his
+// school inbox, never to his personal Gmail.
+const TEACHER_MAIL = "roger.beltran@ietramuntana.cat";
 const ALLOWED = /^[^@\s,]+@ietramuntana\.cat$/i;
 // MARK_TASK_TOKEN: the API token of the scheduled task "English Lab: mark and correct" (claude.ai/code/routines > that task > API trigger >
 // Generate token). Never in the repo (this copy has a placeholder: the button then falls back to the GitHub Action).
@@ -384,7 +390,7 @@ function signedIn(idToken) {
 
 // Run this once from the editor to check that sending works: you get a test email in your Gmail.
 function testMe() {
-  MailApp.sendEmail({to: TEACHER, subject: "English Lab: the school mail script works ✅", body: "Now deploy it as a web app and copy the link.", name: "English Lab"});
+  MailApp.sendEmail({to: TEACHER_MAIL, subject: "English Lab: the school mail script works ✅", body: "Now deploy it as a web app and copy the link.", name: "English Lab"});
 }
 
 // One "English Lab" label in the school Gmail (Roger, 6 Nov 2026: "to see the mails I sent in a section of the mail ... together as well as
@@ -947,7 +953,7 @@ function videoMail(up, f) {
   const m = up.meta || {}, who = up.name || String(up.email || "").split("@")[0], group = m.group || "?";
   const when = Utilities.formatDate(new Date(), "Europe/Madrid", "EEE d MMM, HH:mm");
   const mb = up.size ? Math.round(up.size / 1048576) + " MB" : "";
-  MailApp.sendEmail({to: TEACHER, name: "English Lab",
+  MailApp.sendEmail({to: TEACHER_MAIL, name: "English Lab",
     subject: "English Lab: 🎬 new final product video · " + who + " (" + group + ")",
     body: who + " (" + group + ", " + (up.email || "") + ") has just uploaded a final product video on the website.\n\n" +
       "Final product: " + (m.activity || "?") + "\nWhen: " + when + (mb ? "\nSize: " + mb : "") + "\nFile: " + (f.name || "") + "\n\n" +

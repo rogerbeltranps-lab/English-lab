@@ -8,8 +8,8 @@
 //        today, not ticked in teacherPlan/{group}.ticks, not set as homework, not "Homework by …", "moved to" or self-study lines). Left
 //        alone they move to next week's list (↪), so the email suggests ticking them or 🏠 Set as homework.
 //     2. the problem reports not marked as fixed and the ideas of the last 7 days.
-// Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) or else Gmail (GMAIL_APP_PASSWORD) to ALERT_EMAIL_TO (default
-// roger.beltranps@gmail.com); no password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
+// Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) to Roger's school inbox roger.beltran@ietramuntana.cat
+// (TEACHER_TO; never his personal Gmail, Roger 19 Nov 2026); no school relay or password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
 // The Action log is public (the repo is public): counts only, never names or text.
 //   node tools/notify/notify.mjs [--instant] [--dry]    --dry: nothing sent, the email goes to notify-dry.eml in the temp folder
 //   node tools/notify/notify.mjs --test                  a short test email now (nothing read)
@@ -17,10 +17,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {E,ARGS,DRY,SITE,TZ,SCHOOL,GMAIL,TEACHER_TO,sendMail as send,site,firestore} from "./lib.mjs";
+import {E,ARGS,DRY,SITE,TZ,SCHOOL,TEACHER_TO,sendMail as send,site,firestore} from "./lib.mjs";
 
-const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.ok?SCHOOL:GMAIL.pass?GMAIL:null;
-if(!FROM&&!DRY){console.log("No SCHOOL_MAIL_URL, SCHOOL_APP_PASSWORD or GMAIL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
+const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.ok?SCHOOL:null;
+if(!FROM&&!DRY){console.log("No SCHOOL_MAIL_URL or SCHOOL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
 const sendMail=async(subject,text)=>{await send(FROM||SCHOOL,TEACHER_TO,subject,text);console.log(DRY?"Dry run: email written.":"Email sent.")};
 if(TEST){await sendMail("English Lab: test email ✅","This is a test. You will get an email when a student sends a ⚠️ Problem report or a 💡 Idea, and every Saturday morning one email with the sessions you did not tick and the week's open reports and ideas (no email when there is nothing).\n\nDashboard: "+SITE+"teacher.html\n");process.exit(0)}
 

@@ -11,8 +11,8 @@
 #     (tools/notify/news.mjs; what each student was told is kept in the Actions cache). Homework and announcements are emailed by the dashboard.
 # GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): SCHOOL_MAIL_URL, the web app link of
 # the teacher's Apps Script in roger.beltran@ietramuntana.cat (tools/notify/school-mail.gs; students only receive mail from the school
-# domain and the school blocks app passwords), and SCHOOL_MAIL_KEY, the KEY in that script. Optional: SCHOOL_APP_PASSWORD, ALERT_EMAIL_TO, GMAIL_APP_PASSWORD (+ GMAIL_USER) for the
-# teacher emails only. Without any, every run does nothing.
+# domain and the school blocks app passwords), and SCHOOL_MAIL_KEY, the KEY in that script. Optional: SCHOOL_APP_PASSWORD, ALERT_EMAIL_TO. Teacher emails
+# go to roger.beltran@ietramuntana.cat, never his personal Gmail (Roger, 19 Nov 2026). Without the school relay, every run does nothing.
 # By hand: Actions > English Lab emails > Run workflow. The log shows counts only (it is public).
 name: English Lab emails
 
