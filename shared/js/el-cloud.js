@@ -665,7 +665,7 @@ async function teacherSections(info){
   // projector; the students of the group follow that tab wherever it goes (cmTeacher below) and this tab stays free for other things.
   const cmOpen=()=>{const now=Date.now(),until=(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS,u=new URL(location.href);
     u.searchParams.set("elcm",g+"."+until);window.open(u.href,"_blank","noopener")};
-  const cmStop=()=>setDoc(doc(db,"live",g),{go:null,fs:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
+  const cmStop=()=>setDoc(doc(db,"live",g),{go:null,fs:null},{merge:true}).then(()=>examEndIdle(g)).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
   // 👥 who is in the class (fsPanel above): for the group picked in this bar; on the class tab the class mode's own panel shows instead
   const FP=fsPanel(()=>g,()=>draw(),()=>!cmOn);
   const fsWatch=()=>FP.watch(),fsE=()=>FP.eff(),fsRoll=()=>FP.roll(),fsHm=FP.hm,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
@@ -953,11 +953,19 @@ addEventListener("pagehide",()=>{if(reloading)return;try{const o=JSON.parse(sess
 // live/{group}.exam = {on, href, ls, only, at, go}: every open page of the group's students (only those listed in .only, for a make-up
 // exam of some students) goes to the exam page after the usual short notice that saves their work, and is kept there while it lasts.
 // Pages of the exam itself stay (el-web-exam.js reads .go for ▶ Start). Class mode and pull-ups wait until the teacher ends exam mode.
+// ⏹ Class mode stopping (or ending with the class) also ends an exam mode nobody has started yet, for the whole group (Roger, 19 Nov
+// 2026: class mode opened on the exam at 19:42 and stopped, but exam mode stayed on and took 2ESO A, studying at home, to the waiting
+// screen). An exam that has started (.go) or a make-up for some students (.only) is left alone.
+async function examEndIdle(g){try{const s=await getDoc(doc(db,"live",g)),e=s.exists()?s.data().exam:null;
+  if(!e||!e.on||e.go||Array.isArray(e.only)&&e.only.length||!e.ls)return;
+  await Promise.all([setDoc(doc(db,"ls",e.ls),{webExam:{[g]:{open:false,mode:false,go:null,only:null,at:new Date().toISOString()}}},{merge:true}),
+    setDoc(doc(db,"live",g),{exam:null},{merge:true})])}catch(x){console.warn("exam mode",x)}}
 function examPull(e){
   if(!e||!e.on||!e.href||!user||!isStudent(user)||AS)return false;
   const at=e.at&&e.at.toMillis?e.at.toMillis():+e.at||0;if(at&&Date.now()-at>3*3600e3)return false;   // a forgotten one
   if(Array.isArray(e.only)&&!e.only.includes(String(user.email||"").toLowerCase()))return false;
   const url=new URL(e.href,ROOT);if(location.pathname===url.pathname)return true;
+  try{sessionStorage.setItem("el_exam_from",location.href)}catch(x){}   // where the exam page sends them back if exam mode ends before they begin
   if(inShell){try{FW.location.replace(url.href)}catch(x){location.href=url.href}return true}
   goMove(url,lockCa()?"📝 L’examen":"📝 The exam",false,3,"📝");return true}
 function gamePush(u){
@@ -1769,7 +1777,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   // 2026), then the students are let go. ↩ Back to class keeps class mode on.
   let ending=false;
   async function stopNow(){if(ending)return;ending=true;let r="none";try{const m=await agLoad();r=await m.wrapUp(true)}catch(e){console.warn("class mode",e)}ending=false;
-    if(r==="back")return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit(r==="saved"?"stopped · saved on your Time plan":"stopped")}
+    if(r==="back")return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).then(()=>examEndIdle(o.g)).catch(x=>console.warn("class mode",x));quit(r==="saved"?"stopped · saved on your Time plan":"stopped")}
   // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
   // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
   // (inside a class of the timetable full screen stays on by itself, elFsEff)
@@ -1785,7 +1793,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   try{if(sessionStorage.getItem("el_cm_ag")==="1")agToggle()}catch(e){}
   // stopped from the dashboard or another class tab started later
   stop=onSnapshot(doc(db,"live",o.g),s=>{const g=s.exists()?s.data().go:null;if(s.metadata.hasPendingWrites||!last)return;if(!g||!g.cm||g.s!==o.s)quit(g&&g.cm?"another tab took over":"stopped")},e=>console.warn("class mode",e));
-  const iv=setInterval(()=>{if(!cmRead()){quit("the class is over");if(agM&&!ending){ending=true;agM.wrapUp(false).catch(e=>console.warn("class mode",e))}return}
+  const iv=setInterval(()=>{if(!cmRead()){quit("the class is over");examEndIdle(o.g);if(agM&&!ending){ending=true;agM.wrapUp(false).catch(e=>console.warn("class mode",e))}return}
     const pl=agM&&agM.plan?agM.plan():null;
     // only today's steps on this page for the class tab too: a tab now hidden goes to the first one shown
     if(pl&&cmTabs(pl.vis,[])){const at=document.querySelector(".tab.active[data-panel]");if(at&&at.classList.contains("el-cm-hide")){const f=[...document.querySelectorAll(".tab[data-panel]")].find(t=>!t.classList.contains("el-cm-hide")&&!t.classList.contains("el-sec-hide"));if(f)f.click()}}

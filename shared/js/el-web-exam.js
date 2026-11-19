@@ -201,6 +201,7 @@
         Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-tp="' + p + '" style="margin:3px;padding:6px 11px' + ((tPaper || pick(paperOf(S.level), hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A')) === p ? ';background:#174d3d;color:#fff' : '') + '">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') +
         '<br><small>Everything works as for a student (full screen, lock, password, saving, turn in, games). Your try shows as 🧪 in the dashboard’s Web exam box, in every group (it is never saved with the marks). 🧪 Tester: start again, at the end, deletes it.</small></div>' : '') + '</div>';
     root.querySelectorAll('[data-tp]').forEach(b => b.onclick = () => { tPaper = b.dataset.tp; intro(); });
+    watchGo();   // ▶ Start and the end of exam mode, read live (the same live/{group} document el-cloud.js already listens to)
     $('#wxRead').onchange = e => { $('#wxStart').disabled = !e.target.checked; };
     if (waitMode()) $('#wxStart').textContent = '⛶ ' + t('Estic a punt: pantalla completa', 'I’m ready: full screen');
     $('#wxStart').onclick = async () => {
@@ -216,9 +217,20 @@
   // usual Start button. Leaving full screen while waiting changes nothing (the exam has not started): the button takes them back.
   // the tester waits too while their group's exam mode is on, to see what students see (Roger, 17 Nov 2026)
   const waitMode = () => { const w = (((lsDoc || {}).webExam || {})[S.group] || {}); return !PV && !!w.mode && !w.go; };
-  let liveOff = null, goNow = false;
-  async function watchGo() { if (liveOff || PV || !S.group) return;
+  let liveOff = null, goNow = false, seenOn = false, leaving = false;
+  // 📝 exam mode over before this student began (⏹ End exam mode, 🔒 Close, or class mode stopped): back to the page they were on, so
+  // they are not left on the waiting screen (Roger, 19 Nov 2026: 2ESO A could not study at home until they reloaded). Only after this
+  // page saw exam mode on: a student who came by the link while the exam is open without exam mode stays.
+  function leaveExam() { if (leaving || (S && S.started)) return; leaving = true; window.EL_EXAM_LOCK = false;
+    let from = ''; try { from = sessionStorage.getItem('el_exam_from') || ''; sessionStorage.removeItem('el_exam_from'); } catch (e) {}
+    let to = new URL('../../today.html', location.href).href; try { const u = new URL(from); if (u.origin === location.origin && u.pathname !== location.pathname) to = u.href; } catch (e) {}
+    root.innerHTML = '<div class="wx-card" style="text-align:center"><h2>✓ ' + t('El mode examen s’ha acabat', 'Exam mode is over') + '</h2><p>' + t('Tornes a la teva pàgina…', 'Taking you back to your page…') + '</p></div>';
+    try { if (D.fullscreenElement && D.exitFullscreen) D.exitFullscreen().catch(() => {}); } catch (e) {}
+    setTimeout(() => location.replace(to), 1500); }
+  async function watchGo() { if (liveOff || PV || !S.group) return; liveOff = () => {};
     try { const F = await fsLib(); liveOff = F.onSnapshot(F.doc(C().db, 'live', S.group), s => { const x = s.exists() ? s.data() : null, e = x && x.exam;
+      const mine = e && e.on && (!Array.isArray(e.only) || e.only.includes(String((me && me.email) || '').toLowerCase()));
+      if (mine) seenOn = true; else if (seenOn && !s.metadata.fromCache) return leaveExam();
       if (e && e.go && !goNow) { goNow = true; if ($('#wxWait')) { if (!fsOk() || isFull()) begin(); else waiting(); } } }, e => console.warn('exam live', e)); } catch (e) { console.warn('exam live', e); } }
   function waiting() { watchGo();
     const full = !fsOk() || isFull();
@@ -475,14 +487,26 @@
     const gn = ((window.EL_GROUPS || []).find(x => x.id === g) || {}).name || g;
     const F = await fsLib(), db = C().db, lsRef = F.doc(db, 'ls', X.ls), liveRef = F.doc(db, 'live', g);
     const write = (w, live) => Promise.all([F.setDoc(lsRef, { webExam: { [g]: w } }, { merge: true }), F.setDoc(liveRef, { exam: live }, { merge: true })]);
-    let w = {}; try { const d = await F.getDoc(lsRef); w = ((d.exists() ? d.data() : {}).webExam || {})[g] || {}; } catch (e) { console.warn('exam class', e); }
+    let w = {}, tt = null; try { const [d, l] = await Promise.all([F.getDoc(lsRef), F.getDoc(liveRef)]); w = ((d.exists() ? d.data() : {}).webExam || {})[g] || {}; tt = (l.exists() ? l.data() : {}).tt || null; } catch (e) { console.warn('exam class', e); }
     const fresh = w.at && Date.now() - Date.parse(w.at) < 3 * 3600e3;
-    if (!(w.open && w.mode && fresh)) {   // exam mode on for the group, unless it is already on (a reload of this tab, or started)
+    const start = async () => {   // exam mode on for the group
       const at = new Date().toISOString(), only = w.open && Array.isArray(w.only) ? w.only : null;
       w = { open: true, mode: true, go: null, only, at };
-      try { await write(w, { on: true, href: pageRel(), ls: X.ls, only, at: Date.now(), go: null }); } catch (e) { box.innerHTML = '<p class="wx-warn">✗ Exam mode could not start: ' + esc(e.message || e) + '</p>'; return; }
+      try { await write(w, { on: true, href: pageRel(), ls: X.ls, only, at: Date.now(), go: null }); return true; } catch (e) { box.innerHTML = '<p class="wx-warn">✗ Exam mode could not start: ' + esc(e.message || e) + '</p>'; return false; }
+    };
+    // only by itself in the group's class time (live/{group}.tt, the 🗓 Timetable): outside it, a button (Roger, 19 Nov 2026: class mode
+    // opened on the exam at 19:42 put 2ESO A in exam mode at home, so they could not study the evening before the exam)
+    const inClass = !!(window.elSlotNow && (tt || window.elTT) && elSlotNow(tt || elTT(g)));
+    if (!(w.open && w.mode && fresh)) {   // unless it is already on (a reload of this tab, or started)
+      if (!inClass) {
+        box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 📝 Exam mode is off</h2><p>It is not ' + esc(gn) + '’s class time, so exam mode has not started by itself: it would take every student of ' + esc(gn) + ' with the site open to the exam, even at home. Start it only if they are in class now.</p>' +
+          '<p><button class="wx-btn" id="wxCmOn">📝 Start exam mode for ' + esc(gn) + '</button></p>';
+        $('#wxCmOn').onclick = async () => { $('#wxCmOn').disabled = true; if (await start()) draw(); };
+        return;
+      }
+      if (!(await start())) return;
     }
-    const draw = msg => {
+    function draw(msg) {   // a declaration: the ▶ button above uses it too
       const started = !!w.go, au = X.audio && X.audio.src && !X.audio.plays;
       box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 📝 Exam mode' + (w.only ? ' · ' + w.only.length + ' student' + (w.only.length === 1 ? '' : 's') : '') + '</h2>' +
         (started ? '<p class="wx-done">▶ The exam has started (' + new Date(w.go).toTimeString().slice(0, 5) + '). Students who arrive now press Start themselves.</p>'
@@ -494,7 +518,7 @@
         try { await write(Object.assign({}, w, { go: t }), { on: true, href: pageRel(), ls: X.ls, only: w.only || null, at: Date.parse(w.at) || t, go: t }); w.go = t; draw(); } catch (e) { go.disabled = false; draw('✗ Not started: ' + (e.message || e)); } };
       $('#wxCmEnd').onclick = async () => { if (!confirm('Close the exam for ' + gn + '?\n\nStudents still writing can no longer save. Close it only when everyone has turned in.')) return;
         try { await write({ open: false, mode: false, go: null, only: null, at: new Date().toISOString() }, null); w = {}; box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 🔒 Exam closed</h2><p>Exam mode is over: class mode goes on as usual.</p>'; } catch (e) { draw('✗ Not closed: ' + (e.message || e)); } };
-    };
+    }
     draw();
   }
 
