@@ -8,7 +8,7 @@ export function readingOf(path,tab){const m=/^([24]eso\/(?!my-real-routine\/)[a-
 let fr=null;
 export function openCorrect(root,{ls,lp,tab,g}){
   if(fr)fr.remove();
-  fr=document.createElement("iframe");fr.id="el-correct";fr.title="Correct together";
+  fr=document.createElement("iframe");fr.id="el-correct";fr.title="Work it out together";
   fr.src=new URL("shared/correct/index.html?ls="+encodeURIComponent(ls)+"&lp="+encodeURIComponent(lp)+"&tab="+encodeURIComponent(tab||"read")+(g?"&g="+encodeURIComponent(g):"")+"&embed=1",root).href;
   fr.style.cssText="position:fixed;inset:0;width:100vw;height:100vh;border:0;z-index:2147483000;background:#0f2a3a";
   fr.onload=()=>{try{fr.contentWindow.focus()}catch(e){}};document.body.append(fr);

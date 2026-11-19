@@ -361,7 +361,7 @@ async function run(){
   const lpName=a?(window.elLpLabel?elLpLabel(a):a.title):LP.title;
   const tabName=p=>tx((LP.panels.find(x=>x.id===p)||{}).tab)||p;
   $("sub").textContent=[gname,lpName,[...new Set(slides.map(s=>s.panel))].map(tabName).join(" + ")].filter(Boolean).join(" · ");
-  document.title="✅ Correct · "+(gname?gname+" · ":"")+LP.title;
+  document.title="🙌 Work it out together · "+(gname?gname+" · ":"")+LP.title;
   try{CLASS=await classAnswers()}catch(e){console.warn("class answers",e)}
   if(slides.pro&&(!CLASS||CLASS.lv.native)){slides=slides.concat(slides.pro);PRO_ON=true}
   if(!slides.length){$("out").textContent="This step has no questions to correct together.";return}
