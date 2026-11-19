@@ -3,8 +3,8 @@
 // Sender (Roger, 1 Nov 2026: students' school accounts only receive mail from the school domain): the teacher's school account
 // roger.beltran@ietramuntana.cat. The school blocks app passwords, so it sends through a small Apps Script in that account
 // (tools/notify/school-mail.gs, deployed as a web app): SCHOOL_MAIL_URL = its web app link and SCHOOL_MAIL_KEY = the KEY in the teacher's
-// copy of the script (both GitHub secrets; the script refuses any request without the key). SCHOOL_APP_PASSWORD (SMTP) also works if the school ever allows it; teacher emails fall back to
-// GMAIL_USER + GMAIL_APP_PASSWORD.
+// copy of the script (both GitHub secrets; the script refuses any request without the key). SCHOOL_APP_PASSWORD (SMTP) also works if the school ever allows it. There is no
+// Gmail fallback any more (Roger, 19 Nov 2026: every email goes from and to the school account).
 // DRY=true: nothing is sent, the emails are appended to notify-dry.eml in the temp folder.
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -20,7 +20,11 @@ const PROJECT="english-lab-ietm";
 export const SCHOOL={user:(E.SCHOOL_USER||"roger.beltran@ietramuntana.cat").trim(),pass:(E.SCHOOL_APP_PASSWORD||"").replace(/\s+/g,""),relay:(E.SCHOOL_MAIL_URL||"").trim(),key:(E.SCHOOL_MAIL_KEY||"").trim()};
 SCHOOL.ok=!!((SCHOOL.relay&&SCHOOL.key)||SCHOOL.pass);
 export const GMAIL={user:(E.GMAIL_USER||"roger.beltranps@gmail.com").trim(),pass:(E.GMAIL_APP_PASSWORD||"").replace(/\s+/g,"")};
-export const TEACHER_TO=(E.ALERT_EMAIL_TO||"roger.beltranps@gmail.com").split(",").map(s=>s.trim()).filter(Boolean);
+// Roger's emails go to his SCHOOL inbox, never his personal Gmail (Roger, 19 Nov 2026: "stop sending mails with the reports to my personal
+// mail"). ALERT_EMAIL_TO can still add or change recipients, but the personal Gmail in it is turned into the school address.
+export const TEACHER_MAIL="roger.beltran@ietramuntana.cat";
+export const TEACHER_TO=[...new Set((E.ALERT_EMAIL_TO||TEACHER_MAIL).split(",").map(s=>s.trim()).filter(Boolean)
+  .map(a=>a.toLowerCase()==="roger.beltranps@gmail.com"?TEACHER_MAIL:a))];
 
 // one plain-text email; from = {user, pass}; name = the sender's display name
 export async function sendMail(from,to,subject,text,name="English Lab"){
