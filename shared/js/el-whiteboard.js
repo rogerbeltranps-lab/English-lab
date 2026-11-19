@@ -2,13 +2,12 @@
 // whiteboard and that when they take notes it looks like hand writing and they can underline, highlight, etc. this notes appear in their
 // notes", and "when doing theory like grammar or whatever, they must only see their notes"). While the teacher explains together
 // (📘 Grammar together or 📖 Read together, live/{group}.rt, el-cloud.js), the student's Chromebook shows only this screen, over the page:
-// the board on the left (the boxes or the text the projector shows, the one being explained marked with a red arrow; in Read together ⤵
-// copies a part into the notes) and the handwriting page on the right (el-pad.js). It closes by itself when the teacher goes on to ⏱ Your turn or leaves.
+// the board on the left (the boxes or the text the projector shows, the one being explained marked with a red arrow; no copying) and the handwriting page on the right (el-pad.js). It closes by itself when the teacher goes on to ⏱ Your turn or leaves.
 // el-cloud.js saves the page in the student's notes (📓 My notebook on the LS page shows it). Nothing here reads or writes Firestore.
 // No copying the theory (Roger, 19 Nov 2026: "when students are taking notes when we [work] together in class, I don't want them to be
 // able to copy the theory, since if they do, they have the information doubled in their notebooks" + "remind them that in their notes
 // they can write examples, or just important things to remember and that it's optional"): 📓 My notebook already shows every grammar box,
-// so the grammar boards have no ⤵ copy button (Read together keeps it: the notebook doesn't keep the reading text), a slip above the page
+// so the boards have no ⤵ copy button (Read together neither: Roger, "yes go ahead"), a slip above the page
 // says notes are optional (examples, things to remember), and if a student types 7 words in a row that are on the board, a tip says it is
 // already in the notebook (typing is never stopped). Ctrl+C / paste from the board were already blocked (el-nocopy.js).
 import { pad, css } from './el-pad.js';
@@ -38,23 +37,14 @@ export function render(x) {
   root.querySelector('.wb-remind').textContent = gr
     ? T('📓 La teoria ja és a la teva llibreta: no la copiïs. Aquí pots escriure exemples teus o només les coses importants per recordar. És opcional.', '📓 The theory is already in your notebook: don\'t copy it. Here you can write your own examples or just the important things to remember. It\'s optional.')
     : T('Aquí pots escriure exemples teus o només les coses importants per recordar. És opcional.', 'Here you can write your own examples or just the important things to remember. It\'s optional.');
-  root.querySelector('.wb-tip').textContent = gr
-    ? T('Tria paraules i toca un subratllador o una marca. Tot va a 📓 La meva llibreta.', 'Select words, then tap a highlighter or a mark. Everything goes into 📓 My notebook.')
-    : T('Tria paraules i toca un subratllador o una marca. ⤵ copia una part del text. Tot va a 📓 La meva llibreta.', 'Select words, then tap a highlighter or a mark. ⤵ copies a part of the text. Everything goes into 📓 My notebook.');
+  root.querySelector('.wb-tip').textContent = T('Tria paraules i toca un subratllador o una marca. Tot va a 📓 La meva llibreta.', 'Select words, then tap a highlighter or a mark. Everything goes into 📓 My notebook.');
   const s = o.kind + '|' + (o.ca ? 1 : 0) + '|' + String(o.html || '').length + '|' + String(o.html || '').slice(0, 120);
   if (s !== sig) {
     sig = s; const inn = root.querySelector('.wb-in'); inn.innerHTML = o.html || '';
     inn.querySelectorAll('script,iframe,audio,video,input,textarea,select,button').forEach(e => e.remove());
     grams = o.kind === 'grammar' ? ngrams(inn.innerText) : new Set();
-    items().forEach(el => {
-      el.classList.add('wb-it');
-      if (o.kind === 'grammar') return;   // the grammar is already in 📓 My notebook: nothing to copy
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'wb-copy'; b.textContent = '⤵ ' + T('Copia als apunts', 'Copy to my notes');
-      b.addEventListener('click', () => { const c = el.cloneNode(true); c.querySelectorAll('.wb-copy').forEach(x => x.remove()); if (o.kind === 'grammar') { const l = c.querySelector('span'); if (l && l === c.firstElementChild && l.textContent.length < 30) l.remove(); }
-        c.querySelectorAll('table').forEach(t => t.replaceWith([...t.rows].map(r => [...r.cells].map(x => x.textContent.trim()).join(' · ')).join('\n')));
-        P.add(c.innerText.replace(/\s*\n\s*/g, '\n').trim()); status(T('Copiat als teus apunts ✓', 'Copied into your notes ✓')); });
-      el.append(b);
-    });
+    // no ⤵ copy button (Roger, 19 Nov 2026): the grammar is already in 📓 My notebook, and notes are their own examples / things to remember
+    items().forEach(el => el.classList.add('wb-it'));
   }
   mark(o.k);
   return root;
