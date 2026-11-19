@@ -27,15 +27,26 @@ window.elPointsRules=function(){const en=elNum(EL_POINTS_BONUS,"en"),ca=elNum(EL
 // product (manual) and optional homework never count. Done late still counts as done. isDone(activity) is the page's own check.
 // Returns the missing ones as [[activity, due day]], oldest first.
 window.elTermSpan=id=>{const i=EL_TERMS.findIndex(t=>t.id===id);return [i>0?EL_TERMS[i-1].end:"",EL_TERMS[i]&&EL_TERMS[i].end||"9999-12-31"]};
-// elDueWork: every activity that counts so far this term (the same rule), as [[activity, due day]], oldest first; elMissing: the ones not done.
+// elDueWork: every activity that counts so far this term (the same rule), as [[activity, due day, tabs]], oldest first; elMissing: the ones not done.
+// Only the tabs taught (problem report, 4ESOA, 19 Nov 2026: "Ot did everything and the system is saying he has 10 activities late. Those
+// activities are open to do in the future but they are not to be done"; AGENTS.md: missing work counts 0 only if ticked done in class on
+// the Time plan and its day has passed): when the group has a Time plan agenda, a learning path counts only with its tabs that were on a
+// class day before today, ticked as done in class or set as homework (elDueBefore in el-catalog.js); tabs = a Set of those panel ids
+// (null = the whole path: planned whole, or no agenda). A path with none of them does not count yet. Count tabs with elTabsLeft(a,…,tabs).
 window.elDueWork=function(gid,term,infoOf){
   const [from,to]=elTermSpan(term),today=ELWeek.today(),out=[];
   ELWeek.plans(gid).forEach(x=>{const info=infoOf(x.ls)||{status:"hidden"};if(info.status==="hidden")return;
+    const db=window.EL_RAW_OPEN||!window.elDueBefore?null:elDueBefore(info,gid);
     Object.keys(x.p.due||{}).forEach(id=>{const a=(window.EL_CATALOG||[]).find(y=>y.id===id),d=ELWeek.due(x.p,id,x.gi);
       if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecNeverOpened(a,info,gid).length)return;
-      out.push([a,d])})});
+      const tabs=elTaughtTabs(a,db);if(tabs===false)return;
+      out.push([a,d,tabs])})});
   return out.sort((a,b)=>a[1]<b[1]?-1:1)};
-window.elMissing=(gid,term,isDone,infoOf)=>elDueWork(gid,term,infoOf).filter(([a])=>!isDone(a));
+// the tabs of a path taught so far (db = elDueBefore(info, group), or null): null = the whole path, a Set of panel ids, or false = none yet
+window.elTaughtTabs=function(a,db){if(!db||db.acts.has(a.id)||!elTabsOf(a))return null;const ps=db.tabs[a.id];if(!ps||!ps.size)return false;
+  const o=new Set([...ps].map(k=>elTabOf(a.id,k)));return elTabsOf(a,o).length?o:false};
+// left(a, tabs) = the student's tabs not done (elTabsLeft); without it, a path counts until it is all done
+window.elMissing=(gid,term,isDone,infoOf,left)=>elDueWork(gid,term,infoOf).filter(([a,,tabs])=>left?left(a,tabs).length>0:!isDone(a));
 // Share of an LS mark that is continuous assessment (Roger, 2 Nov 2026: students must see how much their everyday work counts):
 // every block of EL_GRADING[ls] except the final exam and the final product (from LS2 on: grammar, vocabulary and skills 35 % + other competences 5 % = 40 %).
 window.elFormativeShare=ls=>{const g=(window.EL_GRADING||{})[ls];if(!g||g.only||!g.blocks)return 0;

@@ -2639,11 +2639,12 @@ const pkey=s=>s.rid||(s.email||"").toLowerCase(),ptOf=s=>S.D.pt[pkey(s)]||{},ptO
 const ptStuds=g=>Object.values(S.P).filter(s=>s.group===g&&!s.tester&&pkey(s)).sort(byName);
 const ptBest=g=>Math.max(0,...ptStuds(g).map(ptOn));
 // activities of the term missing for the bonus (elMissing in el-points.js; Roger, 30 Oct 2026: without all the work done, no bonus)
-const ptMiss=s=>s.uid?elMissing(s.group,S.term,a=>isDone(s.uid,a),ls=>S.D.ls[ls]):null,ptGets=(s,best,m)=>m&&m.length?0:elBonus(ptOn(s),best);
+const ptLeft=(u,a,o)=>elTabsLeft(a,doneSet(u,a),(S.D.rs[u]||{})[a.id],o);   // o = only the tabs taught so far (elDueWork in el-points.js)
+const ptMiss=s=>s.uid?elMissing(s.group,S.term,a=>isDone(s.uid,a),ls=>S.D.ls[ls],(a,o)=>ptLeft(s.uid,a,o)):null,ptGets=(s,best,m)=>m&&m.length?0:elBonus(ptOn(s),best);
 // the missing work in TABS (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"; elTabsLeft in el-catalog.js), as the student's board:
 // [[activity, due day, [tab names]]] and the number of tabs
-const ptTabs=(s,m)=>(m||[]).map(([a,d])=>[a,d,elTabsLeft(a,doneSet(s.uid,a),(S.D.rs[s.uid]||{})[a.id]).filter(g=>g.length).map(g=>{const c=!isLS1(a)&&lpCols(a).find(x=>x.ks.includes(g[0]));return c?c.n:g[0]})]);
-const ptTabsN=(s,m)=>(m||[]).reduce((n,[a])=>n+elTabsLeft(a,doneSet(s.uid,a),(S.D.rs[s.uid]||{})[a.id]).length,0);
+const ptTabs=(s,m)=>(m||[]).map(([a,d,o])=>[a,d,ptLeft(s.uid,a,o).filter(g=>g.length).map(g=>{const c=!isLS1(a)&&lpCols(a).find(x=>x.ks.includes(g[0]));return c?c.n:g[0]})]);
+const ptTabsN=(s,m)=>(m||[]).reduce((n,[a,,o])=>n+ptLeft(s.uid,a,o).length,0);
 // The bonus is in proportion to the best student with all the work done (Roger, 30 Oct 2026), not the best of everyone. The dashboard
 // works it out (only it sees every student's work) and keeps it in teams/{group}.bestOk.{term} for the student board; it rewrites it
 // whenever it renders and the value has changed, so it follows new work, new due days and point changes.
@@ -2681,7 +2682,7 @@ function ptCols(s,best){if(s.tester||!pkey(s))return `<td class="first pt">–</
 // ✗ n tabs missing opens the list (Roger, 9 Nov 2026: "when I press missing I should be able to see it"): every learning path due so far
 // in the term with the tabs still missing, oldest first, each tab a link to that tab in the read-only student view (what they did so far)
 function ptMissDlg(u){const s=S.P[u];if(!s)return;const m=ptMiss(s)||[];redraw=null;
-  const rows=m.map(([a,d])=>{const left=elTabsLeft(a,doneSet(u,a),(S.D.rs[u]||{})[a.id]).filter(g=>g.length);
+  const rows=m.map(([a,d,o])=>{const left=ptLeft(u,a,o).filter(g=>g.length);
     const tab=g=>{const c=!isLS1(a)&&lpCols(a).find(x=>x.ks.includes(g[0])),t=c?c.t:stepTab(a,g[0]);return `<a class="chip" href="${seeAs(u,a,t)}" target="_blank" rel="noopener" title="Open this tab as ${esc(fullName(s))} sees it (read-only)">${esc(c?c.n:g[0])}</a>`};
     return `<tr><td style="text-align:left"><b>${esc(a.title)}</b><br><small class="muted">${lsLabel(EL_LS.find(l=>l.id===a.ls))} · due ${esc(ELWeek.date(d))}</small></td><td style="text-align:left">${left.map(tab).join(" ")||'<span class="muted">–</span>'}</td></tr>`}).join("");
   dlg(`<h3>✗ Missing work · ${name(s)}</h3><p class="muted">${esc(elTermName(S.term))}: the learning paths due so far that are not finished (every LS of the term), with the tabs still to do. Click a tab to open it as they see it. Until they are done there is no points bonus.</p>`

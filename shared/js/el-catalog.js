@@ -310,10 +310,13 @@ window.elTabGroups=function(a,ks){const xs=((window.EL_SECTIONS||{})[a.id]||[]).
 // Tabs still to do in a learning path (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"): every count of missing work
 // (board banner, All my work done, My activities, the learning-paths table, the dashboard's Points box) counts TABS, not learning paths.
 // The tabs of its scored steps (EL_ACTIONS without a.skip, grouped by elTabGroups); one with no steps listed counts as 1 tab (its flag).
-window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return ks.length?elTabGroups(a,ks):null};
+// only = a Set of panel ids (elDueWork's third item: the tabs taught so far, el-points.js): just those tabs; null/undefined = every tab.
+window.elTabsOf=function(a,only){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));if(!ks.length)return null;const g=elTabGroups(a,ks);
+  if(!only)return g;const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]),pan=k=>{k=elTabOf(a.id,k);return xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k};
+  return g.filter(x=>only.has(pan(x[0])))};
 // the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
-window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
-window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
+window.elTabsLeft=function(a,done,r,only){const g=elTabsOf(a,only);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
+window.elTabsTotal=(a,only)=>{const g=elTabsOf(a,only);return g?g.length:1};
 // 📖 The Book is ONE tab, "book" (Roger, 13 Nov 2026: "only one SLP for the book so that people can continue where they left off"): its
 // steps are the chapters (ch1 … ch6). A chapter planned on the Time plan before then (path#ch1) counts as the book (elTabOf).
 window.elBookPath=a=>/\/ls2-book$|(^|\/)book\.html$/.test(typeof a==="string"?a.split("#")[0]:(a&&a.id)||"");   // an id or a page path

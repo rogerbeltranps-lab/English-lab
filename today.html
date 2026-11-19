@@ -874,7 +874,7 @@ function pointsBox(){
   // best = the best student of my group with all the work done (teams/{group}.bestOk, kept by the dashboard; Roger, 30 Oct 2026),
   // or the best of everyone while the dashboard has not saved it yet
   const p=D.pt||{},tm=D.tm||{},ok=tm.bestOk||{},bestOf=id=>Math.max(ok[id]!=null?+ok[id]:+(tm.best||{})[id]||0,+p[id]||0);
-  const missOf=id=>all()?[]:elMissing(D.me.group,id,isDone,ls=>D.ls[ls]);
+  const missOf=id=>all()?[]:elMissing(D.me.group,id,isDone,ls=>D.ls[ls],tabsLeft);
   if(!EL_TERMS.some(x=>+p[x.id]>0)&&!bestOf(elTerm()))return "";   // no points in my group yet
   const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=missOf(term),bonus=miss.length?0:elBonus(mine,best),nm=tabsMiss(miss);
   const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(missOf(x.id).length?0:elBonus(+p[x.id],bestOf(x.id)),L)}`);
@@ -896,8 +896,8 @@ function pointsBox(){
 function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "";
   const L=lang(),term=elTerm(),due=elDueWork(D.me.group,term,ls=>D.ls[ls]);
   // counted in tabs (activities), not learning paths (Roger, 7 Nov 2026): a path with 5 tabs not done is 5 missing
-  const miss0=due.filter(([a])=>!isDone(a)),tot=due.reduce((n,[a])=>n+elTabsTotal(a),0),done=tot-tabsMiss(miss0),p=tot?Math.round(done/tot*100):100;
-  miss0.forEach(([a])=>S.wmiss.add(a.id));S.wtabs=tabsMiss(miss0);
+  const miss0=due.filter(([a,,o])=>tabsLeft(a,o).length),tot=due.reduce((n,[a,,o])=>n+elTabsTotal(a,o),0),done=tot-tabsMiss(miss0),p=tot?Math.round(done/tot*100):100;
+  due.forEach(([a])=>S.wmiss.add(a.id));S.wtabs=tabsMiss(miss0);   // every path counted here (lateList skips them), missing or not
   // Only ⏰ late work here (Roger, 8 Nov 2026: "I dont understand why the activities pending dont match here", then "here only late
   // activities"): past their day in the class plan (elMissing + lateList, the home banner's number). The opened ones not late yet are
   // in ✅ To do (elTodoList), with 🏫 in class or 📝 homework by …; one line here says how many and links there. Late + opened = To do.
@@ -915,7 +915,7 @@ function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "
     +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏰":"🎉",t("Activitats endarrerides","Late activities"),String(nm),miss.length?t("ja havien d'estar fetes: fes-les ara","past their day: do them now"):t("cap: molt bé!","none: well done!"))
     +(share?fvStat("fk-b","📈",t("Avaluació contínua","Continuous assessment"),`${share} <small>%</small>`,t(`de la nota de ${lsN}`,`of your ${lsN} mark`)):"")+`</div>`
     +(miss.length?`<div class="fv-missbox"><h3 class="fv-sub">⏰ ${nm>1?t(`Tens ${nm} activitats endarrerides`,`You have ${nm} late activities`):t("Tens 1 activitat endarrerida","You have 1 late activity")}</h3><ol class="fv-miss">`
-      +miss.map(([a,d],i)=>{const ln=leftNames(a);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")+`</ol></div>`+openLine
+      +miss.map(([a,d,o],i)=>{const ln=leftNames(a,o);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")+`</ol></div>`+openLine
       :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("No en tens cap d'endarrerida. Continua així!","Nothing late. Keep it up!")}</p>`+openLine)+`</div>`}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
@@ -1167,7 +1167,7 @@ function fpMissed(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.fp||!hasFp(
 function lsDone(l,tm){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return null;const today=ELWeek.today(),closed=(D.ls[l.id]||{}).status==="closed",W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0,parts=[];
   const p=(window.EL_PLAN||{})[l.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;
   const share=elFormativeShare(l.id);if(share&&D.me.group&&(!tm||blockTerm(l,"gv")===tm)){
-    const dw=EL_TERMS.flatMap(T=>elDueWork(D.me.group,T.id,x=>D.ls[x])).filter(([a])=>a.ls===l.id),due=dw.reduce((n,[a])=>n+elTabsTotal(a),0);
+    const dw=EL_TERMS.flatMap(T=>elDueWork(D.me.group,T.id,x=>D.ls[x])).filter(([a])=>a.ls===l.id),due=dw.reduce((n,[a,,o])=>n+elTabsTotal(a,o),0);
     if(due)parts.push({k:"daily",w:share,f:(due-tabsMiss(dw))/due,n:due-tabsMiss(dw),of:due})}
   if(g.exam&&(!tm||blockTerm(l,"exam",gi>=0?ELWeek.exam(p,gi):null)===tm)){const sc=(D.rs[l.id+"/assessment"]||{}).sections||{};if(g.exam.sections.some(([k])=>sc[k]&&sc[k].score!=null))parts.push({k:"exam",w:W("exam"),f:1})}
   if(hasFp(l)&&(!tm||blockTerm(l,"fp",fpDue(l))===tm)){const a=fpAct(l),x=D.rs[a.id]||{},d=fpDue(l),due=closed||(d&&d<today);let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
@@ -1223,7 +1223,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const cw=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp");
   const pr=(ELWeek.plans(D.me.group)||[]).find(y=>y.ls===ls.id),exDay=pr?ELWeek.exam(pr.p,pr.gi):null;
   // in tabs (activities), as everywhere on the board (Roger, 7 Nov 2026): due = tabs of the paths whose day has passed, done = those done
-  const dw=D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).filter(([a])=>a.ls===ls.id):[],due={length:dw.reduce((n,[a])=>n+elTabsTotal(a),0)},done=due.length-tabsMiss(dw);
+  const dw=D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).filter(([a])=>a.ls===ls.id):[],due={length:dw.reduce((n,[a,,o])=>n+elTabsTotal(a,o),0)},done=due.length-tabsMiss(dw);
   // Every row shows its degree too (Roger, 10 Nov 2026: "here I also want the notables"): box first, mark small on its right.
   const mark=m=>m==null?`<span class="muted">${t("encara no","not yet")}</span>`:dgMark(m);
   const bar=m=>`<span class="xbar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%;background:${m==null?"#e2e8f0":col(m*10)}"></span></span>`;
@@ -1583,14 +1583,17 @@ function onlyForm(id){
 const isDone=a=>elAllDone(a,doneSet(a),D.rs[a.id]);   // every step done, not the Submit flag (el-catalog.js)
 // missing work is counted in TABS, not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"; elTabsLeft in
 // el-catalog.js): the tabs not done of a path, how many of a list of [[activity, day]], and their names (as on the learning path)
-const tabsLeft=a=>elTabsLeft(a,doneSet(a),D.rs[a.id]),tabsMiss=list=>list.reduce((n,[a])=>n+tabsLeft(a).length,0);
-const leftNames=a=>tabsLeft(a).filter(g=>g.length).map(g=>tabName(a.id,g[0]));
+const tabsLeft=(a,o)=>elTabsLeft(a,doneSet(a),D.rs[a.id],o),tabsMiss=list=>list.reduce((n,[a,,o])=>n+tabsLeft(a,o).length,0);   // o = only the tabs taught (elDueWork)
+const leftNames=(a,o)=>tabsLeft(a,o).filter(g=>g.length).map(g=>tabName(a.id,g[0]));
 const nAct=n=>n===1?t("1 activitat","1 activity"):t(`${n} activitats`,`${n} activities`);
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
 // "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
 function lateList(lss){const today=ELWeek.today(),late=[];
   lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]},p=(window.EL_PLAN||{})[l.id],gi=ELWeek.col(p,D.me.group);if(info.status!=="open"||gi<0)return;
-    Object.keys(p.due||{}).forEach(id=>{const a=EL_CATALOG.find(x=>x.id===id),d=ELWeek.due(p,id,gi);if(a&&d&&d<today&&!a.manual&&canDo(a,info)&&!isDone(a)&&!(S.wmiss&&S.wmiss.has(a.id)))late.push([a,d])})});
+    const db=window.EL_RAW_OPEN?null:elDueBefore(info,D.me.group);   // only the tabs taught, as elDueWork (el-points.js)
+    Object.keys(p.due||{}).forEach(id=>{const a=EL_CATALOG.find(x=>x.id===id),d=ELWeek.due(p,id,gi);if(!(a&&d&&d<today&&!a.manual&&canDo(a,info)&&!isDone(a)&&!(S.wmiss&&S.wmiss.has(a.id))))return;
+      const o=elTaughtTabs(a,db);if(o===false||!tabsLeft(a,o).length)return;
+      late.push([a,d,o])})});
   return late.sort((x,y)=>x[1]<y[1]?-1:1)}
 function lateBox(lss){const late=lateList(lss);if(!late.length)return "";
   return `<div class="pend late"><b>⏰ ${late.length>1?t(`Tens ${late.length} activitats endarrerides:`,`You have ${late.length} late activities:`):t("Tens 1 activitat endarrerida:","You have 1 late activity:")}</b><ul>`
