@@ -119,6 +119,7 @@ button.cfix{background:#3157d5;color:#fff;border:0;border-radius:10px;padding:5p
 .cnum{display:inline-block;margin:2px 10px 0 0;font-size:14px;color:#334155;white-space:nowrap}details.cgrp,details.cday{border-top:1px solid #e2e8f0;padding:8px 0}details.cgrp>summary,details.cday>summary{cursor:pointer}details.cday h3{margin:10px 0 2px;font-size:.95rem;color:#475569}
 li.askhi{background:#fef3c7;border-radius:8px;transition:background .4s}p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv .gn{white-space:nowrap;margin-right:auto}.tside .nv small.ask{cursor:pointer;white-space:nowrap;margin-left:-2px;opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800}.nv small.late{opacity:1;color:#b91c1c;font-weight:800}
 a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal:hover{filter:brightness(.97)}
+.msgtabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}.msgtabs button{border-radius:999px;padding:8px 16px;font-size:15px;font-weight:700}.msgtabs button b{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:999px;background:#0284c7;color:#fff;font-size:12px;line-height:20px;text-align:center}.msgtabs button b.late{background:#dc2626}.msgtabs .seenall{margin-left:auto}.tag.new{background:#fee2e2;color:#991b1b}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;color:#0f172a;text-decoration:none;min-height:112px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:28px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:17px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .cov .cvt{width:100%}.cov .cvt td,.cov .cvt th{text-align:left;vertical-align:top}.cov .cvt th.cvc,.cov .cvt td.cvc{text-align:center;min-width:58px}.cov td.cvc small{display:block;font-size:11px;color:#475569;line-height:1.2}.cov td.cvk small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#64748b;font-size:12px;max-width:380px;white-space:normal;line-height:1.3}.cov .cvw{overflow-x:auto}.cve .t1{color:#166534;font-weight:600}.cve .t0{color:#64748b}.cov td.cvk{white-space:normal;min-width:220px}.cov tr.cvsec td{background:#f1f5f9;font-weight:700}.cov .cdot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:0}.cvb{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600;white-space:nowrap}.cvsum{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.cve{display:inline-block;font-size:13px;line-height:1.35;border:1px solid #cbd5e1;border-radius:8px;padding:1px 7px;margin:1px;background:#fff}.cve.ok{background:#dcfce7;border-color:#86efac}.cve.dr{background:#fff7ed;border-color:#fdba74;text-decoration:line-through}.cve a{color:inherit;text-decoration:none}.cve a:hover{text-decoration:underline}.cov td.cvy{white-space:nowrap;font-size:13px}.cvn{display:inline-block;margin-left:6px;background:#dc2626;color:#fff;border-radius:999px;padding:0 7px;font-size:12px;font-weight:700}.chip.on .cvn{background:#fff;color:#b91c1c}.cvalert{border:2px solid #fca5a5;background:#fef2f2;border-radius:12px;padding:10px 14px;margin:6px 0 12px}.cvalert h3{margin:0 0 2px;color:#991b1b;font-size:16px}.cvalert p{margin:2px 0 6px}.cvalert ul{list-style:none;margin:0;padding:0}.cvalert li{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0}.cvalert li .cvt2{font-size:12px;font-weight:700;color:#991b1b;background:#fee2e2;border-radius:6px;padding:1px 7px}.cvalert button{font-size:13px;padding:2px 10px}.cov tr.cvbad td{background:#fef2f2}.cov tr.cvbad td:first-child{box-shadow:inset 4px 0 0 #dc2626}.cov tr.cvflash td{animation:cvfl 2.4s ease-out}@keyframes cvfl{0%,40%{background:#fecaca}100%{background:#fef2f2}}
@@ -1242,7 +1243,7 @@ function phoneBar(){
       if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;tphMore()}});
     document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;tphMore()}});
   }
-  const np=S.D?S.D.pb.filter(x=>!x.fixed).length+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length:0,cn=corrN().n||0;
+  const np=S.D?msgsN():0,cn=corrN().n||0;
   const isG=GR.some(g=>g.id===S.g),here=S.g==="plan"?(S.place==="msgs"?"msgs":"home"):isG?"groups":S.g==="corr"?"corr":"more";
   const it=[["home","Home",'data-tph="home"'],["groups","Groups",`data-do="tab" data-g="${TPH.g}"`],["corr","Corrections",'data-do="tab" data-g="corr"',cn],["msgs","Messages",'data-tph="msgs"',np],["more","More",'data-tph="more" aria-haspopup="true"']];
   n.innerHTML=it.map(([k,l,a,c])=>{const on=TPH.more?k==="more":k===here;return `<a href="#" ${a}${k===here?' data-here="1"':""}${on?' class="on" aria-current="page"':""}><span class="pi">${tphIcon(TPH_I[k])}</span><span class="pl">${l}</span>${c?`<b>${c>99?"99+":c}</b>`:""}</a>`}).join("");
@@ -1483,7 +1484,7 @@ const gamesTile=(grp,ls)=>{const l=EL_LS.find(y=>y.id===ls),lsT=l?l.title.split(
   const gs=(window.EL_GAMES||[]).filter(g=>g.course===c&&lsT&&String(g.ls||"").toLowerCase().endsWith(lsT)),gl=(gs[0]||{}).ls||"";
   return `<a class="tile" href="lab/game/results.html?g=${encodeURIComponent(grp.id)}${gl?"&ls="+encodeURIComponent(gl):""}" target="_blank" rel="noopener"><span class="ti">🎮${gs.length?`<span class="tb">${gs.length} games</span>`:""}</span><span><b>Games and theory</b><small>${gs.length?"class games of this LS: % right, each student's answers and theory notes":"no class games in this LS yet: results of every LS"}</small></span></a>`};
 const tTile=(p,ic,t,sub,badge,late,cls,g)=>`<a class="tile ${cls||""}" href="#" ${g?`data-do="tab" data-g="${g}"`:`data-do="place" data-p="${p}"`}><span class="ti">${g?`<b>${t}</b>`:ic}${badge?`<span class="tb ${late?"late":""}">${badge}</span>`:""}</span><span>${g?"":`<b>${t}</b>`}<small>${sub}</small></span></a>`;
-const tAlert=(p,ic,txt,go,cls)=>`<a class="hal ${cls||"late"}" href="#" data-do="place" data-p="${p}">${ic} ${txt}<span>${go} →</span></a>`;
+const tAlert=(p,ic,txt,go,cls,t)=>`<a class="hal ${cls||"late"}" href="#" data-do="place" data-p="${p}"${t?` data-t="${t}"`:""}>${ic} ${txt}<span>${go} →</span></a>`;
 const placeHead=(back,p)=>`<div class="ph"><p class="crumb"><a class="back" href="#" data-do="place" data-p="home">‹ ${back}</a></p><h1 class="pt">${PLACES[p]?PLACES[p].join(" "):""}</h1></div>`;
 const plural=(n,w)=>n+" "+w+(n===1?"":"s");
 // the LS chips under a place's title (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the LS"): every LS
@@ -1546,16 +1547,16 @@ function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y
     +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…",gres)}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…",gres)}</div>`
     +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div></div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
-function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew().length;
+function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
   if(S.place==="msgs")return placeHead("Home","msgs")+msgsBoxes();
   if(S.place==="tt")return ttPage();
   S.place="home";
   const sat=isWkEnd(t)?GR.reduce((n,g)=>{const x=ELWeek.now(g.id);return n+(x?pending(Object.assign({gid:g.id},x)).length:0)},0):0;
   const al=(sat?tAlert("week","⚠",`Weekend check: ${plural(sat,"session")} not ticked`,"Check"):"")
-    +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
-    +(nw?tAlert("msgs","💡",`${plural(nw,"new idea")} from students`,"Read","news"):"")
-    +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
+    +(np?tAlert("msgs","⚠️",`${plural(np,"new problem report")} from students`,"Read","","pb"):"")
+    +(nw?tAlert("msgs","💡",`${plural(nw,"new idea")} from students`,"Read","news","sg"):"")
+    +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news","ann"):"");
   GR.forEach(g=>loadGames(g.id));
   const d=new Date(t+"T12:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   return `<div class="ph"><h1 class="hi">Hi, Roger${window.ELCheer?`! ${esc(ELCheer.teacher(t,S.cheer||0))} <button class="cheer" data-do="cheer" title="Another sentence">↻</button>`:""}</h1><p class="sub">${esc(d)}</p></div>`
@@ -1580,7 +1581,7 @@ function render0(){
     +nv("corr","✏️ Corrections","","What Beltran corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
     // the Home tiles moved here (Roger, 9 Nov 2026: "all this info can only be on the left menu")
     +hp("week","📅 Time plan","Every group's week and exam day","")
-    +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const np=S.D.pb.filter(x=>!x.fixed).length,m=np+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length;return m?`<small class="${np?"late":""}">${m}</small>`:""})())
+    +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const m=msgsN();return m?`<small class="${pbNew().length?"late":""}">${m}</small>`:""})())
     +hp("tt","🗓 Timetable","Your classes with each group, days off","")
     +nv("qa","🔎 Questions","","Which questions students answer well or badly the first time, by route and group")
     +nv("online","🟢 Online","","Who is on English Lab now, and the history of visits: when, for how long, which pages")
@@ -1657,7 +1658,7 @@ function render0(){
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
   if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
   else{S.place="home";
-    const np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
+    const np=pbNew().length,nw=sgNew().length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
       +(nb?tAlert("plan","⏰",`${plural(nb,"earlier session")} not ticked`,"Tick them"):"")
       +(/❌/.test(todoH)?tAlert("todo","❌","Beltran's marking is late","See"):"")
@@ -2556,9 +2557,9 @@ function todo(studs,ls,list){   // studs: signed-in students only. Final product
   studs.forEach(s=>lvAsks(s.uid).forEach(([id,l])=>
     out.push(`🎯 <b>${name(s)}</b> asks for a level change: ${route(elRouteOf(S.D.lv[s.uid],id).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:' <small class="muted">· no reason given</small>'}${id!==ls?` <small class="muted">· in ${lsName(id)}</small>`:""} <button data-do="acc" data-u="${s.uid}" data-ls="${id}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}" data-ls="${id}">Decline</button>`)));
   const grp=GR.find(g=>g.id===S.g),mk=grp?mkTodoItems(grp):[];mk.filter(x=>x.now).forEach(x=>out.push(x.h));if(grp)out.push(...cpItems(grp));
-  const np=S.D.pb.filter(x=>!x.fixed).length;
-  if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
-  const nw=(S.D.sg||[]).filter(x=>!x.read).length;
+  const np=pbNew().length;
+  if(np)out.push(`⚠️ ${np} new problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
+  const nw=sgNew().length;
   if(nw)out.push(`💡 ${nw} new suggestion${nw>1?"s":""} from students (all groups) <button data-do="sgopen">Read</button>`);
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
   // 🗨️ what Claude answered in the last 7 days (Roger, 9 Nov 2026: "I want you to answer straight away but I want to see what you said and
@@ -4510,25 +4511,44 @@ function sgBox(){
   const li=x=>{const w=sgWhen(x);return `<li class="${x.read?"read":""}"><div class="hand">${esc(x.text)}</div><small class="muted">${x.read?"":"<b>New</b> · "}${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.page?" · "+pageLink(x,esc(x.page)):""}</small>
     ${pbSent(x)}<div>${x.uid?`<button data-do="sgmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> `:""}<button class="g" data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button> <button class="g" data-do="sgdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="sugg">${fold("sugg",`💡 Suggestions from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small>`,
-    `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'))}</div>`;
+    `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'),"",true)}</div>`;
 }
 // 💬 Messages: while a problem report is open, ⚠️ Problem reports comes first, above 📣 Announcements (Roger, 14 Nov 2026: "the open
 // problem should appear on top"); with none open, Announcements stays first. The box opens by itself while one is open (like 💡 with a
 // new idea), and inside it open reports come first.
-const msgsBoxes=()=>S.D.pb.some(x=>!x.fixed)?pbBox()+annBox()+sgBox():annBox()+pbBox()+sgBox();
+// Roger, 19 Nov 2026: "I want the ideas and the problems to be in different sections": three tabs at the top, ⚠️ Problems · 💡 Ideas ·
+// 📣 Announcements, each with its own count, and only the chosen one below. With no tab chosen (the menu, the bottom bar) it opens the
+// first one with something new, else Problems while one is open, else Announcements. The Home alerts and Read buttons open their own tab.
+// "Can you make a way to unmark all the messages" (same day): ✓ Mark all as read clears every count at once (msgsSeen).
+function pbNew(){return ((S.D||{}).pb||[]).filter(x=>!x.fixed&&!x.seen)}
+function sgNew(){return ((S.D||{}).sg||[]).filter(x=>!x.read)}
+function msgsN(){return pbNew().length+sgNew().length+msgNew().length}
+const MSG_TABS=[["pb","⚠️","Problems"],["sg","💡","Ideas"],["ann","📣","Announcements"]];
+function msgsBoxes(){
+  const n={pb:pbNew().length,sg:sgNew().length,ann:(S.D.ann||[]).filter(annMine).filter(msgWait).length};
+  const t=MSG_TABS.some(([k])=>k===S.msgTab)?S.msgTab:["pb","sg","ann"].find(k=>n[k])||(S.D.pb.some(x=>!x.fixed)?"pb":"ann"),all=msgsN();
+  const tabs=`<div class="msgtabs" role="tablist">${MSG_TABS.map(([k,ic,l])=>`<button role="tab" aria-selected="${k===t}" class="${k===t?"on":"g"}" data-do="msgtab" data-t="${k}">${ic} ${l}${n[k]?` <b class="${k==="pb"?"late":""}">${n[k]}</b>`:""}</button>`).join("")}`
+    +(all?`<button class="g seenall" data-do="msgsseen" title="Every count goes back to 0: new problem reports stay open (only the &quot;new&quot; mark goes), ideas are marked as read, new answers to your messages as seen. Nothing is sent to students.">✓ Mark all as read <small class="muted">(${all})</small></button>`:"")+`</div>`;
+  return tabs+(t==="pb"?pbBox():t==="sg"?sgBox():annBox())}
+// ✓ Mark all as read: one write per item (problems/{id}.seen, suggestions/{id}.read, announcements/{id}.tDone), in one batch. Students get nothing.
+async function msgsSeen(){const pb=pbNew(),sg=sgNew(),an=msgNew();
+  if(DEMO){pb.forEach(x=>x.seen=true);sg.forEach(x=>x.read=true);an.forEach(a=>a.tDone=(a.thread||[]).length);return}
+  const ops=[...pb.map(x=>b=>b.set(F.doc(db(),"problems",x.id),{seen:true},{merge:true})),...sg.map(x=>b=>b.set(F.doc(db(),"suggestions",x.id),{read:true},{merge:true})),
+    ...an.map(a=>b=>b.update(F.doc(db(),"announcements",a.id),{tDone:(a.thread||[]).length}))];
+  for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}}
 function pbBox(){
-  const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
+  const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||(!!a.seen-!!b.seen)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
   // the teacher's own reports (⚠️ Problem in the bottom bar of the dashboard, the class tab or any page; Roger, 13 Nov 2026): "👨‍🏫 You",
   // with no 💬 Answer and no suggested reply (there is no student to tell)
   const who=x=>x.teacher?"<b>👨‍🏫 You</b>":S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
   const li=x=>{const w=pbWhen(x),where=[x.title||x.page,x.section].filter(Boolean).join(" › ");
-    return `<li id="pb-${esc(x.id)}" class="${x.fixed?"fixed":""}"><b>${esc(PB_KIND[x.kind]||x.kind)}</b>${x.teacher?` <span class="tag">${x.merge===false?"⏸ Don't merge yet":"✅ Merge straight away"}</span>`:""}${x.fixed?` <span class="tag">${x.nobug?"Closed":"Fixed"}</span>`:""}${x.text?`<div class="hand">${esc(x.text)}</div>`:""}
+    return `<li id="pb-${esc(x.id)}" class="${x.fixed?"fixed":""}"><b>${esc(PB_KIND[x.kind]||x.kind)}</b>${x.teacher?` <span class="tag">${x.merge===false?"⏸ Don't merge yet":"✅ Merge straight away"}</span>`:""}${x.fixed?` <span class="tag">${x.nobug?"Closed":"Fixed"}</span>`:x.seen?"":` <span class="tag new">New</span>`}${x.text?`<div class="hand">${esc(x.text)}</div>`:""}
     <small class="muted">${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.route?" · "+route(x.route):""}<br>
     ${x.page?"📍 "+pageLink(x,esc(where)):""}${x.device?" · "+esc(x.device):""}</small>${pbAuto(x)}
     ${pbSent(x)}${(x.errors||[]).length?`<details><summary>Errors the page logged (${x.errors.length})</summary>${x.errors.map(e=>`<code>${esc(e)}</code>`).join("")}</details>`:""}
     <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Copy everything in this report and open the English Lab project, to start a thread that fixes it">🤖 Fix with Beltran</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}${x.teacher?"":`<button data-do="pbmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> `}<button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}" title="${x.teacher?(x.fixed?"Open it again":"Your own report: mark it as done"):x.fixed?"Open it again (an unread ✅ note to the student is taken back)":"The student gets a ✅ note saying it is fixed, the next time they open a page"}">${x.fixed?"Reopen":"✅ Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="probs">${fold("probs",`⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small>`,
-    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page; so can you (👨‍🏫 You: from the dashboard, the class tab or any page, Beltran looks at it straight away). Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Beltran copies the whole report and opens the English Lab project (the app or the browser), where you paste it to start a thread. 💬 Answer sends the student your own message (to explain something, or to ask for more details). ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. Under each report, Beltran says where it stands (✅ Fixed, 👍 Not a bug or ✋ Needs you, with what to do first) and suggests a reply: 📨 sends it with one click, ✏️ Edit first lets you change it. The 🔔 in the bottom bar of every page counts the open ones.</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'),"",np>0)}</div>`;
+    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page; so can you (👨‍🏫 You: from the dashboard, the class tab or any page, Beltran looks at it straight away). Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Beltran copies the whole report and opens the English Lab project (the app or the browser), where you paste it to start a thread. 💬 Answer sends the student your own message (to explain something, or to ask for more details). ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. Under each report, Beltran says where it stands (✅ Fixed, 👍 Not a bug or ✋ Needs you, with what to do first) and suggests a reply: 📨 sends it with one click, ✏️ Edit first lets you change it. The 🔔 in the bottom bar of every page and the 💬 Messages count show the new ones; ✓ Mark all as read clears the counts (open reports stay open, with nothing sent to students).</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'),"",true)}</div>`;
 }
 // The note the student gets (shared/js/el-reply.js writes the words): in the language of the route the report was sent with.
 const pbReply=(x,kind)=>({uid:x.uid,kind,what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String(x.section||x.title||"").slice(0,200),en:!!x.route&&!elCa(x.route),created:DEMO?new Date():F.serverTimestamp(),...(S.hold?{at:S.hold}:{})});
@@ -5477,7 +5497,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=false;S.place="todo";render();
     const li=[...document.querySelectorAll("li")].find(l=>l.textContent.trim().startsWith("🎯"));
     if(li){li.scrollIntoView({block:"center"});li.classList.add("askhi");setTimeout(()=>li.classList.remove("askhi"),2500)}else scrollTo(0,0)},
-    place:()=>{e.preventDefault();if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
+    place:()=>{e.preventDefault();if(k.p==="msgs")S.msgTab=k.t||null;if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
       if(k.p==="qa"){S.qa.ls=k.ls;S.qa.g=k.g;S.g="qa";S.place="home";render();scrollTo(0,0);return}
       S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
       if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
@@ -5597,12 +5617,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),gz:()=>gz(k.z),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
-    sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
+    sgopen:()=>{S.open.add("sugg");S.place="msgs";S.msgTab="sg";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
     annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>lateAsk(()=>msgSend(u,k.id)),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annAtMs()?annSendNow():lateAsk(annSendNow),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
-    sgread:()=>act(api.sgRead(k.id,!!k.v)),sgmsg:()=>sgAnswer(k.id),
+    sgread:()=>act(api.sgRead(k.id,!!k.v)),msgtab:()=>{S.msgTab=k.t;render()},msgsseen:()=>act(msgsSeen()),sgmsg:()=>sgAnswer(k.id),
     sgmsgok:()=>{const v=$("#sgt").value.trim();if(!v)return;lateAsk(()=>{$("#dlg").close();act(api.sgMsg(k.id,v))})},sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
-    pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},
+    pbopen:()=>{S.open.add("probs");S.place="msgs";S.msgTab="pb";render();$("#probs").scrollIntoView({behavior:"smooth"})},
     pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";
       dlg(`<h3>📷 Screenshot</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p><p id="pbimg">Loading…</p>`,true);
       try{const img=await api.pbShot(k.id),ok=typeof img==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(img);
@@ -5708,7 +5728,7 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
 
 // the teacher's 🔔 (shared/js/el-bell.js): "All reports" lands on #probs and one report on #pb-<id> (from another page), or it sends
 // el-probs (detail = the report's id) on this page; the list is reloaded and that report is shown in the middle, lit up for a moment
-const toProbs=async id=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.warn("problems",e)}S.open.add("probs");S.place="msgs";render();
+const toProbs=async id=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.warn("problems",e)}S.open.add("probs");S.place="msgs";S.msgTab="pb";render();
   const r=id&&document.getElementById("pb-"+id),b=r||$("#probs");if(!b)return;b.scrollIntoView({behavior:"smooth",block:r?"center":"start"});
   if(r&&r.animate)r.animate([{background:"#fef3c7"},{background:"#fef3c7",offset:.6},{background:"transparent"}],{duration:2200})};
 addEventListener("el-probs",e=>toProbs(e.detail));
