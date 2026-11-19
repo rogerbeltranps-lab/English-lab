@@ -1527,7 +1527,10 @@ document.addEventListener("click",e=>{if(!lockHere())return;
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
 setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();cmTopSpace();cmStudentTabs();fsRefresh();fsCheck();hereTick()},1000);
 // the student's tabs in class mode (only today's steps); after class mode every tab is back
-function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){cmTabs(null);return}
+// Not on the teacher's class tab while its class mode runs (html.elcmon, el-catalog.js): there cmTeacher hides the tabs itself, and this
+// "every tab back" undid it once a second, so all the steps flashed in the path's column and it jumped (teacher report, 2ESOB, 19 Nov 2026:
+// "the left menu kept moving, things appeared and disappeared"). quit() gives every tab back when it stops.
+function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){if(!document.documentElement.classList.contains("elcmon"))cmTabs(null);return}
   if(!cmTabs(g.vis,cmHere(g).map(x=>x.p)))return;
   const at=document.querySelector(".tab.active[data-panel]");if(!at||!at.classList.contains("el-cm-hide"))return;
   const h=cmHere(g),p=(h.find(x=>x.me)||h[0]||{}).p,t=p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');if(t){lockFrom=null;t.click()}}   // the class is over (until) or LOCK_MS passed
