@@ -49,6 +49,12 @@ button.mkr:hover{background:#f8fafc}.mki{width:34px;height:34px;border-radius:10
 .mklock{font-size:14px;color:#991b1b;background:#fef2f2;border-radius:999px;padding:4px 12px}.mkunl{font-size:14px;color:#166534;background:#dcfce7;border-radius:999px;padding:4px 12px}
 .mkhow{margin-left:auto;font-size:14px}.mkhow summary{cursor:pointer;font-weight:600;color:var(--c-dark,#2443ad)}.mkhow[open]{flex-basis:100%;margin-left:0}
 @media (max-width:900px){.mkgrid{grid-template-columns:minmax(0,1fr)}.mktodo{order:-1}.mkhow{margin-left:0}}@media (max-width:640px){.mkhd{flex-wrap:wrap}.mkbig{text-align:left}.mkls{margin-left:0}}
+.xplead{color:#475569;margin:0 0 14px;font-size:15px}.xph{margin:4px 0 12px;font-size:1.3rem}
+.xpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.xpls,.xpex{display:flex;flex-direction:column;gap:4px;text-align:left;background:#fff;color:#0f172a;border:2px solid #e2e8f0;border-radius:18px;padding:16px 18px;font:inherit;text-decoration:none;cursor:pointer}
+.xpls:hover,.xpex:hover{border-color:var(--c,#3157d5);box-shadow:0 4px 14px #0f172a12}.xpls small{font-weight:800;color:var(--c-dark,#2443ad);font-size:13px}.xpls b,.xpex b{font-size:18px}
+.xpls span,.xpgo{margin-top:6px;color:var(--c-dark,#2443ad);font-weight:700;font-size:14.5px}.xpls.none{opacity:.65}.xpls.none span{color:#64748b;font-weight:600}
+.xpi{font-size:26px}.xpex small{color:#64748b;font-size:14px}
 .tabbody{scroll-margin-top:var(--lsh,16px)}
 .cpl{display:grid;gap:12px}.cpc{background:#fff!important;border:1px solid #e2e8f0!important;border-left:6px solid var(--k,#94a3b8)!important;border-radius:14px;padding:12px 14px}.cpc h3{margin:0;font-size:1.05rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.cpc .cps{margin-left:auto;font-size:1.5rem;font-weight:900;color:var(--k)}
 .cpc .cpw{margin:6px 0 0;color:#475569;font-size:14px}.cpq{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}.cpq li{background:#f8fafc;border-radius:10px;padding:8px 12px;border-left:4px solid #16a34a}.cpq li.no{border-left-color:#dc2626;background:#fef2f2}
@@ -405,7 +411,7 @@ const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   // the same menu as every other student page: elStudentMenu in shared/js/el-catalog.js (Roger, 7 Nov 2026: "this should always be the same")
-  const pl=placeNow(),here={home:"board",marks:"marks",progress:"progress",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
+  const pl=placeNow(),here={examprep:"examprep",home:"board",marks:"marks",progress:"progress",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
   if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
@@ -472,9 +478,9 @@ const helpGuide=()=>{
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={work:"marks",progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
+const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
+const placeTitle=p=>({examprep:t("Practica per l'examen","Exam practice"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
@@ -513,7 +519,7 @@ function meBox(lss,ls){
   return `<div class="pme"><div class="pmeh"><span class="pmea" aria-hidden="true">${esc(ini)}</span><div><b>${esc(nm)}</b><small>${esc(g?g.name:"")}${ls?" · "+lsName(ls):""}</small></div></div>`
     +levelBox(ls)
     +`<h2>${t("Les meves notes","My marks")}</h2><div class="pml">`+r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, el que tens endarrerit, exàmens","LS mark, what's late, exams"))
-    +r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))
+    +r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))+r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))
     +(ls?(window.elLsNum&&elLsNum(ls)!=="LS1"?r(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),t("índex, teoria, vocabulari i els teus apunts","index, theory, vocabulary and your notes")):r(lsHref(ls)+"#notes","🎯",t("Què entra a l'examen","What's in the exam"),t("el que hem fet, paraules clau, teoria i els teus apunts","what we've done, key terms, theory and your notes"))):"")+`</div>`
     +`<h2>${t("Més","More")}</h2><div class="pml">`+r("#units","🗂",t("Les meves Learning Situations","My Learning Situations"))
     +r("#news","📣",t("Anuncis del professor","Announcements from your teacher"))
@@ -708,6 +714,7 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="todo")return pseg("todo",lss,ls)+todoBox(lss,ls,info)+(only(ls.id)?"":agendaBox(ls,info)+weekBox(ls,info,true));
   if(place==="hw")return pseg("hw",lss,ls)+homeworkBox(ls,info);
   if(place==="me")return meBox(lss,ls);
+  if(place==="examprep")return examPrep(lss);
   if(place==="progress")return progressPlace(lss,ls);
   // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
   // only on 📈 My formative assessment (Roger, 14 Nov 2026: "in my final product and exams, students only need to see that, not my activities,
@@ -725,6 +732,18 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   return helpGuide()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
     +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
 const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
+// 📝 Exam practice (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen i que sigui el sample exam, que vegin LS,
+// entrin a cada una i allà ha d'haver el o els sample exams"): the LSs I can see as cards, newest first; one opens its practice exams (the
+// optional activities of EL_CATALOG: always open, never homework, never late). Nothing new is read from Firestore.
+const xpOf=l=>EL_CATALOG.filter(a=>a.ls===l.id&&a.optional&&canDo(a,D.ls[l.id]||{}));
+function examPrep(lss){const n=l=>EL_LS.indexOf(l),ord=[...lss].sort((a,b)=>n(b)-n(a)),cur=ord.find(l=>l.id===S.xls),num=l=>window.elLsNum?elLsNum(l):"";
+  if(!cur)return `<p class="xplead">${t("Tria una LS i practica amb el mateix format que l'examen de veritat. No són deures i mai no queda endarrerit.","Choose an LS and practise with the same format as the real exam. It is not homework and it is never late.")}</p>`
+    +`<div class="xpgrid">${ord.map(l=>{const k=xpOf(l).length;return `<button type="button" class="xpls${k?"":" none"}" data-do="xls" data-ls="${l.id}"><small>${esc(num(l))}</small><b>${esc(String(l.title).replace(/^\S+ · /,""))}</b><span>${k?(k>1?t(`${k} exàmens de pràctica`,`${k} practice exams`):t("1 examen de pràctica","1 practice exam")):t("Encara no n'hi ha","None yet")} →</span></button>`}).join("")}</div>`;
+  const xs=xpOf(cur);
+  return `<div class="mkhead"><button type="button" class="g mkback" data-do="xls" data-ls="">‹ ${t("Totes les LS","All LSs")}</button></div><h2 class="xph">${lsName(cur)}</h2>`
+    +(xs.length?`<div class="xpgrid">${xs.map(a=>{const st=steps(a),d=doneSet(a),k=st.filter(x=>d.has(x)).length;
+        return `<a class="xpex" href="${a.path}"><span class="xpi" aria-hidden="true">📝</span><b>${esc(a.title)}</b><small>${k?t(`${k} de ${st.length} parts fetes`,`${k} of ${st.length} parts done`):t("El mateix format que l'examen","The same format as the exam")}</small><span class="xpgo">${k?t("Continua","Continue"):t("Comença","Start")} →</span></a>`}).join("")}</div>`
+      :`<div class="box"><p class="muted" style="margin:0">${t("Aquesta LS encara no té cap examen de pràctica.","This LS has no practice exam yet.")}</p></div>`)}
 // 📊 My marks on ONE screen (Roger, 19 Nov 2026: "aquesta secció té molta informació i molt desordenada, a més això no crec que ni s'ho mirin"):
 // the LS mark so far and its parts (each opens its details: 📚 everyday work, 🎬 final product, 📝 exam, 🎯 checkpoints), the late activities
 // with Do it, and my points in one line. No learning-paths table (the road on the board shows what is done and missing) and no criteria
@@ -756,13 +775,13 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
   // ⏰ what to do now: the late activities (they count 0 until done), or 🎉 all up to date
   let todo="";
   if(!all()&&D.me.group){
-    if(!W.miss.length)todo=`<section class="box mkc mktodo ok"><h2>🎉 ${t("Tot al dia!","All up to date!")}</h2><p class="mkok"><b>${t("No tens res endarrerit.","Nothing late.")}</b> ${t("Continua així: fes cada activitat el seu dia.","Keep it up: do each activity on its day.")}</p>${W.openLine}</section>`;
+    if(!W.miss.length)todo=`<section class="box mkc mktodo ok"><h2>🎉 ${t("Tot al dia!","All up to date!")}</h2><p class="mkok"><b>${t("No tens res endarrerit.","Nothing late.")}</b> ${t("Continua així: fes cada activitat el seu dia.","Keep it up: do each activity on its day.")}</p></section>`;
     else{const P=(D.rs[ls.id+"/assessment"]||{}).progress||{},zs=M&&!M.only&&g?zeroSteps(ls,g):[],up=zs.length?zeroUp(ls,M,g,zs,P):null;
       const shown=W.miss.slice(0,5),more=tabsMiss(W.miss.slice(5));
       todo=`<section class="box mkc mktodo"><h2>⏰ ${W.nm>1?t(`Tens ${W.nm} activitats endarrerides`,`You have ${W.nm} late activities`):t("Tens 1 activitat endarrerida","You have 1 late activity")}</h2>`
         +`<p class="mklead">${t(W.nm>1?"Compten 0 fins que les facis.":"Compta 0 fins que la facis.",W.nm>1?"They count 0 until you do them.":"It counts 0 until you do it.")} ${up!=null?t(`Fes-les i la teva nota pujarà almenys fins a <b>${f1(up)}</b>.`,`Do them and your mark goes up to at least <b>${f1(up)}</b>.`):t("Fes-les ara i la teva nota puja.","Do them now and your mark goes up.")}</p>`
         +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftNames(a,o);return `<li><b>${esc(a.title)}</b><small>${ln.length?ln.map(esc).join(" · ")+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${a.path}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
-        +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+W.openLine+`</section>`}}
+        +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+`</section>`}}
   return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div><div id="ptbox">${pointsLine()}</div>`}
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
@@ -936,15 +955,13 @@ function pointsLine(){
     +`<ul class="fv-tiles">${elPointsRules().map(r=>`<li><i aria-hidden="true">${r.icon}</i><span>${EN?r.en:r.ca}</span></li>`).join("")}</ul>${past.length?`<p class="muted">${past.join(" · ")}</p>`:""}</details></section>`}
 // My work this term (Roger, 2 Nov 2026; elDueWork, the same rule as the bonus): the paths that count so far by the time plan and the late
 // ones (past their day in the class plan: elMissing + lateList, the home banner's number), in tabs, not learning paths (Roger, 7 Nov 2026).
-// S.wmiss / S.wtabs feed lateList and the home banner. The opened ones not late yet are in ✅ To do (one line links there).
+// S.wmiss / S.wtabs feed lateList and the home banner.
 // It never says which activities are assessed (AGENTS.md: students are never told), only that their everyday work counts.
-function workData(lss){S.wmiss=new Set();S.wtabs=0;const o={miss:[],nm:0,openLine:""};if(all()||!D.me.group)return o;
+function workData(lss){S.wmiss=new Set();S.wtabs=0;const o={miss:[],nm:0};if(all()||!D.me.group)return o;
   const due=elDueWork(D.me.group,elTerm(),ls=>D.ls[ls]),miss0=due.filter(([a,,x])=>tabsLeft(a,x).length);
   due.forEach(([a])=>S.wmiss.add(a.id));S.wtabs=tabsMiss(miss0);   // every path counted here (lateList skips them), missing or not
-  const miss=lss?[...miss0,...lateList(lss)]:miss0,lateIds=new Set(miss.map(([a])=>a.id));
-  const open=lss?todoItems(lss).filter(x=>!lateIds.has(x.a.id)):[],no=open.reduce((n,x)=>n+todoTabs(x),0);
-  o.miss=miss;o.nm=tabsMiss(miss);
-  o.openLine=no?`<p class="mkopen">📂 ${t(`A més, ${nAct(no)} de classe que encara no ${no>1?"van":"va"} tard`,`Plus ${nAct(no)} from class that ${no>1?"are":"is"} not late yet`)}: <a href="#todo">✅ ${t("Per fer","To do")} →</a></p>`:"";
+  const miss=lss?[...miss0,...lateList(lss)]:miss0;
+  o.miss=miss;o.nm=tabsMiss(miss);   // no "plus N from class not late yet" line (Roger, 19 Nov 2026: "aquesta info no vull que la sàpiguen")
   return o}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
@@ -1824,7 +1841,7 @@ const tabName=(id,k)=>{if(window.elTabOf)k=elTabOf(id,k);const xs=(window.EL_SEC
 const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({home:"marks",daily:"work",fp:"final",cp:"checkpoints"}[k.t]||k.t))}catch(e){}render();scrollTo(0,0)},    crit:()=>critPanel(k.c,k),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},xls:()=>{S.xls=k.ls||null;render();scrollTo(0,0)},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({home:"marks",daily:"work",fp:"final",cp:"checkpoints"}[k.t]||k.t))}catch(e){}render();scrollTo(0,0)},    crit:()=>critPanel(k.c,k),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});

@@ -75,6 +75,8 @@ const SHOTS = [
   { id: 'marks-fp', url: 'today.html#marks', preview: true, full: true, click: '[data-do="tab"][data-t="fp"]' },
   { id: 'marks-exams', url: 'today.html#marks', preview: true, full: true, click: '[data-do="tab"][data-t="exam"]' },
   { id: 'marks-ls1', url: 'today.html#marks', preview: true, full: true, click: `[data-do="ls"][data-ls="${C.ls1}"]` },
+  { id: 'exam-practice', url: 'today.html#exam-practice', preview: true, full: true },
+  { id: 'exam-practice-ls', url: 'today.html#exam-practice', preview: true, full: true, click: `[data-do="xls"][data-ls="${C.ls}"]` },
   { id: 'marks-phone', url: 'today.html#marks', preview: true, full: true, w: 390, h: 844 },
   { id: 'help-open', url: 'today.html#help', preview: true, full: true, run: `document.querySelectorAll('details.hgp')[3].open=true` },
 ];
