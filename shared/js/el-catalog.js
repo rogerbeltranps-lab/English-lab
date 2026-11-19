@@ -539,7 +539,7 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
     if(!keepFs&&mine&&fsEl()){mine=false;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}on()}
   ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>d.addEventListener(ev,()=>{const f=fsEl();if(swap)return;
     if(f&&(f.tagName==="VIDEO"||f.tagName==="IFRAME")&&(watch()||(f.dataset&&f.dataset.elsi))){swap=true;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d),v=f;
-      Promise.resolve(x).catch(()=>{}).then(()=>{bigOn(v);return pageFs()}).catch(()=>{}).then(()=>{swap=false})}
+      Promise.resolve(x).catch(()=>{}).then(()=>{bigOn(v);return pageFs()}).catch(()=>{}).then(()=>setTimeout(()=>{swap=false},300))}
     else if(!f){mine=false;if(big)bigOff(true)}}));
   d.addEventListener("keydown",e=>{if(e.key==="Escape"&&big&&!fsEl())bigOff()});
   window.elPlayVideo=function(src){css();const old=d.getElementById("el-vid");if(old)old.remove();const o=d.createElement("div");o.id="el-vid";
@@ -547,6 +547,9 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
     const v=o.querySelector("video");v.src=src;
     o.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.x){if(big===v)bigOff();o.remove();on()}else{bigOn(v);pageFs().catch(()=>{})}};
     d.body.append(o);on();return o};
+  // ⛶ on the shadowing video's own box (below): the click itself makes the page or the box full screen. The video's own ⛶ cannot: Chrome spends
+  // the click on that full screen, so the swap above could not go full screen again (2ESOB class, 19 Nov 2026: "the full screen doesn't work")
+  window.elBigVideo=v=>{bigOn(v);pageFs().catch(()=>{})};
   // links marked data-elvid play over the page instead of opening the video file in a new tab
   d.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-elvid]");if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();window.elPlayVideo(a.href)})})();
 // ⏭ The shadowing video's introduction (Roger, 16 Nov 2026: "in the shadowing video, I want to have a mark where the introduction finishes so that
@@ -561,6 +564,7 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
   const css=()=>{if(d.getElementById("el-sicss"))return;const s=d.createElement("style");s.id="el-sicss";s.textContent=
     ".el-si{position:relative;display:block;max-width:100%}#el-vid .el-si{width:100%;display:flex;flex-direction:column;align-items:center}#el-vid .el-si video{max-height:calc(100vh - 130px)}#el-vid .el-si-bar{align-self:flex-start}"
     +".el-si-skip{position:absolute;z-index:3;border:0;border-radius:999px;padding:9px 18px;background:#fff;color:#0f172a;font:800 16px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 16px #0007;white-space:nowrap}"
+    +".el-si-fs{position:absolute;z-index:3;top:10px;border:0;border-radius:999px;padding:7px 14px;background:#fffffff0;color:#0f172a;font:800 14px system-ui,sans-serif;cursor:pointer;box-shadow:0 3px 12px #0006}.el-si-fs:hover{background:#fef9c3}.el-si-big .el-si-fs,#el-vid .el-si-fs{display:none}"
     +".el-si-skip.el-si-sm{padding:6px 12px;font-size:13px}.el-si-skip:hover{background:#fef9c3}.el-si-skip[hidden]{display:none}"
     +".el-si-bar{position:relative;display:flex;height:30px;margin:6px 0 4px;border-radius:9px;overflow:hidden;cursor:pointer;font:700 13px/30px system-ui,sans-serif;user-select:none;-webkit-user-select:none;box-sizing:border-box}"
     +".el-si-bar>span{position:relative;z-index:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 10px;box-sizing:border-box}"
@@ -573,19 +577,22 @@ window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=
   const IN=16;   // the bar lines up with the video's own time bar (Chrome draws it 16 px in from each side)
   function add(v){if(v.dataset.elsi||!v.parentNode)return;const t=introOf(v);if(!t)return;v.dataset.elsi="1";css();
     const w=d.createElement("div");w.className="el-si";v.parentNode.insertBefore(w,v);w.append(v);if(v.preload==="none")v.preload="metadata";
-    w.insertAdjacentHTML("beforeend",'<button type="button" class="el-si-skip" title="Go to sentence 1 ('+mm(t)+')">⏭ Skip the intro</button>'
+    try{v.controlsList.add("nofullscreen")}catch(e){v.setAttribute("controlslist","nofullscreen")}   // ⛶ Full screen below instead
+
+    w.insertAdjacentHTML("beforeend",'<button type="button" class="el-si-fs" title="The video fills the screen (Esc to come back)">⛶ Full screen</button><button type="button" class="el-si-skip" title="Go to sentence 1 ('+mm(t)+')">⏭ Skip the intro</button>'
       +'<div class="el-si-bar" title="Tap to jump to that point" style="visibility:hidden"><span class="el-si-a">Introduction</span>'
       +'<span class="el-si-b">⏭ Sentences from '+mm(t)+'</span><i class="el-si-now"></i></div>');
-    const b=w.querySelector(".el-si-skip"),bar=w.querySelector(".el-si-bar"),A=bar.children[0],N=bar.children[2];
+    const F=w.querySelector(".el-si-fs"),b=w.querySelector(".el-si-skip"),bar=w.querySelector(".el-si-bar"),A=bar.children[0],N=bar.children[2];
     const go=s=>{if(v.readyState<1){v.addEventListener("loadedmetadata",()=>go(s),{once:true});v.load();return}
       v.currentTime=s;const p=v.play();if(p&&p.catch)p.catch(()=>{})};
     const B=bar.children[1];
     const draw=()=>{const D=v.duration,sm=v.offsetWidth<560;b.hidden=v.currentTime>t-1;b.classList.toggle("el-si-sm",sm);
       A.textContent=sm?"Intro":"Introduction";B.textContent=(sm?"⏭ ":"⏭ Sentences from ")+mm(t);
-      b.style.left="auto";b.style.right=Math.max(8,w.clientWidth-v.offsetLeft-v.offsetWidth+14)+"px";b.style.top=Math.max(8,v.offsetTop+v.offsetHeight-(sm?84:108))+"px";
+      b.style.left="auto";b.style.right=F.style.right=Math.max(8,w.clientWidth-v.offsetLeft-v.offsetWidth+14)+"px";F.style.top=(v.offsetTop+10)+"px";b.style.top=Math.max(8,v.offsetTop+v.offsetHeight-(sm?84:108))+"px";
       bar.style.width=Math.max(0,v.offsetWidth-2*IN)+"px";bar.style.marginLeft=(v.offsetLeft+IN)+"px";
       if(!(D>t))return;bar.style.visibility="";A.style.width=(100*t/D)+"%";N.style.width=(100*Math.min(1,v.currentTime/D))+"%"};
     b.onclick=e=>{e.stopPropagation();go(t)};
+    F.onclick=e=>{e.stopPropagation();if(window.elBigVideo)window.elBigVideo(v)};
     bar.onclick=e=>{const D=v.duration;if(!(D>0))return;const r=bar.getBoundingClientRect();let s=(e.clientX-r.left)/r.width*D;
       if(Math.abs(s-t)<D*0.02)s=t;go(Math.max(0,Math.min(D-0.5,s)))};
     ["loadedmetadata","timeupdate","seeked","play"].forEach(ev=>v.addEventListener(ev,draw));
