@@ -687,11 +687,11 @@ window.EL_EXAM = {
      {
       "id": "bB-v03",
       "t": "mc",
-      "q": "In autumn, the days get ___.",
+      "q": "In autumn the sun goes down early: it gets ___ at six o’clock.",
       "o": [
-       "hotter",
-       "longer",
-       "shorter"
+       "dark",
+       "hot",
+       "light"
       ]
      },
      {
@@ -916,6 +916,430 @@ window.EL_EXAM = {
       "max": 80,
       "ca": "Escriu un missatge a un amic o amiga d’un altre país sobre la teva celebració preferida (40–60 paraules): què és, quan és, què fa la gent, què mengeu i com et sents.",
       "frame": "Hi ___! My favourite celebration is ___. It is celebrated on / in ___. People ___ and children ___. We eat ___. I feel ___ because ___."
+     }
+    ]
+   }
+  },
+  "base-C": {
+   "text": "<p><strong>Text A · Post · Mei, Manchester (UK) · 10 February</strong><br>Happy Lunar New Year! 🧧 It is celebrated in January or February. Before the new year, families clean their houses and decorate them with red lanterns. Red is a lucky colour. Today we are eating dumplings with my grandparents. Children get red envelopes with money. My brother is watching the dragon dance in the street with his friends. I feel really happy!</p><p><strong>Text B · Web page · Carnival Parade</strong><br><strong>Saturday 13 February · 17:00 · from the station to the main square</strong><br>Wear your best costume! The parade starts at the station at 17:00. There is a prize for the best costume: a big chocolate cake. Music and dancing in the main square until 21:00. Free hot chocolate for children.</p>",
+   "sections": {
+    "listening": [
+     {
+      "id": "bC-l01",
+      "t": "mc",
+      "q": "How long ago did Samhain take place?",
+      "o": [
+       "more than two thousand years ago",
+       "twenty years ago",
+       "two hundred years ago"
+      ]
+     },
+     {
+      "id": "bC-l02",
+      "t": "mc",
+      "q": "What is the surprise about Samhain?",
+      "o": [
+       "It was in spring.",
+       "People didn’t use pumpkins.",
+       "People didn’t wear masks."
+      ]
+     },
+     {
+      "id": "bC-l03",
+      "t": "mc",
+      "q": "After Halloween, which celebration do they talk about?",
+      "o": [
+       "Bonfire Night",
+       "Christmas",
+       "the Castanyada"
+      ]
+     },
+     {
+      "id": "bC-l04",
+      "t": "mc",
+      "q": "The Castanyada is the night before…",
+      "o": [
+       "All Saints’ Day",
+       "Christmas Day",
+       "New Year’s Day"
+      ]
+     },
+     {
+      "id": "bC-l05",
+      "t": "mc",
+      "q": "On All Saints’ Day, many people remember…",
+      "o": [
+       "family members who have died",
+       "the first day of winter",
+       "their teachers"
+      ]
+     },
+     {
+      "id": "bC-l06",
+      "t": "mc",
+      "q": "What did the bell ringers do all night?",
+      "o": [
+       "They lit bonfires.",
+       "They rang the church bells.",
+       "They sold chestnuts."
+      ]
+     },
+     {
+      "id": "bC-l07",
+      "t": "mc",
+      "q": "Why are chestnuts and sweet potatoes easy to find?",
+      "o": [
+       "It’s harvest time.",
+       "They are cheap in winter.",
+       "They come from the United States."
+      ]
+     },
+     {
+      "id": "bC-l08",
+      "t": "mc",
+      "q": "What often happens at school?",
+      "o": [
+       "Children carve turnips.",
+       "Someone dresses up as a castanyera.",
+       "Teachers ring the bells."
+      ]
+     }
+    ],
+    "reading": [
+     {
+      "id": "bC-r01",
+      "t": "mc",
+      "q": "When is Lunar New Year celebrated?",
+      "o": [
+       "in January or February",
+       "on 25 December",
+       "on 31 October"
+      ]
+     },
+     {
+      "id": "bC-r02",
+      "t": "mc",
+      "q": "How do families decorate their houses?",
+      "o": [
+       "with orange flowers",
+       "with pumpkins",
+       "with red lanterns"
+      ]
+     },
+     {
+      "id": "bC-r03",
+      "t": "mc",
+      "q": "Why is red important?",
+      "o": [
+       "It’s a lucky colour.",
+       "It’s Mei’s favourite colour.",
+       "It’s the colour of the dragon."
+      ]
+     },
+     {
+      "id": "bC-r04",
+      "t": "mc",
+      "q": "What are they eating today?",
+      "o": [
+       "dumplings",
+       "roasted chestnuts",
+       "toffee apples"
+      ]
+     },
+     {
+      "id": "bC-r05",
+      "t": "mc",
+      "q": "What do children get?",
+      "o": [
+       "chocolate cake",
+       "masks",
+       "red envelopes with money"
+      ]
+     },
+     {
+      "id": "bC-r06",
+      "t": "mc",
+      "q": "What is Mei’s brother doing?",
+      "o": [
+       "He’s cleaning the house.",
+       "He’s making lanterns.",
+       "He’s watching the dragon dance."
+      ]
+     },
+     {
+      "id": "bC-r07",
+      "t": "mc",
+      "q": "Where does the Carnival parade start?",
+      "o": [
+       "at the school",
+       "at the station",
+       "in the main square"
+      ]
+     },
+     {
+      "id": "bC-r08",
+      "t": "mc",
+      "q": "What is the prize for the best costume?",
+      "o": [
+       "a big chocolate cake",
+       "a red envelope",
+       "free hot chocolate"
+      ]
+     }
+    ],
+    "vocabulary": [
+     {
+      "id": "bC-v01",
+      "t": "mc",
+      "q": "It’s very, very cold and there’s ice on the street. It’s ___.",
+      "o": [
+       "cosy",
+       "freezing",
+       "mild"
+      ]
+     },
+     {
+      "id": "bC-v02",
+      "t": "mc",
+      "q": "In autumn the ___ change colour: red, orange and yellow.",
+      "o": [
+       "candles",
+       "clocks",
+       "leaves"
+      ]
+     },
+     {
+      "id": "bC-v03",
+      "t": "mc",
+      "q": "A blanket, a sofa and hot chocolate: our living room is ___.",
+      "o": [
+       "chilly",
+       "cosy",
+       "foggy"
+      ]
+     },
+     {
+      "id": "bC-v04",
+      "t": "mc",
+      "q": "At the Castanyada we eat ___: little sweets with almonds and pine nuts.",
+      "o": [
+       "lanterns",
+       "panellets",
+       "turnips"
+      ]
+     },
+     {
+      "id": "bC-v05",
+      "t": "mc",
+      "q": "At Halloween, children knock on doors and go trick or ___.",
+      "o": [
+       "dancing",
+       "eating",
+       "treating"
+      ]
+     },
+     {
+      "id": "bC-v06",
+      "t": "mc",
+      "q": "At midnight on 31 December we eat twelve ___.",
+      "o": [
+       "candles",
+       "chestnuts",
+       "grapes"
+      ]
+     },
+     {
+      "id": "bC-v07",
+      "t": "mc",
+      "q": "Children ___ presents from the Three Kings on 6 January.",
+      "o": [
+       "carve",
+       "get",
+       "light"
+      ]
+     },
+     {
+      "id": "bC-v08",
+      "t": "mc",
+      "q": "Our town has a summer ___ with music, dancing and fireworks.",
+      "o": [
+       "festival",
+       "frost",
+       "harvest"
+      ]
+     },
+     {
+      "id": "bC-v09",
+      "t": "mc",
+      "q": "On 31 October many people ___ as ghosts and witches.",
+      "o": [
+       "dress up",
+       "give up",
+       "put up"
+      ]
+     },
+     {
+      "id": "bC-v10",
+      "t": "mc",
+      "q": "People ___ candles at Hanukkah and oil lamps at Diwali.",
+      "o": [
+       "carve",
+       "light",
+       "roast"
+      ]
+     },
+     {
+      "id": "bC-v11",
+      "t": "mc",
+      "q": "My little brother is ___ of the dark.",
+      "o": [
+       "excited",
+       "grateful",
+       "scared"
+      ]
+     },
+     {
+      "id": "bC-v12",
+      "t": "gap",
+      "q": "We put ___ in the windows at Christmas. (espelmes)"
+     },
+     {
+      "id": "bC-v13",
+      "t": "gap",
+      "q": "At Carnival I wear a ___ on my face. (màscara)"
+     },
+     {
+      "id": "bC-v14",
+      "t": "gap",
+      "q": "We ___ the house with lights at Christmas. (decorem)"
+     },
+     {
+      "id": "bC-v15",
+      "t": "gap",
+      "q": "In autumn the leaves fall from the ___. (arbres)"
+     },
+     {
+      "id": "bC-v16",
+      "t": "gap",
+      "q": "There is ___ on the cars this morning: everything is white. (gebre)"
+     }
+    ],
+    "grammar": [
+     {
+      "id": "bC-g01",
+      "t": "mc",
+      "q": "My sister ___ a costume every Carnival.",
+      "o": [
+       "wear",
+       "wearing",
+       "wears"
+      ]
+     },
+     {
+      "id": "bC-g02",
+      "t": "mc",
+      "q": "The Christmas holidays ___ two weeks.",
+      "o": [
+       "last",
+       "lasting",
+       "lasts"
+      ]
+     },
+     {
+      "id": "bC-g03",
+      "t": "mc",
+      "q": "My parents ___ work on Christmas Day.",
+      "o": [
+       "aren’t",
+       "doesn’t",
+       "don’t"
+      ]
+     },
+     {
+      "id": "bC-g04",
+      "t": "mc",
+      "q": "___ you eat panellets at the Castanyada? — Yes, we do.",
+      "o": [
+       "Are",
+       "Do",
+       "Does"
+      ]
+     },
+     {
+      "id": "bC-g05",
+      "t": "mc",
+      "q": "Christmas Day is ___ 25 December.",
+      "o": [
+       "at",
+       "in",
+       "on"
+      ]
+     },
+     {
+      "id": "bC-g06",
+      "t": "mc",
+      "q": "Carnival is ___ February.",
+      "o": [
+       "at",
+       "in",
+       "on"
+      ]
+     },
+     {
+      "id": "bC-g07",
+      "t": "mc",
+      "q": "We open the presents ___ the morning.",
+      "o": [
+       "at",
+       "in",
+       "on"
+      ]
+     },
+     {
+      "id": "bC-g08",
+      "t": "mc",
+      "q": "In December it gets ___ every week.",
+      "o": [
+       "darker",
+       "darkest",
+       "more dark"
+      ]
+     },
+     {
+      "id": "bC-g09",
+      "t": "mc",
+      "q": "Last Christmas we ___ to my grandparents’ house.",
+      "o": [
+       "go",
+       "goed",
+       "went"
+      ]
+     },
+     {
+      "id": "bC-g10",
+      "t": "gap",
+      "q": "My cousin ___ (play) the drums in the parade."
+     },
+     {
+      "id": "bC-g11",
+      "t": "gap",
+      "q": "Carnival ___ celebrated in February."
+     },
+     {
+      "id": "bC-g12",
+      "t": "gap",
+      "q": "Yesterday we ___ (watch) the fireworks."
+     }
+    ],
+    "writing": [
+     {
+      "id": "bC-w01",
+      "t": "write",
+      "q": "Write a post for the school blog about a celebration in your town or family (40–60 words): what it is, when it is, what people do, what you eat and how you feel.",
+      "min": 40,
+      "max": 80,
+      "ca": "Escriu una entrada per al blog de l’institut sobre una celebració del teu poble o de la teva família (40–60 paraules): què és, quan és, què fa la gent, què mengeu i com et sents.",
+      "frame": "My favourite celebration is ___. It is celebrated on / in ___. People ___. Children ___. We eat ___. I feel ___ because ___."
      }
     ]
    }
@@ -1622,6 +2046,359 @@ window.EL_EXAM = {
       "min": 60,
       "max": 110,
       "ca": "Escriu un correu a un amic o amiga d’un altre país sobre una celebració del teu poble (60–90 paraules): què és, quan és, els costums, el menjar, i què vas fer l’any passat (Past Simple)."
+     }
+    ]
+   }
+  },
+  "core-C": {
+   "text": "<p><strong>Text A · Post · Mei, Manchester (UK) · 10 February</strong><br>Happy Lunar New Year! 🧧 It is celebrated in January or February and it lasts fifteen days. Before the new year, families clean their houses to sweep away the bad luck of the old year, and then they decorate them with red lanterns, because red is a lucky colour. Today we are eating dumplings with my grandparents, and the children get red envelopes with money. When my mum was a child in Hong Kong, people used to set off firecrackers in the street to scare away bad luck; today this isn’t allowed in many cities. The celebration ends with the Lantern Festival, when people hang lanterns and solve riddles written on them. I’m proud of my family’s traditions.</p><p><strong>Text B · Web page · Carnival Parade</strong><br><strong>Saturday 13 February · 17:00 · from the station to the main square</strong><br>Wear your best costume and join the parade! It starts at the station at 17:00 and finishes in the main square, where there is music and dancing until 21:00. The costume contest costs 2 euros, and all the money goes to the school trip. The prize for the best costume is a giant chocolate cake. The first parade took place in 1980 with only twelve people. Free hot chocolate for children: bring a reusable cup!</p>",
+   "sections": {
+    "listening": [
+     {
+      "id": "cC-l01",
+      "t": "mc",
+      "q": "How long ago did Samhain take place?",
+      "o": [
+       "more than two thousand years ago",
+       "twenty years ago",
+       "two hundred years ago"
+      ]
+     },
+     {
+      "id": "cC-l02",
+      "t": "mc",
+      "q": "What is the surprise about Samhain?",
+      "o": [
+       "It was in spring.",
+       "People didn’t use pumpkins.",
+       "People didn’t wear masks."
+      ]
+     },
+     {
+      "id": "cC-l03",
+      "t": "mc",
+      "q": "The Castanyada is the night before…",
+      "o": [
+       "All Saints’ Day",
+       "Christmas Day",
+       "New Year’s Day"
+      ]
+     },
+     {
+      "id": "cC-l04",
+      "t": "mc",
+      "q": "On All Saints’ Day, many people remember…",
+      "o": [
+       "family members who have died",
+       "the first day of winter",
+       "their teachers"
+      ]
+     },
+     {
+      "id": "cC-l05",
+      "t": "mc",
+      "q": "What did the bell ringers do all night?",
+      "o": [
+       "They lit bonfires.",
+       "They rang the church bells.",
+       "They sold chestnuts."
+      ]
+     },
+     {
+      "id": "cC-l06",
+      "t": "mc",
+      "q": "Which two foods are autumn food?",
+      "o": [
+       "almonds and oranges",
+       "chestnuts and sweet potatoes",
+       "pumpkins and grapes"
+      ]
+     },
+     {
+      "id": "cC-l07",
+      "t": "mc",
+      "q": "Who makes panellets at home?",
+      "o": [
+       "many families, together",
+       "only bakers",
+       "only the castanyeres"
+      ]
+     },
+     {
+      "id": "cC-l08",
+      "t": "mc",
+      "q": "What do the two celebrations have in common?",
+      "o": [
+       "They are on the same night and are about the dead and the end of the harvest.",
+       "They both come from Ireland.",
+       "They both use pumpkins."
+      ]
+     }
+    ],
+    "reading": [
+     {
+      "id": "cC-r01",
+      "t": "mc",
+      "q": "How long does Lunar New Year last?",
+      "o": [
+       "eight nights",
+       "fifteen days",
+       "one night"
+      ]
+     },
+     {
+      "id": "cC-r02",
+      "t": "mc",
+      "q": "Why do families clean their houses before the new year?",
+      "o": [
+       "because it’s spring",
+       "because their grandparents are coming",
+       "to sweep away the bad luck of the old year"
+      ]
+     },
+     {
+      "id": "cC-r03",
+      "t": "mc",
+      "q": "What did people use to do in Hong Kong when Mei’s mum was a child?",
+      "o": [
+       "carve turnips",
+       "set off firecrackers in the street",
+       "stay at the cemetery all night"
+      ]
+     },
+     {
+      "id": "cC-r04",
+      "t": "mc",
+      "q": "Why don’t people do it in many cities today?",
+      "o": [
+       "It isn’t allowed.",
+       "It’s too expensive.",
+       "Nobody likes it."
+      ]
+     },
+     {
+      "id": "cC-r05",
+      "t": "mc",
+      "q": "What happens at the Lantern Festival?",
+      "o": [
+       "People clean their houses.",
+       "People eat dumplings with their grandparents.",
+       "People hang lanterns and solve riddles."
+      ]
+     },
+     {
+      "id": "cC-r06",
+      "t": "mc",
+      "q": "Where does the money from the costume contest go?",
+      "o": [
+       "to the children’s hospital",
+       "to the food bank",
+       "to the school trip"
+      ]
+     },
+     {
+      "id": "cC-r07",
+      "t": "mc",
+      "q": "How was the first parade different?",
+      "o": [
+       "It didn’t have music.",
+       "It was in summer.",
+       "Only twelve people took part."
+      ]
+     },
+     {
+      "id": "cC-r08",
+      "t": "mc",
+      "q": "What should children bring?",
+      "o": [
+       "2 euros",
+       "a reusable cup",
+       "an empty jar"
+      ]
+     }
+    ],
+    "vocabulary": [
+     {
+      "id": "cC-v01",
+      "t": "gap",
+      "q": "It’s ___ today: there’s ice on the street! (fr...)"
+     },
+     {
+      "id": "cC-v02",
+      "t": "gap",
+      "q": "In autumn the ___ change colour and fall from the trees. (l...)"
+     },
+     {
+      "id": "cC-v03",
+      "t": "gap",
+      "q": "In autumn the days get ___: the sun goes down at six. (sh...)"
+     },
+     {
+      "id": "cC-v04",
+      "t": "gap",
+      "q": "We ___ sweet potatoes in the oven at the Castanyada. (r...)"
+     },
+     {
+      "id": "cC-v05",
+      "t": "gap",
+      "q": "At midnight on New Year’s Eve we make a ___. (w...)"
+     },
+     {
+      "id": "cC-v06",
+      "t": "gap",
+      "q": "At Diwali, families ___ small oil lamps. (l...)"
+     },
+     {
+      "id": "cC-v07",
+      "t": "gap",
+      "q": "At Carnival, the whole town watches the ___ in the street. (p...)"
+     },
+     {
+      "id": "cC-v08",
+      "t": "gap",
+      "q": "At Christmas we give and ___ presents. (g...)"
+     },
+     {
+      "id": "cC-v09",
+      "t": "gap",
+      "q": "On 6 January children open their ___. (p...)"
+     },
+     {
+      "id": "cC-v10",
+      "t": "gap",
+      "q": "People hang paper ___ at the Lantern Festival. (l...)"
+     },
+     {
+      "id": "cC-v11",
+      "t": "gap",
+      "q": "Many people ___ the cemetery on All Saints’ Day. (v...)"
+     },
+     {
+      "id": "cC-v12",
+      "t": "gap",
+      "q": "We ___ the Christmas tree with lights and balls. (d...)"
+     },
+     {
+      "id": "cC-v13",
+      "t": "gap",
+      "q": "Some families go to church at Christmas: for them it’s a ___ holiday. (r...)"
+     },
+     {
+      "id": "cC-v14",
+      "t": "mc",
+      "q": "At the end of the summer, farmers collect the ___.",
+      "o": [
+       "crops",
+       "feasts",
+       "frost"
+      ]
+     },
+     {
+      "id": "cC-v15",
+      "t": "mc",
+      "q": "For many people Christmas is ___: it isn’t about religion.",
+      "o": [
+       "crowded",
+       "seasonal",
+       "secular"
+      ]
+     },
+     {
+      "id": "cC-v16",
+      "t": "mc",
+      "q": "Choose the right sentence.",
+      "o": [
+       "We celebrate New Year to our friends.",
+       "We celebrate New Year with our friends.",
+       "We celebrate to New Year with our friends."
+      ]
+     }
+    ],
+    "grammar": [
+     {
+      "id": "cC-g01",
+      "t": "gap",
+      "q": "My grandma ___ (tell) us stories at Christmas."
+     },
+     {
+      "id": "cC-g02",
+      "t": "gap",
+      "q": "The Christmas holidays ___ (last) two weeks."
+     },
+     {
+      "id": "cC-g03",
+      "t": "gap",
+      "q": "My dad ___ (not / work) on 25 December."
+     },
+     {
+      "id": "cC-g04",
+      "t": "gap",
+      "q": "___ your grandparents celebrate the Castanyada? — Yes, they do."
+     },
+     {
+      "id": "cC-g05",
+      "t": "gap",
+      "q": "We open our presents ___ 6 January."
+     },
+     {
+      "id": "cC-g06",
+      "t": "gap",
+      "q": "Carnival ___ place in February."
+     },
+     {
+      "id": "cC-g07",
+      "t": "gap",
+      "q": "In December it gets ___ (dark) every day."
+     },
+     {
+      "id": "cC-g08",
+      "t": "gap",
+      "q": "Last year we ___ (visit) our cousins in Lleida."
+     },
+     {
+      "id": "cC-g09",
+      "t": "gap",
+      "q": "Did your family ___ (eat) grapes last New Year?"
+     },
+     {
+      "id": "cC-g10",
+      "t": "mc",
+      "q": "Look! My brother ___ his costume.",
+      "o": [
+       "is putting on",
+       "put on",
+       "puts on"
+      ]
+     },
+     {
+      "id": "cC-g11",
+      "t": "mc",
+      "q": "Did you ___ dress up for Carnival when you were little?",
+      "o": [
+       "use to",
+       "used to",
+       "using to"
+      ]
+     },
+     {
+      "id": "cC-g12",
+      "t": "mc",
+      "q": "My sister is excited ___ going to the parade.",
+      "o": [
+       "about",
+       "of",
+       "on"
+      ]
+     }
+    ],
+    "writing": [
+     {
+      "id": "cC-w01",
+      "t": "write",
+      "q": "Write a post for the school blog about a celebration, then and now (60–90 words): what it is, when it is, what people do now, one thing people used to do, and what you did last time (Past Simple).",
+      "min": 60,
+      "max": 110,
+      "ca": "Escriu una entrada per al blog de l’institut sobre una celebració, abans i ara (60–90 paraules): què és, quan és, què fa la gent ara, una cosa que la gent feia abans (used to) i què vas fer l’última vegada (Past Simple)."
      }
     ]
    }
