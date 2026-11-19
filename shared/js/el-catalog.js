@@ -145,7 +145,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint32ESO",1,C),
         L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
-        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false,optional:true}),
+        L("sample-exam.html","First exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false,optional:true}),   // Roger 19 Nov 2026: "let's label it first exam" (practice, LP1 + LP2 only)
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
       ];
