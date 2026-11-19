@@ -34,7 +34,7 @@ const today=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new 
 const dLab=d=>{const x=new Date(d+"T12:00");return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][x.getDay()]+" "+x.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]};
 const isGame=p=>/^game:/.test(p||"");
 export const wanted=()=>{try{return sessionStorage.getItem(K)==="1"}catch(e){return false}};
-const want=v=>{try{sessionStorage.setItem(K,v?"1":"0")}catch(e){}};
+const want=v=>{try{sessionStorage.setItem(K,v?"1":"0")}catch(e){}document.documentElement.classList.toggle("elcmag",!!v)};   // closed: the class tab's menu comes back (el-catalog.js)
 
 let C=null,box=null,vid=null;
 function load(src,has){return has()?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL(src,C.root).href;s.onload=s.onerror=r;document.head.append(s)})}

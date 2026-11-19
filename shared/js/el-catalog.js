@@ -828,7 +828,11 @@ window.elMiniRail=function(r){
   if (on) h.classList.add("elcmon");
   const st = document.createElement("style");
   st.id = "el-cmtab-css";
-  st.textContent = "html.elcmtab .elrail .elside,html.elcmtab .elrail .eln,html.elcmtab aside.side .nvs,"
+  // 📋 Today closed (✕): the column shows the menu again instead of staying empty (teacher report, 2ESOB, 19 Nov: "Now I don't see the left
+  // menu"). html.elcmag = 📋 Today wanted (sessionStorage el_cm_ag, kept by el-cm-agenda.js; not set yet = wanted: it opens when class
+  // mode starts), so the menu does not flash before it docks.
+  try { if (sessionStorage.getItem("el_cm_ag") !== "0") h.classList.add("elcmag"); } catch (e) { h.classList.add("elcmag"); }
+  st.textContent = "html.elcmtab.elcmag .elrail .elside,html.elcmtab.elcmag .elrail .eln,html.elcmtab.elcmag aside.side .nvs,"
     + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav,html.elcmtab .elptabs{display:none!important}"
     + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
     + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"
