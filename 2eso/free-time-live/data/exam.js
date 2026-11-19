@@ -877,6 +877,430 @@ window.EL_EXAM = {
     ]
    }
   },
+  "base-C": {
+   "text": "<p><strong>Text A · Post · Olot Climbing Club · Friday 27 November, 18:00</strong><br>Hi from the climbing wall! 🧗 It’s windy and cloudy outside, so today we’re climbing inside the sports centre. Right now Nil is climbing the big wall and his sister Laia is holding the rope. The coach is helping the new members. Everybody is wearing trainers and a helmet. We usually climb on Friday afternoons. Come and try: bring comfortable clothes!</p><p><strong>Text B · Web page · Hip Hop Dance Workshop</strong><br><strong>Saturday 12 December · 10:00 to 13:00 · Casal de Joves</strong><br>Learn hip hop with a professional dancer! For ages 11 to 15. Wear comfortable clothes and trainers. Price: 5 euros. Bring a bottle of water.</p>",
+   "sections": {
+    "listening": [
+     {
+      "id": "bC-l01",
+      "t": "mc",
+      "q": "Where are Emma and Sam?",
+      "o": [
+       "at the park",
+       "at the sports hall",
+       "at the swimming pool"
+      ]
+     },
+     {
+      "id": "bC-l02",
+      "t": "mc",
+      "q": "What is the Blue Team wearing?",
+      "o": [
+       "blue tracksuits",
+       "green T-shirts",
+       "their new white uniform"
+      ]
+     },
+     {
+      "id": "bC-l03",
+      "t": "mc",
+      "q": "Why is it very noisy in the sports hall?",
+      "o": [
+       "It’s raining a lot.",
+       "The crowd is cheering.",
+       "The music is very loud."
+      ]
+     },
+     {
+      "id": "bC-l04",
+      "t": "mc",
+      "q": "What are some students eating?",
+      "o": [
+       "ice cream",
+       "pizza",
+       "sandwiches"
+      ]
+     },
+     {
+      "id": "bC-l05",
+      "t": "mc",
+      "q": "How does Marc usually play?",
+      "o": [
+       "as a defender",
+       "as a forward",
+       "as the captain"
+      ]
+     },
+     {
+      "id": "bC-l06",
+      "t": "mc",
+      "q": "Who is Júlia passing the ball to?",
+      "o": [
+       "number four",
+       "number seven",
+       "the coach"
+      ]
+     },
+     {
+      "id": "bC-l07",
+      "t": "mc",
+      "q": "Which team is winning?",
+      "o": [
+       "nobody: it’s a draw",
+       "the Blue Team",
+       "the Green Team"
+      ]
+     },
+     {
+      "id": "bC-l08",
+      "t": "mc",
+      "q": "What are the players doing at half-time?",
+      "o": [
+       "They’re drinking water.",
+       "They’re eating sandwiches.",
+       "They’re warming up."
+      ]
+     }
+    ],
+    "reading": [
+     {
+      "id": "bC-r01",
+      "t": "mc",
+      "q": "Where are the club members climbing today?",
+      "o": [
+       "at the beach",
+       "in the mountains",
+       "inside the sports centre"
+      ]
+     },
+     {
+      "id": "bC-r02",
+      "t": "mc",
+      "q": "What’s the weather like outside?",
+      "o": [
+       "It’s hot and sunny.",
+       "It’s snowing.",
+       "It’s windy and cloudy."
+      ]
+     },
+     {
+      "id": "bC-r03",
+      "t": "mc",
+      "q": "What is Nil doing right now?",
+      "o": [
+       "He’s climbing the big wall.",
+       "He’s helping the new members.",
+       "He’s holding the rope."
+      ]
+     },
+     {
+      "id": "bC-r04",
+      "t": "mc",
+      "q": "Who is holding the rope?",
+      "o": [
+       "Laia",
+       "Nil",
+       "the coach"
+      ]
+     },
+     {
+      "id": "bC-r05",
+      "t": "mc",
+      "q": "What is everybody wearing?",
+      "o": [
+       "a costume",
+       "a tracksuit and a cap",
+       "trainers and a helmet"
+      ]
+     },
+     {
+      "id": "bC-r06",
+      "t": "mc",
+      "q": "When does the club usually climb?",
+      "o": [
+       "every day",
+       "on Friday afternoons",
+       "on Sunday mornings"
+      ]
+     },
+     {
+      "id": "bC-r07",
+      "t": "mc",
+      "q": "How much is the dance workshop?",
+      "o": [
+       "3 euros",
+       "5 euros",
+       "It’s free."
+      ]
+     },
+     {
+      "id": "bC-r08",
+      "t": "mc",
+      "q": "What do you need to bring to the workshop?",
+      "o": [
+       "a bottle of water",
+       "a costume",
+       "a helmet"
+      ]
+     }
+    ],
+    "vocabulary": [
+     {
+      "id": "bC-v01",
+      "t": "mc",
+      "q": "We ___ volleyball on the beach.",
+      "o": [
+       "do",
+       "go",
+       "play"
+      ]
+     },
+     {
+      "id": "bC-v02",
+      "t": "mc",
+      "q": "I ___ judo after school.",
+      "o": [
+       "do",
+       "go",
+       "play"
+      ]
+     },
+     {
+      "id": "bC-v03",
+      "t": "mc",
+      "q": "My cousins go ___ in the mountains in winter.",
+      "o": [
+       "ski",
+       "skiing",
+       "to ski"
+      ]
+     },
+     {
+      "id": "bC-v04",
+      "t": "mc",
+      "q": "My sister plays ___ drums in a band.",
+      "o": [
+       "a",
+       "the",
+       "to"
+      ]
+     },
+     {
+      "id": "bC-v05",
+      "t": "mc",
+      "q": "We go ___ the beach in summer.",
+      "o": [
+       "at",
+       "in",
+       "to"
+      ]
+     },
+     {
+      "id": "bC-v06",
+      "t": "mc",
+      "q": "I ___ photos of my friends with my phone.",
+      "o": [
+       "make",
+       "play",
+       "take"
+      ]
+     },
+     {
+      "id": "bC-v07",
+      "t": "mc",
+      "q": "It’s cold: put on your ___ and your scarf.",
+      "o": [
+       "cap",
+       "gloves",
+       "shorts"
+      ]
+     },
+     {
+      "id": "bC-v08",
+      "t": "mc",
+      "q": "The players are wearing blue ___ and white socks.",
+      "o": [
+       "costumes",
+       "helmets",
+       "shorts"
+      ]
+     },
+     {
+      "id": "bC-v09",
+      "t": "mc",
+      "q": "It’s minus five degrees! It’s ___.",
+      "o": [
+       "freezing",
+       "hot",
+       "sunny"
+      ]
+     },
+     {
+      "id": "bC-v10",
+      "t": "mc",
+      "q": "I can’t see the mountains: it’s ___.",
+      "o": [
+       "foggy",
+       "hot",
+       "sunny"
+      ]
+     },
+     {
+      "id": "bC-v11",
+      "t": "mc",
+      "q": "___ the weather like today?",
+      "o": [
+       "How",
+       "What do",
+       "What’s"
+      ]
+     },
+     {
+      "id": "bC-v12",
+      "t": "mc",
+      "q": "I always ___ my homework before dinner.",
+      "o": [
+       "do",
+       "go",
+       "play"
+      ]
+     },
+     {
+      "id": "bC-v13",
+      "t": "gap",
+      "q": "I ___ TV after dinner. (miro)"
+     },
+     {
+      "id": "bC-v14",
+      "t": "gap",
+      "q": "We ___ to the cinema on Saturdays. (anem)"
+     },
+     {
+      "id": "bC-v15",
+      "t": "gap",
+      "q": "Take your ___: it’s raining. (paraigua)"
+     },
+     {
+      "id": "bC-v16",
+      "t": "gap",
+      "q": "I wear a warm ___ when it’s cold. (jersei)"
+     }
+    ],
+    "grammar": [
+     {
+      "id": "bC-g01",
+      "t": "mc",
+      "q": "My brother ___ judo on Mondays.",
+      "o": [
+       "do",
+       "does",
+       "doing"
+      ]
+     },
+     {
+      "id": "bC-g02",
+      "t": "gap",
+      "q": "My friend ___ (watch) films every Friday."
+     },
+     {
+      "id": "bC-g03",
+      "t": "mc",
+      "q": "They ___ play tennis in winter.",
+      "o": [
+       "aren’t",
+       "doesn’t",
+       "don’t"
+      ]
+     },
+     {
+      "id": "bC-g04",
+      "t": "gap",
+      "q": "___ your friends go skating? — Yes, they do."
+     },
+     {
+      "id": "bC-g05",
+      "t": "mc",
+      "q": "How ___ do you go to the cinema? — Once a month.",
+      "o": [
+       "many",
+       "much",
+       "often"
+      ]
+     },
+     {
+      "id": "bC-g06",
+      "t": "mc",
+      "q": "Look! The players ___ water.",
+      "o": [
+       "are drinking",
+       "drinking",
+       "is drinking"
+      ]
+     },
+     {
+      "id": "bC-g07",
+      "t": "mc",
+      "q": "My dad ___ a video right now.",
+      "o": [
+       "are taking",
+       "is taking",
+       "taking"
+      ]
+     },
+     {
+      "id": "bC-g08",
+      "t": "gap",
+      "q": "We ___ (watch) the match now."
+     },
+     {
+      "id": "bC-g09",
+      "t": "mc",
+      "q": "Laia ___ now: she’s reading.",
+      "o": [
+       "doesn’t dance",
+       "isn’t dancing",
+       "not dancing"
+      ]
+     },
+     {
+      "id": "bC-g10",
+      "t": "mc",
+      "q": "___ Nil climbing the wall? — Yes, he is.",
+      "o": [
+       "Are",
+       "Does",
+       "Is"
+      ]
+     },
+     {
+      "id": "bC-g11",
+      "t": "gap",
+      "q": "Write the -ing form: read → ___"
+     },
+     {
+      "id": "bC-g12",
+      "t": "mc",
+      "q": "Are you watching TV? — No, I ___.",
+      "o": [
+       "am not",
+       "don’t",
+       "isn’t"
+      ]
+     }
+    ],
+    "writing": [
+     {
+      "id": "bC-w01",
+      "t": "write",
+      "q": "Write an email to your cousin (40–60 words) on a Saturday. Say: where you are now and who with, the weather, what you are all doing right now (2 or 3 sentences: am / is / are + -ing), what you are wearing, and what you usually do at the weekend and how often.",
+      "min": 40,
+      "max": 70,
+      "ca": "Escriu un correu a un cosí o cosina (40–60 paraules) un dissabte. Explica: on ets ara i amb qui, quin temps fa, què esteu fent ara mateix (2 o 3 frases: am / is / are + -ing), què portes posat i què fas normalment el cap de setmana i amb quina freqüència.",
+      "frame": "Hi ___! It’s Saturday and I’m at ___ with ___. It’s ___. Right now we are ___-ing and ___ is ___-ing. I’m wearing ___. At the weekend I usually ___. I ___ every ___."
+     }
+    ]
+   }
+  },
   "core-A": {
    "text": "<p><strong>Text A · Post · Skate Club Girona · Saturday 21 November, 11:00</strong><br>Good morning from the ice rink! ⛸️ It’s freezing outside, minus two degrees, and it’s foggy, so we can’t see the mountains. But inside it’s warm and the music is loud. Today our skaters are practising for the Christmas show. Right now Jana is skating with her little brother Pau, and the coach is filming them for our club channel. Everybody is wearing a tracksuit and a helmet, because safety comes first. We usually skate on Saturday mornings from nine to eleven, and twice a month we have a competition with other clubs. Do you want to try? Your first class is free: just send us a message.</p><p><strong>Text B · Web page · Winter Comic Fair</strong><br><strong>Sunday 29 November · 11:00 to 19:00 · Plaça Major</strong><br>Meet comic artists, draw your own superhero and read the newest comics! There is live music in the afternoon and a stall with hot chocolate. Tickets: 3 euros (children under 8: free). Wear a costume of your favourite character and get a free comic. The money from the tickets goes to the town library. Hurry: there are only 300 tickets!</p>",
    "sections": {
@@ -1539,6 +1963,339 @@ window.EL_EXAM = {
       "min": 60,
       "max": 100,
       "ca": "Escriu un missatge a un amic o amiga (60–80 paraules) des d’una activitat de temps lliure (un partit, una classe de ball, el parc d’skate…): on ets, quin temps fa, què esteu fent tu i els altres ara mateix (3 o 4 frases en Present Continuous), què portes posat, i com és la teva setmana de temps lliure (què fas i amb quina freqüència: Present Simple + adverbis o expressions de freqüència)."
+     }
+    ]
+   }
+  },
+  "core-C": {
+   "text": "<p><strong>Text A · Post · Olot Climbing Club · Friday 27 November, 18:00</strong><br>Hi from the climbing wall! 🧗 It’s windy and cloudy outside, and the rocks are still wet after yesterday’s rain, so today we’re climbing inside the sports centre. The music is on and everybody is having fun. Right now Nil is climbing the hardest wall and his sister Laia is holding the rope for him. The coach is teaching the new members how to tie the knots. Everybody is wearing climbing shoes and a helmet, because the club rules say so. We usually climb on Friday afternoons, and once a month we go to the mountains with the whole club. Do you want to try? The first session is free.</p><p><strong>Text B · Web page · Hip Hop Dance Workshop</strong><br><strong>Saturday 12 December · 10:00 to 13:00 · Casal de Joves</strong><br>Learn hip hop with a professional dancer from Barcelona! For ages 11 to 15, and no experience is needed. Wear comfortable clothes and trainers (no boots, please). Price: 5 euros, and the best dancers get a place in the town’s Christmas show. Bring a bottle of water: the room gets very hot! Only 30 places.</p>",
+   "sections": {
+    "listening": [
+     {
+      "id": "cC-l01",
+      "t": "mc",
+      "q": "Where are Emma and Sam?",
+      "o": [
+       "at the park",
+       "at the sports hall",
+       "at the swimming pool"
+      ]
+     },
+     {
+      "id": "cC-l02",
+      "t": "mc",
+      "q": "What is the crowd doing?",
+      "o": [
+       "cheering",
+       "singing",
+       "sleeping"
+      ]
+     },
+     {
+      "id": "cC-l03",
+      "t": "mc",
+      "q": "What’s the weather like outside?",
+      "o": [
+       "It’s cold and rainy.",
+       "It’s cold but sunny.",
+       "It’s hot and sunny."
+      ]
+     },
+     {
+      "id": "cC-l04",
+      "t": "mc",
+      "q": "What are some students eating?",
+      "o": [
+       "ice cream",
+       "pizza",
+       "sandwiches"
+      ]
+     },
+     {
+      "id": "cC-l05",
+      "t": "mc",
+      "q": "How does Marc get two points?",
+      "o": [
+       "He passes the ball to Júlia.",
+       "He runs, jumps and scores.",
+       "He scores from the middle of the court."
+      ]
+     },
+     {
+      "id": "cC-l06",
+      "t": "mc",
+      "q": "Who is Júlia passing the ball to?",
+      "o": [
+       "number four",
+       "number seven",
+       "the coach"
+      ]
+     },
+     {
+      "id": "cC-l07",
+      "t": "mc",
+      "q": "Which team is winning?",
+      "o": [
+       "nobody: it’s a draw",
+       "the Blue Team",
+       "the Green Team"
+      ]
+     },
+     {
+      "id": "cC-l08",
+      "t": "mc",
+      "q": "What are the players doing at half-time?",
+      "o": [
+       "They’re drinking water.",
+       "They’re eating sandwiches.",
+       "They’re warming up."
+      ]
+     }
+    ],
+    "reading": [
+     {
+      "id": "cC-r01",
+      "t": "mc",
+      "q": "Why are they climbing inside today?",
+      "o": [
+       "because it’s freezing",
+       "because it’s windy and the rocks are wet",
+       "because the coach is ill"
+      ]
+     },
+     {
+      "id": "cC-r02",
+      "t": "mc",
+      "q": "What is Laia doing?",
+      "o": [
+       "She’s climbing the hardest wall.",
+       "She’s holding the rope for Nil.",
+       "She’s teaching the new members."
+      ]
+     },
+     {
+      "id": "cC-r03",
+      "t": "mc",
+      "q": "What is the coach doing?",
+      "o": [
+       "holding the rope",
+       "playing the music",
+       "teaching the new members how to tie the knots"
+      ]
+     },
+     {
+      "id": "cC-r04",
+      "t": "mc",
+      "q": "Why is everybody wearing a helmet?",
+      "o": [
+       "because it’s cold",
+       "because it’s part of a costume",
+       "because the club rules say so"
+      ]
+     },
+     {
+      "id": "cC-r05",
+      "t": "mc",
+      "q": "How often does the club go to the mountains?",
+      "o": [
+       "every Friday",
+       "once a month",
+       "twice a week"
+      ]
+     },
+     {
+      "id": "cC-r06",
+      "t": "mc",
+      "q": "What can the best dancers get?",
+      "o": [
+       "a place in the town’s Christmas show",
+       "a trophy",
+       "free trainers"
+      ]
+     },
+     {
+      "id": "cC-r07",
+      "t": "mc",
+      "q": "Why should you bring water?",
+      "o": [
+       "because the room gets very hot",
+       "because the workshop is long",
+       "because there is no shop"
+      ]
+     },
+     {
+      "id": "cC-r08",
+      "t": "mc",
+      "q": "Can you go to the workshop if you can’t dance?",
+      "o": [
+       "No: it’s only for professional dancers.",
+       "Only if you are 15.",
+       "Yes: no experience is needed."
+      ]
+     }
+    ],
+    "vocabulary": [
+     {
+      "id": "cC-v01",
+      "t": "gap",
+      "q": "My cousin ___ judo on Fridays. (do)"
+     },
+     {
+      "id": "cC-v02",
+      "t": "gap",
+      "q": "We go ___ in the Pyrenees in winter. (ski)"
+     },
+     {
+      "id": "cC-v03",
+      "t": "gap",
+      "q": "Correct the mistake: “I play ballet.” → I ___ ballet."
+     },
+     {
+      "id": "cC-v04",
+      "t": "gap",
+      "q": "I go to the gym on Monday, Wednesday and Friday: I go three ___ a week."
+     },
+     {
+      "id": "cC-v05",
+      "t": "gap",
+      "q": "In my free time I ___ photos of birds. (t...)"
+     },
+     {
+      "id": "cC-v06",
+      "t": "gap",
+      "q": "My friends ___ the drums in a band. (p...)"
+     },
+     {
+      "id": "cC-v07",
+      "t": "gap",
+      "q": "Put on your ___ before your trainers. (s...)"
+     },
+     {
+      "id": "cC-v08",
+      "t": "gap",
+      "q": "Take your ___: it’s raining. (u...)"
+     },
+     {
+      "id": "cC-v09",
+      "t": "gap",
+      "q": "It’s 35 degrees today: it’s very ___. (h...)"
+     },
+     {
+      "id": "cC-v10",
+      "t": "gap",
+      "q": "There’s a ___ today: thunder and lightning! (st...)"
+     },
+     {
+      "id": "cC-v11",
+      "t": "gap",
+      "q": "Correct the mistake: “It’s fog today.” → It’s ___ today."
+     },
+     {
+      "id": "cC-v12",
+      "t": "gap",
+      "q": "What ___ you usually do on Sundays? — I go cycling."
+     },
+     {
+      "id": "cC-v13",
+      "t": "gap",
+      "q": "We ___ to the skate park every Saturday. (g...)"
+     },
+     {
+      "id": "cC-v14",
+      "t": "gap",
+      "q": "Listen! The crowd is ___. (ch...)"
+     },
+     {
+      "id": "cC-v15",
+      "t": "gap",
+      "q": "It’s 2–2 at the end of the match: it’s a ___. (d...)"
+     },
+     {
+      "id": "cC-v16",
+      "t": "mc",
+      "q": "Choose the right sentence.",
+      "o": [
+       "Leo is wearing a black cap and red socks.",
+       "Leo is wearing a cap black and socks red.",
+       "Leo wearing a black cap and red socks."
+      ]
+     }
+    ],
+    "grammar": [
+     {
+      "id": "cC-g01",
+      "t": "gap",
+      "q": "My sister ___ (study) dance at a school in Girona."
+     },
+     {
+      "id": "cC-g02",
+      "t": "gap",
+      "q": "We ___ (not / go) to the gym on Sundays."
+     },
+     {
+      "id": "cC-g03",
+      "t": "gap",
+      "q": "When ___ your brother ___ (play) football?"
+     },
+     {
+      "id": "cC-g04",
+      "t": "gap",
+      "q": "Does your sister play tennis? — Yes, she ___."
+     },
+     {
+      "id": "cC-g05",
+      "t": "gap",
+      "q": "How often ___ you ___ (go) to the cinema?"
+     },
+     {
+      "id": "cC-g06",
+      "t": "gap",
+      "q": "Look! The players ___ (drink) water."
+     },
+     {
+      "id": "cC-g07",
+      "t": "gap",
+      "q": "My friends ___ (wait) for the bus right now."
+     },
+     {
+      "id": "cC-g08",
+      "t": "gap",
+      "q": "Are they playing basketball? — No, they ___."
+     },
+     {
+      "id": "cC-g09",
+      "t": "gap",
+      "q": "Correct the mistake: “We’re geting ready.” → We’re ___ ready."
+     },
+     {
+      "id": "cC-g10",
+      "t": "gap",
+      "q": "Nil usually climbs on Fridays, but today he ___ (help) the coach."
+     },
+     {
+      "id": "cC-g11",
+      "t": "gap",
+      "q": "Listen! The crowd ___ (shout)."
+     },
+     {
+      "id": "cC-g12",
+      "t": "mc",
+      "q": "Choose the right sentence.",
+      "o": [
+       "Right now we wait for the bus.",
+       "Right now we’re wait for the bus.",
+       "Right now we’re waiting for the bus."
+      ]
+     }
+    ],
+    "writing": [
+     {
+      "id": "cC-w01",
+      "t": "write",
+      "q": "Write a post for the class blog (60–80 words) about a day out with your family or friends (the mountains, the beach, a concert…): where you are, the weather, what everybody is doing right now (three or four Present Continuous sentences), what you are wearing, and what you usually do at the weekend and how often (Present Simple + adverbs or expressions of frequency).",
+      "min": 60,
+      "max": 100,
+      "ca": "Escriu un post per al blog de la classe (60–80 paraules) sobre una sortida amb la família o els amics (la muntanya, la platja, un concert…): on ets, quin temps fa, què està fent cadascú ara mateix (3 o 4 frases en Present Continuous), què portes posat, i què fas normalment el cap de setmana i amb quina freqüència (Present Simple + adverbis o expressions de freqüència)."
      }
     ]
    }
