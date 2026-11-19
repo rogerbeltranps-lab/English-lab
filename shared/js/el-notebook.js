@@ -1493,6 +1493,9 @@ window.ELNotebook = (function () {
   // stays whole (the note goes after it)
   function inlinePut(nEl, pEl, at) {
     if (!nEl || !pEl || pEl.classList.contains('nb-note')) return;
+    // ✍ a note taken beside an activity (el-cloud.js ✍ Notes, at.e): right after that step's part, as a part of its own (so a To do part's
+    // lock never covers it), after the notes already there
+    if (at.e) { let ref = pEl; while (ref.nextElementSibling && ref.nextElementSibling.dataset.aft === pEl.dataset.b) ref = ref.nextElementSibling; nEl.dataset.aft = pEl.dataset.b; ref.after(nEl); return; }
     const ns = tnodes(pEl); if (!ns.length) return;
     const full = ns.map(n => n.nodeValue).join(''); let o = Math.max(0, Math.min(full.length - 1, +at.o || 0));
     if (at.x && full.slice(o, o + at.x.length) !== at.x) { let best = -1, i = full.indexOf(at.x); while (i >= 0) { if (best < 0 || Math.abs(i - o) < Math.abs(best - o)) best = i; i = full.indexOf(at.x, i + 1); } if (best >= 0) o = best; }

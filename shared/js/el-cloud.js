@@ -1239,58 +1239,122 @@ document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest
   try{localStorage.setItem("el_nb_from",JSON.stringify({u:u.href,n:document.title,t:Date.now()}))}catch(x){}},true);
 setTimeout(nbFab,0);   // after this module has run (lockCa is defined further down)
 /* ✍ A quick note from any page (Roger, 13 Nov 2026: "is the floating icon of the notebook always available, so that students can note
-   what they need when they need it?"): for a signed-in student the 📓 button opens a small handwriting page (el-pad.js: pens, highlighters,
-   underline) over the page they are on, so they don't leave the activity. It is saved by itself (2 s after they stop, on ✓ and when the
-   page closes) into their notebook, students/{uid}/notes/nb-<LS> parts.n.<id> = {sec: "lp<n>" (the learning path they are in) or "qn"
-   (✍ Quick notes), html, text, dr, day, w: where they wrote it}, merged, so nothing else of the notebook is touched. "Open my notebook"
-   still goes to the whole notebook. No reads. */
-const QN={w:null,p:null,id:"",v:null,dirty:false,t:0,ls:"",sec:"",where:""};
+   what they need when they need it?"): a handwriting page (el-pad.js: pens, highlighters, underline) over the page they are on, so they
+   don't leave the activity. It is saved by itself (2 s after they stop, on ✓ and when the page closes) into their notebook,
+   students/{uid}/notes/nb-<LS> parts.n.<id> = {sec: "lp<n>" (the learning path they are in) or "qn" (✍ Quick notes), html, text, dr, day,
+   w: where they wrote it}, merged, so nothing else of the notebook is touched. "Open my notebook" still goes to the whole notebook.
+   ✍ Notes while doing an activity (2ESOB problem report, 19 Nov 2026: "que quan estiguis fent una activitat puguis fer i posar notes a la
+   teva llibreta", Roger: "I want to do this"): on a learning path (and the other activity pages of an LS from LS2 on; not the exams, the
+   sample exam, the recall checkpoints or a Recall step: those are "No notes") a ✍ Notes button above 📓 opens the page as a panel at the
+   side of the screen, the activity still there to work on. The note belongs to the step on screen: p = its tab, at = {b: that step's part
+   in the notebook, e: 1} puts it right after that step in the notebook (el-notebook.js inlinePut); going to another tab with the panel open
+   goes on in that step's note. The same step's note comes back when the panel opens again: ONE read of notes/nb-<LS> the first time the
+   panel opens on a page, none before. No copying the theory (Roger, 19 Nov 2026, PR #729): Ctrl+C / paste were already blocked
+   (el-nocopy.js); a slip says notes are their own examples or things to remember, and typing 7 words in a row of this step's theory boxes
+   brings a tip that it is already in the notebook (typing is never stopped). Also used by the 📓 button when the teacher keeps them on a
+   page (pull-up). */
+const QN={w:null,p:null,id:"",v:null,dirty:false,t:0,ls:"",sec:"",where:"",pn:"",n:null,grams:null,nudged:0};
 const qnLs=()=>{if(lsId)return lsId;let h="";try{h=localStorage.getItem("el_nb")||""}catch(e){}const x=h.match(/\/((2|4)eso)\/([^/]+)\/(index\.html)?#notes$/);return x?x[1]+"-"+x[3]:""};
-function qnOpen(){
-  if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off"))return false;
+const qnFk=s=>String(s).replace(/[^A-Za-z0-9_~-]/g,"_").slice(0,80);   // as el-notebook.js fk (the parts' ids)
+// the activity page of an LS (not LS1, its notebook page, the exams or the checkpoints) where ✍ Notes shows, for a signed-in student
+function qnPage(){
+  if(!lsId||!m||!user||!isStudent(user)||AS)return false;
+  const f=relPath.slice(m[0].length);if(!f||/^(index\.html)?$/.test(f)||/^(exam|sample-exam|recall-checkpoint-\d+)\.html$/.test(f)||!/\.html$/.test(f))return false;
+  const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum||elLsNum(L)==="LS1")return false;
+  const a=(window.EL_CATALOG||[]).find(y=>y.path===relPath);return !(a&&(a.checkpoint||a.exam))}
+const qnTab=()=>document.querySelector(".tab.active[data-panel]");
+const qnRecall=()=>{const t=qnTab(),id=t?t.dataset.panel:"",p=window.LP&&(LP.panels||[]).find(x=>x.id===id);return id==="recall"||!!(p&&p.type==="recall")};
+// where the student is: the learning path and its step on screen
+function qnWhere(ls){const LP=window.LP,tab=qnTab(),lpN=LP&&LP.n&&lsId===ls?String(LP.n):"",pn=lpN&&tab?tab.dataset.panel:"";
+  const step=String((tab&&(tab.innerText||tab.textContent))||"").replace(/\s+/g," ").trim().replace(/^\d+\s*/,"").replace(/\s*✓$/,"").slice(0,60);
+  return {lpN,pn,where:lpN?("LP"+lpN+(step?" · "+step:"")):String(document.title||"").replace(/\s*[·|–-]\s*English Lab.*$/i,"").slice(0,60)}}
+// this step's theory (How it works, Expressions): 7 words in a row of it typed in the note = copying
+const QW=7,qnWords=t=>String(t||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-zà-ÿ0-9']+/g," ").trim().split(" ").filter(Boolean);
+function qnGrams(){const g=new Set(),tab=qnTab(),pan=tab&&document.getElementById(tab.dataset.panel);if(!pan)return g;
+  const w=qnWords([...pan.querySelectorAll(".section-card.worked,.explain,.model")].map(e=>e.innerText||e.textContent).join(" "));
+  for(let i=0;i+QW<=w.length;i++)g.add(w.slice(i,i+QW).join(" "));return g}
+function qnCopied(v,T){if(!QN.grams||!QN.grams.size||Date.now()-QN.nudged<20e3||!QN.w)return;const w=qnWords(v&&v.text);let hit=false;
+  for(let i=0;i+QW<=w.length&&!hit;i++)hit=QN.grams.has(w.slice(i,i+QW).join(" "));if(!hit)return;QN.nudged=Date.now();
+  const r=QN.w.querySelector(".qn-slip");if(r){r.classList.add("hot");setTimeout(()=>r.classList.remove("hot"),2500)}
+  let h=document.getElementById("pad-hint");if(!h){h=document.createElement("div");h.id="pad-hint";document.body.append(h)}
+  h.textContent=T("📓 Això ja és a la teva llibreta: no cal copiar-ho. Escriu-hi un exemple teu.","📓 This is already in your notebook: no need to copy it. Write an example of your own.");
+  h.classList.add("on");clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove("on"),5000)}
+// the student's notes of this LS's notebook, read once per page (only when the panel opens)
+const qnNotes=ls=>QN.n&&QN.n.ls===ls?QN.n.p:(QN.n={ls,p:getDoc(doc(db,"students",user.uid,"notes","nb-"+ls)).then(x=>x.exists()?((x.data().parts||{}).n||{}):{}).catch(e=>{console.warn("quick note",e);QN.n=null;return {}})}).p;
+function qnCss(){if(document.getElementById("el-qn-css"))return;const st=document.createElement("style");st.id="el-qn-css";st.textContent=
+  "#el-qn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:78px;z-index:9991;width:min(520px,calc(100vw - 28px));height:min(430px,calc(100vh - 110px));display:flex;flex-direction:column;background:#fffef8;border:2px solid #1f4fb5;border-radius:14px;box-shadow:0 14px 34px rgba(20,40,90,.3);font:15px/1.35 system-ui,sans-serif;color:#1e293b;overflow:hidden}"+
+  "#el-qn .qn-top{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #dbe4f5;background:#f3f6fd}#el-qn .qn-top b{white-space:nowrap}#el-qn .qn-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:13px}"+
+  "#el-qn .qn-b{border:1px solid #c7d2ea;background:#fff;border-radius:8px;padding:4px 10px;font:600 13px system-ui,sans-serif;color:#1f4fb5;cursor:pointer;text-decoration:none;white-space:nowrap}#el-qn .qn-ok{background:#1f4fb5;color:#fff;border-color:#1f4fb5}"+
+  "#el-qn .qn-host{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:6px 8px}#el-qn .qn-st{padding:3px 10px 6px;font-size:12px;color:#64748b}#el-qn .pad-tools{margin:0 0 10px;border-radius:8px;border:1px solid #d5dce5}"+
+  "#el-qn .qn-slip{margin:8px 8px 0;padding:6px 11px;background:#fff7c2;border:1px solid #f0dc7a;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,.08);font:500 13.5px/1.35 system-ui,sans-serif;color:#3d3a1f;transition:background .3s}#el-qn .qn-slip.hot{background:#ffd8d2}"+
+  // ✍ Notes beside the activity: a panel down the left side of the screen; the page moves over so nothing of it is covered
+  "#el-qn.side{left:0;top:0;bottom:0;width:390px;height:auto;border-radius:0 14px 14px 0;border-left:0;box-shadow:6px 0 24px rgba(20,40,90,.22)}#el-qn.side .qn-top{flex-wrap:wrap;row-gap:2px;padding:10px 12px}#el-qn.side .qn-top b{font-size:17px}#el-qn .qn-sp{flex:1}#el-qn.side .qn-w{flex-basis:100%;white-space:normal;font-weight:600}"+
+  "#el-qn .qn-foot{display:flex;align-items:center;gap:8px;padding:6px 10px 10px;border-top:1px solid #e5eaf3}#el-qn .qn-foot .qn-st{flex:1;padding:0}"+
+  "@media (min-width:900px){html.el-qn-side body{margin-left:390px!important}html.el-qn-side #el-nbfab,html.el-qn-side #el-qnbtn{display:none}}"+
+  "#el-qnbtn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(max(14px,env(safe-area-inset-bottom,0px)) + 60px);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:52px;padding:0;border-radius:16px;background:#1f4fb5;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#fff;font:700 11px/1 system-ui,sans-serif;cursor:pointer;transition:transform .15s}"+
+  "#el-qnbtn[hidden]{display:none}#el-qnbtn:hover{transform:translateY(-2px)}#el-qnbtn:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}#el-qnbtn span{font-size:20px;line-height:1}html.el-wb-on #el-qnbtn,html.el-nb-full #el-qnbtn{display:none}"+
+  "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn.side{top:auto;border-radius:14px;border-left:2px solid #1f4fb5}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}body.elptab #el-qnbtn{bottom:calc(132px + env(safe-area-inset-bottom,0px))}}@media print{#el-qn,#el-qnbtn{display:none}}";document.head.append(st)}
+// o.side: the ✍ Notes panel beside the activity (else the small quick note over the page)
+function qnOpen(o){
+  o=o||{};if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off"))return false;
   const ls=qnLs();if(!ls)return false;
   if(QN.w){qnClose();return true}
-  const ca=lockCa(),T=(c,e2)=>ca?c:e2,LP=window.LP,tab=document.querySelector(".tab.active[data-panel]");
-  const lpN=LP&&LP.n&&lsId===ls?String(LP.n):"",step=String((tab&&(tab.innerText||tab.textContent))||"").replace(/\s+/g," ").trim().replace(/^\d+\s*/,"").slice(0,60);
-  const where=lpN?("LP"+lpN+(step?" · "+step:"")):String(document.title||"").replace(/\s*[·|–-]\s*English Lab.*$/i,"").slice(0,60);
-  if(!QN.id||QN.ls!==ls||QN.where!==where){if(QN.dirty)qnSave();QN.id="n"+Date.now().toString(36);QN.v=null;QN.dirty=false}
-  QN.ls=ls;QN.sec=lpN?"lp"+lpN:"qn";QN.where=where;
-  if(!document.getElementById("el-qn-css")){const st=document.createElement("style");st.id="el-qn-css";st.textContent=
-    "#el-qn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:78px;z-index:9991;width:min(520px,calc(100vw - 28px));height:min(430px,calc(100vh - 110px));display:flex;flex-direction:column;background:#fffef8;border:2px solid #1f4fb5;border-radius:14px;box-shadow:0 14px 34px rgba(20,40,90,.3);font:15px/1.35 system-ui,sans-serif;color:#1e293b;overflow:hidden}"+
-    "#el-qn .qn-top{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #dbe4f5;background:#f3f6fd}#el-qn .qn-top b{white-space:nowrap}#el-qn .qn-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:13px}"+
-    "#el-qn .qn-b{border:1px solid #c7d2ea;background:#fff;border-radius:8px;padding:4px 10px;font:600 13px system-ui,sans-serif;color:#1f4fb5;cursor:pointer;text-decoration:none;white-space:nowrap}#el-qn .qn-ok{background:#1f4fb5;color:#fff;border-color:#1f4fb5}"+
-    "#el-qn .qn-host{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:6px 8px}#el-qn .qn-st{padding:3px 10px 6px;font-size:12px;color:#64748b}#el-qn .pad-tools{margin:0 0 10px;border-radius:8px;border:1px solid #d5dce5}"+
-    "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}}@media print{#el-qn{display:none}}";document.head.append(st)}
-  const w=document.createElement("div");w.id="el-qn";w.setAttribute("role","dialog");w.setAttribute("aria-label",T("Nota ràpida","Quick note"));
+  const ca=lockCa(),T=(c,e2)=>ca?c:e2,{lpN,pn,where}=qnWhere(ls),side=!!o.side;
+  if(!QN.id||QN.ls!==ls||QN.where!==where){if(QN.dirty)qnSave();QN.id="n"+Date.now().toString(36);QN.v=null;QN.dirty=false;QN.old=false}
+  QN.ls=ls;QN.sec=lpN?"lp"+lpN:"qn";QN.where=where;QN.pn=pn;QN.grams=qnGrams();
+  qnCss();
+  const w=document.createElement("div");w.id="el-qn";if(side)w.className="side";w.setAttribute("role","dialog");w.setAttribute("aria-label",side?T("Apunts","Notes"):T("Nota ràpida","Quick note"));
   const href=document.getElementById("el-nbfab")&&document.getElementById("el-nbfab").getAttribute("href");
-  w.innerHTML=`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${href&&!(lockHere()&&!LOCK.cm)?`<a class="qn-b qn-open" href="${href}">${T("Obre la llibreta","Open my notebook")} →</a>`:""}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
+  const openA=href&&!(lockHere()&&!LOCK.cm)?`<a class="qn-b qn-open" href="${href}">📓 ${T("Obre la llibreta","Open my notebook")} →</a>`:"";
+  w.innerHTML=side?`<div class="qn-top"><b>✍ ${T("Els meus apunts","My notes")}</b><span class="qn-sp"></span><button type="button" class="qn-b qn-ok" aria-label="${T("Tanca","Close")}">✕ ${T("Tanca","Close")}</button><span class="qn-w"></span></div>`
+      +`<p class="qn-slip">${T("📓 La teoria ja és a la teva llibreta: no la copiïs. Aquí pots escriure exemples teus o les coses importants per recordar. És opcional.","📓 The theory is already in your notebook: don't copy it. Here you can write your own examples or the important things to remember. It's optional.")}</p>`
+      +`<div class="qn-host"></div><div class="qn-foot"><span class="qn-st"></span>${openA}</div>`
+    :`<div class="qn-top"><b>📓 ${T("Nota ràpida","Quick note")}</b><span class="qn-w"></span>${openA}<button type="button" class="qn-b qn-ok">✓ ${T("Fet","Done")}</button></div><div class="qn-host"></div><div class="qn-st"></div>`;
   w.querySelector(".qn-w").textContent="📍 "+where;
-  document.body.append(w);QN.w=w;
+  document.body.append(w);QN.w=w;if(side)document.documentElement.classList.add("el-qn-side");
   const st=s2=>{const x=QN.w&&QN.w.querySelector(".qn-st");if(x)x.textContent=s2};
-  st(T("Es desa sol a la teva llibreta, a "+(lpN?"LP"+lpN:"✍ Notes ràpides")+".","Saved by itself in your notebook, in "+(lpN?"LP"+lpN:"✍ Quick notes")+"."));
+  const where0=lpN&&pn?T("sota aquest pas de LP"+lpN,"under this step of LP"+lpN):lpN?"LP"+lpN:T("✍ Notes ràpides","✍ Quick notes");
+  st(T("Es desa sol a la teva llibreta, ","Saved by itself in your notebook, ")+where0+".");
   w.querySelector(".qn-ok").addEventListener("click",()=>qnClose());
-  w.querySelector(".qn-open")?.addEventListener("click",()=>{if(QN.dirty)qnSave()});
+  w.querySelector(".qn-open")?.addEventListener("click",()=>{if(QN.p)QN.v=Object.assign(QN.v||{},QN.p.get());if(QN.dirty)qnSave()});
   w.addEventListener("keydown",e=>{if(e.key==="Escape"){e.stopPropagation();qnClose()}});
-  import("./el-pad.js").then(P=>{if(QN.w!==w)return;
-    QN.p=P.pad(w.querySelector(".qn-host"),{html:QN.v&&QN.v.html,text:QN.v&&QN.v.text,dr:QN.v&&QN.v.dr,ca,ph:T("Escriu aquí el que vulguis recordar. Pots canviar de boli, subratllar i marcar.","Write here what you want to remember. You can change pens, highlight and underline."),
-      onChange:v=>{QN.v=v;QN.dirty=true;st(T("Desant…","Saving…"));clearTimeout(QN.t);QN.t=setTimeout(qnSave,2000)}});
-    QN.st=st;setTimeout(()=>{if(QN.p&&QN.p.ed)QN.p.ed.focus()},30)}).catch(e=>{console.warn("quick note",e);qnClose();if(href)location.href=href});
+  // this step's note from before comes back (side panel on a learning path step only; one read per page)
+  const before=side&&lpN&&pn&&!QN.v&&!QN.old?Promise.race([qnNotes(ls).then(n=>{let id="";for(const k in n){const x=n[k];if(x&&!x.fl&&x.sec===QN.sec&&x.p===pn&&k>id)id=k}
+    if(id&&QN.w===w&&!QN.dirty){QN.id=id;QN.v={html:n[id].html||"",text:n[id].text||"",dr:n[id].dr||[]}}QN.old=true}),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
+  Promise.all([import("./el-pad.js"),before]).then(([P])=>{if(QN.w!==w)return;
+    QN.p=P.pad(w.querySelector(".qn-host"),{html:QN.v&&QN.v.html,text:QN.v&&QN.v.text,dr:QN.v&&QN.v.dr,ca,ph:side?T("Exemples teus o coses importants per recordar… (opcional)","Your own examples or important things to remember… (optional)"):T("Escriu aquí el que vulguis recordar. Pots canviar de boli, subratllar i marcar.","Write here what you want to remember. You can change pens, highlight and underline."),
+      onChange:v=>{QN.v=v;QN.dirty=true;qnCopied(v,T);st(T("Desant…","Saving…"));clearTimeout(QN.t);QN.t=setTimeout(qnSave,2000)}});
+    QN.st=st;setTimeout(()=>{if(QN.p&&QN.p.ed)QN.p.ed.focus({preventScroll:true})},30)}).catch(e=>{console.warn("quick note",e);qnClose();if(href)location.href=href});
   return true;
 }
 async function qnSave(){
   clearTimeout(QN.t);if(!QN.dirty||!QN.v||!user||!isStudent(user)||AS)return;QN.dirty=false;
   const v=QN.v,ca=lockCa(),T=(c,e2)=>ca?c:e2,st=QN.w&&QN.st,id=QN.id,deck="nb-"+QN.ls;
   const L=(window.EL_LS||[]).find(l=>l.id===QN.ls)||{},html=String(v.html||"").length<60000?String(v.html||""):"",dr=[];let n=0;for(const x of v.dr||[]){n+=x.length;if(n>250000)break;dr.push(x)}
-  if(!html.replace(/<[^>]*>/g,"").trim()&&!String(v.text||"").trim()&&!dr.length)return;
-  const day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+  if(!html.replace(/<[^>]*>/g,"").trim()&&!String(v.text||"").trim()&&!dr.length&&!QN.old)return;   // an empty new note is not saved (one from before, emptied, is)
+  const day=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"}),one={sec:QN.sec,html,text:String(v.text||"").slice(0,3000),dr,day,w:QN.where};
+  if(QN.pn&&QN.sec!=="qn"){one.p=QN.pn;one.at={b:QN.sec+"-p-"+qnFk(QN.pn),e:1}}
   try{await setDoc(doc(db,"students",user.uid,"notes",deck),{ls:QN.ls,course:L.course||(QN.ls.match(/^\d+eso/)||[""])[0],deck,title:"📓 My notebook",lp:"",
-      parts:{n:{[id]:{sec:QN.sec,html,text:String(v.text||"").slice(0,3000),dr,day,w:QN.where}}},updated:serverTimestamp()},{merge:true});
+      parts:{n:{[id]:one}},updated:serverTimestamp()},{merge:true});
+    if(QN.id===id)QN.old=true;if(QN.n&&QN.n.ls===QN.ls)QN.n.p=QN.n.p.then(m2=>Object.assign(m2,{[id]:Object.assign({},m2[id],one)}));
     if(st&&QN.id===id)st(T("✓ Desat a la teva llibreta","✓ Saved in your notebook"))}
   catch(e){console.warn("quick note",e);QN.dirty=true;if(st)st(T("⚠ Encara no s'ha desat: ho torna a provar","⚠ Not saved yet: it tries again"));QN.t=setTimeout(qnSave,8e3)}
 }
-function qnClose(){if(QN.p)QN.v=Object.assign(QN.v||{},QN.p.get());if(QN.dirty)qnSave();if(QN.w)QN.w.remove();QN.w=null;QN.p=null}
+function qnClose(){if(QN.p)QN.v=Object.assign(QN.v||{},QN.p.get());if(QN.dirty)qnSave();if(QN.w)QN.w.remove();QN.w=null;QN.p=null;document.documentElement.classList.remove("el-qn-side")}
 addEventListener("pagehide",()=>{if(QN.dirty)qnSave()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&QN.dirty)qnSave()});
+// the ✍ Notes button (above 📓) and the panel follow the step on screen: another tab = that step's note; a Recall step = no notes
+function qnSync(){
+  const b=document.getElementById("el-qnbtn"),ok=qnPage();
+  if(!b){if(!ok)return;qnCss();const x=document.createElement("button");x.type="button";x.id="el-qnbtn";x.addEventListener("click",()=>{if(qnRecall()){lockToast(lockCa()?"🧠 Al Recall no hi ha apunts: respon sense mirar.":"🧠 No notes on Recall: answer without looking.");return}if(!qnOpen({side:true}))lockToast()});document.body.append(x);return qnSync()}
+  const ca=lockCa(),lab=ca?"Apunts":"Notes";if(b.dataset.l!==lab){b.dataset.l=lab;b.innerHTML=`<span aria-hidden="true">✍</span>${lab}`;b.title=ca?"✍ Pren apunts a la teva llibreta sense sortir de l'activitat":"✍ Take notes in your notebook without leaving the activity"}
+  b.hidden=!ok||qnRecall();
+  if(!QN.w||!QN.w.classList.contains("side"))return;
+  if(!ok||qnRecall()){qnClose();return}
+  if(qnWhere(QN.ls).where!==QN.where){qnClose();qnOpen({side:true})}
+}
+document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest(".tab[data-panel],[data-next],.section-next,a[href^='#']"))setTimeout(qnSync,60)});
+setInterval(qnSync,1000);
 function rtGram(rt){
   const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();const ca=lockCa();
