@@ -266,6 +266,8 @@
         d.style.cssText=`left:${x}px;top:${y}px;background:${cols[(b+i)%6]};color:${cols[(b+i)%6]};--x:${Math.cos(a)*r}px;--y:${Math.sin(a)*r}px`;O.appendChild(d);setTimeout(()=>d.remove(),1500)}},b*450)}
 
   window.elVoyage={html,wire,model,skill,PORTS,DEST,SKINS,SND,
+    // a skill's label, icon and colour (the activity pages' 🧭 Your steps, el-app.js, get them from the board's copy)
+    sk:(k,en)=>({n:skName(k,en),i:(SK[k]||SK.Step)[0],c:(SK[k]||SK.Step)[1]}),
     // the first name of "Surname Surname, Name" (the student list) or of "Name Surname"
     first:n=>{n=String(n||"").trim();return (n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0]||"").slice(0,40)}};
 })();

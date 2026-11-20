@@ -28,11 +28,13 @@ const SHOTS = [
   { id: 'home-start', url: 'today.html', run: `(()=>{const s=document.querySelector('.vy-sc');if(s)s.scrollTop=s.scrollHeight})()` },
   { id: 'phone', url: 'today.html', w: 390, h: 844, full: true },
   // the "Port reached" card: as if nothing was done on the last visit (rewards compare with what this browser kept)
+  // an activity page after the board (the board keeps the steps for it in this browser): 🧭 Your steps on the left, 📓 and 🔍 at the bottom
+  { id: 'activity', url: 'today.html', then: '4eso/seasons-and-celebrations/plan-the-day.html#grammar', en: true },
   { id: 'port-reached', url: 'today.html', seed: { d: [], k: [], p: [], f: false }, wait: 2600 },
 ];
 const browser = await chromium.launch();
 for (const S of SHOTS) {
-  if (ONLY && !ONLY.includes(S.id)) continue;
+  if (ONLY && !ONLY.includes(S.id) || S.en && !EN) continue;
   const ctx = await browser.newContext({ viewport: { width: S.w || 1366, height: S.h || 768 }, deviceScaleFactor: 1, locale: EN ? 'en-GB' : 'ca-ES', timezoneId: 'Europe/Madrid' });
   await ctx.addInitScript(([who, seed, key]) => { try { localStorage.setItem('el_who', JSON.stringify(who)); localStorage.setItem('el_phone_seen', '1'); if (seed) localStorage.setItem(key, JSON.stringify(seed)); } catch (e) {} }, [{ role: 'student', group: C.group, ca: !EN, uid: 'demo' }, S.seed || null, 'el_voyage_demo_' + C.ls]);
   await ctx.route('**/*', async (route) => {
@@ -51,6 +53,7 @@ for (const S of SHOTS) {
   await page.goto('http://el.local/' + S.url);
   await page.waitForTimeout(S.wait || 1500);
   if (S.run) { await page.evaluate(S.run); await page.waitForTimeout(500); }
+  if (S.then) { await page.goto('http://el.local/' + S.then); await page.waitForTimeout(2500); }
   const out = path.join(OUT, `${S.id}-${LANG}.png`);
   await page.screenshot({ path: out, fullPage: !!S.full });
   console.log('shot', out);

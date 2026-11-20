@@ -263,6 +263,7 @@
     const steps = col.querySelector(".ellp-steps"), more = col.querySelector(".ellp-more");
     const nav = lp.querySelector(".lp-body>nav.tabs");
     if (nav) { steps.textContent = ""; steps.append(nav); }
+    voyDraw();
     // .lp-top (how it works, the study guide) and the goal card right after it; the review card at the end of the path stays there
     const top = lp.querySelector(":scope>.lp-top"), plan = top && top.nextElementSibling && top.nextElementSibling.classList.contains("plan-card") ? top.nextElementSibling : null;
     if (top) { more.textContent = ""; more.append(top); if (plan) more.append(plan); }
@@ -446,6 +447,80 @@
     // a step chosen any other way (the engine's Next step button, the teacher's class tab): the bar follows
     document.addEventListener("click", e => { if (e.target.closest(".tab[data-panel],.section-next button") && document.body.classList.contains("elslpfs")) setTimeout(() => { slpDraw(); scrollTo(0, 0); }, 0); });
   }
+  // ---- ⛵ 🧭 Your steps of the voyage on a 4 ESO learning path (Roger, 19 Nov 2026, mockup v14: "on the left they see 'your steps'"):
+  // for a student, the left column lists every open step of the LS as on the board's voyage map (ports as headings, ✓ when done, ▶ on
+  // the step on screen, 🏆 final product last) with ⛵ Back to the map, instead of this path's own tab list (kept, hidden: the engine and
+  // class mode use it). The list is the board's copy in this browser (el_voyage_steps, today.html voyageKeep): no reads; this page's own
+  // ticks come from its tabs. Without a copy that has this page (the board not opened yet), the path's own tabs stay. In class mode
+  // (html.elcmtab, only today's steps) the path's own tabs show, as before. The 📓 button (el-cloud.js) stays at the bottom left and the
+  // 🔍 dictionary (el-dict.js) at the bottom right. No music here: the music plays on the board's map only.
+  const VOYC = mode === "lp" && /\/4eso\/(?!towards-nativeness\/)[^/]+\/[^/]+\.html$/.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam|book)\.html$/.test(path);
+  function voyOn() { return VOYC && who.role === "student"; }
+  const voyPage = h => decodeURIComponent(String(h).split("#")[0]), voyHere = h => decodeURIComponent(path).endsWith("/" + voyPage(h));
+  function voyData() {
+    let o = null; try { o = JSON.parse(localStorage.getItem("el_voyage_steps") || "null"); } catch (e) {}
+    if (!o || !Array.isArray(o.items) || (W && W.uid && o.u && o.u !== W.uid && o.u !== "demo")) return null;
+    return o.items.some(x => x.h && voyHere(x.h)) ? o : null;
+  }
+  function voyCss() {
+    if (document.getElementById("el-voy-css")) return; const st = document.createElement("style"); st.id = "el-voy-css";
+    st.textContent = ".ellp-voy{background:#fffaf0;border:3px solid #b08a52;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;flex:none}"
+      + ".ellp-voy .vb{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 12px 4px;padding:8px 10px;border-radius:12px;background:#1f6b52;color:#fff;font-weight:800;font-size:14px;text-decoration:none;box-shadow:0 3px 0 #174d3d}.ellp-voy .vb:hover{filter:brightness(1.08)}"
+      + ".ellp-voy h2{margin:0;padding:8px 12px 6px;font:700 16px Georgia,serif;color:#4a2f0e;display:flex;justify-content:space-between;align-items:baseline;gap:6px}.ellp-voy h2 small{font:600 12px system-ui,sans-serif;color:#8a5a1f;white-space:nowrap}"
+      + ".ellp-voy .bar{height:8px;background:#ead9b5;margin:0 12px 6px;border-radius:9px;overflow:hidden}.ellp-voy .bar i{display:block;height:100%;background:#15803d;border-radius:9px}"
+      + ".ellp-voy ol{list-style:none;margin:0;padding:0 6px 10px}.ellp-voy .pt{display:flex;align-items:center;gap:6px;font:700 13px system-ui,sans-serif;color:#4a2f0e;padding:9px 6px 3px;border-bottom:1px dashed #d9c294}.ellp-voy .pt .tk{margin-left:auto}"
+      + ".ellp-voy li.s a{display:flex;align-items:center;gap:8px;padding:6px;border-radius:10px;font-size:13px;line-height:1.25;color:#1f2937;text-decoration:none}.ellp-voy li.s a:hover{background:#f3e7cc}"
+      + ".ellp-voy li.s small{display:block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}"
+      + ".ellp-voy .tk{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;border:2px solid #c9b07a;color:transparent}"
+      + ".ellp-voy .ok .tk,.ellp-voy .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.ellp-voy li.ok .n{color:#6b7280}"
+      + ".ellp-voy li.here a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.ellp-voy li.here .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}"
+      + ".ellp-voy li.fp a{margin-top:6px;background:#fdf2d6;font-weight:700}.ellp-voy li.fp .tk{border:0;font-size:17px;color:inherit}"
+      + ".ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}"
+      + "html.el-voy #el-nbfab b{max-width:140px;margin-left:8px}";
+    document.head.append(st);
+  }
+  function voyDraw() {
+    const side = $(".ellpside"); if (!side) return;
+    const o = voyOn() ? voyData() : null; let box = side.querySelector(".ellp-voy");
+    side.classList.toggle("ellp-isvoy", !!o);
+    if (!o) { if (box) box.hidden = true; return; }
+    voyCss();
+    if (!box) {
+      box = document.createElement("nav"); box.className = "ellp-voy"; box.setAttribute("aria-label", t("Els teus passos", "Your steps"));
+      side.querySelector(".ellp-steps").before(box);
+      // a step of this page: its own tab (the engine shows it); another page: the link
+      box.addEventListener("click", e => { const a = e.target.closest("a[data-p]"); if (!a) return; const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]');
+        if (tb) { e.preventDefault(); tb.click(); scrollTo(0, 0); voyTicks(); } });
+    }
+    box.hidden = false;
+    const nav = $(".ellp-steps nav.tabs");
+    if (nav && box._nav !== nav) { box._nav = nav; new MutationObserver(() => voyTicks()).observe(nav, { subtree: true, attributes: true, attributeFilter: ["class"] }); }
+    const key = JSON.stringify([o.at, CA]); if (box._key === key) return voyTicks(); box._key = key;
+    let h = `<a class="vb" href="${ROOT}today.html">⛵ ${t("Torna al mapa", "Back to the map")}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
+    o.items.forEach(x => {
+      if (x.p) { h += `<li class="pt" data-port><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${x.ok ? " ok" : ""}">✓</span></li>`; return; }
+      const here = voyHere(x.h), pid = here ? (String(x.h).split("#")[1] || "") : "";
+      h += `<li class="s${x.d ? " ok" : ""}" data-k="${esc(x.k)}"><a href="${ROOT}${esc(x.h)}"${here && pid ? ` data-p="${esc(decodeURIComponent(pid))}"` : ""}><span class="tk">✓</span><span class="n"><small style="color:${esc(x.c || "#8a5a1f")}">${esc(x.s || "")}</small>${esc(x.t)}</span></a></li>`;
+    });
+    if (o.fp && o.fp.title) h += `<li class="s fp${o.fp.done ? " ok" : ""}"><a href="${ROOT}${esc(o.fp.href || "")}"><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final", "Final product")}</small>${esc(o.fp.title)}</span></a></li>`;
+    box.innerHTML = h + "</ol>";
+    voyTicks(true);
+  }
+  // this page's ticks from its own tabs (done, the one on screen), the count and the ports
+  function voyTicks(first) {
+    const box = $(".ellp-voy"); if (!box || box.hidden) return;
+    box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
+      li.classList.toggle("ok", tb.classList.contains("done"));
+      const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
+    const all = [...box.querySelectorAll("li.s:not(.fp)")], ok = all.filter(l => l.classList.contains("ok")).length;
+    box.querySelector("h2 small").textContent = t(`${ok} de ${all.length} fets`, `${ok} of ${all.length} done`);
+    box.querySelector(".bar i").style.width = (all.length ? Math.round(ok / all.length * 100) : 0) + "%";
+    let port = null, pd = true; const close = () => { if (port) port.querySelector(".tk").classList.toggle("ok", pd); };
+    [...box.querySelectorAll("ol>li")].forEach(li => { if (li.hasAttribute("data-port")) { close(); port = li; pd = true; } else if (!li.classList.contains("fp")) pd = pd && li.classList.contains("ok"); });
+    close();
+    const here = box.querySelector("li.here"), sd = $(".ellpside");
+    if (first && here && sd) { const y = here.getBoundingClientRect().top - sd.getBoundingClientRect().top + sd.scrollTop; if (y > sd.clientHeight * .6) sd.scrollTop = y - sd.clientHeight * .4; }
+  }
   // ---- 📓 the step drawn like the student's notebook (Roger, 14 Nov 2026: "when doing a LP, or a SLP I want students to have a button
   // to go notebook-like, meaning they have a feeling they are working on their notebook"): lined paper with the red margin, the step's
   // title in pencil, its boxes as taped slips in the teacher's handwriting and the student's answers in blue pen (shared/css/el-lpnb.css,
@@ -453,7 +528,7 @@
   // A checked activity keeps its first try in the notebook; ↺ Practise again moves to the laptop look, where the new try and its results stay.
   // LS2 on, the same pages as ⛶ Full screen (not a recall checkpoint or the sample exam), and not the 📖 Book (it has its own pages).
   const NBOK = FSOK && !/\/book\.html$/.test(path), NBKEY = "el_lpnb", NBDEF = true;
-  const nbOn = () => { let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
+  const nbOn = () => { if (voyOn()) return true; let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
   function nbSet(on) { try { localStorage.setItem(NBKEY, on ? "1" : "0"); } catch (e) {} nbDraw(); }
   if (NBOK) window.elLpNb = on => nbSet(!!on);   // ↺ Practise again in the notebook look takes the page back to the laptop look (ls2-engine.js)
   function nbDraw() {
@@ -463,6 +538,10 @@
       const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114b"; document.head.append(l); }
     // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
     if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
+    // ⛵ 4 ESO students see only the notebook look (Roger, 19 Nov 2026: "I want students to only see the notebook style in the activities"):
+    // no 🖥 Normal page button; ↺ Practise again then starts a fresh notebook page (window.elNbOnly, ls2-engine.js). The teacher keeps the switch.
+    window.elNbOnly = voyOn(); H.classList.toggle("el-voy", voyOn());
+    if (voyOn()) { $$(".lp-panels>.panel>.panel-head>.ellpnb").forEach(b => b.remove()); return; }
     const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
     const tip = on ? t("Torna a veure aquest pas com una pàgina web normal", "Show this step as a normal web page again") : t("Mostra aquest pas com la teva llibreta", "Show this step like your notebook");
     $$(".lp-panels>.panel>.panel-head").forEach(h => {
