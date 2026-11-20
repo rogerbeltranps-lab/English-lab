@@ -83,7 +83,16 @@ var LS2 = (function () {
   // a step checked earlier with every question answered but under the old 80 %: done now, on the day of that check (Roger, 6 Nov 2026)
   function doneFrom(k, tk) { if (state.done[k]) return; const d = ((state.last || {})[tk] || (state.tries || {})[tk] || {}).date; if (!d) return; state.done[k] = true; state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = d; save(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
-  function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
+  // all[k] {s, n}: every try of a step (s = the sum of score/max, n = how many), for the LS home's % per skill (Roger, 20 Nov 2026:
+  // "average of all tries"). A step tried before 20 Nov 2026 starts from its latest try and its first one (the only two kept then).
+  // whole = false: a check of only some of the questions, not a try (the questions not answered yet would count as wrong).
+  function lastTry(k, score, max, whole) {
+    state.last = state.last || {}; state.all = state.all || {};
+    if (!state.all[k]) { const A = state.all[k] = { s: 0, n: 0 }, P = state.last[k], F = (state.tries || {})[k], add = x => { if (x && +x.max > 0) { A.s += (+x.score || 0) / +x.max; A.n++; } };
+      if (P) { add(P); if (F && Date.parse(P.date) - Date.parse(F.date) > 5000) add(F); } }
+    if (whole !== false && +max > 0) { const A = state.all[k]; A.s = Math.round((A.s + score / max) * 1000) / 1000; A.n++; }
+    state.last[k] = { score, max, level, date: new Date().toISOString() };
+  }
   function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
   // items[panel_route]: every question of a panel's first counted check, kept once per route, for the dashboard's Question analysis
   // (Roger, 26 Oct 2026). q: the question's place in the page's list (in the route's own list when the page gives one per route),
@@ -387,7 +396,7 @@ var LS2 = (function () {
     idx = idx.filter(i => need.includes(i)); if (!idx.length) return;
     counts = counts || (() => true);
     const now = new Date().toISOString(), sc = need.filter(counts);
-    lastTry(k, sc.filter(i => g[i] && g[i][0]).length, sc.length);
+    lastTry(k, sc.filter(i => g[i] && g[i][0]).length, sc.length, sc.every(i => g[i] && g[i][1] != null && String(g[i][1]).trim() !== ''));
     state.items = state.items || {}; state.tries = state.tries || {};
     const key = id + '_' + level; let R = state.items[key];
     if (R && !R.per) return save();   // checked as a whole set before 16 Nov 2026: that first try stays
