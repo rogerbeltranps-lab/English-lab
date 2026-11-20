@@ -170,7 +170,7 @@
 .vy-st.flash{animation:vyflash 1s ease 2}@keyframes vyflash{50%{filter:drop-shadow(0 0 14px #ffd54a) brightness(1.25)}}
 .vy-lab{position:absolute;transform:translateY(-50%);max-width:240px;font-size:13px;line-height:1.25;color:#2b1d0b;background:#fbf3dfee;border:1px solid #d9c08a;padding:5px 9px;border-radius:10px;z-index:2;text-decoration:none}
 .vy-lab small{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}.vy-lab.done{opacity:.8}.vy-lab.now{background:#fff;font-weight:700;box-shadow:0 2px 8px #0003;border:2px solid #b45309}
-.vy-port{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;width:max-content;display:flex;align-items:center;gap:8px;background:#fbf3df;border:2px solid #b08a52;border-radius:14px;padding:6px 14px;box-shadow:0 3px 0 #8a6a3a;max-width:min(94%,560px)}
+.vy-port{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;width:min(250px,74%);display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;background:#fbf3df;border:2px solid #b08a52;border-radius:14px;padding:8px 14px 10px;box-shadow:0 3px 0 #8a6a3a;line-height:1.3}
 .vy-port .fl{font-size:28px;line-height:1}.vy-port b{font:700 18px Georgia,serif;color:#4a2f0e}.vy-port em{font-style:normal;font-size:12.5px;color:#8a5a1f}.vy-port i{font-size:12px;color:#4b3a1f;font-style:normal}.vy-port i.ce{color:#9a3412;font-weight:600}
 .vy-port.ok::after{content:"✓";position:absolute;right:-9px;top:-9px;width:22px;height:22px;border-radius:50%;background:#15803d;color:#fff;font-size:13px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
 .vy-pimg{position:absolute;z-index:1;pointer-events:none}.vy-pimg img{width:100%;display:block;filter:drop-shadow(0 6px 6px #0003)}.vy-pimg .lf{position:absolute;left:50%;top:4%;transform:translateX(-50%);font-size:30px;line-height:1}
@@ -255,10 +255,15 @@
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
     SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
     const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:12,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
-    let total=TOP;M.items.forEach(it=>total+=it.port?GAP+2*PH:STEP);total+=90;
+    // a port card (square-ish, Roger 20 Nov) never covers a stop, a label or a vehicle: measure each card first and give it the room it
+    // needs (half its height + the vehicles' half height ~50 px + a margin, on each side)
+    const portCard=it=>{const P=it.port;return `<div class="vy-port${it.done?" ok":""}" style="top:${it.y||0}px"><span class="fl">${P.f}</span><span><b>${esc(P.c)}</b><br><em>${esc(py(P))}</em>${P.h?`<br><i>📜 ${esc(P.h)}</i>`:""}${S.fest&&P.fe?`<br><i class="ce">🎉 ${esc(P.fe)}</i>`:""}</span></div>`};
+    map.style.width=W+"px";map.innerHTML=M.ports.map(portCard).join("");
+    map.querySelectorAll(".vy-port").forEach((el,j)=>{M.ports[j].ph=Math.max(PH,Math.ceil(el.offsetHeight/2)+56-GAP/2)});
+    let total=TOP;M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP);total+=90;
     map.style.height=total+"px";map.style.width=W+"px";
     let yy=total-70,li=0;const pts=[];
-    M.items.forEach(it=>{if(it.port){yy-=GAP/2+PH;it.y=yy;yy-=GAP/2+PH;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
+    M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
     let h="";
     const topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120;
     // the route
@@ -271,7 +276,7 @@
         h+=`<img class="vy-deco${mv?" "+mv[0]:""}" src="${I}${f}.webp" style="left:${x}px;top:${y}px;${w?`width:${w}px;`:""}${mv?`--d:${d};--f:${d*mv[1]};--t:${14+i%3*3}s;--dl:-${i*2.3}s`:""}" alt="">`});
     // ports: the label on the route, the picture at the side
     M.ports.forEach((it,j)=>{const P=it.port,img=P.img;
-      h+=`<div class="vy-port${it.done?" ok":""}" style="top:${it.y}px"><span class="fl">${P.f}</span><span><b>${esc(P.c)}</b> <em>${esc(py(P))}</em>${P.h?`<br><i>📜 ${esc(P.h)}</i>`:""}${S.fest&&P.fe?`<br><i class="ce">🎉 ${esc(P.fe)}</i>`:""}</span></div>`;
+      h+=portCard(it);
       if(W>560){const left=j%2===0,sz=Math.min(280,W*.27),px=left?Math.max(-20,cx-lane*2-sz-150):Math.min(W-sz+20,cx+lane*2+150);
         h+=`<div class="vy-pimg" style="left:${px}px;top:${it.y-sz*.95}px;width:${sz}px"><img src="${I}${img}.webp" alt="">${hasFw(S,it.pi)?fwHtml():""}<span class="ln">${P.f} ${esc(P.c)}</span></div>`}});
     // the stops
