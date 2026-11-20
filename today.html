@@ -873,7 +873,12 @@ function mkSkills(ls){if(!window.ELCharts)return "";const SK=ELCharts.SK,nm=k=>E
   if(E&&X.sections&&!held)E.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null||v.excused)return;const sk=String(name).split(/\s|·/)[0];if(!SK[sk])return;
     const z=ex[sk]||(ex[sk]={s:0,m:0});z.s+=+v.score||0;z.m+=+(v.max||max)||0});
   if(!Object.keys(A).length&&!Object.keys(ex).length)return "";
-  const M=lsMarks(ls),FP=hasFp(ls)||(M&&M.w&&M.w.fp)?{p:M&&M.fp!=null?Math.round(M.fp*10):null}:null;
+  // the final product's speaking: in LS1 (only an exam and a final product) the whole final product is spoken; from LS2 on only its rubric
+  // rows of the oral production criteria (3.x, e.g. "My part", "My vlog"), each row's mark (progress.parts.fp) by its weight (Roger, 20 Nov 2026:
+  // "producte final la part d'speaking, en el cas de my real routine es tot pero a les SL2 no sempre")
+  const M=lsMarks(ls),gr=(window.EL_GRADING||{})[ls.id]||{},rows=((gr.fp||{}).rows||[]).filter(r=>/^3\./.test(r.c)),PF=((X.progress||{}).parts||{}).fp||{};
+  const spk=gr.only?(M&&M.fp!=null?M.fp*10:null):(()=>{const got=rows.filter(r=>PF[r.step+"|"+r.c]!=null),w=got.reduce((n,r)=>n+r.w,0);return w?got.reduce((n,r)=>n+(+PF[r.step+"|"+r.c])*r.w,0)/w*10:null})();
+  const FP=gr.only?(hasFp(ls)||(M&&M.w&&M.w.fp)?{p:spk==null?null:Math.round(spk)}:null):rows.length?{p:spk==null?null:Math.round(spk)}:null;
   const bar=(lab,p,c)=>`<div class="mkskb"><em>${lab}</em><span><i style="width:${p==null?0:p}%;background:${c}"></i></span><b${p==null?' class="na"':""}>${p==null?"–":p+" %"}</b></div>`;
   const row=(k,i)=>{const a=A[k],e=ex[k],pa=a&&a.n?Math.round(a.s/a.n*100):null,pe=e&&e.m?Math.round(e.s/e.m*100):null;
     // Speaking: the exam has no speaking part, the final product is spoken (Roger, 20 Nov 2026: "producte final inclou speaking, per tant,
@@ -881,7 +886,7 @@ function mkSkills(ls){if(!window.ELCharts)return "";const SK=ELCharts.SK,nm=k=>E
     if(k==="Speaking"&&!e&&FP)return `<div class="mkskr"><span class="mkskn">${SK[k][0]} ${esc(nm(k))}</span>${bar(t("Activitats","Activities"),pa,SK[k][1])}${bar(t("Prod. final","Final prod."),FP.p,SK[k][1])}</div>`;
     return `<div class="mkskr${i===4?" sep":""}"><span class="mkskn">${SK[k][0]} ${esc(nm(k))}</span>${bar(t("Activitats","Activities"),pa,SK[k][1])}${bar(t("Examen","Exam"),pe,SK[k][1])}</div>`};
   const hd=held&&X.showFrom?new Date(X.showFrom).toLocaleDateString(EN?"en-GB":"ca",{weekday:"short",day:"numeric",month:"short"}):"";
-  return `<section class="box mkc mksk"><h2>📊 ${t("Com et va a cada destresa","How you are doing in each skill")}</h2><p class="mklead">${t("Activitats: la mitjana de tots els teus intents. Examen: la teva nota a cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}${FP&&!ex.Speaking?" "+t("Speaking: la nota del producte final, que és oral.","Speaking: your final product mark, as it is spoken."):""}</p>`
+  return `<section class="box mkc mksk"><h2>📊 ${t("Com et va a cada destresa","How you are doing in each skill")}</h2><p class="mklead">${t("Activitats: la mitjana de tots els teus intents. Examen: la teva nota a cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}${FP&&!ex.Speaking?" "+(gr.only?t("Speaking: la nota del producte final, que és oral.","Speaking: your final product mark, as it is spoken."):t("Speaking: la part oral del producte final.","Speaking: the spoken part of your final product.")):""}</p>`
     +Object.keys(SK).map(row).join("")+(held?`<p class="mkskh">🔒 ${hd?t(`Resultats de l'examen: ${esc(hd)}`,`Exam results: ${esc(hd)}`):t("Els resultats de l'examen sortiran aviat.","Your exam results are coming soon.")}</p>`:"")+`</section>`}
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
