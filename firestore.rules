@@ -55,6 +55,12 @@ service cloud.firestore {
       allow read: if signedIn() || isTeacher();
       allow write: if isTeacher();
     }
+    // Beltran's drafts of the teacher's answers to private messages (Roger, 20 Nov 2026): msgDrafts/{announcement id} = {en, ca, note, n, at},
+    // written by the instant task (tools/problems/auto.mjs msg, service account). Teacher only: the announcement itself is readable by the
+    // student, so the draft is kept apart until the teacher sends it.
+    match /msgDrafts/{id} {
+      allow read, write: if isTeacher();
+    }
     // problem reports (the "Problem" button in the bottom bar): signed-in students and testers send them with where they happened; only the teacher reads, marks or deletes them
     function shortText(v, n) { return v == null || (v is string && v.size() <= n); }
     // suggestions to improve the site (the "Idea" button in the bottom bar): signed-in students and testers send them; only the teacher reads, marks or deletes them. Kept apart from problem reports.

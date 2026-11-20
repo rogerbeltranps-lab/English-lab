@@ -106,6 +106,12 @@ D.pb[1].auto = { verdict: 'roger', status: 'nobug', note: 'The key accepts "take
 D.pb.push({ id: 'p3', uid: a4[11].uid, group: '4ESOA', kind: 'other', text: 'El meu cognom està mal escrit.', page: 'today.html#formative', title: 'My dashboard · English Lab', section: 'My activities', route: null, device: 'Chromebook · Chrome · 1366×768', created: Date.now() - 50 * 60e3,
   auto: { verdict: 'roger', status: 'you', note: 'The roster has the surname with a different spelling from the one the student uses (and the school email). Roster data is yours to change.', todo: 'Change the surname in 👥 Students, then send.', reply: 'Tens raó: ja he corregit el teu cognom. Recarrega la pàgina i ja el veuràs bé.', at: new Date().toISOString() } });
 D.sg.push({ id: 's1', uid: a4[7].uid, group: '4ESOA', text: 'Could we have more vocabulary games for each Learning Path?', page: 'lab/index.html', created: Date.now() - 5 * 3600e3 });
+// an idea with Beltran's draft reply (Roger, 20 Nov 2026: tools/problems/auto.mjs idea → suggestions/{id}.auto)
+{ const a2 = Object.values(D.st).filter((s) => s.group === '2ESOA');
+  D.sg.push({ id: 's2', uid: a2[4].uid, group: '2ESOA', text: "alguna activitat per estudiar l'examen", page: 'today.html', created: Date.now() - 2 * 3600e3,
+    auto: { note: 'The LS page already has the practice exam (First exam) and every learning path has a "How to study" guide with exam-style practice: the draft points to them.',
+      ca: "Gràcies per la idea! Ja tens un examen de pràctica a la pàgina de la LS (First exam), i a cada learning path hi ha la guia \"Com estudiar\" amb exercicis com els de l'examen. Per al pròxim examen, comença uns dies abans.",
+      en: 'Thanks for the idea! There is already a practice exam on the LS page (First exam), and every learning path has a "How to study" guide with exercises like the ones in the exam. For the next exam, start a few days before.', at: Date.now() - 2 * 3600e3 + 240e3 } }); }
 // the class games of LS2 (gameResults): a vocabulary and a grammar game for LP1-LP3 in every group, a few students absent from each
 const LS2T = { '2eso': 'LS2 · Free Time, Live!', '4eso': 'LS2 · Seasons & Celebrations' };
 D.games = [];

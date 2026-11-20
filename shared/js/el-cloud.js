@@ -767,7 +767,8 @@ async function myAnnouncements(u){
 // The student's answer to a private message (to:"one"; Roger, 7 Nov 2026: "they should be able to answer back"): one more thread item, read
 // now, sAt = when (the teacher's 15-minute email looks for new sAt). firestore.rules allows exactly this to the student it was sent to.
 function annReply(u,id,text){text=String(text||"").trim().slice(0,1000);if(!u||!text||AS)return Promise.reject(new Error("nothing to send"));
-  return updateDoc(doc(db,"announcements",id),{thread:arrayUnion({by:"s",uid:u.uid,text,at:Date.now()}),["read."+u.uid]:serverTimestamp(),sAt:serverTimestamp()})}
+  return updateDoc(doc(db,"announcements",id),{thread:arrayUnion({by:"s",uid:u.uid,text,at:Date.now()}),["read."+u.uid]:serverTimestamp(),sAt:serverTimestamp()})
+    .then(r=>{wakeFixer(u);return r})}   // the instant task writes the teacher a draft answer (Roger, 20 Nov 2026), never sent by itself
 // Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
 // Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
 // Outside an LS page (course pages, English Lab, Practice) the route is the one of the course's latest LS (homeLevel), so a Core or
@@ -800,6 +801,7 @@ function suggest(u){
     ok.disabled=true;
     try{await setDoc(doc(collection(db,"suggestions")),{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,
         page:location.pathname.replace(/^.*?\/English-lab\//i,"").slice(0,200)||"index.html",text,created:serverTimestamp()});
+      wakeFixer(u);   // the instant task writes the teacher a draft reply (Roger, 20 Nov 2026), never sent by itself
       d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor llegirà el teu suggeriment.","Thank you! Your teacher will read your suggestion.");
       const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c)}
     catch(e){console.warn("suggestion",e);ok.disabled=false;alert(t("No s'ha pogut enviar. Torna-ho a provar més tard.","It could not be sent. Please try again later."))}};

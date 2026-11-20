@@ -125,6 +125,28 @@ line, after the reports (or alone, when there is no open report):
    tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
    comment again). The Friday 15:00 task still answers any comment left.
 
+## Drafts for ideas and private answers (Roger, 20 Nov 2026)
+
+"Pq no tens un draft preparat per contestar?" (on a 💡 idea whose 💬 Answer box was empty). The same task now also starts when a student
+sends a 💡 Idea (`suggestions/{id}`) or answers one of Roger's private messages (`announcements/{id}`, a thread item by "s"): the student's
+page calls `wakeFixer` after saving, like a report. `auto.mjs open` lists, after the reports, every idea with no draft and no answer yet and
+every private conversation whose last word is the student's with no draft for it (last 14 days), with a line "NEW IDEAS / PRIVATE ANSWERS
+WITHOUT A DRAFT". For each one, **write a draft only; nothing is ever sent to the student by the task**:
+
+- An idea: `node tools/problems/auto.mjs idea <id> --note "…" --en "…" --ca "…" --apply` → `suggestions/{id}.auto = {en, ca, note, at}`.
+- A private answer: `node tools/problems/auto.mjs msg <id> --note "…" --en "…" --ca "…" --apply` → `msgDrafts/{id} = {en, ca, note, n, at}`
+  (teacher-only collection: the student can read the announcement itself; `n` = the thread length it answers, so a newer answer from the
+  student gets a new draft).
+
+How to write it: Roger's voice, first person, warm and short (two or three sentences), at the student's level (simple English for 2 ESO);
+`--ca` and `--en` say the same thing, both natural. Never the student's name or surnames (the tool refuses them), never AI, Claude, Gemini,
+PRs or code. Read what the student means and check the site first: if what they ask for already exists, say where it is (the page's real
+names, for example "First exam" on the LS page, the "Com estudiar / How to study" guide in each learning path); if it is a new idea, thank
+them and say you will think about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
+information you don't have: a short honest draft he can complete, and the note says what is missing. `--note` = one line for Roger (what
+you checked). The dashboard puts the draft in the 💬 Answer box (ideas: both boxes, the language Roger writes in first; private messages:
+Catalan for Starter, Base and no route, English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.
+
 ## Costs and limits
 
 - Firestore: one list of `problems` (a few dozen documents) per run, plus a screenshot per new report. Never list students or results
