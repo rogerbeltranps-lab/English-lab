@@ -170,7 +170,7 @@
 .vy-st.flash{animation:vyflash 1s ease 2}@keyframes vyflash{50%{filter:drop-shadow(0 0 14px #ffd54a) brightness(1.25)}}
 .vy-lab{position:absolute;transform:translateY(-50%);max-width:240px;font-size:13px;line-height:1.25;color:#2b1d0b;background:#fbf3dfee;border:1px solid #d9c08a;padding:5px 9px;border-radius:10px;z-index:2;text-decoration:none}
 .vy-lab small{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}.vy-lab.done{opacity:.8}.vy-lab.now{background:#fff;font-weight:700;box-shadow:0 2px 8px #0003;border:2px solid #b45309}
-.vy-port{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;display:flex;align-items:center;gap:8px;background:#fbf3df;border:2px solid #b08a52;border-radius:14px;padding:6px 14px;box-shadow:0 3px 0 #8a6a3a;max-width:min(94%,560px)}
+.vy-port{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;width:max-content;display:flex;align-items:center;gap:8px;background:#fbf3df;border:2px solid #b08a52;border-radius:14px;padding:6px 14px;box-shadow:0 3px 0 #8a6a3a;max-width:min(94%,560px)}
 .vy-port .fl{font-size:28px;line-height:1}.vy-port b{font:700 18px Georgia,serif;color:#4a2f0e}.vy-port em{font-style:normal;font-size:12.5px;color:#8a5a1f}.vy-port i{font-size:12px;color:#4b3a1f;font-style:normal}.vy-port i.ce{color:#9a3412;font-weight:600}
 .vy-port.ok::after{content:"✓";position:absolute;right:-9px;top:-9px;width:22px;height:22px;border-radius:50%;background:#15803d;color:#fff;font-size:13px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
 .vy-pimg{position:absolute;z-index:1;pointer-events:none}.vy-pimg img{width:100%;display:block;filter:drop-shadow(0 6px 6px #0003)}.vy-pimg .lf{position:absolute;left:50%;top:4%;transform:translateX(-50%);font-size:30px;line-height:1}
@@ -254,11 +254,11 @@
   function wire(root,V){const sea=root&&root.querySelector(".vy-sea");if(!sea)return;
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
     SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
-    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:62,STEP=wide?118:96,GAP=56,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
-    let total=TOP;M.items.forEach(it=>total+=it.port?GAP+88:STEP);total+=90;
+    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:62,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
+    let total=TOP;M.items.forEach(it=>total+=it.port?GAP+2*PH:STEP);total+=90;
     map.style.height=total+"px";map.style.width=W+"px";
     let yy=total-70,li=0;const pts=[];
-    M.items.forEach(it=>{if(it.port){yy-=GAP/2+44;it.y=yy;yy-=GAP/2+44;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
+    M.items.forEach(it=>{if(it.port){yy-=GAP/2+PH;it.y=yy;yy-=GAP/2+PH;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
     let h="";
     const topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120;
     // the route
