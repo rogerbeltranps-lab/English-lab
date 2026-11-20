@@ -81,6 +81,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag .it:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .it .go{margin-left:auto;color:#4338ca;font-weight:800;white-space:nowrap}
 #el-cmag .crt{display:block;margin:-2px 0 6px auto;padding:3px 10px;border:1.5px solid #86efac;border-radius:999px;background:#f0fdf4;color:#166534;font:700 13px system-ui,sans-serif;cursor:pointer}#el-cmag .crt:hover{border-color:#16a34a}
 #el-cmag.dock .crt{font-size:12px;padding:2px 8px}
+#el-cmag .tbs{display:flex;gap:6px;margin:0 0 8px}#el-cmag .tbs button{flex:1;padding:6px 8px;border:1.5px solid #c7d2fe;border-radius:999px;background:#fff;color:#3730a3;font:700 14px system-ui,sans-serif;cursor:pointer}#el-cmag .tbs button.on{background:#3730a3;color:#fff;border-color:#3730a3}#el-cmag .pt{margin:14px 2px 0;padding-bottom:2px;font:700 15px Georgia,serif;color:#4a2f0e;border-bottom:1px dashed #d9c294}
 #el-cmag .it.nt{background:#fef9c3;border-color:#fde047;cursor:default}#el-cmag .it.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6;cursor:pointer}
 #el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag button.it.ex{cursor:pointer}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
 #el-cmag .m{flex:none;border:1.5px solid #60a5fa;border-radius:999px;padding:1px 9px;font-size:14px;color:#1d4ed8;background:#fff}
@@ -240,10 +241,34 @@ export async function open(){if(!C)return;want(true);
 let L=null,D=null,MO=null,ADD=false,MSG=null;
 const msg=()=>MSG?`<p class="ok ${MSG.err?"err":""}">${E(MSG.t)}</p>`:"";
 const say=(t,err)=>{MSG={t,err:!!err};clearTimeout(say.k);say.k=setTimeout(()=>{MSG=null;if(box)draw()},err?9000:5000)};
+// 🧭 Class steps (Roger, 19 Nov 2026, voyage mockups v11/v14: "in class mode the left column gets two tabs, 📋 Today | 🧭 Class steps"): in
+// the courses with the students' voyage map (today.html VOYAGE), every tab of the LS's open learning paths in order, under the ports the
+// students see (one per learning path), with ● now on the class tab's step. A click takes the class there, as a step of Today does
+// (it opens it for the group first if it is locked). 📋 Today and everything on it stay as they are. Nothing new is read.
+const VOY=["4eso"],FLAGS=[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🇺🇸","USA"],["🇮🇳","India"],["🇯🇲","Jamaica"],["🇨🇦","Canada"],["🇸🇱","Sierra Leone"]];
+let TB="today";
+const voyC=()=>!!C&&VOY.includes(((window.EL_GROUPS||[]).find(x=>x.id===C.g)||{}).course||(String(C.g).match(/^\d+eso/i)||[""])[0].toLowerCase());
+const tbBar=()=>voyC()?`<div class="tbs" role="tablist"><button data-tb="today" class="${TB==="today"?"on":""}" role="tab" aria-selected="${TB==="today"}">📋 Today</button><button data-tb="steps" class="${TB==="steps"?"on":""}" role="tab" aria-selected="${TB==="steps"}">🧭 Class steps</button></div>`:"";
+// the LS: the one with steps today, else the one of this page, else the latest with an agenda (C.lsInfo: the page's cached read of the LS)
+async function stepsLs(){const t=todayLs()[0];if(t)return t;
+  const a=(window.EL_CATALOG||[]).find(z=>z.path&&new URL(z.path,C.root).pathname===location.pathname),y=a&&(L||[]).find(z=>z.ls.id===a.ls);if(y)return y;
+  if(a){const l=(window.EL_LS||[]).find(z=>z.id===a.ls);try{if(l)return {ls:l,info:await C.lsInfo(l.id),ag:{}}}catch(e){}}
+  return L&&L.length?L[L.length-1]:null}
+async function drawSteps(){const x=await stepsLs(),its=[];let body="",pi=-1;if(!box)return;
+  if(x){const info=x.info||{};(window.EL_CATALOG||[]).filter(a=>a.ls===x.ls.id&&!a.optional&&!a.manual&&secs(a).length&&(!window.elLpOpen||elLpOpen(a,info,C.g))).forEach(a=>{
+    if(!a.checkpoint&&pi<FLAGS.length-1){pi++;body+=`<div class="pt">${FLAGS[pi][0]} ${E(FLAGS[pi][1])}</div>`}
+    body+=`<div class="lp">${a.checkpoint?"🛡 ":""}${E(lpLab(x,a))}</div>`;
+    const off=window.elSecLocked?elSecLocked(a,info,C.g):[];
+    secs(a).forEach(([p,nm])=>{const n=its.push({ls:x,a,p,it:a.id+"#"+p})-1,now=hereIs(a,p),lk=off.includes(p);
+      body+=`<button class="it ${now?"now":""}" data-i="${n}" title="Go there: ${E(C.gname)} follows${lk?" (it opens for the group first)":""}"><span>${E(nm)}${lk?" 🔒":""}</span><span class="go ${now?"":"gt"}">${now?"● now":"Go →"}</span></button>`})})}
+  box.innerHTML=`<div class="hd"><b>🧭 Class steps</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`+tbBar()+msg()
+    +(body||`<p class="msg">No learning paths open for ${E(C.gname)} yet.</p>`);
+  box._its=its}
 async function draw(){if(!box)return;
   try{L=await agendas()}catch(e){L=[]}
   D=pickDay(L);const t=today(),live=D===t;
   if(ADD)return drawAdd();
+  if(TB==="steps"&&voyC())return drawSteps();
   const its=[];let body="",tot=0,nTab=0;
   L.forEach(x=>{const ag=x.ag,mn=it=>+((ag.min||{})[D+"|"+it])||0;
     // 📝 the exam day: an LS with a web exam opens it here (exam mode for the group, el-web-exam.js on the class tab; Roger, 17 Nov 2026)
@@ -263,7 +288,7 @@ async function draw(){if(!box)return;
         body+=`<div class="row"><button class="en ${now?"me":on?"on":""}" data-en="${n}" aria-pressed="${now||on}" title="${now?"Your tab: students are always here":on?"Students can work on this step now · click to close it":"Let students work on this step too (they can move between the 👥 steps)"}">👥</button>${btn}<button class="mo ${MO===it?"on":""}" data-mo="${n}" title="Homework or next class">⋯</button></div>`;
         if(MO===it)body+=`<div class="acts">${p?`<button data-hw="${n}" class="${hw?"on":""}" title="${hw?"It is homework for "+E(dLab(hw[1].by))+" · click to take it off":"Students do it at home for the next class"}">🏠 ${hw?"Homework ✓":"Homework"}</button>`:""}${nd?`<button data-nx="${n}" title="It moves to the next class on your Time plan">⏭ Next class · ${E(dLab(nd))}</button>`:""}</div>`;body+=cr})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60,tabs=its.filter(z=>z.a&&!isGame(z.p)),allOn=tabs.length>0&&tabs.every(z=>EN.has(z.it)||hereIs(z.a,z.p)),nOn=tabs.filter(z=>EN.has(z.it)&&!hereIs(z.a,z.p)).length;
-  box.innerHTML=`<div class="hd"><b>📋 ${live?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
+  box.innerHTML=`<div class="hd"><b>📋 ${live?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`+tbBar()
     +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
     +`<div class="tools">${live&&nTab>1?`<button data-all="1" class="${allOn?"on":""}" title="${allOn?"Back to one step: students follow your tab":"Students can move between all of today's steps"}">👥 ${allOn?"Only mine":"Open all"}</button>`:""}<button data-wu="1" title="A quick whole-class game with the words and grammar of today’s learning path (hangman, word order…): you tap what the students call out">🔥 Warm-up</button><button data-add="1" title="Put another step on today's class: it opens and students can do it">➕ Add a step</button></div>`
     +(live&&nOn?`<p class="hint">👥 Students can move between ${nOn+1} steps.</p>`:"")+msg()
@@ -285,7 +310,7 @@ function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];
   box.innerHTML=`<div class="hd"><b>➕ Add a step</b><button class="x" data-x="1" title="Hide">✕</button></div><button class="back" data-back="1">‹ Back to today</button>`+msg()
     +`<p class="msg" style="margin-top:0">It goes on today's class on the Time plan, opens for ${E(C.gname)} and students can do it (👥).</p>`+(body||`<p class="msg">No learning paths found.</p>`);
   box._add=its}
-function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.wu)return warmOpen();
+function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.tb){TB=b.dataset.tb;ADD=false;MO=null;return draw()}if(b.dataset.wu)return warmOpen();
   if(b.dataset.ex){location.href=new URL(b.dataset.ex,C.root).href;return}
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
