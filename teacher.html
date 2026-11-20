@@ -1748,7 +1748,7 @@ function render0(){
 // step still to do and a status: 🟢 On course (at most 1 step missing and a mark of 5 or more), 🟠 Drifting (2-4 missing, or a mark under
 // 5), 🔴 Needs a push (5 or more missing). A red dashed line marks where the 🔴 group starts. A mini sea shows the class's boats by steps
 // done. Nothing new is read: what the dashboard already has.
-const VOY_COURSES=["4eso"];
+const VOY_COURSES=["4eso","2eso"],VY_ART={"4eso":["voyage/sea.webp","voyage/boat.webp"],"2eso":["road-2eso/bg-pitch-tile.webp","road-2eso/bus.webp"]};   // the map's background and vehicle (el-voyage.js SKINS)
 // As the students' map (today.html vyPlanned, Roger 20 Nov 2026): only the tabs on the group's Time plan agenda when it has one, never 📖 the book.
 function vyOnPlan(ls,gid){const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,gid):-1,ag=gi>=0&&p._ag&&p._ag[gi];if(!ag||!ag.days)return null;
   const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));return on}
@@ -1759,7 +1759,7 @@ function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0;const
     elTabGroups(a,ks).forEach(g=>{if(on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+vyTab(a,g[0])))return;const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;total++;if(d)done++;else miss.push([a,g[0]])})});
   return {done,total,miss}}
 function vyRank(grp,ls,studs){
-  const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id;
+  const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id,art=VY_ART[grp.course]||VY_ART["4eso"];
   const rows=studs.filter(s=>s.uid).map(s=>{const v=vySteps(s,ls,gid,fa);let m=null;try{const pr=((S.D.rs[s.uid]||{})[asId(ls)]||{}).progress;m=pr&&pr.total!=null?pr.total:G()?grade(s).total:null}catch(e){m=null}
     const n=v.total-v.done,st=n>=5?"red":n>=2||m!=null&&m<5?"amber":"green";return {s,...v,n,m,st}});
   const nm=r=>fullName(r.s),bym=(a,b)=>(b.m??-1)-(a.m??-1);
@@ -1769,8 +1769,8 @@ function vyRank(grp,ls,studs){
   // the mini sea: a boat per student by steps done, stacked when they share a place
   const at={};rows.forEach(r=>{const x=T?Math.round(r.done/T*10):0;(at[x]=at[x]||[]).push(r)});
   const hh=Math.max(190,60+Math.max(1,...Object.values(at).map(L=>L.length))*30);
-  const sea=`<div class="vysea" aria-hidden="true" style="height:${hh}px"><span class="vyport l">⚓ Start</span><span class="vyport r">🏆 ${fa?esc(fa.title.replace(/\s*\([^)]*\)\s*$/,"")):"Final product"}</span>`
-    +Object.entries(at).map(([x,L])=>L.map((r,j)=>`<span class="vyb ${r.st}" style="left:calc(${5+x*8.6}% - 20px);bottom:${8+j*30}px" title="${esc(fullName(r.s))}: ${r.done} of ${r.total} steps"><img src="shared/img/voyage/boat.webp" alt=""><b>${esc(first(r.s))}</b></span>`).join("")).join("")+`</div>`;
+  const sea=`<div class="vysea" aria-hidden="true" style="height:${hh}px;background-image:linear-gradient(#ffffff38,#ffffff38),url(shared/img/${art[0]})"><span class="vyport l">⚓ Start</span><span class="vyport r">🏆 ${fa?esc(fa.title.replace(/\s*\([^)]*\)\s*$/,"")):"Final product"}</span>`
+    +Object.entries(at).map(([x,L])=>L.map((r,j)=>`<span class="vyb ${r.st}" style="left:calc(${5+x*8.6}% - 20px);bottom:${8+j*30}px" title="${esc(fullName(r.s))}: ${r.done} of ${r.total} steps"><img src="shared/img/${art[1]}" alt=""><b>${esc(first(r.s))}</b></span>`).join("")).join("")+`</div>`;
   let red=false;
   const body=rows.map((r,i)=>{const line=srt==="steps"&&r.st==="red"&&!red?(red=true,`<tr class="vyline"><td colspan="6">🔴 From here: needs a push (5 or more steps missing)</td></tr>`):"";
     const nx=r.miss[0],todo=nx?`${stepName(nx[0].id,nx[1])}${r.miss.length>1?` <small class="muted">+${r.miss.length-1}</small>`:""}`:`<span class="muted">nothing: all done ✓</span>`;
