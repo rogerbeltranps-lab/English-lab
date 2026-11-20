@@ -1719,16 +1719,20 @@ function render0(){
 // scroll the learning paths table. Gemini's drafts are one settings doc per final product (read once, cached in FPG.d).
 // ⛵ Class voyage: who needs a push (Roger, 19 Nov 2026: "as a teacher, I want to see the order of the students according to the activities
 // done and marks of the LS. Dont change this but add a button"; mockup v15). A button on the group page of the courses with the student
-// voyage map (today.html VOYAGE) opens this place: every student ordered by steps done of the open tabs (the stops of their map: open
-// learning paths, open sections, not the final product or the optional sample exam), then by the LS mark so far (grade, as 📊), with the first
+// voyage map (today.html VOYAGE) opens this place: every student ordered by steps done of the open tabs (the stops of their map: the
+// Time plan's tabs of the open learning paths, open sections, not the final product or the optional sample exam), then by the LS mark so far (grade, as 📊), with the first
 // step still to do and a status: 🟢 On course (at most 1 step missing and a mark of 5 or more), 🟠 Drifting (2-4 missing, or a mark under
 // 5), 🔴 Needs a push (5 or more missing). A red dashed line marks where the 🔴 group starts. A mini sea shows the class's boats by steps
 // done. Nothing new is read: what the dashboard already has.
 const VOY_COURSES=["4eso"];
-function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0;const miss=[];
-  acts(ls).filter(a=>!a.optional&&!a.manual&&(!fa||a.id!==fa.id)&&elLpOpen(a,info,gid)).forEach(a=>{
+// As the students' map (today.html vyPlanned, Roger 20 Nov 2026): only the tabs on the group's Time plan agenda when it has one, never 📖 the book.
+function vyOnPlan(ls,gid){const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,gid):-1,ag=gi>=0&&p._ag&&p._ag[gi];if(!ag||!ag.days)return null;
+  const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));return on}
+const vyTab=(a,k)=>{const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);k=window.elTabOf?elTabOf(a.id,k):k;return xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k};
+function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0;const miss=[],on=vyOnPlan(ls,gid);
+  acts(ls).filter(a=>!a.optional&&!a.manual&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,gid)).forEach(a=>{
     const ds=doneSet(s.uid,a),ks=(EL_ACTIONS[a.id]||[]).filter(k=>!(a.skip||[]).includes(k)),off=elSecLockedFor(a,info,gid,ds)||[],lk=k=>off.includes(k)||(k==="cards"||k==="practice")&&off.includes("vocab");
-    elTabGroups(a,ks).forEach(g=>{const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;total++;if(d)done++;else miss.push([a,g[0]])})});
+    elTabGroups(a,ks).forEach(g=>{if(on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+vyTab(a,g[0])))return;const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;total++;if(d)done++;else miss.push([a,g[0]])})});
   return {done,total,miss}}
 function vyRank(grp,ls,studs){
   const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id;
