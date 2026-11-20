@@ -679,3 +679,5 @@ html.el-nb-plain .nb-fpi textarea,html.el-nb-plain .nb-fpi-t{font-size:15px;line
 @media (max-width:899px){.nb-ifl{padding:3px 4px;gap:4px}.nb-ifl .pad-tb{min-width:28px;height:30px;padding:0 3px}.nb-ifl .pad-g{padding-right:2px}}
 /* 💬 the teacher's feedback on a step (Roger, 18 Nov 2026): a green slip, as the correction at the top of the step's tab */
 .nb-postit.k-fb,.nb-stab.k-fb{background:#c5e1a5}.nb-slip.nb-tfb{background:#f1f8e9;border-left:4px solid #8bc34a}.nb-slip.nb-tfb h4{color:#33691e}
+/* 🛟 a section that could not be laid out in pages (el-notebook.js layout) is kept whole on one page: it scrolls on the screen, runs on over more sheets on paper */
+.nb-page.nb-whole .nb-paper{overflow-y:auto}

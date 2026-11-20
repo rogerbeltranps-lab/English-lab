@@ -104,7 +104,7 @@ function curSave(){if(!S||!S.o.s)return;try{sessionStorage.setItem(CUR,JSON.stri
 // o = {root (site URL), g (group id), gname, s (this class mode), decks: [class game ids], title (today's learning paths)}
 export async function open(o){root=o.root;close();
   if(!document.getElementById("el-wu-css")){const st=document.createElement("style");st.id="el-wu-css";st.textContent=CSS;document.head.append(st);
-    if(!document.querySelector('link[href*="el-notebook.css"]')){const f=document.createElement("link");f.rel="stylesheet";f.href=new URL("shared/css/el-notebook.css?v=20261114w",root).href;document.head.append(f)}}
+    if(!document.querySelector('link[href*="el-notebook.css"]')){const f=document.createElement("link");f.rel="stylesheet";f.href=new URL("shared/css/el-notebook.css?v=20261120a",root).href;document.head.append(f)}}
   box=document.createElement("div");box.id="el-wu";box.setAttribute("role","dialog");box.setAttribute("aria-label","Warm-up game");box.className="notranslate";box.translate=false;
   box.innerHTML='<div class="wu-c"><p class="wu-msg">Getting the warm-up ready…</p></div>';box.onclick=click;document.body.append(box);
   keyH=e=>{if(!box||!S||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==="Escape"){close();return}
