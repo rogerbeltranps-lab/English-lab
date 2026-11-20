@@ -1,5 +1,7 @@
 # Teaching materials index
 
+**How Claude works on English Lab:** [REQUIREMENTS.md](REQUIREMENTS.md) (every standing rule in one place, with the exam guide).
+
 Everything Roger needs to teach and assess each course, in one place. Pick the course, then the Learning Situation (LS). Nothing here is for students: they use the site.
 
 **Where each kind of material lives**

@@ -66,7 +66,7 @@ Each step ends with Roger's OK before the next one starts.
 7. **Final product.** 🤖 Claude prepares the final product page: a model final product for each route, the task, the steps, the groups, the rubric per route (Word) and the two marking rounds. 👤 Roger approves the models, the rubric and its weights.
 8. **Grading.** 🤖 Claude prepares the LS mark and the few moments when Roger clicks a level on the dashboard. 👤 Roger approves it. Changes to the dashboard are made by the English Lab project, so Roger may need to paste a message there.
 9. **Calendar.** 🤖 Claude dates every session, the exam day and the due dates for each group. 👤 Roger checks it on the dashboard's time plan.
-10. **Exam.** 🤖 Claude proposes the exam, then makes the Word exam, the key and the audio (private) and the sample exam on the site. 👤 Roger approves it and reviews the Word files.
+10. **Exam.** Follow the exam guide in [REQUIREMENTS.md › 5](../REQUIREMENTS.md#5-making-an-exam-the-exam-guide). 🤖 Claude proposes the exam, then makes the Word exam, the key and the audio (private) and the sample exam on the site. 👤 Roger approves it and reviews the Word files.
 11. **Study summary.** 🤖 Claude makes the PDF for each route and the Word copy. 👤 Roger checks them.
 12. **Go live.** 👤 Roger says "ok merge". 👤 In the dashboard, Roger opens the LS for his groups and turns on graded activities when they are due.
 
