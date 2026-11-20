@@ -118,7 +118,7 @@ Read this file first in every thread. It says **what** must happen. **How** it i
 - **One colour rule for every percentage** (20 Nov 2026): under 50 red · 50–59 orange · 60–79 green · 80–89 blue · 90+ purple (`elPctCol`).
 - Marks: the degree (Assoliment notable…) in a coloured box first, the number small beside it (10 Nov 2026).
 - Student pages: no translating, no copying of page text, no spell-check in answer boxes (9 and 13 Nov 2026).
-- Everything students can download or print carries "© <year> Roger Beltran · English Lab · All rights reserved".
+- Everything students can download or print carries "© (year) Roger Beltran · English Lab · All rights reserved".
 - Students' answers always come back (on reload, another device, after a level change) unless they redo that activity (6 Nov 2026).
 - Never draw a guessed page that changes after sign-in (7 Nov 2026).
 - **LS1 stays as it is** unless Roger asks: its content and pages are finished.
