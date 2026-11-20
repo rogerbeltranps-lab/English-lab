@@ -30,11 +30,20 @@ window.ELCheckpoint = (function () {
   const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
   const goFull = () => { try { if (!fsOk()) return;
     // Esc does not leave full screen (Chrome and Chromebooks: Keyboard Lock); only holding Esc down does, and that sends the checkpoint
-    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
-    if (isFull()) { lock(); return; }   // already in full screen (e.g. the class full screen of el-cloud.js): Esc is still locked
+    // ALL keys locked, as in web exams (Roger, 20 Nov 2026): 🔍 Search / Launcher, Alt+Tab and the top-row keys reach the page, and
+    // keyGuard (below) makes them do nothing
+    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock().catch(() => {}); } catch (e) {} };
+    if (isFull()) { lock(); return; }   // already in full screen (e.g. the class full screen of el-cloud.js): the keys are still locked
     const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E);
     if (r && r.then) r.then(lock, () => {}); else lock(); } catch (e) {} };
   const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
+  // while a checkpoint runs in full screen, the keys that would take a student out do nothing (same list as el-web-exam.js)
+  const keyGuard = e => { if (!isFull()) return;
+    const k = e.key || '', c = e.code || '', ctl = e.ctrlKey || e.metaKey;
+    const bad = /^(Meta|OS|Super|Hyper)/.test(k) || /^(Meta|OS)(Left|Right)$/.test(c) || /^Browser|^Launch|^ZoomToggle$|^(F5|F11)$/.test(k) || /^Browser|^Launch/.test(c)
+      || (e.altKey && /^(Tab|ArrowLeft|ArrowRight|Home|F4)$/.test(k)) || (ctl && /^(Tab|PageUp|PageDown)$/.test(k)) || (ctl && /^[wtnrlqWTNRLQ]$/.test(k));
+    if (bad) { e.preventDefault(); e.stopPropagation(); } };
+  D.addEventListener('keydown', keyGuard, true); D.addEventListener('keyup', keyGuard, true);
   const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };
 
   /* api (from ls2-engine.js): LP, level(), ca(), state, save(), complete(id), forLevel(items) */

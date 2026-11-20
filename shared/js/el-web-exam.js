@@ -7,7 +7,8 @@
      classmates get different papers; the questions of each section and the options of each question are shuffled per student.
    - Sections: 🎧 Listening first (the teacher plays the audio twice for the class; once a student presses "Listening finished" those
      answers are locked), then 📖 Reading, 📚 Vocabulary, 🧩 Grammar in any order, and ✅ Review: every answer, blanks in red, before 🏁 Turn in.
-   - Full screen. Leaving it (or another tab, window or app for more than 2 s, or closing / reloading the page) STOPS the exam: a lock screen
+   - Full screen, with every key locked (Keyboard Lock): 🔍 Search / Launcher, Alt+Tab and the top-row keys do nothing (Roger, 20 Nov 2026).
+     Leaving it (or another tab, window or app for more than 2 s, or closing / reloading the page) STOPS the exam: a lock screen
      with the answers saved. Only the teacher's password opens it again (a PBKDF2 hash in the data, never the password). Each exit saves a
      copy of the answers at that moment (snaps, which firestore.rules never let the student change), and every answer changed after coming
      back is logged (changes), so the dashboard shows whether going out changed anything.
@@ -53,10 +54,21 @@
   const fsOk = () => !IOS && !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
   const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
   const goFull = () => { try { if (!fsOk()) return Promise.resolve();
-    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
+    // ALL keys locked, not only Esc (Roger, 20 Nov 2026: "Chromebooks have a magnifying glass next to the A … that makes them exit the
+    // exam"): in a page's own full screen Chrome's Keyboard Lock gives the page the keys the system would take (🔍 Search / Launcher,
+    // Alt+Tab, Ctrl+W/T/N, the top-row keys), and keyGuard (below) makes them do nothing. Typing in the boxes works as always.
+    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock().catch(() => {}); } catch (e) {} };
     if (isFull()) { lock(); return Promise.resolve(); }
     const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E); return r && r.then ? r.then(lock, () => {}) : (lock(), Promise.resolve()); } catch (e) { return Promise.resolve(); } };
   const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
+  // While the exam page is in full screen, the keys that would take a student out of it do nothing: 🔍 Search / Launcher (Meta), the
+  // Chromebook top row (back, forward, reload, full screen, overview), F5, Alt+Tab, Alt+←/→, Ctrl+W/T/N/R/L/Tab. Esc keeps its warning below.
+  const keyGuard = e => { if (!isFull()) return;
+    const k = e.key || '', c = e.code || '', ctl = e.ctrlKey || e.metaKey;
+    const bad = /^(Meta|OS|Super|Hyper)/.test(k) || /^(Meta|OS)(Left|Right)$/.test(c) || /^Browser|^Launch|^ZoomToggle$|^(F5|F11)$/.test(k) || /^Browser|^Launch/.test(c)
+      || (e.altKey && /^(Tab|ArrowLeft|ArrowRight|Home|F4)$/.test(k)) || (ctl && /^(Tab|PageUp|PageDown)$/.test(k)) || (ctl && /^[wtnrlqWTNRLQ]$/.test(k));
+    if (bad) { e.preventDefault(); e.stopPropagation(); } };
+  D.addEventListener('keydown', keyGuard, true); D.addEventListener('keyup', keyGuard, true);
   const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };
   const unbind = () => { off.forEach(f => f()); off = []; };
   const LK = () => 'el_webexam_' + X.key + '_' + (me ? me.uid : 'preview');
