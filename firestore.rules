@@ -154,6 +154,18 @@ service cloud.firestore {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();
     }
+    // ⛵ the voyage map on the student board (today.html, shared/js/el-voyage.js; Roger, 20 Nov 2026): road/{ls}/groups/{group} =
+    // {uid: {n: first name, s: steps done}}. Students of the group read it (their classmates' boats, first names only, never marks)
+    // and write only their own line; testers read but never write (they are not in the class).
+    match /road/{ls}/groups/{group} {
+      allow read: if isTeacher() || inGroup(group);
+      allow write: if isTeacher();
+      allow create, update: if signedIn() && !isTester() && rosterGroup() == group
+        && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data[request.auth.uid].keys().hasOnly(['n', 's'])
+        && request.resource.data[request.auth.uid].n is string && request.resource.data[request.auth.uid].n.size() <= 40
+        && request.resource.data[request.auth.uid].s is int && request.resource.data[request.auth.uid].s >= 0 && request.resource.data[request.auth.uid].s <= 500;
+    }
     // live class (shared/js/el-deck-points.js): live/{group} = where the teacher's presentation is (slide, step); buzz/{group} = {open, q, out, winner}.
     // Only the teacher writes them; a student of the group reads them and can buzz once: set the winner while the buzzers are open and nobody
     // has won, for their own team (points/{email}.team), not for a team that is out of this question, at the server's time.
