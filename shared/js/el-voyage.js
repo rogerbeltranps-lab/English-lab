@@ -72,8 +72,8 @@
         {img:"van-camper",me:"van-camper-me",band:"inset(31% 0 9% 0)"},{img:"bus-double",me:"bus-double-me",band:"inset(28% 0 9% 0)"},
         {img:"van-cart",me:"van-cart-me",band:"inset(28% 0 11% 0)"}]},
       fog:"clouds",
-      // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
-      decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
+      // sports-reporter decorations only: no Barcelona landmarks (Roger, 20 Nov: "it doesn't make sense")
+      decos:["deco-traffic-light","deco-camera","deco-football","deco-drone","deco-microphone","deco-camera","deco-football","deco-drone","deco-microphone"],
       road:{halo:"#6b7280",hw:30,line:"#fff",lw:3,dash:"14 12"},
       // sounds: a clean sports-TV theme (no noise drums), camera snap, cheer, fanfare, beep-beep horn. No background loop: the crowd
       // loop sounded like noise, and iPhones ignore the volume we set, so it played as loud as the song (Roger, 20 Nov)
