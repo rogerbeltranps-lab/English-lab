@@ -199,7 +199,7 @@
 .vy-fog{position:absolute;left:-60px;right:-60px;z-index:4;pointer-events:none}.vy-fog img{position:absolute;width:100%;height:150px;left:0}
 .vy-tip{position:absolute;left:50%;transform:translateX(-50%);z-index:5;background:#fff;border-radius:12px;padding:6px 12px;font-size:12.5px;color:#4b5563;box-shadow:0 1px 4px #0002;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
 .vy-dest{position:absolute;left:50%;transform:translateX(-50%);z-index:5;text-align:center;width:min(330px,92%);background:#fbf3df;border:2px solid #b08a52;border-radius:16px;padding:6px 10px 10px;box-shadow:0 3px 0 #8a6a3a;color:inherit;text-decoration:none}
-.vy-dest img{width:180px;display:block;margin:-4px auto -8px}.vy-dest small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b45309;font-weight:800}
+.vy-dest img{width:180px;height:170px;object-fit:contain;display:block;margin:-4px auto -8px}.vy-dest small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b45309;font-weight:800}
 .vy-dest small.ce{color:#9a3412;text-transform:none;letter-spacing:0;font-size:12px}.vy-dest b{display:block;font:700 18px Georgia,serif;color:#4a2f0e;margin-top:2px}.vy-dest p{margin:3px 0 0;font-size:12.5px;color:#374151;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .vy-dest.ok b::after{content:" ✓";color:#15803d}
 .vy-btn{position:absolute;bottom:12px;z-index:7;height:42px;border-radius:12px;background:#ffffffe6;display:flex;align-items:center;gap:6px;padding:0 12px;font:700 14px system-ui,sans-serif;box-shadow:0 1px 4px #0003;color:#1d3557;border:0;cursor:pointer}
@@ -258,14 +258,22 @@
     // a port card (square-ish, Roger 20 Nov) never covers a stop, a label or a vehicle: measure each card first and give it the room it
     // needs (half its height + the vehicles' half height ~50 px + a margin, on each side)
     const portCard=it=>{const P=it.port;return `<div class="vy-port${it.done?" ok":""}" style="top:${it.y||0}px"><span class="fl">${P.f}</span><span><b>${esc(P.c)}</b><br><em>${esc(py(P))}</em>${P.h?`<br><i>📜 ${esc(P.h)}</i>`:""}${S.fest&&P.fe?`<br><i class="ce">🎉 ${esc(P.fe)}</i>`:""}</span></div>`};
-    map.style.width=W+"px";map.innerHTML=M.ports.map(portCard).join("");
+    const D=S.dest,destCard=()=>`<a class="vy-dest${fp.done?" ok":""}" href="${esc(fp.href||"#")}" style="top:58px"><img src="${I}${D.img}.webp" alt="">${hasFw(S,S.places.length)?fwHtml("left:50%;width:180px;height:70px;transform:translateX(-50%)"):""}<small>${D.f} ${esc(wd("dest"))}: ${esc([D.c,py(D)].filter(Boolean).join(" · "))}</small>`
+      +(S.fest&&D.fe?`<small class="ce">🎉 ${esc(D.fe)}</small>`:"")+`<b>${esc(fp.title||"")}</b>${fp.sub?`<p>${esc(fp.sub)}</p>`:""}</a>`;
+    map.style.width=W+"px";map.innerHTML=M.ports.map(portCard).join("")+destCard();
     map.querySelectorAll(".vy-port").forEach((el,j)=>{M.ports[j].ph=Math.max(PH,Math.ceil(el.offsetHeight/2)+56-GAP/2)});
-    let total=TOP;M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP);total+=90;
-    map.style.height=total+"px";map.style.width=W+"px";
-    let yy=total-70,li=0;const pts=[];
-    M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
+    // from the top: the final product card, the vehicles that got there, the fog (only until the final product is sent), then the
+    // stops. The fog never covers a vehicle or a label (Roger, 20 Nov): the road starts low enough to leave it its own band
+    const dEl=map.querySelector(".vy-dest"),destB=58+(dEl&&dEl.offsetHeight||330),finY=destB+60,FOGH=220,fogTop=destB+110;
+    const need=fp.done?finY+150:fogTop+FOGH+70;
+    let total,pts,topY;
+    const lay=T=>{total=T;M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP);total+=90;
+      let yy=total-70,li=0;pts=[];
+      M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
+      topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120};
+    lay(TOP);if(topY<need)lay(TOP+need-topY);
+    map.style.height=total+"px";
     let h="";
-    const topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120;
     // the route
     if(pts.length){let d=`M${pts[0][0]} ${pts[0][1]+70}`;pts.forEach(([x,y],i)=>{if(!i){d+=` L${x} ${y}`;return}const [px,py]=pts[i-1];d+=` C${px} ${(py+y)/2} ${x} ${(py+y)/2} ${x} ${y}`});
       const l=pts[pts.length-1];d+=` C${l[0]} ${l[1]-80} ${cx} ${l[1]-80} ${cx} 160`;
@@ -285,10 +293,10 @@
       h+=`<a class="vy-st${c}" href="${esc(s.href)}" data-k="${esc(s.key)}" style="left:${s.x}px;top:${s.y}px" title="${esc(skName(s.sk,en)+" · "+s.t)}">${k[0]}</a>`
         +`<a class="vy-lab${c}" href="${esc(s.href)}" style="${s.right?`left:${lx}px`:`right:${W-lx}px`};top:${s.y}px"><small style="color:${k[1]}">${esc(skName(s.sk,en))}</small>${esc(s.t)}</a>`});
     // boats: every student by the steps done (one past the last stop = at the destination)
-    const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),destY=wide?300:290;
+    const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0));
     const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
     const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
-    const YO=wide?78:74,XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),s.y+48])(M.stops[i]):[cx+(wide?200:110),destY+60],meXY=XY(meI);M.xy=XY;M.meI=meI;
+    const YO=wide?78:74,XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),s.y+48])(M.stops[i]):[cx+(wide?200:110),finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;
     // at a stop the vehicles stand in one row on the side without the label: yours next to the stop, then the classmates that fit
     // (never on top of each other or of the stop; the others become "+3", names on hover)
     const bw=m=>Math.max(52,String(m.n).length*7.5+16)+4;
@@ -299,14 +307,12 @@
       const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
       const wB=used+(more?36:0);
       if(s){const x=s.right?s.x-40-wB-off:s.x+40+off;h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
-      else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${destY+60}px">${boats}</div>`}
+      else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${finY}px">${boats}</div>`}
     if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1,V.me.n)}</div>`;
     // fog over what is not open yet, then the destination: the final product
-    if(!fp.done){const fg=`${I}${S.fog}.webp`;h+=`<div class="vy-fog" style="top:${topY-235}px;height:220px"><img src="${fg}" style="top:0" alt=""><img src="${fg}" style="top:50px;transform:scaleX(-1)" alt=""><img src="${fg}" style="top:95px" alt=""></div>`
-      +`<div class="vy-tip" style="top:${topY-130}px">🌫️ ${esc(wd("tip"))}</div>`}
-    const D=S.dest;
-    h+=`<a class="vy-dest${fp.done?" ok":""}" href="${esc(fp.href||"#")}" style="top:58px"><img src="${I}${D.img}.webp" alt="">${hasFw(S,S.places.length)?fwHtml("left:50%;width:180px;height:70px;transform:translateX(-50%)"):""}<small>${D.f} ${esc(wd("dest"))}: ${esc([D.c,py(D)].filter(Boolean).join(" · "))}</small>`
-      +(S.fest&&D.fe?`<small class="ce">🎉 ${esc(D.fe)}</small>`:"")+`<b>${esc(fp.title||"")}</b>${fp.sub?`<p>${esc(fp.sub)}</p>`:""}</a>`;
+    if(!fp.done){const fg=`${I}${S.fog}.webp`;const ft=topY-70-FOGH;h+=`<div class="vy-fog" style="top:${ft}px;height:${FOGH}px"><img src="${fg}" style="top:0" alt=""><img src="${fg}" style="top:35px;transform:scaleX(-1)" alt=""><img src="${fg}" style="top:70px" alt=""></div>`
+      +`<div class="vy-tip" style="top:${ft+95}px">🌫️ ${esc(wd("tip"))}</div>`}
+    h+=destCard();
     map.innerHTML=h;
     // where the view starts: where it was, else my boat
     const toMe=b=>sc.scrollTo({top:Math.max(0,meXY[1]-sc.clientHeight*.55),behavior:b?"smooth":"auto"});
