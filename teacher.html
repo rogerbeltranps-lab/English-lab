@@ -1612,8 +1612,20 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
     const mk=studs.map(s=>examMark(s.uid,xe.l.id)).filter(Boolean);
     xr={l:xe.l,n:mk.length,N:studs.length,ex:xe.ex,full:mk.filter(m=>m.n===m.of).length,parts:P.map(q=>{const v=studs.map(s=>{const x=res(s.uid,asId(xe.l.id)).sections||{};let sc=0,m=0;
       q.ks.forEach(([k,mx])=>{const y=x[k];if(y&&y.score!=null){sc+=+y.score;m+=+(y.max||mx||E.max)}});return m?{p:sc/m*100,sc,m}:null}).filter(Boolean);
-      return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})}}
-  return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr}}
+      return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})};
+  }
+  // 🙌 Class work, in place of First tries (Roger, 20 Nov 2026: "en compte de First tries aquí posarem la mateixa info que surt a l'examen però
+  // en les activitats (ajuntant first tries de vocab i grammar amb els games)"): the same rings as the exam (whole + each part) for the card's
+  // LS: the first try of each auto-corrected step of the open learning paths (its skill from el-voyage.js, as 🌱 Progress), averaged over the
+  // students; Grammar and Vocabulary also take the class games of that LS (half and half when both exist); the whole: every first try, with the
+  // games as one more half.
+  const FT={},all=[],LV=/_(beginners|insecure|safe|daring|native)$/;
+  if(window.ELCharts)as.filter(a=>!a.checkpoint&&!/sample exam/i.test(a.title)).forEach(a=>studs.forEach(s=>Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
+    if(!t||!+t.max)return;const sk=ELCharts.skillOf(a,k.replace(LV,""));if(!sk)return;const v=Math.max(0,Math.min(100,t.score/t.max*100));(FT[sk]=FT[sk]||[]).push(v);all.push(v)})));
+  const mix=(a,g)=>a!=null&&g!=null?Math.round((a+g)/2):a!=null?a:g!=null?g:null,gm=[gs.grammar,gs.vocab].filter(v=>v!=null);
+  const cw={all:mix(avgP(all),gm.length?avgP(gm):null),n:{all:all.length}};
+  ["Listening","Reading","Speaking","Vocabulary","Grammar","Writing"].forEach(k=>{cw[k]=mix(avgP(FT[k]||[]),k==="Grammar"?gs.grammar??null:k==="Vocabulary"?gs.vocab??null:null);cw.n[k]=(FT[k]||[]).length});
+  return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr,cw}}
 const bCol=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol)
 function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
@@ -1625,8 +1637,7 @@ function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y
   const exs=b.exams.map(e=>`<a class="bex" href="#" data-do="bgo" data-g="${g.id}" data-p="marks" data-ls="${e.l.id}" title="Open ${esc(g.name)}'s assessment details for ${lsLabel(e.l)}"><b>${lsLabel(e.l).split(" · ")[0]}</b> ${e.ex==null?`<span class="muted">exam not marked yet</span>`:`exam <b>${f1(e.ex)}</b> <small>(${e.n})</small>${e.ls!=null?` · LS mark <b>${f1(e.ls)}</b> <small>(${e.ln})</small>`:""}`}</a>`).join("");
   return `<div class="brf c${g.course} ${ls0?"one":""}">${ls0?`<div class="bhd"><b>📊 How ${esc(g.name)} is doing</b><span>`:`<a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>`}${l?lsLabel(l):"No time plan yet"}${dn!=null&&dn>=0?` · exam ${dn===0?"today":dn===1?"tomorrow":"in "+dn+" days"}`:""}${when?" · "+when:""} · ${N} students</span>${ls0?"</div>":"</a>"}`
     +`<div class="bcols"><div class="bcol"><h3>Work done in each learning path</h3><div class="blps">${lps}</div></div><div class="bcol">`
-    +`<h3>First tries</h3><div class="bsts">${stat("🎯","Checkpoints",b.cp,b.cpN?`Recall checkpoints of this LS, first try: ${b.cp} % right on average (${b.cpN} tries)`:"No checkpoint done yet",{p:"todo",t:"click: each student's checkpoints"})}${stat("✏️","Activities",b.ft,b.ftN?`First try of the auto-corrected steps of the open learning paths: ${b.ft} % right on average (${b.ftN} steps)`:"No first tries yet",{p:"qa",t:"click: which questions they get right or wrong the first time"})}`
-    +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…",gres)}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…",gres)}</div>`
+    +classRings(g,b)
     +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div>${xRings(g,b.xr)}</div>`}
 // the 📝 exam row under a group's card: the whole exam (mark out of 10 in the ring) and one ring per part (% of its points); a click opens 📝 Exams
 const XIC={Listening:"🎧",Reading:"📖",Vocabulary:"📚",Grammar:"🧩",Writing:"✍️"};
@@ -1635,6 +1646,15 @@ function xRings(g,x){if(!x)return "";const lab=lsLabel(x.l).split(" · ")[0],go=
   return `<div class="bxrs"><h3>${esc(lab)} exam <small class="muted">· ${x.n} of ${x.N} students marked${left?` (${left} not yet)`:""} · average of each part</small></h3><div class="bxg">`
     +one("📝","Whole exam",Math.round(x.ex*10),f1(x.ex),"out of 10",`${lab} exam: average mark ${f1(x.ex)} out of 10 (${x.n} students)`)
     +x.parts.map(q=>one(XIC[q.n]||"•",q.n,q.p,null,q.c?`${f1(q.pts)} / ${f1(q.max)} points`:"not marked yet",q.c?`${q.n}: ${q.p} % of the points on average (${f1(q.pts)} out of ${f1(q.max)}, ${q.c} students)`:`${q.n}: not marked yet`)).join("")+`</div></div>`}
+// 🙌 Class work on a group's card (in place of First tries): the same rings as the exam row, from the class activities (brief().cw): the whole
+// and each exam part's skill (Speaking too: the exam has none, the class does). A click opens 🔎 Questions (what they get right the first time).
+function classRings(g,b){const c=b.cw||{n:{}},go=`href="#" data-do="bgo" data-g="${g.id}" data-p="qa" data-ls="${b.ls}"`,ks=b.xr?b.xr.parts.map(q=>q.n):["Listening","Reading","Vocabulary","Grammar","Writing"];
+  const one=(ic,nm,k)=>{const p=c[k],n=c.n[k]||0,gm=k==="Grammar"?b.gs.grammar:k==="Vocabulary"?b.gs.vocab:null,src=`${n} first tries${gm!=null?` + the class ${k==="Grammar"?"grammar":"vocabulary"} games (${gm} %)`:k==="all"&&(b.gs.grammar!=null||b.gs.vocab!=null)?" + the class games":""}`;
+    const tip=p==null?`${nm}: nothing yet`:`${nm}: ${p} % right on average (${src})`;
+    return `<a class="bst bxr" ${go} title="${esc(tip)} · click: which questions they get right or wrong the first time">${elRing(p,"",46,tip)}<span><b>${ic} ${esc(nm)}</b><small>${p==null?"nothing yet":gm!=null?"first tries + games":"first tries"}</small></span></a>`};
+  const sk=ks.concat(c.n.Speaking&&!ks.includes("Speaking")?["Speaking"]:[]);
+  return `<h3>Class work <small class="muted">· % right in the activities (first tries; grammar and vocabulary with the games)</small></h3><div class="bxg">`
+    +one("🙌","All class work","all")+sk.map(k=>one(XIC[k]||(k==="Speaking"?"🗣":"•"),k,k)).join("")+`</div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
