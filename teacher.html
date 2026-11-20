@@ -138,7 +138,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .blp .bln{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.blp b{text-align:right;font-variant-numeric:tabular-nums}.blps a.blp small{color:#64748b;font-variant-numeric:tabular-nums}.bbar{height:9px;border-radius:999px;background:#e2e8f0;overflow:hidden}.bbar i{display:block;height:100%;border-radius:999px}
 .bsts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.brf a.bst,.brf a.bex,.brf a.bst *,.brf a.bex *{text-decoration:none}.brf a.bst,.brf a.bex{color:#0f172a}.bst,.bex{border-radius:10px;padding:3px 5px;margin:-3px -5px}.bst:hover,.bex:hover,.blp:hover{background:#eef3ff}.bst{display:flex;align-items:center;gap:8px;font-size:13px}.bst span{display:flex;flex-direction:column}.bst small{color:#64748b}
 .bexs{display:flex;flex-direction:column;gap:3px;font-size:14px}.bex small{color:#64748b}
-.bxrs{border-top:1px solid #e2e8f0;padding-top:4px;display:flex;flex-direction:column;gap:8px}.bxg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}@media(max-width:560px){.bxg{grid-template-columns:repeat(2,minmax(0,1fr))}}.brf a.bxr{color:#0f172a}.bxr b{white-space:nowrap}.bxr small{font-variant-numeric:tabular-nums}
+.r2,.bst .r2,.bst .r2 span,.r2 b{border-radius:50%;display:grid;place-items:center;flex:0 0 auto}.r2 b{background:#fff;font-weight:800;line-height:1;color:#0f172a}.bxr small.bxc{color:#475569}.bxrs{border-top:1px solid #e2e8f0;padding-top:4px;display:flex;flex-direction:column;gap:8px}.bxg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}@media(max-width:560px){.bxg{grid-template-columns:repeat(2,minmax(0,1fr))}}.brf a.bxr{color:#0f172a}.bxr b{white-space:nowrap}.bxr small{font-variant-numeric:tabular-nums}
 .tside .nv.on.off{background:none;color:inherit}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cbar2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:14px}.cbar2 .cbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.cbar2 button{margin:0}
@@ -1612,7 +1612,18 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
     const mk=studs.map(s=>examMark(s.uid,xe.l.id)).filter(Boolean);
     xr={l:xe.l,n:mk.length,N:studs.length,ex:xe.ex,full:mk.filter(m=>m.n===m.of).length,parts:P.map(q=>{const v=studs.map(s=>{const x=res(s.uid,asId(xe.l.id)).sections||{};let sc=0,m=0;
       q.ks.forEach(([k,mx])=>{const y=x[k];if(y&&y.score!=null){sc+=+y.score;m+=+(y.max||mx||E.max)}});return m?{p:sc/m*100,sc,m}:null}).filter(Boolean);
-      return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})}}
+      return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})};
+    // 🙌 the class work of that LS in each skill, the ring's inner line (Roger, 20 Nov 2026: "two lines in the % cercle: activities done in class
+    // (first tries and grammar and vocab games too)"): the first try of each auto-corrected step (its skill from el-voyage.js, as 🌱 Progress),
+    // averaged over the students; Grammar and Vocabulary also take the class games of that LS (half and half when both exist). The whole exam:
+    // every first try, with the games as one more half.
+    const FT={},all=[],LV=/_(beginners|insecure|safe|daring|native)$/;
+    if(window.ELCharts)acts(xe.l.id).filter(a=>!a.checkpoint&&!/sample exam/i.test(a.title)).forEach(a=>studs.forEach(s=>Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
+      if(!t||!+t.max)return;const sk=ELCharts.skillOf(a,k.replace(LV,""));if(!sk)return;const v=Math.max(0,Math.min(100,t.score/t.max*100));(FT[sk]=FT[sk]||[]).push(v);all.push(v)})));
+    const GX=G0&&!G0.busy?elGameStats(G0.list.filter(z=>z.lsId===xe.l.id).flatMap(z=>(z.stu||[]).filter(y=>ems.has(y.e)).map(y=>({kind:z.kind,r:y.r,of:z.cb?y.a||0:z.done})))):{};
+    const mix=(a,g)=>a!=null&&g!=null?Math.round((a+g)/2):a!=null?a:g!=null?g:null,gm=[GX.grammar,GX.vocab].filter(v=>v!=null);
+    xr.cls=n=>n==="all"?mix(avgP(all),gm.length?avgP(gm):null):mix(avgP(FT[n]||[]),n==="Grammar"?GX.grammar??null:n==="Vocabulary"?GX.vocab??null:null);
+    xr.clsN=n=>(n==="all"?all.length:(FT[n]||[]).length)}
   return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr}}
 const bCol=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol)
 function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
@@ -1625,16 +1636,18 @@ function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y
   const exs=b.exams.map(e=>`<a class="bex" href="#" data-do="bgo" data-g="${g.id}" data-p="marks" data-ls="${e.l.id}" title="Open ${esc(g.name)}'s assessment details for ${lsLabel(e.l)}"><b>${lsLabel(e.l).split(" · ")[0]}</b> ${e.ex==null?`<span class="muted">exam not marked yet</span>`:`exam <b>${f1(e.ex)}</b> <small>(${e.n})</small>${e.ls!=null?` · LS mark <b>${f1(e.ls)}</b> <small>(${e.ln})</small>`:""}`}</a>`).join("");
   return `<div class="brf c${g.course} ${ls0?"one":""}">${ls0?`<div class="bhd"><b>📊 How ${esc(g.name)} is doing</b><span>`:`<a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>`}${l?lsLabel(l):"No time plan yet"}${dn!=null&&dn>=0?` · exam ${dn===0?"today":dn===1?"tomorrow":"in "+dn+" days"}`:""}${when?" · "+when:""} · ${N} students</span>${ls0?"</div>":"</a>"}`
     +`<div class="bcols"><div class="bcol"><h3>Work done in each learning path</h3><div class="blps">${lps}</div></div><div class="bcol">`
-    +`<h3>First tries</h3><div class="bsts">${stat("🎯","Checkpoints",b.cp,b.cpN?`Recall checkpoints of this LS, first try: ${b.cp} % right on average (${b.cpN} tries)`:"No checkpoint done yet",{p:"todo",t:"click: each student's checkpoints"})}${stat("✏️","Activities",b.ft,b.ftN?`First try of the auto-corrected steps of the open learning paths: ${b.ft} % right on average (${b.ftN} steps)`:"No first tries yet",{p:"qa",t:"click: which questions they get right or wrong the first time"})}`
-    +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…",gres)}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…",gres)}</div>`
     +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div>${xRings(g,b.xr)}</div>`}
 // the 📝 exam row under a group's card: the whole exam (mark out of 10 in the ring) and one ring per part (% of its points); a click opens 📝 Exams
 const XIC={Listening:"🎧",Reading:"📖",Vocabulary:"📚",Grammar:"🧩",Writing:"✍️"};
 function xRings(g,x){if(!x)return "";const lab=lsLabel(x.l).split(" · ")[0],go=`href="#" data-do="bgo" data-g="${g.id}" data-p="exams" data-ls="${x.l.id}"`,left=x.N-x.n;
-  const one=(ic,nm,p,txt,sub,tip)=>`<a class="bst bxr" ${go} title="${esc(tip)} · click: each student's exam (📝 Exams)">${elRing(p,"",46,tip,txt)}<span><b>${ic} ${esc(nm)}</b><small>${sub}</small></span></a>`;
-  return `<div class="bxrs"><h3>${esc(lab)} exam <small class="muted">· ${x.n} of ${x.N} students marked${left?` (${left} not yet)`:""} · average of each part</small></h3><div class="bxg">`
-    +one("📝","Whole exam",Math.round(x.ex*10),f1(x.ex),"out of 10",`${lab} exam: average mark ${f1(x.ex)} out of 10 (${x.n} students)`)
-    +x.parts.map(q=>one(XIC[q.n]||"•",q.n,q.p,null,q.c?`${f1(q.pts)} / ${f1(q.max)} points`:"not marked yet",q.c?`${q.n}: ${q.p} % of the points on average (${f1(q.pts)} out of ${f1(q.max)}, ${q.c} students)`:`${q.n}: not marked yet`)).join("")+`</div></div>`}
+  const cl=k=>x.cls?x.cls(k):null,cTip=k=>{const c=cl(k);return c==null?" · class work: nothing yet":` · class work: ${c} % right (first tries${k==="Grammar"?" and grammar games":k==="Vocabulary"?" and vocabulary games":k==="all"?" and games":""})`};
+  const one=(ic,nm,p,txt,sub,tip,c)=>`<a class="bst bxr" ${go} title="${esc(tip)} · click: each student's exam (📝 Exams)">${ring2(p,c,52,txt)}<span><b>${ic} ${esc(nm)}</b><small>${sub}</small><small class="bxc">🙌 class ${c==null?"–":c+" %"}</small></span></a>`;
+  return `<div class="bxrs"><h3>${esc(lab)} exam <small class="muted">· ${x.n} of ${x.N} students marked${left?` (${left} not yet)`:""} · average of each part · outer line: the exam · inner line: 🙌 class work (first tries and games)</small></h3><div class="bxg">`
+    +one("📝","Whole exam",Math.round(x.ex*10),f1(x.ex),"out of 10",`${lab} exam: average mark ${f1(x.ex)} out of 10 (${x.n} students)`+cTip("all"),cl("all"))
+    +x.parts.map(q=>one(XIC[q.n]||"•",q.n,q.p,null,q.c?`${f1(q.pts)} / ${f1(q.max)} points`:"not marked yet",(q.c?`${q.n}: ${q.p} % of the points on average (${f1(q.pts)} out of ${f1(q.max)}, ${q.c} students)`:`${q.n}: not marked yet`)+cTip(q.n),cl(q.n))).join("")+`</div></div>`}
+// a ring with two lines: outside the exam %, inside the class work % (each in the site's colours, elPctCol); the middle says the exam
+function ring2(p,c,z,txt){const g=(v,w)=>`conic-gradient(${elPctCol(v)} ${(v||0)*3.6}deg,#e5e7eb 0)`;
+  return `<span class="r2" style="width:${z}px;height:${z}px;background:${g(p)}"><span style="width:${z-10}px;height:${z-10}px;background:#fff"><span style="width:${z-14}px;height:${z-14}px;background:${g(c)}"><b style="width:${z-22}px;height:${z-22}px;font-size:${Math.round(z/4.4)}px">${p==null?"–":txt!=null?txt:p+"%"}</b></span></span></span>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
