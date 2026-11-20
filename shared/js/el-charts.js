@@ -17,15 +17,16 @@
     const over=ls.length?ls[ls.length-1].y-bot:0;if(over>0)for(let i=ls.length-1;i>=0;i--){ls[i].y-=over;if(i&&ls[i].y-ls[i-1].y>=15)break}
     ls.forEach(l=>l.y=Math.max(top,l.y));return ls}
 
-  // o = {x:[labels], tips:[html per column, optional], series:[{label, icon, color, shape, dash, v:[0-100 | null]}], marks:[{i, label}], h, unit}
+  // o = {x:[labels], tips:[html per column, optional], series:[{label, icon, color, shape, dash, v:[0-100 | null]}], marks:[{i, label}], h, unit,
+  //      w (a narrower drawing on a phone, so the text is bigger), noEnds (no end labels: the chips above already name the skills)}
   function line(o){
-    const W=960,H=o.h||300,L=46,R=205,T=22,B=30,iw=W-L-R,ih=H-T-B,n=o.x.length,unit=o.unit==null?" %":o.unit;
+    const W=o.w||960,H=o.h||300,L=46,R=o.noEnds?16:205,T=22,B=30,iw=W-L-R,ih=H-T-B,n=o.x.length,unit=o.unit==null?" %":o.unit;
     const x=i=>L+(n<2?iw/2:i*iw/(n-1)),y=v=>T+ih*(1-Math.max(0,Math.min(100,v))/100);
     let g="";
     [0,25,50,75,100].forEach(v=>{g+=`<line x1="${L}" x2="${L+iw}" y1="${y(v)}" y2="${y(v)}" stroke="${v===50?"#cbd5e1":"#eef2f7"}" stroke-width="1"${v===50?' stroke-dasharray="4 4"':""}/>`
       +`<text x="${L-8}" y="${y(v)+4}" text-anchor="end" class="elc-ax">${v}${unit}</text>`});
     const step=Math.max(1,Math.ceil(n/9));
-    o.x.forEach((lab,i)=>{if(i%step&&i!==n-1)return;g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" class="elc-ax">${esc(lab)}</text>`});
+    o.x.forEach((lab,i)=>{if((i%step||n-1-i<step*0.6)&&i!==n-1)return;g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" class="elc-ax">${esc(lab)}</text>`});
     // where each LS starts: a thin line and its short name at the top
     (o.marks||[]).forEach(m=>{const xx=x(m.i)-(n>1?iw/(n-1)/2:0);if(m.i>0)g+=`<line x1="${xx}" x2="${xx}" y1="${T-6}" y2="${T+ih}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 3"/>`;
       g+=`<text x="${Math.max(L,xx)+4}" y="${T-8}" class="elc-ls">${esc(m.label)}</text>`});
@@ -36,7 +37,7 @@
       if(!s.thin)pts.forEach(p=>g+=mark(s.shape,p[0],p[1],s.color));
       // the end label: its latest value, with that week when it is not the last one (a skill not checked lately says since when)
       const e=pts[pts.length-1],li=s.v.length-1-[...s.v].reverse().findIndex(v=>v!=null);
-      if(!s.thin)ends.push({y:e[1]+4,x:e[0],t:(s.icon?s.icon+" ":"")+s.label+" "+Math.round(e[2])+unit+(li<n-1?" ("+o.x[li]+")":""),c:s.color})});
+      if(!s.thin&&!o.noEnds)ends.push({y:e[1]+4,x:e[0],t:(s.icon?s.icon+" ":"")+s.label+" "+Math.round(e[2])+unit+(li<n-1?" ("+o.x[li]+")":""),c:s.color})});
     spread(ends,T+4,T+ih+4).forEach(l=>g+=`<text x="${L+iw+12}" y="${r1(l.y)}" class="elc-end">${esc(l.t)}</text>`);
     // the hover columns: one per week, wider than the marks
     const cw=n>1?iw/(n-1):iw;
@@ -73,5 +74,42 @@
     document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest(".elc-wrap [data-tip]");if(el)show(el,e.clientX,e.clientY);else hide()});
     addEventListener("scroll",hide,{passive:true})}
 
-  window.ELCharts={line,radar,wire};
+  // ---- the skills (as the voyage map and the LS page): icon, colour, marker, dash; Catalan name where the map has one
+  const SK={Reading:["📖","#1d4ed8","circle","","Reading"],Listening:["🎧","#7e22ce","square","","Listening"],Speaking:["🗣","#c2410c","diamond","","Speaking"],
+    Writing:["✍️","#15803d","triangle","","Escriptura"],Grammar:["🧩","#b91c1c","circle","6 4","Gramàtica"],Vocabulary:["🔤","#0f766e","square","6 4","Vocabulari"]};
+  const LVL=/_(beginners|insecure|safe|daring|native)$/;
+  const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):typeof v.toMillis==="function"?v.toMillis():v.seconds?v.seconds*1000:0;
+  const monday=t=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
+  // a step's skill: the voyage map's (el-voyage.js skill), only these six (recall, research and checkpoints mix things up: left out), as the LS page
+  function skillOf(a,pid){let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
+    if(!s)s=/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d/.test(pid)?"Reading":"";
+    s=String(s).split(" · ")[0];return SK[s]?s:null}
+  // One student's work by skill, from their progress (pg[ls][key] = the page's state as JSON) and results (rs[activity id]):
+  // act[ls][skill] = {s, n}: each step's average of all its tries (the engine's all since 20 Nov 2026, before that the first and the latest
+  // try), a teacher level when the step has no checks; each step counts the same (as the LS page). Practice (graded:false, LS1) is left out.
+  // ev = [{t, sk, v (0-1), ls}]: the dated checks for the line: each step's first try and its latest check (the tries in between have no
+  // date) and a teacher level on the day it was marked; practice counts here (it is evidence of how a skill grows).
+  function work(pg,rs){const ev=[],act={},M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10},cat=window.EL_CATALOG||[];
+    (window.EL_LS||[]).forEach(l=>{const ls=l.id,P=pg[ls]||{},A={},put=(k,v)=>{const z=A[k]||(A[k]={s:0,n:0});z.s+=Math.max(0,Math.min(1,v));z.n++};
+      cat.filter(a=>a.ls===ls).forEach(a=>{if(/checkpoint/.test(a.id))return;const seen=new Set(),pr=a.graded===false;
+        (a.keys||[]).forEach(key=>{let st=null;try{st=typeof P[key]==="string"?JSON.parse(P[key]):null}catch(e){}if(!st||typeof st!=="object")return;
+          const AL=st.all||{},F=st.tries||{},L=st.last||{},ok=x=>x&&+x.max>0,sc=x=>Math.min(1,(+x.score||0)/+x.max);
+          new Set([...Object.keys(AL),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(LVL,""),sk=skillOf(a,pid);if(!sk)return;
+            const f=F[k],l=L[k],two=ok(l)&&(!ok(f)||Math.abs(tms(l.date)-tms(f.date))>5000);
+            let v=null;if(AL[k]&&AL[k].n)v=AL[k].s/AL[k].n;else{const xs=[f,two?l:null].filter(ok);if(xs.length)v=xs.reduce((n,x)=>n+sc(x),0)/xs.length}
+            if(v!=null&&!pr){put(sk,v);seen.add(pid)}
+            if(ok(f)&&tms(f.date))ev.push({t:tms(f.date),sk,v:sc(f),ls});if(two&&tms(l.date))ev.push({t:tms(l.date),sk,v:sc(l),ls})})});
+        const x=rs[a.id]||{};Object.entries(x.levels||{}).forEach(([pid,cs])=>{const sk=skillOf(a,pid);if(!sk)return;
+          const ms=Object.values(cs||{}).map(d=>M[d]).filter(n=>n!=null);if(!ms.length)return;const v=ms.reduce((n,m)=>n+m,0)/ms.length/10;
+          if(!seen.has(pid)&&!pr)put(sk,v);const t=tms((x.marked||{})[pid]);if(t)ev.push({t,sk,v,ls})})});
+      if(Object.keys(A).length)act[ls]=A});
+    return {ev,act}}
+  // the weeks (Mondays) from the first check to this week
+  function weeks(ev){if(!ev.length)return [];const W=[];for(let d=new Date(monday(Math.min(...ev.map(e=>e.t))));d.getTime()<=monday(Date.now());d.setDate(d.getDate()+7))W.push(d.getTime());return W}
+  // the base look of the charts and the tooltip, once (the teacher dashboard and the student board both use it)
+  try{const st=document.createElement("style");st.textContent=".elc{width:100%;height:auto;display:block;font-family:system-ui,sans-serif}.elc-ax{font-size:12px;fill:#64748b}.elc-ls{font-size:12px;font-weight:700;fill:#334155}.elc-end{font-size:13px;fill:#0f172a;font-weight:600}.elc-rl{font-size:12.5px;fill:#0f172a;font-weight:600}.elc-col{cursor:crosshair}.elc-pt{cursor:pointer}"
+    +".elc-tip{position:fixed;z-index:60;background:#0f172a;color:#fff;font-size:13px;line-height:1.45;border-radius:10px;padding:8px 11px;pointer-events:none;box-shadow:0 6px 18px #0f172a40;max-width:280px}.elc-tip small{color:#cbd5e1}";
+    document.head.appendChild(st)}catch(e){}
+
+  window.ELCharts={line,radar,wire,SK,skillOf,work,weeks,monday,tms};
 })();
