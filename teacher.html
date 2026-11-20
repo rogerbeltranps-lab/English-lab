@@ -1203,6 +1203,15 @@ function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(
     <p class="svnote">Tap a name: their board opens ${svSame()?"here (Back or ✕ Exit brings you to the dashboard)":"in a new tab"} and every page shows what they see, with their answers. Read-only: nothing is changed.</p>
     <div class="svlist">${studs.map(s=>`<a href="today.html?student=${encodeURIComponent(s.uid)}${q}" target="_blank" rel="noopener" data-sv="1"><span>${name(s)}</span>${route(level(s.uid,l?l.id:S.ls))}</a>`).join("")||'<p class="muted">Nobody in this group has signed in yet.</p>'}</div>
     ${out>0?`<p class="svnote">${out} not signed in yet (no student view for them).</p>`:""}</div>`}
+// the same list as a sheet on a phone (More → See the site as a student): a name opens the board in this tab (svSame)
+function svSheet(gid){const g=GR.find(x=>x.id===gid)||GR[0];if(!g)return "";
+  const studs=Object.values(S.P||{}).filter(s=>s.group===g.id&&!s.tester&&!s.away&&s.uid).sort(byName),l=EL_LS.find(x=>x.id===S.ls&&x.course===g.course),
+    out=Object.values((S.D&&S.D.ro)||{}).filter(r=>r&&r.group===g.id).length-studs.length;
+  return `<div class="tpsh" role="dialog" aria-label="See the site as a student"><div class="tph">👁 See the site as a student</div>
+    <nav class="tpsvg" aria-label="Groups">${GR.map(x=>`<a href="#" data-tph="svg" data-g="${x.id}"${x.id===g.id?' class="on" aria-current="true"':""}>${esc(x.name.replace(/^(\d)ESO\s*/,"$1"))}</a>`).join("")}</nav>
+    <p class="tpsub">Tap a name: their board opens here, read-only, as they see it. Back or ✕ Exit brings you to the dashboard.</p>
+    <div class="tpl">${studs.map(s=>`<a href="today.html?student=${encodeURIComponent(s.uid)}" target="_blank" rel="noopener" data-sv="1"><span>${name(s)}</span>${route(level(s.uid,l?l.id:S.ls))}</a>`).join("")||'<p class="tpsub" style="padding:10px 14px">Nobody in this group has signed in yet.</p>'}</div>
+    ${out>0?`<p class="tpsub">${out} not signed in yet (no student view for them).</p>`:""}</div>`}
 const svKeep=n=>{const l=n.querySelector(".svlist");if(!l)return;l.scrollTop=SV.top||0;l.onscroll=()=>{SV.top=l.scrollTop}};
 // The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … I need to be able to minimise
 // the message but every time somebody gets out it gets bigger again"): the group's student list (roster) by elClassRoll in el-catalog.js;
@@ -1269,7 +1278,7 @@ function render(){
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
 // view, time plan of all groups, timetable, questions, materials, reference, how it works, maintenance). Everything it shows is display:none
 // on a computer (shared/css/el-phone.css, section 8): the menu, the pages and the buttons are the same ones, with their own data-do actions.
-const TPH={g:null,more:false,chip:null};
+const TPH={g:null,more:false,chip:null,sv:null};
 const tphIcon=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
   corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
@@ -1282,12 +1291,14 @@ function phoneBar(){
     document.addEventListener("click",e=>{const b=e.target.closest("[data-tph]"),inM=e.target.closest("#tpmore");
       if(b){e.preventDefault();const w=b.dataset.tph;
         if(w==="chip"){TPH.chip=b.dataset.u;TPH.more=true;tphMore();return}
-        if(w==="more"){TPH.more=!TPH.more||!!TPH.chip;TPH.chip=null;tphMore();return}
-        TPH.more=false;TPH.chip=null;
-        if(w==="sv"||w==="cm"){const v=document.querySelector(w==="sv"?'#fsctl [data-do="sview"]':'#fsctl .cmbtn');tphMore();if(v)v.click();return}
+        if(w==="more"){TPH.more=!TPH.more||!!TPH.chip||!!TPH.sv;TPH.chip=null;TPH.sv=null;tphMore();return}
+        // 👁 the student list is a sheet of its own on a phone (Roger, 20 Nov 2026, iPhone app: the row only closed More, no list showed)
+        if(w==="sv"||w==="svg"){TPH.sv=b.dataset.g||(GR.find(g=>g.id===fsGroup())||GR.find(g=>g.id===TPH.g)||GR[0]||{}).id||null;TPH.more=true;TPH.chip=null;tphMore();return}
+        TPH.more=false;TPH.chip=null;TPH.sv=null;
+        if(w==="cm"){const v=document.querySelector('#fsctl .cmbtn');tphMore();if(v)v.click();return}
         S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
-      if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;tphMore()}});
-    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;tphMore()}});
+      if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;TPH.sv=null;tphMore()}});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;TPH.sv=null;tphMore()}});
   }
   const np=S.D?msgsN():0,cn=corrN().n||0;
   const isG=GR.some(g=>g.id===S.g),here=S.g==="plan"?(S.place==="msgs"?"msgs":"home"):isG?"groups":S.g==="corr"?"corr":"more";
@@ -1318,6 +1329,7 @@ function chipSheet(u){const s=S.P[u];if(!s)return "";const n=shortName(s),G=game
     +`<div class="tpl">${lvRow(s)}${r(`href="#" data-do="stu" data-u="${esc(u)}"`,"👤","Student details","level, work, marks, contact")}${nl?r(`href="${nl[1]}" target="_blank" rel="noopener"`,"📝","Their notes","the theory of the class games, as they see it"):""}${G?r(`href="${esc(G.href)}" target="_blank" rel="noopener"`,"🎮","Game answers","every answer in the class games"):""}</div></div>`}
 function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidden=!TPH.more;
   if(TPH.more&&TPH.chip){m.innerHTML=chipSheet(TPH.chip);return}
+  if(TPH.more&&TPH.sv){m.innerHTML=svSheet(TPH.sv);return}
   document.querySelectorAll("#tptabs a").forEach(a=>{const on=TPH.more&&!TPH.chip?a.dataset.tph==="more":a.dataset.here==="1";a.classList.toggle("on",on);on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   const mo=document.querySelector('#tptabs [data-tph="more"]');if(mo)mo.setAttribute("aria-expanded",TPH.more?"true":"false");
   if(!TPH.more){m.innerHTML="";return}
