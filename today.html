@@ -1632,18 +1632,40 @@ function progressPlace(lss,ls){
 // Nothing new is read.
 function skGrowBox(course){if(!window.ELCharts)return "";ELCharts.wire();
   const SK=ELCharts.SK,K=Object.keys(SK),inC=new Set(EL_LS.filter(l=>l.course===course).map(l=>l.id)),sel=SK[S.pgsk]?S.pgsk:"all",nm=k=>EN?k:SK[k][4];
-  const ev=ELCharts.work(D.pg||{},D.rs||{}).ev.filter(e=>inC.has(e.ls)),W=ELCharts.weeks(ev);
+  const ev=ELCharts.work(D.pg||{},D.rs||{}).ev.filter(e=>inC.has(e.ls)),mil=skMilestones(course,ev),W=ELCharts.weeks(ev.concat(mil));
   const head=fvHead("📈",t("Com creixen les meves destreses","How my skills grow"),t("setmana a setmana","week by week"));
-  if(!ev.length)return `<div class="box fv skg">${head}<p class="fvlead">${t("Quan comprovis les teves respostes a les activitats, aquí veuràs com millores en cada destresa.","When you check your answers in the activities, you will see here how you improve in each skill.")}</p></div>`;
+  if(!ev.length&&!mil.length)return `<div class="box fv skg">${head}<p class="fvlead">${t("Quan comprovis les teves respostes a les activitats, aquí veuràs com millores en cada destresa.","When you check your answers in the activities, you will see here how you improve in each skill.")}</p></div>`;
   const wi=x=>{const m=ELCharts.monday(x);let i=W.indexOf(m);if(i<0)i=W.findIndex(w=>Math.abs(w-m)<2*864e5);return i},lab=x=>new Date(x).toLocaleDateString(EN?"en-GB":"ca",{day:"numeric",month:"short"});
   const wk={};ev.forEach(e=>{const i=wi(e.t);if(i<0)return;const a=(wk[e.sk]=wk[e.sk]||[])[i]||(wk[e.sk][i]=[0,0]);a[0]+=e.v;a[1]++});
   const tips=W.map(()=>[]),ser=(sel==="all"?K:[sel]).map(k=>{const v=W.map((w,i)=>{const a=(wk[k]||[])[i];return a?a[0]/a[1]*100:null});
     v.forEach((x,i)=>{if(x!=null)tips[i].push(`${SK[k][0]} ${esc(nm(k))}: <b>${Math.round(x)} %</b>`)});return {label:nm(k),icon:SK[k][0],color:SK[k][1],shape:SK[k][2],dash:SK[k][3],v}});
-  const marks=EL_LS.filter(l=>inC.has(l.id)).map(l=>{const ts=ev.filter(e=>e.ls===l.id).map(e=>e.t);return ts.length?{i:wi(Math.min(...ts)),label:window.elLsNum?elLsNum(l):""}:null}).filter(Boolean).sort((a,b)=>a.i-b.i).filter((m,j,a)=>!j||m.i>a[j-1].i);
+  // the exam and the final product of each LS: big points in the week they were done, joined from LS to LS (All skills: the exam mark and the
+  // final product mark; one skill: that part of the exam)
+  const one=sel!=="all";
+  [["fp","🎬",t("Producte final","Final product"),"#be185d","square"],["exam","📝",t("Examen","Exam"),"#0f172a","star"]].forEach(([k,ic,name,color,shape])=>{if(one&&k==="fp")return;
+    const ms=mil.filter(m=>m.k===k&&(!one||m.parts[sel]!=null));if(!ms.length)return;const v=W.map(()=>null);
+    ms.forEach(m=>{const i=wi(m.t);if(i<0)return;const x=one?m.parts[sel]:m.v;v[i]=x;
+      tips[i].push(`${ic} <b>${esc(name)} ${esc(m.n)}</b>${one?` · ${esc(nm(sel))}: <b>${Math.round(x)} %</b>`:`: <b>${f1(x/10)} / 10</b>`}`)});
+    ser.push({label:one?name+" · "+nm(sel):name,icon:ic,color,shape,big:true,v})});
+  const marks=EL_LS.filter(l=>inC.has(l.id)).map(l=>{const ts=ev.concat(mil).filter(e=>e.ls===l.id).map(e=>e.t);return ts.length?{i:wi(Math.min(...ts)),label:window.elLsNum?elLsNum(l):""}:null}).filter(Boolean).sort((a,b)=>a.i-b.i).filter((m,j,a)=>!j||m.i>a[j-1].i);
   const chips=`<div class="skgch" role="group" aria-label="${t("Destresa","Skill")}"><button type="button" class="pgt${sel==="all"?" on":""}" data-do="pgsk" data-k="all"><b>${t("Totes","All skills")}</b></button>`
     +K.map(k=>`<button type="button" class="pgt${sel===k?" on":""}" data-do="pgsk" data-k="${k}"><b><i class="skgsw" style="background:${SK[k][1]}"></i>${SK[k][0]} ${esc(nm(k))}</b></button>`).join("")+`</div>`;
-  return `<div class="box fv skg elc-wrap">${head}<p class="fvlead">${t("Cada punt és la teva mitjana en aquesta destresa aquella setmana (el primer intent i l'última comprovació de cada activitat). Per sobre de la línia del 50 % tens més de la meitat bé.","Each point is your average in that skill that week (the first try and the latest check of each activity). Above the 50 % line you got more than half right.")}</p>`
+  return `<div class="box fv skg elc-wrap">${head}<p class="fvlead">${t("Cada punt és la teva mitjana en aquesta destresa aquella setmana (el primer intent i l'última comprovació de cada activitat). Per sobre de la línia del 50 % tens més de la meitat bé.","Each point is your average in that skill that week (the first try and the latest check of each activity). Above the 50 % line you got more than half right.")}${mil.length?" "+t("<b style='color:#0f172a'>★</b> L'examen i <b style='color:#be185d'>■</b> el producte final de cada LS hi surten amb la seva nota.","<b style='color:#0f172a'>★</b> The exam and <b style='color:#be185d'>■</b> the final product of each LS show with their mark."):""}</p>`
     +chips+ELCharts.line({x:W.map(lab),tips:tips.map((r,i)=>r.length?`<b>${t("Setmana del","Week of")} ${esc(lab(W[i]))}</b><br>`+r.join("<br>"):""),series:ser,marks,h:sel==="all"?320:280,...(innerWidth<600?{w:420,h:340,noEnds:true}:{}),aria:t("Com creixen les meves destreses","How my skills grow")})+`</div>`}
+// The exam and final product marks of each LS of the course for 📈 How my skills grow (Roger, 20 Nov 2026: "aquí tb poden sortir les notes de
+// l'examen i el producte final per a fer el progress"): [{k: exam|fp, ls, n (LS1…), t, v (0-100), parts {skill: %} (the exam's parts)}].
+// The exam only once its results are out (held or before showFrom: left out, as in the radar); its day from the Time plan, else the LS's
+// last check (a marked one dated later shows this week). The final product: its mark (lsMarks, 0 when it was not handed in) on its due day.
+function skMilestones(course,ev){const out=[],day=d=>d?Date.parse(d+"T12:00:00")||0:0;
+  EL_LS.filter(l=>l.course===course).forEach(l=>{const M=lsMarks(l);if(!M)return;const X=D.rs[l.id+"/assessment"]||{},held=X.held||(X.showFrom&&Date.now()<Date.parse(X.showFrom));
+    const {p,gi}=planOf(l),ts=ev.filter(e=>e.ls===l.id).map(e=>e.t),last=ts.length?Math.max(...ts):0,n=window.elLsNum?elLsNum(l):"",E=((window.EL_GRADING||{})[l.id]||{}).exam;
+    if(!held&&M.exam!=null){const tt=day(gi>=0?ELWeek.exam(p,gi):null)||last,parts={},z={};
+      if(E&&X.sections)E.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null||v.excused)return;const sk=String(name).split(/\s|·/)[0];if(!ELCharts.SK[sk])return;
+        const a=z[sk]||(z[sk]={s:0,m:0});a.s+=+v.score||0;a.m+=+(v.max||max)||0});
+      Object.entries(z).forEach(([k,a])=>{if(a.m)parts[k]=a.s/a.m*100});
+      if(tt)out.push({k:"exam",ls:l.id,n,t:tt,v:M.exam*10,parts})}
+    if(M.fp!=null&&hasFp(l)){const tt=day(fpDue(l))||last;if(tt)out.push({k:"fp",ls:l.id,n,t:tt,v:M.fp*10,parts:{}})}});
+  out.forEach(m=>m.t=Math.min(m.t,Date.now()));return out}
 // 🕸 My skills in an LS, in 🎓 My progress (Roger, 20 Nov 2026, the teacher's radar: "I also like this for the student"): the % per skill
 // in the activities (all tries, as the LS page) and in the exam (its parts), the exam only once the results are out (el-cloud.js elHeld
 // takes the marks away until their day; showFrom checked again here). Only their own work. The LS chips: the LSs they can see that have work.
