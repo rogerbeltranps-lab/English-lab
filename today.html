@@ -1720,28 +1720,24 @@ function homeworkBox(ls,info){const empty=`<div class="box"><p class="muted">${t
 // Time plan agenda (ls/{id}.planEdits[group].agenda) from today on: each class day with its learning-path tabs, class games and the notes
 // the teacher wrote, and the exam day. Nothing here is To do or homework; past days are in "What we've done in class" below.
 function agendaBox(ls,info){const g=D.me.group,ag=g&&window.elAgendaOf?elAgendaOf(info,g):null;if(!ag)return "";
-  const {p,gi}=planOf(ls),today=ELWeek.today(),ex=ag.exam||(p&&gi>=0?ELWeek.exam(p,gi):null),lp=p&&gi>=0?lpNums(p,gi):()=>"";
-  const nm=a=>{const n=lp(a),s=a.title.split(/[:(]/)[0].trim();return n?n+" · "+s:s};
+  const {p,gi}=planOf(ls),today=ELWeek.today(),ex=ag.exam||(p&&gi>=0?ELWeek.exam(p,gi):null);
   // the homework the teacher set, on the day it is for (Roger, 9 Nov 2026: a calendar button "only on the homework and the exam's and a final product deadline")
   const hws=hwList(ls,info).filter(h=>h.x.date>=today),hwOn=d=>hws.filter(h=>h.x.date===d);
-  const days=Object.keys(ag.days||{}).filter(d=>d>=today&&(ag.days[d]||[]).length);if(ex&&ex>=today&&!days.includes(ex))days.push(ex);
+  // no class work here any more (Roger, 20 Nov 2026: "they see activities in blue, because we have to do them in class, this shouldnt appear"):
+  // only the exam, homework, deadlines and the teacher's notes; a day with only class work is left out
+  const days=Object.keys(ag.days||{}).filter(d=>d>=today&&(ag.days[d]||[]).some(x=>/^note:\s*\S/.test(String(x))));if(ex&&ex>=today&&!days.includes(ex))days.push(ex);
   hws.forEach(h=>{if(!days.includes(h.x.date))days.push(h.x.date)});days.sort();
   if(!days.length)return "";
   const lsn=elLsName(ls),site=new URL("today.html",location.href).href;
   const cal=(title,d)=>` <a class="calb" href="${ELWeek.gcalDay(title,d,t("Anglès · ","English · ")+lsn+"\n"+site)}" target="_blank" rel="noopener" title="${t("Afegeix-ho al teu Google Calendar","Add it to your Google Calendar")}">📅 ${t("Afegeix-ho al calendari","Add to your calendar")}</a>`;
-  const dayHtml=d=>{const its=(ag.days[d]||[]).map(String),by=new Map(),lines=[];
+  const dayHtml=d=>{const its=(ag.days[d]||[]).map(String),lines=[];
     // ⏰ a deadline the teacher added to the day on the Time plan (⏰ Deadline, e.g. the final product): with the calendar button
     its.forEach(it=>{if(/^note:/.test(it)){const x=it.slice(5).trim();if(!x)return;const m=x.match(/^⏰\s*(?:Deadline:\s*)?(.*)$/);
-        lines.push(m?`<li class="dl">⏰ <b>${t("Data límit","Deadline")}: ${esc(m[1]||t("lliurament","hand-in"))}</b>${cal("⏰ "+t("Anglès","English")+": "+(m[1]||t("data límit","deadline")),d)}</li>`:`<li>📌 ${esc(x)}</li>`);return}
-      const i=it.indexOf("#");if(i<0)return;const id=it.slice(0,i),pn=it.slice(i+1),a=EL_CATALOG.find(y=>y.id===id);
-      if(/^game:/.test(pn)){const gm=pn.slice(5).match(/lp(\d+)-(vocab|grammar)/);lines.push(`<li>🎲 ${t("Joc de classe","Class game")}${gm?` · LP${gm[1]} ${gm[2]==="vocab"?t("vocabulari","vocabulary"):t("gramàtica","grammar")}`:""}</li>`);return}
-      if(!a||a.optional&&!pn)return;if(!by.has(a))by.set(a,[]);if(pn)by.get(a).push(pn)});
-    const lps=[...by].map(([a,ps])=>{const sec=(window.EL_SECTIONS||{})[a.id]||[],tn=ps.map(x=>(sec.find(z=>z[0]===x)||[])[1]||x);
-      return `<li>📘 <b>${canDo(a,info)?`<a href="${tabHref(a)}">${esc(nm(a))}</a>`:esc(nm(a))}</b>${tn.length?` <span class="tn">· ${esc(tn.join(", "))}</span>`:""}</li>`});
+        lines.push(m?`<li class="dl">⏰ <b>${t("Data límit","Deadline")}: ${esc(m[1]||t("lliurament","hand-in"))}</b>${cal("⏰ "+t("Anglès","English")+": "+(m[1]||t("data límit","deadline")),d)}</li>`:`<li>📌 ${esc(x)}</li>`)}});
     const isEx=d===ex,n=ELWeek.days(today,d);
     const hw=hwOn(d).map(h=>`<li class="hwd ${h.done?"dn":""}">🏠 <b>${t("Deures","Homework")}:</b> ${esc(h.x.text)}${h.done?` <span class="ok">✔ ${t("Fet","Done")}</span>`:cal("🏠 "+t("Deures d'anglès","English homework")+": "+h.x.text,d)}</li>`);
-    return `<div class="agd ${d===today?"now":""} ${isEx?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${hw.join("")}${lps.join("")}${lines.join("")}</ul></div>`};
-  return `<div class="box agbox"><h2>📅 ${t("Agenda de classe","Class agenda")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted" style="margin:0 0 6px">${t("El que farem a classe els propers dies, els deures, les dates límit i el dia de l'examen. El que és de classe no l'has de fer abans: ho farem junts. 📅 posa els deures, l'examen i les dates límit al teu calendari.","What we will do in class in the next few days, your homework, deadlines and the exam day. You don't have to do the class work before: we'll do it together. 📅 puts homework, the exam and deadlines in your calendar.")}</p>${days.map(dayHtml).join("")}</div>`}
+    return `<div class="agd ${d===today?"now":""} ${isEx?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${hw.join("")}${lines.join("")}</ul></div>`};
+  return `<div class="box agbox"><h2>📅 ${t("Agenda","Agenda")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted" style="margin:0 0 6px">${t("Els deures, les dates límit i el dia de l'examen. 📅 els posa al teu calendari.","Your homework, deadlines and the exam day. 📅 puts them in your calendar.")}</p>${days.map(dayHtml).join("")}</div>`}
 function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;
   const exam=ex&&n>=0?`<div class="exam">📝 ${t("Examen","Exam")}: ${when(ex)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
