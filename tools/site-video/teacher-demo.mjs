@@ -154,6 +154,33 @@ D.fpg = {};
   }
 }
 
+// 🗣 Speaking analyses (EL_DEMO_SPEAK=1): Roig's analysis of the 2 ESO A Getting started recordings (all but the last two), teacher only
+if (process.env.EL_DEMO_SPEAK) {
+  const c = '2eso', ls = LS2[c], gs = CAT.find((a) => a.id === c + '/ls2-getting-started'), doc = D.spk = {}, d = doc['spk_' + ls + '_2ESOA'] = {};
+  const SND = [['walk', '/wɔːlk/', '/wɔːk/ (the L is silent)'], ['clothes', '/ˈkloθes/', '/kləʊðz/ (one syllable)'], ['watched', '/ˈwɒtʃɪd/', '/wɒtʃt/ (silent e)'],
+    ['very', '/ˈbeɾi/', '/ˈveri/ (v with the teeth)'], ['sport', '/esˈpoɾt/', '/spɔːt/ (no e before s)'], ['music', '/muˈsik/', '/ˈmjuːzɪk/ (stress on mu)'], ['usually', '/ˈusuali/', '/ˈjuːʒuəli/'],
+    ['friends', '/frens/', '/frendz/ (say the d and z)'], ['play', '/pleɪ/', ''], ['three', '/tri/', '/θriː/ (th)']];
+  const GOOD = [['thing', 'th'], ['weekend', 'stress on week'], ['played', 'one syllable'], ['vegetables', '3 syllables'], ['basketball', ''], ['listen', 'silent t'], ['comfortable', '3 syllables']];
+  const ERR = [['he play football', 'he plays football', 'he/she/it + -s'], ['I listen music', 'I listen to music', 'listen TO'], ['I go to the cinema the Saturday', 'I go to the cinema on Saturday', 'on + day'],
+    ['she don\'t like', 'she doesn\'t like', 'doesn\'t with he/she/it'], ['I am agree', 'I agree', 'agree (no be)'], ['is very funny play', 'it is very fun to play', 'missing subject it']];
+  const CON = ['and', 'but', 'because', 'then', 'also', 'so', 'first', 'after that'], TOP = ['football', 'play video games', 'go out with friends', 'listen to music', 'on Saturdays', 'swimming pool', 'hang out', 'my favourite hobby', 'twice a week'];
+  const SEN = ['simple', 'joined', 'joined', 'simple', 'complex', 'words', 'joined'];
+  Object.values(D.st).filter((s) => s.group === '2ESOA').slice(0, 7).forEach((s, i) => {
+    const pg = D.pg[s.uid][ls], st = JSON.parse(pg[gs.keys[0]] || '{}'); st.steps.speak.audio.id = 'demo-' + s.uid; pg[gs.keys[0]] = JSON.stringify(st);
+    if (i >= 5) return;
+    const lv = (b) => Math.max(1, Math.min(4, b + ((i * 7 + b) % 3) - 1)), sk = 1 + (i % 3);
+    d[s.uid] = { ['demo-' + s.uid]: { a: gs.id, k: 'speak', at: st.steps.speak.date, model: 'gemini-flash-latest', eur: 0.0052 + i * 0.0003, done: '2026-11-20T19:30:00Z', an: {
+      summary: ['Speaks for about 40 seconds without reading; clear ideas, but the -s of he/she/it is often missing.', 'Hesitant, with long pauses; a list of hobbies with little linking.', 'Fluent and natural; good range of free-time expressions, joins ideas with because.', 'Reads part of it; short simple sentences, understandable.', 'Speaks freely with a clear start and end; some Catalan sounds in v/b.'][i],
+      fluency: ['free', 'hesitant', 'free', 'reads', 'free'][i],
+      good: GOOD.slice(i % 3, i % 3 + 3 + (i % 2)).map(([word, note]) => ({ word, note })),
+      sounds: SND.filter((x, j) => (j + i) % 3 !== 0 && x[2]).slice(0, 3 + i % 3).map(([word, heard, tip]) => ({ word, heard, tip })),
+      voc: { topic: TOP.slice(i % 4, i % 4 + 4), conn: CON.slice(0, 2 + (sk + i) % 4), rep: i % 2 ? ['like'] : ['very'], l1: i === 1 ? ['pues'] : [], note: ['Basic but enough for the task.', 'Basic: mostly "like" and "play".', 'Varied, with chunks like "hang out" and "twice a week".', 'Basic, repeats "very".', 'Good range for A2.'][i], level: lv(2 + (i === 2)) },
+      gram: { good: ['present simple: "I play"', 'like + -ing: "I like swimming"', 'frequency: "twice a week"'].slice(0, 1 + i % 3), errors: ERR.filter((x, j) => (j + i) % 2 === 0).slice(0, 2 + i % 3).map(([said, correct, rule]) => ({ said, correct, rule })), note: 'Mostly present simple; no past.', level: lv(2) },
+      str: { opening: i !== 1, ending: i % 2 === 0, sentences: SEN[i], order: ['A list of hobbies, then when and with whom.', 'Jumps between ideas.', 'First, then, after that: a clear sequence with reasons.', 'A list.', 'Introduction, three hobbies with reasons, a short ending.'][i], note: '', level: lv(2 + (i % 2)) },
+      pron: { note: 'Understandable; the main problem is the vowel before s + consonant.', level: lv(3) }, task: { done: i === 1 ? 'partly' : 'yes', note: i === 1 ? 'Does not say how often.' : 'Covers what, when and with whom.' } } } };
+  });
+}
+
 // none of the invented names may be a real student's (the private list, if it is on this machine)
 const LIST = process.env.EL_STUDENT_LIST;
 if (LIST && fs.existsSync(LIST)) {

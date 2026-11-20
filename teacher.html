@@ -94,6 +94,14 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .prc{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 72px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9}.prcn{display:flex;flex-direction:column;gap:1px;min-width:0}.prcn small{color:#64748b;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prcn .pill{align-self:flex-start}
 .prcb{position:relative;height:14px;background:#f1f5f9;border-radius:7px}.prcb b{position:absolute;left:0;top:0;bottom:0;border-radius:7px}.prcb i{position:absolute;top:-3px;bottom:-3px;width:1px;background:#cbd5e1;z-index:1}.prcb .t5{left:50%}.prcb .t7{left:70%}.prcb .t9{left:90%}
 .prcb u{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#0f172a;border:2px solid #fff;z-index:2}.prc strong{text-align:right;font-size:14px}
+/* 🗣 Speaking (spkPage, spkCard) */
+.spkc{margin:10px 0;padding:10px 14px;border:1px solid #e2e8f0;border-left:4px solid #0f766e;border-radius:12px;background:#f8fafc}.spkh{margin:0 0 6px}.spkp{margin:6px 0;font-size:14px;line-height:1.45}
+.spklv{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.spkl{font-size:13px;padding:2px 9px;border-radius:999px;border:1.5px solid var(--c);color:#0f172a;background:#fff}.spkl b{color:var(--c)}.spkt{font-size:13px;padding:2px 9px;border-radius:999px;background:#f1f5f9}
+.spkerr{font-size:13px;border-collapse:collapse;margin:2px 0 6px}.spkerr td{padding:2px 8px 2px 0;vertical-align:top;text-align:left;border:0}.spkt2{font-size:13.5px}.spkt2 th,.spkt2 td{text-align:left}
+.spkws{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.spkw{font-size:13.5px;padding:2px 9px;border-radius:999px;background:#f0fdfa;border:1px solid #99f6e4}.spkw small{margin-left:3px}
+.spkg{padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:14px}.spkb{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 36px;gap:10px;align-items:center;font-size:13.5px;padding:3px 0}.spkb strong{text-align:right}
+.spkr{padding:8px 0;border-bottom:1px solid #e2e8f0}#spkstu{font:inherit;padding:5px 10px;border:1px solid #cbd5e1;border-radius:10px;max-width:100%}
+@media (max-width:640px){.spkb{grid-template-columns:minmax(0,120px) minmax(0,1fr) 30px}}
 @media (max-width:1100px){.prgrid{grid-template-columns:minmax(0,1fr)}}@media (max-width:760px){.prstats{grid-template-columns:repeat(2,minmax(0,1fr))}.prradin{grid-template-columns:minmax(0,1fr)}}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
@@ -984,7 +992,7 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
     :aud&&aud.id?`<p class="muted">🤖 <b>No feedback from Roig</b> on this recording (the recording could not be checked when it was handed in): the Wednesday correction is written from the transcript.</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.filter(y=>!isNote(y)).map(y=>`<p><b>${esc(y.l==="Text"&&sp?"What they said (transcript)":isTr(y)?"What they said (Roig's transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp?spkBox(u,aid,step):""}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
@@ -1497,7 +1505,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"]};
+const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1736,7 +1744,8 @@ function render0(){
     exams:()=>examsPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs,lpAll),
     voyage:()=>vyRank(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
-    prog:()=>prPage(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
+    prog:()=>prPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
+    spk:()=>spkPage(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
   // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
   if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
@@ -1761,6 +1770,7 @@ function render0(){
       +examsTile(grp,ls,inG.filter(s=>!s.away&&!s.tester))
       +tTile("marks","📊","Assessment details","LS grade, criteria, self-assessment")
       +tTile("prog","🌱","Progress","skill mastery over time, skills radar, criteria: the group or one student")
+      +tTile("spk","🗣","Speaking","words said well and wrong, vocabulary, grammar, how they build the talk: only for you")
       +tTile("students","👥","Students' progress","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
@@ -1781,8 +1791,13 @@ const PR_SK={Reading:["📖","#1d4ed8","circle",""],Listening:["🎧","#7e22ce",
   Grammar:["🧩","#b91c1c","circle","6 4"],Vocabulary:["🔤","#0f766e","square","6 4"]},PR_K=Object.keys(PR_SK);
 let PRC={d:null,m:new Map()};
 // One student's work by skill (ELCharts.work, shared with the student's 🎓 My progress): act[ls][skill] = {s, n} as the LS page, ev = the dated checks
-function prStu(u){if(PRC.d!==S.D)PRC={d:S.D,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
-  const o=window.ELCharts?ELCharts.work(S.D.pg[u]||{},S.D.rs[u]||{}):{ev:[],act:{}};PRC.m.set(u,o);return o}
+function prStu(u){if(PRC.d!==S.D||PRC.v!==SPK.v)PRC={d:S.D,v:SPK.v,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
+  const o=window.ELCharts?ELCharts.work(S.D.pg[u]||{},S.D.rs[u]||{}):{ev:[],act:{}};
+  // 🗣 Roig's speaking analysis of each recording (spkPage): the average of its four levels out of 4, on the day it was handed in. Teacher
+  // only: the students' own charts (today.html) cannot read it.
+  EL_LS.forEach(l=>Object.values(((SPK.d[spkDoc(l.id,(S.P[u]||{}).group)]||{})[u])||{}).forEach(r=>{const sc=r&&spkScore(r.an);if(sc==null)return;
+    const A=o.act[l.id]=o.act[l.id]||{},z=A.Speaking||(A.Speaking={s:0,n:0}),t=tms(r.at)||tms(r.done);z.s+=sc/4;z.n++;if(t)o.ev.push({t,sk:"Speaking",v:sc/4,ls:l.id})}));
+  PRC.m.set(u,o);return o}
 // the exam of an LS by skill: the points of its parts (results/{ls}__assessment sections); held = the date students see it, or true
 function prExam(u,ls){const X=res(u,asId(ls)),E=((window.EL_GRADING||{})[ls]||{}).exam,ex={};
   const held=X.held||(X.showFrom&&Date.now()<tms(X.showFrom))?(X.showFrom||true):null;
@@ -1793,7 +1808,7 @@ const prMon=t=>ELCharts.monday(t);
 const prAvg=xs=>{xs=xs.filter(v=>v!=null&&!isNaN(v));return xs.length?xs.reduce((n,v)=>n+v,0)/xs.length:null};
 const prPc=v=>v==null?"–":Math.round(v)+" %";
 function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
-  studs=studs.filter(s=>s.uid);const lss=EL_LS.filter(l=>l.course===grp.course),inC=new Set(lss.map(l=>l.id)),lsS=l=>lsLabel(l).split(" · ")[0];
+  studs=studs.filter(s=>s.uid);const lss=EL_LS.filter(l=>l.course===grp.course);spkEnsure(grp.id,lss.map(l=>l.id),"prog");const inC=new Set(lss.map(l=>l.id)),lsS=l=>lsLabel(l).split(" · ")[0];
   const me=studs.find(s=>s.uid===S.prU)||null;if(!me)S.prU="";const sel=PR_SK[S.prSk]?S.prSk:"all";
   const X=studs.map(s=>({s,x:prStu(s.uid)}));
   // ---- the four cards: this LS, the group (as ⛵ Class voyage: steps of the open tabs, the LS mark so far)
@@ -1831,7 +1846,7 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
   const chips=`<div class="bar prsk"><button class="chip ${sel==="all"?"on":""}" data-do="prsk" data-s="all">All skills</button>`+PR_K.map(k=>`<button class="chip ${sel===k?"on":""}" data-do="prsk" data-s="${k}"><i class="sw" style="background:${PR_SK[k][1]}"></i>${PR_SK[k][0]} ${k}</button>`).join("")+`</div>`;
   const how=me?(sel==="all"?`Each point is the average of ${esc(shortName(me).mid)}'s checks in that skill that week (first tries and latest checks, and the levels you gave).`:`${esc(shortName(me).mid)} in ${sel}, week by week, with the group's average (dotted).`)
     :sel==="all"?"Each point is the group's average in that skill that week: each student's checks that week (first tries and latest checks, and the levels you gave), then the average of the students.":`The group's average in ${sel} week by week; each faint line is one student. Pick a student above to follow them.`;
-  const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass.</p>${chips}`
+  const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass. Speaking comes from Roig's analysis of the recordings (🗣 Speaking).</p>${chips}`
     +(line||`<p class="muted">No checked activities yet${me?" for "+esc(shortName(me).mid):""}.</p>`)+table+`</div>`;
   // ---- 🕸 skills in this LS: activities (all tries) and exam
   const exs=studs.map(s=>prExam(s.uid,ls)),held=exs.find(e=>e.held),pctA=(x,sk)=>{const z=(x.act[ls]||{})[sk];return z&&z.n?z.s/z.n*100:null},pctE=(e,sk)=>{const z=e.ex[sk];return z&&z.m?z.s/z.m*100:null};
@@ -1858,6 +1873,124 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     crB=`<div class="box elc-wrap prcr"><h2>🎯 Average per assessment criterion</h2><p class="muted">${g.evidence?"The degree you confirmed, or the one the evidence suggests, out of 10.":"The points of the graded activities of each criterion, out of 10."} Lines at 5, 7 and 9: AS, AN, AE.${me?` The dot is ${esc(shortName(me).mid)}.`:""}</p>`
       +(cs.length?cs.map(row).join(""):`<p class="muted">This LS has no criteria yet.</p>`)+`</div>`}
   return cards+lineB+`<div class="prgrid">${radarB}${crB}</div>`}
+// ---- 🗣 Speaking (Roger, 20 Nov 2026: "I see there's no speaking data: why don't we make a collection of the words they pronounce well and
+// badly, and of how they structure the oral text at lexical and grammatical level"): Roig Flash listens again to every Speaking or Talk
+// recording (school script v34, action "speak_an": old recordings too) and writes an analysis FOR THE TEACHER ONLY: words said well and said
+// wrong, vocabulary (topic words, connectors, repetition, Catalan/Spanish words), grammar (used well, mistakes), how the talk is built
+// (opening, order, sentence type, ending) and a level 1-4 for pronunciation, vocabulary, grammar and structure. Kept in settings/spk_{ls}_
+// {group} = {uid: {Drive file id: {a, k, at, an, model, eur, done}}} (settings is teacher only: students never read it). Shown in the
+// 🗣 Speaking place (the group or one student, this LS or the whole year), under the 🔊 player of each recording, and its levels give the
+// Speaking line of 🌱 Progress its data. One read per LS and group, only when one of those places opens. Nothing is analysed by itself:
+// the button says how many and about how much (Roger watches the Roig credit).
+const SPK={d:{},ld:{},v:0,run:null},SPK_EUR=0.006,SPK_EUR_FP=0.012,spkDoc=(ls,gid)=>"spk_"+ls+"_"+gid;
+const SPK_LV=[["pron","🗣","Pronunciation"],["voc","🔤","Vocabulary"],["gram","🧩","Grammar"],["str","🧱","Structure"]],SPK_LC=["#94a3b8","#dc2626","#d97706","#2563eb","#7c3aed"],
+  SPK_SEN={words:"Single words, lists",simple:"Short simple sentences",joined:"Joined with and/but/because",complex:"Complex (when, if, who…)"},SPK_FL={free:"🟢 Speaks freely",hesitant:"🟡 Hesitant",reads:"🔴 Reads"};
+function spkLoad(ls,gid){const id=spkDoc(ls,gid);if(SPK.d[id])return Promise.resolve(SPK.d[id]);if(SPK.ld[id])return SPK.ld[id];
+  if(DEMO){SPK.d[id]=JSON.parse(JSON.stringify((DEMO.spk||{})[id]||{}));SPK.v++;return Promise.resolve(SPK.d[id])}
+  return SPK.ld[id]=F.getDoc(F.doc(db(),"settings",id)).then(c=>{SPK.d[id]=c.exists()?c.data():{};SPK.v++;return SPK.d[id]},e=>{console.warn("speaking analyses",e);delete SPK.ld[id];return {}})}
+// load the group's analyses of these LSs once; draw again when they arrive (only if the place is still open)
+function spkEnsure(gid,lss,place){const miss=lss.filter(ls=>!SPK.d[spkDoc(ls,gid)]),fa=place==="spk"?lss.map(ls=>fpAct(ls)).filter(a=>a&&!FPG.d[a.id]):[];if(!miss.length&&!fa.length)return true;
+  Promise.all(miss.map(ls=>spkLoad(ls,gid)).concat(fa.map(a=>fpgLoad(a).catch(()=>{})))).then(()=>{if(S.g===gid&&(!place||S.place===place))render()});return false}
+const spkGet=(gid,ls,u,fid)=>((SPK.d[spkDoc(ls,gid)]||{})[u]||{})[fid]||null;
+// every recording handed in by these students in these LSs (the hand-in's x.audio, as the 🔊 in Learning paths): the latest per step.
+// And the final product video of each LS (Roger, 20 Nov 2026: "use the final product too"): the student's own video, on the site, on
+// Classroom or by a link (fpgVideo, as 🎬 Final product); group videos are left out (Roig can't tell which voice is the student) and so
+// are YouTube links (no file).
+function spkRecs(studs,lss){const out=[];studs.forEach(s=>lss.forEach(ls=>acts(ls).forEach(a=>{const st=pstate(s.uid,a).steps||{};
+  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""})})})));
+  lss.forEach(ls=>{const a=fpAct(ls);if(a)studs.forEach(s=>{const r=spkFpRec(s,a);if(r)out.push(r)})});
+  return out.sort((p,q)=>tms(q.at)-tms(p.at))}
+const spkLevels=an=>SPK_LV.map(([k])=>an&&an[k]&&an[k].level!=null?+an[k].level:null);
+const spkScore=an=>prAvg(spkLevels(an));   // 0-4, the average of the four levels
+const spkFpRec=(s,a)=>{let v=null;try{v=fpgVideo(s.uid,a)}catch(e){}return v&&v.id&&!v.by?{u:s.uid,s,a,k:"fp",ls:a.ls,fid:v.id,ids:v.ids||[],secs:null,at:v.at||null,title:"",fp:true}:null};
+const spkTask=(a,k,title)=>k==="fp"?(a.title||"Final product")+" (the final product: a spoken presentation)":(a.title||a.id)+" · "+(title||tabName(a,k)||cpName(a.id,k));
+const spkCost=list=>list.reduce((n,r)=>n+(r.fp?SPK_EUR_FP:SPK_EUR),0);
+const spkCefr=ls=>/my-real-routine/.test(ls)&&ls.startsWith("2eso")?"A1":"A2+";
+async function spkOne(r,gid){const j=await fpgCall({action:"speak_an",fileId:r.fid,fp:!!r.fp,fileIds:r.ids||[],task:spkTask(r.a,r.k,r.title),level:level(r.u,r.ls),course:r.ls.startsWith("2eso")?"2 ESO":"4 ESO",cefr:spkCefr(r.ls)});
+  const rec={a:r.a.id,k:r.k,at:r.at||null,an:j.an,model:j.model||"",eur:j.eur==null?null:j.eur,done:new Date().toISOString()},id=spkDoc(r.ls,gid),d=SPK.d[id]=SPK.d[id]||{};
+  (d[r.u]=d[r.u]||{})[r.fid]=rec;SPK.v++;FPG.cost=null;await put(["settings",id],{[r.u]:{[r.fid]:rec}});return rec}
+// analyse a list of recordings, three at a time; the line at the top of the page shows how far it is; ⏸ Stop finishes the ones running
+function spkRun(list,gid){if(SPK.run||!list.length)return;const R=SPK.run={n:list.length,ok:0,bad:0,err:"",stop:false,gid};let i=0;
+  const line=()=>{const el=document.getElementById("spkrun");if(el)el.innerHTML=spkRunLine()};
+  const next=async()=>{while(!R.stop&&i<list.length){const r=list[i++];try{await spkOne(r,gid);R.ok++}catch(e){R.bad++;R.err=String(e.message||e)}line()}};
+  line();Promise.all([next(),next(),next()]).then(()=>{SPK.run=null;S.spkDone=R;render()})}
+const spkRunLine=()=>{const R=SPK.run;if(R)return `⏳ Roig is listening: <b>${R.ok+R.bad} of ${R.n}</b>${R.bad?` · ${R.bad} could not be analysed`:""} <button class="g mini" data-do="spkstop">⏸ Stop</button>`;
+  const D=S.spkDone;return D?`✓ ${plural(D.ok,"recording")} analysed${D.bad?` · <b>${D.bad} could not be analysed</b> (${esc(D.err.replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v34"))})`:""}.`:""};
+const spkLvPill=(n,lab)=>n==null?`<span class="spkl" style="--c:#cbd5e1">${lab} –</span>`:`<span class="spkl" style="--c:${SPK_LC[Math.round(n)]}">${lab} <b>${Number.isInteger(n)?n:f1(n)}</b>/4</span>`;
+// one recording's analysis (under the 🔊 player and in a student's card)
+function spkCard(rec,r){const an=(rec||{}).an;if(!an)return "";const V=an.voc||{},Gm=an.gram||{},T=an.str||{},list=(xs,f)=>xs&&xs.length?xs.map(f).join(" · "):"";
+  const line=(ic,lab,v)=>v?`<p class="spkp"><b>${ic} ${lab}</b> ${v}</p>`:"";
+  return `<div class="spkc"><p class="spkh"><b>🗣 Speaking analysis</b> <small class="muted">only for you · Roig Flash${rec.done?" · "+esc(ymd(rec.done)):""}${rec.eur!=null?" · €"+(+rec.eur).toFixed(3):""}</small>${r?` <button class="g mini" data-do="spkagain" data-u="${esc(r.u)}" data-a="${esc(r.a.id)}" data-s="${esc(r.k)}" title="Roig listens to this recording again">🔄 Again</button>`:""}</p>`
+    +`<p class="spklv">${SPK_LV.map(([k,ic,lab])=>spkLvPill(an[k]&&an[k].level,ic+" "+lab)).join("")}${an.fluency?`<span class="spkt">${SPK_FL[an.fluency]}</span>`:""}${an.task&&an.task.done?`<span class="spkt">Task: ${esc(an.task.done)}</span>`:""}</p>`
+    +(an.summary?`<p class="spkp">${esc(an.summary)}</p>`:"")
+    +line("✅","Said well:",list(an.good,w=>`<b>${esc(w.word)}</b>${w.note?` <small class="muted">(${esc(w.note)})</small>`:""}`))
+    +line("❌","Said wrong:",list(an.sounds,w=>`<b>${esc(w.word)}</b>${w.heard?` <small class="muted">said ${esc(w.heard)}</small>`:""}${w.tip?` → ${esc(w.tip)}`:""}`))
+    +(an.pron&&an.pron.note?`<p class="spkp muted">${esc(an.pron.note)}</p>`:"")
+    +line("🔤","Vocabulary:",[V.note?esc(V.note):"",V.topic&&V.topic.length?"<i>Topic words:</i> "+V.topic.map(esc).join(", "):"",V.conn&&V.conn.length?"<i>Connectors:</i> "+V.conn.map(esc).join(", "):"",
+      V.rep&&V.rep.length?"<i>Repeats:</i> "+V.rep.map(esc).join(", "):"",V.l1&&V.l1.length?"<i>Catalan/Spanish:</i> "+V.l1.map(esc).join(", "):""].filter(Boolean).join("<br>"))
+    +line("🧩","Grammar:",[Gm.note?esc(Gm.note):"",Gm.good&&Gm.good.length?"<i>Used well:</i> "+Gm.good.map(esc).join(" · "):""].filter(Boolean).join("<br>"))
+    +(Gm.errors&&Gm.errors.length?`<table class="spkerr"><tbody>${Gm.errors.map(e=>`<tr><td>“${esc(e.said)}”</td><td>→ <b>${esc(e.correct)}</b></td><td class="muted">${esc(e.rule)}</td></tr>`).join("")}</tbody></table>`:"")
+    +line("🧱","Structure:",[`Opening ${T.opening?"✓":"✗"} · ending ${T.ending?"✓":"✗"}${T.sentences?" · "+esc(SPK_SEN[T.sentences]):""}`,T.order?esc(T.order):"",T.note?esc(T.note):""].filter(Boolean).join("<br>"))
+    +(an.task&&an.task.note?`<p class="spkp muted">🎯 ${esc(an.task.note)}</p>`:"")+`</div>`}
+// under the 🔊 player in the recording window (wrOpen): the analysis, or a button to make it
+function spkBox(u,aid,step){const a=byId(aid),x=((pstate(u,a)||{}).steps||{})[step],s=S.P[u];if(!a||!s||!x||!x.audio||!x.audio.id)return "";
+  const gid=s.group;if(!SPK.d[spkDoc(a.ls,gid)]){spkLoad(a.ls,gid).then(()=>{if(redraw&&$("#dlg").open)redraw()});return `<p class="muted">🗣 Loading the speaking analysis…</p>`}
+  const r={u,s,a,k:step,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""},rec=spkGet(gid,a.ls,u,x.audio.id);
+  if(rec)return spkCard(rec,r);
+  return `<p class="muted">🗣 <b>No speaking analysis yet</b> (words said well and wrong, vocabulary, grammar, structure: only for you). <button class="g mini" data-do="spkagain" data-u="${esc(u)}" data-a="${esc(aid)}" data-s="${esc(step)}">🔍 Analyse it</button> <small>about €${SPK_EUR.toFixed(3)}</small></p>`}
+// the collection: what many recordings have in common, most common first. one = a single student (their own lists, no student counts)
+function spkCollect(items){const W={},G={},Ok={},C={},T={},L1={},Rep={},sen={},fl={},n=items.length;let op=0,en=0;
+  const add=(M,key,u,f)=>{const k=String(key||"").toLowerCase().trim();if(!k)return;const z=M[k]=M[k]||{n:0,who:new Set()};z.n++;z.who.add(u);if(f)f(z)};
+  items.forEach(({u,rec})=>{const an=rec.an||{},V=an.voc||{},Gm=an.gram||{},Tt=an.str||{};
+    (an.sounds||[]).forEach(w=>add(W,w.word,u,z=>{z.word=z.word||w.word;(z.heard=z.heard||new Set()).add(w.heard);z.tip=z.tip||w.tip}));
+    (an.good||[]).forEach(w=>add(Ok,w.word,u,z=>{z.word=z.word||w.word}));
+    (Gm.errors||[]).forEach(e=>add(G,e.rule||e.correct,u,z=>{z.rule=z.rule||e.rule||"";z.ex=z.ex||[];if(z.ex.length<3&&!z.ex.some(y=>y.said===e.said))z.ex.push(e)}));
+    new Set((V.conn||[]).map(x=>x.toLowerCase())).forEach(c=>add(C,c,u,z=>{z.word=z.word||c}));
+    (V.topic||[]).forEach(t=>add(T,t,u,z=>{z.word=z.word||t}));(V.l1||[]).forEach(t=>add(L1,t,u,z=>{z.word=z.word||t}));(V.rep||[]).forEach(t=>add(Rep,t,u,z=>{z.word=z.word||t}));
+    if(Tt.sentences)sen[Tt.sentences]=(sen[Tt.sentences]||0)+1;if(an.fluency)fl[an.fluency]=(fl[an.fluency]||0)+1;if(Tt.opening)op++;if(Tt.ending)en++});
+  const top=(M,k)=>Object.values(M).sort((p,q)=>q.who.size-p.who.size||q.n-p.n||String(p.word||p.rule).localeCompare(String(q.word||q.rule))).slice(0,k);
+  return {n,W:top(W,40),G:top(G,15),Ok:top(Ok,30),C:top(C,20),T:top(T,30),L1:top(L1,10),Rep:top(Rep,10),sen,fl,op,en,
+    lv:SPK_LV.map((x,i)=>prAvg(items.map(({rec})=>spkLevels(rec.an)[i])))}}
+function spkPage(grp,ls,studs){studs=studs.filter(s=>s.uid);const lss=EL_LS.filter(l=>l.course===grp.course),ids=S.spkYear?lss.map(l=>l.id):[ls];
+  if(!spkEnsure(grp.id,ids,"spk"))return `<div class="box"><p class="muted">🗣 Loading the speaking analyses…</p></div>`;
+  const me=studs.find(s=>s.uid===S.spkU)||null;if(!me)S.spkU="";
+  const all=spkRecs(studs,ids),recs=me?all.filter(r=>r.u===me.uid):all,done=recs.map(r=>({r,u:r.u,rec:spkGet(grp.id,r.ls,r.u,r.fid)})).filter(x=>x.rec&&x.rec.an),todo=recs.filter(r=>!spkGet(grp.id,r.ls,r.u,r.fid));SPK.todo=todo;SPK.gid=grp.id;
+  const lsS=l=>lsLabel(l).split(" · ")[0],cnt=z=>me?"":` <small class="muted" title="${esc([...z.who].map(v=>fullName(S.P[v]||{uid:v})).join(", "))}">${z.who.size}</small>`;
+  const who=`<select id="spkstu" aria-label="Whose speaking"><option value="">👥 Whole group</option>${studs.slice().sort((a,b)=>fullName(a).localeCompare(fullName(b),"ca")).map(s=>`<option value="${esc(s.uid)}" ${me&&me.uid===s.uid?"selected":""}>${esc(fullName(s))}</option>`).join("")}</select>`;
+  const scope=`<span class="bar" style="display:inline-flex;margin:0"><button class="chip ${S.spkYear?"":"on"}" data-do="spkyear" data-v="">This LS</button><button class="chip ${S.spkYear?"on":""}" data-do="spkyear" data-v="1">Whole year</button></span>`;
+  const nfp=todo.filter(r=>r.fp).length,nrec=todo.length-nfp;
+  const run=SPK.run?"":todo.length?`<button data-do="spkrun">🔍 Analyse ${[nrec?plural(nrec,"new recording"):"",nfp?plural(nfp,"final product video"):""].filter(Boolean).join(" and ")}</button> <small class="muted">about €${spkCost(todo).toFixed(2)} of Roig credit · Roig listens again to each one (Flash)</small>`:all.length?`<span class="muted">✓ Every recording here is analysed.</span>`:"";
+  const head=`<div class="box"><div class="prhd"><h2>🎙 ${me?esc(shortName(me).mid):"The whole group"}</h2><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${scope}${who}</span></div>`
+    +`<p class="muted prhow">What Roig hears in every Speaking and Talk recording and final product video ${S.spkYear?"of the school year":"of this LS"}: only for you, the students never see it (they keep their usual feedback). ${plural(done.length,"recording")} analysed of ${recs.length}.</p>`
+    +`<p class="bar">${run} <span id="spkrun">${spkRunLine()}</span></p></div>`;
+  if(!done.length)return head+`<div class="box"><p class="muted">${all.length?"No recording analysed yet: press 🔍 Analyse above.":"No Speaking or Talk recordings handed in "+(S.spkYear?"this year":"in this LS")+" yet."}</p></div>`;
+  const C=spkCollect(done),card=(ic,lab,v,sub)=>`<div class="prcard"><span class="prci">${ic}</span><span><small>${lab}</small><b>${v==null?"–":f1(v)+"<i>/4</i>"}</b><em>${sub}</em></span></div>`;
+  const cards=`<div class="prstats">`+SPK_LV.map(([k,ic,lab],i)=>card(ic,lab,C.lv[i],me?"average of "+plural(C.n,"recording"):"group average · "+plural(C.n,"recording"))).join("")+`</div>`;
+  const tw=(z,f)=>`<span class="spkw">${f(z)}${cnt(z)}</span>`;
+  const wrong=`<div class="box"><h2>❌ Words said wrong</h2><p class="muted">${me?"Every word Roig heard said wrong, most often first.":"Most students first (the number is how many students; hover for names)."} For your listen-and-repeat practice in class.</p>`
+    +(C.W.length?`<div class="wrap"><table class="spkt2"><thead><tr><th>Word</th><th>How they said it</th><th>Correct</th>${me?"<th>Times</th>":"<th>Students</th>"}</tr></thead><tbody>${C.W.map(z=>`<tr><td><b>${esc(z.word)}</b></td><td>${[...z.heard].filter(Boolean).map(esc).join(", ")}</td><td>${esc(z.tip||"")}</td><td title="${esc([...z.who].map(v=>fullName(S.P[v]||{uid:v})).join(", "))}">${me?z.n:z.who.size}</td></tr>`).join("")}</tbody></table></div>`
+      +`<label class="muted" style="font-size:13px">The words to copy</label><textarea rows="2" readonly onclick="this.select()" style="width:100%">${esc(C.W.map(z=>z.word).join(", "))}</textarea>`:`<p class="muted">None heard.</p>`)+`</div>`;
+  const good=`<div class="box"><h2>✅ Words said well</h2><p class="muted">Hard words for Catalan and Spanish speakers that ${me?"they":"students"} got right.</p>${C.Ok.length?`<p class="spkws">${C.Ok.map(z=>tw(z,z=>esc(z.word))).join("")}</p>`:`<p class="muted">None listed yet.</p>`}</div>`;
+  const gram=`<div class="box"><h2>🧩 Grammar mistakes</h2><p class="muted">Grouped by rule, ${me?"most often first":"most students first"}, with their real words.</p>`
+    +(C.G.length?C.G.map(z=>`<div class="spkg"><b>${esc(z.rule||"–")}</b>${cnt(z)}<br><small>${z.ex.map(e=>`“${esc(e.said)}” → <b>${esc(e.correct)}</b>`).join(" · ")}</small></div>`).join(""):`<p class="muted">No mistakes listed.</p>`)+`</div>`;
+  const bar=(lab,v,tot,col)=>`<div class="spkb"><span>${lab}</span><span class="prcb"><b style="width:${tot?v/tot*100:0}%;background:${col}"></b></span><strong>${v}</strong></div>`;
+  const voc=`<div class="box"><h2>🔤 Vocabulary</h2><p class="muted">Connectors: in how many recordings${me?"":" (students)"}.</p>`
+    +(C.C.length?C.C.slice(0,12).map(z=>bar(esc(z.word),me?z.n:z.who.size,me?C.n:new Set(done.map(d=>d.u)).size,"#0f766e")).join(""):`<p class="muted">No connectors used.</p>`)
+    +(C.T.length?`<p class="spkp"><b>Topic words</b><br><span class="spkws">${C.T.map(z=>tw(z,z=>esc(z.word))).join("")}</span></p>`:"")
+    +(C.Rep.length?`<p class="spkp"><b>Words repeated a lot</b> ${C.Rep.map(z=>esc(z.word)+cnt(z)).join(" · ")}</p>`:"")
+    +(C.L1.length?`<p class="spkp"><b>Catalan or Spanish words</b> ${C.L1.map(z=>esc(z.word)+cnt(z)).join(" · ")}</p>`:"")+`</div>`;
+  const ST=Object.keys(SPK_SEN),stot=ST.reduce((n,k)=>n+(C.sen[k]||0),0);
+  const str=`<div class="box"><h2>🧱 How they build the talk</h2><p class="muted">The kind of sentences in each recording.</p>`+ST.map((k,i)=>bar(SPK_SEN[k],C.sen[k]||0,stot,["#f59e0b","#60a5fa","#2563eb","#7c3aed"][i])).join("")
+    +`<p class="spkp">Introduce the topic: <b>${C.op} of ${C.n}</b> · close it: <b>${C.en} of ${C.n}</b>${Object.keys(C.fl).length?` · ${Object.keys(SPK_FL).filter(k=>C.fl[k]).map(k=>SPK_FL[k]+" "+C.fl[k]).join(" · ")}`:""}</p></div>`;
+  let body;
+  if(me)body=`<div class="box"><h2>🎙 ${esc(shortName(me).mid)}'s recordings</h2>${recs.map(r=>{const rec=spkGet(grp.id,r.ls,r.u,r.fid);
+    return `<div class="spkr"><p style="margin:0 0 4px"><b>${esc(spkTask(r.a,r.k,r.title))}</b> <small class="muted">${r.fp?"🎬 final product · ":""}${S.spkYear?esc(lsS(EL_LS.find(l=>l.id===r.ls)))+" · ":""}${r.at?esc(ymd(r.at)):""}${r.secs?" · "+r.secs+" s":""}</small> ${r.fp?`<button class="g mini" data-do="place" data-p="fp">🎬 Watch</button>`:`<button class="g mini" data-do="wrop" data-u="${esc(r.u)}" data-a="${esc(r.a.id)}" data-s="${esc(r.k)}">🔊 Listen</button>`}${rec&&rec.an?"":` <button class="g mini" data-do="spkagain" data-u="${esc(r.u)}" data-a="${esc(r.a.id)}" data-s="${esc(r.k)}">🔍 Analyse it</button>`}</p>${rec&&rec.an?spkCard(rec,r):""}</div>`}).join("")}</div>`;
+  else{const by=new Map();done.forEach(d=>{const z=by.get(d.u)||by.set(d.u,[]).get(d.u);z.push(d)});
+    const rows=studs.filter(s=>all.some(r=>r.u===s.uid)).sort((a,b)=>fullName(a).localeCompare(fullName(b),"ca")).map(s=>{const ds=by.get(s.uid)||[],n=all.filter(r=>r.u===s.uid).length,lv=SPK_LV.map((x,i)=>prAvg(ds.map(d=>spkLevels(d.rec.an)[i])));
+      const last=ds[0]&&ds[0].rec.an,ww=[...new Set(ds.flatMap(d=>(d.rec.an.sounds||[]).map(w=>w.word)))].slice(0,4);
+      return `<tr><td><a href="#" data-do="spkstu" data-u="${esc(s.uid)}">${esc(fullName(s))}</a></td><td>${ds.length} of ${n}</td>${lv.map(v=>`<td>${v==null?'<span class="muted">–</span>':`<b style="color:${SPK_LC[Math.round(v)]}">${f1(v)}</b>`}</td>`).join("")}<td>${last&&last.fluency?SPK_FL[last.fluency]:""}</td><td>${last&&last.str&&last.str.sentences?esc(SPK_SEN[last.str.sentences]):""}</td><td>${ww.map(esc).join(", ")}</td></tr>`}).join("");
+    body=`<div class="box"><h2>👥 Each student</h2><p class="muted">The average of their analysed recordings (out of 4) and their latest one. Click a name for their whole collection.</p><div class="wrap"><table class="spkt2"><thead><tr><th>Student</th><th>Analysed</th>${SPK_LV.map(([,ic,lab])=>`<th title="${lab}">${ic}</th>`).join("")}<th>Fluency</th><th>Sentences</th><th>Words said wrong</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+  return head+cards+`<div class="prgrid">${wrong}${good}${gram}${voc}${str}</div>`+body}
 // ---- 🎬 Final product (Roger, 8 Nov 2026: "add a final product access there to mark students work (in all LS)"): a tile on the group page
 // that opens a list of the group's students for the selected LS's final product: video handed in, Gemini's draft, your mark, and a button that
 // opens the usual final product dialog (🎬 Gemini, watch it · ✅ Approve). 📥 Draft the whole group from Classroom is at the top, so no need to
@@ -3732,7 +3865,7 @@ function autoSaveExam(t){const u=t.dataset.ex;if(!u||!G()||!G().exam)return;
   Promise.all(ps).then(()=>{exDirty.delete(u);exState(t,"✓ saved","#15803d");
     setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},   // the LS grade table catches up (not while typing or clicking)
     e=>{console.warn(e);exState(t,"not saved","#b91c1c");alert("Could not save: "+e.message)})}
-document.addEventListener("change",e=>{if(e.target.id==="prstu"){S.prU=e.target.value;render()}});   // 🌱 Progress: whose line and radar
+document.addEventListener("change",e=>{if(e.target.id==="prstu"){S.prU=e.target.value;render()}if(e.target.id==="spkstu"){S.spkU=e.target.value;render()}});   // 🌱 Progress: whose line and radar
 document.addEventListener("change",e=>{if(e.target.matches("input.ex[data-ex]"))autoSaveExam(e.target);
   if(e.target.matches("select[data-exver]")){const t=e.target,u=t.dataset.exver;if(t.closest("[data-exrow]"))exState(t,"saving…","#64748b");
     patch(u,asId(S.ls),{version:t.value||null}).then(()=>{if(t.closest("[data-exrow]"))exState(t,"✓ saved","#15803d");setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},
@@ -5948,7 +6081,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
         if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
-      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
+      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},spkyear:()=>{S.spkYear=!!k.v;render()},spkstu:()=>{e.preventDefault();S.spkU=k.u;render();scrollTo(0,0)},
+    spkrun:()=>{S.spkDone=null;spkRun(SPK.todo||[],SPK.gid)},spkstop:()=>{if(SPK.run)SPK.run.stop=true;t.disabled=true},
+    spkagain:async()=>{const a=byId(k.a),s=S.P[k.u],x=a&&k.s!=="fp"&&(((pstate(k.u,a)||{}).steps||{})[k.s]),r=k.s==="fp"?a&&s&&spkFpRec(s,a):x&&x.audio&&{u:k.u,s,a,k:k.s,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""};
+      if(!r)return;t.disabled=true;t.textContent="⏳ Roig is listening…";
+      try{await spkOne(r,s.group)}catch(err){alert("Roig could not analyse it: "+String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v34"))}
+      if(redraw&&$("#dlg").open)redraw();else render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
