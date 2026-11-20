@@ -31,6 +31,8 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 .mkhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mkhead:empty{display:none}.mkback{font-weight:700}
 .mkls{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.mkls button{background:#fff;color:#334155;border:1px solid #cbd5e1;border-radius:999px;padding:6px 14px;font-size:14px}.mkls button.on{background:var(--c,#3157d5);border-color:var(--c,#3157d5);color:#fff;font-weight:700}.mkls button:not(.on):hover{border-color:var(--c,#3157d5)}
 .mkgrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}.mkgrid.one{grid-template-columns:minmax(0,1fr)}
+.box.mkc.mksk{margin-top:16px}.mksk .mklead{margin:4px 0 10px}.mkskr{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr) minmax(0,1fr);gap:6px 18px;align-items:center;padding:7px 0;border-top:1px solid #eef2f7}.mkskr:first-of-type{border-top:0}.mkskr.sep{border-top:2px solid #e2e8f0}.mkskn{font-weight:700}.mkskb{display:grid;grid-template-columns:5.8em minmax(60px,1fr) 52px;gap:8px;align-items:center;font-size:.92rem}.mkskb em{font-style:normal;color:#64748b}.mkskb span{height:10px;border-radius:6px;background:#eef2f7;overflow:hidden}.mkskb span i{display:block;height:100%;border-radius:6px}.mkskb b{text-align:right}.mkskb b.na{color:#94a3b8;font-weight:500}.mkskh{margin:10px 0 0;color:#64748b;font-size:.92rem}
+@media (max-width:640px){.mkskr{grid-template-columns:minmax(0,1fr)}.mkskr .mkskn{margin-top:2px}}
 .box.mkc{border-radius:18px;padding:16px 20px;margin:0}.mkc h2{margin:0;font-size:1.15rem;letter-spacing:-.01em}
 .mkhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.mksub{color:#64748b;font-size:14px;margin:4px 0 0}.mkbig{flex:none;text-align:right}
 .mksplit{display:flex;gap:4px;height:12px;margin:14px 0 4px}.mksplit span{border-radius:6px;background:#e2e8f0;position:relative;overflow:hidden}.mksplit i{position:absolute;inset:0 auto 0 0;background:#16a34a}
@@ -862,7 +864,21 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
         +`<p class="mklead">${t(W.nm>1?"Compten 0 fins que les facis.":"Compta 0 fins que la facis.",W.nm>1?"They count 0 until you do them.":"It counts 0 until you do it.")} ${up!=null?t(`Fes-les i la teva nota pujarà almenys fins a <b>${f1(up)}</b>.`,`Do them and your mark goes up to at least <b>${f1(up)}</b>.`):t("Fes-les ara i la teva nota puja.","Do them now and your mark goes up.")}</p>`
         +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftNames(a,o);return `<li><b>${esc(a.title)}</b><small>${ln.length?ln.map(esc).join(" · ")+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${a.path}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
         +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+`</section>`}}
-  return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div><div id="ptbox">${pointsLine()}</div>`}
+  return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div>${mkSkills(ls)}<div id="ptbox">${pointsLine()}</div>`}
+// 📊 How you are doing in each skill, on My marks (Roger, 20 Nov 2026: "this should appear in my marks", the LS home's card, el-ls-home.js
+// skillsCard): for this LS, each skill's % in the activities (all tries, ELCharts.work as 🎓 My progress) and in the exam (its parts), the
+// exam only once its results are out (held or before showFrom: the day they come out instead).
+function mkSkills(ls){if(!window.ELCharts)return "";const SK=ELCharts.SK,nm=k=>EN?k:SK[k][4],A=ELCharts.work(D.pg||{},D.rs||{}).act[ls.id]||{};
+  const X=D.rs[ls.id+"/assessment"]||{},E=((window.EL_GRADING||{})[ls.id]||{}).exam,held=X.held||(X.showFrom&&Date.now()<Date.parse(X.showFrom)),ex={};
+  if(E&&X.sections&&!held)E.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null||v.excused)return;const sk=String(name).split(/\s|·/)[0];if(!SK[sk])return;
+    const z=ex[sk]||(ex[sk]={s:0,m:0});z.s+=+v.score||0;z.m+=+(v.max||max)||0});
+  if(!Object.keys(A).length&&!Object.keys(ex).length)return "";
+  const bar=(lab,p,c)=>`<div class="mkskb"><em>${lab}</em><span><i style="width:${p==null?0:p}%;background:${c}"></i></span><b${p==null?' class="na"':""}>${p==null?"–":p+" %"}</b></div>`;
+  const row=(k,i)=>{const a=A[k],e=ex[k],pa=a&&a.n?Math.round(a.s/a.n*100):null,pe=e&&e.m?Math.round(e.s/e.m*100):null;
+    return `<div class="mkskr${i===4?" sep":""}"><span class="mkskn">${SK[k][0]} ${esc(nm(k))}</span>${bar(t("Activitats","Activities"),pa,SK[k][1])}${bar(t("Examen","Exam"),pe,SK[k][1])}</div>`};
+  const hd=held&&X.showFrom?new Date(X.showFrom).toLocaleDateString(EN?"en-GB":"ca",{weekday:"short",day:"numeric",month:"short"}):"";
+  return `<section class="box mkc mksk"><h2>📊 ${t("Com et va a cada destresa","How you are doing in each skill")}</h2><p class="mklead">${t("Activitats: la mitjana de tots els teus intents. Examen: la teva nota a cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}</p>`
+    +Object.keys(SK).map(row).join("")+(held?`<p class="mkskh">🔒 ${hd?t(`Resultats de l'examen: ${esc(hd)}`,`Exam results: ${esc(hd)}`):t("Els resultats de l'examen sortiran aviat.","Your exam results are coming soon.")}</p>`:"")+`</section>`}
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
   return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`
