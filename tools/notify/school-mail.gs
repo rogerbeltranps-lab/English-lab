@@ -58,6 +58,10 @@
 //      never sees it): words said well and said wrong, vocabulary, grammar, how the talk is built, and a level 1-4 for each. The dashboard
 //      (🗣 Speaking) keeps it in Firestore settings/spk_{ls}_{group}, which only the teacher can read. About €0.005 a recording.
 //      With fp: true (and fileIds, as fp_watch) the same analysis of a final product video through the Gemini Files API (about €0.01).
+//  24. v35 (Roger, 20 Nov 2026: "I want a copy every friday"): new action {key, action: "backup", name, count, sha256, data (base64 gzip)}
+//      → {ok, bytes} or {ok, exists}: the GitHub Action "Database copy to Drive" (tools/backup/firestore-copy.mjs) sends a copy of the
+//      whole database every Friday and this saves it in BACKUP_FOLDER as english-lab-backup-YYYY-MM-DD.json.gz. Key only (no student
+//      can send one); a second copy on the same day is skipped, never replaced; nothing is ever deleted.
 //  22. v33 (Roger, 19 Nov 2026: "stop sending mails with the reports to my personal mail"): the emails this script sends to Roger itself
 //      (🎬 new final product video, the setup test) go to his school inbox TEACHER_MAIL (roger.beltran@ietramuntana.cat), never to
 //      his personal Gmail. TEACHER stays his English Lab sign-in for the teacher actions.
@@ -124,6 +128,9 @@ const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
 // videos now go to Google's flagship Gemini 4 Argon, with sharper frames (MEDIA_RESOLUTION_HIGH) and the default temperature 1.0 that Google
 // advises for Gemini 3 and later. About €0.07 a 100-second video (introductory price; Google doubles it on 1 Dec 2026).
 const FP_MODEL = "gemini-4-argon";
+// v35: the weekly database copies (Teacher Studio › 04_Students (private) › English Lab database copies). The school account already has
+// Editor access through 04_Students.
+const BACKUP_FOLDER = "1H0X0RRewzYBcBr8Qd-eP9c2tNun64b_f";
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
@@ -158,6 +165,7 @@ function doPost(e) {
   if (!keyOk && !(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: m.idToken ? "not the teacher" : "wrong key"});
   if (m.action === "mark") return out(startMarking(m.at));
   if (m.action === "inbox") return out(readInbox(m));
+  if (m.action === "backup") return out(keyOk ? saveBackup(m) : {ok: false, error: "wrong key"});
   const to = clean(m.to), bcc = clean(m.bcc);
   if ((!to.length && !bcc.length) || !m.subject || !m.body) return out({ok: false, error: "nothing to send"});
   if (to.length + bcc.length > 50) return out({ok: false, error: "too many people in one email (50 at most)"});
@@ -926,6 +934,22 @@ function testClassroom() {
 
 // 9. READ ONLY look at the inbox for Claude's "which emails need my reply" (v19). Plain text only, each message cut to 6000 characters,
 // attachments listed by name. getPlainBody() does not mark anything as read.
+// v35: one database copy from the GitHub Action (see 24 above). Checks the name, the size and the checksum before saving.
+function saveBackup(m) {
+  const name = String(m.name || "");
+  if (!/^english-lab-backup-\d{4}-\d{2}-\d{2}\.json\.gz$/.test(name)) return {ok: false, error: "bad name"};
+  if (!m.data || String(m.data).length > 55000000) return {ok: false, error: "no copy or too big"};
+  let folder;
+  try { folder = DriveApp.getFolderById(BACKUP_FOLDER); } catch (x) { return {ok: false, error: "no access to the copies folder"}; }
+  if (folder.getFilesByName(name).hasNext()) return {ok: true, exists: true};
+  const bytes = Utilities.base64Decode(String(m.data));
+  const sha = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, bytes).map(b => ("0" + (b & 255).toString(16)).slice(-2)).join("");
+  if (m.sha256 && sha !== m.sha256) return {ok: false, error: "the copy arrived damaged"};
+  const f = folder.createFile(Utilities.newBlob(bytes, "application/gzip", name));
+  f.setDescription("English Lab database copy: " + (m.count || "?") + " documents, " + new Date().toISOString());
+  return {ok: true, bytes: bytes.length};
+}
+
 function readInbox(m) {
   const days = Math.min(30, Math.max(1, Number(m.days) || 7)), max = Math.min(50, Math.max(1, Number(m.max) || 30));
   const threads = GmailApp.search("in:inbox newer_than:" + days + "d", 0, max);
