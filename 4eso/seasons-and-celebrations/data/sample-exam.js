@@ -6,8 +6,8 @@
    - format and points = the 2 ESO first web exam: listening 20, reading 20, vocabulary 35, grammar 15, writing 10 (describe a celebration, LP2).
    - items lean on what the class games and the activities show students do best (Starter/Base mostly multiple choice; the weakest
      points, such as the passive, "dates back to", prepositions after verbs, typed used to, only as easy choices or not at all).
-   Multiple choice has four options (the first is the right one; the engine shuffles). The text is handed in and corrected by the
-   teacher with a table of mistakes, no mark (Roger, 20 Nov 2026). */
+   Multiple choice has four options (the first is the right one; the engine shuffles). The text gets a table of mistakes from the
+   student's ChatGPT, no mark (Roger, 20 Nov 2026). */
 (function () {
 const L10 = [3, 5, 8, 10];   // the 5.1 levels scaled to 10 points (NA 8 · AS 15 · AN 23 · AE 30 of 30)
 const ROW = (a, b) => '<tr><td>' + a + '</td><td style="text-align:right">' + b + '</td></tr>';
@@ -47,9 +47,9 @@ window.LP = {
         en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
       html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong>. Només surt el que hem fet a classe: <strong>LP1 Getting started</strong>, <strong>LP2 Celebrations around the world</strong> i el vocabulari i la gramàtica (Past Simple / used to) de <strong>LP3 Where traditions come from</strong>. 55 minuts, sense apunts.</p>' + TABLE.ca +
-        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El text no té nota en aquesta pràctica: l’entregues i el professor et torna la correcció a la mateixa pestanya, amb una taula de les errades (la correcció i per què) i el teu text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
+        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El text no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
         en: '<p>This practice has <strong>the same format and the same points as the first exam</strong>. Only what we have done in class: <strong>LP1 Getting started</strong>, <strong>LP2 Celebrations around the world</strong> and the vocabulary and grammar (Past Simple / used to) of <strong>LP3 Where traditions come from</strong>. 55 minutes, no notes.</p>' + TABLE.en +
-        '<p>The questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The text has no mark in this practice: you hand it in and your teacher gives you the correction in the same tab, with a table of your mistakes (the correction and why) and your text, corrected. At the end, <em>My score</em> shows your total.</p>' } },
+        '<p>The questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The text has no mark in this practice: the button opens ChatGPT, which makes a table of your mistakes (the correction and why) and gives you your text, corrected. At the end, <em>My score</em> shows your total.</p>' } },
 
     { id: 'listen', type: 'quiz', tab: 'Listening', title: 'Listening: Two New Years', pts: [2, 2], start: 1,
       intro: { ca: 'Escolta dues vegades el Callum i la Yuki, que parlen del seu Cap d’Any, i respon.', en: 'Listen twice to Callum and Yuki talking about their New Year, and answer.' },
