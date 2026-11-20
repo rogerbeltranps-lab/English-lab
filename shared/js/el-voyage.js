@@ -65,7 +65,11 @@
       bg:{tile:"bg-pitch-tile",size:300,color:"#9cc680",wash:"#ffffff00",drift:false},   // a striped football pitch (Roger's choice)
       stop:{step:"stop",done:"stop-done",now:"stop-now"},
       // bus.webp is 220×171; the white body is from 34% down to 9% from the bottom (camera and dish on the roof stay grey)
-      veh:{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)",icon:"🚌"},
+      // five shapes (Roger, 20 Nov 2026), one per student by first name: the minibus, a box van, a classic van, a camper and a double-decker;
+      // band = from the roof down (the camera and the dish stay grey)
+      veh:{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)",icon:"🚌",imgs:[{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)"},
+        {img:"van-box",me:"van-box-me",band:"inset(33% 0 9% 0)"},{img:"van-classic",me:"van-classic-me",band:"inset(34% 0 9% 0)"},
+        {img:"van-camper",me:"van-camper-me",band:"inset(31% 0 9% 0)"},{img:"bus-double",me:"bus-double-me",band:"inset(28% 0 9% 0)"}]},
       fog:"clouds",
       // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
       decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
