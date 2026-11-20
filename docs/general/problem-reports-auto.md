@@ -140,9 +140,11 @@ WITHOUT A DRAFT". For each one, **write a draft only; nothing is ever sent to th
 
 How to write it: Roger's voice, first person, warm and short (two or three sentences), at the student's level (simple English for 2 ESO);
 `--ca` and `--en` say the same thing, both natural. Never the student's name or surnames (the tool refuses them), never AI, Claude, Gemini,
-PRs or code. Read what the student means and check the site first: if what they ask for already exists, say where it is (the page's real
-names, for example "First exam" on the LS page, the "Com estudiar / How to study" guide in each learning path); if it is a new idea, thank
-them and say you will think about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
+PRs or code. Read what the student means and check the site first. **Favour what already exists** (Roger, 20 Nov 2026, on a draft for "alguna
+activitat per estudiar l'examen": "Però si té un examen d'exemple i a Practice un munt d'exercicis…"): most ideas ask for something the site
+has, so the draft tells them where it is, with the names they see (the "Examen de mostra / Sample exam" on the LS page, "🎯 Practica /
+Practise" on the board, Games, the learning paths) and how to use it. Only when nothing like it exists: thank them and say you will think
+about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
 information you don't have: a short honest draft he can complete, and the note says what is missing. `--note` = one line for Roger (what
 you checked). The dashboard puts the draft in the 💬 Answer box (ideas: both boxes, the language Roger writes in first; private messages:
 Catalan for Starter, Base and no route, English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.

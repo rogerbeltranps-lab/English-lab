@@ -109,9 +109,9 @@ D.sg.push({ id: 's1', uid: a4[7].uid, group: '4ESOA', text: 'Could we have more 
 // an idea with Beltran's draft reply (Roger, 20 Nov 2026: tools/problems/auto.mjs idea → suggestions/{id}.auto)
 { const a2 = Object.values(D.st).filter((s) => s.group === '2ESOA');
   D.sg.push({ id: 's2', uid: a2[4].uid, group: '2ESOA', text: "alguna activitat per estudiar l'examen", page: 'today.html', created: Date.now() - 2 * 3600e3,
-    auto: { note: 'The LS page already has the practice exam (First exam) and every learning path has a "How to study" guide with exam-style practice: the draft points to them.',
-      ca: "Gràcies per la idea! Ja tens un examen de pràctica a la pàgina de la LS (First exam), i a cada learning path hi ha la guia \"Com estudiar\" amb exercicis com els de l'examen. Per al pròxim examen, comença uns dies abans.",
-      en: 'Thanks for the idea! There is already a practice exam on the LS page (First exam), and every learning path has a "How to study" guide with exercises like the ones in the exam. For the next exam, start a few days before.', at: Date.now() - 2 * 3600e3 + 240e3 } }); }
+    auto: { note: 'The LS page already has the sample exam and 🎯 Practise has lots of exercises at their level: the draft points to them.',
+      ca: "Gràcies per la idea! Ja tens l'examen de mostra a la pàgina de la LS i molts exercicis a 🎯 Practica, al teu nivell. Fes-los uns dies abans del pròxim examen i repassa només el que t'hagi sortit malament.",
+      en: 'Thanks for the idea! You already have the sample exam on the LS page and lots of exercises in 🎯 Practise, at your level. Do them a few days before the next exam and go over only what you got wrong.', at: Date.now() - 2 * 3600e3 + 240e3 } }); }
 // the class games of LS2 (gameResults): a vocabulary and a grammar game for LP1-LP3 in every group, a few students absent from each
 const LS2T = { '2eso': 'LS2 · Free Time, Live!', '4eso': 'LS2 · Seasons & Celebrations' };
 D.games = [];
