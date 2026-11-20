@@ -72,7 +72,11 @@ function myResults(uid,fresh){
 function held(d){const now=Date.now(),o={};
   for(const [k,r] of Object.entries(d||{})){if(!(r&&r.showFrom&&now<Date.parse(r.showFrom))){o[k]=r;continue}
     const c=Object.assign({},r);delete c.sections;delete c.report;delete c.version;delete c.webPaper;
-    if(c.levels){c.levels=Object.assign({},c.levels);delete c.levels.writing}c.held=r.showFrom;o[k]=c}
+    if(c.levels){c.levels=Object.assign({},c.levels);delete c.levels.writing}
+    // the exam mark the dashboard keeps in .progress (progSync) is held too (Roger, 20 Nov 2026: "students can see their results! they
+    // shouldnt yet": My marks showed Exam 7.6 from progress.exam, and the LS mark so far counted it): no exam, no total with the exam in it
+    if(c.progress){c.progress=Object.assign({},c.progress);delete c.progress.exam;delete c.progress.total}
+    c.held=r.showFrom;o[k]=c}
   return o}
 window.elHeld=held;
 // A result this page saved: put into the copy too (the server's time is unknown here, so "updated" stays out).
