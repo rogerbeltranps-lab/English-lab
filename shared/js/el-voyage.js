@@ -29,9 +29,11 @@
   //   places   [{f flag, c name, p place, y year or when, h 📜 fact, fe 🎉 celebration, img}], in order: one per learning path
   //   dest     the final destination, the same fields;  img: pictures that replace the places' own, the one after the last place = dest
   //            (null = keep);  fest: show the 🎉 lines
-  //   bg       {tile, size (px), color, wash (a colour laid over the tile)};  stop: {step, done, now} the stop pictures
-  //   veh      {img (a classmate's, tinted per student), me (my own), band (the part of img the tint colours: a CSS clip-path), icon}
-  //   fog      the picture over what is not open yet;  decos: 9 pictures for the sides of the map, top to bottom (null = none)
+  //   bg       {tile, size (px), color, wash (a colour laid over the tile), drift (false = land: it does not move)};  stop: {step, done, now} the stop pictures
+  //   veh      {img (a classmate's, tinted per student), me (my own), band (the part of img the tint colours: a CSS clip-path), icon,
+  //            imgs: [{img, me, band}] several shapes: each student gets one by their first name, the same on every screen}
+  //   fog      the picture over what is not open yet;  decos: 9 pictures for the sides of the map: the 1st in the bottom corner, the
+  //            others from the top down (null = none, [name, width px] = a bigger one)
   //   road     {halo, hw, line, lw, dash} the colours and widths of the route;  snd: {dir (under shared/), music, amb (the loop under the
   //            music, null = none), ambVol, click, step, port, fog, voyage} sound files (null = silent)
   //   w        wording {key: [Catalan, English]}: title, back (to my vehicle), map (back to the map), tip (the fog), reached (a place),
@@ -47,7 +49,33 @@
       dest:["Destinació final","Final destination"],done:["Viatge completat!","Voyage complete!"],reach:["Has arribat a","You reached"],end:["el final del viatge.","the end of the voyage."]}};
   // 4 ESO LS2: the sea, with Gemini art made with Roger (20 Nov 2026), cut out of its background, 320 px WebP; fw = the pictures with
   // fireworks that go off over them (place numbers from 0, the one after the last place = dest)
-  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire","port-usa-fest","port-india-fest","port-jamaica-fest","port-canada-fest","port-sierra-leone-fest","port-australia-fest"],fw:[0,2,6]}};
+  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire","port-usa-fest","port-india-fest","port-jamaica-fest","port-canada-fest","port-sierra-leone-fest","port-australia-fest"],fw:[0,2,6]},
+    // 2 ESO LS2 "Free Time, Live!": young sports reporters in a TV bus touring sports events, ending at the vlog studio (Roger, 20 Nov
+    // 2026). Gemini art cut out of its white background. The road is drawn grey with a white centre line; no sounds of its own yet (no waves)
+    "2eso-free-time-live":{
+      dir:"img/road-2eso/",
+      places:[
+        {f:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",c:"England",p:"London · Wimbledon",y:"July",h:"It's the oldest tennis tournament in the world, and the players must wear white clothes.",img:"place-england-wimbledon"},
+        {f:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",c:"Scotland",p:"Braemar · the Highland Games",y:"September",h:"Athletes in kilts throw a heavy tree trunk called a caber.",img:"place-scotland-highland"},
+        {f:"🇺🇸",c:"USA",p:"New York · a baseball game",y:"Spring and summer",h:"In the middle of the game, all the fans stand up and sing a song together.",img:"place-usa-baseball"},
+        {f:"🇨🇦",c:"Canada",p:"Toronto · an ice-hockey game",y:"Winter",h:"Ice hockey is Canada's national winter sport.",img:"place-canada-hockey"},
+        {f:"🇯🇲",c:"Jamaica",p:"Kingston · Champs",y:"March",h:"At the school athletics championships, thousands of fans watch teenage runners, and some become Olympic stars.",img:"place-jamaica-champs"},
+        {f:"🇦🇺",c:"Australia",p:"Sydney · Bondi Beach",y:"Summer",h:"Surfers and swimmers stay between the red and yellow flags, where the lifeguards can see them.",img:"place-australia-bondi"}],
+      dest:{f:"🎬",c:"Free Time, Live!",p:"the vlog studio",y:"",h:"Time to make your vlog!",img:"dest-vlog-studio"},
+      bg:{tile:"bg-pitch-tile",size:300,color:"#9cc680",wash:"#ffffff00",drift:false},   // a striped football pitch (Roger's choice)
+      stop:{step:"stop",done:"stop-done",now:"stop-now"},
+      // bus.webp is 220×171; the white body is from 34% down to 9% from the bottom (camera and dish on the roof stay grey)
+      veh:{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)",icon:"🚌"},
+      fog:"clouds",
+      // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
+      decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
+      road:{halo:"#6b7280",hw:30,line:"#fff",lw:3,dash:"14 12"},
+      // sounds: none of their own yet (Roger may send a bus horn, a crowd cheer and a city loop); no sea waves
+      snd:{amb:null},
+      w:{title:["La teva gira de reporter","Your reporter tour"],back:["Torna al meu bus","Back to my bus"],tip:["Apareixeran més parades quan el professor les afegeixi","More stops appear when your teacher adds them"],
+         reached:["Parada assolida","Stop reached"],dest:["Destinació final","Final destination"],done:["Gira completada!","Trip complete!"],
+         reach:["Has arribat a","You made it to"],end:["el final de la gira.","the end of the tour."]}
+    }};
   function skinOf(V){const k=SKINS[V&&V.skin]||{},o={...SEA,...k},im=k.img||[];
     ["bg","stop","veh","road","snd","w"].forEach(x=>o[x]={...SEA[x],...(k[x]||{})});
     o.places=(k.places||SEA.places).map((P,i)=>({...P,img:im[i]||P.img}));const d=k.dest||SEA.dest;o.dest={...d,img:im[o.places.length]||d.img};
@@ -93,7 +121,12 @@
     items.filter(x=>x.port).forEach(x=>{x.done=x.keys.every(k=>stops.find(s=>s.key===k).done)});
     return {items,stops,ports:items.filter(x=>x.port),done:stops.filter(s=>s.done).length}}
   const hue=n=>[...String(n)].reduce((a,c)=>a+c.charCodeAt(0)*37,0)%360,col=n=>`hsl(${hue(n)} 60% 42%)`;
-  const BOAT=(S,c,big)=>big?`<span class="vy-b big"><img src="${S.I}${S.veh.me}.webp" alt=""></span>`:`<span class="vy-b"><img src="${S.I}${S.veh.img}.webp" alt=""><i style="background:${c}"></i></span>`;
+  // a student's vehicle: the skin's one, or one of its shapes (veh.imgs) picked by the first name, so classmates see the same one
+  const shape=(S,n)=>{const L=S.veh.imgs;if(!L||!L.length||n==null)return null;return L[[...String(n)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7)%L.length]};
+  const BOAT=(S,c,big,n)=>{const v=shape(S,n);
+    if(big)return `<span class="vy-b big"><img src="${S.I}${v&&v.me||S.veh.me}.webp" alt=""></span>`;
+    const m=v?`;-webkit-mask-image:url(${S.I}${v.img}.webp);mask-image:url(${S.I}${v.img}.webp);clip-path:${v.band||"none"}`:"";
+    return `<span class="vy-b"><img src="${S.I}${v?v.img:S.veh.img}.webp" alt=""><i style="background:${c}${m}"></i></span>`};
 
   // ---- sounds ----
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
@@ -121,7 +154,7 @@
 .vy{margin:0 0 14px}.vy-row{display:flex;gap:14px;height:max(440px,calc(100vh - 250px))}
 .vy-sea{position:relative;flex:1;min-width:0;border-radius:20px;overflow:hidden;border:3px solid #b08a52;background:var(--vy-bgc)}
 .vy-sea::before{content:"";position:absolute;top:0;bottom:0;left:0;right:calc(-1*var(--vy-bgs));background:linear-gradient(var(--vy-wash),var(--vy-wash)),var(--vy-bg) 0 0/var(--vy-bgs) repeat;animation:vydrift 60s linear infinite}
-@keyframes vydrift{to{translate:calc(-1*var(--vy-bgs)) 0}}
+@keyframes vydrift{to{translate:calc(-1*var(--vy-bgs)) 0}}.vy-sea.still::before{animation:none}
 .vy-top{position:absolute;left:0;right:0;top:0;z-index:6;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;background:linear-gradient(#f6ead0f2,#f6ead000);pointer-events:none}
 .vy-top small{display:block;font-size:11px;color:#8a5a1f;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.vy-top b{font:700 17px Georgia,serif;color:#4a2f0e}
 .vy-sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.vy-map{position:relative}.vy-map>svg{position:absolute;left:0;top:0;pointer-events:none}
@@ -201,7 +234,7 @@
     const go=V.cont?`<a href="${esc(V.cont.href)}">▶ ${t("Continua","Continue")} <small>· ${esc(V.cont.label||(now?now.t:""))}</small></a>`
       :fp.title&&!fp.done?`<a class="fin" href="${esc(fp.href||"#")}">🏆 ${t("Producte final","Final product")} <small>· ${esc(fp.title)}</small></a>`
       :`<a class="all" href="lab/practice.html">✓ ${t("Ho tens tot fet! Practica pel teu compte","You're all done! Practise on your own")} →</a>`;
-    return `<section class="vy" aria-label="${esc(wd("title"))}"><div class="vy-row"><div class="vy-sea" style="${esc(cssVars(S))}"><div class="vy-sc"><div class="vy-map"></div></div>`
+    return `<section class="vy" aria-label="${esc(wd("title"))}"><div class="vy-row"><div class="vy-sea${S.bg.drift===false?" still":""}" style="${esc(cssVars(S))}"><div class="vy-sc"><div class="vy-map"></div></div>`
       +`<div class="vy-top"><div><small>${esc(V.ls||"")} · ${esc(wd("title"))}</small><b>🏆 ${esc(fp.title||"")}</b></div></div>`
       +`<button type="button" class="vy-btn vy-snd" data-vy="snd"></button><button type="button" class="vy-btn vy-down" data-vy="me" title="${esc(wd("back"))}" aria-label="${esc(wd("back"))}">${S.veh.icon}</button>`
       +`<div class="vy-toast" role="status"></div><div class="vy-ovl"></div></div><aside class="vy-steps">${col}</aside></div><div class="vy-go">${go}</div></section>`}
@@ -224,7 +257,7 @@
       h+=`<svg width="${W}" height="${total}" aria-hidden="true"><path d="${d}" fill="none" stroke="${S.road.halo}" stroke-width="${S.road.hw}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${S.road.line}" stroke-width="${S.road.lw}" stroke-dasharray="${S.road.dash}" stroke-linecap="round"/></svg>`}
     // the decorations at the sides (the sea: a compass, sea life), one per place of the skin's list
     if(W>500)[[W-120,total-170,90],[W*.06,TOP+180],[W*.86,TOP+620],[W*.08,TOP+1250],[W*.82,TOP+1500],[W*.88,TOP+40],[W*.1,TOP+1950],[W*.85,TOP+2400],[W*.07,TOP+2900]]
-      .map((d,i)=>[d[0],d[1],d[2]||0,(S.decos||[])[i]]).filter(d=>d[3]&&d[1]<total-110).forEach(([x,y,w,f],i)=>{const mv=MOVE(f),d=x>W/2?-1:1;   // on the right they set off to the left
+      .map((d,i)=>{const k=(S.decos||[])[i];return Array.isArray(k)?[d[0],d[1],k[1]||d[2]||0,k[0]]:[d[0],d[1],d[2]||0,k]}).filter(d=>d[3]&&d[1]<total-110).forEach(([x,y,w,f],i)=>{const mv=MOVE(f),d=x>W/2?-1:1;   // on the right they set off to the left
         h+=`<img class="vy-deco${mv?" "+mv[0]:""}" src="${I}${f}.webp" style="left:${x}px;top:${y}px;${w?`width:${w}px;`:""}${mv?`--d:${d};--f:${d*mv[1]};--t:${14+i%3*3}s;--dl:-${i*2.3}s`:""}" alt="">`});
     // ports: the label on the route, the picture at the side
     M.ports.forEach((it,j)=>{const P=it.port,img=P.img;
@@ -242,11 +275,11 @@
     const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
     const meXY=meI<n?(s=>[s.x+(s.right?-78:78),s.y+48])(M.stops[meI]):[cx+(wide?200:110),destY+60];
     for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),max=wide?4:2,sh=L.slice(0,max),more=L.length-sh.length;
-      const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n))}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
+      const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
       const wB=sh.reduce((a,m)=>a+Math.max(52,String(m.n).length*7.5+16)+4,0)+(more?40:0);
       if(+i<n){const s=M.stops[i],off=+i===meI?100:0;let x=s.right?s.x-40-wB-off:s.x+40+off;x=Math.max(4,Math.min(W-wB-4,x));h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
       else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${destY+60}px">${boats}</div>`}
-    if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1)}</div>`;
+    if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1,V.me.n)}</div>`;
     // fog over what is not open yet, then the destination: the final product
     if(!fp.done){const fg=`${I}${S.fog}.webp`;h+=`<div class="vy-fog" style="top:${topY-235}px;height:220px"><img src="${fg}" style="top:0" alt=""><img src="${fg}" style="top:50px;transform:scaleX(-1)" alt=""><img src="${fg}" style="top:95px" alt=""></div>`
       +`<div class="vy-tip" style="top:${topY-130}px">🌫️ ${esc(wd("tip"))}</div>`}

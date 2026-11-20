@@ -592,7 +592,7 @@ function lsBeds(ls,info){
 // sea map of the current LS instead of the garden: a stop per open tab, a port per learning path, the final product last; every student
 // of the group is a boat by the steps done. Classmates come from one document per LS and group, road/{ls}/groups/{group} = {uid: {n: first
 // name, s: steps done}}: one read when the board opens, and the student writes only their own line when their count changes.
-const VOYAGE=["4eso"];
+const VOYAGE=["4eso","2eso"];
 const vyOn=ls=>!!(window.elVoyage&&ls&&VOYAGE.includes(ls.course)&&!only(ls.id)&&!all()&&D.me.group&&!(window.elLsNum&&elLsNum(ls)==="LS1"));
 const RD={};   // road docs read this page load: {ls id: {uid: {n, s}}}
 function voyageData(ls,info,nx){
@@ -606,7 +606,7 @@ function voyageData(ls,info,nx){
   if(nx&&!stops.some(x=>x.key===nowKey)){const x=stops.find(y=>y.st!=="bloom");
     if(x){now=x.key;cont={href:x.href,label:""}}else if(fa){now=null;cont={href:fp.href,label:fp.title}}}
   return {ls:window.elLsNum?elLsNum(ls):"",skin:ls.id,en:EN,beds,now,fp,
-    me:{s:null},mates:Object.entries(road).filter(([u,x])=>u!==me&&x&&x.n).map(([,x])=>({n:x.n,s:+x.s||0})),
+    me:{s:null,n:elVoyage.first(D.me.name)},mates:Object.entries(road).filter(([u,x])=>u!==me&&x&&x.n).map(([,x])=>({n:x.n,s:+x.s||0})),
     cont,
     store:"el_voyage_"+me+"_"+ls.id,save:!AS,quiet:()=>!!AS||!!(LIVE&&LIVE.go&&elCmOn(LIVE.go))}}
 // Only what the teacher put on the group's Time plan agenda (Roger, 20 Nov 2026: "they only needed to see the activities I add on the

@@ -510,7 +510,7 @@ var LS2 = (function () {
     if (!Array.isArray(v) || !v.some(x => x != null && x !== '')) return;
     fresh[id] = true;
     // like ↺ Practise again in the notebook look: the new try is done in the laptop look (el-app.js draws the look after this script)
-    if (!gameBack) { gameBack = true; const go = () => { if (window.elLpNb && document.documentElement.classList.contains('el-lpnb')) window.elLpNb(false); }; document.readyState === 'complete' ? setTimeout(go, 0) : addEventListener('load', go); }
+    if (!gameBack) { gameBack = true; const go = () => { if (window.elLpNb && !window.elNbOnly && document.documentElement.classList.contains('el-lpnb')) window.elLpNb(false); }; document.readyState === 'complete' ? setTimeout(go, 0) : addEventListener('load', go); }
   }
   function forget(id, prefix) { fresh[id] = true; CHK[id] = new Set(); state.again = state.again || {}; state.again[id] = 1; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
@@ -539,7 +539,9 @@ var LS2 = (function () {
       L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('input.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
     }
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
-    $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
+    // ⛵ a student who sees only the notebook look (window.elNbOnly, el-app.js; Roger, 19 Nov 2026): the new try is a fresh notebook page
+    // (state.nbAgain[id]: the page shows the latest try from now on, as the laptop look did); the first try still counts for the mark
+    $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); if (nbk && window.elNbOnly) { state.nbAgain = state.nbAgain || {}; state.nbAgain[id] = 1; } forget(id, prefix); if (nbk && window.elLpNb && !window.elNbOnly) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     // an activity checked before the notebook kept anything (14 Nov 2026): its answers as they are now go into the notebook
     if (state.ans && state.ans[id] && !(state.nb && state.nb[id])) { state.nb = state.nb || {}; state.nb[id] = state.ans[id]; }
@@ -564,7 +566,7 @@ var LS2 = (function () {
   const nbOff = id => { const nb = state.nb && state.nb[id], S = NBS[id];
     return !!(nb && Array.isArray(nb.q) && nb.q.length && S && Array.isArray(S.items) && !S.items.some(it => nb.q.includes(qid(it)))); };
   const nbFrozen = id => { const nb = state.nb && state.nb[id], S = NBS[id];
-    return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !!(nb && Array.isArray(nb.v)) && !nbOff(id) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
+    return document.documentElement.classList.contains('el-lpnb') && !fresh[id] && !(state.nbAgain && state.nbAgain[id]) && !!(nb && Array.isArray(nb.v)) && !nbOff(id) && (!Array.isArray(nb.c) || !S || !S.one || S.one.every(i => nb.c.includes(i))); };
   /* ➕ Extra practice stays open (problem report, 4ESOB, 17 Nov 2026: "no puc fer les opcionals"): a frozen notebook freezes only the
      counted questions, so the optional extras below them can still be typed and checked one by one. Marks never change (firsts: need only). */
   function nbLock(id, listId, on) {

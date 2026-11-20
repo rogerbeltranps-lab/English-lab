@@ -454,7 +454,7 @@
   // ticks come from its tabs. Without a copy that has this page (the board not opened yet), the path's own tabs stay. In class mode
   // (html.elcmtab, only today's steps) the path's own tabs show, as before. The 📓 button (el-cloud.js) stays at the bottom left and the
   // 🔍 dictionary (el-dict.js) at the bottom right. No music here: the music plays on the board's map only.
-  const VOYC = mode === "lp" && /\/4eso\/(?!towards-nativeness\/)[^/]+\/[^/]+\.html$/.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam|book)\.html$/.test(path);
+  const VOYC = mode === "lp" && /\/[24]eso\/(?!towards-nativeness\/)[^/]+\/[^/]+\.html$/.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam|book)\.html$/.test(path);
   function voyOn() { return VOYC && who.role === "student"; }
   const voyPage = h => decodeURIComponent(String(h).split("#")[0]), voyHere = h => decodeURIComponent(path).endsWith("/" + voyPage(h));
   function voyData() {
