@@ -4918,12 +4918,12 @@ const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.create
 function sgBox(){
   const L=[...(S.D.sg||[])].sort((a,b)=>(sgWhen(b)||0)-(sgWhen(a)||0)),nw=L.filter(x=>!x.read).length;
   const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
-  const li=x=>ibMail("sg-"+esc(x.id),"💡 Idea","",x,gr(x),"",sgWhen(x),x.page?"Sent from 📍 "+pageLink(x,esc(x.page)):"",x.text,pbSent(x),
-    `${x.uid?`<button data-do="sgmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">↩ Answer</button>`:""}<button data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button><button data-do="sgdel" data-id="${esc(x.id)}">🗑 Delete</button>`);
-  const how=`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. Open one to read it all: the student, group, page and time. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it. Opening an idea marks it as read.</p></details>`;
+  const li=x=>ibMail("sg-"+esc(x.id),"💡 Idea","",x,gr(x),"",sgWhen(x),x.page?"Sent from 📍 "+pageLink(x,esc(x.page)):"",x.text,sgDraftHtml(x)+pbSent(x),
+    `${x.uid?`<button data-do="sgmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page${sgDraft(x)?". Beltran's draft is already in the box":""}">↩ Answer${sgDraft(x)?" (draft ready)":""}</button>`:""}<button data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button><button data-do="sgdel" data-id="${esc(x.id)}">🗑 Delete</button>`);
+  const how=`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. Open one to read it all: the student, group, page and time. A few minutes after an idea arrives, Beltran writes a draft reply (in your voice, both languages; "Reply ready" in the list): ↩ Answer opens it in the box, ready to change, and nothing goes until you press Send. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it. Opening an idea marks it as read.</p></details>`;
   const x=S.sgOpen&&L.find(y=>y.id===S.sgOpen);
   if(x)return `<div class="box ibx" id="sugg"><button class="g ibback" data-do="sgview" data-id="">‹ All ideas</button><div class="pbl">${li(x)}</div></div>`;
-  const row=x=>ibRow(x,"sgview",!x.read,esc(ibSender(x)),gr(x),"💡 "+esc(x.text),"",(x.msgs||[]).length,sgWhen(x));
+  const row=x=>ibRow(x,"sgview",!x.read,esc(ibSender(x)),gr(x),"💡 "+esc(x.text),"",(x.msgs||[]).length,sgWhen(x),sgDraft(x)?'<span class="iblab" title="Beltran wrote a reply: ↩ Answer opens it, ready to change and send">Reply ready</span>':"");
   return `<div class="box ibx" id="sugg"><h2>💡 Ideas from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small></h2>${how}`
     +(L.length?`<ul class="ibl">${L.map(row).join("")}</ul>`:'<p class="muted">No ideas yet.</p>')+`</div>`;
 }
@@ -5014,7 +5014,9 @@ function rpWire(id,ph,draw,pre){
     // English ⇄ Català with both texts there: they swap places, nothing is lost
     const a=t.value,b=t2.value;seq++;busy=false;if(b.trim()){t.value=b;t2.value=a}else{t2.value="";if(a.trim()){lab();tr();return}}lab();draw()});
   lab();
-  if(pre&&pre.text){t.value=pre.text;if(pre.other){t2.value=pre.other;st("Beltran wrote both versions. Change anything you like.")}else tr()}
+  if(pre&&pre.text){t.value=pre.text;if(pre.other){t2.value=pre.other;st("Beltran wrote both versions. Change anything you like.")}else tr()
+    // a draft is read from its start, and the boxes grow to show all of it (a phone shows only three lines of a 100px box)
+    setTimeout(()=>[t,t2].forEach(e=>{if(!e.isConnected)return;if(e.value&&e.scrollHeight>e.clientHeight)e.style.height=Math.min(e.scrollHeight+4,320)+"px";e.setSelectionRange(0,0);e.scrollTop=0}),60)}
   return {vals:()=>{const L=rpLang(),a=t.value.trim(),b=t2.value.trim();return {text:a,en:L==="en"?a:b,ca:L==="ca"?a:b}},
     ready:()=>!!t.value.trim()&&!!t2.value.trim()&&!busy}}
 // The note the student gets (shared/js/el-reply.js writes the words): in the language of the route the report was sent with.
@@ -5039,16 +5041,25 @@ const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return 
 const sgEn=x=>{const s=S.P[x.uid];return !!s&&msgCa(s)===false};
 const sgReply=(x,msg)=>({uid:x.uid,kind:"idea",what:"idea",text:String(x.text||"").slice(0,300),where:"",en:sgEn(x),...rpDoc(rpTwo(msg)),created:DEMO?new Date():F.serverTimestamp(),...(S.hold?{at:S.hold}:{})});
 const sgNote=(x,msg)=>{const en=sgEn(x),r=replyText(sgReply(x),en);return `<div style="border:2px solid ${replyColor("idea")};border-radius:12px;padding:8px 12px;margin:8px 0"><b>${esc(r.title)}</b><br>${esc(r.body)}${rpMsgHtml(msg,en)}</div>`};
+// Beltran's draft for an idea (Roger, 20 Nov 2026, on an idea with an empty answer box: "Pq no tens un draft preparat per contestar?"):
+// the instant task (docs/general/problem-reports-auto.md, tools/problems/auto.mjs idea) saves suggestions/{id}.auto = {en, ca, note, at}
+// a few minutes after the idea arrives. ↩ Answer opens with it in the boxes (the language Roger writes in first), to change and send;
+// nothing goes by itself. Not shown once the idea is answered.
+const sgDraft=x=>{const a=x.auto;return a&&a.en&&a.ca&&!(x.msgs||[]).length?a:null};
+const sgPre=x=>{const a=sgDraft(x);if(!a)return null;const L=rpLang();return {text:L==="ca"?a.ca:a.en,other:L==="ca"?a.en:a.ca,lang:L}};
+const sgDraftHtml=x=>{const a=sgDraft(x);if(!a)return "";return `<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(Beltran's draft; ↩ Answer opens it, ready to change; nothing is sent until you press Send)</small>${a.note?`<p class="muted">${esc(a.note)}</p>`:""}<p>${esc(a.ca)}</p><p><span class="muted">🌐 English:</span> ${esc(a.en)}</p></div>`};
 function sgAnswer(id){
-  const x=(S.D.sg||[]).find(y=>y.id===id);if(!x)return;const en=sgEn(x),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
+  const x=(S.D.sg||[]).find(y=>y.id===id);if(!x)return;const en=sgEn(x),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),pre=sgPre(x);
   dlg(`<h3>💬 Answer ${who}</h3><p class="muted">💡 Suggestion${x.page?" · "+esc(x.page):""}</p><div class="hand">${esc(x.text)}</div>
+    ${pre?`<p class="muted" style="margin:6px 0 0">✏️ Beltran's draft is ready in the boxes. Change anything you like; nothing goes until you press Send.</p>`:(x.msgs||[]).length?"":`<p class="muted" style="margin:6px 0 0">No draft for this one yet: Beltran writes one a few minutes after an idea arrives (🔄 reload the page to see it).</p>`}
     ${rpBoxes("sgt")}
     <p class="muted" style="margin:6px 0 0">What ${who} sees, once, at the top of the next page they open (the card is in ${en?"English":"Catalan"}, like their level, with your message in both languages):</p><div id="sgprev">${sgNote(x,"")}</div>
     <div class="row" style="justify-content:flex-start"><button data-do="sgmsgok" data-id="${esc(x.id)}" disabled>💬 Send</button></div>`,true);
   const b=$('#dlg [data-do="sgmsgok"]'),draw=()=>{if(!S.rpW)return;$("#sgprev").innerHTML=sgNote(x,S.rpW.vals());b.disabled=!S.rpW.ready()};
-  S.rpW=null;S.rpW=rpWire("sgt",{en:"For example: Great idea! From next week you will see your marks on every activity.",ca:"Per exemple: Bona idea! A partir de la setmana que ve veuràs les notes a cada activitat."},draw);
+  S.rpW=null;S.rpW=rpWire("sgt",{en:"For example: Great idea! From next week you will see your marks on every activity.",ca:"Per exemple: Bona idea! A partir de la setmana que ve veuràs les notes a cada activitat."},draw,pre);
   $("#sgt").addEventListener("input",draw);draw();$("#sgt").focus()}
-const pbPre=x=>{const a=x.auto||{};return a.reply?{text:a.reply,other:a.reply2||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
+// also ↩ Answer (Roger, 20 Nov 2026: a draft ready in every answer box), while that reply has not been sent and the report is open
+const pbPre=x=>{const a=x.auto||{};return a.reply&&!x.fixed&&!(x.msgs||[]).some(m=>m.sug)?{text:a.reply,other:a.reply2||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
 // "💬 Answer": write to the student. The card's own words follow the report's language; the message goes as written.
 function pbAnswer(id,pre){
   const x=S.D.pb.find(y=>y.id===id);if(!x)return;const en=!!x.route&&!elCa(x.route),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
@@ -5275,6 +5286,12 @@ function msgConv(a){const st=S.P[msgStu(a)],who=st?name(st):"The student";
   const b=(x,me)=>`<div style="margin:4px ${me?"28px 0 0":"0 0 28px"};padding:5px 10px;border-radius:8px;background:${me?"#fff7ed":"#e0f2fe"};border-left:4px solid ${me?"#ea580c":"#0284c7"};white-space:pre-wrap;overflow-wrap:anywhere"><small class="muted" style="display:block;font-weight:600">${me?"You":who} · ${msgWhen(x.at)}</small>${annHtml(x.text)}</div>`;
   return b({text:a.text,at:annMs(a.at||a.created)||Date.now()},true)+(a.thread||[]).map(x=>b(x,x.by==="t")).join("")}
 // the buttons under a private message (student window and 💬 Messages)
+// Beltran's draft for the student's last answer (Roger, 20 Nov 2026: "Pq no tens un draft preparat per contestar?"): the instant task
+// (tools/problems/auto.mjs msg) saves msgDrafts/{announcement id} = {en, ca, note, n (the thread length it answers), at}, teacher only (the
+// student can read the announcement). ↩ Answer reads it (one read, only then) and puts it in the box, in Catalan for Starter, Base and no
+// route, else English (a private message goes in one language). Never sent by itself.
+async function msgDraft(a){if(!a||!msgWait(a)||DEMO)return null;
+  try{const r=await F.getDoc(F.doc(db(),"msgDrafts",a.id)),d=r.exists()?r.data():null;return d&&d.en&&d.ca&&d.n===(a.thread||[]).length?d:null}catch(e){console.warn("msgDraft",e);return null}}
 const msgBtns=(a,u)=>`<div class="bar" style="margin:4px 0 0">${msgWait(a)?'<b style="color:#0284c7">💬 New answer</b> ':""}<button class="${msgWait(a)?"":"g"}" data-do="msgnew" data-u="${esc(u)}" data-id="${esc(a.id)}">↩ Answer</button>${msgWait(a)?`<button class="g" data-do="msgseen" data-u="${esc(u)}" data-id="${esc(a.id)}" title="You read it and it needs no answer: the tag goes">✓ Seen, no answer needed</button>`:""}</div>`;
 function msgLine(u){const s=S.P[u];if(!s||s.tester)return "";const L=msgSent(u),em=mailTo([s]).length,nw=L.filter(msgWait).length;
   if(s.away&&!em)return "";
@@ -5286,6 +5303,7 @@ function msgDialog(u,id){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==tr
   dlg(`<h3>${a?"↩ Answer":"✉️ Message to"} ${name(s)}</h3><p class="muted" style="margin:0 0 6px">${s.away?"Not signed in yet, so it goes only by email.":"Only this student sees it (and your test account)."}</p>
     ${a?`<div style="max-height:30vh;overflow:auto;margin-bottom:8px">${msgConv(a)}</div>`:""}
     <label for="msgt">${a?"Your answer":"Your message"} <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it; a web link becomes clickable)</small></label>
+    ${a&&msgWait(a)?`<p class="muted" id="msgdr" style="margin:2px 0 4px">✏️ Looking for Beltran's draft…</p>`:""}
     <textarea id="msgt" maxlength="${ANN_MAX}" style="min-height:${a?90:120}px" placeholder="${a?"For example: Thanks! See you on Monday.":"For example: Well done on your vlog script! Remember to record it before Friday."}"></textarea>
     ${s.away?"":`<p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route; they can answer with ↩ Reply):</p>
     <div class="annc" id="msgp" style="${annCardStyle};max-width:440px"></div>`}
@@ -5294,7 +5312,12 @@ function msgDialog(u,id){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==tr
     <div class="row" style="justify-content:flex-start"><button data-do="msgsend" data-u="${esc(u)}" data-id="${esc(id||"")}" id="msgsend" disabled>${a?"↩ Send the answer":"✉️ Send"}</button><button class="g" data-do="stu" data-u="${esc(u)}">Back</button></div>`);
   const t=$("#msgt"),draw=()=>{const v=t.value.trim(),card=a?Object.assign({},a,{thread:[...(a.thread||[]),{by:"t",text:v||"…",at:Date.now()}]}):{text:v,created:Date.now(),to:"one"};
     if($("#msgp")){$("#msgp").innerHTML=annCardHtml(card,en,true);const bd=$("#msgp [data-annbody]");if(bd)bd.scrollTop=bd.scrollHeight}$("#msgsend").disabled=!v};
-  t.oninput=draw;draw();t.focus()}
+  t.oninput=draw;draw();t.focus();
+  if(a&&msgWait(a))msgDraft(a).then(dr=>{const p=$("#msgdr");if(!p||!t.isConnected)return;
+    if(!dr){p.textContent="No draft for this answer yet: Beltran writes one a few minutes after the student answers.";return}
+    if(!t.value.trim()){t.value=ca===false?dr.en:dr.ca;draw()}
+    if(t.scrollHeight>t.clientHeight)t.style.height=Math.min(t.scrollHeight+4,320)+"px";t.setSelectionRange(0,0);t.scrollTop=0;
+    p.textContent="✏️ Beltran's draft is ready in the box. Change anything you like; nothing goes until you press Send."+(dr.note?" ("+dr.note.replace(/\.$/,"")+")":"")})}
 function msgSend(u,id){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_MAX),a=id&&(S.D.ann||[]).find(x=>x.id===id);if(!s||!text)return;
   const mail=!!($("#msgmail")&&$("#msgmail").checked),ca=msgCa(s),emails=mailTo([s]);
   const subject=a?(ca===true?"English Lab · ✉️ El teu professor t'ha respost":ca===false?"English Lab · ✉️ Your teacher answered":"English Lab · ✉️ Your teacher answered / El professor t'ha respost")
@@ -6214,7 +6237,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       try{const img=await api.pbShot(k.id),ok=typeof img==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(img);
         $("#pbimg").innerHTML=ok?`<img src="${img}" alt="Screenshot from the student" title="Click to see it full size" onclick="this.style.maxWidth=this.style.maxWidth==='none'?'100%':'none'" style="max-width:100%;cursor:zoom-in;border:1px solid #cbd5e1;border-radius:8px"><br><small class="muted">${cap}</small>`:"The screenshot could not be found."}
       catch(e){console.warn("shot",e);$("#pbimg").textContent="The screenshot could not be loaded: "+e.message}},
-    pbclaude:()=>pbClaude(k.id),pbmsg:()=>pbAnswer(k.id),
+    pbclaude:()=>pbClaude(k.id),pbmsg:()=>{const x=S.D.pb.find(y=>y.id===k.id);pbAnswer(k.id,x&&pbPre(x))},
     pbmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(api.pbMsg(k.id,v,!!k.f))})},
     // Beltran's suggested reply goes in both languages (auto.reply in the report's language, auto.reply2 the other one); an older one
     // with only one version opens ✏️ Edit first, where Google Translate writes the other version for him to read

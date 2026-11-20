@@ -75,6 +75,9 @@ hourly task "English Lab: problem reports" is switched off.
 - `--reply`: the answer to the student, in the report's language (the tool says which), Roger's voice, first person, plain and kind,
   two or three short sentences; never AI, Claude, PRs or code. Write it so it is true once the todo is done.
 - `--reply2`: the same answer in the other language (the tool says which). Both go to the student with one click.
+- **Every reply and draft is built on what the website really has** (Roger, 20 Nov 2026: "always suggest replies according to the web
+  info"): check the pages and data first and point the student to the real thing, with the names they see (sample exam, 🎯 Practise,
+  Games, the learning paths, a step's title), instead of general advice or a promise of something new.
 
 In ⚠️ Problem reports the reply has **📨 Send…** (fixed → the ✅ fixed card with it; nobug → the message card and the report closes;
 you → the message card, the report stays open) and **✏️ Edit first** (opens 💬 Answer with the text). Run `leave` again on the same
@@ -124,6 +127,30 @@ line, after the reports (or alone, when there is no open report):
 3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
    tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
    comment again). The Friday 15:00 task still answers any comment left.
+
+## Drafts for ideas and private answers (Roger, 20 Nov 2026)
+
+"Pq no tens un draft preparat per contestar?" (on a 💡 idea whose 💬 Answer box was empty). The same task now also starts when a student
+sends a 💡 Idea (`suggestions/{id}`) or answers one of Roger's private messages (`announcements/{id}`, a thread item by "s"): the student's
+page calls `wakeFixer` after saving, like a report. `auto.mjs open` lists, after the reports, every idea with no draft and no answer yet and
+every private conversation whose last word is the student's with no draft for it (last 14 days), with a line "NEW IDEAS / PRIVATE ANSWERS
+WITHOUT A DRAFT". For each one, **write a draft only; nothing is ever sent to the student by the task**:
+
+- An idea: `node tools/problems/auto.mjs idea <id> --note "…" --en "…" --ca "…" --apply` → `suggestions/{id}.auto = {en, ca, note, at}`.
+- A private answer: `node tools/problems/auto.mjs msg <id> --note "…" --en "…" --ca "…" --apply` → `msgDrafts/{id} = {en, ca, note, n, at}`
+  (teacher-only collection: the student can read the announcement itself; `n` = the thread length it answers, so a newer answer from the
+  student gets a new draft).
+
+How to write it: Roger's voice, first person, warm and short (two or three sentences), at the student's level (simple English for 2 ESO);
+`--ca` and `--en` say the same thing, both natural. Never the student's name or surnames (the tool refuses them), never AI, Claude, Gemini,
+PRs or code. Read what the student means and check the site first. **Favour what already exists** (Roger, 20 Nov 2026, on a draft for "alguna
+activitat per estudiar l'examen": "Però si té un examen d'exemple i a Practice un munt d'exercicis…"): most ideas ask for something the site
+has, so the draft tells them where it is, with the names they see (the "Examen de mostra / Sample exam" on the LS page, "🎯 Practica /
+Practise" on the board, Games, the learning paths) and how to use it. Only when nothing like it exists: thank them and say you will think
+about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
+information you don't have: a short honest draft he can complete, and the note says what is missing. `--note` = one line for Roger (what
+you checked). The dashboard puts the draft in the 💬 Answer box (ideas: both boxes, the language Roger writes in first; private messages:
+Catalan for Starter, Base and no route, English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.
 
 ## Costs and limits
 
