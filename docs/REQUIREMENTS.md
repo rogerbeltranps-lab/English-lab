@@ -1,6 +1,6 @@
 # How we work - Work requirements
 
-**Every rule Claude follows when it works for Roger on English Lab, in one organised document.** Draft of 20 Nov 2026, **for Roger to revise**.
+**Every rule Claude follows when it works for Roger on English Lab, in one organised document.** First version 20 Nov 2026, **for Roger to revise** (start with [section 13](#13-to-revise-what-is-outdated-and-what-contradicts)).
 
 It unifies:
 
@@ -12,11 +12,13 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 ## 0. About this document
 
-**Where it lives.**
+**Where it lives** (Roger, 20 Nov 2026: "I need you to be efficient… organize the info there where I can also review it").
 
-- The Google Doc **"How we work - Work requirements"** in Teacher Studio › 01_General › 01_How we work is the copy Roger reads and revises.
-- This file, `docs/REQUIREMENTS.md`, is the same text in the repo, so every Claude thread reads it first. When Roger edits the Doc, Claude copies the edits here (and the other way round), so the two never differ.
-- The original Drive guides stay where they are, untouched. Once Roger has revised this document, he decides which of them go to `Archive`.
+- **This file is the one rulebook.** Every rule lives here and nowhere else: project memory and the routine files only point here. The repo's `CLAUDE.md` loads this file into every Claude session that works in the repo, so no thread can miss it.
+- **Roger reviews it on GitHub**: [docs/REQUIREMENTS.md](https://github.com/rogerbeltranps-lab/English-lab/blob/main/docs/REQUIREMENTS.md). He writes his changes or answers in a thread (or as a comment on the PR), and Claude edits this file in a PR.
+- **A new standing rule goes here in the same PR as the work.** Change or remove the old line instead of adding a second one. Never write a rule only in project memory, a routine file or Drive.
+- The Google Doc "How we work - Work requirements" in Teacher Studio › 01_General › 01_How we work is a **snapshot of 20 Nov 2026**, not kept in step; its first line points here.
+- The original Drive guides stay where they are, untouched. Once Roger has revised this file, he decides which of them go to `Archive`.
 
 **Order of authority** (first wins):
 
@@ -27,7 +29,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **Keeping it true.**
 
-- When Roger sets a new standing rule, change this document **in the same PR** as the work (and the technical detail in `AGENTS.md`). Change or remove the old line instead of adding a second one.
+- The technical detail of a rule (file names, functions, data) goes in `AGENTS.md`, in the same PR.
 - Each rule carries its date, so the newest is easy to see.
 - A rule for one LS only goes in that LS's `AGENTS.md`, not here.
 
