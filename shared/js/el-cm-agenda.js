@@ -245,9 +245,11 @@ const say=(t,err)=>{MSG={t,err:!!err};clearTimeout(say.k);say.k=setTimeout(()=>{
 // the courses with the students' voyage map (today.html VOYAGE), every tab of the LS's open learning paths in order, under the ports the
 // students see (one per learning path), with ● now on the class tab's step. A click takes the class there, as a step of Today does
 // (it opens it for the group first if it is locked). 📋 Today and everything on it stay as they are. Nothing new is read.
-const VOY=["4eso"],FLAGS=[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🇺🇸","USA"],["🇮🇳","India"],["🇯🇲","Jamaica"],["🇨🇦","Canada"],["🇸🇱","Sierra Leone"]];
+// the places of each course's map, in order (el-voyage.js SKINS: 4 ESO the sea ports, 2 ESO the sports events of the reporters' bus tour)
+const VOYF={"4eso":[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🇺🇸","USA"],["🇮🇳","India"],["🇯🇲","Jamaica"],["🇨🇦","Canada"],["🇸🇱","Sierra Leone"]],
+  "2eso":[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🏴󠁧󠁢󠁳󠁣󠁴󠁿","Scotland"],["🇺🇸","USA"],["🇨🇦","Canada"],["🇯🇲","Jamaica"],["🇦🇺","Australia"]]},VOY=Object.keys(VOYF);
 let TB="today";
-const voyC=()=>!!C&&VOY.includes(((window.EL_GROUPS||[]).find(x=>x.id===C.g)||{}).course||(String(C.g).match(/^\d+eso/i)||[""])[0].toLowerCase());
+const crsC=()=>C?((window.EL_GROUPS||[]).find(x=>x.id===C.g)||{}).course||(String(C.g).match(/^\d+eso/i)||[""])[0].toLowerCase():"",voyC=()=>VOY.includes(crsC());
 const tbBar=()=>voyC()?`<div class="tbs" role="tablist"><button data-tb="today" class="${TB==="today"?"on":""}" role="tab" aria-selected="${TB==="today"}">📋 Today</button><button data-tb="steps" class="${TB==="steps"?"on":""}" role="tab" aria-selected="${TB==="steps"}">🧭 Class steps</button></div>`:"";
 // the LS: the one with steps today, else the one of this page, else the latest with an agenda (C.lsInfo: the page's cached read of the LS)
 async function stepsLs(){const t=todayLs()[0];if(t)return t;
@@ -255,6 +257,7 @@ async function stepsLs(){const t=todayLs()[0];if(t)return t;
   if(a){const l=(window.EL_LS||[]).find(z=>z.id===a.ls);try{if(l)return {ls:l,info:await C.lsInfo(l.id),ag:{}}}catch(e){}}
   return L&&L.length?L[L.length-1]:null}
 async function drawSteps(){const x=await stepsLs(),its=[];let body="",pi=-1;if(!box)return;
+  const FLAGS=VOYF[crsC()]||VOYF["4eso"];
   if(x){const info=x.info||{};(window.EL_CATALOG||[]).filter(a=>a.ls===x.ls.id&&!a.optional&&!a.manual&&secs(a).length&&(!window.elLpOpen||elLpOpen(a,info,C.g))).forEach(a=>{
     if(!a.checkpoint&&pi<FLAGS.length-1){pi++;body+=`<div class="pt">${FLAGS[pi][0]} ${E(FLAGS[pi][1])}</div>`}
     body+=`<div class="lp">${a.checkpoint?"🛡 ":""}${E(lpLab(x,a))}</div>`;

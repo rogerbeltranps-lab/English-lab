@@ -114,6 +114,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .blp .bln{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.blp b{text-align:right;font-variant-numeric:tabular-nums}.blps a.blp small{color:#64748b;font-variant-numeric:tabular-nums}.bbar{height:9px;border-radius:999px;background:#e2e8f0;overflow:hidden}.bbar i{display:block;height:100%;border-radius:999px}
 .bsts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.brf a.bst,.brf a.bex,.brf a.bst *,.brf a.bex *{text-decoration:none}.brf a.bst,.brf a.bex{color:#0f172a}.bst,.bex{border-radius:10px;padding:3px 5px;margin:-3px -5px}.bst:hover,.bex:hover,.blp:hover{background:#eef3ff}.bst{display:flex;align-items:center;gap:8px;font-size:13px}.bst span{display:flex;flex-direction:column}.bst small{color:#64748b}
 .bexs{display:flex;flex-direction:column;gap:3px;font-size:14px}.bex small{color:#64748b}
+.bxrs{border-top:1px solid #e2e8f0;padding-top:4px;display:flex;flex-direction:column;gap:8px}.bxg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}@media(max-width:560px){.bxg{grid-template-columns:repeat(2,minmax(0,1fr))}}.brf a.bxr{color:#0f172a}.bxr b{white-space:nowrap}.bxr small{font-variant-numeric:tabular-nums}
 .tside .nv.on.off{background:none;color:inherit}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cbar2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:14px}.cbar2 .cbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.cbar2 button{margin:0}
@@ -1373,10 +1374,16 @@ setInterval(()=>liveTick(),15e3);
 //    counts as fetched, so its marks so far are worked out again and saved.
 // 2. Once a day, the first open of the dashboard on a day after the last full fetch (AT.all) does one full fetch (as "Update all", ~3,600
 //    reads) in the background: the student list, levels and points, which rule 1 does not read. The buttons stay for "now".
-const AUTO={ms:30*60e3,busy:false,day:false,wait:{}};
-async function autoGroup(){const gid=S.g;
-  if(DEMO||!RAW||!S.D||!gid||!GR.some(g=>g.id===gid)||document.hidden||AUTO.busy||LIVE.busy||liveOn())return;
-  const at=AT.g[gid]||0;if(FRESH.has(gid)&&Date.now()-at<AUTO.ms||Date.now()<(AUTO.wait[gid]||0))return;
+// 3. 🏠 Home shows every group's card (Roger, 20 Nov 2026: 2ESO B's card said "LS2 exam 6.9 (9)" when 26 exams were saved: its copy was from
+//    before the marks): on Home, a group whose copy is over an hour old (AUTO.home) is updated as in rule 1, the oldest first, one group a
+//    minute. About 3 reads per student, so ~90 per group and at most once an hour each while Home is open and on screen.
+const AUTO={ms:30*60e3,home:60*60e3,busy:false,day:false,wait:{}};
+async function autoGroup(){let gid=S.g,home=false;
+  if(DEMO||!RAW||!S.D||document.hidden||AUTO.busy||LIVE.busy||liveOn())return;
+  if(gid==="plan"&&(S.place||"home")==="home"){const t=Date.now(),o=GR.map(g=>({id:g.id,at:AT.g[g.id]||0})).filter(x=>t-x.at>=AUTO.home&&t>=(AUTO.wait[x.id]||0)).sort((a,b)=>a.at-b.at)[0];
+    if(!o)return;gid=o.id;home=true}
+  if(!gid||!GR.some(g=>g.id===gid))return;
+  const at=AT.g[gid]||0;if(!home&&(FRESH.has(gid)&&Date.now()-at<AUTO.ms||Date.now()<(AUTO.wait[gid]||0)))return;
   AUTO.busy=true;const t0=Date.now();
   // never fetched on this computer, or the copy has none of its students (Roger, 14 Nov 2026: 4ESO A showed "0/0" and an empty final
   // product table "as of 17:40": this update only asks for changes of the students already in the copy, so it fetched nothing): the whole group
@@ -1390,7 +1397,7 @@ async function autoGroup(){const gid=S.g;
         r.forEach(d=>{const x=d.data();(RAW.rs[u]=RAW.rs[u]||{})[x.activity||d.id.replace("__","/")]=x});
         if(k)k.forEach(d=>{(RAW.cp[u]=RAW.cp[u]||{})[d.id]=d.data()})}));
       AT.g[gid]=t0;FRESH.add(gid)}
-    saveCache();if(S.g===gid){S.D=build(S.D);LIVE.pend=true}}
+    saveCache();if(S.g===gid||home&&S.g==="plan"){S.D=build(S.D);LIVE.pend=true}}
   catch(e){console.warn("auto update",e);AUTO.wait[gid]=t0+5*60e3}   // failed: try again in 5 minutes
   AUTO.busy=false;liveDraw()}
 async function autoDay(){if(DEMO||AUTO.day||AUTO.busy||LIVE.busy||!RAW||!S.D||document.hidden)return;
@@ -1556,7 +1563,17 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
   const exams=EL_LS.filter(l=>l.course===g.course&&(EL_GRADING[l.id]||{}).exam).map(l=>{const ex=studs.map(s=>examMark(s.uid,l.id)).filter(Boolean).map(m=>m.mark);
     if(!ex.length)return {l,ex:null,n:0};const tot=withLsG(l.id,g.id,()=>studs.map(s=>{const r=grade(s);return G().blocks.every(b=>(b.id==="gv"?r.B.gv.mark:r.B[b.id])!=null)?r.total:null}).filter(v=>v!=null));
     return {l,ex:ex.reduce((a,b)=>a+b,0)/ex.length,n:ex.length,ls:tot.length?tot.reduce((a,b)=>a+b,0)/tot.length:null,ln:tot.length}});
-  return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams}}
+  // 📝 Exam rings (Roger, 20 Nov 2026: "I need to understand at first glance the exam results here too, so a cercle with all the sections"):
+  // the exam of the card's LS, else the latest LS of the course with marks. Parts with the same name before " · " are one ring (2ESO LS1:
+  // Vocabulary · choose + complete = Vocabulary; Writing · task, grammar… = Writing): each student's points ÷ max, averaged over the students
+  // with that part marked (a part left out, excused, is not 0). The whole exam: the exam mark as in Assessment details (with the harder version's factor).
+  const xe=exams.filter(e=>e.n).sort((a,c)=>(c.l.id===ls)-(a.l.id===ls)||EL_LS.indexOf(c.l)-EL_LS.indexOf(a.l))[0];let xr=null;
+  if(xe){const E=EL_GRADING[xe.l.id].exam,P=[];E.sections.forEach(([k,nm,mx])=>{const n=String(nm).split(" · ")[0];let q=P.find(z=>z.n===n);if(!q)P.push(q={n,ks:[]});q.ks.push([k,mx])});
+    const mk=studs.map(s=>examMark(s.uid,xe.l.id)).filter(Boolean);
+    xr={l:xe.l,n:mk.length,N:studs.length,ex:xe.ex,full:mk.filter(m=>m.n===m.of).length,parts:P.map(q=>{const v=studs.map(s=>{const x=res(s.uid,asId(xe.l.id)).sections||{};let sc=0,m=0;
+      q.ks.forEach(([k,mx])=>{const y=x[k];if(y&&y.score!=null){sc+=+y.score;m+=+(y.max||mx||E.max)}});return m?{p:sc/m*100,sc,m}:null}).filter(Boolean);
+      return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})}}
+  return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr}}
 const bCol=p=>p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
 function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
@@ -1570,7 +1587,14 @@ function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y
     +`<div class="bcols"><div class="bcol"><h3>Work done in each learning path</h3><div class="blps">${lps}</div></div><div class="bcol">`
     +`<h3>First tries</h3><div class="bsts">${stat("🎯","Checkpoints",b.cp,b.cpN?`Recall checkpoints of this LS, first try: ${b.cp} % right on average (${b.cpN} tries)`:"No checkpoint done yet",{p:"todo",t:"click: each student's checkpoints"})}${stat("✏️","Activities",b.ft,b.ftN?`First try of the auto-corrected steps of the open learning paths: ${b.ft} % right on average (${b.ftN} steps)`:"No first tries yet",{p:"qa",t:"click: which questions they get right or wrong the first time"})}`
     +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…",gres)}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…",gres)}</div>`
-    +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div></div>`}
+    +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div>${xRings(g,b.xr)}</div>`}
+// the 📝 exam row under a group's card: the whole exam (mark out of 10 in the ring) and one ring per part (% of its points); a click opens 📝 Exams
+const XIC={Listening:"🎧",Reading:"📖",Vocabulary:"📚",Grammar:"🧩",Writing:"✍️"};
+function xRings(g,x){if(!x)return "";const lab=lsLabel(x.l).split(" · ")[0],go=`href="#" data-do="bgo" data-g="${g.id}" data-p="exams" data-ls="${x.l.id}"`,left=x.N-x.n;
+  const one=(ic,nm,p,txt,sub,tip)=>`<a class="bst bxr" ${go} title="${esc(tip)} · click: each student's exam (📝 Exams)">${elRing(p,"",46,tip,txt)}<span><b>${ic} ${esc(nm)}</b><small>${sub}</small></span></a>`;
+  return `<div class="bxrs"><h3>${esc(lab)} exam <small class="muted">· ${x.n} of ${x.N} students marked${left?` (${left} not yet)`:""} · average of each part</small></h3><div class="bxg">`
+    +one("📝","Whole exam",Math.round(x.ex*10),f1(x.ex),"out of 10",`${lab} exam: average mark ${f1(x.ex)} out of 10 (${x.n} students)`)
+    +x.parts.map(q=>one(XIC[q.n]||"•",q.n,q.p,null,q.c?`${f1(q.pts)} / ${f1(q.max)} points`:"not marked yet",q.c?`${q.n}: ${q.p} % of the points on average (${f1(q.pts)} out of ${f1(q.max)}, ${q.c} students)`:`${q.n}: not marked yet`)).join("")+`</div></div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
@@ -1724,7 +1748,7 @@ function render0(){
 // step still to do and a status: 🟢 On course (at most 1 step missing and a mark of 5 or more), 🟠 Drifting (2-4 missing, or a mark under
 // 5), 🔴 Needs a push (5 or more missing). A red dashed line marks where the 🔴 group starts. A mini sea shows the class's boats by steps
 // done. Nothing new is read: what the dashboard already has.
-const VOY_COURSES=["4eso"];
+const VOY_COURSES=["4eso","2eso"],VY_ART={"4eso":["voyage/sea.webp","voyage/boat.webp"],"2eso":["road-2eso/bg-pitch-tile.webp","road-2eso/bus.webp"]};   // the map's background and vehicle (el-voyage.js SKINS)
 // As the students' map (today.html vyPlanned, Roger 20 Nov 2026): only the tabs on the group's Time plan agenda when it has one, never 📖 the book.
 function vyOnPlan(ls,gid){const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,gid):-1,ag=gi>=0&&p._ag&&p._ag[gi];if(!ag||!ag.days)return null;
   const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));return on}
@@ -1735,7 +1759,7 @@ function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0;const
     elTabGroups(a,ks).forEach(g=>{if(on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+vyTab(a,g[0])))return;const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;total++;if(d)done++;else miss.push([a,g[0]])})});
   return {done,total,miss}}
 function vyRank(grp,ls,studs){
-  const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id;
+  const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id,art=VY_ART[grp.course]||VY_ART["4eso"];
   const rows=studs.filter(s=>s.uid).map(s=>{const v=vySteps(s,ls,gid,fa);let m=null;try{const pr=((S.D.rs[s.uid]||{})[asId(ls)]||{}).progress;m=pr&&pr.total!=null?pr.total:G()?grade(s).total:null}catch(e){m=null}
     const n=v.total-v.done,st=n>=5?"red":n>=2||m!=null&&m<5?"amber":"green";return {s,...v,n,m,st}});
   const nm=r=>fullName(r.s),bym=(a,b)=>(b.m??-1)-(a.m??-1);
@@ -1745,8 +1769,8 @@ function vyRank(grp,ls,studs){
   // the mini sea: a boat per student by steps done, stacked when they share a place
   const at={};rows.forEach(r=>{const x=T?Math.round(r.done/T*10):0;(at[x]=at[x]||[]).push(r)});
   const hh=Math.max(190,60+Math.max(1,...Object.values(at).map(L=>L.length))*30);
-  const sea=`<div class="vysea" aria-hidden="true" style="height:${hh}px"><span class="vyport l">⚓ Start</span><span class="vyport r">🏆 ${fa?esc(fa.title.replace(/\s*\([^)]*\)\s*$/,"")):"Final product"}</span>`
-    +Object.entries(at).map(([x,L])=>L.map((r,j)=>`<span class="vyb ${r.st}" style="left:calc(${5+x*8.6}% - 20px);bottom:${8+j*30}px" title="${esc(fullName(r.s))}: ${r.done} of ${r.total} steps"><img src="shared/img/voyage/boat.webp" alt=""><b>${esc(first(r.s))}</b></span>`).join("")).join("")+`</div>`;
+  const sea=`<div class="vysea" aria-hidden="true" style="height:${hh}px;background-image:linear-gradient(#ffffff38,#ffffff38),url(shared/img/${art[0]})"><span class="vyport l">⚓ Start</span><span class="vyport r">🏆 ${fa?esc(fa.title.replace(/\s*\([^)]*\)\s*$/,"")):"Final product"}</span>`
+    +Object.entries(at).map(([x,L])=>L.map((r,j)=>`<span class="vyb ${r.st}" style="left:calc(${5+x*8.6}% - 20px);bottom:${8+j*30}px" title="${esc(fullName(r.s))}: ${r.done} of ${r.total} steps"><img src="shared/img/${art[1]}" alt=""><b>${esc(first(r.s))}</b></span>`).join("")).join("")+`</div>`;
   let red=false;
   const body=rows.map((r,i)=>{const line=srt==="steps"&&r.st==="red"&&!red?(red=true,`<tr class="vyline"><td colspan="6">🔴 From here: needs a push (5 or more steps missing)</td></tr>`):"";
     const nx=r.miss[0],todo=nx?`${stepName(nx[0].id,nx[1])}${r.miss.length>1?` <small class="muted">+${r.miss.length-1}</small>`:""}`:`<span class="muted">nothing: all done ✓</span>`;
@@ -2802,14 +2826,18 @@ function exDlg(u,lsId){const s=S.P[u],ls=lsId||S.ls,e=exOf(ls),l=EL_LS.find(x=>x
 // read, so no Firestore read, no sign-in and no student view) and shows only that report, in the student's language (or the one picked here).
 // From 👥 Students' progress (the exam mark, 🔍 › 📄) it opens on top of the dashboard (xrOpen: ‹ › go through the group, Esc closes); in
 // 📝 Exams it sits on the right of the table, as the final product's side panel does.
-const XR={lang:null,u:null,ls:null,sel:{}};
+const XR={lang:null,u:null,ls:null,sel:{},best:false};
 window.elExamEmbed=(u,ls,lang)=>{const s=S.P[u];if(!s||!exOf(ls))return null;const c=o=>JSON.parse(JSON.stringify(o||{}));
   return {embed:{ls,en:lang==="en"?true:lang==="ca"?false:null},me:{name:fullName(s),group:s.group,email:s.email||""},rs:c(S.D.rs[u]),lv:c(S.D.lv[u]),pg:{},ls:c(S.D.ls)}};
 const xrSrc=(u,ls)=>`today.html?embed=exam&student=${encodeURIComponent(u)}&ls=${encodeURIComponent(ls)}${XR.lang?"&lang="+XR.lang:""}`;
 const xrLang=(u,ls)=>XR.lang||(elCa(level(u,ls))?"ca":"en");
 // the students the arrows go through: the group's, by name (signed in, not testers)
-const xrList=u=>{const g=(S.P[u]||{}).group;return Object.values(S.P).filter(s=>s.uid&&s.group===g&&!s.away&&!s.tester).sort(byName).map(s=>s.uid)};
-function xrHead(u,ls,big){const s=S.P[u],l=EL_LS.find(x=>x.id===ls),m=examMark(u,ls),L=xrLang(u,ls),list=xrList(u),i=list.indexOf(u);
+// 🏆 Best mark first (Roger, 20 Nov 2026: "a button to order the students according to their exams results, the best scores at the top"):
+// XR.best, for the 📝 Exams table and the report's ‹ › arrows; students with no mark go last, by name
+const byExam=ls=>(a,b)=>{const x=a.uid&&examMark(a.uid,ls),y=b.uid&&examMark(b.uid,ls);return (y?y.mark:-1)-(x?x.mark:-1)||byName(a,b)};
+const xrSort=ls=>XR.best&&ls?byExam(ls):byName;
+const xrList=(u,ls)=>{const g=(S.P[u]||{}).group;return Object.values(S.P).filter(s=>s.uid&&s.group===g&&!s.away&&!s.tester).sort(xrSort(ls)).map(s=>s.uid)};
+function xrHead(u,ls,big){const s=S.P[u],l=EL_LS.find(x=>x.id===ls),m=examMark(u,ls),L=xrLang(u,ls),list=xrList(u,ls),i=list.indexOf(u);
   return `<div class="xrh"><span class="xrn"><b>${name(s)}</b> <small class="muted">${big?esc(lsLabel(l))+" · ":""}${route(level(u,ls))}</small></span>`
     +`<span class="xrm">${m?`Exam <b>${f1(m.mark)}</b> / 10`:'<span class="muted">not marked yet</span>'}</span>`
     +`<span class="xrb"><button type="button" class="g mini" data-xr="lang" title="${L==="ca"?"Show the board's words in English (the report's own text stays as written)":"Show it in Catalan, as a Starter or Base student sees it"}">${L==="ca"?"🌐 English":"🌐 Català"}</button>`
@@ -2835,7 +2863,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-xr]");if(!
   if(k.xr==="open")xrOpen(k.u,k.ls);
   else if(k.xr==="close")xrClose();
   else if(k.xr==="lang"){const sd=$("#xrside"),c=b.closest("#xrep")||!sd?{u:XR.u,ls:XR.ls}:{u:sd.dataset.u,ls:sd.dataset.ls};if(!c.u)return;XR.lang=xrLang(c.u,c.ls)==="ca"?"en":"ca";xrRedraw()}
-  else if(k.xr==="go"){const L=xrList(k.u),i=L.indexOf(k.u),n=L[(i+ +k.d+L.length)%L.length];if(!n)return;if(b.closest("#xrep"))xrOpen(n,k.ls);else xrPick(n,k.ls)}});
+  else if(k.xr==="best"){XR.best=k.v==="1";render()}
+  else if(k.xr==="go"){const L=xrList(k.u,k.ls),i=L.indexOf(k.u),n=L[(i+ +k.d+L.length)%L.length];if(!n)return;if(b.closest("#xrep"))xrOpen(n,k.ls);else xrPick(n,k.ls)}});
 function xrRedraw(){const o=$("#xrep");if(XR.u&&o&&!o.hidden)xrOpen(XR.u,XR.ls);const b=$("#xrside");if(b&&b.dataset.u)xrPick(b.dataset.u,b.dataset.ls)}
 document.addEventListener("keydown",e=>{const o=$("#xrep");if(e.key==="Escape"&&XR.u&&o&&!o.hidden&&!$("#dlg").open){e.preventDefault();xrClose()}});
 // ---- 📝 Exams (Roger, 14 Nov 2026: "I want a section with only exams here in all LS similar to Final products but with students reports"): a
@@ -3021,7 +3050,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
     reset:()=>{if(!confirm("Delete this student's exam? They start again from zero, with a new order. Their answers are lost."))return;$("#dlg").close();
       Promise.resolve(DEMO?null:F.deleteDoc(F.doc(db(),"students",k.u,"exams",c.key))).then(()=>{delete WX.docs[k.u];render()},x=>alert("Could not delete: "+x.message))}
   })[k.wx]?.()});
-function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(byName);
+function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(xrSort(ls));
   if(!e)return `<div class="box"><p class="muted">This LS has no exam on the site yet.</p></div>`;
   const on=studs.filter(s=>s.uid),p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,grp.id):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
   const ms=on.map(s=>examMark(s.uid,ls)).filter(Boolean),avg=ms.length?ms.reduce((a,m)=>a+m.mark,0)/ms.length:null,nd=on.filter(s=>xrSt(s.uid,ls)==="done").length,
@@ -3035,6 +3064,7 @@ function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(byNam
       +`<td><b>${m?f1(m.mark):"–"}</b></td><td>${rp||'<span class="muted">–</span>'}</td><td><button type="button" class="g mini" data-xr="open" data-u="${u}" data-ls="${esc(ls)}" title="Open the report bigger, on top of the dashboard">⤢</button></td></tr>`};
   return wxBox(grp,ls,studs)+`<div class="box"><h2>📝 ${esc(lsLabel(EL_LS.find(l=>l.id===ls)))} · exam ${ex?`<small class="muted">· ${esc(ELWeek.date(ex))}</small>`:""}</h2>`
     +`<p class="muted"><b>${nd} of ${on.length} marked</b>${np?` · ${np} partly marked`:""}${avg!=null?` · average <b>${f1(avg)}</b>`:""} · ${nr} with a report${nOut?` · ${nOut} with a part left out (not done, not 0)`:""}${hd?` · <b style="color:#92400e">🔒 ${hold.length} hidden from the students until ${hd.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}, ${hd.toTimeString().slice(0,5)}</b> (they show by themselves then: nothing to accept)`:""}. Click a student to see their report on the right, exactly as they see it on their board; ⤢ opens it bigger. Type or change the points in 📊 Assessment details.</p>`
+    +`<div class="bar"><span class="muted">Order:</span> <button type="button" class="chip ${XR.best?"":"on"}" data-xr="best" data-v="0">A–Z</button><button type="button" class="chip ${XR.best?"on":""}" data-xr="best" data-v="1" title="Best exam mark at the top; students with no mark yet at the bottom">🏆 Best mark first</button></div>`
     +`<div class="fpwrap xrwrap"><div class="wrap"><table class="fpt xrt"><thead><tr><th>Student</th><th>Version</th><th>Marking</th><th>Exam<br><small class="muted">/10</small></th><th>Report</th><th></th></tr></thead><tbody>${studs.map(row).join("")}</tbody></table></div>`
     +`<aside class="fpside xrside" id="xrside" data-ls="${esc(ls)}" data-u="${sel||""}"${sel?"":' style="height:auto"'}>${sel?xrSideH(sel,ls):`<p class="muted">No exam marked yet in this LS. Once you type the points in 📊 Assessment details (or import them), each student's report shows here.</p>`}</aside></div></div>`}
 // 🏠 on a learning path's heading (set some of its tabs as homework): a group tab whose time plan has this LS, and a page with tabs

@@ -20,9 +20,10 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261118g', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261120a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
+  const NBERR = window.elNbLayoutErrors = [];   // the sections that could not be laid out (layout), for the console and a ⚠️ report
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
   // (Roger, 13 Nov 2026: "I don't want Aa Print letters"): no button any more; always the handwriting
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -811,15 +812,30 @@ window.ELNotebook = (function () {
     // the pages are filled SLACK px short of the paper's foot, so a book a little shorter later (the top bar on two rows, "Saving…" in
     // it, the current tab taller) keeps the same pages instead of moving everything on (the watch below)
     const slack = printing() ? 0 : SLACK; sp.style.setProperty('--nb-slack', slack + 'px'); sp.classList.add('nb-flowing');
-    secs.forEach((s, si) => {
-      use(s.ci || 0); const M = MK(), n0 = pages.length;
+    // 🛟 one part that cannot be laid out never takes the rest of the notebook with it (Roger, 20 Nov 2026: "when I choose print the
+    // whole notebook there are pages missing; a lot of them actually": the paper layout stopped after the LS2 Index, so the learning
+    // paths, Checkpoints, Exams and the rest never reached the paper and the Index kept its "00"). That section goes whole on a page of
+    // its own instead (it scrolls on the screen and runs on over more sheets on paper), and the layout goes on with the next one.
+    const make = (s, M) => {
       tpl.innerHTML = s.head + s.blocks.map(b => `<div class="nb-blk${b.note || b.own ? ' nb-note' : ''}" data-b="${b.id}">${b.html}</div>`).join('') + (s.foot || '');
-      tpl.content.querySelectorAll('.nb-blk[data-b]:not(.nb-note)').forEach(el => paintMarks(el, M[el.dataset.b]));
+      tpl.content.querySelectorAll('.nb-blk[data-b]:not(.nb-note)').forEach(el => { try { paintMarks(el, M[el.dataset.b]); } catch (e) { console.warn('notebook marks', el.dataset.b, e); } });
       const top = id => [...tpl.content.children].find(e => e.classList.contains('nb-blk') && e.dataset.b === id);
-      s.blocks.filter(b => b.at).sort((x, y) => String(x.ts).localeCompare(String(y.ts))).forEach(b => inlinePut(top(b.id), top(b.at.b), b.at));
+      s.blocks.filter(b => b.at).sort((x, y) => String(x.ts).localeCompare(String(y.ts))).forEach(b => { try { inlinePut(top(b.id), top(b.at.b), b.at); } catch (e) { console.warn('notebook note', b.id, e); } });
       s.blocks.forEach(b => { if (b.lock || wlock(b.id)) { const e = top(b.id); if (e) e.classList.add('nb-wlock'); } });
       if (EDN && (s.ci || 0) === EDN.ci) { const e = tpl.content.querySelector(`.nb-blk[data-b="${EDN.id}"]`); if (e) e.classList.add('nb-edit'); }
-      flow(sp, tpl.content, si);
+    };
+    secs.forEach((s, si) => {
+      use(s.ci || 0); const M = MK(), n0 = pages.length;
+      try { make(s, M); flow(sp, tpl.content, si); }
+      catch (err) {
+        console.error('📓 notebook layout', s.key, err); NBERR.push(String(s.key) + ': ' + String(err && err.message || err));
+        while (pages.length > n0) pages.pop().el.remove();
+        try { make(s, M); } catch (e) { tpl.innerHTML = s.head; }
+        const page = document.createElement('section'); page.className = 'nb-page nb-whole'; page.dataset.i = pages.length; page.dataset.s = si;
+        page.innerHTML = `<div class="nb-paper"></div><span class="nb-pno">${pages.length + 1}</span><span class="nb-corner" aria-hidden="true"></span>`;
+        page.firstChild.append(tpl.content); sp.append(page); pages.push({ s: si, el: page });
+      }
+      sp.querySelectorAll('.nb-page.nb-meas').forEach(p => p.classList.remove('nb-meas'));
       for (let i = n0; i < pages.length; i++) pages[i].el.dataset.ci = s.ci || 0;
     });
     use(keepCi); sp.classList.remove('nb-flowing');
