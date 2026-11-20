@@ -75,8 +75,8 @@
       // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
       decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
       road:{halo:"#6b7280",hw:30,line:"#fff",lw:3,dash:"14 12"},
-      // sounds: none of their own yet (Roger may send a bus horn, a crowd cheer and a city loop); no sea waves
-      snd:{amb:null},
+      // sounds: sports-TV theme, soft stadium crowd loop instead of the waves, camera snap, cheer, fanfare, beep-beep horn
+      snd:{dir:"audio/road-2eso/",music:"music.mp3",amb:"amb.mp3",ambVol:.15,click:"click.mp3",step:"step.mp3",port:"port.mp3",fog:"fog.mp3",voyage:"voyage.mp3",horn:"horn.mp3"},
       w:{title:["La teva gira de reporter","Your reporter tour"],back:["Torna al meu bus","Back to my bus"],tip:["Apareixeran més parades quan el professor les afegeixi","More stops appear when your teacher adds them"],
          reached:["Parada assolida","Stop reached"],dest:["Destinació final","Final destination"],done:["Gira completada!","Trip complete!"],
          reach:["Has arribat a","You made it to"],end:["el final de la gira.","the end of the tour."]}
