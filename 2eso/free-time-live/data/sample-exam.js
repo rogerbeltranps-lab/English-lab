@@ -7,8 +7,8 @@
    - format and points = Friday's web exam (data/exam.js): listening 20, reading 20, vocabulary 35, grammar 15, writing 10 (a short post).
    - items lean on what the class games and the LP1/LP2 activities show students do best (Starter/Base mostly multiple choice; no adverb
      position, no "take part", "tournament", "warm up"); different sentences from the real exam, so nothing is given away.
-   Multiple choice has four options (the first is the right one; the engine shuffles). The post gets a guide mark from ChatGPT (in the
-   real exam the teacher marks it). */
+   Multiple choice has four options (the first is the right one; the engine shuffles). The post gets a table of mistakes from the
+   student's ChatGPT, no mark (Roger, 20 Nov 2026). */
 (function () {
 const L10 = [3, 5, 8, 10];   // the 5.1 levels scaled to 10 points, as in the web exam (NA 8 · AS 15 · AN 23 · AE 30 of 30)
 const ROW = (a, b) => '<tr><td>' + a + '</td><td style="text-align:right">' + b + '</td></tr>';
@@ -47,9 +47,9 @@ window.LP = {
         en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
       html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong> (el faràs al web, en mode examen). Només surt el que hem fet a classe: <strong>LP1 Getting started</strong> i <strong>LP2 What are they doing?</strong> 55 minuts, sense apunts.</p>' + TABLE.ca +
-        '<p>Tot es corregeix sol: el <strong>primer intent</strong> és la teva nota, com a l’examen. El post el corregeix <strong>ChatGPT</strong> amb els criteris de l’examen i et dona una nota orientativa. Al final, a <em>La meva nota</em>, veuràs el total.</p><p class="warm-note">⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el post el corregeix el professorat.</p>',
+        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El post no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
         en: '<p>This practice has <strong>the same format and the same points as the first exam</strong> (which you will do on the website, in exam mode). Only what we have done in class: <strong>LP1 Getting started</strong> and <strong>LP2 What are they doing?</strong> 55 minutes, no notes.</p>' + TABLE.en +
-        '<p>Everything is marked automatically: your <strong>first try</strong> is your score, as in the exam. The post is marked by <strong>ChatGPT</strong> with the exam criteria, which gives you a guide mark. At the end, <em>My score</em> shows your total.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the post.</p>' } },
+        '<p>The questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The post has no mark in this practice: the button opens ChatGPT, which makes a table of your mistakes (the correction and why) and gives you your text, corrected. At the end, <em>My score</em> shows your total.</p>' } },
 
     { id: 'listen', type: 'quiz', tab: 'Listening', title: 'Listening: Two vlogs', pts: [2, 2], start: 1,
       intro: { ca: 'Escolta dues vegades l’Ellie i el Jack, que graven el seu vlog, i respon.', en: 'Listen twice to Ellie and Jack recording their vlogs, and answer.' },
@@ -316,7 +316,7 @@ window.LP = {
       min: { beginners: 30, insecure: 40, safe: 60, daring: 70 } },
 
     { id: 'score', type: 'summary', tab: { ca: 'La meva nota', en: 'My score' }, title: { ca: 'La meva nota', en: 'My score' },
-      intro: { ca: 'Primer intent de cada secció i les notes de ChatGPT que has apuntat.', en: 'Your first try in each section and the ChatGPT marks you noted.' } }
+      intro: { ca: 'Primer intent de cada secció. L’escriptura no té nota: en tens la correcció.', en: 'Your first try in each section. The writing has no mark: you get its correction.' } }
   ]
 };
 })();

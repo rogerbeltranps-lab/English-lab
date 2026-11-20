@@ -11,7 +11,7 @@ window.LP.native = {
       '<tr><td>3 Vocabulary: multiple-choice cloze (7 × 1) + word formation (4 × 2)</td><td style="text-align:right">15</td></tr>' +
       '<tr><td>4 Grammar: open cloze (7 × 1) + key word transformations (4 × 2)</td><td style="text-align:right">15</td></tr>' +
       '<tr><td>5 Writing: a formal letter (C2 Proficiency, Part 2)</td><td style="text-align:right">30</td></tr></tbody></table>' +
-      '<p>Your <strong>first try</strong> is your score. The letter gets feedback and a guide mark from ChatGPT.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide.</p>' },
+      '<p>Your <strong>first try</strong> is your score. The letter has no mark in this practice: the button opens ChatGPT, which makes a table of your mistakes (the correction and why) and gives you your text, corrected.</p>' },
 
   listen: { type: 'quiz', tab: 'Listening', title: 'Listening: Two New Years', pts: [2, 2], start: 1, media: base('listen').media,
     items: [
