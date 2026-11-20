@@ -496,7 +496,8 @@
     const nav = $(".ellp-steps nav.tabs");
     if (nav && box._nav !== nav) { box._nav = nav; new MutationObserver(() => voyTicks()).observe(nav, { subtree: true, attributes: true, attributeFilter: ["class"] }); }
     const key = JSON.stringify([o.at, CA]); if (box._key === key) return voyTicks(); box._key = key;
-    let h = `<a class="vb" href="${ROOT}today.html">⛵ ${t("Torna al mapa", "Back to the map")}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
+    const vb = Array.isArray(o.vb) && o.vb.length === 3 ? o.vb : ["⛵", "Torna al mapa", "Back to the map"];   // the skin's words (el-voyage.js)
+    let h = `<a class="vb" href="${ROOT}today.html">${esc(vb[0])} ${esc(t(vb[1], vb[2]))}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
     o.items.forEach(x => {
       if (x.p) { h += `<li class="pt" data-port><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${x.ok ? " ok" : ""}">✓</span></li>`; return; }
       const here = voyHere(x.h), pid = here ? (String(x.h).split("#")[1] || "") : "";
