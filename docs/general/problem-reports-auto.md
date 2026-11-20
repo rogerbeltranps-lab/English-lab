@@ -1,5 +1,7 @@
 # Problem reports handled automatically
 
+**The rules for every answer and draft (timing, no names, both languages, built on what the website really has) are in [REQUIREMENTS.md › 9](../REQUIREMENTS.md#9-answering-students).** This file only has the steps of the routine; if the two ever differ, REQUIREMENTS.md wins.
+
 Roger, 8 Nov 2026: "When somebody reports a problem I want you to read it straightaway and, if it's a real problem, fix it and answer the
 student that it is fixed straightaway. Merge, but it must be a technical problem, not a design or pedagogical thing." Then: "I must be
 informed though via mail, with an important subject."
