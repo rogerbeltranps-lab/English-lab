@@ -5,6 +5,7 @@
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}a[data-do]{color:#0f766e;cursor:pointer;text-decoration:underline dotted}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.chip.dim:not(.on){color:#64748b;border-style:dashed}.lsbar{margin:2px 0 10px}#stans td{white-space:normal}td.ac.st{cursor:pointer}td.ac.st:hover{outline:2px solid #0f766e;outline-offset:-2px}td.pt{white-space:nowrap}td.gcol{white-space:nowrap}a.ptm{cursor:pointer;text-decoration:underline dotted}td.gcol .grings{margin-left:0}td.exm{background:#f8fafc;white-space:nowrap}td.exm a.exrep{color:inherit;text-decoration:underline dotted}td.exm a.exrep:hover{color:#0f766e}td.exm .exsec{border:0;background:none;padding:0 0 0 4px;font-size:12px;cursor:pointer;opacity:.7}td.exm .exsec:hover{opacity:1}a.vygo{background:#1f6b52;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 2px 0 #174d3d}a.vygo:hover{filter:brightness(1.1)}
+.vymap{margin:8px 0 12px}.vymap .vy-steps,.vymap .vy-go,.vymap .vy-down{display:none}.vymap .vy{margin:0}
 .vysea{position:relative;height:190px;margin:8px 0 12px;border-radius:16px;border:3px solid #b08a52;background:linear-gradient(#ffffff38,#ffffff38),url(shared/img/voyage/sea.webp) 0 0/240px repeat,#7fc0e3;overflow:hidden}
 .vysea .vyport{position:absolute;top:8px;background:#fbf3df;border:1px solid #b08a52;border-radius:10px;padding:2px 10px;font:700 13px Georgia,serif;color:#4a2f0e}.vysea .vyport.l{left:10px}.vysea .vyport.r{right:10px;max-width:45%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vysea .vyb{position:absolute;display:flex;align-items:center;gap:2px;width:40px}.vysea .vyb img{width:34px;height:34px}.vysea .vyb b{font-size:10.5px;color:#fff;border-radius:999px;padding:0 6px;border:1.5px solid #fff;white-space:nowrap;background:#16a34a}.vysea .vyb.amber b{background:#ea580c}.vysea .vyb.red b{background:#dc2626}
@@ -272,6 +273,8 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-garden.js" defer></script>
 <script src="4eso/towards-nativeness/tn-garden.js" defer></script>
 <script src="shared/js/el-sections.js"></script>
+<script src="shared/js/el-step-titles.js" defer></script>
+<script src="shared/js/el-voyage.js" defer></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
@@ -1766,22 +1769,44 @@ function vyRank(grp,ls,studs){
   rows.sort(srt==="name"?(a,b)=>nm(a).localeCompare(nm(b),"ca"):srt==="mark"?(a,b)=>bym(a,b)||b.done-a.done||nm(a).localeCompare(nm(b),"ca"):(a,b)=>b.done-a.done||bym(a,b)||nm(a).localeCompare(nm(b),"ca"));
   const ST={green:["🟢","On course"],amber:["🟠","Drifting"],red:["🔴","Needs a push"]},T=Math.max(0,...rows.map(r=>r.total)),first=s=>(shortName(s).short||"").split(" ")[0];
   const cnt=k=>rows.filter(r=>r.st===k).length;
-  // the mini sea: a boat per student by steps done, stacked when they share a place
+  // 🗺 the class map (Roger, 20 Nov 2026: "I need to see the path with the students on my dashboard"): the students' own voyage map of
+  // this group (the Time plan's stops, the ports, the destination), every student's boat or van by steps done, nobody as "You"; no reads
+  const map=vyMap(grp,ls,rows,fa,first);if(map)return vyBox(rows,srt,cnt,`<div class="vymap">${map}</div>`,body0(rows,srt,ST,nm),T);
+  // the mini sea (if the map is not there): a boat per student by steps done, stacked when they share a place
   const at={};rows.forEach(r=>{const x=T?Math.round(r.done/T*10):0;(at[x]=at[x]||[]).push(r)});
   const hh=Math.max(190,60+Math.max(1,...Object.values(at).map(L=>L.length))*30);
   const sea=`<div class="vysea" aria-hidden="true" style="height:${hh}px;background-image:linear-gradient(#ffffff38,#ffffff38),url(shared/img/${art[0]})"><span class="vyport l">⚓ Start</span><span class="vyport r">🏆 ${fa?esc(fa.title.replace(/\s*\([^)]*\)\s*$/,"")):"Final product"}</span>`
     +Object.entries(at).map(([x,L])=>L.map((r,j)=>`<span class="vyb ${r.st}" style="left:calc(${5+x*8.6}% - 20px);bottom:${8+j*30}px" title="${esc(fullName(r.s))}: ${r.done} of ${r.total} steps"><img src="shared/img/${art[1]}" alt=""><b>${esc(first(r.s))}</b></span>`).join("")).join("")+`</div>`;
-  let red=false;
-  const body=rows.map((r,i)=>{const line=srt==="steps"&&r.st==="red"&&!red?(red=true,`<tr class="vyline"><td colspan="6">🔴 From here: needs a push (5 or more steps missing)</td></tr>`):"";
+  return vyBox(rows,srt,cnt,sea,body0(rows,srt,ST,nm),T)}
+function body0(rows,srt,ST,nm){let red=false;
+  return rows.map((r,i)=>{const line=srt==="steps"&&r.st==="red"&&!red?(red=true,`<tr class="vyline"><td colspan="6">🔴 From here: needs a push (5 or more steps missing)</td></tr>`):"";
     const nx=r.miss[0],todo=nx?`${stepName(nx[0].id,nx[1])}${r.miss.length>1?` <small class="muted">+${r.miss.length-1}</small>`:""}`:`<span class="muted">nothing: all done ✓</span>`;
     return line+`<tr class="vy-${r.st}"><td class="muted">${i+1}</td><td class="stu"><a data-do="stu" data-u="${esc(r.s.uid)}">${name(r.s)}</a></td>`
       +`<td><span class="vybar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></span> <b>${r.done}</b> <small class="muted">/ ${r.total}</small></td>`
-      +`<td class="vytodo">${todo}</td><td><b>${f1(r.m)}</b></td><td>${ST[r.st][0]} ${ST[r.st][1]}</td></tr>`}).join("");
-  return `<div class="box vyrank"><h2>⛵ Class voyage: who needs a push</h2><p class="muted">Steps done of the open steps (the stops of the students' voyage map: open learning paths and sections, not the final product or the sample exam), then the LS mark so far. Click a name for the student's details.</p>`
+      +`<td class="vytodo">${todo}</td><td><b>${f1(r.m)}</b></td><td>${ST[r.st][0]} ${ST[r.st][1]}</td></tr>`}).join("")}
+function vyBox(rows,srt,cnt,sea,body){
+  return `<div class="box vyrank"><h2>⛵ Class voyage: who needs a push</h2><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map: the Time plan's activities in open learning paths and sections, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>`
     +`<div class="bar"><span class="muted">Order by ·</span> ${[["steps","Steps done"],["mark","LS mark"],["name","Name"]].map(([k,l])=>`<button class="chip ${srt===k?"on":""}" data-do="vysort" data-s="${k}">${l}</button>`).join("")}`
     +` <span class="muted">· 🟢 ${cnt("green")} on course · 🟠 ${cnt("amber")} drifting · 🔴 ${cnt("red")} need a push</span></div>${sea}`
     +`<div class="wrap"><table class="vyt"><thead><tr><th>#</th><th>Student</th><th>Steps done</th><th>Still to do</th><th>LS mark so far</th><th>Status</th></tr></thead><tbody>${body}</tbody></table></div>`
     +`<p class="muted">🟢 On course: at most 1 step missing and a mark of 5 or more · 🟠 Drifting: 2 to 4 steps missing, or a mark under 5 · 🔴 Needs a push: 5 or more steps missing.</p></div>`}
+// the students' map for the whole group: stops = the tabs on the group's Time plan (vyOnPlan) of its open learning paths, locked ones hidden
+let VYV=null;
+function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.D.ls[ls]||{},gid=grp.id,on=vyOnPlan(ls,gid),L=EL_LS.find(l=>l.id===ls);
+  const beds=acts(ls).filter(a=>!a.manual&&!(a.optional&&!a.checkpoint)&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,gid)).map(a=>{
+    const ks=(EL_ACTIONS[a.id]||[]).filter(k=>!(a.skip||[]).includes(k)),off=elSecLocked(a,info,gid)||[],lk=k=>off.includes(k)||(k==="cards"||k==="practice")&&off.includes("vocab");
+    const secs=(window.EL_SECTIONS||{})[a.id]||[],seen=new Set(),plants=[];
+    elTabGroups(a,ks).forEach(g=>{const id=vyTab(a,g[0]);if(seen.has(id)||on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+id)||g.every(lk))return;seen.add(id);
+      plants.push({id,key:a.id+"#"+id,name:((secs.find(x=>x[0]===id)||[])[1])||id,href:a.path?a.path+"#"+id:"#",st:"sprout"})});
+    return {id:a.id,kind:a.checkpoint?"cp":"lp",plants}}).filter(b=>b.plants.length);
+  if(!beds.length)return "";
+  VYV={ls:window.elLsNum&&L?elLsNum(L):"",skin:ls,en:true,beds,now:null,fp:{title:fa?fa.title.replace(/\s*\([^)]*\)\s*$/,"").replace(/^final product:\s*/i,""):"",href:fa&&fa.path||"#",done:false},
+    me:null,mates:rows.map(r=>({n:first(r.s),s:r.done})),cont:null,store:null,save:false,quiet:()=>true};
+  // wired once the box is on the page; the view starts at the middle of the class (no "You" here)
+  setTimeout(()=>{const r=document.querySelector(".vyrank .vymap");if(!r||!VYV)return;elVoyage.wire(r,VYV);
+    const sc=r.querySelector(".vy-sc"),ms=[...r.querySelectorAll(".vy-mates")].sort((x,y)=>x.offsetTop-y.offsetTop),m=ms[ms.length>>1];
+    if(sc&&m)sc.scrollTop=Math.max(0,m.offsetTop-sc.clientHeight*.5)},0);
+  return elVoyage.html(VYV)}
 const fpAct=(ls,list)=>{const g=(window.EL_GRADING||{})[ls]||{};return (g.fp&&byId(g.fp.a))||(list||acts(ls)).find(a=>a.manual&&a.graded)||(list||acts(ls)).find(a=>a.manual)||null};
 const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};if(x.max)return true;
   return !!(g.fp&&g.fp.a===a.id&&!g.fp.mark&&g.fp.rows.length&&g.fp.rows.every(r=>lvOf(u,a.id,r.step,r.c)))};

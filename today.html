@@ -636,9 +636,11 @@ function voyageRoad(ls,V){
   F.getDoc(ref).then(x=>{RD[ls.id]=x.exists()?x.data():{};write();if(placeNow()==="home"&&S.ls===ls.id&&$(".vy"))render()}).catch(e=>{console.warn("road",e);RD[ls.id]={}})}
 // 🧭 Your steps on the activity pages (el-app.js): the voyage's stops as the board sees them, kept in this browser (el_voyage_steps), so
 // the activity pages draw the same list with no reads (their own page's ticks come from the page itself). Not in the teacher's student view.
-function voyageKeep(ls,V){if(AS)return;try{const M=elVoyage.model(V),k=x=>elVoyage.sk(x,EN);
+// The teacher's view of a student's board keeps that student's copy too (u = the student), so the activity pages opened from it show the
+// same Your steps (Roger, 20 Nov 2026).
+function voyageKeep(ls,V){try{const M=elVoyage.model(V),k=x=>elVoyage.sk(x,EN);
   const sk=elVoyage.skin(V);
-  localStorage.setItem("el_voyage_steps",JSON.stringify({u:(U&&U.uid)||"demo",ls:ls.id,at:Date.now(),en:EN,now:V.now,fp:V.fp,vb:[sk.veh.icon,...sk.w.map],
+  localStorage.setItem("el_voyage_steps",JSON.stringify({u:AS||(U&&U.uid)||"demo",ls:ls.id,at:Date.now(),en:EN,now:V.now,fp:V.fp,vb:[sk.veh.icon,...sk.w.map],
     items:M.items.map(x=>x.port?{p:x.port.f,c:x.port.c,ok:!!x.done}:(o=>({k:x.key,h:x.href,t:x.t,s:o.n,i:o.i,c:o.c,d:!!x.done}))(k(x.sk)))}))}catch(e){}}
 function voyageHome(ls,info,nx,top){S.vy=voyageData(ls,info,nx);voyageRoad(ls,S.vy);voyageKeep(ls,S.vy);
   if(window.elNbFab)elNbFab(new URL(lsHref(ls)+"#notes",location.href).href);   // the floating 📓 button, as the notebook card did

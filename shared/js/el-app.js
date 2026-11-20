@@ -459,7 +459,7 @@
   const voyPage = h => decodeURIComponent(String(h).split("#")[0]), voyHere = h => decodeURIComponent(path).endsWith("/" + voyPage(h));
   function voyData() {
     let o = null; try { o = JSON.parse(localStorage.getItem("el_voyage_steps") || "null"); } catch (e) {}
-    if (!o || !Array.isArray(o.items) || (W && W.uid && o.u && o.u !== W.uid && o.u !== "demo")) return null;
+    if (!o || !Array.isArray(o.items) || (W && W.uid && o.u && o.u !== (who.as || W.uid) && o.u !== "demo")) return null;
     return o.items.some(x => x.h && voyHere(x.h)) ? o : null;
   }
   function voyCss() {
@@ -475,15 +475,22 @@
       + ".ellp-voy .ok .tk,.ellp-voy .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.ellp-voy li.ok .n{color:#6b7280}"
       + ".ellp-voy li.here a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.ellp-voy li.here .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}"
       + ".ellp-voy li.fp a{margin-top:6px;background:#fdf2d6;font-weight:700}.ellp-voy li.fp .tk{border:0;font-size:17px;color:inherit}"
-      + ".ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}"
+      + ".ellp-voyback{margin-bottom:10px;padding-bottom:6px}.ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}"
       + "html.el-voy #el-nbfab b{max-width:140px;margin-left:8px}";
     document.head.append(st);
   }
   function voyDraw() {
     const side = $(".ellpside"); if (!side) return;
-    const o = voyOn() ? voyData() : null; let box = side.querySelector(".ellp-voy");
+    const o = voyOn() ? voyData() : null; let box = side.querySelector(".ellp-voy:not(.ellp-voyback)");
     side.classList.toggle("ellp-isvoy", !!o);
-    if (!o) { if (box) box.hidden = true; return; }
+    const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
+    // no copy of the steps yet (the board not opened in this browser): still a button back to the map, over the path's own tabs
+    if (!o) { if (box) box.hidden = true; let b = side.querySelector(".ellp-voyback");
+      if (voyOn()) { voyCss(); if (!b) { b = document.createElement("nav"); b.className = "ellp-voy ellp-voyback"; side.querySelector(".ellp-steps")?.before(b); }
+        const v = /\/2eso\//.test(path) ? ["🚌", "Torna al mapa", "Back to the map"] : ["⛵", "Torna al mapa", "Back to the map"];
+        b.innerHTML = `<a class="vb" href="${board}">${esc(v[0])} ${esc(t(v[1], v[2]))}</a>`; b.hidden = false; }
+      return; }
+    { const b = side.querySelector(".ellp-voyback"); if (b) b.hidden = true; }
     voyCss();
     if (!box) {
       box = document.createElement("nav"); box.className = "ellp-voy"; box.setAttribute("aria-label", t("Els teus passos", "Your steps"));
@@ -497,7 +504,7 @@
     if (nav && box._nav !== nav) { box._nav = nav; new MutationObserver(() => voyTicks()).observe(nav, { subtree: true, attributes: true, attributeFilter: ["class"] }); }
     const key = JSON.stringify([o.at, CA]); if (box._key === key) return voyTicks(); box._key = key;
     const vb = Array.isArray(o.vb) && o.vb.length === 3 ? o.vb : ["⛵", "Torna al mapa", "Back to the map"];   // the skin's words (el-voyage.js)
-    let h = `<a class="vb" href="${ROOT}today.html">${esc(vb[0])} ${esc(t(vb[1], vb[2]))}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
+    let h = `<a class="vb" href="${board}">${esc(vb[0])} ${esc(t(vb[1], vb[2]))}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
     o.items.forEach(x => {
       if (x.p) { h += `<li class="pt" data-port><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${x.ok ? " ok" : ""}">✓</span></li>`; return; }
       const here = voyHere(x.h), pid = here ? (String(x.h).split("#")[1] || "") : "";
@@ -509,7 +516,7 @@
   }
   // this page's ticks from its own tabs (done, the one on screen), the count and the ports
   function voyTicks(first) {
-    const box = $(".ellp-voy"); if (!box || box.hidden) return;
+    const box = $(".ellp-voy:not(.ellp-voyback)"); if (!box || box.hidden) return;
     box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
       li.classList.toggle("ok", tb.classList.contains("done"));
       const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
