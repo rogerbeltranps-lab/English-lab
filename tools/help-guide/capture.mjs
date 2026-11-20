@@ -60,7 +60,7 @@ const SHOTS = [
   { id: 'lp', url: `${C.dir}/${C.lp}.html`, pg: lpNotDone('listen'), click: '.tab[data-panel="listen"]',
     run: `(()=>{const f=document.querySelector('#listenForm');const qs=f.querySelectorAll('.question');qs.forEach((q,i)=>{const r=q.querySelector('input[value="'+(i===qs.length-2?1:0)+'"]');if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}))}});
       document.querySelector('#listenCheck').click();setTimeout(()=>{const e=document.querySelector('#listenCheck');scrollTo({top:e.getBoundingClientRect().top+scrollY-innerHeight+200,behavior:'instant'})},200)})()` },
-  { id: 'cards', url: `${C.dir}/${C.lp}.html`, click: '.tab[data-panel="vocab"]', run: toTop('#flashcard', 260) },
+  { id: 'cards', url: `${C.dir}/${C.lp}.html`, click: '.tab[data-panel="vocab"]', run: toTop('#wordCards', 260) },
   { id: 'notes', url: `${C.dir}/index.html#notes`, run: toTop('.ncard:nth-of-type(2), .ncard + .ncard', 30) },
   { id: 'marks', url: 'today.html#marks' },
   { id: 'marks-exam', url: 'today.html#marks', click: `[data-do="ls"][data-ls="${C.ls1}"]`, click2: '[data-do="tab"][data-t="exam"]', run: toTop('.tabbody', 30) },

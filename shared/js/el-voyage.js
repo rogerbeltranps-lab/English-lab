@@ -72,8 +72,8 @@
         {img:"van-camper",me:"van-camper-me",band:"inset(31% 0 9% 0)"},{img:"bus-double",me:"bus-double-me",band:"inset(28% 0 9% 0)"},
         {img:"van-cart",me:"van-cart-me",band:"inset(28% 0 11% 0)"}]},
       fog:"clouds",
-      // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
-      decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
+      // sports-reporter decorations only: no Barcelona landmarks (Roger, 20 Nov: "it doesn't make sense")
+      decos:["deco-traffic-light","deco-camera","deco-football","deco-drone","deco-microphone","deco-camera","deco-football","deco-drone","deco-microphone"],
       road:{halo:"#6b7280",hw:30,line:"#fff",lw:3,dash:"14 12"},
       // sounds: a clean sports-TV theme (no noise drums), camera snap, cheer, fanfare, beep-beep horn. No background loop: the crowd
       // loop sounded like noise, and iPhones ignore the volume we set, so it played as loud as the song (Roger, 20 Nov)
@@ -136,9 +136,10 @@
 
   // ---- sounds ----
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
-  // quiet(): the teacher's view of a student's board and class mode start with no sound; there the 🎵 button turns it on for this page (force)
-  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,force:false,dt:0,sk:skinOf(null),
-    hush(){return this.quiet()&&!this.force},
+  // The music is on by default (Roger, 20 Nov: "always on except for when it's class time for the students"). quiet(): no sound to
+  // start with, the 🎵 button turns it on for this page (force); lock(): no sound at all, not even with 🎵 (a student in class time)
+  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
+    hush(){return this.lock()||this.quiet()&&!this.force},
     play(k,vol){const f=this.sk.snd[k];if(!f||!this.on||this.hush())return;try{const a=new Audio(this.sk.A+f);a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
     duck(){const m=this.music;if(!m)return;clearTimeout(this.dt);m.volume=this.MV*.35;this.dt=setTimeout(()=>{if(this.music)this.music.volume=this.MV},1800)},
     startBg(){if(this.music||!this.on||this.hush()||!document.querySelector(".vy-sea")||document.hidden)return;
@@ -199,8 +200,9 @@
 .vy-fog{position:absolute;left:-60px;right:-60px;z-index:4;pointer-events:none}.vy-fog img{position:absolute;width:100%;height:150px;left:0}
 .vy-tip{position:absolute;left:50%;transform:translateX(-50%);z-index:5;background:#fff;border-radius:12px;padding:6px 12px;font-size:12.5px;color:#4b5563;box-shadow:0 1px 4px #0002;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
 .vy-dest{position:absolute;left:50%;transform:translateX(-50%);z-index:5;text-align:center;width:min(330px,92%);background:#fbf3df;border:2px solid #b08a52;border-radius:16px;padding:6px 10px 10px;box-shadow:0 3px 0 #8a6a3a;color:inherit;text-decoration:none}
-.vy-dest img{width:180px;height:170px;object-fit:contain;display:block;margin:-4px auto -8px}.vy-dest small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b45309;font-weight:800}
+.vy-dest img{width:180px;height:170px;object-fit:contain;display:block;margin:-4px auto 4px}.vy-dest small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b45309;font-weight:800}
 .vy-dest small.ce{color:#9a3412;text-transform:none;letter-spacing:0;font-size:12px}.vy-dest b{display:block;font:700 18px Georgia,serif;color:#4a2f0e;margin-top:2px}.vy-dest p{margin:3px 0 0;font-size:12.5px;color:#374151;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.vy-sea.narrow .vy-b.big{width:64px;height:64px}.vy-sea.narrow .vy-boat .vy-b{width:46px;height:46px}.vy-sea.narrow .vy-boat b{font-size:10px;padding:1px 5px}.vy-sea.narrow .vy-boat{min-width:40px}
 .vy-dest.ok b::after{content:" ✓";color:#15803d}
 .vy-btn{position:absolute;bottom:12px;z-index:7;height:42px;border-radius:12px;background:#ffffffe6;display:flex;align-items:center;gap:6px;padding:0 12px;font:700 14px system-ui,sans-serif;box-shadow:0 1px 4px #0003;color:#1d3557;border:0;cursor:pointer}
 .vy-btn.off{opacity:.65}.vy-snd{right:66px}.vy-down{right:14px;width:42px;justify-content:center;padding:0;font-size:19px}
@@ -226,7 +228,7 @@
 .vy-go{display:flex;margin-top:10px}.vy-go a{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;background:#3fa34d;color:#fff;text-decoration:none;font-weight:800;font-size:19px;border-radius:16px;padding:12px;box-shadow:0 4px 0 #2b7a36;min-width:0}
 .vy-go a small{font-weight:600;font-size:15px;opacity:.95;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vy-go a.fin{background:#b45309;box-shadow:0 4px 0 #7c3a06}.vy-go a.all{background:#fff;color:#174d3d;box-shadow:0 4px 0 #cbd5e1}
 @media (max-width:900px){.vy-steps{display:none}}
-@media (max-width:640px){.vy-row{height:calc(100vh - 210px);min-height:420px}.vy-top b{font-size:15px}.vy-lab{max-width:140px;font-size:12px}.vy-b.big{width:64px;height:64px}.vy-go a{font-size:17px}.vy-go a small{display:none}.vy-snd span{display:none}}
+@media (max-width:640px){.vy-row{height:calc(100vh - 210px);min-height:420px}.vy-top b{font-size:15px}.vy-lab{max-width:140px;font-size:12px}.vy-go a{font-size:17px}.vy-go a small{display:none}.vy-snd span{display:none}}
 @media (prefers-reduced-motion:reduce){.vy-b,.vy-deco,.vy-fog img,.vy-sea::before{animation:none}.vy-fws{display:none}}`;document.head.appendChild(s)}
 
   // ---- the frame (the map itself is laid out by wire, at the width it gets) ----
@@ -253,7 +255,7 @@
   const LAST={};   // scroll position per store, kept when the board draws again
   function wire(root,V){const sea=root&&root.querySelector(".vy-sea");if(!sea)return;
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
-    SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
+    SND.quiet=V.quiet||(()=>false);SND.lock=V.lock||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
     const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:32,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
     // a port card (square-ish, Roger 20 Nov) never covers a stop, a label or a vehicle: measure each card first and give it the room it
     // needs (half its height + the vehicles' half height ~50 px + a margin, on each side)
@@ -264,12 +266,27 @@
     map.querySelectorAll(".vy-port").forEach((el,j)=>{M.ports[j].ph=Math.max(PH,Math.ceil(el.offsetHeight/2)+56-GAP/2)});
     // from the top: the final product card, the vehicles that got there, the fog (only until the final product is sent), then the
     // stops. The fog never covers a vehicle or a label (Roger, 20 Nov): the road starts low enough to leave it its own band
-    const dEl=map.querySelector(".vy-dest"),destB=58+(dEl&&dEl.offsetHeight||330),finY=destB+60,FOGH=220,fogTop=destB+110;
-    const need=fp.done?finY+150:fogTop+FOGH+70;
+    // every student's vehicle is shown (Roger, 20 Nov: "I want to see them all"): at a stop they stand in rows on the side without
+    // the label (yours first, next to the stop), as many rows as needed, and the road leaves the stop the room for its rows
+    const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),RH=wide?80:66,YW=wide?100:72;sea.classList.toggle("narrow",!wide);
+    const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
+    Object.values(at).forEach(L=>L.sort((a,b)=>String(a.n).localeCompare(b.n)));
+    const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
+    const bw=m=>wide?Math.max(52,String(m.n).length*7.5+16)+4:Math.max(46,String(m.n).length*6.3+14)+4;
+    const pack=(L,room0,room)=>{const rows=[[]];let used=0,cap=room0;
+      L.forEach(m=>{const w=bw(m),r=rows[rows.length-1];if(r.length?used+w>cap:w>cap&&cap<room){rows.push([]);used=0;cap=room}rows[rows.length-1].push(m);used+=w});
+      return rows.filter((r,k)=>r.length||(k===0&&rows.length>1))};
+    const dEl=map.querySelector(".vy-dest"),destB=58+(dEl&&dEl.offsetHeight||330),finY=destB+70,FOGH=220;
+    const finRows=at[n]?pack(at[n],W-8-(meI===n&&V.me?YW:0),W-8):[],fR=Math.max(finRows.length,meI===n&&V.me?1:0);
+    const fogTop=destB+110+Math.max(0,fR-1)*RH,need=fp.done?finY+Math.max(0,fR-1)*RH+150:fogTop+FOGH+70;
     let total,pts,topY;
-    const lay=T=>{total=T;M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP);total+=90;
-      let yy=total-70,li=0;pts=[];
-      M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}it.x=cx+lanes[li%lanes.length]*lane;it.y=yy;it.right=it.x<=cx;pts.push([it.x,it.y]);li++;yy-=STEP});
+    const lay=T=>{let yy=0,li=0;pts=[];total=T;
+      // first the rows of each stop (they depend on where the stop stands), then the heights
+      M.items.forEach(it=>{if(it.port)return;it.x=cx+lanes[li%lanes.length]*lane;it.right=it.x<=cx;li++;
+        const i=M.stops.indexOf(it),room=(it.right?it.x-40:W-it.x-40)-4,mine=i===meI&&V.me;
+        it.rows=at[i]?pack(at[i],room-(mine?YW:0),room):[];it.ex=Math.max(0,Math.max(it.rows.length,mine?1:0)-1)*RH});
+      M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP+it.ex);total+=90;yy=total-70;
+      M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}yy-=it.ex/2;it.y=yy;pts.push([it.x,it.y]);yy-=STEP+it.ex/2});
       topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120};
     lay(TOP);if(topY<need)lay(TOP+need-topY);
     map.style.height=total+"px";
@@ -293,21 +310,13 @@
       h+=`<a class="vy-st${c}" href="${esc(s.href)}" data-k="${esc(s.key)}" style="left:${s.x}px;top:${s.y}px" title="${esc(skName(s.sk,en)+" · "+s.t)}">${k[0]}</a>`
         +`<a class="vy-lab${c}" href="${esc(s.href)}" style="${s.right?`left:${lx}px`:`right:${W-lx}px`};top:${s.y}px"><small style="color:${k[1]}">${esc(skName(s.sk,en))}</small>${esc(s.t)}</a>`});
     // boats: every student by the steps done (one past the last stop = at the destination)
-    const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0));
-    const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
-    const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
-    const YO=wide?78:74,XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),s.y+48])(M.stops[i]):[cx+(wide?200:110),finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;
-    // at a stop the vehicles stand in one row on the side without the label: yours next to the stop, then the classmates that fit
-    // (never on top of each other or of the stop; the others become "+3", names on hover)
-    const bw=m=>Math.max(52,String(m.n).length*7.5+16)+4;
-    for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),s=+i<n?M.stops[i]:null,off=+i===meI&&V.me?(wide?100:72):0;
-      let room=s?(s.right?s.x-40:W-s.x-40)-off-4:W-8,sh=[],used=0;
-      for(const m of L){const w=bw(m),left=L.length-sh.length-1;if(sh.length>=(wide?4:3)||used+w+(left?36:0)>room)break;sh.push(m);used+=w}
-      const more=L.length-sh.length,max=sh.length;
-      const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
-      const wB=used+(more?36:0);
-      if(s){const x=s.right?s.x-40-wB-off:s.x+40+off;h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
-      else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${finY}px">${boats}</div>`}
+    // the rows of a stop are centred on it; yours is the first row; at the destination the rows start at the left edge
+    const y0=s=>s.y-s.ex/2,YO=wide?78:74;
+    const XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),y0(s)+48])(M.stops[i]):[8+YW/2,finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;
+    const row=r=>r.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
+    M.stops.forEach((s,i)=>(s.rows||[]).forEach((r,k)=>{if(!r.length)return;const off=k===0&&i===meI&&V.me?YW:0,wB=r.reduce((a,m)=>a+bw(m),0);
+      h+=`<div class="vy-mates" style="left:${s.right?s.x-40-wB-off:s.x+40+off}px;top:${y0(s)+k*RH}px">${row(r)}</div>`}));
+    finRows.forEach((r,k)=>{if(!r.length)return;const off=k===0&&meI===n&&V.me?YW:0;h+=`<div class="vy-mates" style="left:${8+off}px;top:${finY+k*RH}px">${row(r)}</div>`});
     if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1,V.me.n)}</div>`;
     // fog over what is not open yet, then the destination: the final product
     if(!fp.done){const fg=`${I}${S.fog}.webp`;const ft=topY-70-FOGH;h+=`<div class="vy-fog" style="top:${ft}px;height:${FOGH}px"><img src="${fg}" style="top:0" alt=""><img src="${fg}" style="top:35px;transform:scaleX(-1)" alt=""><img src="${fg}" style="top:70px" alt=""></div>`

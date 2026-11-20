@@ -695,6 +695,7 @@ var LS2 = (function () {
 
   /* ---------- panels ---------- */
   const R = {};
+  let WC = null;   // the word cards of the Vocabulary step (el-wordcards.js)
   // a checkpoint with `secure` (answers not in the page, one try, feedback when the teacher releases it): shared/js/el-checkpoint.js
   R.recall = p => p.secure && window.ELCheckpoint ? ELCheckpoint.panel(p, { LP, level: () => level, ca, get state() { return state; }, save, complete, forLevel }) : ({
     html: '<div class="section-card"><div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
@@ -727,10 +728,7 @@ var LS2 = (function () {
       (p.explain ? '<div class="section-card worked vocab-expr"><h3>💬 Expressions</h3><p class="instruction">' + (ca() ? 'Paraules que van juntes: aprèn-les en bloc.' : 'Words that go together: learn them as one block.') + '</p>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
       '<div class="actions dir-toggle" role="group"' + (level === 'native' ? ' hidden' : '') + ' aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
-      '<p class="instruction" id="cardHow"></p>' +
-      '<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>' + (ca() ? 'Clica per girar la targeta' : 'Click to turn the card') + '</p></div><div class="face back"><div class="label" id="cardBackLabel">Català + example</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>' +
-      '<div class="actions" id="cardTypeRow" hidden><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (ca() ? 'Escriu la paraula en anglès' : 'Type the English') + '"><button class="btn" type="button" id="cardTypeCheck">' + (ca() ? 'Comprova i gira' : 'Check and turn') + '</button></div><p class="feedback" id="cardTypeMsg"></p>' +
-      '<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← ' + (ca() ? 'Anterior' : 'Previous') + '</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">' + (ca() ? 'Següent' : 'Next') + ' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p></div>' +
+      '<div id="wordCards"></div></div>' +
       (p.practice ? '<div class="section-card"><h3>' + (p.practiceMode === 'listen' ? (ca() ? 'Escolta i completa' : 'Listen and complete') : (ca() ? 'Completa les frases' : 'Complete the sentences')) + '</h3>' + (p.practiceMode ? '<p class="instruction">' + modeHow(p.practiceMode) + '</p>' : '') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + allLabel() + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
     bind() {
       const groups = forLevel(p.groups);
@@ -740,10 +738,9 @@ var LS2 = (function () {
       const chipsHtml = items => '<div class="chips">' + items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div>';
       $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3>' + chipsHtml(g.items) + '</article>').join('') +
         revGroups.map(g => '<article class="vocab-group vocab-review" style="border-style:dashed"><h3>🔁 ' + (ca() ? 'Repàs · ' : 'Review · ') + g.g + '</h3>' + chipsHtml(g.items) + '</article>').join('');
-      /* Catalan → English (research audit, Roger 26 Oct 2026): the card shows the Catalan, the student types (or says) the English, then turns it.
+      /* Catalan → English (research audit, Roger 26 Oct 2026): the card shows the Catalan and the student says the English, then turns it.
          It uses the core words of the panel (p.core: a list of English words, or one list per route) and, until the LS project marks them,
-         every word of the Learning Path. state.cardDir remembers the direction.
-         English → Català (Roger, 3 Nov 2026) also has an optional box: type the meaning, Check and turn; lenient check (loose/oneEdit). */
+         every word of the Learning Path. state.cardDir remembers the direction. */
       const dir = () => state.cardDir === 'ca' && level !== 'native' ? 'ca' : 'en';   // Native: word → meaning only
       const coreSet = () => { const c = p.core; if (!c) return null; const l = Array.isArray(c) ? c : forLevel(c); return l.length ? new Set(l.map(norm)) : null; };
       const deck = () => {
@@ -756,43 +753,24 @@ var LS2 = (function () {
         const earlier = forLevel(p.review || []).flatMap(g => g.items.map(x => [x[0], x[1], g.g + ' · review', x[2]]));
         return own.concat(earlier);
       };
-      const showDir = () => {
-        const c = dir() === 'ca';
-        $$('.dir-toggle [data-dir]').forEach(b => { const on = b.dataset.dir === dir(); b.classList.toggle('secondary', !on); b.setAttribute('aria-pressed', on); });
-        $('#cardHow').textContent = c ? (ca() ? 'Llegeix la paraula en català, escriu-la o digues-la en anglès i després gira la targeta per comprovar-ho.' : 'Read the Catalan, type or say the English, then turn the card to check.')
-          : (ca() ? 'Digues l’expressió en veu alta i, si vols, escriu què vol dir en català. Després gira la targeta.' : level === 'native' ? 'Say the expression aloud and, if you want, type its meaning. Then turn the card.' : 'Say the expression aloud and, if you want, type what it means in Catalan. Then turn the card.');
-        $('#cardBackLabel').textContent = c ? 'English + example' : level === 'native' ? 'Meaning + example' : 'Català + example';
-        $('#cardTypeRow').hidden = false; $('#cardType').value = '';
-        $('#cardType').placeholder = c ? (ca() ? 'Escriu la paraula en anglès' : 'Type the English') : ca() ? 'Escriu què vol dir en català (opcional)' : level === 'native' ? 'Type the meaning (optional)' : 'Type the meaning in Catalan (optional)'; $('#cardTypeMsg').textContent = '';
-      };
-      const loose = x => norm(String(x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’‘·-]/g, ' '))
-        .split(' ').filter(w => w && !/^(el|la|l|els|les|lo|un|una|uns|unes|al|als|del|dels|d|de|the|a|an|to)$/.test(w)).join(' ');
-      const oneEdit = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, d = 0;
-        while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++d > 1) return false; if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; } }
-        return d + (a.length - i) + (b.length - j) <= 1; };
-      const typedCheck = () => {
-        const card = flashcardSet.cards[flashcardSet.index]; if (!card) return;
-        const v = norm($('#cardType').value), alts = String(card[1]).split(/\s*[\/,;]\s*/);
-        let ok = !!v && alts.some(a => norm(a.replace(/\([^)]*\)/g, '')) === v || norm(a) === v), near = false;
-        if (v && !ok && dir() === 'en') {   // a meaning (Catalan) can be written in several ways: ignore accents, articles, brackets; one typo is "nearly"
-          const t = loose(v), cands = alts.flatMap(a => [a.replace(/\([^)]*\)/g, ''), ...(a.match(/\(([^)]*)\)/g) || []).map(x => x.slice(1, -1))]).map(loose).filter(Boolean);
-          ok = cands.includes(t); near = !ok && t.length >= 5 && cands.some(x => oneEdit(x, t));
-        }
-        $('#cardTypeMsg').className = 'feedback ' + (ok || near ? 'ok' : 'no');
-        $('#cardTypeMsg').textContent = !v ? (ca() ? 'Escriu-la o digues-la en veu alta i gira la targeta.' : 'Type it, or say it aloud and turn the card.') : ok ? (ca() ? 'Correcte! Tria «Ho sé».' : 'Correct! Choose “Got it”.') : near ? (ca() ? 'Gairebé! Mira com s’escriu a la targeta.' : 'Nearly! Check the spelling on the card.') : (ca() ? 'Compara-la amb la targeta. Si no la sabies, tria «Un altre cop».' : 'Compare it with the card. If you didn’t know it, choose “Again”.');
-        $('#flashcard').classList.add('flipped');
-      };
-      $('#flashcard').onclick = () => $('#flashcard').classList.toggle('flipped');
-      $('#flashcard').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#flashcard').classList.toggle('flipped'); } };
-      window.renderCards = window.renderCards || function () {};
-      flashcardSet.cards = []; flashcardSet.lastLevel = null;
-      if (!flashcardSet.config) flashcardSet.init({ cards: deck, level: () => level, complete: () => complete('cards'), isDone: () => !!state.done.cards, always: true });
-      else { flashcardSet.config.cards = deck; flashcardSet.render(); }
+      const showDir = () => $$('.dir-toggle [data-dir]').forEach(b => { const on = b.dataset.dir === dir(); b.classList.toggle('secondary', !on); b.setAttribute('aria-pressed', on); });
+      /* 🃏 The cards (Roger, 20 Nov 2026: "simplify the vocabulary cards, no writing the prediction, simple like this and full screen,
+         like Practise"): shared/js/el-wordcards.js, the same cards as 🎯 Practise. Look, say it, turn over, ✓ Ho sabia / ↺ Encara no;
+         no typing; full screen on the first turn. The step is done when the student knows 10 cards (all of them if there are fewer),
+         as with the old set of 10. */
+      const known = new Set(), goal = () => Math.min(10, deck().length);
+      if (WC) WC.gone();
+      WC = ELWordCards.mount($('#wordCards'), {
+        cards: () => deck().map(x => { const en = dir() === 'ca' ? x[1] : x[0]; return { front: x[0], back: x[1], en, ex: x[3], src: x[2] }; }),
+        ca,
+        how: () => dir() === 'ca' ? (ca() ? 'Llegeix la paraula en català, digues-la en anglès en veu alta i després gira la targeta.' : 'Read the Catalan, say the English out loud, then turn the card over.')
+          : (ca() ? 'Mira la paraula, digues-la en veu alta i pensa què vol dir. Després gira la targeta.' : 'Look at the word, say it out loud and think what it means. Then turn the card over.'),
+        note: () => state.done.cards ? (ca() ? '✓ Pas fet. Pots continuar practicant tant com vulguis.' : '✓ Step done. Keep practising as much as you like.')
+          : (ca() ? 'El pas queda fet quan sàpigues ' + goal() + ' targetes (' + known.size + '/' + goal() + ').' : 'The step is done when you know ' + goal() + ' cards (' + known.size + '/' + goal() + ').'),
+        onKnow: w => { known.add(w.front); if (!state.done.cards && known.size >= goal()) complete('cards'); }
+      });
       showDir();
-      $$('.dir-toggle [data-dir]').forEach(b => b.onclick = () => { state.cardDir = b.dataset.dir; save(); flashcardSet.cards = []; flashcardSet.render(); showDir(); });
-      new MutationObserver(() => { if (!$('#flashcard').classList.contains('flipped')) { $('#cardType').value = ''; $('#cardTypeMsg').textContent = ''; } }).observe($('#flashcard'), { attributes: true, attributeFilter: ['class'] });
-      $('#cardTypeCheck').onclick = typedCheck;
-      $('#cardType').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); typedCheck(); } };
+      $$('.dir-toggle [data-dir]').forEach(b => b.onclick = () => { state.cardDir = b.dataset.dir; save(); known.clear(); showDir(); WC.render(); });
       if (p.practice) {
         const items = forLevel(p.practice);
         $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode, null, true); bindModes(items, 'vp', p.practiceMode);
@@ -1879,7 +1857,7 @@ var LS2 = (function () {
     $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + PS.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
       PS.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
-    flashcardSet.config = null;
+    if (WC) { WC.gone(); WC = null; }
     PS.forEach(p => p._r.bind());
     bindPlan();
     bindStudy();

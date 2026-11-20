@@ -7,7 +7,10 @@
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const r1=n=>Math.round(n*10)/10;
   // a marker shape (8px and up, with a 2px white ring so overlapping points stay apart): the second cue next to the colour
-  function mark(shape,x,y,col,tip){const t=tip?` data-tip="${esc(tip)}"`:"",a=`fill="${col}" stroke="#fff" stroke-width="2" class="elc-pt"${t}`;
+  // (big: the exam and final product points, which stand out from the weekly ones; star: the exam)
+  function mark(shape,x,y,col,tip,big){const t=tip?` data-tip="${esc(tip)}"`:"",a=`fill="${col}" stroke="#fff" stroke-width="2" class="elc-pt"${t}`;
+    if(shape==="star"){const R=big?10:7,r=R*0.45;return `<path d="${[...Array(10)].map((_,i)=>{const q=(-90+i*36)*Math.PI/180,d=i%2?r:R;return (i?"L":"M")+r1(x+Math.cos(q)*d)+" "+r1(y+Math.sin(q)*d)}).join("")}Z" ${a}/>`}
+    if(big&&shape==="square")return `<rect x="${r1(x-6.5)}" y="${r1(y-6.5)}" width="13" height="13" rx="2" ${a}/>`;
     if(shape==="square")return `<rect x="${r1(x-4.5)}" y="${r1(y-4.5)}" width="9" height="9" rx="1.5" ${a}/>`;
     if(shape==="diamond")return `<path d="M${r1(x)} ${r1(y-6)}L${r1(x+6)} ${r1(y)}L${r1(x)} ${r1(y+6)}L${r1(x-6)} ${r1(y)}Z" ${a}/>`;
     if(shape==="triangle")return `<path d="M${r1(x)} ${r1(y-6)}L${r1(x+6)} ${r1(y+4.5)}L${r1(x-6)} ${r1(y+4.5)}Z" ${a}/>`;
@@ -17,7 +20,7 @@
     const over=ls.length?ls[ls.length-1].y-bot:0;if(over>0)for(let i=ls.length-1;i>=0;i--){ls[i].y-=over;if(i&&ls[i].y-ls[i-1].y>=15)break}
     ls.forEach(l=>l.y=Math.max(top,l.y));return ls}
 
-  // o = {x:[labels], tips:[html per column, optional], series:[{label, icon, color, shape, dash, v:[0-100 | null]}], marks:[{i, label}], h, unit,
+  // o = {x:[labels], tips:[html per column, optional], series:[{label, icon, color, shape, dash, big, v:[0-100 | null]}], marks:[{i, label}], h, unit,
   //      w (a narrower drawing on a phone, so the text is bigger), noEnds (no end labels: the chips above already name the skills)}
   function line(o){
     const W=o.w||960,H=o.h||300,L=46,R=o.noEnds?16:205,T=22,B=30,iw=W-L-R,ih=H-T-B,n=o.x.length,unit=o.unit==null?" %":o.unit;
@@ -33,11 +36,11 @@
     g+=`<line class="elc-xh" x1="0" x2="0" y1="${T}" y2="${T+ih}" stroke="#334155" stroke-width="1" visibility="hidden"/>`;
     const ends=[];
     o.series.forEach(s=>{const pts=s.v.map((v,i)=>v==null?null:[x(i),y(v),v]).filter(Boolean);if(!pts.length)return;
-      if(pts.length>1)g+=`<polyline points="${pts.map(p=>r1(p[0])+","+r1(p[1])).join(" ")}" fill="none" stroke="${s.color}" stroke-width="${s.thin?1.5:2}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:""}/>`;
-      if(!s.thin)pts.forEach(p=>g+=mark(s.shape,p[0],p[1],s.color));
+      if(pts.length>1)g+=`<polyline points="${pts.map(p=>r1(p[0])+","+r1(p[1])).join(" ")}" fill="none" stroke="${s.color}" stroke-width="${s.thin?1.5:s.big?2.5:2}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:""}/>`;
+      if(!s.thin)pts.forEach(p=>g+=mark(s.shape,p[0],p[1],s.color,"",s.big));
       // the end label: its latest value, with that week when it is not the last one (a skill not checked lately says since when)
       const e=pts[pts.length-1],li=s.v.length-1-[...s.v].reverse().findIndex(v=>v!=null);
-      if(!s.thin&&!o.noEnds)ends.push({y:e[1]+4,x:e[0],t:(s.icon?s.icon+" ":"")+s.label+" "+Math.round(e[2])+unit+(li<n-1?" ("+o.x[li]+")":""),c:s.color})});
+      if(!s.thin&&!o.noEnds)ends.push({y:e[1]+4,x:e[0],t:(s.icon?s.icon+" ":"")+s.label+" "+Math.round(e[2])+unit+(li<n-1&&!s.big?" ("+o.x[li]+")":""),c:s.color})});
     spread(ends,T+4,T+ih+4).forEach(l=>g+=`<text x="${L+iw+12}" y="${r1(l.y)}" class="elc-end">${esc(l.t)}</text>`);
     // the hover columns: one per week, wider than the marks
     const cw=n>1?iw/(n-1):iw;
