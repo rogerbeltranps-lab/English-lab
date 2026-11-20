@@ -144,6 +144,7 @@ dialog.fxd{max-width:640px}.fxpt{margin:2px 0 10px;display:flex;flex-direction:c
 <style>/* Simple board (Roger, 6 Nov 2026): a home with one Continue button and four places; Chromebook screens first */
 body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.4em 0 .1em}body[data-place="home"] #sub{font-size:17px;margin:0 0 14px}
 #crumb a.back{display:inline-flex;align-items:center;gap:4px;margin:6px 0 0;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}#crumb a.back:hover{background:#eaf0ff}
+.vy-chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}a.vy-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;text-decoration:none;font-size:14px;font-weight:600}a.vy-chip:hover{border-color:#3157d5}a.vy-chip b{background:#3157d5;color:#fff;border-radius:999px;padding:0 7px;font-size:12px}a.vy-chip.late{background:#fef2f2;border-color:#fca5a5;color:#991b1b}a.vy-chip.news{background:#fff7ed;border-color:#fdba74;color:#9a3412}a.vy-chip.news b{background:#ea580c}
 .hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start;margin-top:6px}.hl{display:flex;flex-direction:column;gap:12px;min-width:0}
 .cont{background:#3157d5;color:#fff;border-radius:20px;padding:16px 22px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 24px #3157d533}.cont .ck{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ff}
 .cont .ct{font-size:22px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:16px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
@@ -314,6 +315,8 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-sound.js"></script>
 <script src="shared/js/el-garden.js"></script>
+<script src="shared/js/el-step-titles.js"></script>
+<script src="shared/js/el-voyage.js"></script>
 <script type="module">
 // Student board: the same grid the teacher sees, for this student only (one row).
 // Language (Roger, 25 Oct 2026): Catalan for Insecure, English for Safe and Daring, by the student's route in the LS on screen
@@ -556,6 +559,12 @@ function homeHtml(lss,ls,info){
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
   // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
   // estigui on està el requadre blau")
+  // ⛵ the voyage: a row of small links (late, news, To do, Homework, My notebook) over the map
+  S.vy=null;
+  if(vyOn(ls)){const chip=(h,i,l,b,cl)=>`<a class="vy-chip${cl?" "+cl:""}" href="${h}">${i} ${l}${b?` <b>${b}</b>`:""}</a>`;
+    return voyageHome(ls,info,nx,(miss?chip("#marks","⏰",miss>1?t(`${miss} endarrerides`,`${miss} late`):t("1 endarrerida","1 late"),"","late"):"")
+      +(unread?chip("#news","📣",t("Anuncis","News"),unread,"news"):"")+chip("#todo","✅",t("Per fer","To do"),ntd||"")+chip("#homework","📝",t("Deures","Homework"),hwOpen.length||"")
+      +chip(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),""))}
   const gc=gamesCard(ls);
   // 🌱 My garden right under them, before the current LS (Roger, 17 Nov 2026): gardenHtml
   if(/class="hal games nbk"/.test(gc))return `<div class="hgrid nbswap"><div class="hl">${alerts}${gc}</div><div class="hr">${cont}<div class="tiles">${tiles}</div></div></div>`+gardenHtml(ls,info)+lsNowHtml(ls,info,nx);
@@ -566,6 +575,10 @@ function homeHtml(lss,ls,info){
 // Only open paths and the tabs the student can see (visSteps), never locked ones; LS1 has none. No new reads: what the board already has.
 function gardenHtml(ls,info){
   if(!window.elGarden||!ls||only(ls.id)||all()||!D.me.group||(window.elLsNum&&elLsNum(ls)==="LS1"))return "";
+  const beds=lsBeds(ls,info);if(!beds.length)return "";
+  return elGarden({ls:window.elLsNum?elLsNum(ls):"",beds,store:"el_garden_"+(AS||(U&&U.uid)||"me")+"_"+ls.id,save:!AS},{en:EN})}
+// the open learning paths of an LS in the LS page's order, each with its tabs (the garden's beds and plants; the voyage's ports and stops)
+function lsBeds(ls,info){
   const {p,gi}=planOf(ls),dr=(gi>=0&&p&&(p._dropped||{})[gi])||[],L=lshGet(ls),fp=hasFp(ls)?fpAct(ls).id:null;
   const thirsty=new Set();todoItems([ls]).forEach(x=>{if(!x.tabs.length)thirsty.add(x.a.id+"#*");x.tabs.forEach(([id])=>thirsty.add(x.a.id+"#"+id))});
   const order=L&&L.lps?L.lps.map(r=>r.id):[],at=id=>{const i=order.indexOf(id);return i<0?999:i};
@@ -574,8 +587,34 @@ function gardenHtml(ls,info){
     return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional?"bonus":"lp",
       plants:gs.map(g=>{const id=panelOf(a,g[0]),k=g.filter(x=>ds.has(x)).length;
         return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),later:g.every(x=>secOff(a,info,x)),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
-  if(!beds.length)return "";
-  return elGarden({ls:window.elLsNum?elLsNum(ls):"",beds,store:"el_garden_"+(AS||(U&&U.uid)||"me")+"_"+ls.id,save:!AS},{en:EN})}
+  return beds}
+// ⛵ The voyage to the challenge (Roger, 19-20 Nov 2026; shared/js/el-voyage.js): in the courses below, from LS2 on, the board's home is a
+// sea map of the current LS instead of the garden: a stop per open tab, a port per learning path, the final product last; every student
+// of the group is a boat by the steps done. Classmates come from one document per LS and group, road/{ls}/groups/{group} = {uid: {n: first
+// name, s: steps done}}: one read when the board opens, and the student writes only their own line when their count changes.
+const VOYAGE=["4eso"];
+const vyOn=ls=>!!(window.elVoyage&&ls&&VOYAGE.includes(ls.course)&&!only(ls.id)&&!all()&&D.me.group&&!(window.elLsNum&&elLsNum(ls)==="LS1"));
+const RD={};   // road docs read this page load: {ls id: {uid: {n, s}}}
+function voyageData(ls,info,nx){
+  const L=lshGet(ls),fa=hasFp(ls)?fpAct(ls):null,me=AS||(U&&U.uid)||"demo";
+  const nowKey=nx?nx.a.id+"#"+panelOf(nx.a,nx.cp?(steps(nx.a)[0]||"check"):nx.k):null;
+  const road=DEMO?(DEMO.road&&DEMO.road.mates)||{}:RD[ls.id]||{};
+  return {ls:window.elLsNum?elLsNum(ls):"",skin:ls.id,en:EN,beds:lsBeds(ls,info),now:nowKey,
+    fp:fa?{title:(L&&L.chal&&L.chal.b)||fa.title.replace(/\s*\([^)]*\)\s*$/,""),sub:L&&L.chal&&L.chal.d||"",href:tabHref(fa),done:isDone(fa)}:{},
+    me:{s:null},mates:Object.entries(road).filter(([u,x])=>u!==me&&x&&x.n).map(([,x])=>({n:x.n,s:+x.s||0})),
+    cont:nx?{href:nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k),label:nx.cp?nx.a.title:""}:null,
+    store:"el_voyage_"+me+"_"+ls.id,save:!AS,quiet:()=>!!AS||!!(LIVE&&LIVE.go&&elCmOn(LIVE.go))}}
+// the road document: read once per LS, then my own line written when my steps done change (never in the teacher's or a tester's view)
+function voyageRoad(ls,V){
+  if(DEMO||!F||!D.me.group)return;const db=ELCloud.db,ref=F.doc(db,"road",ls.id,"groups",D.me.group);
+  const write=()=>{const r=RD[ls.id];if(!r||AS||!U||ELCloud.isTester(U))return;const s=elVoyage.model(V).done,n=elVoyage.first(D.me.name),mine=r[U.uid];
+    if(!n||mine&&mine.s===s&&mine.n===n)return;r[U.uid]={n,s};F.setDoc(ref,{[U.uid]:{n,s}},{merge:true}).catch(e=>console.warn("road",e))};
+  if(RD[ls.id]){write();return}
+  if(voyageRoad[ls.id])return;voyageRoad[ls.id]=1;
+  F.getDoc(ref).then(x=>{RD[ls.id]=x.exists()?x.data():{};write();if(placeNow()==="home"&&S.ls===ls.id&&$(".vy"))render()}).catch(e=>{console.warn("road",e);RD[ls.id]={}})}
+function voyageHome(ls,info,nx,top){S.vy=voyageData(ls,info,nx);voyageRoad(ls,S.vy);
+  if(window.elNbFab)elNbFab(new URL(lsHref(ls)+"#notes",location.href).href);   // the floating 📓 button, as the notebook card did
+  return `<div class="vy-chips">${top}</div>`+elVoyage.html(S.vy)+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
@@ -853,7 +892,7 @@ function render(){
   const n=S.pend.length;
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
-    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info)}
+    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy)elVoyage.wire($("#main"),S.vy)}
   else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
