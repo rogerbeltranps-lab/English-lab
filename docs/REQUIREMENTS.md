@@ -17,8 +17,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - **This file is the one rulebook.** Every rule lives here and nowhere else: project memory and the routine files only point here. The repo's `CLAUDE.md` loads this file into every Claude session that works in the repo, so no thread can miss it.
 - **Roger reviews it on GitHub**: [docs/REQUIREMENTS.md](https://github.com/rogerbeltranps-lab/English-lab/blob/main/docs/REQUIREMENTS.md). He writes his changes or answers in a thread (or as a comment on the PR), and Claude edits this file in a PR.
 - **A new standing rule goes here in the same PR as the work.** Change or remove the old line instead of adding a second one. Never write a rule only in project memory, a routine file or Drive.
-- The Google Doc "How we work - Work requirements" in Teacher Studio › 01_General › 01_How we work is a **snapshot of 20 Nov 2026**, not kept in step; its first line points here.
-- The original Drive guides stay where they are, untouched. Once Roger has revised this file, he decides which of them go to `Archive`.
+- **In Drive** (Roger, 20 Nov 2026), Teacher Studio › 01_General › 01_How we work and 08_Reference docs each hold only a link doc that opens this file. The old guides, and a snapshot of this file as of 20 Nov, are in each folder's `Archive`. Nothing was deleted.
 
 **Order of authority** (first wins):
 
@@ -488,7 +487,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 ## 12. Where the details live
 
-**Drive guides** (Teacher Studio › 01_General). This document replaces them as the rulebook; they stay as Roger's originals until he archives them.
+**Old Drive guides** (Teacher Studio › 01_General). This document replaces them; on 20 Nov 2026 they moved to the `Archive` of their folder (01_How we work › Archive, 08_Reference docs › the Archive made on 31 Oct), except *Prompts* and *Procediment*, which Drive would not let Claude move.
 
 | Guide | Folder | Status (section 13) |
 | --- | --- | --- |
@@ -536,12 +535,10 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 | LS playbook (Drive) | – | A copy from 30 Oct; the repo playbook has changed many times since. Replace with a fresh copy or archive it. |
 | Research audit | The content rules (section 5). | Status column of 27 Oct: items 3–9 say "to do"; Roger to confirm which are done. Grammar block split (row 26). |
 
-**Drive tidy-up for Roger to decide** (Claude moved or deleted nothing of his):
+**Drive tidy-up** (20 Nov 2026, on Roger's word): the guides went to `Archive` (nothing deleted; the older class game copy is named "older duplicate"). Still for Roger:
 
-- The two "How to make a class game" copies in 08_Reference docs.
-- 08_Reference docs has **two folders called Archive** (made 26 Oct and 31 Oct).
-- The old Drive LS playbook copy (30 Oct).
-- Which guides go to `Archive` once this document is revised.
+- Move *Prompts* (01_How we work) and *Procediment_LS_per_curs.md* (08_Reference docs) to `Archive` by hand: Drive refused Claude's move.
+- 08_Reference docs has **two folders called Archive** (made 26 Oct and 31 Oct); the guides went to the 31 Oct one.
 
 ### 13.2 Contradictions
 

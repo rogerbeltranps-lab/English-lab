@@ -1,6 +1,6 @@
 # Teaching materials index
 
-**How Claude works on English Lab:** [REQUIREMENTS.md](REQUIREMENTS.md), "How we work - Work requirements" (every rule in one place: the Drive guides unified with the standing rules, incl. the exam and rubric guides). Roger reviews it here on GitHub; the Google Doc in 01_How we work is a snapshot of 20 Nov.
+**How Claude works on English Lab:** [REQUIREMENTS.md](REQUIREMENTS.md), "How we work - Work requirements" (every rule in one place: the Drive guides unified with the standing rules, incl. the exam and rubric guides). Roger reviews it here on GitHub; in Drive, 01_How we work and 08_Reference docs hold a link doc to it (old guides in Archive).
 
 Everything Roger needs to teach and assess each course, in one place. Pick the course, then the Learning Situation (LS). Nothing here is for students: they use the site.
 
