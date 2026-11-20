@@ -31,16 +31,41 @@ if (process.env.EXAM_PASSWORD) {
 if (!pass) throw new Error("No password hash: run with EXAM_PASSWORD=… the first time");
 const keys = {}, papers = {};
 const sortO = o => o.slice().sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
+// Typed answers with more than one word (Roger, 20 Nov 2026: "whenever they have two words, we must allow students to only write the
+// words like Does go, or the entire sentence or the chunk"): besides the answer itself, accept the whole sentence with the gaps filled
+// (without the clue in brackets; also for one-word answers), the part of it after → or —, the chunk from the first gap to the last, and "does / go", "does - go".
+const GAP = /_{3,}/g, nrm = x => String(x).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"]/g, "").replace(/[.,!?;:…→]/g, " ").replace(/\s+/g, " ").trim();
+function accepted(q, list) {
+  const out = list.slice(), seen = new Set(out.map(nrm)), add = x => { x = String(x).replace(/\s+/g, " ").replace(/\s+(['’](?:re|s|m|ve|ll|d|t))\b/gi, "$1").trim(); if (x && !seen.has(nrm(x))) { seen.add(nrm(x)); out.push(x); } };
+  const n = (q.match(GAP) || []).length;
+  if (!n) return out;
+  for (const a of list) {
+    const w = String(a).trim().split(/\s+/);
+    const fill = n === 1 ? [w.join(" ")] : n === 2 && w.length >= 2 ? [w.slice(0, -1).join(" "), w[w.length - 1]] : null;
+    if (!fill) continue;
+    if (n === 2) { add(fill.join(" / ")); add(fill.join("/")); add(fill.join(" - ")); add(fill.join(" ... ")); }
+    let k = 0; const filled = q.replace(/\s*\([^)]*\)/g, "").replace(GAP, () => fill[k++]);
+    add(filled);
+    let j = 0; const marked = q.replace(/\s*\([^)]*\)/g, "").replace(GAP, () => "\u0001" + fill[j++] + "\u0002");
+    for (const seg of marked.split(/\s*(?:→|—|–)\s*|(?<=[.!?])\s+/)) if (seg.includes("\u0001")) {
+      add(seg.replace(/[\u0001\u0002]/g, ""));
+      if (n === 2) { const a0 = seg.indexOf("\u0001"), b0 = seg.lastIndexOf("\u0002"); if (a0 >= 0 && b0 > a0) {
+        const chunk = seg.slice(a0, b0).replace(/[\u0001\u0002]/g, ""), next = (seg.slice(b0 + 1).match(/^\s*([A-Za-z’']+)/) || [])[1];
+        add(chunk); if (/\u0002\s*\u0001/.test(seg) && next) add(chunk + " " + next); } }   // two gaps side by side ("I ___ ___ believe"): also "used to believe"
+    }
+  }
+  return out;
+}
 for (const [p, P] of Object.entries(S.papers)) {
   papers[p] = { text: P.text, sections: {} };
   for (const s of SECTIONS) {
     papers[p].sections[s] = (P[s] || []).map(it => {
       if (it.t === "write") return Object.assign({ id: it.id, t: "write", q: it.q, min: it.min, max: it.max }, it.ca ? { ca: it.ca } : {}, it.frame ? { frame: it.frame } : {});
       if (keys[it.id]) throw new Error("Duplicate id " + it.id);
-      keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : it.a, q: it.q, s, p };
+      keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : accepted(it.q, it.a || []), q: it.q, s, p };
       if (it.t === "mc" && new Set(it.o).size !== it.o.length) throw new Error("Repeated option in " + it.id);
       if (it.t === "gap" && !(it.a || []).length) throw new Error("No answer in " + it.id);
-      return it.t === "mc" ? { id: it.id, t: "mc", q: it.q, o: sortO(it.o) } : { id: it.id, t: "gap", q: it.q };
+      return it.t === "mc" ? { id: it.id, t: "mc", q: it.q, o: sortO(it.o) } : Object.assign({ id: it.id, t: "gap", q: it.q }, it.split ? { split: true } : {});   // split: one box per gap (Roger, 20 Nov 2026)
     });
   }
 }
