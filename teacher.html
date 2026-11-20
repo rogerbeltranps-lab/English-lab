@@ -2814,9 +2814,11 @@ const wxNorm=s=>String(s||"").toLowerCase().replace(/[’‘`´]/g,"'").replace(
 const wxAcc=(K,id)=>{const k=(K||{})[id];return k?(k.a||[]).concat(k.extra||[]):null};
 // Typed answers (Roger, 20 Nov 2026 "don't penalize students if they write more than they should"): an answer is also right when it holds
 // a right answer as whole words and every other word comes from the question itself ("I used to believe", "Lunar New Year is celebrated").
-// The words of the clue in brackets don't count as question words, and words that aren't in the question (two answers, "is are") stay wrong.
-const wxWs=s=>wxNorm(String(s||"").replace(/\s[\/]\s|\s?\/\s?|_{2,}/g," ")).split(" ").filter(Boolean);
-const wxMore=(k,x)=>{if(!k||k.t==="mc"||!/_{2,}/.test(k.q||""))return false;const X=wxWs(x),Q=new Set(wxWs(String(k.q).replace(/\([^)]*\)/g," ")));
+// The words of the clue in brackets (and of the wrong sentence in "Correct the mistake") don't count as question words, and words that aren't
+// in the question (two answers, "is are") stay wrong.
+const wxWs=s=>wxNorm(String(s||"").replace(/\s[\/]\s|\s?\/\s?|_{2,}/g," ")).replace(/\bcan't\b/g,"can not").replace(/\bwon't\b/g,"will not").replace(/n't\b/g," not")
+  .replace(/\bi'm\b/g,"i am").replace(/'re\b/g," are").replace(/\b(it|he|she|that|what|there|who|where)'s\b/g,"$1 is").split(" ").filter(Boolean);   // contractions count as the full form (I'm watching = I am watching)
+const wxMore=(k,x)=>{if(!k||k.t==="mc"||!/_{2,}/.test(k.q||""))return false;const X=wxWs(x),Q=new Set(wxWs(String(k.q).split(/→/).pop().replace(/\([^)]*\)/g," ")));   // "Correct the mistake: … → …": only the sentence with the gap
   return (k.a||[]).concat(k.extra||[]).some(a=>{const A=wxWs(a);if(!A.length||A.length>X.length)return false;
     for(let i=0;i+A.length<=X.length;i++)if(A.every((w,j)=>X[i+j]===w)&&X.every((w,j)=>(j>=i&&j<i+A.length)||Q.has(w)))return true;return false})};
 const wxOk=(K,id,v)=>{const acc=wxAcc(K,id),x=wxNorm(v);return !!(acc&&x&&(acc.some(a=>wxNorm(a)===x)||wxMore(K[id],v)))};
