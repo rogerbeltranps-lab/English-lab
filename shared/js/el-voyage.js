@@ -65,11 +65,12 @@
       bg:{tile:"bg-pitch-tile",size:300,color:"#9cc680",wash:"#ffffff00",drift:false},   // a striped football pitch (Roger's choice)
       stop:{step:"stop",done:"stop-done",now:"stop-now"},
       // bus.webp is 220×171; the white body is from 34% down to 9% from the bottom (camera and dish on the roof stay grey)
-      // five shapes (Roger, 20 Nov 2026), one per student by first name: the minibus, a box van, a classic van, a camper and a double-decker;
+      // six shapes (Roger, 20 Nov 2026), one per student by first name: the minibus, a box van, a classic van, a camper, a double-decker and a cart;
       // band = from the roof down (the camera and the dish stay grey)
-      veh:{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)",icon:"🚌",imgs:[{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)"},
+      veh:{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)",icon:"🚌",drive:true,imgs:[{img:"bus",me:"bus-me",band:"inset(34% 0 9% 0)"},
         {img:"van-box",me:"van-box-me",band:"inset(33% 0 9% 0)"},{img:"van-classic",me:"van-classic-me",band:"inset(34% 0 9% 0)"},
-        {img:"van-camper",me:"van-camper-me",band:"inset(31% 0 9% 0)"},{img:"bus-double",me:"bus-double-me",band:"inset(28% 0 9% 0)"}]},
+        {img:"van-camper",me:"van-camper-me",band:"inset(31% 0 9% 0)"},{img:"bus-double",me:"bus-double-me",band:"inset(28% 0 9% 0)"},
+        {img:"van-cart",me:"van-cart-me",band:"inset(28% 0 11% 0)"}]},
       fog:"clouds",
       // Barcelona landmarks bigger than the small decorations (Torre Glòries is tall, so narrower)
       decos:["deco-traffic-light","deco-camera",["deco-bcn-tibidabo",110],["deco-bcn-sagrada-familia",110],"deco-football","deco-drone",["deco-bcn-torre-glories",55],["deco-bcn-stadium",110],"deco-microphone"],
@@ -188,6 +189,10 @@
 .vy-b{position:relative;display:block;width:58px;height:58px;filter:drop-shadow(0 2px 1px #0003);animation:vybob 2.8s ease-in-out infinite;transform-origin:50% 85%}.vy-b.big{width:80px;height:80px;animation-duration:3s}
 .vy-b img{width:100%;height:100%;display:block}.vy-b i{position:absolute;inset:0;mix-blend-mode:multiply;-webkit-mask:var(--vy-veh) center/contain no-repeat;mask:var(--vy-veh) center/contain no-repeat;clip-path:var(--vy-band)}
 .vy-boat:nth-child(2n) .vy-b{animation-duration:3.2s;animation-delay:-.8s}.vy-boat:nth-child(3n) .vy-b{animation-duration:2.6s;animation-delay:-1.5s}
+/* veh.drive (vans, buses): a small up-down bounce as if driving, no rocking */
+.vy-sea.drive .vy-b{animation-name:vydrive;animation-duration:.9s;animation-timing-function:ease-in-out}.vy-sea.drive .vy-b.big{animation-duration:1s}
+.vy-sea.drive .vy-boat:nth-child(2n) .vy-b{animation-duration:1.05s}.vy-sea.drive .vy-boat:nth-child(3n) .vy-b{animation-duration:.8s}
+@keyframes vydrive{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
 @keyframes vybob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
 .vy-you{position:absolute;z-index:4;transform:translate(-50%,-100%);text-align:center}.vy-you b{background:#b45309}
 .vy-fog{position:absolute;left:-60px;right:-60px;z-index:4;pointer-events:none}.vy-fog img{position:absolute;width:100%;height:150px;left:0}
@@ -238,7 +243,7 @@
     const go=V.cont?`<a href="${esc(V.cont.href)}">▶ ${t("Continua","Continue")} <small>· ${esc(V.cont.label||(now?now.t:""))}</small></a>`
       :fp.title&&!fp.done?`<a class="fin" href="${esc(fp.href||"#")}">🏆 ${t("Producte final","Final product")} <small>· ${esc(fp.title)}</small></a>`
       :`<a class="all" href="lab/practice.html">✓ ${t("Ho tens tot fet! Practica pel teu compte","You're all done! Practise on your own")} →</a>`;
-    return `<section class="vy" aria-label="${esc(wd("title"))}"><div class="vy-row"><div class="vy-sea${S.bg.drift===false?" still":""}" style="${esc(cssVars(S))}"><div class="vy-sc"><div class="vy-map"></div></div>`
+    return `<section class="vy" aria-label="${esc(wd("title"))}"><div class="vy-row"><div class="vy-sea${S.bg.drift===false?" still":""}${S.veh.drive?" drive":""}" style="${esc(cssVars(S))}"><div class="vy-sc"><div class="vy-map"></div></div>`
       +`<div class="vy-top"><div><small>${esc(V.ls||"")} · ${esc(wd("title"))}</small><b>🏆 ${esc(fp.title||"")}</b></div></div>`
       +`<button type="button" class="vy-btn vy-snd" data-vy="snd"></button><button type="button" class="vy-btn vy-down" data-vy="me" title="${esc(wd("back"))}" aria-label="${esc(wd("back"))}">${S.veh.icon}</button>`
       +`<div class="vy-toast" role="status"></div><div class="vy-ovl"></div></div><aside class="vy-steps">${col}</aside></div><div class="vy-go">${go}</div></section>`}
@@ -277,7 +282,7 @@
     const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),destY=wide?300:290;
     const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
     const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
-    const meXY=meI<n?(s=>[s.x+(s.right?-78:78),s.y+48])(M.stops[meI]):[cx+(wide?200:110),destY+60];
+    const XY=i=>i<n?(s=>[s.x+(s.right?-78:78),s.y+48])(M.stops[i]):[cx+(wide?200:110),destY+60],meXY=XY(meI);M.xy=XY;M.meI=meI;
     for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),max=wide?4:2,sh=L.slice(0,max),more=L.length-sh.length;
       const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
       const wB=sh.reduce((a,m)=>a+Math.max(52,String(m.n).length*7.5+16)+4,0)+(more?40:0);
@@ -325,6 +330,13 @@
     // the board may draw again in the meantime (the LS page arrives, the classmates arrive): look the map up when each effect plays
     const el=k=>[...document.querySelectorAll(".vy-sea .vy-st")].find(e=>e.dataset.k===k),li=k=>[...document.querySelectorAll(".vy-steps li.s")].find(e=>e.dataset.k===k);
     let delay=300;
+    // veh.drive: my vehicle drives along the road from where it was (the steps done last time) to where it is now, then the step pops
+    const fromI=M.stops.filter(s=>od.has(s.key)).length,still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(S.veh.drive&&newDone.length&&M.xy&&M.meI>fromI&&!still){const to=M.xy(M.meI),pts=[];for(let i=fromI;i<=M.meI;i++)pts.push(M.xy(i));
+      setTimeout(()=>{const y=document.querySelector(".vy-sea .vy-you");if(!y||!y.animate)return;
+        const sc=document.querySelector(".vy-sea .vy-sc");if(sc)sc.scrollTo({top:Math.max(0,pts[0][1]-sc.clientHeight*.55)});
+        SND.play("horn",.7);y.animate(pts.map(p=>({translate:`${p[0]-to[0]}px ${p[1]-to[1]}px`})),{duration:Math.min(2400,700+300*(pts.length-1)),easing:"ease-in-out"});
+        if(sc)sc.scrollTo({top:Math.max(0,to[1]-sc.clientHeight*.55),behavior:"smooth"})},delay);delay+=Math.min(2400,700+300*(pts.length-1))+150}
     if(newDone.length){setTimeout(()=>{newDone.forEach(k=>{const e=el(k);if(e){e.classList.remove("pop");void e.offsetWidth;e.classList.add("pop")}const l=li(k);if(l)l.classList.add("pop")});SND.play("step")},delay);delay+=900}
     if(newStops.length&&old.k&&old.k.length){setTimeout(()=>{newStops.forEach(k=>{const e=el(k);if(e)e.classList.add("flash")});SND.play("fog",.6)},delay);delay+=900}
     if(newPorts.length){const it=M.ports.find(p=>p.pi===newPorts[newPorts.length-1]),P=it.port;
