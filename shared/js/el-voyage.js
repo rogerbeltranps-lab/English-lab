@@ -226,7 +226,7 @@
 .vy-go{display:flex;margin-top:10px}.vy-go a{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;background:#3fa34d;color:#fff;text-decoration:none;font-weight:800;font-size:19px;border-radius:16px;padding:12px;box-shadow:0 4px 0 #2b7a36;min-width:0}
 .vy-go a small{font-weight:600;font-size:15px;opacity:.95;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vy-go a.fin{background:#b45309;box-shadow:0 4px 0 #7c3a06}.vy-go a.all{background:#fff;color:#174d3d;box-shadow:0 4px 0 #cbd5e1}
 @media (max-width:900px){.vy-steps{display:none}}
-@media (max-width:640px){.vy-row{height:calc(100vh - 210px);min-height:420px}.vy-top b{font-size:15px}.vy-lab{max-width:150px;font-size:12px}.vy-go a{font-size:17px}.vy-go a small{display:none}.vy-snd span{display:none}}
+@media (max-width:640px){.vy-row{height:calc(100vh - 210px);min-height:420px}.vy-top b{font-size:15px}.vy-lab{max-width:140px;font-size:12px}.vy-b.big{width:64px;height:64px}.vy-go a{font-size:17px}.vy-go a small{display:none}.vy-snd span{display:none}}
 @media (prefers-reduced-motion:reduce){.vy-b,.vy-deco,.vy-fog img,.vy-sea::before{animation:none}.vy-fws{display:none}}`;document.head.appendChild(s)}
 
   // ---- the frame (the map itself is laid out by wire, at the width it gets) ----
@@ -254,7 +254,7 @@
   function wire(root,V){const sea=root&&root.querySelector(".vy-sea");if(!sea)return;
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
     SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
-    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:62,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
+    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:12,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
     let total=TOP;M.items.forEach(it=>total+=it.port?GAP+2*PH:STEP);total+=90;
     map.style.height=total+"px";map.style.width=W+"px";
     let yy=total-70,li=0;const pts=[];
@@ -283,11 +283,17 @@
     const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),destY=wide?300:290;
     const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
     const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
-    const XY=i=>i<n?(s=>[s.x+(s.right?-78:78),s.y+48])(M.stops[i]):[cx+(wide?200:110),destY+60],meXY=XY(meI);M.xy=XY;M.meI=meI;
-    for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),max=wide?4:2,sh=L.slice(0,max),more=L.length-sh.length;
+    const YO=wide?78:74,XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),s.y+48])(M.stops[i]):[cx+(wide?200:110),destY+60],meXY=XY(meI);M.xy=XY;M.meI=meI;
+    // at a stop the vehicles stand in one row on the side without the label: yours next to the stop, then the classmates that fit
+    // (never on top of each other or of the stop; the others become "+3", names on hover)
+    const bw=m=>Math.max(52,String(m.n).length*7.5+16)+4;
+    for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),s=+i<n?M.stops[i]:null,off=+i===meI&&V.me?(wide?100:72):0;
+      let room=s?(s.right?s.x-40:W-s.x-40)-off-4:W-8,sh=[],used=0;
+      for(const m of L){const w=bw(m),left=L.length-sh.length-1;if(sh.length>=(wide?4:3)||used+w+(left?40:0)>room)break;sh.push(m);used+=w}
+      const more=L.length-sh.length,max=sh.length;
       const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
-      const wB=sh.reduce((a,m)=>a+Math.max(52,String(m.n).length*7.5+16)+4,0)+(more?40:0);
-      if(+i<n){const s=M.stops[i],off=+i===meI?100:0;let x=s.right?s.x-40-wB-off:s.x+40+off;x=Math.max(4,Math.min(W-wB-4,x));h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
+      const wB=used+(more?40:0);
+      if(s){const x=s.right?s.x-40-wB-off:s.x+40+off;h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
       else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${destY+60}px">${boats}</div>`}
     if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1,V.me.n)}</div>`;
     // fog over what is not open yet, then the destination: the final product
