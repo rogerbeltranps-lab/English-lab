@@ -62,7 +62,7 @@ for (const [p, P] of Object.entries(S.papers)) {
     papers[p].sections[s] = (P[s] || []).map(it => {
       if (it.t === "write") return Object.assign({ id: it.id, t: "write", q: it.q, min: it.min, max: it.max }, it.ca ? { ca: it.ca } : {}, it.frame ? { frame: it.frame } : {});
       if (keys[it.id]) throw new Error("Duplicate id " + it.id);
-      keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : accepted(it.q, it.a || []), q: it.q, s, p };
+      keys[it.id] = { a: it.t === "mc" ? [it.o[0]] : accepted(it.q, it.a || []), q: it.q, s, p, t: it.t };   // t: the dashboard is lenient with extra words only in typed answers
       if (it.t === "mc" && new Set(it.o).size !== it.o.length) throw new Error("Repeated option in " + it.id);
       if (it.t === "gap" && !(it.a || []).length) throw new Error("No answer in " + it.id);
       return it.t === "mc" ? { id: it.id, t: "mc", q: it.q, o: sortO(it.o) } : Object.assign({ id: it.id, t: "gap", q: it.q }, it.split ? { split: true } : {});   // split: one box per gap (Roger, 20 Nov 2026)
