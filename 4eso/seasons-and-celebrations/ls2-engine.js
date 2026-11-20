@@ -83,7 +83,16 @@ var LS2 = (function () {
   // a step checked earlier with every question answered but under the old 80 %: done now, on the day of that check (Roger, 6 Nov 2026)
   function doneFrom(k, tk) { if (state.done[k]) return; const d = ((state.last || {})[tk] || (state.tries || {})[tk] || {}).date; if (!d) return; state.done[k] = true; state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = d; save(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
-  function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
+  // all[k] {s, n}: every try of a step (s = the sum of score/max, n = how many), for the LS home's % per skill (Roger, 20 Nov 2026:
+  // "average of all tries"). A step tried before 20 Nov 2026 starts from its latest try and its first one (the only two kept then).
+  // whole = false: a check of only some of the questions, not a try (the questions not answered yet would count as wrong).
+  function lastTry(k, score, max, whole) {
+    state.last = state.last || {}; state.all = state.all || {};
+    if (!state.all[k]) { const A = state.all[k] = { s: 0, n: 0 }, P = state.last[k], F = (state.tries || {})[k], add = x => { if (x && +x.max > 0) { A.s += (+x.score || 0) / +x.max; A.n++; } };
+      if (P) { add(P); if (F && Date.parse(P.date) - Date.parse(F.date) > 5000) add(F); } }
+    if (whole !== false && +max > 0) { const A = state.all[k]; A.s = Math.round((A.s + score / max) * 1000) / 1000; A.n++; }
+    state.last[k] = { score, max, level, date: new Date().toISOString() };
+  }
   function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
   // items[panel_route]: every question of a panel's first counted check, kept once per route, for the dashboard's Question analysis
   // (Roger, 26 Oct 2026). q: the question's place in the page's list (in the route's own list when the page gives one per route),
@@ -387,7 +396,7 @@ var LS2 = (function () {
     idx = idx.filter(i => need.includes(i)); if (!idx.length) return;
     counts = counts || (() => true);
     const now = new Date().toISOString(), sc = need.filter(counts);
-    lastTry(k, sc.filter(i => g[i] && g[i][0]).length, sc.length);
+    lastTry(k, sc.filter(i => g[i] && g[i][0]).length, sc.length, sc.every(i => g[i] && g[i][1] != null && String(g[i][1]).trim() !== ''));
     state.items = state.items || {}; state.tries = state.tries || {};
     const key = id + '_' + level; let R = state.items[key];
     if (R && !R.per) return save();   // checked as a whole set before 16 Nov 2026: that first try stays
@@ -1164,7 +1173,7 @@ var LS2 = (function () {
   // its points (EL_DEGREE_MARK: NA 2.5 · AS 5 · AN 7.5 · AE 10 out of 10), sent by el-corrections.js as the "el-levels" event.
   function handToTeacher(p, text) {
     state.steps = state.steps || {};
-    state.steps[p.id] = { level, title: tx(p.title), w: p.type === 'writing' || p.type === 'marked' ? 1 : undefined, ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+    state.steps[p.id] = { level, title: tx(p.title), w: p.type === 'writing' ? 1 : undefined, ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
     complete(p.id); save();
   }
   function teacherBtn() { return ca() ? 'Entrega al professor' : 'Hand it in to my teacher'; }
@@ -1179,7 +1188,7 @@ var LS2 = (function () {
      "Reopen" on the dashboard (results.reopenedAt after it). el-corrections.js sends the activity's result as the "el-result" event. */
   const reopened = {};
   const handedText = id => { const h = (state.steps || {})[id]; return h && h.f && h.f[0] ? String(h.f[0].v || '') : ''; };
-  window.elHandedText = id => (LP.panels || []).some(p => p.id === id && (p.type === 'writing' || p.type === 'marked')) ? handedText(id) : '';
+  window.elHandedText = id => (LP.panels || []).some(p => p.id === id && p.type === 'writing') ? handedText(id) : '';
   function wroteMsg(p) { const h = (state.steps || {})[p.id]; return ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. Ja no el pots canviar. Quan el professor l’hagi corregit, veuràs la correcció a dalt de tot d’aquesta secció: el teu text, una taula amb les errades i el text corregit.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. You can’t change it now. When your teacher has corrected it, you will see the correction at the top of this section: your text, a table with your mistakes and your text, corrected.'; }
   addEventListener('el-result', e => {
     const r = (e.detail || {}).result || {}, ms = v => v == null ? 0 : typeof v === 'number' ? v : v.toDate ? +v.toDate() : v.seconds ? v.seconds * 1000 : +new Date(v) || 0;
@@ -1701,10 +1710,12 @@ var LS2 = (function () {
     };
   };
 
-  /* ---------- sample exam: points per item, the writing corrected by the teacher (no mark), score summary ---------- */
+  /* ---------- sample exam: points per item, tasks marked by ChatGPT, score summary ---------- */
   const ptsOf = (p, q) => q.p || (q.o ? p.pts[0] : p.pts[1]);
   const maxOf = p => p.type === 'quiz' ? forLevel(p.items).reduce((t, q) => t + ptsOf(p, q), 0) : p.max;
   const ptsWord = n => n + ' ' + (ca() ? (n === 1 ? 'punt' : 'punts') : (n === 1 ? 'point' : 'points'));
+  const aiWarning = () => ca() ? '⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el correu el corregeix el professorat.'
+    : '⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the email.';
   // Multiple choice ({q, o}: first option right, shown shuffled) and gaps ({q, a}) in one list, each with its points.
   R.quiz = p => ({
     html: '<div class="section-card">' + mediaHtml(p) + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
@@ -1741,58 +1752,72 @@ var LS2 = (function () {
       }, p.items);
     }
   });
-  // An open task (the sample exam's writing). Roger, 20 Nov 2026 ("they get this kind of feedback (like grades...) and I want them to get
-  // this instead"): no mark, no level and no outside website here. The student hands it in like any writing (state.steps[p.id], w: 1,
-  // with the writing log); the correction run sends back a comment, the table of mistakes (no., criterion, mistake, correction, why with
-  // its kind) and the text corrected, shown at the top of this tab by el-corrections.js. It is practice: the text stays open, and a
-  // changed text can be handed in again for a new correction.
+  // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
+  // with the criterion's levels; the student can note that mark for the summary.
+  function markPrompt(p, text) {
+    const lv = { beginners: 'Beginners (A1)', insecure: 'Insecure (A2 / A2+)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)', native: 'Native (C2 Proficiency)' }[level];   // CEFR only: students copy this prompt (Roger, 1 Nov 2026: no "molt suport")
+    const src = byLevel(p.source || '');
+    return (ca() ? 'Actua com a professor d’anglès de 4t d’ESO. És l’EXAMEN D’EXEMPLE (pràctica) de la Learning Situation “Seasons & Celebrations”.' : 'Act as a 4 ESO English teacher. This is the SAMPLE EXAM (practice) of the Learning Situation “Seasons & Celebrations”.') +
+      '\n\nRoute / level: ' + lv + '.\nTask (' + p.max + ' points): ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
+      (src ? '\n\n' + (p.sourceLabel || 'Source') + ':\n"""\n' + src.replace(/<[^>]+>/g, ' ').replace(/\s+\n/g, '\n') + '\n"""' : '') +
+      '\n\nStudent’s answer:\n"""\n' + text + '\n"""\n\n' +
+      'Mark it with the four levels of criterion ' + p.criterion + ':\n' + ['NA', 'AS', 'AN', 'AE'].map((l, i) => l + ' (' + p.levelPts[i] + ' points): ' + p.levels[i]).join('\n') +
+      '\nBlank, not in English or off task: 0 points.\n\n' + learningSupport.aiLanguage(level) +
+      ' Do not rewrite the whole answer. Reply only with these parts:\n1. 📊 Level and mark: "Level: AN · ' + p.levelPts[2] + '/' + p.max + '", and one sentence saying which description fits and why.\n2. ✅ Two things done well.\n3. 🔧 Up to 4 important problems: quote the words, explain why briefly, give a better version.\n4. 🎯 One thing to do to reach the next level.\n5. ⚠️ End with one line: this mark is only a guide, AI can make mistakes, and in the real exam the teacher marks it.';
+  }
   R.marked = p => ({
-    html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + '</h3><p class="instruction" id="' + p.id + 'Task"></p>' +
+    html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + ' <small>[' + ptsWord(p.max) + ']</small></h3><p class="instruction" id="' + p.id + 'Task"></p>' +
       '<textarea id="' + p.id + 'Text" rows="9"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
-      '<div class="section-card"><h3>✏️ ' + (ca() ? 'La correcció' : 'Your correction') + '</h3><p class="instruction">' + (ca() ? 'Quan acabis, entrega-ho. El professor et tornarà la correcció aquí mateix: una taula amb cada errada, la correcció i per què, i el teu text corregit. No té nota: serveix per aprendre de les errades abans de l’examen.' : 'When you finish, hand it in. Your teacher will give you the correction right here: a table with each mistake, the correction and why, and your text, corrected. There is no mark: it is to learn from your mistakes before the exam.') + '</p>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + teacherBtn() + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
+      (p.teacher ? '<div class="section-card"><h3>' + (ca() ? 'Entrega' : 'Hand it in') + '</h3><p class="instruction">' + (ca() ? 'Quan acabis, entrega-ho. El professor et tornarà la correcció aquí mateix.' : 'When you finish, hand it in. Your teacher’s correction will appear right here.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + teacherBtn() + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>' :
+      '<div class="section-card"><h3>' + (ca() ? 'Feedback i nota orientativa' : 'Feedback and a guide mark') + '</h3><p class="instruction">' + (ca() ? 'Prem el botó: s’obre ChatGPT amb la teva resposta i els criteris de correcció. Et dirà el nivell (NA, AS, AN, AE), els punts i què has de millorar.' : 'Press the button: ChatGPT opens with your answer and the marking criteria. It tells you the level (NA, AS, AN, AE), the points and what to improve.') + '</p>' +
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb ChatGPT ↗' : 'Save and mark with ChatGPT ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '<label class="field"><strong>' + (ca() ? 'Punts que t’ha donat ChatGPT (de ' + p.max + ')' : 'Points ChatGPT gave you (out of ' + p.max + ')') + '</strong><input type="number" class="typed" id="' + p.id + 'Pts" min="0" max="' + p.max + '" step="1" style="max-width:120px"></label>' +
+      '<p class="warm-note">' + aiWarning() + '</p></div>'),
     bind() {
       bindAudio(p);
-      const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min), msg = $('#' + p.id + 'Msg'), btn = $('#' + p.id + 'Ai');
-      state.texts = state.texts || {};
-      ta.value = state.texts[key] || handedText(p.id) || ''; ta.placeholder = byLevel(p.template || '');
+      const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min);
+      state.texts = state.texts || {}; state.ai = state.ai || {};
+      ta.value = state.texts[key] || ''; ta.placeholder = byLevel(p.template || '');
       $('#' + p.id + 'Task').innerHTML = byLevel(p.task).replace(/\n/g, '<br>');
-      const flat = t => String(t || '').replace(/\s+/g, ' ').trim(), same = () => flat(handedText(p.id)) === flat(ta.value);
       const count = () => { $('#' + p.id + 'Count').textContent = realWords(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
-      const state2 = () => {   // the button and the line under it: handed in (this text) or a new version to hand in
-        const h = (state.steps || {})[p.id];
-        btn.textContent = h && !same() ? (ca() ? 'Entrega la nova versió' : 'Hand in my new version') : teacherBtn();
-        if (h) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
-      };
-      ta.oninput = () => { state.texts[key] = ta.value; save(); count(); state2(); };
-      count(); state2();
-      btn.onclick = () => {
+      ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
+      count();
+      if (p.teacher) {
+        const msg = $('#' + p.id + 'Msg'); if (handedMsg(p)) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
+        $('#' + p.id + 'Ai').onclick = () => {
+          if (realWords(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.') + padNote(ta.value); return; }
+          handToTeacher(p, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p);
+        };
+        return;
+      }
+      const pts = $('#' + p.id + 'Pts'), k = p.id + '_' + level;
+      pts.value = state.ai[k] != null ? state.ai[k] : '';
+      pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };
+      $('#' + p.id + 'Ai').onclick = () => {
+        const msg = $('#' + p.id + 'Msg');
         if (realWords(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.') + padNote(ta.value); return; }
-        if ((state.steps || {})[p.id] && same()) { msg.className = 'feedback'; msg.textContent = ca() ? 'Aquest text ja l’has entregat. Si el canvies, el pots tornar a entregar.' : 'You have already handed in this text. If you change it, you can hand it in again.'; return; }
-        handToTeacher(p, ta.value.trim()); state2();
-        if (LP.onScore) LP.onScore();
+        window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(markPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
+        msg.className = 'feedback ok';
+        msg.textContent = ca() ? 'Desat ✓ S’ha obert ChatGPT. Apunta aquí sota els punts que et doni i llegeix què has de millorar.' : 'Saved ✓ ChatGPT has opened. Note the points it gives you below and read what to improve.';
+        complete(p.id);
       };
     }
   });
-  // My score: the auto-marked sections (first try, as in the exam). The writing has no points in this practice, only its correction.
+  // My score: auto-marked sections (first try, as in the exam) + the guide marks noted from ChatGPT.
   R.summary = p => ({
-    html: '<div class="section-card"><div id="' + p.id + 'Table"></div></div>',
+    html: '<div class="section-card"><div id="' + p.id + 'Table"></div><p class="warm-note">' + aiWarning() + '</p></div>',
     bind() {
       const draw = () => {
-        let got = 0, max = 0, missing = false, writing = false;
+        let got = 0, max = 0, missing = false;
         const rows = LP.panels.filter(x => x.type === 'quiz' || x.type === 'marked').map(x => {
-          if (x.type === 'marked') {
-            writing = true; const h = (state.steps || {})[x.id];
-            return '<tr><td>' + tx(x.tab) + '</td><td style="text-align:right">' + (h ? (ca() ? '✏️ Entregat: la correcció surt a la seva pestanya' : '✏️ Handed in: the correction appears in its tab') : (ca() ? '✏️ Encara no l’has entregat' : '✏️ Not handed in yet')) + '</td></tr>';
-          }
-          const m = maxOf(x), t = (state.tries || {})[x.id + '_' + level], v = t ? t.score : null;
+          const m = maxOf(x), t = x.type === 'quiz' ? (state.tries || {})[x.id + '_' + level] : null, a = x.type === 'marked' ? (state.ai || {})[x.id + '_' + level] : null;
+          const v = x.type === 'quiz' ? (t ? t.score : null) : (a != null ? a : null);
           max += m; if (v == null) missing = true; else got += v;
-          return '<tr><td>' + tx(x.tab) + '</td><td style="text-align:right">' + (v == null ? '–' : v) + ' / ' + m + '</td></tr>';
+          return '<tr><td>' + tx(x.tab) + (x.type === 'marked' ? ' <small>(ChatGPT)</small>' : '') + '</td><td style="text-align:right">' + (v == null ? '–' : v) + ' / ' + m + '</td></tr>';
         });
         $('#' + p.id + 'Table').innerHTML = '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + rows.join('') +
-          '<tr><td><strong>Total</strong></td><td style="text-align:right"><strong>' + got + ' / ' + max + '</strong>' + (max ? ' · ' + (Math.round(got / max * 100) / 10) + ' / 10' : '') + '</td></tr></tbody></table>' +
-          (missing ? '<p class="tiny">' + (ca() ? '– = encara no ho has fet.' : '– = not done yet.') + '</p>' : '') +
-          (writing ? '<p class="tiny">' + (ca() ? 'L’escriptura no té nota en aquesta pràctica: el professor te la corregeix i aprens de la taula d’errades.' : 'The writing has no mark in this practice: your teacher corrects it and you learn from the table of mistakes.') + '</p>' : '');
+          '<tr><td><strong>Total</strong></td><td style="text-align:right"><strong>' + got + ' / ' + max + '</strong> · ' + (Math.round(got / max * 100) / 10) + ' / 10</td></tr></tbody></table>' +
+          (missing ? '<p class="tiny">' + (ca() ? '– = encara no ho has fet (o no has apuntat els punts de ChatGPT).' : '– = not done yet (or ChatGPT’s points not noted).') + '</p>' : '');
       };
       LP.onScore = draw; draw();
     }
