@@ -7,10 +7,18 @@
 // carry msg too ("Send and mark as fixed"). The card shows msg as it was written, in its own box under the standard sentence.
 // kind "idea" (Roger, 13 Nov 2026: "I want to be able to answer the students in here", the 💡 Suggestions in Messages): the teacher's answer
 // to a suggestion sent with 💡 Idea, saved as problemReplies/sg_{suggestion id}_m{time}; text = the suggestion, msg = the answer. Same card.
+// Both languages (Roger, 20 Nov 2026, on an English-only answer to a student who wrote in Catalan: "It should also have the catalan
+// version"): the teacher's words are saved twice, msgEn and msgCa (msg = what he typed, for older pages). The card shows the version in the
+// card's language first and the other one under it, labelled "🌐 En català" / "🌐 In English". Old replies only have msg: shown as before.
 import {KINDS} from "./el-report.js";
 
 export const MSG_MAX=1000;
 export const replyColor=k=>k==="fixed"?"#16a34a":k==="message"?"#2563eb":k==="idea"?"#d97706":"#7c3aed";
+// [first, second] versions of the teacher's message for a card in English (en) or Catalan; second is "" when there is only one.
+export function replyMsgs(r,en){
+  const t=x=>String(x||"").trim().slice(0,MSG_MAX),E=t(r&&r.msgEn),C=t(r&&r.msgCa);
+  if(E&&C)return en?[E,C]:[C,E];return [t(r&&r.msg)||E||C,""]}
+export const otherLabel=en=>en?"🌐 En català":"🌐 In English";
 const cut=(s,n)=>{s=String(s??"").replace(/\s+/g," ").trim();return s.length>n?s.slice(0,n-1)+"…":s};
 // r = the reply document, en = English or Catalan. Returns {title, body}.
 export function replyText(r,en){
@@ -38,9 +46,10 @@ export async function showReplies({load,done,en}){
     const r=L.shift();if(!r)return;const lang=typeof r.en==="boolean"?r.en:en,{title,body}=replyText(r,lang);
     const c=document.createElement("div");c.id="el-reply";c.setAttribute("role","status");
     c.style.cssText="position:fixed;top:16px;left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));box-sizing:border-box;z-index:10004;background:#fff;color:#0f172a;border:2px solid "+replyColor(r.kind)+";border-radius:16px;box-shadow:0 10px 30px #0003;padding:14px 16px;font:15px/1.45 system-ui,sans-serif";
-    c.innerHTML='<b style="display:block;font-size:17px;margin-bottom:4px"></b><p style="margin:0 0 10px"></p><div hidden style="margin:0 0 10px;padding:8px 12px;border-left:4px solid #2563eb;background:#eff6ff;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:45vh;overflow:auto"></div><small style="display:block;color:#64748b;margin-bottom:10px">'+(lang?"From your teacher":"Del teu professor")+'</small><button type="button" style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:6px 18px;font:inherit;font-weight:600;cursor:pointer">'+(lang?"OK":"D'acord")+"</button>";
+    c.innerHTML='<b style="display:block;font-size:17px;margin-bottom:4px"></b><p style="margin:0 0 10px"></p><div hidden style="margin:0 0 10px;max-height:50vh;overflow:auto"><div style="padding:8px 12px;border-left:4px solid #2563eb;background:#eff6ff;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere"></div><div hidden style="margin-top:6px;padding:6px 12px;border-left:4px solid #94a3b8;background:#f8fafc;border-radius:8px;color:#334155"><small style="display:block;color:#64748b;font-weight:600;margin-bottom:2px"></small><div style="white-space:pre-wrap;overflow-wrap:anywhere"></div></div></div><small style="display:block;color:#64748b;margin-bottom:10px">'+(lang?"From your teacher":"Del teu professor")+'</small><button type="button" style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:6px 18px;font:inherit;font-weight:600;cursor:pointer">'+(lang?"OK":"D'acord")+"</button>";
     c.querySelector("b").textContent=title;c.querySelector("p").textContent=body;
-    const m=String(r.msg||"").trim().slice(0,MSG_MAX),mb=c.querySelector("div");if(m){mb.textContent=m;mb.hidden=false}
+    const [m,m2]=replyMsgs(r,lang),mb=c.querySelector("div");
+    if(m){mb.hidden=false;mb.children[0].textContent=m;if(m2){const o=mb.children[1];o.hidden=false;o.querySelector("small").textContent=otherLabel(lang);o.lastChild.textContent=m2}}
     c.querySelector("button").onclick=()=>{c.remove();Promise.resolve(done(r.id)).catch(e=>console.warn("reply",e));next()};
     document.body.append(c);c.querySelector("button").focus({preventScroll:true})};
   next();
