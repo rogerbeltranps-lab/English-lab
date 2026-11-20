@@ -341,7 +341,7 @@ const levelTag=(c,l)=>l?`<span class="route r-${l}" title="${esc(elCefr(c,l,true
 const steps=a=>EL_ACTIONS[a.id]||[];
 const stepCrit=(a,k)=>(a.skip||[]).includes(k)?`<small class="muted">${t("no puntua","no points")}</small>`:((((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]).map(pill).join("")||`<small class="muted" title="${t("Pràctica de llengua: sense criteri","Language practice: no criterion")}">–</small>`);
 const pts=a=>a.graded?(a.manual?t("nota del professor","teacher's mark"):a.points+(a.points===1?t(" punt"," point"):t(" punts"," points"))):t("no avalua","not assessed");
-const col=p=>p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";
+const col=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol, Roger 20 Nov 2026)
 const S={ls:null,view:"lp",pend:[]};let U=null,D=null;   // view: lp = one grid per learning path · sum = summary of my criteria
 
 // D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups,open,secLocked}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}

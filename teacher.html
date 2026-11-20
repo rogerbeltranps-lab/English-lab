@@ -1614,7 +1614,7 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
       q.ks.forEach(([k,mx])=>{const y=x[k];if(y&&y.score!=null){sc+=+y.score;m+=+(y.max||mx||E.max)}});return m?{p:sc/m*100,sc,m}:null}).filter(Boolean);
       return {n:q.n,p:avgP(v.map(z=>z.p)),c:v.length,pts:v.length?v.reduce((a,z)=>a+z.sc,0)/v.length:null,max:v.length?v[0].m:null}})}}
   return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr}}
-const bCol=p=>p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
+const bCol=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol)
 function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
   const N=b.studs.length,stat=(ic,lab,p,tip,go)=>`<a class="bst" href="${go.href||"#"}" ${go.href?`target="_blank" rel="noopener"`:`data-do="bgo" data-g="${g.id}" data-p="${go.p}" data-ls="${b.ls}"`} title="${esc(tip)} · ${esc(go.t)}">${elRing(p,"",40,tip)}<span><b>${ic} ${lab}</b><small>${p==null?"nothing yet":p+" % right"}</small></span></a>`;
@@ -1868,7 +1868,7 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     else{const list=acts(ls);cs=[...new Set(list.flatMap(a=>a.criteria||[]))].sort();val=(u,c)=>{let ts=0,tm=0;list.forEach(a=>{const y=a.graded&&(a.criteria||[]).includes(c)&&res(u,a.id).max&&scOf(u,a);if(y){ts+=y.score;tm+=y.max}});return tm?ts/tm*10:null}}
     const row=c=>{const vs=studs.map(s=>{try{return val(s.uid,c)}catch(e){return null}}),a=prAvg(vs),n=vs.filter(v=>v!=null).length,mv=me?vs[studs.indexOf(me)]:null,l=elDegree(a);
       return `<div class="prc"><span class="prcn">${pill(c)}<small>${esc(elCompetence(c)||"")}</small></span><span class="prcb" data-tip="${esc(`<b>${c}</b>: group average ${a==null?"–":f1(a)} (${plural(n,"student")})${me?`<br>${esc(shortName(me).mid)}: ${mv==null?"–":f1(mv)}`:""}`)}">`
-        +`<i class="t5"></i><i class="t7"></i><i class="t9"></i>${a==null?"":`<b style="width:${a*10}%;background:${LVCOL[l]}"></b>`}${me&&mv!=null?`<u style="left:${mv*10}%"></u>`:""}</span>`
+        +`<i class="t5"></i><i class="t7"></i><i class="t9"></i>${a==null?"":`<b style="width:${a*10}%;background:${elPctCol(a*10)}"></b>`}${me&&mv!=null?`<u style="left:${mv*10}%"></u>`:""}</span>`
         +`<strong>${a==null?'<span class="muted">–</span>':f1(a)+` <small style="color:${LVCOL[l]}">${l}</small>`}</strong></div>`};
     crB=`<div class="box elc-wrap prcr"><h2>🎯 Average per assessment criterion</h2><p class="muted">${g.evidence?"The degree you confirmed, or the one the evidence suggests, out of 10.":"The points of the graded activities of each criterion, out of 10."} Lines at 5, 7 and 9: AS, AN, AE.${me?` The dot is ${esc(shortName(me).mid)}.`:""}</p>`
       +(cs.length?cs.map(row).join(""):`<p class="muted">This LS has no criteria yet.</p>`)+`</div>`}
@@ -2754,7 +2754,7 @@ function crPage(){crLoad();
   if(!L.length)return head+`<div class="box"><p class="muted">${CRES.err?"Could not read the class results.":"Nothing yet. Open 🙌 Work it out together on a Grammar or Reading tab in class mode and go to ⏱ Your turn: from then on the lesson is saved here."}</p></div>`;
   const byMail={};Object.values(S.P||{}).forEach(s=>{if(s.email)byMail[s.email.toLowerCase()]=s;if(s.rid)byMail[s.rid]=s});
   const nm=r=>{const s=byMail[r.e];return s?fullName(s):r.n||r.e},gname=id=>(GR.find(g=>g.id===id)||{}).name||id,LVN={beginners:"Starter",insecure:"Base",safe:"Core",daring:"Plus",native:"Pro"};
-  const pc=x=>x==null?"–":x+" %",col=x=>x==null?"#cbd5e1":x>=80?"#16a34a":x>=50?"#d97706":"#dc2626";
+  const pc=x=>x==null?"–":x+" %",col=x=>elPctCol(x);
   const avg=a=>{const v=a.map(x=>x.sum&&x.sum.pct).filter(x=>x!=null);return v.length?Math.round(v.reduce((p,q)=>p+q,0)/v.length):null};
   const date=d=>new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
   // per group: the average of its lessons and the latest ones as bars, oldest on the left (how the class is going)
@@ -3476,7 +3476,7 @@ function criteria(studs,list){
   const crits=[...new Set(list.flatMap(a=>a.criteria))].sort();
   let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small>${esc(elCompetence(c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
-    if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
+    if(!tm)return "<td>–</td>";const p=ts/tm*100,col=elPctCol(p);return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
 // What makes up the LS mark (Roger, 2 Nov 2026: "can you make a table that counts and explains this? … I need it to be very clear"):

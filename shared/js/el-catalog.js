@@ -726,8 +726,11 @@ window.elGameTip=function(games,kind,ca){
   const day=d=>{if(!d)return "";const x=new Date(d+"T12:00");return isNaN(x)?"":x.toLocaleDateString(ca?"ca":"en-GB",{day:"numeric",month:"short"})};
   const name=t=>String(t||"").replace(/^(Vocabulary|Grammar|Vocabulari|Gramàtica) · /,"");
   return `${T[kind]}: ${Math.round(r/of*100)} % ${T.right} (${r} / ${of})\n`+l.map(g=>`• ${g.lp?String(g.lp).split(" · ")[0]+" · ":""}${name(g.title)}${day(g.day)?" · "+day(g.day):""}: ${g.r||0} / ${g.of} (${Math.round((g.r||0)/g.of*100)} %)`).join("\n")};
+// The colour of a % (or a mark out of 10 × 10) everywhere on the site: rings, bars, marks (Roger, 20 Nov 2026: "A 60 should be green
+// already, 80 blue 90 purple <50 red 60-50 orange"): under 50 red · 50-59 orange · 60-79 green · 80-89 blue · 90 and more purple; none = grey.
+window.elPctCol=p=>p==null||isNaN(p)?"#cbd5e1":p<50?"#dc2626":p<60?"#ea580c":p<80?"#16a34a":p<90?"#2563eb":"#8b5cf6";
 window.elRing=function(p,label,size,tip,txt){   // txt: what the ring says instead of "p%" (e.g. a mark out of 10)
-  const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a",q=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  const z=size||46,col=elPctCol(p),q=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
   return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${q(tip||label+": "+(p==null?"–":p+" %"))}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":txt!=null?txt:p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};
 // ---- The students' left menu, ONE for every student page (Roger, 7 Nov 2026: "this should always be the same"): the board (today.html),
 // the LS homes (el-ls-home.js) and Games, Practise, learning paths, vocabulary games, course pages (el-app.js) all draw it from here.
