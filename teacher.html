@@ -2812,7 +2812,14 @@ const wxKey=ls=>{const c=wxCfg(ls),k=c&&S.D.ck&&S.D.ck[c.key];return k&&k.web||n
 const wxDoc=u=>WX.docs[u]||null;
 const wxNorm=s=>String(s||"").toLowerCase().replace(/[’‘`´]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:…→]/g," ").replace(/\s+/g," ").trim();
 const wxAcc=(K,id)=>{const k=(K||{})[id];return k?(k.a||[]).concat(k.extra||[]):null};
-const wxOk=(K,id,v)=>{const acc=wxAcc(K,id),x=wxNorm(v);return !!(acc&&x&&acc.some(a=>wxNorm(a)===x))};
+// Typed answers (Roger, 20 Nov 2026 "don't penalize students if they write more than they should"): an answer is also right when it holds
+// a right answer as whole words and every other word comes from the question itself ("I used to believe", "Lunar New Year is celebrated").
+// The words of the clue in brackets don't count as question words, and words that aren't in the question (two answers, "is are") stay wrong.
+const wxWs=s=>wxNorm(String(s||"").replace(/\s[\/]\s|\s?\/\s?|_{2,}/g," ")).split(" ").filter(Boolean);
+const wxMore=(k,x)=>{if(!k||k.t==="mc"||!/_{2,}/.test(k.q||""))return false;const X=wxWs(x),Q=new Set(wxWs(String(k.q).replace(/\([^)]*\)/g," ")));
+  return (k.a||[]).concat(k.extra||[]).some(a=>{const A=wxWs(a);if(!A.length||A.length>X.length)return false;
+    for(let i=0;i+A.length<=X.length;i++)if(A.every((w,j)=>X[i+j]===w)&&X.every((w,j)=>(j>=i&&j<i+A.length)||Q.has(w)))return true;return false})};
+const wxOk=(K,id,v)=>{const acc=wxAcc(K,id),x=wxNorm(v);return !!(acc&&x&&(acc.some(a=>wxNorm(a)===x)||wxMore(K[id],v)))};
 const WXSEC=[["listening","Listening","🎧"],["reading","Reading","📖"],["vocabulary","Vocabulary","📚"],["grammar","Grammar","🧩"]];   // marked with the key
 // ✍️ Writing (Roger, 17 Nov 2026 "add writing"): the student's text (order.writing, one id), marked by the teacher with a 5.1 level in the
 // student's dialog: the level and the points (NA 8 · AS 15 · AN 23 · AE 30 of 30, scaled to the section) go straight into results/{ls}__assessment
