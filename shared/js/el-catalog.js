@@ -166,8 +166,15 @@ window.EL_CATALOG=(function(){
 // 🎓 Personal LSs (personal:true in EL_LS, e.g. Roger's own Towards Nativeness, 17 Nov 2026) exist only for the teacher and the tester
 // account (el_who.role, saved by el-cloud.js): for everybody else the LS and its activities are not in EL_LS / EL_CATALOG at all, so no
 // student list, menu, notebook chapter, "latest LS of the course" or route ever picks it up, even if its status were changed by mistake.
+// 👁 The teacher's student view counts as a student (Roger, 20 Nov 2026: "students see towards nativeness and that was a rule, they mustn't
+// see it"): Priscila's board opened from the dashboard showed it in the menu and as a My marks tab, because this browser's el_who is still
+// the teacher's. elAsView() = this tab is the teacher's student view: sessionStorage el_as (el-cloud.js), or the board's ?student= on its
+// first load, before el-cloud.js has saved el_as. The dashboard itself (teacher.html) is never a student view, and the teacher on the
+// course's own pages (4eso/towards-nativeness/) keeps it (students: hidden everywhere, as before). Checked by tools/students-never-see/check.mjs.
+window.elAsView=function(){try{if(/\/teacher\.html$/.test(location.pathname))return false;
+  return !!JSON.parse(sessionStorage.getItem("el_as")||"null")||/[?&]student=/.test(location.search)}catch(e){return false}};
 (function(){let r=null;try{r=(JSON.parse(localStorage.getItem("el_who")||"null")||{}).role}catch(e){}
-  if(r==="teacher"||r==="tester")return;const P=new Set(window.EL_LS.filter(l=>l.personal).map(l=>l.id));if(!P.size)return;
+  if(r==="tester"||r==="teacher"&&(!window.elAsView()||/\/towards-nativeness\//.test(location.pathname)))return;const P=new Set(window.EL_LS.filter(l=>l.personal).map(l=>l.id));if(!P.size)return;
   window.EL_LS=window.EL_LS.filter(l=>!P.has(l.id));window.EL_CATALOG=window.EL_CATALOG.filter(a=>!P.has(a.ls))})();
 // Number of distinct completed actions (truthy keys inside any "done" map) in a synced localStorage state string.
 window.elDone=function(str,skip){skip=skip||[];const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d]&&!skip.includes(d))s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s.size};
