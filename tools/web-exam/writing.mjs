@@ -55,8 +55,17 @@ const words = s => (String(s || "").trim().match(/[A-Za-zÀ-ÿ’'0-9-]+/g) || [
 
 // every exam doc of this key (collection group "exams"), with its uid
 async function exams() {
-  const j = await api("POST", BASE + ":runQuery", { structuredQuery: { from: [{ collectionId: "exams", allDescendants: true }], where: { fieldFilter: { field: { fieldPath: "key" }, op: "EQUAL", value: { stringValue: key } } } } });
-  return j.filter(x => x.document).map(x => ({ uid: x.document.name.split("/").slice(-3)[0], d: dec({ mapValue: { fields: x.document.fields } }) }));
+  try {
+    const j = await api("POST", BASE + ":runQuery", { structuredQuery: { from: [{ collectionId: "exams", allDescendants: true }], where: { fieldFilter: { field: { fieldPath: "key" }, op: "EQUAL", value: { stringValue: key } } } } });
+    return j.filter(x => x.document).map(x => ({ uid: x.document.name.split("/").slice(-3)[0], d: dec({ mapValue: { fields: x.document.fields } }) }));
+  } catch (e) {   // the collection-group query needs an index the project may not have (400): read students/{uid}/exams/{key} one by one
+    console.warn("(collection-group query refused: " + e.message + "; reading each student)");
+    let ids = [], tok = "";
+    do { const j = await api("GET", BASE + "/students?pageSize=300&mask.fieldPaths=group" + (tok ? "&pageToken=" + tok : "")); ids = ids.concat((j.documents || []).map(x => x.name.split("/").pop())); tok = j.nextPageToken; } while (tok);
+    const out = [];
+    for (const uid of ids) { const x = await api("GET", DOCS + "students/" + uid + "/exams/" + key, null, true); if (x && x.fields) out.push({ uid, d: dec({ mapValue: { fields: x.fields } }) }); }
+    return out;
+  }
 }
 const wid = d => ((d.order || {}).writing || [])[0];
 
