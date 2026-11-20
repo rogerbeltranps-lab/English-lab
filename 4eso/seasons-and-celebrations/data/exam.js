@@ -2005,7 +2005,8 @@ window.EL_EXAM = {
      {
       "id": "cB-g09",
       "t": "gap",
-      "q": "When I was little, I ___ ___ believe in the Three Kings. Now I don’t!"
+      "q": "When I was little, I ___ ___ believe in the Three Kings. Now I don’t!",
+      "split": true
      },
      {
       "id": "cB-g10",

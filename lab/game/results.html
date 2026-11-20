@@ -270,4 +270,5 @@ if(DEMO){R.user={};R.teacher=true;if(!R.g)R.g=GROUPS[0].id;load()}
 else{const fb=getApps()[0]||initializeApp(CONFIG);auth=A.getAuth(fb);db=S.getFirestore(fb);
   A.onAuthStateChanged(auth,u=>{R.user=u;R.teacher=!!u&&TEACHERS.includes((u.email||"").toLowerCase());if(R.teacher&&R.g)load();else draw()})}
 </script>
+<script type="module" src="../../shared/js/el-report-btn.js"></script>
 </body></html>

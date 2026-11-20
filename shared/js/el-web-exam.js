@@ -87,7 +87,7 @@
   .wx-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
   .wx-opt{border:2px solid #d8e6df;background:#fbfdfc;border-radius:11px;padding:8px 13px;font:inherit;text-align:left;cursor:pointer;color:#20312b}
   .wx-opt.on{border-color:#1f6b52;background:#e2f3ea;font-weight:800}.wx-opt:disabled{cursor:default}
-  .wx-in{margin-top:9px;width:100%;max-width:460px;padding:9px 11px;border:2px solid #d8e6df;border-radius:10px;font:inherit;box-sizing:border-box}
+  .wx-in{margin-top:9px;width:100%;max-width:460px;padding:9px 11px;border:2px solid #d8e6df;border-radius:10px;font:inherit;box-sizing:border-box}.wx-in.wx-in2{margin:3px 4px;width:150px;max-width:40%;padding:6px 9px;display:inline-block;vertical-align:middle}
   .wx-in:focus{border-color:#1f6b52;outline:none}.wx-in:disabled{background:#f1f5f3}
   .wx-ta{margin-top:9px;width:100%;padding:11px 13px;border:2px solid #d8e6df;border-radius:12px;font:inherit;line-height:1.6;box-sizing:border-box;resize:vertical}
   .wx-ta:focus{border-color:#1f6b52;outline:none}.wx-ta:disabled{background:#f1f5f3}
@@ -314,6 +314,11 @@
       body = (it.ca ? '<div class="wx-ca"><b>Català:</b> ' + esc(it.ca) + '</div>' : '') + (it.frame ? '<div class="wx-frame"><b>Frame:</b> ' + esc(it.frame) + '</div>' : '') +
         '<textarea class="wx-ta" data-q="' + it.id + '" maxlength="1500" rows="9" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="Your text">' + esc(v || '') + '</textarea>' +
         '<div class="wx-wc" data-wc="' + it.id + '" data-min="' + (it.min || 0) + '">' + wcText(w, it.min) + '</div>'; }
+    else if (it.split) {   // one box per gap (Roger, 20 Nov 2026: "it'd be better if they had two separate spaces"); saved as "word / word"
+      const parts = String(v || '').split(' / '); let k = 0;
+      const qt = it.q.split(/_{3,}/).map(esc).reduce((h, seg, j) => h + (j ? '<input class="wx-in wx-in2" type="text" data-q="' + it.id + '" data-k="' + (k++) + '" value="' + esc(parts[j - 1] || '') + '" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('Buit ' + j, 'Gap ' + j)) + '">' : '') + seg, '');
+      return '<div class="wx-q' + (blank ? ' blank' : '') + '" id="q-' + it.id + '"><div class="wx-qt"><span class="wx-n">' + (i + 1) + '.</span>' + qt + '</div></div>';
+    }
     else body = '<input class="wx-in" type="text" data-q="' + it.id + '" value="' + esc(v || '') + '" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false"' + (lockedSec ? ' disabled' : '') + ' aria-label="' + esc(t('La teva resposta', 'Your answer')) + '">';
     return '<div class="wx-q' + (blank ? ' blank' : '') + '" id="q-' + it.id + '"><div class="wx-qt"><span class="wx-n">' + (i + 1) + '.</span>' + esc(it.q) + '</div>' + body + '</div>';
   }
@@ -326,7 +331,8 @@
         : t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
       reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
       vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
-      grammar: t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.'),
+      grammar: list.some(it => it.split) ? t('Tria o escriu la forma correcta. Si hi ha dues caselles, escriu una paraula a cada una.', 'Choose or type the right form. With two boxes, type one word in each.')
+        : t('Tria o escriu la forma correcta. Si hi ha dos buits (___ … ___), escriu les dues paraules a la casella.', 'Choose or type the right form. With two gaps (___ … ___), type both words in the box.'),
       writing: 'Write your text in the box. Use full sentences and check them before you turn in.' }[s];
     const qs = list.map((it, i) => qHtml(it, i, ro)).join('');
     let html = '<div class="wx-sec"><h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + '</h2><p class="wx-lead">' + lead + '</p>';
@@ -341,7 +347,10 @@
     b.innerHTML = html;
     if (!ro) {
       b.querySelectorAll('.wx-opt').forEach(x => x.onclick = () => { set(x.dataset.q, x.dataset.v); b.querySelectorAll('.wx-opt[data-q="' + x.dataset.q + '"]').forEach(y => { y.classList.toggle('on', y === x); y.setAttribute('aria-pressed', y === x); }); x.closest('.wx-q').classList.remove('blank'); });
-      b.querySelectorAll('.wx-in').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 80)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim()); };
+      b.querySelectorAll('.wx-in').forEach(x => { x.oninput = () => {
+          if (x.classList.contains('wx-in2')) { const ps = [...b.querySelectorAll('.wx-in2[data-q="' + x.dataset.q + '"]')].map(y => y.value.replace(/\//g, ' ').trim().slice(0, 40)), any = ps.some(Boolean);
+            set(x.dataset.q, any ? ps.join(' / ') : ''); x.closest('.wx-q').classList.toggle('blank', !any); return; }
+          set(x.dataset.q, x.value.slice(0, 80)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim()); };
         x.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const all = [...b.querySelectorAll('.wx-in')], k = all.indexOf(x); if (all[k + 1]) all[k + 1].focus(); } }; });
       b.querySelectorAll('.wx-ta').forEach(x => { x.oninput = () => { set(x.dataset.q, x.value.slice(0, 1500)); x.closest('.wx-q').classList.toggle('blank', !x.value.trim());
         const wc = b.querySelector('[data-wc="' + x.dataset.q + '"]'); if (wc) wc.textContent = wcText(words(x.value), +wc.dataset.min); }; });

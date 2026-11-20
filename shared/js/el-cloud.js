@@ -960,11 +960,24 @@ async function examEndIdle(g){try{const s=await getDoc(doc(db,"live",g)),e=s.exi
   if(!e||!e.on||e.go||Array.isArray(e.only)&&e.only.length||!e.ls)return;
   await Promise.all([setDoc(doc(db,"ls",e.ls),{webExam:{[g]:{open:false,mode:false,go:null,only:null,at:new Date().toISOString()}}},{merge:true}),
     setDoc(doc(db,"live",g),{exam:null},{merge:true})])}catch(x){console.warn("exam mode",x)}}
-function examPull(e){
-  if(!e||!e.on||!e.href||!user||!isStudent(user)||AS)return false;
+// 🚫📓 No notebook during an exam (Roger, 20 Nov 2026, 2ESO LS2 web exam: "students can see the notebook during the exam! change that
+// immediately"): while exam mode is on for this student (and always on an exam page) html.el-exam-on hides 📓 and ✍ Notes, and the
+// notebook (an LS page's #notes) does not open: the student goes straight back to the exam, no notice.
+let examHref="";
+const examMine=e=>{if(!e||!e.on||!e.href||!user||!isStudent(user)||AS)return false;
   const at=e.at&&e.at.toMillis?e.at.toMillis():+e.at||0;if(at&&Date.now()-at>3*3600e3)return false;   // a forgotten one
-  if(Array.isArray(e.only)&&!e.only.includes(String(user.email||"").toLowerCase()))return false;
+  return !(Array.isArray(e.only)&&!e.only.includes(String(user.email||"").toLowerCase()))};
+const examPage=/(^|\/)exam\.html$/.test(relPath);
+const examNb=()=>{const h=document.documentElement;if(!h.classList.contains("el-exam-on")||!examHref||location.hash!=="#notes"||!lsId||!/\/(index\.html)?$/.test(location.pathname))return false;
+  h.style.visibility="hidden";location.replace(new URL(examHref,ROOT).href);return true};
+(()=>{const st=document.createElement("style");st.textContent="html.el-exam-on #el-nbfab,html.el-exam-on #el-qnbtn,html.el-exam-on #el-qn{display:none!important}";document.head.append(st);
+  if(examPage)document.documentElement.classList.add("el-exam-on")})();
+addEventListener("hashchange",examNb);
+function examFlag(e){const on=examMine(e);examHref=on?e.href:"";if(!examPage)document.documentElement.classList.toggle("el-exam-on",on);if(on)examNb()}
+function examPull(e){
+  if(!examMine(e))return false;
   const url=new URL(e.href,ROOT);if(location.pathname===url.pathname)return true;
+  if(examNb())return true;
   try{sessionStorage.setItem("el_exam_from",location.href)}catch(x){}   // where the exam page sends them back if exam mode ends before they begin
   if(inShell){try{FW.location.replace(url.href)}catch(x){location.href=url.href}return true}
   goMove(url,lockCa()?"📝 L’examen":"📝 The exam",false,3,"📝");return true}
@@ -976,6 +989,7 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     // 📝 a student in the web exam (el-web-exam.js sets EL_EXAM_LOCK while they wait for ▶ Start or take it) is never moved: not by class
     // mode, a class game or a pull-up (Roger, 17 Nov 2026: Elunei takes her exam while the rest of the class is in class mode)
+    examFlag(x&&x.exam);
     if(window.EL_EXAM_LOCK)return;
     // exam mode first: a student called to the exam is not taken to a class game the others play
     if(examPull(x&&x.exam))return;
@@ -1214,7 +1228,7 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
    notebook), elsewhere the last one the board or an LS page showed (el_nb on this device; window.elNbFab(href) from the board). Hidden on
    the notebook itself, under the whiteboard and on the teacher's dashboard. No reads. */
 function nbFab(){
-  if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname))return;
+  if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname)||examPage)return;   // never on an exam page
   let href=null;
   if(lsId&&m){const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum)return;
     href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}
@@ -1304,7 +1318,7 @@ function qnCss(){if(document.getElementById("el-qn-css"))return;const st=documen
   "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn.side{top:auto;border-radius:14px;border-left:2px solid #1f4fb5}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}body.elptab #el-qnbtn{bottom:calc(132px + env(safe-area-inset-bottom,0px))}}@media print{#el-qn,#el-qnbtn{display:none}}";document.head.append(st)}
 // o.side: the ✍ Notes panel beside the activity (else the small quick note over the page)
 function qnOpen(o){
-  o=o||{};if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off"))return false;
+  o=o||{};if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off")||document.documentElement.classList.contains("el-exam-on"))return false;
   const ls=qnLs();if(!ls)return false;
   if(QN.w){qnClose();return true}
   const ca=lockCa(),T=(c,e2)=>ca?c:e2,{lpN,pn,where}=qnWhere(ls),side=!!o.side;

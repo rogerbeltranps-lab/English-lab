@@ -14,6 +14,10 @@ but `auto.mjs fixed` and `marks.mjs answer` save the student's card or answer wi
 pass `--now` (only Roger can ask for it, in a thread). Never write the student's first name or surnames in `--msg`, `--reply` or an
 answer, not even "Hola …": start with the answer itself. The tools refuse a text that uses them; write it again without them.
 
+**Always both languages (Roger, 20 Nov 2026: "It should also have the catalan version"):** every `--msg` comes with `--msg2` and every
+`--reply` with `--reply2`: the same words in the other language (Catalan when the report is in English, English when it is in Catalan),
+just as natural and in Roger's voice. The student's card shows both, their language first. The tool refuses one without the other.
+
 On the site and in anything Roger reads (`--note`, `--todo`, emails), call yourself **Beltran**, never Claude, and call Gemini **Roig** (Roger, 16 Nov 2026; AGENTS.md).
 
 ## When it runs
@@ -39,7 +43,7 @@ hourly task "English Lab: problem reports" is switched off.
      plainly correct for that item, a marking run that missed a hand-in) → fix it.
    - **Not technical** (design wishes, what to teach or practise, how hard something is, a mark or correction the student disagrees with,
      routes and levels, deadlines, personal matters), **unclear** (you cannot find or reproduce a bug), or a fix that would change LS1
-     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --status … --note "…" --reply "…" [--todo "…"]
+     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --status … --note "…" --reply "…" --reply2 "…" [--todo "…"]
      --apply`. Nothing is sent to the student: Roger sends it with one click (see "Status and suggested reply" below).
    - Already fixed by an earlier change → no PR; answer it as fixed (step 4), naming the PR or date in the note.
 3. Fix: a branch `claude/problem-<short id>` from `main`, the smallest change that fixes it, following `AGENTS.md`, plus a line in
@@ -47,7 +51,7 @@ hourly task "English Lab: problem reports" is switched off.
    `node --check` on changed JS, a Playwright look at the page at 1366×768 when it is visual). Open the PR (attribution block, assignee and
    reviewer `rogerbeltranps-lab`), wait for its checks, **squash-merge it without asking** (Roger's standing approval for technical fixes
    from problem reports). Never put student names or emails in the PR, commits or code: say "problem report, 2ESOA, 8 Nov".
-4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank
+4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --msg2 "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank
    you…" in the report's language (Catalan for Beginners, Insecure and no route, English for Safe and Daring; the tool says which). `--msg`
    adds one or two plain sentences in that language, in Roger's voice: what was wrong and what they see now ("Tenies raó: …", "You were
    right: …"). Never mention AI, Claude, PRs or code. If they must reload, say so ("Recarrega la pàgina").
@@ -70,6 +74,7 @@ hourly task "English Lab: problem reports" is switched off.
 - `--todo` (only with `you`): what Roger must do first, one short line ("Press ↺ Let them do it again on her checkpoint 1 score").
 - `--reply`: the answer to the student, in the report's language (the tool says which), Roger's voice, first person, plain and kind,
   two or three short sentences; never AI, Claude, PRs or code. Write it so it is true once the todo is done.
+- `--reply2`: the same answer in the other language (the tool says which). Both go to the student with one click.
 
 In ⚠️ Problem reports the reply has **📨 Send…** (fixed → the ✅ fixed card with it; nobug → the message card and the report closes;
 you → the message card, the report stays open) and **✏️ Edit first** (opens 💬 Answer with the text). Run `leave` again on the same

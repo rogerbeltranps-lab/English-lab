@@ -32,6 +32,11 @@
 // only have one game of grammar and one game of vocab per LS"): the board's list has 🧩 Grammar · LSn and 📚 Vocabulary · LSn (?ls=<ls id>&kind=);
 // after the group, the points of every learning path of the LS (and earlier LSs) are ticked by the Time plan, and the game is saved as the
 // newest learning path's game with ticked points (all its ticked questions); the other ticked points bring their 🔁 questions.
+// 📚🧩 Vocabulary + Grammar in one game (Roger, 19 Nov 2026: "I want to be able to choose vocab and grammar in the games"): a third card per
+// LS (?ls=&kind=mix) whose ticks screen has the vocabulary AND the grammar points of every learning path (each learning path's two games
+// together, 📚 / 🧩 on each tick). The decks stay separate: the game is saved as the newest ticked learning path's grammar game (its
+// vocabulary game if only vocabulary is ticked there); the other game of that path brings all its ticked questions, mixed in among them,
+// and counts for its own points (d, dp), as 💬 the expressions do. gameResults kind "mixed" (results.html), myGames keeps the game's kind.
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -84,13 +89,16 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // phase, keys {slide: right option, in the shown order}, aw {slide: [emails that got the point]}. names {email: "First S."} (student list),
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
 // the LS game (🧩 Grammar · LSn / 📚 Vocabulary · LSn): {ls: EL_LS id, kind}; H.deckId is then its newest learning path's game
-const lsGames=(ls,kind)=>(window.EL_GAMES||[]).filter(d=>(d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar"))===kind&&lsOf(d)===ls).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));
+const kd0=d=>d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar");
+// 📚🧩 mix: one deck per learning path, its grammar game (else its vocabulary game); the other one of the path comes with it (sib)
+const mixPrim=d=>kd0(d)==="grammar"||!(window.EL_GAMES||[]).some(x=>x.course===d.course&&x.ls===d.ls&&x.lp===d.lp&&kd0(x)==="grammar");
+const lsGames=(ls,kind)=>(window.EL_GAMES||[]).filter(d=>(kind==="mix"?mixPrim(d):kd0(d)===kind)&&lsOf(d)===ls).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));
 // A learning path's own game (host.html?deck= only: the 🎮 buttons on the learning path pages, 📓 ▶ Play, Materials) opens as its LS game
 // too, so every way in is the same 3 steps: group → points → Start, with 🎮/🕵️/🚀 beside Start (Roger, 18 Nov 2026, 4 ESO B: "yesterday we
 // agreed on another way of choosing the games", PR #687; the LP3 page's buttons still opened the old boards)
 const LSG0=(()=>{let ls=URLP.get("ls"),k=URLP.get("kind");
   if(!ls){const d=(window.EL_GAMES||[]).find(x=>x.id===URLP.get("deck"));if(d&&d.lp){ls=lsOf(d);k=d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar")}}
-  return ls&&/^(grammar|vocab)$/.test(k||"")&&lsGames(ls,k).length?{ls,kind:k}:null})();
+  return ls&&/^(grammar|vocab|mix)$/.test(k||"")&&lsGames(ls,k).length?{ls,kind:k}:null})();
 const H={user:null,teacher:false,lsg:LSG0,deckId:URLP.get("deck")||(LSG0?lsGames(LSG0.ls,LSG0.kind).slice(-1)[0].id:""),deck:null,deck0:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:"",tg:"",tp:null,tsel:null};
 const saved=tab.get();
 if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp,tp:saved.tp||null,rvn:saved.rvn});
@@ -111,14 +119,17 @@ const isW=s=>!!(s&&s.q&&s.write);   // a written question
 const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
 // what the 2 sentences use (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever
 // they need to remember better the theory explained"): the game's kind (decks/index.js), or the end of its id
-const kindOf=()=>meta().kind||(/-vocab$/.test(H.deckId||"")?"vocab":/-grammar$/.test(H.deckId||"")?"grammar":"");
+const isMix=()=>!!(H.lsg&&H.lsg.kind==="mix");
+const kindOf=()=>isMix()?"mix":meta().kind||(/-vocab$/.test(H.deckId||"")?"vocab":/-grammar$/.test(H.deckId||"")?"grammar":"");
 const noteWhat=(kind,id)=>{kind=kind||(/-vocab$/.test(id||"")?"vocab":/-grammar$/.test(id||"")?"grammar":"");
   return kind==="vocab"?"<b>the new words</b>":kind==="grammar"?"<b>the grammar structures</b> you have learnt":"<b>the new words or grammar</b>"};
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
 // the game's name starts with its learning path: "LP2 · Vocabulary · Clothes, kit and weather" (decks/index.js elGameName, Roger 7 Nov 2026)
-const gName=()=>meta().lp?elGameName(H.deckId):H.deck.title;
+const gName=()=>isMix()?mixName():meta().lp?elGameName(H.deckId):H.deck.title;
+// 📚🧩 the mixed game's name: "LP2 · Vocabulary + Grammar"
+const mixName=()=>{const n=String(meta().lp||"").split(" · ")[0];return (n?n+" · ":"")+"Vocabulary + Grammar"};
 // the LS game's name on the board's screens before it starts: "🧩 Grammar · LS2 · Seasons & Celebrations"
-const lsgName=()=>{const d=meta();return (H.lsg.kind==="vocab"?"📚 Vocabulary":"🧩 Grammar")+" · "+(d.ls||"")};
+const lsgName=()=>{const d=meta();return (H.lsg.kind==="mix"?"📚🧩 Vocabulary + Grammar":H.lsg.kind==="vocab"?"📚 Vocabulary":"🧩 Grammar")+" · "+(d.ls||"")};
 const boardName=()=>H.lsg?lsgName():gName();
 // the LS of the game (decks/index.js ls "LS2 · Free Time, Live!" → EL_LS id "2eso-free-time-live"), where the notes are shown
 const lsId=()=>{const m=meta(),c=m.course||(H.deck&&H.deck.course)||"",nm=String(m.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
@@ -180,7 +191,7 @@ function lsOf(d){const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toL
 const lpNum=d=>String(d.lp||"").split(" · ")[0];
 // the games of this game's course and kind (grammar or vocabulary), by LS and then learning path (decks/index.js)
 const kindIs=d=>d.kind||(/-vocab$/.test(d.id)?"vocab":"grammar");
-const gDecks=()=>{const c=meta().course,k=kindOf();return (window.EL_GAMES||[]).filter(d=>d.course===c&&kindIs(d)===k)
+const gDecks=()=>{const c=meta().course,k=kindOf();return (window.EL_GAMES||[]).filter(d=>d.course===c&&(k==="mix"?mixPrim(d):kindIs(d)===k))
   .sort((a,b)=>(a.ls+" "+a.lp).localeCompare(b.ls+" "+b.lp,"en",{numeric:true}))};
 // 💬 Expressions (Roger, 16 Nov 2026: "why do we have grammar in the vocabulary section? … can we label them as Expressions" + "and include
 // them in the grammar games"): a point of a 📚 vocabulary deck whose theory slide has ex:true (play / go / do, on / at / in + time, verb +
@@ -188,9 +199,11 @@ const gDecks=()=>{const c=meta().course,k=kindOf();return (window.EL_GAMES||[]).
 // in its own deck (the same point number, so the students' notes and results keep their place): its questions come in like a 🔁 review
 // question (d, dp: they count for their own point), all of them when it is the learning path the game is saved as (anchor), else 1, 2 or 3.
 const exDeck=d=>d&&kindIs(d)==="grammar"?(window.EL_GAMES||[]).find(x=>x.course===d.course&&x.ls===d.ls&&x.lp===d.lp&&kindIs(x)==="vocab")||null:null;
-const exDecks=()=>kindOf()==="grammar"?gDecks().map(exDeck).filter(Boolean):[];
+// the deck that comes with a learning path's deck: 💬 its expressions in a grammar game, 📚🧩 its other game in a mixed one
+const sib=d=>!d?null:isMix()?(window.EL_GAMES||[]).find(x=>x!==d&&sameLp(x,d)&&kindIs(x)!==kindIs(d))||null:exDeck(d);
+const exDecks=()=>/^(grammar|mix)$/.test(kindOf())?gDecks().map(sib).filter(Boolean):[];
 // the points a deck offers in this game: a vocabulary deck gives its 💬 points to the grammar game and keeps the others
-const ptsOf=d=>{const P=RAW[d.id]||[];return kindIs(d)!=="vocab"?P:kindOf()==="vocab"?P.filter(p=>!p.ex):P.filter(p=>p.ex)};
+const ptsOf=d=>{const P=RAW[d.id]||[];return kindIs(d)!=="vocab"||isMix()?P:kindOf()==="vocab"?P.filter(p=>!p.ex):P.filter(p=>p.ex)};
 const sameLp=(a,b)=>!!a&&!!b&&a.course===b.course&&a.ls===b.ls&&a.lp===b.lp;
 let tpBusy=false;
 async function loadPoints(){if(tpBusy)return;tpBusy=true;for(const d of gDecks().concat(exDecks()))await rawDeck(d.id);tpBusy=false;draw()}
@@ -212,10 +225,12 @@ function tpDefault(g){const out={};
     out[d.id]=new Set(ks)});
   // an LS game with nothing done yet: its first learning path
   if(H.lsg&&!gDecks().concat(exDecks()).some(d=>d.ls===meta().ls&&out[d.id]&&out[d.id].size)){const f=gDecks().find(d=>d.ls===meta().ls);
-    [f,exDeck(f)].forEach(x=>{if(x&&RAW[x.id])out[x.id]=new Set(ptsOf(x).map(p=>p.k))})}
+    [f,sib(f)].forEach(x=>{if(x&&RAW[x.id])out[x.id]=new Set(ptsOf(x).map(p=>p.k))})}
   return out}
 // the game it is saved as: this game, or for an LS game the newest learning path of the LS with ticked points
-function anchor(sel){if(!H.lsg)return H.deckId;const on=d=>!!d&&!!sel&&!!sel[d.id]&&sel[d.id].size>0,ds=gDecks().filter(d=>d.ls===meta().ls&&(on(d)||on(exDeck(d))));return ds.length?ds[ds.length-1].id:H.deckId}
+// (📚🧩 mixed: that path's grammar game, or its vocabulary game when only vocabulary is ticked there)
+function anchor(sel){if(!H.lsg)return H.deckId;const on=d=>!!d&&!!sel&&!!sel[d.id]&&sel[d.id].size>0,ds=gDecks().filter(d=>d.ls===meta().ls&&(on(d)||on(sib(d))));
+  if(!ds.length)return H.deckId;const p=ds[ds.length-1];return isMix()&&!on(p)&&sib(p)?sib(p).id:p.id}
 // the choice as it is kept: null = this game exactly as it is (all its points, nothing else)
 function tpFrom(sel,a){a=a||H.deckId;const o={};Object.entries(sel||{}).forEach(([id,ks])=>{const x=[...ks].sort((p,q)=>p-q);if(x.length)o[id]=x});
   const P=RAW[a]||[],mine=o[a]||[];if(Object.keys(o).length===(mine.length?1:0)&&mine.length===P.length)return null;return o}
@@ -227,21 +242,24 @@ async function build(){
   if(!H.deck0)return;if(!H.tp){H.deck=H.deck0;return}
   const tp=H.tp,own=new Set(tp[H.deckId]||[]),seed=H.sid||1,n=H.rvn||rvN(),main=[];let k=0;
   H.deck0.slides.forEach(s=>{if(isN(s)){k=s.notes;return}if(s.q&&(!k||own.has(k)))main.push(Object.assign({},s,{_p:k&&H.deck0.notes!==false?"p"+k:""}))});
-  const rv=[];
+  const rv=[],mix=[];
   for(const id of Object.keys(tp)){if(id===H.deckId)continue;const P=await rawDeck(id),d=gm(id);if(!P)continue;
     // 💬 the expressions of this game's own learning path: all their questions, after this game's own (as its points, in deck order)
     const mine=sameLp(d,gm(H.deckId));
     tp[id].forEach(kk=>{const p=P.find(x=>x.k===kk);if(!p)return;const tag=q=>{q=Object.assign({},q);delete q.p;return Object.assign(q,{_p:"",_rv:{d:id,dp:"p"+kk,lp:lpNum(d),ls:String(d.ls||"").split(" · ")[0],name:p.name,...(p.ex?{ex:true}:{}),...(mine?{own:true}:{})}})};
-      if(mine){p.qs.forEach(q=>main.push(tag(q)));return}
+      if(mine){p.qs.forEach(q=>(isMix()?mix:main).push(tag(q)));return}
       const pool=p.qs.concat(p.more),h=[...(id+kk)].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7);
       G.shuffle(pool.length,seed+h).slice(0,n).forEach(j=>rv.push(tag(pool[j])))})}
+  // 📚🧩 a mixed game: the other game of the learning path spread evenly among this game's questions (vocabulary and grammar take turns)
+  if(mix.length){const a=main.splice(0),long=a.length>=mix.length?a:mix,short=long===a?mix:a;
+    long.forEach((q,i)=>{main.push(q);main.push(...short.slice(Math.floor(i*short.length/long.length),Math.floor((i+1)*short.length/long.length)))})}
   const R=G.shuffle(rv.length,seed+17).map(j=>rv[j]),out=[];
   if(!main.length)out.push(...R);else main.forEach((q,i)=>{out.push(q);out.push(...R.slice(Math.floor(i*R.length/main.length),Math.floor((i+1)*R.length/main.length)))});
   H.deck=Object.assign({},H.deck0,{slides:out});
 }
 // how many questions the choice gives (the 🧩 screen): this game's, and review
 // (Code Breakers: this game's decks/more questions too, and the same number of review questions per point)
-function tpCount(sel,cb){const a=anchor(sel),P=RAW[a]||[],mine=sel[a]||new Set(),n=H.rvn||rvN(),x=exDeck(gm(a)),X=x&&RAW[x.id]||[],xs=x&&sel[x.id]||new Set();
+function tpCount(sel,cb){const a=anchor(sel),P=RAW[a]||[],mine=sel[a]||new Set(),n=H.rvn||rvN(),x=sib(gm(a)),X=x&&RAW[x.id]||[],xs=x&&sel[x.id]||new Set();
   // this game's points and 💬 the expressions of its learning path: all their questions
   const own=P.filter(p=>mine.has(p.k)).concat(X.filter(p=>xs.has(p.k))).reduce((t,p)=>t+p.qs.length+(cb?p.more.length:0),0);let rv=0;
   Object.entries(sel).forEach(([id,ks])=>{const Q=RAW[id];if(!Q||id===a||x&&id===x.id)return;Q.filter(p=>ks.has(p.k)).forEach(p=>{rv+=Math.min(n,p.qs.length+p.more.length)})});
@@ -254,7 +272,7 @@ function tpCount(sel,cb){const a=anchor(sel),P=RAW[a]||[],mine=sel[a]||new Set()
 const GP={};let gpBusy="";
 const qKey=t=>String(t??"").replace(/\*\*|~~/g,"").replace(/\s+/g," ").trim().slice(0,150).toLowerCase();
 const gpKey=g=>g+"_"+kindOf();
-function gpForget(g){["vocab","grammar"].forEach(k=>{delete GP[g+"_"+k];try{sessionStorage.removeItem("el_gp_"+g+"_"+k)}catch(e){}})}
+function gpForget(g){["vocab","grammar","mix"].forEach(k=>{delete GP[g+"_"+k];try{sessionStorage.removeItem("el_gp_"+g+"_"+k)}catch(e){}})}
 async function loadGp(g){const k=gpKey(g);if(GP[k]||gpBusy===k)return;
   try{const c=JSON.parse(sessionStorage.getItem("el_gp_"+k)||"null");if(c&&c.m&&Date.now()-c.t<3*3600e3){GP[k]=c.m;draw();return}}catch(e){}
   gpBusy=k;const m={};
@@ -381,7 +399,9 @@ const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"s
 function markPlayed(){
   const id=lsId();if(!id||!H.g||!H.sid||playedSid===H.sid||!H.deck||H.deck.notes===false)return;playedSid=H.sid;
   if(PL&&!(PL[H.deckId]||{})[H.g])(PL[H.deckId]=PL[H.deckId]||{})[H.g]=H.sid;
-  S.setDoc(S.doc(db,"ls",id),{played:{[H.g]:{[H.deckId]:H.sid}}},{merge:true}).catch(e=>{playedSid=0;console.warn("played",e)});
+  // 📚🧩 a mixed game: the other game of its learning path was played too (its ticked questions were all in it)
+  const pg={[H.deckId]:H.sid},o=isMix()&&sib(gm(H.deckId));if(o&&H.tp&&(H.tp[o.id]||[]).length){pg[o.id]=H.sid;if(PL&&!(PL[o.id]||{})[H.g])(PL[o.id]=PL[o.id]||{})[H.g]=H.sid}
+  S.setDoc(S.doc(db,"ls",id),{played:{[H.g]:pg}},{merge:true}).catch(e=>{playedSid=0;console.warn("played",e)});
 }
 let savedSid=0;
 async function saveResults(){
@@ -399,7 +419,7 @@ async function saveResults(){
     nIdx.forEach(i=>{if(typeof a[i]==="string"&&a[i].trim())notes["p"+slides()[i].notes]=a[i].slice(0,3000)});
     return {e,r:shown.length-miss.length,a:shown.filter(i=>a[i]!=null).length,miss,ans,notes}});
   const d=new Date(H.sid),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  const doc={group:H.g,course:meta.course||H.deck.course||"",deck:H.deckId,title:H.deck.title,kind:meta.kind||"mixed",ls:meta.ls||"",lp:meta.lp||"",
+  const doc={group:H.g,course:meta.course||H.deck.course||"",deck:H.deckId,title:isMix()?mixName():H.deck.title,kind:isMix()?"mixed":meta.kind||"mixed",...(isMix()?{mix:true}:{}),ls:meta.ls||"",lp:meta.lp||"",
     sid:H.sid,day,term:H.term,at:S.serverTimestamp(),qn:qs.length,done:shown.length,
     qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),ok:String(isW(slides()[i])?slides()[i].write[0]:slides()[i].options[0]).replace(/\*\*/g,"").slice(0,80),right:H.aw[i].length,of:answered(i).length,...(slides()[i]._rv?{d:slides()[i]._rv.d}:{})})),
     nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu,...(H.tp?{tp:H.tp}:{})};
@@ -418,7 +438,7 @@ async function saveResults(){
   const pn={};shown.forEach(i=>{const p=partOf(i);if(p)pn[p]=(pn[p]||0)+1});
   try{const w=S.writeBatch(db),key=H.g+"_"+H.sid;
     stu.forEach(x=>{const miss=x.miss.map(n=>{const i=qs[n-1],q=doc.qs.find(z=>z.n===n)||{};const r=slides()[i]._rv;return Object.assign({n,q:q.q||"",a:x.ans[n]==null?"":x.ans[n],ok:q.ok||"",p:partOf(i)},r?{d:r.d,dp:r.dp}:{})});
-      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,pn,miss,...(Object.keys(px).length?{px}:{})}},updated:S.serverTimestamp()},{merge:true})});
+      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:doc.title,kind:meta.kind||doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,pn,miss,...(Object.keys(px).length?{px}:{})}},updated:S.serverTimestamp()},{merge:true})});
     await w.commit()}catch(e){console.warn("my games",e);H.err="⚠ Students' results not saved: "+e.message;draw()}
 }
 let autoT=null;
@@ -501,6 +521,8 @@ function endGame(){
 }
 
 /* ---------- screens ---------- */
+// 📚 or 🧩 (💬 for an expression): which game a question of a mixed game comes from
+const qKind=s=>s&&s._rv&&s._rv.ex?"":kindIs(gm(s&&s._rv?s._rv.d:H.deckId))==="vocab"?"📚":"🧩";
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   const w=who(),{gone,back,never}=elWhoLeft(w);
   // only the counts on the board (Roger, 10 Nov 2026: "during the games students played to log in and out so that their name appeared"):
@@ -508,7 +530,7 @@ const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${back.length?`<p class="bk">↩ Left and came back (${back.length}): ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${hm(y.left.at)})</small>`).join(", ")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
   ${w.active?`<button class="pill who${gone.length?" warn":""}" data-do="who" title="Who is in full screen and connected, who left and who is not in the game (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${gone.length} left${back.length?` · ↩ ${back.length}`:""}${never.length?` · ⚪ ${never.length} not here`:""}</button>`:""}${box}
-  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}${cur()._rv?`${cur()._rv.ex?" · 💬 Expressions":""}${cur()._rv.own?"":` · 🔁 ${esc(cur()._rv.ls+" "+cur()._rv.lp)}`}`:""}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
+  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}${isMix()&&qKind(cur())?qKind(cur())+" ":""}Question ${qn} / ${qs.length}${cur()._rv?`${cur()._rv.ex?" · 💬 Expressions":""}${cur()._rv.own?"":` · 🔁 ${esc(cur()._rv.ls+" "+cur()._rv.lp)}`}`:""}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
@@ -521,7 +543,10 @@ function blockHtml(l,hid,fresh){
 const tiles=(s,i,reveal)=>{const o=order(i),ok=okAt(i);
   return `<div class="tiles">${o.map((k,n)=>`<div class="tile t${n}${reveal&&n!==ok?" dim":""}"><span class="shp s${n}"></span><span class="tx">${md(s.options[k])}</span>${reveal&&n===ok?'<span class="mark">✓</span>':""}</div>`).join("")}</div>`};
 
-function draw(){
+// ↕ the long screens (the game list, the ticks) scroll inside the board (the page itself never scrolls: game.css body overflow hidden;
+// Roger, 19 Nov 2026: "I want this at the top, and I want to be able to scroll down in case a menu is long")
+function draw(){draw0();app$.classList.toggle("scroll",!!app$.querySelector(".tpwrap,.courses"))}
+function draw0(){
   if(!H.user){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🎮 Class game</h2><p>This is the teacher's board. Sign in with the teacher's account to start a game.</p><p><button class="btn go" data-do="signin">Sign in with Google</button></p></div></div>`;return}
   if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🎮 Class game</h2><p>This is the teacher's board. When your teacher starts a game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a> <button class="btn" data-do="signout">Sign out</button></p></div></div>`;return}
   if(!H.deck){
@@ -530,12 +555,14 @@ function draw(){
     // ONE 🧩 grammar game and ONE 📚 vocabulary game per LS (Roger, 16 Nov 2026: "so now we only have one game of grammar and one game of vocab
     // per LS"): each opens the LS's points to tick (drawPoints). Under it, which learning paths each group has played. The learning path
     // games still open from their learning path page and the Time plan; Code Breakers with both games of a path is on codebreakers.html.
-    const lsCard=(c,l,kind)=>{const ds=list.filter(d=>d.course===c&&(d.ls||"")===l&&kindIs(d)===kind).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));if(!ds.length)return "";
+    // 📚🧩 Vocabulary + Grammar (Roger, 19 Nov 2026): both kinds' points on one ticks screen, one game
+    const lsCard=(c,l,kind)=>{const ds=list.filter(d=>d.course===c&&(d.ls||"")===l&&(kind==="mix"?mixPrim(d):kindIs(d)===kind)).sort((a,b)=>String(a.lp).localeCompare(String(b.lp),"en",{numeric:true}));if(!ds.length)return "";
+      if(kind==="mix")return list.some(d=>d.course===c&&(d.ls||"")===l&&kindIs(d)==="vocab")&&list.some(d=>d.course===c&&(d.ls||"")===l&&kindIs(d)==="grammar")?`<button class="btn deckbtn mixbtn slidein" data-do="lsgame" data-ls="${esc(lsOf(ds[0]))}" data-kind="mix"><span class="e">📚🧩</span><span>Vocabulary + Grammar · ${esc(String(l).split(" · ")[0])}<br><small style="opacity:.7">Both in one game: tick vocabulary and grammar points</small></span></button>`:"";
       const id=lsOf(ds[0]),gs=(window.EL_GROUPS||[]).filter(g=>g.course===c);
       const pl=PL?`<br><small class="pl">${gs.map(g=>{const n=ds.filter(d=>(PL[d.id]||{})[g.id]).map(d=>lpNum(d));return n.length?`<span class="pl-y">✓ ${esc(g.name)}: ${esc(n.join(" "))}</span>`:`<span class="pl-n">✗ ${esc(g.name)}</span>`}).join(" ")}</small>`:"";
       return `<button class="btn deckbtn slidein" data-do="lsgame" data-ls="${esc(id)}" data-kind="${kind}"><span class="e">${kind==="vocab"?"📚":"🧩"}</span><span>${kind==="vocab"?"Vocabulary":"Grammar"} · ${esc(String(l).split(" · ")[0])}<br><small style="opacity:.7">${ds.map(d=>esc(lpNum(d))).join(" · ")}: tick the points you've done</small>${pl}</span></button>`};loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
-      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${lsCard(c,l,"grammar")}${lsCard(c,l,"vocab")}</div>`).join("")}</section>`}).join("");
+      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${lsCard(c,l,"grammar")}${lsCard(c,l,"vocab")}${lsCard(c,l,"mix")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game, then the group, then tick what goes in it and start.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.tg&&!H.g){drawPoints();return}
   if(H.phase==="pick"||!H.g){
@@ -551,7 +578,7 @@ function draw(){
   if(H.phase==="lobby"){
     loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
     const rpLine=pb?`<p class="rp pop">🔁 Played on ${esc(plDay(pb))}.</p>`:"";
-    const tpLine=H.tp?`<p class="rp pop">${kindOf()==="vocab"?"📚":"🧩"} ${qList().length} questions on ${Object.values(H.tp).reduce((t,a)=>t+a.length,0)} ${kindOf()==="vocab"?"vocabulary":"grammar"} points${Object.keys(H.tp).some(id=>id!==H.deckId)?`, with 🔁 review of earlier learning paths`:""}.</p>`:"";
+    const tpLine=H.tp?`<p class="rp pop">${kindOf()==="mix"?"📚🧩":kindOf()==="vocab"?"📚":"🧩"} ${qList().length} questions on ${Object.values(H.tp).reduce((t,a)=>t+a.length,0)} ${kindOf()==="mix"?"vocabulary and grammar":kindOf()==="vocab"?"vocabulary":"grammar"} points${Object.keys(H.tp).some(id=>id!==H.deckId)?`, with 🔁 review of earlier learning paths`:""}.</p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
@@ -613,29 +640,31 @@ function draw(){
 const fmtSwitch=()=>`<span class="fsw" role="radiogroup" aria-label="How to play it">${[["quiz","🎮","Quiz: everyone answers the same question, on the board"],["cb","🕵️","Code Breakers: each student at their own pace"],["sr","🚀","Space rescue: each student at their own pace"]].map(([f,i,t])=>`<button class="${fmt()===f?"on":""}" role="radio" aria-checked="${fmt()===f}" data-do="fmt" data-f="${f}" title="${t}">${i} ${t.split(":")[0]}</button>`).join("")}</span>`;
 // 🧩 Which grammar? for the group H.tg: every grammar point of the course's grammar games, by LS and learning path, ticked by the Time plan
 function drawPoints(){
-  const g=H.tg,cb=ownPace(),head=`<h1 class="logo pop">${esc(boardName())}</h1>`,what=kindOf()==="vocab"?"vocabulary":"grammar";
-  if(!PL||!pointsReady()){loadPlayed();loadPoints();app$.innerHTML=`<div class="center"><div>${head}<p class="sub">Loading the grammar points…</p></div></div>`;return}
+  const g=H.tg,cb=ownPace(),head=`<h1 class="logo pop">${esc(boardName())}</h1>`,what=kindOf()==="mix"?"vocabulary and grammar":kindOf()==="vocab"?"vocabulary":"grammar";
+  if(!PL||!pointsReady()){loadPlayed();loadPoints();app$.innerHTML=`<div class="center"><div>${head}<p class="sub">Loading the ${what} points…</p></div></div>`;return}
   if(!H.tsel)H.tsel=tpDefault(g);
   if(!GP[gpKey(g)])loadGp(g);
   const sel=H.tsel,day=v=>{const t=/^\d{4}-\d\d-\d\d$/.test(String(v))?new Date(v+"T12:00:00"):new Date(+v||v);return isNaN(t)?"":t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
   const lsList=[...new Set(gDecks().map(d=>d.ls||""))];
   // the ticks of one deck's points (a grammar deck, or 💬 the expressions of its learning path's vocabulary deck, labelled as such)
-  const A=anchor(sel),rows=(d,me)=>{const P=ptsOf(d),done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set(),ex=kindIs(d)==="vocab"&&kindOf()==="grammar";
+  const A=anchor(sel),mx=isMix(),rows=(d,me)=>{const P=ptsOf(d),done=doneOf(d,g),info=d.act&&Object.keys(done).some(k=>k.startsWith(d.act+"#")),pl=PL&&(PL[d.id]||{})[g],on=sel[d.id]||new Set(),ex=kindIs(d)==="vocab"&&kindOf()==="grammar",gk=mx?(kindIs(d)==="vocab"?"vocabulary ":"grammar "):ex?"vocabulary ":"";
+    // 📚🧩 a mixed game: each tick says which game it is from
+    const lab=p=>mx?(p.ex?"💬 <b>Expressions</b> · ":kindIs(d)==="vocab"?"📚 ":"🧩 "):ex?"💬 <b>Expressions</b> · ":"";
     const why=p=>{if(p.tab&&info){const v=doneDay(d,g,p);return v?`<span class="tpy">✓ done${day(v)?" "+esc(day(v)):""}</span>`:`<span class="tpn">not done yet</span>`}
-      return pl?`<span class="tpy">✓ ${ex?"vocabulary ":""}game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">${ex?"vocabulary ":""}game not played yet</span>`};
-    return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}>${gpTag(g,d,p)}<span class="tpt">${ex?"💬 <b>Expressions</b> · ":""}${esc(p.name)}</span><small>${[gpDay(g,d,p),why(p)].filter(Boolean).join(" · ")}</small></label>`).join("")};
-  const lp=d=>{const me=d.id===A,x=exDeck(d);
+      return pl?`<span class="tpy">✓ ${gk}game played ${esc(plDay(pl))}</span>`:me?"":`<span class="tpn">${gk}game not played yet</span>`};
+    return P.map(p=>`<label class="tpi${on.has(p.k)?" on":""}"><input type="checkbox" data-do="tpk" data-id="${esc(d.id)}" data-k="${p.k}"${on.has(p.k)?" checked":""}>${gpTag(g,d,p)}<span class="tpt">${lab(p)}${esc(p.name)}</span><small>${[gpDay(g,d,p),why(p)].filter(Boolean).join(" · ")}</small></label>`).join("")};
+  const lp=d=>{const me=d.id===A||mx&&sameLp(d,gm(A)),x=sib(d);
     return `<div class="tplp${me?" me":""}"><div class="tph"><b>${esc(d.lp||d.title)}</b>${me?`<span class="tpme">${H.lsg?"All its questions":"This game"}</span>`:""}<span class="sp"></span><button class="tpa" data-do="tpall" data-id="${esc(d.id)}">All</button><button class="tpa" data-do="tpnone" data-id="${esc(d.id)}">None</button></div>
-      <div class="tprows">${rows(d,me)}${x&&RAW[x.id]?rows(x,me):""}</div></div>`};
+      <div class="tprows">${mx&&x&&kindIs(x)==="vocab"&&RAW[x.id]?rows(x,me)+rows(d,me):rows(d,me)+(x&&RAW[x.id]?rows(x,me):"")}</div></div>`};
   // 👀 the learning path of this game first, full width (Roger, 18 Nov 2026: "I can't see LP3 well here"), the earlier ones below as review
-  const meD=gDecks().find(d=>d.id===A);
+  const meD=gDecks().find(d=>d.id===A||mx&&sameLp(d,gm(A)));
   const c=tpCount(sel,cb),n=H.rvn||rvN(),none=!Object.values(sel).some(x=>x.size),tot=c.own+c.rv;
   app$.innerHTML=`<div class="center tpwrap"><div style="width:100%">${head}
-    <p class="sub">${what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class. Untick what you haven't taught yet. % = how the class did last time${GP[gpKey(g)]?"":" (loading…)"}.</p>
-    <div class="tpcols">${meD?`<section class="course tpls tpnow"><h3>🎯 This game</h3>${lp(meD)}</section>`:""}${lsList.map(l=>{const ds=gDecks().filter(d=>(d.ls||"")===l&&d!==meD);return ds.length?`<section class="course tpls">${l?`<h3>${meD?"🔁 ":""}${esc(l)}${meD?" · review":""}</h3>`:""}${ds.map(lp).join("")}</section>`:""}).join("")}</div>
+    <p class="sub">${kindOf()==="mix"?"📚🧩":what==="vocabulary"?"📚":"🧩"} <b>Which ${what} for ${esc(groupName(g))}?</b> Ticked = done in class. Untick what you haven't taught yet. % = how the class did last time${GP[gpKey(g)]?"":" (loading…)"}.</p>
     <div class="tpbar"><span class="tpnum">🔁 Each earlier point:</span>${[1,2,3,99].map(k=>`<button class="btn${k===n?" go":" ghost"}" data-do="tpn" data-n="${k}">${k===99?"all":k} question${k>1?"s":""}</button>`).join("")}
       <b class="tptot">${none?"Tick at least one point":`${tot} question${tot===1?"":"s"}${c.rv?` (${c.own} from ${esc(lpNum(gm(A))||"this game")} + ${c.rv} review)`:""}${cb?" · "+paceIcon()+" each at their own pace":""}`}</b>
       ${fmtSwitch()}<button class="btn ${fmt()==="sr"?"srbtn":cb?"cbbtn":"go"}" data-do="tpgo"${none?" disabled":""} style="font-size:1.1em">${cb?paceIcon():"▶"} Start for ${esc(groupName(g))}</button></div>
+    <div class="tpcols">${meD?`<section class="course tpls tpnow"><h3>🎯 This game</h3>${lp(meD)}</section>`:""}${lsList.map(l=>{const ds=gDecks().filter(d=>(d.ls||"")===l&&d!==meD);return ds.length?`<section class="course tpls">${l?`<h3>${meD?"🔁 ":""}${esc(l)}${meD?" · review":""}</h3>`:""}${ds.map(lp).join("")}</section>`:""}).join("")}</div>
     <p>${backBtn()}<button class="btn ghost" data-do="tpback">← Groups</button></p></div></div>`;
 }
 
@@ -649,11 +678,11 @@ app$.addEventListener("click",async e=>{
     history.replaceState(null,"","?ls="+encodeURIComponent(H.lsg.ls)+"&kind="+H.lsg.kind);if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw();return}
   if(d==="deck"){H.lsg=null;H.tp=null;H.tg="";H.deckId=b.dataset.id;history.replaceState(null,"","?deck="+encodeURIComponent(H.deckId));if(!await loadDeck(H.deckId))H.err="Could not load the game.";draw()}
   if(d==="decks"){H.deck=H.deck0=null;H.deckId="";H.tp=null;H.tg="";H.lsg=null;history.replaceState(null,"",location.pathname);draw()}
-  if(d==="group"&&/^(grammar|vocab)$/.test(kindOf())){H.tg=b.dataset.g;H.tsel=null;H.err="";loadPlayed();loadPoints();draw();window.scrollTo(0,0);return}
+  if(d==="group"&&/^(grammar|vocab|mix)$/.test(kindOf())){H.tg=b.dataset.g;H.tsel=null;H.err="";loadPlayed();loadPoints();draw();window.scrollTo(0,0);return}
   if(d==="group"){if(ownPace()){keep();location.href=pacePage()+"?game="+encodeURIComponent(H.deckId)+"&g="+encodeURIComponent(b.dataset.g)+"&go=1"+(BACK?"&from="+encodeURIComponent(BACK):"");return}startGame(b.dataset.g)}
   if(d==="fmt"){fmt(b.dataset.f);draw()}
   if(d==="tpk"){const s=H.tsel&&H.tsel[b.dataset.id];if(s){const k=+b.dataset.k;if(b.checked)s.add(k);else s.delete(k);draw()}}
-  if(d==="tpall"||d==="tpnone"){const dk=gm(b.dataset.id);if(RAW[b.dataset.id]&&H.tsel){[dk,exDeck(dk)].forEach(x=>{if(x&&RAW[x.id])H.tsel[x.id]=new Set(d==="tpall"?ptsOf(x).map(p=>p.k):[])});draw()}}
+  if(d==="tpall"||d==="tpnone"){const dk=gm(b.dataset.id);if(RAW[b.dataset.id]&&H.tsel){[dk,sib(dk)].forEach(x=>{if(x&&RAW[x.id])H.tsel[x.id]=new Set(d==="tpall"?ptsOf(x).map(p=>p.k):[])});draw()}}
   if(d==="tpn"){rvN(+b.dataset.n);draw()}
   if(d==="tpback"){H.tg="";H.tsel=null;draw()}
   if(d==="tpgo"&&H.tsel){const g=H.tg,a=anchor(H.tsel),tp=tpFrom(H.tsel,a);if(tp&&!Object.keys(tp).length)return;
