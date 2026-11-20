@@ -100,7 +100,7 @@ window.ELItems=(function(){
 
   // ---- view
   const pc=c=>c&&c.n?Math.round(c.ok/c.n*100):null;
-  const col=p=>p==null?"":p<50?"#fee2e2":p<75?"#fef3c7":"#dcfce7";
+  const col=p=>p==null?"":p<50?"#fee2e2":p<60?"#ffedd5":p<80?"#dcfce7":p<90?"#dbeafe":"#ede9fe";   // pale tints of elPctCol (el-catalog.js)
   const cell=(c,tip)=>{const p=pc(c);return p==null?`<td class="muted">–</td>`:`<td style="background:${col(p)}" title="${esc(tip||"")}"><b>${p} %</b><br><small>${c.ok}/${c.n}</small></td>`};
   const sum=qs=>qs.reduce((t,q)=>({n:t.n+q.c.n,ok:t.ok+q.c.ok}),{n:0,ok:0});
   const qText=q=>esc(plain(q.it.q));
