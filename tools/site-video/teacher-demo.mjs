@@ -61,8 +61,10 @@ for (const g of global.EL_GROUPS) {
       st.slice(0, k).forEach((s) => (done[s] = true));
       // first try and latest check of each step done (score out of max), and the reading log handed in
       const tries = {}, last = {}, steps = {};
-      st.slice(0, k).forEach((s) => { const m = 4 + Math.floor(rnd() * 7), f = Math.round(m * Math.min(1, skill * 0.8 + rnd() * 0.3));
-        tries[s] = { score: f, max: m }; last[s] = { score: Math.min(m, f + Math.floor(rnd() * 3)), max: m, date: Date.now() - 86400e3 }; });
+      // dated tries (🌱 Progress: skill mastery over time): the learning paths in order from 26 Oct, two days a step, latest check two days later
+      const ai = OPEN[c].indexOf(a.id), d0 = Date.parse('2026-10-26T09:00:00Z') + ai * 9 * 86400e3, day = (j) => Math.min(Date.now() - 3600e3, d0 + j * 2 * 86400e3);
+      st.slice(0, k).forEach((s, j) => { const m = 4 + Math.floor(rnd() * 7), f = Math.round(m * Math.min(1, skill * 0.8 + rnd() * 0.3));
+        tries[s] = { score: f, max: m, date: new Date(day(j)).toISOString() }; last[s] = { score: Math.min(m, f + Math.floor(rnd() * 3)), max: m, date: new Date(day(j) + 2 * 86400e3 > Date.now() ? Date.now() - 1800e3 : day(j) + 2 * 86400e3).toISOString() }; });
       if (done.log) steps.log = { f: [{ l: 'Text 1: which celebration? What is it, when and where?', v: 'Diwali. Festival of lights, in October or November, in India. It lasts five days.' },
         { l: 'Text 1: the main customs', v: 'People clean and decorate their houses with lamps. Families visit relatives and share sweets.' }], date: Date.now() - 86400e3 };
       pg[a.keys[0]] = JSON.stringify({ done, tries, last, steps });
@@ -75,6 +77,20 @@ for (const g of global.EL_GROUPS) {
       }
     }
     D.pg[uid] = { [LS2[c]]: pg };
+    if (process.env.EL_DEMO_PROGRESS) {   // 🌱 Progress preview: LS1 checks from mid September, a little better each week (a hash, not rnd(), so nothing else changes)
+      const h = (x) => { let v = 0; for (const ch of x) v = (v * 31 + ch.charCodeAt(0)) % 1000; return v / 1000; }, p1 = {};
+      CAT.filter((x) => x.ls === LS1[c] && (x.keys || []).length && !x.checkpoint).forEach((a, ai) => { const st = ACT[a.id] || [], tries = {}, last = {};
+        st.forEach((s, j) => { const t = Date.parse('2026-09-15T09:00:00Z') + (ai * 7 + j) * 86400e3, gain = (t - Date.parse('2026-09-15')) / (60 * 86400e3) * 0.25;
+          const v = Math.max(0.05, Math.min(1, skill * 0.75 + gain + (h(uid + a.id + s) - 0.5) * 0.35)); tries[s] = { score: Math.round(v * 10), max: 10, date: new Date(t).toISOString() };
+          last[s] = { score: Math.min(10, Math.round(v * 10) + 1), max: 10, date: new Date(t + 86400e3).toISOString() }; });
+        p1[a.keys[0]] = JSON.stringify({ done: Object.fromEntries(st.map((s) => [s, true])), tries, last }); });
+      D.pg[uid][LS1[c]] = p1;
+      // the LS2 exam (held until Friday, as the real 2 ESO release) and some confirmed criterion degrees
+      const g2 = global.EL_GRADING[LS2[c]], sec2 = {};
+      g2.exam.sections.forEach(([k, , mx]) => { sec2[k] = { score: Math.round(Math.max(0, Math.min(1, skill * 0.9 + (h(uid + k) - 0.4) * 0.4)) * mx), max: mx }; });
+      const fin = {}; [...g2.key, ...g2.other].forEach((cr) => { const m = Math.max(1, Math.min(10, skill * 9 + (h(uid + cr) - 0.5) * 4)); if (h(cr + uid) < 0.75) fin[cr] = m < 5 ? 'NA' : m < 7 ? 'AS' : m < 9 ? 'AN' : 'AE'; });
+      D.rs[uid][LS2[c] + '/assessment'] = { ls: LS2[c], activity: LS2[c] + '/assessment', sections: sec2, final: fin, showFrom: '2026-11-27T07:00:00Z' };
+    }
     D.pt[email] = { t1: Math.floor(rnd() * rnd() * 16) };
   }
   D.tm[g.id] = { best: { t1: 15 }, bestOk: { t1: 12 } };
