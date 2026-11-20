@@ -185,6 +185,11 @@
   #tpmore .tpl i{font-style:normal;font-size:20px;width:26px;text-align:center;flex:none}
   #tpmore .tpl span{flex:1;min-width:0}
   #tpmore .tpl small{display:block;color:#586174;font-size:12.5px;font-weight:500;margin:1px 0 0}
+  /* 👁 the student list sheet (svSheet): the four groups as the group switch */
+  #tpmore .tpsvg{display:flex;gap:4px;margin:8px 0 4px;padding:4px;background:#e8ecf3;border-radius:14px}
+  body.tph #tpmore .tpsvg a{flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#475569;font-weight:700;font-size:15px;text-decoration:none}
+  body.tph #tpmore .tpsvg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  #tpmore .tpl a[data-sv]>:not(:first-child){flex:none;font-size:13px}
   #tpmore .tpl a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
   /* the wide tables (Students, Marks…): the sticky name column narrow, the name on two lines, so the columns next to it show (it took
      260 px of a 390 px screen: only Student and Route were visible) */
