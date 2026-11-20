@@ -87,9 +87,6 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .prcard small{color:#64748b;font-size:13px}.prcard b{font-size:1.6rem;line-height:1.15}.prcard b i{font-style:normal;font-size:.95rem;color:#64748b;font-weight:600}.prcard em{font-style:normal;font-size:12px;color:#64748b}.prcard.warn .prci{background:#fff7ed}
 .prhd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}.prhd h2{margin:.2em 0}#prstu{font:inherit;padding:5px 10px;border:1px solid #cbd5e1;border-radius:10px;max-width:100%}
 .prhow{margin:2px 0 6px;font-size:13.5px}.prsk .chip{display:inline-flex;align-items:center;gap:5px}i.sw{display:inline-block;width:10px;height:10px;border-radius:3px;box-sizing:border-box}
-.elc{width:100%;height:auto;display:block;font-family:system-ui,sans-serif}.elc-ax{font-size:12px;fill:#64748b}.elc-ls{font-size:12px;font-weight:700;fill:#334155}.elc-end{font-size:13px;fill:#0f172a;font-weight:600}.elc-rl{font-size:12.5px;fill:#0f172a;font-weight:600}
-.elc-col{cursor:crosshair}.elc-pt{cursor:pointer}
-.elc-tip{position:fixed;z-index:60;background:#0f172a;color:#fff;font-size:13px;line-height:1.45;border-radius:10px;padding:8px 11px;pointer-events:none;box-shadow:0 6px 18px #0f172a40;max-width:280px}.elc-tip small{color:#cbd5e1}
 .prtab summary{cursor:pointer;color:#475569;font-size:13px;margin-top:6px}.prtab table{font-size:13px}
 .prgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}.prgrid .box{margin:0}
 .prlg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#334155}.prlg span{display:inline-flex;align-items:center;gap:5px}
@@ -1769,40 +1766,18 @@ function render0(){
 // the average per assessment criterion. No leaderboard (🏆 Best mark and ⛵ Class voyage already rank). Nothing new is read: the progress,
 // results and levels the dashboard already has. The teacher sees the exam even while it is held from students.
 const PR_SK={Reading:["📖","#1d4ed8","circle",""],Listening:["🎧","#7e22ce","square",""],Speaking:["🗣","#c2410c","diamond",""],Writing:["✍️","#15803d","triangle",""],
-  Grammar:["🧩","#b91c1c","circle","6 4"],Vocabulary:["🔤","#0f766e","square","6 4"]},PR_K=Object.keys(PR_SK),PR_LVL=/_(beginners|insecure|safe|daring|native)$/;
-// a step's skill: the voyage map's (el-voyage.js skill), only these six (recall, research and checkpoints mix things up: left out), as the LS page
-function prSkill(a,pid){let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
-  if(!s)s=/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d/.test(pid)?"Reading":"";
-  s=String(s).split(" · ")[0];return PR_SK[s]?s:null}
+  Grammar:["🧩","#b91c1c","circle","6 4"],Vocabulary:["🔤","#0f766e","square","6 4"]},PR_K=Object.keys(PR_SK);
 let PRC={d:null,m:new Map()};
-// One student's work by skill. act[ls][skill] = {s, n}: each step's average of all its tries (the engine's all since 20 Nov 2026, before that
-// the first and the latest try), a teacher level when the step has no checks; each step counts the same (as the LS page).
-// ev = the dated checks for the line: each step's first try and its latest check (the tries in between have no date), and a teacher level on
-// the day it was marked. v is 0-1.
+// One student's work by skill (ELCharts.work, shared with the student's 🎓 My progress): act[ls][skill] = {s, n} as the LS page, ev = the dated checks
 function prStu(u){if(PRC.d!==S.D)PRC={d:S.D,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
-  const ev=[],act={},M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10},pg=S.D.pg[u]||{},rs=S.D.rs[u]||{};
-  EL_LS.forEach(l=>{const ls=l.id,P=pg[ls]||{},A={},put=(k,v)=>{const z=A[k]||(A[k]={s:0,n:0});z.s+=Math.max(0,Math.min(1,v));z.n++};
-    // practice (graded:false, e.g. LS1's learning paths) is still evidence of how a skill grows: on the line, not in the radar (as the LS page)
-    acts(ls).forEach(a=>{if(/checkpoint/.test(a.id))return;const seen=new Set(),pr=a.graded===false;
-      (a.keys||[]).forEach(key=>{let st=null;try{st=JSON.parse(P[key]||"null")}catch(e){}if(!st||typeof st!=="object")return;
-        const AL=st.all||{},F=st.tries||{},L=st.last||{},ok=x=>x&&+x.max>0,sc=x=>Math.min(1,(+x.score||0)/+x.max);
-        new Set([...Object.keys(AL),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(PR_LVL,""),sk=prSkill(a,pid);if(!sk)return;
-          const f=F[k],l=L[k],two=ok(l)&&(!ok(f)||Math.abs(tms(l.date)-tms(f.date))>5000);
-          let v=null;if(AL[k]&&AL[k].n)v=AL[k].s/AL[k].n;else{const xs=[f,two?l:null].filter(ok);if(xs.length)v=xs.reduce((n,x)=>n+sc(x),0)/xs.length}
-          if(v!=null&&!pr){put(sk,v);seen.add(pid)}
-          if(ok(f)&&tms(f.date))ev.push({t:tms(f.date),sk,v:sc(f),ls});if(two&&tms(l.date))ev.push({t:tms(l.date),sk,v:sc(l),ls})})});
-      const x=rs[a.id]||{};Object.entries(x.levels||{}).forEach(([pid,cs])=>{const sk=prSkill(a,pid);if(!sk)return;
-        const ms=Object.values(cs||{}).map(d=>M[d]).filter(n=>n!=null);if(!ms.length)return;const v=ms.reduce((n,m)=>n+m,0)/ms.length/10;
-        if(!seen.has(pid)&&!pr)put(sk,v);const t=tms((x.marked||{})[pid]);if(t)ev.push({t,sk,v,ls})})});
-    if(Object.keys(A).length)act[ls]=A});
-  const o={ev,act};PRC.m.set(u,o);return o}
+  const o=window.ELCharts?ELCharts.work(S.D.pg[u]||{},S.D.rs[u]||{}):{ev:[],act:{}};PRC.m.set(u,o);return o}
 // the exam of an LS by skill: the points of its parts (results/{ls}__assessment sections); held = the date students see it, or true
 function prExam(u,ls){const X=res(u,asId(ls)),E=((window.EL_GRADING||{})[ls]||{}).exam,ex={};
   const held=X.held||(X.showFrom&&Date.now()<tms(X.showFrom))?(X.showFrom||true):null;
   if(E&&X.sections)E.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null||v.excused)return;const sk=String(name).split(/\s|·/)[0];if(!PR_SK[sk])return;
     const z=ex[sk]||(ex[sk]={s:0,m:0});z.s+=+v.score||0;z.m+=+(v.max||max)||0});
   return {ex,held}}
-const prMon=t=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
+const prMon=t=>ELCharts.monday(t);
 const prAvg=xs=>{xs=xs.filter(v=>v!=null&&!isNaN(v));return xs.length?xs.reduce((n,v)=>n+v,0)/xs.length:null};
 const prPc=v=>v==null?"–":Math.round(v)+" %";
 function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
