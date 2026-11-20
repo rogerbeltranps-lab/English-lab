@@ -141,6 +141,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - Students never see **send times** of messages (14 Nov 2026), never classmates' marks, never where Practise content comes from.
 - "Not late yet" counts are never shown to students (19 Nov 2026).
 - The public home page shows no screenshots or pictures of the app and never mentions the full screen mode (7 Nov 2026).
+- **Students never see Towards Nativeness** (20 Nov 2026). It is Roger's own C1 to C2 course (a personal LS in 4 ESO). It never appears anywhere for students: menu, My marks tabs, board, progress, notebook, LS lists. The teacher's 👁 student view must show exactly what students see, so it is hidden there too. Only the dashboard, Roger's own view and the tester see it. Checked on every PR by `tools/students-never-see/check.mjs` (PR #784).
 
 **Look and devices**
 
