@@ -24,7 +24,7 @@
   const DEST={f:"🇦🇺",c:"Australia",p:"Sydney Cove",y:1788,h:"The First Fleet arrives with 11 ships.",fe:"New Year's Eve: fireworks over Sydney Harbour.",img:"port-australia"};
   // the port pictures and lines of each LS (a skin per LS id): fest = the 🎉 celebration lines; img = a picture per port, the 7th is the
   // destination (null = the plain island). Gemini art made with Roger (20 Nov 2026), cut out of its background, 320 px WebP.
-  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire",null,null,null,null,"port-sierra-leone-fest","port-australia-fest"]}};
+  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire","port-usa-fest","port-india-fest","port-jamaica-fest","port-canada-fest","port-sierra-leone-fest","port-australia-fest"]}};
   const skinOf=V=>SKINS[V.skin]||{},pimg=(V,i)=>(skinOf(V).img||[])[i]||(i<PORTS.length?PORTS[i].img:DEST.img),fest=V=>!!skinOf(V).fest;
   // the skill of a stop, from the tab's type (EL_STEP_TITLES, built by tools/gen-sections.js) and its panel id
   const SK={Recall:["🧠","#6b7280"],Vocabulary:["🔤","#0f766e"],Grammar:["🧩","#b91c1c"],Listening:["🎧","#7e22ce"],Reading:["📖","#1d4ed8"],Research:["🔎","#0369a1"],
