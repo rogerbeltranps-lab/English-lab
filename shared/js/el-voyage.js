@@ -254,7 +254,7 @@
   function wire(root,V){const sea=root&&root.querySelector(".vy-sea");if(!sea)return;
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
     SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
-    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:12,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
+    const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:32,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
     // a port card (square-ish, Roger 20 Nov) never covers a stop, a label or a vehicle: measure each card first and give it the room it
     // needs (half its height + the vehicles' half height ~50 px + a margin, on each side)
     const portCard=it=>{const P=it.port;return `<div class="vy-port${it.done?" ok":""}" style="top:${it.y||0}px"><span class="fl">${P.f}</span><span><b>${esc(P.c)}</b><br><em>${esc(py(P))}</em>${P.h?`<br><i>📜 ${esc(P.h)}</i>`:""}${S.fest&&P.fe?`<br><i class="ce">🎉 ${esc(P.fe)}</i>`:""}</span></div>`};
@@ -294,10 +294,10 @@
     const bw=m=>Math.max(52,String(m.n).length*7.5+16)+4;
     for(const i in at){const L=at[i].sort((a,b)=>String(a.n).localeCompare(b.n)),s=+i<n?M.stops[i]:null,off=+i===meI&&V.me?(wide?100:72):0;
       let room=s?(s.right?s.x-40:W-s.x-40)-off-4:W-8,sh=[],used=0;
-      for(const m of L){const w=bw(m),left=L.length-sh.length-1;if(sh.length>=(wide?4:3)||used+w+(left?40:0)>room)break;sh.push(m);used+=w}
+      for(const m of L){const w=bw(m),left=L.length-sh.length-1;if(sh.length>=(wide?4:3)||used+w+(left?36:0)>room)break;sh.push(m);used+=w}
       const more=L.length-sh.length,max=sh.length;
       const boats=sh.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("")+(more?`<span class="vy-more" title="${esc(L.slice(max).map(m=>m.n).join(", "))}">+${more}</span>`:"");
-      const wB=used+(more?40:0);
+      const wB=used+(more?36:0);
       if(s){const x=s.right?s.x-40-wB-off:s.x+40+off;h+=`<div class="vy-mates" style="left:${x}px;top:${s.y}px">${boats}</div>`}
       else h+=`<div class="vy-mates" style="left:${Math.max(4,cx-(wide?200:110)-wB/2)}px;top:${destY+60}px">${boats}</div>`}
     if(V.me)h+=`<div class="vy-you" style="left:${meXY[0]}px;top:${meXY[1]}px"><b>${t("Tu","You")}</b>${BOAT(S,"#b45309",1,V.me.n)}</div>`;
