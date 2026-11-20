@@ -71,17 +71,21 @@
 
   // ---- sounds ----
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
-  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,dt:0,
-    play(k,vol){if(!this.on||this.quiet())return;try{const a=new Audio(AUD+k+".mp3");a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
+  // quiet(): the teacher's view of a student's board and class mode start with no sound; there the 🎵 button turns it on for this page (force)
+  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,force:false,dt:0,
+    hush(){return this.quiet()&&!this.force},
+    play(k,vol){if(!this.on||this.hush())return;try{const a=new Audio(AUD+k+".mp3");a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
     duck(){const m=this.music;if(!m)return;clearTimeout(this.dt);m.volume=this.MV*.35;this.dt=setTimeout(()=>{if(this.music)this.music.volume=this.MV},1800)},
-    startBg(){if(this.music||!this.on||this.quiet()||!document.querySelector(".vy-sea")||document.hidden)return;
-      try{this.music=new Audio(AUD+"music.mp3");this.music.loop=true;this.music.volume=this.MV;this.music.play().catch(()=>{this.music=null});
-        this.sea=new Audio(AUD+"sea-loop.wav");this.sea.loop=true;this.sea.volume=.15;this.sea.play().catch(()=>{})}catch(e){}},
+    startBg(){if(this.music||!this.on||this.hush()||!document.querySelector(".vy-sea")||document.hidden)return;
+      try{const m=this.music=new Audio(AUD+"music.mp3"),w=this.sea=new Audio(AUD+"sea-loop.wav");m.loop=w.loop=true;m.volume=this.MV;w.volume=.15;
+        // refused (no tap yet): forget both, the next tap tries again
+        m.play().catch(()=>{if(this.music===m){try{w.pause()}catch(e){}this.music=this.sea=null}});w.play().catch(()=>{})}catch(e){}},
     stopBg(){[this.music,this.sea].forEach(a=>{try{a&&a.pause()}catch(e){}});this.music=this.sea=null}};
   // the song starts with the first tap on the board (browsers allow sound only after one), and stops when the map is gone (another
   // place of the board), the tab is hidden or class mode starts
-  addEventListener("pointerdown",()=>SND.startBg(),{capture:true});
-  setInterval(()=>{if(SND.music&&(!document.querySelector(".vy-sea")||SND.quiet()||!SND.on))SND.stopBg()},1500);
+  // (pointerdown, click, keydown and touchend: Safari and touch screens count only some of them as a tap; the 🎵 button handles itself)
+  ["pointerdown","click","keydown","touchend"].forEach(ev=>addEventListener(ev,e=>{if(!(e.target&&e.target.closest&&e.target.closest('[data-vy="snd"]')))SND.startBg()},{capture:true}));
+  setInterval(()=>{if(SND.music&&(!document.querySelector(".vy-sea")||SND.hush()||!SND.on))SND.stopBg()},1500);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)SND.stopBg()});
 
   // ---- styles ----
@@ -225,8 +229,13 @@
     if(LAST[V.store]!=null&&LAST.w===W)sc.scrollTop=LAST[V.store];else toMe();LAST.w=W;
     sc.addEventListener("scroll",()=>{LAST[V.store]=sc.scrollTop},{passive:true});
     // buttons
-    const sb=sea.querySelector('[data-vy="snd"]'),setSb=()=>{sb.innerHTML=SND.on?`🎵 <span>${t("Música sí","Music on")}</span>`:`🔇 <span>${t("Música no","Music off")}</span>`;sb.classList.toggle("off",!SND.on)};setSb();
-    sb.onclick=e=>{e.stopPropagation();SND.on=!SND.on;SND.on?SND.startBg():SND.stopBg();setSb();try{localStorage.setItem("el_voyage_snd",SND.on?"1":"0")}catch(e){}};
+    const sb=sea.querySelector('[data-vy="snd"]'),setSb=()=>{const on=SND.on&&!SND.hush();sb.innerHTML=on?`🎵 <span>${t("Música sí","Music on")}</span>`:`🔇 <span>${t("Música no","Music off")}</span>`;sb.classList.toggle("off",!on)};setSb();
+    // a tap on 🎵 always does what it says: sound off → on; on but not playing yet (no tap on the page before) → it starts; playing → off
+    sb.onclick=e=>{e.stopPropagation();
+      if(SND.hush()){SND.force=true;SND.on=true;SND.startBg()}
+      else if(SND.on&&!SND.music){SND.startBg()}
+      else{SND.on=!SND.on;if(!SND.on)SND.force=false;SND.on?SND.startBg():SND.stopBg();if(!SND.quiet())try{localStorage.setItem("el_voyage_snd",SND.on?"1":"0")}catch(e){}}
+      setSb()};
     sea.querySelector('[data-vy="me"]').onclick=()=>{toMe(1);SND.play("click",.6)};
     map.addEventListener("click",e=>{if(e.target.closest(".vy-st,.vy-lab,.vy-dest"))SND.play("click",.6)});
     root.querySelectorAll(".vy-steps li.s a").forEach(a=>a.addEventListener("click",()=>SND.play("click",.6)));

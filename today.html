@@ -598,12 +598,33 @@ const RD={};   // road docs read this page load: {ls id: {uid: {n, s}}}
 function voyageData(ls,info,nx){
   const L=lshGet(ls),fa=hasFp(ls)?fpAct(ls):null,me=AS||(U&&U.uid)||"demo";
   const nowKey=nx?nx.a.id+"#"+panelOf(nx.a,nx.cp?(steps(nx.a)[0]||"check"):nx.k):null;
-  const road=DEMO?(DEMO.road&&DEMO.road.mates)||{}:RD[ls.id]||{};
-  return {ls:window.elLsNum?elLsNum(ls):"",skin:ls.id,en:EN,beds:lsBeds(ls,info),now:nowKey,
-    fp:fa?{title:(L&&L.chal&&L.chal.b)||fa.title.replace(/\s*\([^)]*\)\s*$/,""),sub:L&&L.chal&&L.chal.d||"",href:tabHref(fa),done:isDone(fa)}:{},
+  const road=DEMO?(DEMO.road&&DEMO.road.mates)||{}:RD[ls.id]||{},beds=vyPlanned(ls,lsBeds(ls,info));
+  const fp=fa?{title:(L&&L.chal&&L.chal.b)||fa.title.replace(/\s*\([^)]*\)\s*$/,""),sub:L&&L.chal&&L.chal.d||"",href:tabHref(fa),done:isDone(fa)}:{};
+  let now=nowKey,cont=nx?{href:nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k),label:nx.cp?nx.a.title:""}:null;
+  // ▶ Continue goes to a stop of the map: the board's next step when it is one, else the first stop not done, else the final product
+  const stops=beds.filter(b=>b.kind!=="fp").flatMap(b=>b.plants.filter(x=>!x.later));
+  if(nx&&!stops.some(x=>x.key===nowKey)){const x=stops.find(y=>y.st!=="bloom");
+    if(x){now=x.key;cont={href:x.href,label:""}}else if(fa){now=null;cont={href:fp.href,label:fp.title}}}
+  return {ls:window.elLsNum?elLsNum(ls):"",skin:ls.id,en:EN,beds,now,fp,
     me:{s:null},mates:Object.entries(road).filter(([u,x])=>u!==me&&x&&x.n).map(([,x])=>({n:x.n,s:+x.s||0})),
-    cont:nx?{href:nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k),label:nx.cp?nx.a.title:""}:null,
+    cont,
     store:"el_voyage_"+me+"_"+ls.id,save:!AS,quiet:()=>!!AS||!!(LIVE&&LIVE.go&&elCmOn(LIVE.go))}}
+// Only what the teacher put on the group's Time plan agenda (Roger, 20 Nov 2026: "they only needed to see the activities I add on the
+// calendar"): a tab is a stop when "path#tab" is on any day of the agenda (past or coming), a whole path ("path#", a recall checkpoint)
+// brings all its tabs, class games (#game:) and notes are not stops. The final product is always there, last. A path with several steps in
+// one tab is one stop, done when all of them are. No agenda for the group: every open tab. 📖 The book is never a stop (Roger, 20 Nov
+// 2026: "the reading shouldn't be here, since it's sth they do when they finish before").
+function vyPlanned(ls,beds){beds=beds.filter(b=>!(window.elBookPath&&elBookPath(b.id)));
+  const {p,gi}=planOf(ls),ag=gi>=0&&p&&p._ag&&p._ag[gi];
+  const one=b=>{const m=new Map();b.plants.forEach(x=>{const o=m.get(x.key);if(!o){m.set(x.key,Object.assign({},x));return}
+    o.later=o.later&&x.later;
+    o.st=o.st==="bloom"&&x.st==="bloom"?"bloom":o.st==="thirsty"||x.st==="thirsty"?"thirsty":o.st==="sprout"&&x.st==="sprout"?"sprout":"bud"});
+    return Object.assign({},b,{plants:[...m.values()]})};
+  if(!ag||!ag.days)return beds.map(one);
+  const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");
+    if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));
+  const out=beds.map(b=>b.kind==="fp"?b:Object.assign({},b,{plants:b.plants.filter(x=>on.has(b.id+"#")||on.has(x.key))})).map(one).filter(b=>b.plants.length);
+  return out.filter(b=>b.kind!=="fp").concat(out.filter(b=>b.kind==="fp"))}
 // the road document: read once per LS, then my own line written when my steps done change (never in the teacher's or a tester's view)
 function voyageRoad(ls,V){
   if(DEMO||!F||!D.me.group)return;const db=ELCloud.db,ref=F.doc(db,"road",ls.id,"groups",D.me.group);
@@ -1885,7 +1906,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
-if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
+if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
   // signed out: the welcome page, where everyone signs in (Roger, 7 Nov 2026); el_who is already gone, so it does not send them back here
   if(!u){location.replace("index.html");return}
