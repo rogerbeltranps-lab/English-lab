@@ -23,9 +23,18 @@
     {f:"🇸🇱",c:"Sierra Leone",p:"Freetown",y:1787,h:"About 400 settlers from London, many of them freed Black people, start a settlement here.",fe:"The Lantern Parade: big glowing lanterns through the streets.",img:"port-sierra-leone"}];
   const DEST={f:"🇦🇺",c:"Australia",p:"Sydney Cove",y:1788,h:"The First Fleet arrives with 11 ships.",fe:"New Year's Eve: fireworks over Sydney Harbour.",img:"port-australia"};
   // the port pictures and lines of each LS (a skin per LS id): fest = the 🎉 celebration lines; img = a picture per port, the 7th is the
-  // destination (null = the plain island). Gemini art made with Roger (20 Nov 2026), cut out of its background, 320 px WebP.
-  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire","port-usa-fest","port-india-fest","port-jamaica-fest","port-canada-fest","port-sierra-leone-fest","port-australia-fest"]}};
-  const skinOf=V=>SKINS[V.skin]||{},pimg=(V,i)=>(skinOf(V).img||[])[i]||(i<PORTS.length?PORTS[i].img:DEST.img),fest=V=>!!skinOf(V).fest;
+  // destination (null = the plain island); fw = the pictures with fireworks that go off over them (same numbers). Gemini art made with
+  // Roger (20 Nov 2026), cut out of its background, 320 px WebP.
+  const SKINS={"4eso-seasons-and-celebrations":{fest:true,img:["port-england-bonfire","port-usa-fest","port-india-fest","port-jamaica-fest","port-canada-fest","port-sierra-leone-fest","port-australia-fest"],fw:[0,2,6]}};
+  const skinOf=V=>SKINS[V.skin]||{},pimg=(V,i)=>(skinOf(V).img||[])[i]||(i<PORTS.length?PORTS[i].img:DEST.img),fest=V=>!!skinOf(V).fest,hasFw=(V,i)=>(skinOf(V).fw||[]).includes(i);
+  // ✨ things that move (Roger, 20 Nov 2026: "turtles could swim, clouds could move, fireworks too"): the sea drifts, sea animals swim
+  // to and fro and turn round, gulls glide, the fog drifts, fireworks go off over the pictures that have them. Only transforms (cheap on a
+  // Chromebook), and nothing moves for "reduce motion".
+  const FW=["#ffd54a","#ff6b6b","#4fc3f7","#81c784","#f48fb1","#fff"];
+  const fwHtml=st=>`<span class="vy-fws" aria-hidden="true"${st?` style="${st}"`:""}>`+[[20,14,0],[56,6,.9],[82,18,1.7]].map(([x,y,d],b)=>`<b style="left:${x}%;top:${y}%;--dl:${d}s;--c:${FW[(b*2+1)%6]}">`
+    +Array.from({length:10},(_,i)=>`<i style="--a:${i*36}deg"></i>`).join("")+`</b>`).join("")+`</span>`;
+  // a decoration's movement, by what it is: [kind, faces right (1) or left (-1)]
+  const MOVE=f=>/whale|turtle/.test(f)?["swim",1]:/dolphin/.test(f)?["swim",-1]:/seagull/.test(f)?["fly",1]:/compass/.test(f)?["sway",1]:null;
   // the skill of a stop, from the tab's type (EL_STEP_TITLES, built by tools/gen-sections.js) and its panel id
   const SK={Recall:["🧠","#6b7280"],Vocabulary:["🔤","#0f766e"],Grammar:["🧩","#b91c1c"],Listening:["🎧","#7e22ce"],Reading:["📖","#1d4ed8"],Research:["🔎","#0369a1"],
     Speaking:["🗣","#c2410c"],"Speaking · Shadowing":["🎙","#c2410c"],"Speaking · Talk":["📞","#c2410c"],Writing:["✍️","#15803d"],"Reading · Book":["📚","#1d4ed8"],Checkpoint:["🛡","#334155"],Step:["⭐","#8a5a1f"]};
@@ -78,7 +87,9 @@
   // ---- styles ----
   function css(){if(document.getElementById("vy-css"))return;const s=document.createElement("style");s.id="vy-css";s.textContent=`
 .vy{margin:0 0 14px}.vy-row{display:flex;gap:14px;height:max(440px,calc(100vh - 250px))}
-.vy-sea{position:relative;flex:1;min-width:0;border-radius:20px;overflow:hidden;border:3px solid #b08a52;background:linear-gradient(#ffffff38,#ffffff38),url(${IMG}sea.webp) 0 0/300px repeat,#7fc0e3}
+.vy-sea{position:relative;flex:1;min-width:0;border-radius:20px;overflow:hidden;border:3px solid #b08a52;background:#7fc0e3}
+.vy-sea::before{content:"";position:absolute;top:0;bottom:0;left:0;right:-300px;background:linear-gradient(#ffffff38,#ffffff38),url(${IMG}sea.webp) 0 0/300px repeat;animation:vydrift 60s linear infinite}
+@keyframes vydrift{to{translate:-300px 0}}
 .vy-top{position:absolute;left:0;right:0;top:0;z-index:6;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;background:linear-gradient(#f6ead0f2,#f6ead000);pointer-events:none}
 .vy-top small{display:block;font-size:11px;color:#8a5a1f;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.vy-top b{font:700 17px Georgia,serif;color:#4a2f0e}
 .vy-sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.vy-map{position:relative}.vy-map>svg{position:absolute;left:0;top:0;pointer-events:none}
@@ -94,6 +105,14 @@
 .vy-pimg{position:absolute;z-index:1;pointer-events:none}.vy-pimg img{width:100%;display:block;filter:drop-shadow(0 6px 6px #0003)}.vy-pimg .lf{position:absolute;left:50%;top:4%;transform:translateX(-50%);font-size:30px;line-height:1}
 .vy-pimg .ln{position:absolute;left:50%;bottom:2%;transform:translateX(-50%);font:700 15px Georgia,serif;color:#4a2f0e;background:#fbf3dfee;border:1px solid #d9c08a;border-radius:8px;padding:2px 10px;white-space:nowrap}
 .vy-deco{position:absolute;z-index:1;width:64px;opacity:.95;pointer-events:none}
+.vy-deco.swim,.vy-deco.fly{animation:vyswim var(--t,16s) ease-in-out var(--dl,0s) infinite}.vy-deco.fly{--m:150px}.vy-deco.sway{animation:vysway 7s ease-in-out infinite alternate}
+@keyframes vyswim{0%{translate:0 0;scale:var(--f) 1}25%{translate:calc(var(--d)*var(--m,70px)/2) -7px}46%{translate:calc(var(--d)*var(--m,70px)) 0;scale:var(--f) 1}50%{translate:calc(var(--d)*var(--m,70px)) 0;scale:calc(var(--f)*-1) 1}75%{translate:calc(var(--d)*var(--m,70px)/2) 7px}96%{translate:0 0;scale:calc(var(--f)*-1) 1}100%{translate:0 0;scale:var(--f) 1}}
+@keyframes vysway{from{rotate:-8deg}to{rotate:8deg}}
+.vy-fog img{animation:vyfog 14s ease-in-out infinite alternate}.vy-fog img:nth-child(2){animation-duration:19s;animation-delay:-6s}.vy-fog img:nth-child(3){animation-duration:11s;animation-delay:-3s}
+@keyframes vyfog{from{translate:-40px 0}to{translate:40px 0}}
+.vy-fws{position:absolute;left:0;top:0;width:100%;height:45%;pointer-events:none;z-index:1}.vy-fws b{position:absolute;width:0;height:0}
+.vy-fws i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c);opacity:0;animation:vyfwp 2.6s ease-out var(--dl) infinite}
+@keyframes vyfwp{0%{transform:rotate(var(--a)) translateY(0) scale(.5);opacity:0}8%{opacity:1}65%{opacity:.9}100%{transform:rotate(var(--a)) translateY(-30px) scale(.9);opacity:0}}
 .vy-mates{position:absolute;display:flex;gap:4px;transform:translateY(-60%);z-index:3}.vy-boat{display:flex;flex-direction:column;align-items:center;min-width:44px}
 .vy-boat b,.vy-you b{margin-top:1px;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;border:1.5px solid #fff;white-space:nowrap}
 .vy-more{align-self:center;background:#fffd;color:#374151;font-size:12px;font-weight:800;border-radius:999px;padding:3px 8px}
@@ -133,7 +152,7 @@
 .vy-go a small{font-weight:600;font-size:15px;opacity:.95;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vy-go a.fin{background:#b45309;box-shadow:0 4px 0 #7c3a06}.vy-go a.all{background:#fff;color:#174d3d;box-shadow:0 4px 0 #cbd5e1}
 @media (max-width:900px){.vy-steps{display:none}}
 @media (max-width:640px){.vy-row{height:calc(100vh - 210px);min-height:420px}.vy-top b{font-size:15px}.vy-lab{max-width:150px;font-size:12px}.vy-go a{font-size:17px}.vy-go a small{display:none}.vy-snd span{display:none}}
-@media (prefers-reduced-motion:reduce){.vy-b{animation:none}}`;document.head.appendChild(s)}
+@media (prefers-reduced-motion:reduce){.vy-b,.vy-deco,.vy-fog img,.vy-sea::before{animation:none}.vy-fws{display:none}}`;document.head.appendChild(s)}
 
   // ---- the frame (the map itself is laid out by wire, at the width it gets) ----
   function html(V){css();const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),n=M.stops.length,fp=V.fp||{};
@@ -171,12 +190,13 @@
       h+=`<svg width="${W}" height="${total}" aria-hidden="true"><path d="${d}" fill="none" stroke="#ffffff55" stroke-width="22" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 10" stroke-linecap="round"/></svg>`}
     // sea life
     if(W>500)[[W-120,total-170,"compass",90],[W*.06,TOP+180,"whale"],[W*.86,TOP+620,"dolphin"],[W*.08,TOP+1250,"turtle"],[W*.82,TOP+1500,"seagull"],[W*.88,TOP+40,"seagull"],[W*.1,TOP+1950,"dolphin"],[W*.85,TOP+2400,"whale"],[W*.07,TOP+2900,"turtle"]]
-      .filter(d=>d[1]<total-110).forEach(([x,y,f,w])=>h+=`<img class="vy-deco" src="${IMG}${f}.webp" style="left:${x}px;top:${y}px;${w?`width:${w}px`:""}" alt="">`);
+      .filter(d=>d[1]<total-110).forEach(([x,y,f,w],i)=>{const mv=MOVE(f),d=x>W/2?-1:1;   // on the right they set off to the left
+        h+=`<img class="vy-deco${mv?" "+mv[0]:""}" src="${IMG}${f}.webp" style="left:${x}px;top:${y}px;${w?`width:${w}px;`:""}${mv?`--d:${d};--f:${d*mv[1]};--t:${14+i%3*3}s;--dl:-${i*2.3}s`:""}" alt="">`});
     // ports: the label on the route, the picture at the side
     M.ports.forEach((it,j)=>{const P=it.port,img=pimg(V,it.pi);
       h+=`<div class="vy-port${it.done?" ok":""}" style="top:${it.y}px"><span class="fl">${P.f}</span><span><b>${esc(P.c)}</b> <em>${esc(P.p)} · ${P.y}</em><br><i>📜 ${esc(P.h)}</i>${fest(V)?`<br><i class="ce">🎉 ${esc(P.fe)}</i>`:""}</span></div>`;
       if(W>560){const left=j%2===0,sz=Math.min(280,W*.27),px=left?Math.max(-20,cx-lane*2-sz-150):Math.min(W-sz+20,cx+lane*2+150);
-        h+=`<div class="vy-pimg" style="left:${px}px;top:${it.y-sz*.95}px;width:${sz}px"><img src="${IMG}${img}.webp" alt=""><span class="ln">${P.f} ${esc(P.c)}</span></div>`}});
+        h+=`<div class="vy-pimg" style="left:${px}px;top:${it.y-sz*.95}px;width:${sz}px"><img src="${IMG}${img}.webp" alt="">${hasFw(V,it.pi)?fwHtml():""}<span class="ln">${P.f} ${esc(P.c)}</span></div>`}});
     // the stops
     const now=M.stops.find(s=>s.key===V.now);
     M.stops.forEach(s=>{const k=SK[s.sk]||SK.Step,nw=now&&s.key===now.key,c=(s.done?" done":"")+(nw?" now":""),lx=s.right?s.x+36:s.x-36;
@@ -197,7 +217,7 @@
     if(!fp.done){h+=`<div class="vy-fog" style="top:${topY-235}px;height:220px"><img src="${IMG}fog.webp" style="top:0" alt=""><img src="${IMG}fog.webp" style="top:50px;transform:scaleX(-1)" alt=""><img src="${IMG}fog.webp" style="top:95px" alt=""></div>`
       +`<div class="vy-tip" style="top:${topY-130}px">🌫️ ${t("Apareixeran més ports quan el professor els afegeixi","More ports appear when your teacher adds them")}</div>`}
     const D=DEST,dimg=pimg(V,PORTS.length);
-    h+=`<a class="vy-dest${fp.done?" ok":""}" href="${esc(fp.href||"#")}" style="top:58px"><img src="${IMG}${dimg}.webp" alt=""><small>${D.f} ${t("Destinació final","Final destination")}: ${esc(D.c)} · ${esc(D.p)} · ${D.y}</small>`
+    h+=`<a class="vy-dest${fp.done?" ok":""}" href="${esc(fp.href||"#")}" style="top:58px"><img src="${IMG}${dimg}.webp" alt="">${hasFw(V,PORTS.length)?fwHtml("left:50%;width:180px;height:70px;transform:translateX(-50%)"):""}<small>${D.f} ${t("Destinació final","Final destination")}: ${esc(D.c)} · ${esc(D.p)} · ${D.y}</small>`
       +(fest(V)?`<small class="ce">🎉 ${esc(D.fe)}</small>`:"")+`<b>${esc(fp.title||"")}</b>${fp.sub?`<p>${esc(fp.sub)}</p>`:""}</a>`;
     map.innerHTML=h;
     // where the view starts: where it was, else my boat
