@@ -80,6 +80,24 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .crq div{display:grid;grid-template-columns:110px 48px 44px 1fr;gap:8px;align-items:center;font-size:14px;padding:3px 0}.crq small{color:#64748b}
 .crqb{height:9px;background:#f1f5f9;border-radius:5px;overflow:hidden}.crqb i{display:block;height:100%}
 @media (max-width:640px){.crgc{flex:1 1 140px;min-width:0}.crq div{grid-template-columns:70px 44px 1fr}.crq small{display:none}.crt th:nth-child(5),.crt td:nth-child(5){display:none}}
+
+/* 🌱 Progress (prPage; charts: shared/js/el-charts.js) */
+.prstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:10px 0}.prcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.prcard .prci{font-size:22px;width:42px;height:42px;border-radius:12px;background:#f1f5f9;display:grid;place-items:center;flex:none}.prcard>span:last-child{display:flex;flex-direction:column;min-width:0}
+.prcard small{color:#64748b;font-size:13px}.prcard b{font-size:1.6rem;line-height:1.15}.prcard b i{font-style:normal;font-size:.95rem;color:#64748b;font-weight:600}.prcard em{font-style:normal;font-size:12px;color:#64748b}.prcard.warn .prci{background:#fff7ed}
+.prhd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}.prhd h2{margin:.2em 0}#prstu{font:inherit;padding:5px 10px;border:1px solid #cbd5e1;border-radius:10px;max-width:100%}
+.prhow{margin:2px 0 6px;font-size:13.5px}.prsk .chip{display:inline-flex;align-items:center;gap:5px}i.sw{display:inline-block;width:10px;height:10px;border-radius:3px;box-sizing:border-box}
+.elc{width:100%;height:auto;display:block;font-family:system-ui,sans-serif}.elc-ax{font-size:12px;fill:#64748b}.elc-ls{font-size:12px;font-weight:700;fill:#334155}.elc-end{font-size:13px;fill:#0f172a;font-weight:600}.elc-rl{font-size:12.5px;fill:#0f172a;font-weight:600}
+.elc-col{cursor:crosshair}.elc-pt{cursor:pointer}
+.elc-tip{position:fixed;z-index:60;background:#0f172a;color:#fff;font-size:13px;line-height:1.45;border-radius:10px;padding:8px 11px;pointer-events:none;box-shadow:0 6px 18px #0f172a40;max-width:280px}.elc-tip small{color:#cbd5e1}
+.prtab summary{cursor:pointer;color:#475569;font-size:13px;margin-top:6px}.prtab table{font-size:13px}
+.prgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}.prgrid .box{margin:0}
+.prlg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#334155}.prlg span{display:inline-flex;align-items:center;gap:5px}
+.prradin{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;justify-items:center}.prradin svg{max-width:480px}.prnum{max-width:480px}.prnum{font-size:13px;border-collapse:collapse;width:100%}.prnum td,.prnum th{padding:3px 6px;text-align:right;border-bottom:1px solid #f1f5f9;white-space:nowrap}.prnum td:first-child{text-align:left}
+.prc{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 72px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9}.prcn{display:flex;flex-direction:column;gap:1px;min-width:0}.prcn small{color:#64748b;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prcn .pill{align-self:flex-start}
+.prcb{position:relative;height:14px;background:#f1f5f9;border-radius:7px}.prcb b{position:absolute;left:0;top:0;bottom:0;border-radius:7px}.prcb i{position:absolute;top:-3px;bottom:-3px;width:1px;background:#cbd5e1;z-index:1}.prcb .t5{left:50%}.prcb .t7{left:70%}.prcb .t9{left:90%}
+.prcb u{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#0f172a;border:2px solid #fff;z-index:2}.prc strong{text-align:right;font-size:14px}
+@media (max-width:1100px){.prgrid{grid-template-columns:minmax(0,1fr)}}@media (max-width:760px){.prstats{grid-template-columns:repeat(2,minmax(0,1fr))}.prradin{grid-template-columns:minmax(0,1fr)}}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
@@ -290,6 +308,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-items.js"></script>
 <script src="lab/game/decks/index.js"></script>
 <script src="shared/print/lp-list.js"></script>
+<script src="shared/js/el-step-titles.js" defer></script><script src="shared/js/el-voyage.js" defer></script><script src="shared/js/el-charts.js" defer></script><!-- 🌱 Progress: the skill of each step (as the LS page) and the charts -->
 <script type="module">
 import {replyText,replyColor,replyMsgs,otherLabel,MSG_MAX} from "./shared/js/el-reply.js";
 import {ANN_MAX,annMs,annLast,annHtml,annText,annTranslate,annCardHtml,annCardStyle,lateHold} from "./shared/js/el-announce.js";
@@ -1468,7 +1487,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"]};
+const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1706,7 +1725,8 @@ function render0(){
     fp:()=>fpPage(grp,ls,list,inG.filter(s=>!s.away&&!s.tester)),
     exams:()=>examsPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs,lpAll),
-    voyage:()=>vyRank(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
+    voyage:()=>vyRank(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
+    prog:()=>prPage(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
   // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
   if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
@@ -1730,6 +1750,7 @@ function render0(){
       +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Roig's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
       +examsTile(grp,ls,inG.filter(s=>!s.away&&!s.tester))
       +tTile("marks","📊","Assessment details","LS grade, criteria, self-assessment")
+      +tTile("prog","🌱","Progress","skill mastery over time, skills radar, criteria: the group or one student")
       +tTile("students","👥","Students' progress","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
@@ -1740,6 +1761,115 @@ function render0(){
   sumApply();gzApply();
 
 }
+// ---- 🌱 Progress (Roger, 20 Nov 2026: he liked a "Student Progress Tracking" dashboard and said yes to its charts on the group page; "skill
+// mastery over time is super (formative assessment)", so that line is the centrepiece). A tile on the group page opens it: four stat cards
+// (LS mark so far, steps done, work marked, activities average), 📈 skill mastery over time (the whole school year, week by week, the group
+// or one student, every skill or one), 🕸 the skills radar of this LS (activities and exam, as the % per skill on the LS page, PR #767) and
+// the average per assessment criterion. No leaderboard (🏆 Best mark and ⛵ Class voyage already rank). Nothing new is read: the progress,
+// results and levels the dashboard already has. The teacher sees the exam even while it is held from students.
+const PR_SK={Reading:["📖","#1d4ed8","circle",""],Listening:["🎧","#7e22ce","square",""],Speaking:["🗣","#c2410c","diamond",""],Writing:["✍️","#15803d","triangle",""],
+  Grammar:["🧩","#b91c1c","circle","6 4"],Vocabulary:["🔤","#0f766e","square","6 4"]},PR_K=Object.keys(PR_SK),PR_LVL=/_(beginners|insecure|safe|daring|native)$/;
+// a step's skill: the voyage map's (el-voyage.js skill), only these six (recall, research and checkpoints mix things up: left out), as the LS page
+function prSkill(a,pid){let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
+  if(!s)s=/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d/.test(pid)?"Reading":"";
+  s=String(s).split(" · ")[0];return PR_SK[s]?s:null}
+let PRC={d:null,m:new Map()};
+// One student's work by skill. act[ls][skill] = {s, n}: each step's average of all its tries (the engine's all since 20 Nov 2026, before that
+// the first and the latest try), a teacher level when the step has no checks; each step counts the same (as the LS page).
+// ev = the dated checks for the line: each step's first try and its latest check (the tries in between have no date), and a teacher level on
+// the day it was marked. v is 0-1.
+function prStu(u){if(PRC.d!==S.D)PRC={d:S.D,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
+  const ev=[],act={},M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10},pg=S.D.pg[u]||{},rs=S.D.rs[u]||{};
+  EL_LS.forEach(l=>{const ls=l.id,P=pg[ls]||{},A={},put=(k,v)=>{const z=A[k]||(A[k]={s:0,n:0});z.s+=Math.max(0,Math.min(1,v));z.n++};
+    // practice (graded:false, e.g. LS1's learning paths) is still evidence of how a skill grows: on the line, not in the radar (as the LS page)
+    acts(ls).forEach(a=>{if(/checkpoint/.test(a.id))return;const seen=new Set(),pr=a.graded===false;
+      (a.keys||[]).forEach(key=>{let st=null;try{st=JSON.parse(P[key]||"null")}catch(e){}if(!st||typeof st!=="object")return;
+        const AL=st.all||{},F=st.tries||{},L=st.last||{},ok=x=>x&&+x.max>0,sc=x=>Math.min(1,(+x.score||0)/+x.max);
+        new Set([...Object.keys(AL),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(PR_LVL,""),sk=prSkill(a,pid);if(!sk)return;
+          const f=F[k],l=L[k],two=ok(l)&&(!ok(f)||Math.abs(tms(l.date)-tms(f.date))>5000);
+          let v=null;if(AL[k]&&AL[k].n)v=AL[k].s/AL[k].n;else{const xs=[f,two?l:null].filter(ok);if(xs.length)v=xs.reduce((n,x)=>n+sc(x),0)/xs.length}
+          if(v!=null&&!pr){put(sk,v);seen.add(pid)}
+          if(ok(f)&&tms(f.date))ev.push({t:tms(f.date),sk,v:sc(f),ls});if(two&&tms(l.date))ev.push({t:tms(l.date),sk,v:sc(l),ls})})});
+      const x=rs[a.id]||{};Object.entries(x.levels||{}).forEach(([pid,cs])=>{const sk=prSkill(a,pid);if(!sk)return;
+        const ms=Object.values(cs||{}).map(d=>M[d]).filter(n=>n!=null);if(!ms.length)return;const v=ms.reduce((n,m)=>n+m,0)/ms.length/10;
+        if(!seen.has(pid)&&!pr)put(sk,v);const t=tms((x.marked||{})[pid]);if(t)ev.push({t,sk,v,ls})})});
+    if(Object.keys(A).length)act[ls]=A});
+  const o={ev,act};PRC.m.set(u,o);return o}
+// the exam of an LS by skill: the points of its parts (results/{ls}__assessment sections); held = the date students see it, or true
+function prExam(u,ls){const X=res(u,asId(ls)),E=((window.EL_GRADING||{})[ls]||{}).exam,ex={};
+  const held=X.held||(X.showFrom&&Date.now()<tms(X.showFrom))?(X.showFrom||true):null;
+  if(E&&X.sections)E.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null||v.excused)return;const sk=String(name).split(/\s|·/)[0];if(!PR_SK[sk])return;
+    const z=ex[sk]||(ex[sk]={s:0,m:0});z.s+=+v.score||0;z.m+=+(v.max||max)||0});
+  return {ex,held}}
+const prMon=t=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
+const prAvg=xs=>{xs=xs.filter(v=>v!=null&&!isNaN(v));return xs.length?xs.reduce((n,v)=>n+v,0)/xs.length:null};
+const prPc=v=>v==null?"–":Math.round(v)+" %";
+function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
+  studs=studs.filter(s=>s.uid);const lss=EL_LS.filter(l=>l.course===grp.course),inC=new Set(lss.map(l=>l.id)),lsS=l=>lsLabel(l).split(" · ")[0];
+  const me=studs.find(s=>s.uid===S.prU)||null;if(!me)S.prU="";const sel=PR_SK[S.prSk]?S.prSk:"all";
+  const X=studs.map(s=>({s,x:prStu(s.uid)}));
+  // ---- the four cards: this LS, the group (as ⛵ Class voyage: steps of the open tabs, the LS mark so far)
+  const fa=fpAct(ls),rows=studs.map(s=>{const v=vySteps(s,ls,grp.id,fa);let m=null;try{const pr=res(s.uid,asId(ls)).progress;m=pr&&pr.total!=null?pr.total:G()?grade(s).total:null}catch(e){m=null}return {v,m}});
+  const mk=prAvg(rows.map(r=>r.m)),sd=rows.reduce((n,r)=>n+r.v.done,0),stt=rows.reduce((n,r)=>n+r.v.total,0);
+  let cw=0,cd=0;try{const c=corrScan(),mine=i=>i.gid===grp.id&&i.ls===ls;cw=c.wait.filter(i=>mine(i)&&i.k!=="copy").length;cd=c.done.filter(i=>mine(i)&&!["answer","back","copy"].includes(i.k)).length}catch(e){}
+  const actAvg=prAvg(X.map(({x})=>prAvg(Object.values((x.act[ls])||{}).map(z=>z.s/z.n*100))));
+  const card=(ic,lab,big,sub,cls)=>`<div class="prcard ${cls||""}"><span class="prci">${ic}</span><span><small>${lab}</small><b>${big}</b><em>${sub}</em></span></div>`;
+  const cards=`<div class="prstats">`
+    +card("🎓","LS mark so far",mk==null?"–":f1(mk)+"<i>/10</i>",`${rows.filter(r=>r.m!=null).length} of ${studs.length} students with a mark`)
+    +card("👣","Steps done",stt?Math.round(sd/stt*100)+"<i> %</i>":"–",stt?`${sd} of ${stt} open steps, whole group`:"no open steps yet")
+    +card("✏️","Work marked",cd+cw?cd+"<i> of "+(cd+cw)+"</i>":"–",cw?`${cw} waiting for Beltran`:"nothing waiting",cw?"warn":"")
+    +card("📊","Activities average",prPc(actAvg),"all tries, every skill (as the LS page)")+`</div>`;
+  // ---- 📈 skill mastery over time: week by week, the whole school year
+  const evs=X.flatMap(({x})=>x.ev.filter(e=>inC.has(e.ls)));let line="",table="";
+  if(evs.length){const w0=prMon(Math.min(...evs.map(e=>e.t))),W=[];for(let d=new Date(w0);d.getTime()<=prMon(Date.now());d.setDate(d.getDate()+7))W.push(d.getTime());
+    const wi=t=>{const m=prMon(t);let i=W.indexOf(m);if(i<0)i=W.findIndex(w=>Math.abs(w-m)<2*86400e3);return i};
+    // per student: wk[sk][w] = [sum, n] of that week's checks
+    const per=X.map(({s,x})=>{const wk={};x.ev.forEach(e=>{if(!inC.has(e.ls))return;const i=wi(e.t);if(i<0)return;const a=(wk[e.sk]=wk[e.sk]||[])[i]||(wk[e.sk][i]=[0,0]);a[0]+=e.v;a[1]++});return {s,wk}});
+    const stuV=(p,sk)=>W.map((w,i)=>{const a=(p.wk[sk]||[])[i];return a?a[0]/a[1]*100:null}),stuN=(p,sk)=>W.map((w,i)=>((p.wk[sk]||[])[i]||[0,0])[1]);
+    const grpV=sk=>{const vs=per.map(p=>stuV(p,sk));return {v:W.map((w,i)=>prAvg(vs.map(v=>v[i]))),n:W.map((w,i)=>vs.filter(v=>v[i]!=null).length)}};
+    const pm=me&&per.find(p=>p.s.uid===me.uid),ks=sel==="all"?PR_K:[sel],ser=[],tipRows=W.map(()=>[]);
+    if(sel!=="all"&&!me)per.forEach(p=>{const v=stuV(p,sel);if(v.some(x=>x!=null))ser.push({label:"",color:"#cbd5e1",thin:true,v})});   // every student, faint, under the group
+    ks.forEach(sk=>{const [ic,col,sh,da]=PR_SK[sk],g=pm?null:grpV(sk),v=pm?stuV(pm,sk):g.v,n=pm?stuN(pm,sk):g.n;
+      ser.push({label:sk,icon:ic,color:col,shape:sh,dash:da,v});v.forEach((x,i)=>{if(x!=null)tipRows[i].push(`${ic} ${esc(sk)}: <b>${Math.round(x)} %</b> <small>(${pm?plural(n[i],"check"):plural(n[i],"student")})</small>`)})});
+    if(pm&&sel!=="all"){const g=grpV(sel);ser.push({label:"Group",color:"#64748b",shape:"circle",dash:"3 4",v:g.v});g.v.forEach((x,i)=>{if(x!=null)tipRows[i].push(`👥 Group: <b>${Math.round(x)} %</b>`)})}
+    const lab=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+    const marks=lss.map(l=>{const ts=evs.filter(e=>e.ls===l.id).map(e=>e.t);return ts.length?{i:wi(Math.min(...ts)),label:lsS(l)}:null}).filter(Boolean).sort((a,b)=>a.i-b.i).filter((m,j,a)=>!j||m.i>a[j-1].i);
+    line=ELCharts?ELCharts.line({x:W.map(lab),tips:tipRows.map((r,i)=>r.length?`<b>Week of ${esc(lab(W[i]))}</b><br>`+r.join("<br>"):""),series:ser,marks,h:sel==="all"?320:290,
+      aria:"Skill mastery over time, week by week"}):"";
+    const tv=(v,i)=>v[i]==null?"–":Math.round(v[i]);
+    table=`<details class="prtab"><summary>See it as a table</summary><div class="wrap"><table><thead><tr><th>Week of</th>${ser.filter(s=>!s.thin).map(s=>`<th>${s.icon||"👥"} ${esc(s.label)}</th>`).join("")}</tr></thead><tbody>`
+      +W.map((w,i)=>ser.some(s=>!s.thin&&s.v[i]!=null)?`<tr><td>${esc(lab(w))}</td>${ser.filter(s=>!s.thin).map(s=>`<td>${tv(s.v,i)}</td>`).join("")}</tr>`:"").join("")+`</tbody></table></div></details>`}
+  const who=`<select id="prstu" aria-label="Whose progress"><option value="">👥 Whole group (average)</option>${studs.slice().sort((a,b)=>fullName(a).localeCompare(fullName(b),"ca")).map(s=>`<option value="${esc(s.uid)}" ${me&&me.uid===s.uid?"selected":""}>${esc(fullName(s))}</option>`).join("")}</select>`;
+  const chips=`<div class="bar prsk"><button class="chip ${sel==="all"?"on":""}" data-do="prsk" data-s="all">All skills</button>`+PR_K.map(k=>`<button class="chip ${sel===k?"on":""}" data-do="prsk" data-s="${k}"><i class="sw" style="background:${PR_SK[k][1]}"></i>${PR_SK[k][0]} ${k}</button>`).join("")+`</div>`;
+  const how=me?(sel==="all"?`Each point is the average of ${esc(shortName(me).mid)}'s checks in that skill that week (first tries and latest checks, and the levels you gave).`:`${esc(shortName(me).mid)} in ${sel}, week by week, with the group's average (dotted).`)
+    :sel==="all"?"Each point is the group's average in that skill that week: each student's checks that week (first tries and latest checks, and the levels you gave), then the average of the students.":`The group's average in ${sel} week by week; each faint line is one student. Pick a student above to follow them.`;
+  const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass.</p>${chips}`
+    +(line||`<p class="muted">No checked activities yet${me?" for "+esc(shortName(me).mid):""}.</p>`)+table+`</div>`;
+  // ---- 🕸 skills in this LS: activities (all tries) and exam
+  const exs=studs.map(s=>prExam(s.uid,ls)),held=exs.find(e=>e.held),pctA=(x,sk)=>{const z=(x.act[ls]||{})[sk];return z&&z.n?z.s/z.n*100:null},pctE=(e,sk)=>{const z=e.ex[sk];return z&&z.m?z.s/z.m*100:null};
+  const gA=PR_K.map(sk=>prAvg(X.map(({x})=>pctA(x,sk)))),gE=PR_K.map(sk=>prAvg(exs.map(e=>pctE(e,sk))));
+  const mi=me?studs.indexOf(me):-1,mA=me?PR_K.map(sk=>pctA(X[mi].x,sk)):null,mE=me?PR_K.map(sk=>pctE(exs[mi],sk)):null;
+  const rs=me?[{label:"Activities",color:"#2563eb",fill:true,v:mA},{label:"Exam",color:"#b45309",shape:"square",v:mE},{label:"Group activities",color:"#94a3b8",dash:"4 4",v:gA}]
+    :[{label:"Activities",color:"#2563eb",fill:true,v:gA},{label:"Exam",color:"#b45309",shape:"square",v:gE}];
+  const any=rs.some(s=>s.v.some(v=>v!=null)),lg=rs.map(s=>`<span><i class="sw" style="${s.dash?`border:2px dashed ${s.color};background:none`:`background:${s.color}`}"></i>${esc(s.label)}</span>`).join("");
+  const radarB=`<div class="box elc-wrap prrad"><h2>🕸 Skills in ${esc(lsS(EL_LS.find(l=>l.id===ls)))}${me?` · ${esc(shortName(me).mid)}`:" · the group"}</h2>`
+    +`<p class="muted">Activities: the average of all tries. Exam: the points in each part.${held?` <b>🔒 Students can't see the exam yet${held.held===true?"":` (from ${esc(new Date(tms(held.held)).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))})`}.</b>`:""}</p>`
+    +(any&&window.ELCharts?`<div class="prlg">${lg}</div><div class="prradin">${ELCharts.radar({axes:PR_K.map(k=>({label:k,icon:PR_SK[k][0]})),series:rs,aria:"Skills radar"})}`
+      +`<table class="prnum"><thead><tr><th></th>${rs.map(s=>`<th>${esc(s.label.replace("Group activities","Group"))}</th>`).join("")}</tr></thead><tbody>${PR_K.map((k,i)=>`<tr><td>${PR_SK[k][0]} ${k}</td>${rs.map(s=>`<td>${prPc(s.v[i])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+      :`<p class="muted">Nothing checked in this LS yet.</p>`)+`</div>`;
+  // ---- the average per assessment criterion in this LS: the degree you confirmed, else the suggestion from the evidence (as 📊 Assessment
+  // details); an LS with no evidence rules: the points of the graded activities of each criterion. The student's own value is a dot on the bar.
+  let crB="";const g=G();
+  if(g&&!g.only){let cs=[],val;
+    if(g.evidence){cs=[...g.key,...g.other];val=(u,c)=>{const f=(res(u,asId(ls)).final||{})[c];return f?EL_DEGREE_MARK[f]:(suggest(u,c)||{}).mark}}
+    else{const list=acts(ls);cs=[...new Set(list.flatMap(a=>a.criteria||[]))].sort();val=(u,c)=>{let ts=0,tm=0;list.forEach(a=>{const y=a.graded&&(a.criteria||[]).includes(c)&&res(u,a.id).max&&scOf(u,a);if(y){ts+=y.score;tm+=y.max}});return tm?ts/tm*10:null}}
+    const row=c=>{const vs=studs.map(s=>{try{return val(s.uid,c)}catch(e){return null}}),a=prAvg(vs),n=vs.filter(v=>v!=null).length,mv=me?vs[studs.indexOf(me)]:null,l=elDegree(a);
+      return `<div class="prc"><span class="prcn">${pill(c)}<small>${esc(elCompetence(c)||"")}</small></span><span class="prcb" data-tip="${esc(`<b>${c}</b>: group average ${a==null?"–":f1(a)} (${plural(n,"student")})${me?`<br>${esc(shortName(me).mid)}: ${mv==null?"–":f1(mv)}`:""}`)}">`
+        +`<i class="t5"></i><i class="t7"></i><i class="t9"></i>${a==null?"":`<b style="width:${a*10}%;background:${LVCOL[l]}"></b>`}${me&&mv!=null?`<u style="left:${mv*10}%"></u>`:""}</span>`
+        +`<strong>${a==null?'<span class="muted">–</span>':f1(a)+` <small style="color:${LVCOL[l]}">${l}</small>`}</strong></div>`};
+    crB=`<div class="box elc-wrap prcr"><h2>🎯 Average per assessment criterion</h2><p class="muted">${g.evidence?"The degree you confirmed, or the one the evidence suggests, out of 10.":"The points of the graded activities of each criterion, out of 10."} Lines at 5, 7 and 9: AS, AN, AE.${me?` The dot is ${esc(shortName(me).mid)}.`:""}</p>`
+      +(cs.length?cs.map(row).join(""):`<p class="muted">This LS has no criteria yet.</p>`)+`</div>`}
+  return cards+lineB+`<div class="prgrid">${radarB}${crB}</div>`}
 // ---- 🎬 Final product (Roger, 8 Nov 2026: "add a final product access there to mark students work (in all LS)"): a tile on the group page
 // that opens a list of the group's students for the selected LS's final product: video handed in, Gemini's draft, your mark, and a button that
 // opens the usual final product dialog (🎬 Gemini, watch it · ✅ Approve). 📥 Draft the whole group from Classroom is at the top, so no need to
@@ -3614,6 +3744,7 @@ function autoSaveExam(t){const u=t.dataset.ex;if(!u||!G()||!G().exam)return;
   Promise.all(ps).then(()=>{exDirty.delete(u);exState(t,"✓ saved","#15803d");
     setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},   // the LS grade table catches up (not while typing or clicking)
     e=>{console.warn(e);exState(t,"not saved","#b91c1c");alert("Could not save: "+e.message)})}
+document.addEventListener("change",e=>{if(e.target.id==="prstu"){S.prU=e.target.value;render()}});   // 🌱 Progress: whose line and radar
 document.addEventListener("change",e=>{if(e.target.matches("input.ex[data-ex]"))autoSaveExam(e.target);
   if(e.target.matches("select[data-exver]")){const t=e.target,u=t.dataset.exver;if(t.closest("[data-exrow]"))exState(t,"saving…","#64748b");
     patch(u,asId(S.ls),{version:t.value||null}).then(()=>{if(t.closest("[data-exrow]"))exState(t,"✓ saved","#15803d");setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},
@@ -5823,7 +5954,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
         if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
-      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
+      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
