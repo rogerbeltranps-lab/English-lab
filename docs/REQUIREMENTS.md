@@ -31,6 +31,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - The technical detail of a rule (file names, functions, data) goes in `AGENTS.md`, in the same PR.
 - Each rule carries its date, so the newest is easy to see.
 - A rule for one LS only goes in that LS's `AGENTS.md`, not here.
+- **The website and this file move together** (Roger, 20 Nov 2026: "I've been making changes (and I will continue) and I will change rules"): every PR that changes what students or Roger see, or how something is marked, checks this file and updates the line it changes, in the same PR. When Roger changes a rule in a thread, the old line is replaced, never kept next to the new one.
 
 **Key words.** LS = Learning Situation · LP = learning path · SLP = a section (tab) of a learning path · FP = final product · CE2 to CE5 = listening, speaking, reading, writing · CE1, CE6 to CE10 = the integrated competences · route = the student's level (Starter, Base, Core, Plus, Pro; called itinerary in the older guides).
 
@@ -137,7 +138,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 **What students must not see**
 
 - **Never show locked or future work** (7 Nov 2026): no 🔒, "not open", "checkpoint first", or totals that include closed steps. Only learning paths and sections Roger has opened.
-- **No class work shown in advance** (20 Nov 2026): tabs planned for a later class are hidden until 5 minutes before class or class mode.
+- **No class work shown in advance** (20 Nov 2026): a tab planned for a later class is hidden, like a locked tab, until its class opens it (5 minutes before class, or class mode); never shown in blue. Its steps still count in the path's progress.
 - **Students are never told which activities are assessed**: no "this counts", "first try" or "checkpoint" labels (26 Oct 2026). Only the general note that all work is part of continuous assessment (40 % of the LS mark from LS2).
 - Students never see **send times** of messages (14 Nov 2026), never classmates' marks, never where Practise content comes from.
 - "Not late yet" counts are never shown to students (19 Nov 2026).
@@ -156,6 +157,21 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - Students' answers always come back (on reload, another device, after a level change) unless they redo that activity (6 Nov 2026).
 - Never draw a guessed page that changes after sign-in (7 Nov 2026).
 - **LS1 stays as it is** unless Roger asks: its content and pages are finished.
+
+**The student's pages** (site as of 20 Nov 2026)
+
+- **Home = the voyage road** of the LS: same layout every LS, a new setting per LS (4 ESO a sea voyage, 2 ESO LS2 a reporters' bus tour; art from ChatGPT/Gemini prompts Roger runs). The stops are only the Time plan's tabs; every student's vehicle is shown; nothing covers a stop, a label or a vehicle. Music is on by default and **off during the group's class time** (the 🎵 button can't turn it on then). The 2 ESO road has no Barcelona landmarks (20 Nov 2026).
+- **⚠️ Report a problem on every page**, including game boards, videos, flashcards, rubrics, grammar presentations and print pages (19 Nov 2026).
+- **📊 My marks on one screen** (19–20 Nov 2026): the LS mark so far with its parts (📚 Everyday work, 🎬 Final product, 📝 Exam, 🎯 My checkpoints), ⏰ late activities (at most 5, the rest in ✅ To do), the points in one line, and **How you are doing in each skill** (activities and exam per skill; the exam only once results are released). **Speaking = the final product's oral rows** (criteria 3.x) from LS2 on; in LS1 the whole final product.
+- **🎓 My progress**: 📈 How my skills grow and 🕸 My skills radar, the student's own work only, the exam only once released (20 Nov 2026).
+- **📝 Exam practice** in the side menu under My marks: the student's LSs, each opening its sample exams (19 Nov 2026).
+- Question labels: no 👆 Tria / ✏️ Completa labels where the task is obvious; join, change, fix, listen and own example keep theirs (19 Nov 2026).
+
+**The teacher's dashboard** (20 Nov 2026)
+
+- Home: one card per group with the exam rings per part and a second line per skill with the **class work** (first tries + vocabulary and grammar games); the old First tries section is gone. 📝 Exams sorts 🏆 Best mark first.
+- 🌱 Progress tile per group: LS mark so far, steps done, work marked, activities average, 📈 skill mastery over time (the whole year, week by week), 🕸 skills radar, average per criterion. No new Firestore reads.
+- 👁 The student view shows exactly what students see.
 
 ---
 
@@ -225,7 +241,8 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 
 **Inside a learning path**
 
-- Recall warm-up, vocabulary + study cards (15–20 **core words** per route, both directions; core words come back in later readings, warm-ups and checkpoints, the rest stay receptive: Research audit), practice, grammar, 💬 Expressions, reading, listening (prediction, a check between the two listens, a micro-dictation of 2–3 chunks of 3–6 words), shadowing, speaking / Talk, writing, My goal and How did it go?
+- Recall warm-up, vocabulary cards (15–20 **core words** per route, both directions; core words come back in later readings, warm-ups and checkpoints, the rest stay receptive: Research audit), practice, grammar, 💬 Expressions, reading, listening (prediction, a check between the two listens, a micro-dictation of 2–3 chunks of 3–6 words), shadowing, speaking / Talk, writing, My goal and How did it go?
+- **Vocabulary cards** (20 Nov 2026: "simple like this and full screen, like Practise"): one card for the whole site, as in 🎯 Practise. Look at the word, say it out loud, **Turn over** (it plays the word and the example), then **✓ Ho sabia / I knew it** or **↺ Encara no / Not yet**. Full screen, **no typing**. The step is done after 10 "Ho sabia"; the cards never lock. LS1 keeps its old cards.
 - **How it works boxes are always visual** (cards, examples, tables, ⚠ typical mistakes) and hold **no practice boxes** inside (14 Nov 2026).
 - **Teaching flow** (13–16 Nov 2026): visual How it works → 📘 Grammar together: 🙌 4 questions together (from the extra practice), then ⏱ Your turn, and it ends there. Then notebook / pairs, then a short individual set.
 - **Compulsory per grammar block = 4** (3 questions + the own example), the rest ➕ extra practice; 💬 Expressions = 6 compulsory + 4 extra per level.
@@ -354,6 +371,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 - After listening, students move freely between Reading, Vocabulary, Grammar and Writing and see ✅ Review (blanks in red) before 🏁 Turn in (see contradiction 17).
 - **Roger closes the exam himself** (🔒 Close). Nothing closes a started exam automatically (19 Nov 2026).
 - Make-ups and single students: 👤 Only some students…; class mode goes on for the others.
+- On a Chromebook in full screen, the 🔍 Search key, Alt+Tab, the top-row keys and Ctrl+W/T/N do nothing (20 Nov 2026; still to test on a real Chromebook).
 - After turning in: practice games (LS words, never exam items), points only in the browser.
 
 ### 6.11 Marking and results
