@@ -452,9 +452,9 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 **What a suggested reply says**
 
-- Built on **what the website really has** (the sample exam, 🎯 Practise, Games, the notebook…), never generic advice or promises of features Roger hasn't decided (20 Nov 2026).
+- **Every suggested reply or draft to a student** (problem reports, ideas, private-message answers, comments) is built on **what the website really has** (20 Nov 2026): point to the real thing with the names students see (Examen de mostra / Sample exam, 🎯 Practica / Practise, Games, the learning paths, a step's title) and say how to use it. No generic advice, and never promise something new Roger hasn't decided.
 - Short, kind, plain, first person as Roger. Never AI, Claude, PRs or code.
-- A 💬 draft is ready in every Answer box (ideas, private answers, problem reports): Roger edits and sends it.
+- **Every 💬 Answer box opens with Beltran's draft** (Catalan + English, Roger's voice, no names; 20 Nov 2026, PR #777). It is never sent by itself: Roger edits it and presses Send. Routine details: [problem-reports-auto.md › Drafts for ideas and private answers](general/problem-reports-auto.md).
 
 ---
 
