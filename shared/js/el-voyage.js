@@ -136,9 +136,10 @@
 
   // ---- sounds ----
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
-  // quiet(): the teacher's view of a student's board and class mode start with no sound; there the 🎵 button turns it on for this page (force)
-  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,force:false,dt:0,sk:skinOf(null),
-    hush(){return this.quiet()&&!this.force},
+  // The music is on by default (Roger, 20 Nov: "always on except for when it's class time for the students"). quiet(): no sound to
+  // start with, the 🎵 button turns it on for this page (force); lock(): no sound at all, not even with 🎵 (a student in class time)
+  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
+    hush(){return this.lock()||this.quiet()&&!this.force},
     play(k,vol){const f=this.sk.snd[k];if(!f||!this.on||this.hush())return;try{const a=new Audio(this.sk.A+f);a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
     duck(){const m=this.music;if(!m)return;clearTimeout(this.dt);m.volume=this.MV*.35;this.dt=setTimeout(()=>{if(this.music)this.music.volume=this.MV},1800)},
     startBg(){if(this.music||!this.on||this.hush()||!document.querySelector(".vy-sea")||document.hidden)return;
@@ -254,7 +255,7 @@
   const LAST={};   // scroll position per store, kept when the board draws again
   function wire(root,V){const sea=root&&root.querySelector(".vy-sea");if(!sea)return;
     const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),sc=sea.querySelector(".vy-sc"),map=sea.querySelector(".vy-map"),fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en),I=S.I;
-    SND.quiet=V.quiet||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
+    SND.quiet=V.quiet||(()=>false);SND.lock=V.lock||(()=>false);if(SND.sk.dir!==S.dir||SND.sk.snd.music!==S.snd.music)SND.stopBg();SND.sk=S;
     const W=sc.clientWidth||800,wide=W>640,cx=W/2,lane=wide?95:32,STEP=wide?118:96,GAP=56,PH=wide?44:72,TOP=wide?440:420,lanes=[0,-1,-1.6,-1,0,1,1.6,1];
     // a port card (square-ish, Roger 20 Nov) never covers a stop, a label or a vehicle: measure each card first and give it the room it
     // needs (half its height + the vehicles' half height ~50 px + a margin, on each side)

@@ -611,7 +611,11 @@ function voyageData(ls,info,nx){
   return {ls:window.elLsNum?elLsNum(ls):"",skin:ls.id,en:EN,beds,now,fp,
     me:{s:null,n:elVoyage.first(D.me.name)},mates:Object.entries(road).filter(([u,x])=>u!==me&&x&&x.n).map(([,x])=>({n:x.n,s:+x.s||0})),
     cont,
-    store:"el_voyage_"+me+"_"+ls.id,save:!AS,quiet:()=>!!AS||!!(LIVE&&LIVE.go&&elCmOn(LIVE.go))}}
+    store:"el_voyage_"+me+"_"+ls.id,save:!AS,
+    // music always on, except in the group's class time by its timetable and in class mode: a student can't turn it on then; the teacher's
+    // view of a student's board can (Roger, 20 Nov 2026)
+    quiet:()=>vyClass(),lock:()=>!AS&&vyClass()}}
+const vyClass=()=>!!(LIVE&&LIVE.go&&elCmOn(LIVE.go))||!!(window.elSlotNow&&elSlotNow((LIVE&&LIVE.tt)||(window.elTT&&D&&D.me&&elTT(D.me.group))));
 // Only what the teacher put on the group's Time plan agenda (Roger, 20 Nov 2026: "they only needed to see the activities I add on the
 // calendar"): a tab is a stop when "path#tab" is on any day of the agenda (past or coming), a whole path ("path#", a recall checkpoint)
 // brings all its tabs, class games (#game:) and notes are not stops. The final product is always there, last. A path with several steps in
