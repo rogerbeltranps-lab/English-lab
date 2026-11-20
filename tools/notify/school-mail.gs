@@ -52,6 +52,12 @@
 //      {idToken (Roger's accounts), action: "tn_mark", at} and starts the same scheduled task as ✏️ Correct everything waiting now
 //      (startMarking, at most once every 10 minutes), where Claude corrects it (tools/marking/marks.mjs tn-ready / tn-apply). The C2
 //      speaking coach now corrects only what is really wrong or sounds non-native, never a nicer version of what a native could say.
+//  23. v34 (Roger, 20 Nov 2026: "why don't we make a collection of well and badly pronounced words and how they structure the oral text at
+//      lexical and grammatical level"): new action {idToken (teacher), action: "speak_an", fileId, task, level, course} → {ok, an, model,
+//      eur}: Gemini Flash listens again to one recording in AUDIO_FOLDER (old ones too) and writes an analysis FOR ROGER ONLY (the student
+//      never sees it): words said well and said wrong, vocabulary, grammar, how the talk is built, and a level 1-4 for each. The dashboard
+//      (🗣 Speaking) keeps it in Firestore settings/spk_{ls}_{group}, which only the teacher can read. About €0.005 a recording.
+//      With fp: true (and fileIds, as fp_watch) the same analysis of a final product video through the Gemini Files API (about €0.01).
 //  22. v33 (Roger, 19 Nov 2026: "stop sending mails with the reports to my personal mail"): the emails this script sends to Roger itself
 //      (🎬 new final product video, the setup test) go to his school inbox TEACHER_MAIL (roger.beltran@ietramuntana.cat), never to
 //      his personal Gmail. TEACHER stays his English Lab sign-in for the teacher actions.
@@ -143,6 +149,7 @@ function doPost(e) {
   if (m.action === "fp_auto_list") return out(m.idToken && isTeacher(m.idToken) ? fpaList(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
   if (m.action === "audio_get") return out(m.idToken && isTeacher(m.idToken) ? audioGet(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "speak_an") return out(m.idToken && isTeacher(m.idToken) ? speakAn(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
@@ -280,7 +287,14 @@ function saveAudio(m) {
 // v30: a recording for the dashboard's in-page player (action "audio_get", see 19 above). Only files inside AUDIO_FOLDER (directly or
 // in a group folder), so the teacher's sign-in cannot be used to read anything else from this school account's Drive.
 function audioGet(m) {
-  const id = String(m.fileId || "");
+  const r = recordingFile(m.fileId);
+  if (!r.ok) return r;
+  const b = r.file.getBlob();
+  return {ok: true, mime: b.getContentType() || "audio/webm", name: r.file.getName(), data: Utilities.base64Encode(b.getBytes())};
+}
+// a recording by its Drive id, only inside AUDIO_FOLDER (directly or in a group folder): {ok, file} or {ok: false, error}
+function recordingFile(fileId) {
+  const id = String(fileId || "");
   let f;
   try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the recording could not be opened"}; }
   let inside = false;
@@ -290,9 +304,96 @@ function audioGet(m) {
     else for (const qs = p.getParents(); qs.hasNext();) if (qs.next().getId() === AUDIO_FOLDER) inside = true;
   }
   if (!inside) return {ok: false, error: "that file is not a speaking recording"};
-  if (f.getSize() > 9e6) return {ok: false, error: "the recording is too long to play here"};
-  const b = f.getBlob();
-  return {ok: true, mime: b.getContentType() || "audio/webm", name: f.getName(), data: Utilities.base64Encode(b.getBytes())};
+  if (f.getSize() > 9e6) return {ok: false, error: "the recording is too long"};
+  return {ok: true, file: f};
+}
+
+// v34: Roig's speaking analysis for the teacher (action "speak_an", see 23 above). One Flash call per recording; the dashboard sends the
+// activity's task, the student's route and the course. Nothing here is ever shown to the student.
+function speakAn(m) {
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return {ok: false, error: "no Gemini key in the school script"};
+  if (m.fp) return speakAnFp(m);
+  const r = recordingFile(m.fileId);
+  if (!r.ok) return r;
+  const b = r.file.getBlob(), mime = /^audio\/(webm|ogg|mp4)$/.test(b.getContentType()) ? b.getContentType() : "audio/webm", data = Utilities.base64Encode(b.getBytes());
+  const ask = speakAnPrompt(m);
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
+  let why = "Roig could not listen to it";
+  for (const mt of [mime, mime === "audio/webm" ? "video/webm" : null].filter(Boolean)) {
+    try {
+      const res = UrlFetchApp.fetch(url, {method: "post", contentType: "application/json", muteHttpExceptions: true,
+        payload: JSON.stringify({contents: [{parts: [{inline_data: {mime_type: mt, data}}, {text: ask}]}],
+          generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+      if (res.getResponseCode() !== 200) { why = "Roig answered " + res.getResponseCode(); continue; }
+      const j = JSON.parse(res.getContentText()), eur = addUsage(GEMINI_MODEL, "audio", j);
+      const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+      return {ok: true, an: speakAnClean(JSON.parse(t)), model: GEMINI_MODEL, eur};
+    } catch (x) { why = "Roig's answer could not be read"; }
+  }
+  return {ok: false, error: why};
+}
+// v34 (Roger, 20 Nov 2026: "use the final product too"): a final product video (or audio) handed in on the site, on Classroom or by a link
+// (fileId, fileIds as fp_watch): it goes to the Gemini Files API like fp_watch (fpSend), Flash hears it with LOW media resolution (the
+// pictures matter little here, so it costs about a cent a video) and the copy is deleted from Gemini at once. Slides (PDF) are left out.
+function speakAnFp(m) {
+  const t0 = Date.now(), ids = [String(m.fileId || "")].concat([].concat(m.fileIds || []).map(String)).filter((x, k, a) => x && a.indexOf(x) === k).slice(0, 3);
+  const got = [], delAll = () => got.forEach(g => g.del());
+  for (const id of ids) {
+    const r = fpSend(id, t0);
+    if (!r.ok) { delAll(); return r; }
+    if (r.kind === "pdf") r.del(); else got.push(r);
+  }
+  if (!got.length) return {ok: false, error: "no video or audio of the student speaking (slides only)"};
+  try {
+    const res = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
+      payload: JSON.stringify({contents: [{parts: got.map(g => ({file_data: g.fd})).concat([{text: speakAnPrompt(m)}])}],
+        generationConfig: {temperature: 0.2, mediaResolution: "MEDIA_RESOLUTION_LOW", responseMimeType: "application/json"}})});
+    if (res.getResponseCode() !== 200) return {ok: false, error: "Roig answered " + res.getResponseCode()};
+    const j = JSON.parse(res.getContentText()), eur = addUsage(GEMINI_MODEL, "video", j);
+    const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+    return {ok: true, an: speakAnClean(JSON.parse(t)), model: GEMINI_MODEL, eur};
+  } catch (x) { return {ok: false, error: "Roig's answer could not be read"}; }
+  finally { delAll(); }
+}
+function speakAnPrompt(m) {
+  return [
+    "You are helping Roger, an English teacher at a secondary school in Catalonia (students aged 12-16, Catalan and Spanish speakers), build a picture of each student's speaking over the year. " + (m.fp ? "This is one student's FINAL PRODUCT: a spoken presentation (a video, sometimes only audio). Listen to the student speaking; ignore music, the text on the slides and any computer voice." : "This is a recording of one student doing a speaking task.") + "",
+    "This analysis is FOR THE TEACHER ONLY: the student never sees it. Be accurate and specific, neither kind nor harsh: describe what you really hear. Quote the student's real words.",
+    "Course: " + String(m.course || "ESO").slice(0, 20) + ". Judge every level against what is expected at about " + String(m.cefr || "A2").slice(0, 10) + " for this course (the same scale for every student, so Roger can compare them and see progress). The student's route: " + (ROUTE[m.level] || "not known") + ".",
+    "The task they were given: \"" + String(m.task || "a short speaking task").slice(0, 1500) + "\".",
+    "If a computer voice reads questions in the recording, those are not the student: leave them out. NO NAMES: never write anyone's name; when you quote the student, replace any name with \"…\".",
+    "If you cannot hear the student speaking English at all, give every level 0 and empty lists, and say why in summary.",
+    "Answer in JSON with these keys:",
+    "summary: one or two sentences for Roger on this recording (how long they really speak, how freely, the main strength and the main weakness);",
+    "fluency: \"free\" (speaks without reading, few pauses) | \"hesitant\" (many pauses, restarts) | \"reads\" (clearly reading a text);",
+    "good_words: up to 10 words that are hard for Catalan and Spanish speakers and that the student pronounced WELL (e.g. 'usually', 'vegetables' in 3 syllables, a silent -ed, 'th', a final -s, word stress). Each item: {word, note: what they got right, very short};",
+    "sounds: up to 12 words the student mispronounced in a way that matters (typical Catalan/Spanish errors: 'walk' with the L, 'clothes' as 2 syllables, '-ed' sounded, 'v' and 'b' the same, no final -s, a vowel added before s+consonant 'estudent', wrong word stress). Each item: {word: as written, heard: how they said it in IPA, tip: the correct British pronunciation in IPA and a very short note}. Only words you clearly heard;",
+    "vocabulary: {topic: up to 12 words or chunks they used that belong to the task's topic; connectors: every linking word they used, each once (and, but, because, then, first, also, so, after that…); repeated: words they repeat a lot, up to 5; l1: Catalan or Spanish words they used, up to 5; note: one sentence on the range (varied or basic, chunks and expressions, gaps that block meaning); level};",
+    "grammar: {good: up to 6 structures they used correctly, each as a short label with their own example, e.g. 'present simple 3rd person -s: \"she plays\"'; errors: up to 8 real mistakes, each {said: their words, correct: the correct form, rule: a very short label, e.g. 'he/she/it + -s'}; note: one sentence on accuracy and range (only present simple? past? questions? can/must?); level};",
+    "structure: {opening: true if they introduce the topic or greet; ending: true if they close it (e.g. 'That's all', a conclusion); order: one sentence on how the ideas are organised (a list, a sequence with first/then, reasons with because, examples, jumps between ideas); sentences: \"words\" (mostly single words or lists) | \"simple\" (short simple sentences) | \"joined\" (sentences joined with and/but/because/so) | \"complex\" (subordinate clauses: when, if, who, that); note: one sentence on how the talk is built; level};",
+    "pronunciation: {note: one sentence on how understandable they are and their main sound problem; level};",
+    "task: {done: \"yes\" | \"partly\" | \"no\", note: one sentence on what they covered or missed}.",
+    "Every level is 1-4 at the course level: 4 = very good, 3 = good, 2 = fair, 1 = developing (0 only when the student does not speak English at all).",
+    "Write everything in English, short."
+  ].join("\n");
+}
+function speakAnClean(o) {
+  o = o || {};
+  const s = (v, n) => String(v == null ? "" : v).replace(/\s+/g, " ").trim().slice(0, n), lv = v => { const n = Math.round(Number(v)); return n >= 0 && n <= 4 && v !== null && v !== "" ? n : null; };
+  const arr = (v, n) => [].concat(v || []).slice(0, n), words = (v, n, k) => arr(v, n).map(x => s(x, k)).filter(Boolean);
+  const V = o.vocabulary || {}, G = o.grammar || {}, T = o.structure || {}, P = o.pronunciation || {}, K = o.task || {};
+  return {
+    summary: s(o.summary, 400), fluency: ["free", "hesitant", "reads"].indexOf(o.fluency) >= 0 ? o.fluency : "",
+    good: arr(o.good_words, 10).map(x => ({word: s(x && x.word, 40), note: s(x && x.note, 100)})).filter(x => x.word),
+    sounds: arr(o.sounds, 12).map(x => ({word: s(x && x.word, 40), heard: s(x && x.heard, 60), tip: s(x && x.tip, 120)})).filter(x => x.word),
+    voc: {topic: words(V.topic, 12, 40), conn: words(V.connectors, 15, 25), rep: words(V.repeated, 5, 30), l1: words(V.l1, 5, 30), note: s(V.note, 300), level: lv(V.level)},
+    gram: {good: words(G.good, 6, 120), errors: arr(G.errors, 8).map(x => ({said: s(x && x.said, 120), correct: s(x && x.correct, 120), rule: s(x && x.rule, 60)})).filter(x => x.said),
+      note: s(G.note, 300), level: lv(G.level)},
+    str: {opening: T.opening === true, ending: T.ending === true, order: s(T.order, 300), sentences: ["words", "simple", "joined", "complex"].indexOf(T.sentences) >= 0 ? T.sentences : "",
+      note: s(T.note, 300), level: lv(T.level)},
+    pron: {note: s(P.note, 300), level: lv(P.level)},
+    task: {done: ["yes", "partly", "no"].indexOf(K.done) >= 0 ? K.done : "", note: s(K.note, 300)}
+  };
 }
 
 // Gemini listens to the recording (Roger, 8 Nov 2026: "gemini can give feedback itself with a proper prompt per each activity, we need him
