@@ -1195,6 +1195,7 @@ const fsGroup=()=>GR.some(x=>x.id===S.g)?S.g:FSW.g||((window.ELWeek&&ELWeek.clas
 // in a new tab in the read-only student view (today.html?student=…, el-cloud.js el_as): every page then shows the site as they see it.
 // It never passes the LS picked on the dashboard (a 4 ESO B tab left on LS1 opened their board on LS1): today.html picks the current LS by the time plan.
 const SV={open:false,g:null};
+const svSame=()=>{try{return matchMedia("(max-width:640px)").matches||matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
 const svBtn=()=>`<button type="button" class="fsbtn svbtn ${SV.open?"on":""}" data-do="sview" title="See the site as one of your students sees it: read-only, opens in a new tab">👁 Student<span class="lg"> view</span></button>`;
 function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(x=>x.id===fsGroup())||GR[0];if(!g)return "";
   const all=Object.values(S.P||{}).filter(s=>s.group===g.id&&!s.tester&&!s.away),studs=all.filter(s=>s.uid).sort(byName),
@@ -1202,7 +1203,7 @@ function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(
     out=Object.values((S.D&&S.D.ro)||{}).filter(r=>r&&r.group===g.id).length-studs.length;
   return `<div class="svpop"><div class="svh"><b>👁 See the site as a student</b><button type="button" class="svx" data-do="sview" title="Close">✕</button></div>
     <div class="svg">${GR.map(x=>`<button type="button" class="${x.id===g.id?"on":""}" data-do="svgroup" data-g="${x.id}">${esc(x.name)}</button>`).join("")}</div>
-    <p class="svnote">Tap a name: their board opens in a new tab and every page shows what they see, with their answers. Read-only: nothing is changed.</p>
+    <p class="svnote">Tap a name: their board opens ${svSame()?"here (Back or ✕ Exit brings you to the dashboard)":"in a new tab"} and every page shows what they see, with their answers. Read-only: nothing is changed.</p>
     <div class="svlist">${studs.map(s=>`<a href="today.html?student=${encodeURIComponent(s.uid)}${q}" target="_blank" rel="noopener" data-sv="1"><span>${name(s)}</span>${route(level(s.uid,l?l.id:S.ls))}</a>`).join("")||'<p class="muted">Nobody in this group has signed in yet.</p>'}</div>
     ${out>0?`<p class="svnote">${out} not signed in yet (no student view for them).</p>`:""}</div>`}
 const svKeep=n=>{const l=n.querySelector(".svlist");if(!l)return;l.scrollTop=SV.top||0;l.onscroll=()=>{SV.top=l.scrollTop}};
@@ -1325,7 +1326,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   if(!TPH.more){m.innerHTML="";return}
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
-    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
+    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only · Back or ✕ Exit returns here")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
@@ -5929,6 +5930,12 @@ function peSave(reset){const h=S.peX;if(!h)return;const {x,o}=h;
   const tabs=document.querySelectorAll(".petab").length&&(picked.length!==plain.length||picked.some(t=>!plain.includes(t)))?picked:null,to=v!==h.orig?v:null;
   if(h.add){$("#dlg").close();S.peX=null;return quick(api.planEdit(x.ls,x.gid,o,Object.assign({},h.add,{to:v,tabs:picked})))}   // a line of tabs sent from another class keeps them
   $("#dlg").close();S.peX=null;quick(api.planEdit(x.ls,x.gid,o,to||tabs?{to,tabs}:null))}
+// 👁 On a phone, and in the English Lab app from the home screen, every student-view link (👁 list, 📄, 📝, 📍) opens in this same tab
+// (Roger, 20 Nov 2026: "With my cellphone I can't see the students view"): the home-screen app sends a new tab to the phone's browser
+// (or a view inside the app) that is not signed in, so the student's board never showed. ✕ Exit or Back returns to the dashboard.
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href^="today.html?student="]');
+  if(!a||a.target!=="_blank"||!svSame()||e.defaultPrevented||e.metaKey||e.ctrlKey)return;
+  e.preventDefault();SV.open=false;location.href=a.href},true);
 document.addEventListener("click",e=>{if(!SV.open)return;const a=e.target.closest("#fsctl");if(a&&!e.target.closest("[data-sv]"))return;
   setTimeout(()=>{SV.open=false;fsDraw()},0)});   // 👁 Student view list closes on a tap outside it or once a student is opened
 document.addEventListener("input",e=>{if(e.target.id==="pe-day")peWarn()});
