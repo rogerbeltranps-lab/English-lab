@@ -1674,28 +1674,24 @@ function homeworkBox(ls,info){const empty=`<div class="box"><p class="muted">${t
 // Time plan agenda (ls/{id}.planEdits[group].agenda) from today on: each class day with its learning-path tabs, class games and the notes
 // the teacher wrote, and the exam day. Nothing here is To do or homework; past days are in "What we've done in class" below.
 function agendaBox(ls,info){const g=D.me.group,ag=g&&window.elAgendaOf?elAgendaOf(info,g):null;if(!ag)return "";
-  const {p,gi}=planOf(ls),today=ELWeek.today(),ex=ag.exam||(p&&gi>=0?ELWeek.exam(p,gi):null),lp=p&&gi>=0?lpNums(p,gi):()=>"";
-  const nm=a=>{const n=lp(a),s=a.title.split(/[:(]/)[0].trim();return n?n+" · "+s:s};
+  const {p,gi}=planOf(ls),today=ELWeek.today(),ex=ag.exam||(p&&gi>=0?ELWeek.exam(p,gi):null);
   // the homework the teacher set, on the day it is for (Roger, 9 Nov 2026: a calendar button "only on the homework and the exam's and a final product deadline")
   const hws=hwList(ls,info).filter(h=>h.x.date>=today),hwOn=d=>hws.filter(h=>h.x.date===d);
-  const days=Object.keys(ag.days||{}).filter(d=>d>=today&&(ag.days[d]||[]).length);if(ex&&ex>=today&&!days.includes(ex))days.push(ex);
+  // no class work here any more (Roger, 20 Nov 2026: "they see activities in blue, because we have to do them in class, this shouldnt appear"):
+  // only the exam, homework, deadlines and the teacher's notes; a day with only class work is left out
+  const days=Object.keys(ag.days||{}).filter(d=>d>=today&&(ag.days[d]||[]).some(x=>/^note:\s*\S/.test(String(x))));if(ex&&ex>=today&&!days.includes(ex))days.push(ex);
   hws.forEach(h=>{if(!days.includes(h.x.date))days.push(h.x.date)});days.sort();
   if(!days.length)return "";
   const lsn=elLsName(ls),site=new URL("today.html",location.href).href;
   const cal=(title,d)=>` <a class="calb" href="${ELWeek.gcalDay(title,d,t("Anglès · ","English · ")+lsn+"\n"+site)}" target="_blank" rel="noopener" title="${t("Afegeix-ho al teu Google Calendar","Add it to your Google Calendar")}">📅 ${t("Afegeix-ho al calendari","Add to your calendar")}</a>`;
-  const dayHtml=d=>{const its=(ag.days[d]||[]).map(String),by=new Map(),lines=[];
+  const dayHtml=d=>{const its=(ag.days[d]||[]).map(String),lines=[];
     // ⏰ a deadline the teacher added to the day on the Time plan (⏰ Deadline, e.g. the final product): with the calendar button
     its.forEach(it=>{if(/^note:/.test(it)){const x=it.slice(5).trim();if(!x)return;const m=x.match(/^⏰\s*(?:Deadline:\s*)?(.*)$/);
-        lines.push(m?`<li class="dl">⏰ <b>${t("Data límit","Deadline")}: ${esc(m[1]||t("lliurament","hand-in"))}</b>${cal("⏰ "+t("Anglès","English")+": "+(m[1]||t("data límit","deadline")),d)}</li>`:`<li>📌 ${esc(x)}</li>`);return}
-      const i=it.indexOf("#");if(i<0)return;const id=it.slice(0,i),pn=it.slice(i+1),a=EL_CATALOG.find(y=>y.id===id);
-      if(/^game:/.test(pn)){const gm=pn.slice(5).match(/lp(\d+)-(vocab|grammar)/);lines.push(`<li>🎲 ${t("Joc de classe","Class game")}${gm?` · LP${gm[1]} ${gm[2]==="vocab"?t("vocabulari","vocabulary"):t("gramàtica","grammar")}`:""}</li>`);return}
-      if(!a||a.optional&&!pn)return;if(!by.has(a))by.set(a,[]);if(pn)by.get(a).push(pn)});
-    const lps=[...by].map(([a,ps])=>{const sec=(window.EL_SECTIONS||{})[a.id]||[],tn=ps.map(x=>(sec.find(z=>z[0]===x)||[])[1]||x);
-      return `<li>📘 <b>${canDo(a,info)?`<a href="${tabHref(a)}">${esc(nm(a))}</a>`:esc(nm(a))}</b>${tn.length?` <span class="tn">· ${esc(tn.join(", "))}</span>`:""}</li>`});
+        lines.push(m?`<li class="dl">⏰ <b>${t("Data límit","Deadline")}: ${esc(m[1]||t("lliurament","hand-in"))}</b>${cal("⏰ "+t("Anglès","English")+": "+(m[1]||t("data límit","deadline")),d)}</li>`:`<li>📌 ${esc(x)}</li>`)}});
     const isEx=d===ex,n=ELWeek.days(today,d);
     const hw=hwOn(d).map(h=>`<li class="hwd ${h.done?"dn":""}">🏠 <b>${t("Deures","Homework")}:</b> ${esc(h.x.text)}${h.done?` <span class="ok">✔ ${t("Fet","Done")}</span>`:cal("🏠 "+t("Deures d'anglès","English homework")+": "+h.x.text,d)}</li>`);
-    return `<div class="agd ${d===today?"now":""} ${isEx?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${hw.join("")}${lps.join("")}${lines.join("")}</ul></div>`};
-  return `<div class="box agbox"><h2>📅 ${t("Agenda de classe","Class agenda")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted" style="margin:0 0 6px">${t("El que farem a classe els propers dies, els deures, les dates límit i el dia de l'examen. El que és de classe no l'has de fer abans: ho farem junts. 📅 posa els deures, l'examen i les dates límit al teu calendari.","What we will do in class in the next few days, your homework, deadlines and the exam day. You don't have to do the class work before: we'll do it together. 📅 puts homework, the exam and deadlines in your calendar.")}</p>${days.map(dayHtml).join("")}</div>`}
+    return `<div class="agd ${d===today?"now":""} ${isEx?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${hw.join("")}${lines.join("")}</ul></div>`};
+  return `<div class="box agbox"><h2>📅 ${t("Agenda","Agenda")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted" style="margin:0 0 6px">${t("Els deures, les dates límit i el dia de l'examen. 📅 els posa al teu calendari.","Your homework, deadlines and the exam day. 📅 puts them in your calendar.")}</p>${days.map(dayHtml).join("")}</div>`}
 function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;
   const exam=ex&&n>=0?`<div class="exam">📝 ${t("Examen","Exam")}: ${when(ex)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
@@ -1840,6 +1836,9 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     if(!TX&&!can&&!ds.size&&!D.rs[a.id])return "";   // students never see a learning path they cannot open yet (Roger, 7 Nov 2026: "they mustn't see that anything is locked")
     const vis=steps(a).filter(k=>TX||ds.has(k)||(can&&(!secOff(a,info,k)||soonK(a,info,k))));   // students: only the tabs they have done or can open, + 🏫 the ones for a later class
     if(!TX&&steps(a).length&&!vis.length)return "";   // open, but none of its sections yet
+    // 🏫 tabs for a later class: never shown to students (Roger, 20 Nov 2026: "they see activities in blue, because we have to do them in
+    // class, this shouldnt appear"); still counted in "x / y tabs", like the LS page. A path with only those left is not listed.
+    const now=TX?vis:vis.filter(k=>ds.has(k)||!soonK(a,info,k));if(!TX&&steps(a).length&&!now.length)return "";
     const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today&&!steps(a).some(k=>secOff(a,info,k)),go=can&&!drop&&!done&&!a.manual&&open;
     // the chips above the table count TABS (activities), not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!")
     const tabs=tabGroups(a,steps(a)).map(g=>{const k=g.find(x=>!ds.has(x))||g[g.length-1],sk=g.every(x=>(a.skip||[]).includes(x)),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
@@ -1848,6 +1847,8 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
       if(g.every(x=>ds.has(x))&&elStepsOptional(stateOf(a),g)){cnt("done");return `<span class="stp op" title="${esc(nm)}: ${t("no cal que la tornis a fer: compta com a feta","you don't need to do it again: it counts as done")}">○ ${esc(nm)} <small>· ${t("opcional","optional")}</small></span>`}
       if(g.every(x=>ds.has(x))){cnt("done");const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd,sc=g.map(x=>stepSc(a,x)).find(Boolean);return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}${sc?" · "+sc.tip:""}">✔ ${esc(nm)}${sc?` <small class="sc">${sc.t}</small>`:""}</span>`}
       if(!g.some(x=>vis.includes(x)))return "";
+      if(!TX&&!g.some(x=>now.includes(x)))return "";
+      if(!TX&&g.some(x=>soonK(a,info,x)))return `<span class="stp">· ${esc(nm)}</span>`;   // started, then moved to a later class: no 🏫, no 🔒
       if(can&&!drop&&g.some(x=>soonK(a,info,x))){cnt("off");const sd2=soonOf(a,info)[panelOf(a,g[0])];
         return `<span class="stp cls" title="${esc(nm)}: ${t("ho farem a classe","we'll do it in class")}${sd2?" · "+when(sd2):""}">🏫 ${esc(nm)}${sd2?` <small>· ${when(sd2)}</small>`:""}</span>`}
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
@@ -1866,7 +1867,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`}
     else if(a.optional){st=`<span class="s-ok" style="color:#0e7490">💪 ${t("Opcional · per practicar l'examen","Optional · exam practice")}</span>`}
     else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`}
-    else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:dueB(a)?`<span class="s-no">✅ ${t("Per fer","To do")}</span>`:`<span class="s-td">🏫 ${t("Ho farem a classe","We'll do it in class")}</span>`;
+    else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:dueB(a)?`<span class="s-no">✅ ${t("Per fer","To do")}</span>`:TX?`<span class="s-td">🏫 We'll do it in class</span>`:tabGroups(a,now).every(g=>g.every(k=>ds.has(k)))?`<span class="s-ok">✔ ${t("Al dia","Up to date")}</span>`:`<span class="s-td">▶ ${t("Oberta","Open")}</span>`;
       if(TX&&d&&!h)st+=`<br><small class="muted">plan: ${when(d)} (students don't see this date)</small>`}
     const c=cell(a);if(vis.length<steps(a).length&&!a.graded&&!a.manual)c.t=vis.filter(k=>ds.has(k)).length+"/"+vis.length+(x.feedback?" 💬":"");
     const num=lpN(a),title=(num?`<span class="lpno">${num}</span> `:"")+(can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title));
@@ -1879,7 +1880,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     +(TX?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the student sees this table without the “counted” tags.</p>`:`<p class="muted" style="margin:0 0 6px">${t("Clica una pestanya que et falta per anar-hi directament.","Click a tab you are missing to go straight to it.")}</p>`)
     +nx
     +`<div class="lpsum"><span>✔ ${nAct(n.done)} ${t(n.done===1?"feta":"fetes","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerida":"endarrerides",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span>${TX?`<span>🔒 ${n.off} not open</span>`:""}${TX?`<span>Counted so far: ${dn} of ${due.length} tabs done</span>`:""}</div>`
-    +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>${t("Estat","State")}</th><th>${t("Pestanyes","Tabs")} <small class="muted">(✔ ${t("fet","done")} · <span style="color:#92400e">${t("taronja = després del seu dia","amber = after its day")}</span> · <span style="color:#991b1b">✗ ${t("falta i ja tocava","missing past its day")}</span> · <span style="color:#1e40af">🏫 ${t("la farem a classe aquell dia","we'll do it in class that day")}</span>${TX?" · 🔒 not open":""})</small></th><th>${t("Punts","Score")}</th></tr></thead><tbody>${body}</tbody></table></div>`
+    +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>${t("Estat","State")}</th><th>${t("Pestanyes","Tabs")} <small class="muted">(✔ ${t("fet","done")} · <span style="color:#92400e">${t("taronja = després del seu dia","amber = after its day")}</span> · <span style="color:#991b1b">✗ ${t("falta i ja tocava","missing past its day")}</span>${TX?` · <span style="color:#1e40af">🏫 we'll do it in class that day</span> · 🔒 not open`:""})</small></th><th>${t("Punts","Score")}</th></tr></thead><tbody>${body}</tbody></table></div>`
     +(TX?`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p>`:"")+`</div>`}
 // a step's name = the name of the tab it lives in, as on the learning path (Roger, 7 Nov 2026: "make sure students see the same" as the
 // dashboard): the cards and practice steps are both the Vocabulary tab, never "Cards" or "Practice" (panelOf)

@@ -477,8 +477,13 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 function lockSections(ids,ca,a,done,soon,gid){
   const fr=window.EL_CM_FREE;if(fr)ids=ids.filter(id=>!fr.has(id));   // steps class mode opened for the student now (cmFree)
   if(!ids.length)return;soon=soon||{};
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
-  window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
+  // 🏫 tabs for a later class are no longer shown (Roger, 20 Nov 2026: "students still see to do activities and then they see activities in
+  // blue, because we have to do them in class, this shouldnt appear"): hidden like a locked tab until their class opens them (the timers
+  // below and class mode give them back in place), but still counted in the path's progress (wait), so a path never looks finished with
+  // tabs still to come. A tab the student had already started stays shown, frozen, with their answers (cls).
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon&&did(id)),wait=ids.filter(id=>id in soon&&!did(id)),hide=ids.filter(id=>!did(id)),ro=ids.filter(id=>did(id)&&!(id in soon));
+  const hidSteps=()=>a?hide.filter(id=>!wait.includes(id)).flatMap(id=>elSecSteps(a,id)):[];
+  window.EL_HIDDEN_STEPS=hidSteps();if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
   const today=elAgToday(),openAt=gid?elClassOpenAt(gid,today):null,hm=ms=>{const d=new Date(ms);return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")};
   const day=d=>d===today?(ca?"avui":"today")+(openAt?(ca?" a les ":" at ")+hm(openAt+5*60e3):""):(()=>{try{return new Date(d+"T12:00:00").toLocaleDateString(ca?"ca-ES":"en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}})();
@@ -488,8 +493,7 @@ function lockSections(ids,ca,a,done,soon,gid){
     +(did(id)?(ca?"Les teves respostes estan desades: les podràs continuar i canviar a classe. Fins llavors no es pot respondre ni posar els àudios o vídeos.":"Your answers are saved: you can carry on and change them in class. Until then you can't answer or play the audio or videos.")
       :(ca?"Ara ja ho pots mirar, però ho farem junts a classe: encara no pots respondre ni posar els àudios o vídeos.":"You can look at it now, but we'll do it together in class: you can't answer it or play the audio or videos yet."));
   const st=document.createElement("style");st.textContent=".panel.el-sec-off>:not(.el-sec-note){pointer-events:none}.panel.el-sec-off :is(audio,video,summary,[data-vs]){pointer-events:auto}"
-    +".panel.el-sec-cls>:not(.el-sec-note){pointer-events:none}.panel.el-sec-cls{box-shadow:0 0 0 3px #93c5fd,0 0 26px 4px #bfdbfecc!important;border-radius:16px}"
-    +".panel.el-sec-cls .el-sec-note{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}.tab.el-sec-cls{box-shadow:inset 0 0 0 2px #93c5fd;background:#eff6ff}.tab.el-sec-cls .tl::after{content:\" 🏫\"}"
+    +".panel.el-sec-cls>:not(.el-sec-note){pointer-events:none}"   // no blue any more (Roger, 20 Nov 2026): a plain grey note, like a tab to look back at
     +".tab.el-sec-hide,.panel.el-sec-hide{display:none!important}.el-sec-note{margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#f1f5f9;color:#334155;font-weight:600}";document.head.append(st);
   // nothing plays in a tab for class: a play started some other way (keyboard, script) stops at once
   if(cls.length)document.addEventListener("play",e=>{const m=e.target;if(m&&m.closest&&m.closest(".panel.el-sec-cls")){m.pause();try{m.currentTime=0}catch(x){}}},true);
@@ -513,7 +517,8 @@ function lockSections(ids,ca,a,done,soon,gid){
       p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.dataset.elro="1";e.disabled=true;e.tabIndex=-1}})})};
   apply();if(cls.length&&window.elProgress)window.elProgress();   // again, now the tabs for class are marked: never the "next" one
   // today's tabs for class open by themselves 5 minutes before the class (elClassOpenAt), on this page too: what was frozen is given back
-  const now0=cls.filter(id=>soon[id]===today);
+  const now0=cls.filter(id=>soon[id]===today),wait0=wait.filter(id=>soon[id]===today);
+  if(wait0.length&&openAt&&openAt>Date.now()&&openAt-Date.now()<18*3600e3)setTimeout(()=>window.elSecFree&&window.elSecFree(wait0),openAt-Date.now());   // hidden ones appear
   if(now0.length&&openAt&&openAt>Date.now()&&openAt-Date.now()<18*3600e3)setTimeout(()=>{cls=cls.filter(id=>!now0.includes(id));
     now0.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{t.classList.remove("el-sec-cls");t.removeAttribute("title")});
       const p=document.getElementById(id);if(!p)return;p.classList.remove("el-sec-cls");const n=p.querySelector(":scope>.el-sec-note");if(n)n.remove();
@@ -524,17 +529,17 @@ function lockSections(ids,ca,a,done,soon,gid){
   // 🎓 class mode opens steps for the class there and then (Roger, 12 Nov 2026: steps added during the class, several steps at once): they
   // are given back in place, hidden, 🏫 or read-only as they were, so nothing reloads (el-cloud.js cmFree; the agenda says so after a reload)
   window.elSecFree=list=>{const f=(list||[]).filter(id=>hide.includes(id)||cls.includes(id)||ro.includes(id));if(!f.length)return;
-    hide=hide.filter(id=>!f.includes(id));cls=cls.filter(id=>!f.includes(id));ro=ro.filter(id=>!f.includes(id));
+    hide=hide.filter(id=>!f.includes(id));cls=cls.filter(id=>!f.includes(id));ro=ro.filter(id=>!f.includes(id));wait=wait.filter(id=>!f.includes(id));
     f.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{t.classList.remove("el-sec-hide","el-sec-cls");t.removeAttribute("title")});
       const p=document.getElementById(id);if(!p)return;p.classList.remove("el-sec-hide","el-sec-cls","el-sec-off");const n=p.querySelector(":scope>.el-sec-note");if(n)n.remove();
       p.querySelectorAll("[data-elcls]").forEach(e=>{const k=e.dataset.elcls;delete e.dataset.elcls;e.removeAttribute("tabindex");
         if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true});
       p.querySelectorAll("[data-elro]").forEach(e=>{delete e.dataset.elro;e.removeAttribute("tabindex");e.disabled=false})});
-    window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];apply();if(window.elProgress)window.elProgress()};
+    window.EL_HIDDEN_STEPS=hidSteps();apply();if(window.elProgress)window.elProgress()};
   // a page left open from an earlier day (problem report, 2ESOA, 13 Nov 2026: a Chromebook closed after Thursday's class and opened again
   // in Friday's class kept Friday's tabs 🏫 frozen): every minute, the tabs whose class day has come open in place, like the timer above
-  if(cls.length){const reday=setInterval(()=>{if(!cls.length)return clearInterval(reday);const t=elAgToday(),op=gid?elClassOpenAt(gid,t):null;
-    const f=cls.filter(id=>soon[id]&&(soon[id]<t||soon[id]===t&&(!op||Date.now()>=op)));if(f.length)window.elSecFree(f)},60e3)}
+  if(cls.length||wait.length){const reday=setInterval(()=>{if(!cls.length&&!wait.length)return clearInterval(reday);const t=elAgToday(),op=gid?elClassOpenAt(gid,t):null;
+    const f=[...cls,...wait].filter(id=>soon[id]&&(soon[id]<t||soon[id]===t&&(!op||Date.now()>=op)));if(f.length)window.elSecFree(f)},60e3)}
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
