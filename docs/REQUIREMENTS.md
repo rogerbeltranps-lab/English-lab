@@ -54,7 +54,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 | Roger says | It means |
 | --- | --- |
 | **"merge"** | Approval to merge the PR. |
-| **"apply"** | Approval for a live write (Firestore data, uploading exam or checkpoint keys, importing marks, deleting an account). "merge" alone never covers it. |
+| **"apply"** | Approval for a live write (Firestore data, uploading exam or checkpoint keys, importing marks, deleting an account, deploying a new school script version). "merge" alone never covers it. |
 | **"send"** | Approval to send an email or message that was shown to him. |
 | "merge without asking" / "send without asking" | Approval for that one ask, not a standing rule. |
 
@@ -72,11 +72,11 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **His computers and accounts**
 
-- **Never act in Roger's browser or accounts without asking** (8 Nov 2026). Give him the link instead.
+- **Never act in Roger's browser or accounts without asking** (8 Nov 2026). Give him the link instead. **One exception** (Roger, 21 Nov 2026): Claude pastes and deploys new versions of the school Apps Script relay itself, in the browser built into the Claude app, once Roger says **"apply"** for that change. Every other browser or account action stays forbidden.
 - Setup on his computer: **one step at a time, one paste-ready command**, full paths filled in. Never ask him to paste a secret in the chat; for a key, give one Terminal line that copies `NAME=value` to the clipboard.
 - School Wi-Fi blocks github.com: on school days he needs his phone hotspot for anything that talks to GitHub.
 - Devices: Mac (`/Users/roger/Developer/English-lab-site`) and PC (`C:\Developer\English-lab`). Both fall behind `main`; pull when a device session starts.
-- New versions of the school Apps Script (mail relay, Gemini, Classroom): Claude writes the file in `/mnt/project-files/school-script/`; **Roger pastes and deploys it himself**. Scripts Roger runs himself must need no API to switch on and no Google Cloud setup (Prompts, 22 Oct 2026).
+- New versions of the school Apps Script (mail relay, Gemini, Classroom): Claude writes the file in `/mnt/project-files/school-script/`, shows what changes, and after Roger's **"apply"** pastes and deploys it in the Claude app's built-in browser (21 Nov 2026; Roger no longer pastes scripts by hand). Scripts Roger runs himself must need no API to switch on and no Google Cloud setup (Prompts, 22 Oct 2026).
 
 **Costs and scheduled tasks**
 
@@ -535,7 +535,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - PRs: the attribution block, assignee and reviewer `rogerbeltranps-lab`, screenshots for visual changes. Merge only on "merge" (or the problem-report standing approval for technical bugs).
 - Checks before a PR: `node --check` on changed JS, `git diff --check`, the repo checks that apply (`tools/vocab-cards/check.mjs`, `tools/answers-stay/…`), a Playwright look at 1366×768 (and 390×844 for student pages). Say honestly when a check was only programmatic.
 - Bump `?v=` cache keys when a shared file or media changes; tell Roger (and students) to hard reload.
-- `firestore.rules` publish by themselves on merge (GitHub Action). New school script versions: Roger pastes and deploys.
+- `firestore.rules` publish by themselves on merge (GitHub Action). New school script versions: Claude pastes and deploys them in the Claude app's browser after Roger's "apply" (section 1).
 - Preview without Firebase: `EL_DEMO_*` demo data and the invented students; never real data in previews.
 - Firestore: no new reads without need; the dashboard works from its browser copy and updates per group.
 - `teacher.html` belongs to this project; the separate LS (content) project must ask here for dashboard changes.
