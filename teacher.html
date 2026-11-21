@@ -1824,7 +1824,7 @@ function render0(){
     const fa=fpAct(ls,list),fw=fa?fpWaiting(fa,inG.filter(s=>!s.away&&!s.tester)):0;
     // the class briefing of Home for this group and LS (Roger, 10 Nov 2026: "vull que aquesta info estigui aqui"), above the tiles
     loadGames(grp.id);
-    $("#main").innerHTML=head+`<div class="gal">${al}</div>${briefBox(grp,ls)}<div class="tiles wide">`
+    $("#main").innerHTML=head+`<div class="gal">${al}</div>${briefBox(grp,ls)}${vyHome(grp,ls,inG.filter(s=>!s.away&&!s.tester))}<div class="tiles wide">`
       +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","open and lock, assessment criteria")
@@ -2118,6 +2118,12 @@ function body0(rows,srt,ST,nm){let red=false;
     return line+`<tr class="vy-${r.st}"><td class="muted">${i+1}</td><td class="stu"><a data-do="stu" data-u="${esc(r.s.uid)}">${name(r.s)}</a></td>`
       +`<td><span class="vybar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></span> <b>${r.done}</b> <small class="muted">/ ${r.total}</small></td>`
       +`<td class="vytodo">${todo}</td><td><b>${f1(r.m)}</b></td><td>${ST[r.st][0]} ${ST[r.st][1]}</td></tr>`}).join("")}
+// ⛵ the class map on the group's page itself (Roger, 21 Nov 2026: "I said I wanted to see this on the teacher's dashboard"): the students'
+// own map with every student's boat or van, under the class briefing; the list of who needs a push stays in ⛵ Class voyage
+function vyHome(grp,ls,studs){if(!VOY_COURSES.includes(grp.course)||!window.elVoyage)return "";
+  const fa=fpAct(ls),rows=studs.filter(s=>s.uid).map(s=>({s,...vySteps(s,ls,grp.id,fa)})),first=s=>(shortName(s).short||"").split(" ")[0];
+  const map=vyMap(grp,ls,rows,fa,first);if(!map)return "";
+  return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a></h2><div class="vymap">${map}</div></div>`}
 function vyBox(rows,srt,cnt,sea,body){
   return `<div class="box vyrank"><h2>⛵ Class voyage: who needs a push</h2><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map: the Time plan's activities in open learning paths and sections, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>`
     +`<div class="bar"><span class="muted">Order by ·</span> ${[["steps","Steps done"],["mark","LS mark"],["name","Name"]].map(([k,l])=>`<button class="chip ${srt===k?"on":""}" data-do="vysort" data-s="${k}">${l}</button>`).join("")}`

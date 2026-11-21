@@ -147,8 +147,8 @@
       try{const m=this.music=new Audio(S.A+S.snd.music);m.loop=true;m.volume=this.MV;let w=null;
         if(S.snd.amb){w=this.sea=new Audio(S.A+S.snd.amb);w.loop=true;w.volume=S.snd.ambVol;w.play().catch(()=>{})}
         // refused (no tap yet): forget both, the next tap tries again
-        m.play().catch(()=>{if(this.music===m){try{w&&w.pause()}catch(e){}this.music=this.sea=null}})}catch(e){}},
-    stopBg(){[this.music,this.sea].forEach(a=>{try{a&&a.pause()}catch(e){}});this.music=this.sea=null}};
+        m.play().then(()=>{this.ui&&this.ui()},()=>{if(this.music===m){try{w&&w.pause()}catch(e){}this.music=this.sea=null}this.ui&&this.ui()})}catch(e){}},
+    stopBg(){[this.music,this.sea].forEach(a=>{try{a&&a.pause()}catch(e){}});this.music=this.sea=null;this.ui&&this.ui()}};
   // the song starts with the first tap on the board (browsers allow sound only after one), and stops when the map is gone (another
   // place of the board), the tab is hidden or class mode starts
   // (pointerdown, click, keydown and touchend: Safari and touch screens count only some of them as a tap; the 🎵 button handles itself)
@@ -205,7 +205,7 @@
 .vy-sea.narrow .vy-b.big{width:64px;height:64px}.vy-sea.narrow .vy-boat .vy-b{width:46px;height:46px}.vy-sea.narrow .vy-boat b{font-size:10px;padding:1px 5px}.vy-sea.narrow .vy-boat{min-width:40px}
 .vy-dest.ok b::after{content:" ✓";color:#15803d}
 .vy-btn{position:absolute;bottom:12px;z-index:7;height:42px;border-radius:12px;background:#ffffffe6;display:flex;align-items:center;gap:6px;padding:0 12px;font:700 14px system-ui,sans-serif;box-shadow:0 1px 4px #0003;color:#1d3557;border:0;cursor:pointer}
-.vy-btn.off{opacity:.65}.vy-snd{right:66px}.vy-down{right:14px;width:42px;justify-content:center;padding:0;font-size:19px}
+.vy-btn.off{opacity:.65}.vy-btn.wait{animation:vywait 1.6s ease-in-out infinite}@keyframes vywait{50%{box-shadow:0 0 0 6px #fbbf2466}}.vy-snd{right:66px}.vy-down{right:14px;width:42px;justify-content:center;padding:0;font-size:19px}
 .vy-toast{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:9;width:min(440px,90%);background:#fbf3df;border:3px solid #b08a52;border-radius:18px;padding:14px 22px;text-align:center;box-shadow:0 6px 0 #8a6a3a,0 10px 30px #0004;transition:all .35s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
 .vy-toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}.vy-toast .big{font-size:42px;line-height:1}.vy-toast b{display:block;font:700 23px Georgia,serif;color:#4a2f0e;margin-top:4px}.vy-toast small{display:block;font-size:13.5px;color:#8a5a1f;margin-top:3px}.vy-toast small.ce{color:#9a3412;font-weight:700}
 .vy-ovl{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(#0b1f3acc,#0b1f3af2);opacity:0;pointer-events:none;transition:opacity .5s}.vy-ovl.on{opacity:1;pointer-events:auto}
@@ -328,7 +328,14 @@
     if(LAST[V.store]!=null&&LAST.w===W)sc.scrollTop=LAST[V.store];else toMe();LAST.w=W;
     sc.addEventListener("scroll",()=>{LAST[V.store]=sc.scrollTop},{passive:true});
     // buttons
-    const sb=sea.querySelector('[data-vy="snd"]'),setSb=()=>{const on=SND.on&&!SND.hush();sb.innerHTML=on?`🎵 <span>${t("Música sí","Music on")}</span>`:`🔇 <span>${t("Música no","Music off")}</span>`;sb.classList.toggle("off",!on)};setSb();
+    // the button says what is happening: playing → "Music on"; on but the browser is still waiting for a first tap (browsers never
+    // play sound before one) → "▶ Tap for music"; off → "Music off"
+    const sb=sea.querySelector('[data-vy="snd"]'),setSb=()=>{if(!sb.isConnected)return;const on=SND.on&&!SND.hush(),pl=on&&SND.music&&!SND.music.paused;
+      sb.innerHTML=!on?`🔇 <span>${t("Música no","Music off")}</span>`:pl?`🎵 <span>${t("Música sí","Music on")}</span>`:`▶ <span>${t("Toca per a la música","Tap for music")}</span>`;
+      sb.classList.toggle("off",!on);sb.classList.toggle("wait",on&&!pl)};SND.ui=setSb;setSb();
+    // try the music as soon as the map is drawn: it plays when the browser allows it (the page was reached with a click, or the site
+    // is trusted), else at the first tap anywhere on the page
+    SND.startBg();
     // a tap on 🎵 always does what it says: sound off → on; on but not playing yet (no tap on the page before) → it starts; playing → off
     sb.onclick=e=>{e.stopPropagation();
       if(SND.hush()){SND.force=true;SND.on=true;SND.startBg()}
