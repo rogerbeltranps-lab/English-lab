@@ -373,6 +373,18 @@
       +`<div class="vy-tip" style="top:${ft+95}px">🌫️ ${esc(wd("tip"))}</div>`}
     h+=destCard();
     map.innerHTML=h;
+    // no decoration under a vehicle, a stop, a label or a picture (Roger, 21 Nov 2026: "theres a microfone covered"): each one, with the
+    // way it swims or flies, moves up or down to the nearest free place, else it is left out
+    {const mr=map.getBoundingClientRect();if(mr.width){const bx=e=>{const r=e.getBoundingClientRect(),x=r.left-mr.left,y=r.top-mr.top;return [x,y,r.right-mr.left,y+Math.max(r.height,r.width<300?r.width:0)]},
+      cut=(a,b)=>a[0]<b[2]&&b[0]<a[2]&&a[1]<b[3]&&b[1]<a[3],
+      obs=[...map.querySelectorAll(".vy-st,.vy-lab,.vy-mates,.vy-you,.vy-pimg,.vy-port,.vy-dest,.vy-tip")].map(bx);
+      map.querySelectorAll(".vy-deco").forEach(el=>{const x=parseFloat(el.style.left),y=parseFloat(el.style.top),w=parseFloat(el.style.width)||64,
+          d=parseFloat(el.style.getPropertyValue("--d"))||0,m=el.classList.contains("fly")?150:el.classList.contains("swim")?70:0,
+          x0=Math.min(x,x+d*m)-8,x1=Math.max(x+w,x+w+d*m)+8,
+          hh=el.complete&&el.naturalWidth?w*el.naturalHeight/el.naturalWidth:w*1.75;   // not loaded yet: as tall as the tallest (the traffic light)
+        for(let k=0;k<=30;k++){const dy=(k%2?1:-1)*Math.ceil(k/2)*40,t=y+dy,b=[x0,t-12,x1,t+hh+12];
+          if(t<0||t+hh>total-90||obs.some(o=>cut(b,o)))continue;el.style.top=t+"px";obs.push(b);return}
+        el.remove()})}}
     // where the view starts: where it was, else my boat
     const toMe=b=>sc.scrollTo({top:Math.max(0,meXY[1]-sc.clientHeight*.55),behavior:b?"smooth":"auto"});
     const LK=V.store||V.view||"-";   // the scroll kept per map (the teacher's map: per group)
