@@ -280,3 +280,19 @@
   #tpmore .pbar em{display:block;height:100%;border-radius:99px}
   #tpmore .tpl+.tpl{margin-top:10px}
 }
+
+/* ⛵ Class voyage full screens on a phone (Roger, 21 Nov 2026, iPhone: "I can't see the full screen map well"): the map, the page and the
+   table really fill the screen. The tab bar goes away while they are on, the header is one short line (no Order by or counts on the map
+   full screen: the map shows them), and the notch and the home bar keep their room. */
+@media (max-width:640px){
+  body.hfs .elptabs,body.vfs .elptabs,body.hfs #fsctl,body.vfs #fsctl{display:none!important}
+  body.hfs .vyrank,body.vfs .vyrank{z-index:9100;padding-top:env(safe-area-inset-top,0px)!important;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))!important}
+  body.hfs .vyrank{padding-left:6px!important;padding-right:6px!important}
+  body.hfs .vyrank h2{font-size:15px;line-height:1.25;margin:4px 0!important;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+  body.hfs .vyrank .vyhd{padding:0 0 4px!important}
+  body.hfs .vyrank .vyhd .bar>.muted,body.hfs .vyrank .vyhd [data-do=vysort]{display:none}
+  body.hfs .vyrank .vyhd .bar{display:flex;flex-wrap:nowrap;gap:6px;margin:0;overflow-x:auto;scrollbar-width:none}
+  body.hfs .vyrank .vyfsb,body.hfs .vyrank h2 .chip{flex:none;font-size:12px;padding:4px 8px;min-height:0;white-space:nowrap;margin:0}
+  body.hfs .vyrank .vy-sea{border-width:2px;border-radius:14px}
+  body.hfs .vyrank .vy-top{padding:6px 12px}
+}
