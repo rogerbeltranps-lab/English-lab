@@ -1,7 +1,7 @@
-/* LS2 · Learning Path 5 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
+/* LS2 · Learning Path 4 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
 window.LP.study = {
   next: 3,
-  covers: { ca: 'Learning Paths 1–3 i 5', en: 'Learning Paths 1–3 and 5' },
+  covers: { ca: 'Learning Paths 1–4', en: 'Learning Paths 1–4' },
   today: { ca: 'tres coses que t’encanta fer (love + -ing) i dos consells de pantalles', en: 'three things you love doing (love + -ing) and two screen tips' },
   exam: { ca: 'd’aquest Learning Path surten el Listening (preguntes amb quatre opcions), el Vocabulary (gustos i consells de pantalles) i el Grammar (like + -ing, imperatius).', en: 'this Learning Path comes up in the Listening (questions with four options), the Vocabulary (likes and screen tips) and the Grammar (like + -ing, imperatives).' },
   check: [

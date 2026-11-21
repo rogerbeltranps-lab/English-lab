@@ -2,7 +2,7 @@
 window.LP.native = { check: {
  "type": "recall",
  "tab": "Checkpoint",
- "title": "Checkpoint 3: Learning Paths 1–3 and 5 (C2)",
+ "title": "Checkpoint 3: Learning Paths 1–4 (C2)",
  "pill": "No notes · one question at a time",
  "intro": "Answer with no notes or help: one question at a time, with no going back. Stay on this page until you send it. When you send it, the next Learning Path opens.",
  "secure": {

@@ -1,7 +1,7 @@
-/* LS2 · Learning Path 5 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
+/* LS2 · Learning Path 4 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
 window.LP.study = {
   next: 3,
-  covers: { ca: 'LS1, Learning Paths 1–3 i 5', en: 'LS1, Learning Paths 1–3 and 5' },
+  covers: { ca: 'LS1, Learning Paths 1–4', en: 'LS1, Learning Paths 1–4' },
   today: { ca: 'cinc paraules per organitzar un esdeveniment i dues frases sobre un pla (going to i will)', en: 'five words for planning an event and three sentences about a plan (going to, will, Present Continuous)' },
   exam: { ca: 'd’aquest Learning Path surten el Listening (preguntes amb quatre opcions), el Vocabulary (organitzar un esdeveniment) i el Grammar (going to, will, there will be).', en: 'this Learning Path comes up in the Listening (questions with four options), the Vocabulary (planning an event) and the Grammar (going to, will, Present Continuous for arrangements, Present Simple for timetables).' },
   check: [

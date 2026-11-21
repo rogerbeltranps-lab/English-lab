@@ -18,9 +18,9 @@ window.EL_GAMES=[
   {id:"2eso-ls2-lp2-grammar",act:"2eso/ls2-what-are-they-doing",title:"Grammar · Present Continuous",course:"2eso",emoji:"🎥",kind:"grammar",ls:"LS2 · Free Time, Live!",lp:"LP2 · What are they doing?"},
   {id:"2eso-ls2-lp3-vocab",act:"2eso/ls2-now-or-usually",title:"Vocabulary · Now or usually? Time words and sport",course:"2eso",emoji:"⛸️",kind:"vocab",ls:"LS2 · Free Time, Live!",lp:"LP3 · Now or usually?"},
   {id:"2eso-ls2-lp3-grammar",act:"2eso/ls2-now-or-usually",title:"Grammar · Present Simple or Present Continuous?",course:"2eso",emoji:"🔄",kind:"grammar",ls:"LS2 · Free Time, Live!",lp:"LP3 · Now or usually?"},
-  {id:"2eso-ls2-lp5-grammar",act:"2eso/ls2-likes-and-screen-tips",title:"Grammar · Likes and tips",course:"2eso",emoji:"❤️",kind:"grammar",ls:"LS2 · Free Time, Live!",lp:"LP5 · Likes and screen tips"},
-  {id:"4eso-ls2-lp5-vocab",act:"4eso/ls2-plan-the-day",title:"Vocabulary · Planning an event",course:"4eso",emoji:"🎪",kind:"vocab",ls:"LS2 · Seasons & Celebrations",lp:"LP5 · Plan the day"},
-  {id:"4eso-ls2-lp5-grammar",act:"4eso/ls2-plan-the-day",title:"Grammar · Future plans",course:"4eso",emoji:"📅",kind:"grammar",ls:"LS2 · Seasons & Celebrations",lp:"LP5 · Plan the day"},
+  {id:"2eso-ls2-lp5-grammar",act:"2eso/ls2-likes-and-screen-tips",title:"Grammar · Likes and tips",course:"2eso",emoji:"❤️",kind:"grammar",ls:"LS2 · Free Time, Live!",lp:"LP4 · Likes and screen tips"},
+  {id:"4eso-ls2-lp5-vocab",act:"4eso/ls2-plan-the-day",title:"Vocabulary · Planning an event",course:"4eso",emoji:"🎪",kind:"vocab",ls:"LS2 · Seasons & Celebrations",lp:"LP4 · Plan the day"},
+  {id:"4eso-ls2-lp5-grammar",act:"4eso/ls2-plan-the-day",title:"Grammar · Future plans",course:"4eso",emoji:"📅",kind:"grammar",ls:"LS2 · Seasons & Celebrations",lp:"LP4 · Plan the day"},
 ];
 // A game's name starts with its learning path (Roger, 7 Nov 2026: "games should have the name of the LP … they should start with LP1 and the
 // name they already have"): "LP2 · Vocabulary · Clothes, kit and weather". g = an EL_GAMES entry, a deck id, or a saved result ({deck, title,

@@ -169,8 +169,8 @@ window.LP = {
    },
    "title": "Chapter 3 · Who is M?",
    "pill": {
-    "en": "With LP3 + LP4",
-    "ca": "Amb LP3 + LP4"
+    "en": "With LP3 + LP6",
+    "ca": "Amb LP3 + LP6"
    },
    "intro": {
     "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
@@ -237,8 +237,8 @@ window.LP = {
    },
    "title": "Chapter 4 · Plan the day",
    "pill": {
-    "en": "With LP5",
-    "ca": "Amb LP5"
+    "en": "With LP4",
+    "ca": "Amb LP4"
    },
    "intro": {
     "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
@@ -305,8 +305,8 @@ window.LP = {
    },
    "title": "Chapter 5 · Gran’s story",
    "pill": {
-    "en": "With LP6",
-    "ca": "Amb LP6"
+    "en": "With LP5",
+    "ca": "Amb LP5"
    },
    "intro": {
     "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",

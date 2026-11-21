@@ -1,6 +1,6 @@
-/* LS2 · Learning Path 6 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others are the Daring version. */
+/* LS2 · Learning Path 5 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others are the Daring version. */
 window.LP.native = {
-  recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 3–5', pill: 'No notes',
+  recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 3, 4 and 6', pill: 'No notes',
     intro: 'Type the answers without looking.',
     items: [
       { q: '___ it rain, we will use the gym. (1 word)', a: ['should'], en: 'Inverted conditional.' },

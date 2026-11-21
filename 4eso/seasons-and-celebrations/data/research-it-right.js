@@ -1,6 +1,6 @@
-/* LS2 · Learning Path 4 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
+/* LS2 · Learning Path 6 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Research4ESO', n: 4, starter: true, title: 'Research it right',
+  key: 'ls2Research4ESO', n: 6, starter: true, title: 'Research it right',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },

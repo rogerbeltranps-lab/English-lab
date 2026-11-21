@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 4 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others (credit, card) are the Daring version. */
+/* LS2 · Learning Path 6 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others (credit, card) are the Daring version. */
 window.LP.native = {
   recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 2 and 3', pill: 'No notes',
     intro: 'Type the answers without looking.',

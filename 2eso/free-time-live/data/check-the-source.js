@@ -1,6 +1,6 @@
-/* 2 ESO · LS2 Free Time, Live! · Learning Path 4 · Check the source (LS criteria 4.2 and 6.2; term 2, before the final product) */
+/* 2 ESO · LS2 Free Time, Live! · Learning Path 6 · Check the source (LS criteria 4.2 and 6.2; term 2, before the final product) */
 window.LP = {
-  key: 'ls2Source2ESO', n: 4, starter: true, title: 'Check the source',
+  key: 'ls2Source2ESO', n: 6, starter: true, title: 'Check the source',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },

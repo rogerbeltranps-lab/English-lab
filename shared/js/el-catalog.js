@@ -118,11 +118,11 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["2.2","4.1","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint24ESO",1,C),
-        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",10,{steps:[["card","Research card"],["talk","Talk"]]}),
         L("plan-the-day.html","Plan the day",["2.2","5.1","3.2","CC1 1.3"],"ls2Plan4ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
         L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
+        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",10,{steps:[["card","Research card"],["talk","Talk"]]}),
         L("sample-exam.html","First exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false,optional:true}),   // Roger 19 Nov 2026: practice for the first exam (LP1, LP2, LP3 vocab + grammar)
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect4ESO",2,{graded:false,self:"self"})
@@ -140,11 +140,11 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
         L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint22ESO",1,C),
-        L("check-the-source.html","Check the source",["4.2","6.2"],"ls2Source2ESO",10,{steps:[["factfile","Fact file"],["talk","Talk"]]}),
         L("likes-and-screen-tips.html","Likes and screen tips",["2.2","5.1","3.2","CD4 4.5"],"ls2Tips2ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint32ESO",1,C),
         L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
+        L("check-the-source.html","Check the source",["4.2","6.2"],"ls2Source2ESO",10,{steps:[["factfile","Fact file"],["talk","Talk"]]}),
         L("sample-exam.html","First exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false,optional:true}),   // Roger 19 Nov 2026: "let's label it first exam" (practice, LP1 + LP2 only)
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
