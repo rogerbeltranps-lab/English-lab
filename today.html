@@ -589,7 +589,7 @@ function lsBeds(ls,info){
   const order=L&&L.lps?L.lps.map(r=>r.id):[],at=id=>{const i=order.indexOf(id);return i<0?999:i};
   const beds=EL_CATALOG.filter(a=>a.ls===ls.id&&!dr.includes(a.id)&&canDo(a,info)).sort((x,y)=>at(x.id)-at(y.id)).map(a=>{
     const ds=doneSet(a),gs=tabGroups(a,visSteps(a,info).filter(k=>!(a.skip||[]).includes(k))),r=order.length?L.lps.find(x=>x.id===a.id):null,n=r&&r.n||"";
-    return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional?"bonus":"lp",
+    return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional||a.sq?"bonus":"lp",
       plants:gs.map(g=>{const id=panelOf(a,g[0]),k=g.filter(x=>ds.has(x)).length;
         return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),later:g.every(x=>secOff(a,info,x)),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
   return beds}
@@ -633,7 +633,14 @@ function vyPlanned(ls,beds){beds=beds.filter(b=>!(window.elBookPath&&elBookPath(
   const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");
     if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));
   const out=beds.map(b=>b.kind==="fp"?b:Object.assign({},b,{plants:b.plants.filter(x=>on.has(b.id+"#")||on.has(x.key))})).map(one).filter(b=>b.plants.length);
+  vySq(ls,out);
   return out.filter(b=>b.kind!=="fp").concat(out.filter(b=>b.kind==="fp"))}
+// 🎲 each Surprise questions activity is a stop right after the last learning path it takes questions from (its SLPs, el-catalog.js
+// elSqList), so it sits where the class is on the road, not all of them at one place
+function vySq(ls,out){const A=window.elSqAct&&elSqAct(ls.id),i=A?out.findIndex(b=>b.id===A.id):-1;if(i<0)return;
+  const sb=out.splice(i,1)[0],L=elSqList(ls.id);
+  sb.plants.forEach(pl=>{const q=L.find(x=>x.id===pl.id),ids=new Set(((q&&q.tabs)||[]).map(t=>t.split("#")[0]));let at=-1;
+    out.forEach((b,j)=>{if(b.kind!=="fp"&&ids.has(b.id))at=j});out.splice(at<0?out.length:at+1,0,Object.assign({},sb,{kind:"bonus",plants:[pl]}))})}
 // 🏁 To win the race (Roger, 21 Nov 2026: "A message could pop up saying that to win the race they need to do all the activities pending"):
 // once a day, on the board's map, a card over the map when ✅ To do has something (the same count as the To do tile); ✅ See them opens it.
 // Not in class time or class mode (the class gets its own ✅ Finish all your activities card after the warm-up, el-todo.js remind).
@@ -1140,7 +1147,7 @@ async function goLive(){
   // 📌 a learning path pulled up by the teacher shows at once: only the LS docs of the group's open LSs (one read each when the board opens)
   const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};setInterval(pdraw,30e3);   // gone when the class it was made in ends (until)
   EL_LS.filter(l=>{const i=D.ls[l.id];return i&&i.status==="open"&&elLsForGroup(l,i,g)}).forEach(l=>F.onSnapshot(F.doc(db,"ls",l.id),x=>{const d=x.exists()?x.data():{},i=D.ls[l.id];
-    i.push=d.push||{};if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
+    i.push=d.push||{};if(window.elSqSync&&elSqAct(l.id))elSqSync(l.id,d.sq||{});if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
   const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsLine()};
   F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw()},e=>console.warn("points",e));
@@ -2069,7 +2076,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
-if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
+if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits);if(i&&i.sq&&window.elSqSync&&elSqAct(id))elSqSync(id,i.sq,true)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
   // signed out: the welcome page, where everyone signs in (Roger, 7 Nov 2026); el_who is already gone, so it does not send them back here
   if(!u){location.replace("index.html");return}

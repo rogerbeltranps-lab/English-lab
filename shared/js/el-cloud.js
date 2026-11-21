@@ -155,6 +155,7 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
+  if(window.elSqSync&&window.elSqAct&&elSqAct(id))elSqSync(id,d.sq||{});   // 🎲 the Surprise questions activities of this LS become its tabs (el-catalog.js)
   const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{},webExam:d.webExam||{}};
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
@@ -1712,6 +1713,7 @@ if(inShell){addEventListener("pagehide",()=>FSEV.forEach(t=>FD.removeEventListen
 function goTo(g,first){
   cmCheer(g);   // 🌟 the first 4 minutes of class mode (gone when it stops)
   cmRemind(g);   // ✅ Finish all your activities, once, when the teacher's warm-up ends
+  cmLook(g);   // 👀 Look at the screen, while the teacher shows the class map
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
@@ -1801,6 +1803,20 @@ function cmRemind(g){const r=g&&g.cm&&g.rem;if(!r||r.s!==g.s||!(Date.now()-r.at<
   const k="el_rem_seen";let was="";try{was=localStorage.getItem(k)||""}catch(e){}if(was===String(r.s))return;
   try{origSet.call(localStorage,k,String(r.s))}catch(e){}
   import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.remind()).catch(e=>console.warn("finish reminder",e))}
+// 👀 Look at the screen (Roger, 21 Nov 2026: "In class mode I want to be able to show this [the class map] to students, when I show it on the
+// panel, they see look at the panel"): while the teacher's class tab shows ⛵ the class map (el-cm-agenda.js mapOpen writes go.look = {s, at}
+// and clears it on ✕ Close), every student in that class mode gets a cover over the page; it goes when go.look goes (or after 15 minutes,
+// if the teacher's tab closed without clearing it). Their work stays as it is underneath. Not on the dashboard.
+const LOOK_MS=15*60e3;let lookT=0;
+function lookOff(){clearTimeout(lookT);const x=document.getElementById("el-look");if(x)x.remove()}
+function cmLook(g){const l=g&&g.cm&&g.look;if(!l||l.s!==g.s||!(Date.now()-l.at<LOOK_MS)||onDash||!user||!(isStudent(user)||AS))return lookOff();
+  clearTimeout(lookT);lookT=setTimeout(lookOff,Math.max(1e3,l.at+LOOK_MS-Date.now()));if(document.getElementById("el-look"))return;
+  const ca=lockCa(),x=document.createElement("div");x.id="el-look";x.setAttribute("role","alert");
+  x.innerHTML=`<div><span>👀</span><b>${ca?"Mira la pantalla!":"Look at the screen!"}</b><small>${ca?"Look at the screen!":"Mira la pantalla!"}</small></div>`
+    +`<style>#el-look{position:fixed;inset:0;z-index:2147482400;background:rgba(15,23,42,.82);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#fff;text-align:center}`
+    +`#el-look div{display:flex;flex-direction:column;align-items:center;gap:6px}#el-look span{font-size:clamp(70px,14vw,150px);line-height:1;animation:ellk 1.6s ease-in-out infinite}`
+    +`#el-look b{font-size:clamp(30px,5vw,56px)}#el-look small{font-size:clamp(16px,2vw,22px);opacity:.8}@keyframes ellk{50%{transform:scale(1.12)}}@media (prefers-reduced-motion:reduce){#el-look span{animation:none}}</style>`;
+  document.body.append(x)}
 const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
 // the 🌟 line sits under the 🎓 class mode bar: lockPad moves the page down by both (one place for it, #550 + #551)

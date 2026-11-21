@@ -48,6 +48,8 @@ window.ELMark=(function(){
           "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log. Never flag the Pro route for being too good. Still write the full correction: the teacher decides.",
           ...(L.length?["LEVEL: also give each text one level for criterion "+L.join(", ")+" (NA, AS, AN or AE), using the indicators below. They were written for this LS's final writing: apply the same demand to this smaller piece and its route's task (read the task first): did they do what the task asked and get the message across, and how many of the forms the task asks for are right (fewer than half NA, half AS, 7 in 10 AN, 9 in 10 AE). Judge against what their route asked (Starter and Base had more support and shorter tasks). Do not lower a level for small spelling slips. The student never sees the level: write nothing about it in the correction.",
             ...L.flatMap(c=>[o.crit&&o.crit[c]||c,...((o.ind||{})[c]||[]).map((d,i)=>`  ${DEG[i]}: ${d}`)])]:[])]
+        :o.mode==="surprise"?["🎲 SURPRISE QUESTIONS (Roger, 21 Nov 2026): the student pressed record and then answered four questions they had NOT seen before, from easy to harder ([Questions asked]); [Help used] = they tapped for help words. They never see a mark or a level, only what to improve.",
+          "Write as their teacher, in the first person, with no signature, warm and encouraging: ONE short sentence on something they did well, then the TWO or THREE most useful things to improve, each short and concrete: quote their words → the better version, or a tip (answer every question, add a reason or a detail, use the LS grammar such as now vs usually, a word they mispronounced from the Notes from the recording). Base it on the Transcript of the recording (written from the audio) and the Notes from the recording. Judge against their route (Starter and Base had help and shorter answers). Never correct spelling or punctuation. Never say the notes or the transcript came from a machine. A question left unanswered: one point says so kindly. An empty or silent recording: tell them kindly to do a new round and hand it in again."]
         :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. When there is also a Transcript of the recording (Transcripció de la gravació), it was written from the audio itself and is the more accurate one: base the correction on it. SPEAKING AND TALK are for learning (Roger, 8 Nov 2026): be encouraging, not strict; focus on whether they did the task and on their pronunciation, using the Notes from the recording (a listener heard the audio: task, pronunciation, well done, next time), with at most one grammar point and only if it blocks the meaning. Never say the notes or the transcript came from a machine. Empty work: tell them kindly to do it and hand it in again.",
           // Roger, 7 Nov 2026 (a Speaking transcript with 568 characters pasted got a normal correction): speech recognition never pastes,
           // so a transcript with a [paste log] was typed or pasted, not spoken. Clearly pasted ones (ELMark.pasted) go back to redo at once.
@@ -59,6 +61,7 @@ window.ELMark=(function(){
       `${V} | ${o.aid} | ${o.step} | ${o.group}`,
       ...(o.mode==="writing"?[`<code> | ${L.length?L.map(c=>c+"=<level>").join("; "):"-"} | <comment> ## <their words> => <correct form> :: <why> ## <their words> => <correct form> :: <why> ## TEXT: <their text corrected, changes in *asterisks*>`,
           `For a flagged text add a fourth part at the end of its line: <code> | ${L.length?"… ":"- "}| <the correction as above> | COPY? <short reason for the teacher, in English>`,...(L.length?["Levels must be exactly NA, AS, AN or AE."]:[])]
+        :o.mode==="surprise"?["<code> | - | <one thing done well> ## <thing to improve> ## <thing to improve> ## <thing to improve, optional>"]
         :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,...(o.mode==="reply"?[]:["For a transcript that was not spoken add a fourth part: <code> | - | <the correction> | COPY? pasted, not spoken"])]),
       "(one line per student, every code above, same order)","END",
       "Never write | inside the correction. Never add names."];
@@ -71,7 +74,7 @@ window.ELMark=(function(){
   const FORM={can:"My scores (1-4) for the unit goals",improve:"What improved most",helped:"What helped me most",goal:"My goal for the next LS"};
   function fbItems(st,skip,form){st=st||{};skip=skip||new Set();const out={},R=/_(beginners|insecure|safe|daring|native)$/,has=v=>String(v||"").trim();
     if(form){const f=Object.entries(st.form||{}).filter(([,v])=>has(v)).map(([k,v])=>({l:FORM[k]||k,v}));return (st.done||{})[form]&&f.length?{[form]:{fields:f,date:(st.doneAt||{})[form]||null,ty:null,title:"Reflection",mode:"reply"}}:{}}
-    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null,...(h.w?{mode:"writing"}:{})}}
+    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null,...(h.w?{mode:"writing"}:h.sq?{mode:"surprise"}:{})}}
     const keys=new Set([...Object.keys(st.drafts||{}),...Object.keys(st.finals||{}),...Object.keys(st.texts||{}).filter(k=>(st.done||{})[k.replace(R,"")])]);
     for(const k of keys){const id=k.replace(R,"");if(skip.has(id)||out[id])continue;const f=(st.finals||{})[k],t=(st.texts||{})[k],d=(st.drafts||{})[k];
       const text=has((f&&f.text)||t||(d&&d.text));if(!text)continue;
@@ -85,6 +88,10 @@ window.ELMark=(function(){
     for(const x of ps){const t=/^TEXT\s*:\s*([\s\S]*)$/i.exec(x),m=/^([\s\S]+?)\s*=>\s*([\s\S]+?)(?:\s*::\s*([\s\S]*))?$/.exec(x);
       if(t)text=t[1].trim();else if(m)rows.push("✗ "+m[1].trim()+" → "+m[2].trim()+(m[3]&&m[3].trim()?" — "+m[3].trim():""));else out.push(x)}
     return [out.join(" "),...(rows.length?["",...rows]:[]),...(text?["","✅ "+text]:[])].join("\n").trim()}
+  // 🎲 Surprise questions: "well done ## tip ## tip" from the sheet as the text the student gets (replies[step]): the sentence, then one
+  // "➜ " line per thing to improve (shared/js/el-corrections.js shows them under "Things to improve").
+  function sqText(fb){const ps=String(fb||"").split(/\s*##\s*/).map(x=>x.trim()).filter(Boolean);if(ps.length<2)return String(fb||"").trim();
+    return [ps[0],"",...ps.slice(1).map(x=>"➜ "+x.replace(/^➜\s*/,""))].join("\n")}
   // the writing log in words: "pasted 180 characters (the text has 200) · 40 keys typed · 3 min writing"
   function tyText(t){return `pasted ${t.p||0} characters (the text has ${t.n||0}) · ${t.k||0} keys typed · ${t.s>=60?Math.round(t.s/60)+" min":(t.s||0)+" s"} writing`}
   // the answer: {err} or {group, rows:[{code, lv:{c: level}, fb, flag (the COPY? reason or "")}], bad:[lines left out], missing:[codes without a line]}
@@ -186,5 +193,5 @@ window.ELMark=(function(){
   // 646 characters pasted for 383 kept, 271 keys in 16 s: "it's evident, why didn't you do it automatically?"): the characters pasted
   // beyond the final text (p − n) were deleted, and those keys are not counted as typed.
   const pasted=t=>{t=t||{};const n=+t.n||0,p=+t.p||0,typed=(+t.k||0)-Math.max(0,p-n);return n>=40&&p>=0.8*n&&typed<0.5*n};
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,sqText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
 })();

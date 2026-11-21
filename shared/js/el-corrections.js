@@ -25,6 +25,11 @@ function marked(orig,rows){const rs=[];for(const l of rows){const w=(ROW.exec(l)
   for(const [a,b] of rs){h+=esc(orig.slice(at,a))+'<span style="color:#b91c1c;text-decoration:underline wavy #ef4444;text-underline-offset:3px">'+esc(orig.slice(a,b))+'</span>';at=b}
   return h+esc(orig.slice(at))}
 export function writing(el,text,T,orig){const ls=String(text).split("\n"),rows=ls.filter(l=>l.startsWith("✗ ")),fixed=ls.find(l=>l.startsWith("✅ "));
+  const tips=ls.filter(l=>l.startsWith("➜ "));
+  // 🎲 Surprise questions (el-marking.js sqText): the sentence, then "➜ Things to improve" as a list; never a mark or a level
+  if(tips.length&&!rows.length&&!fixed){const note=ls.filter(l=>!l.startsWith("➜ ")).join("\n").trim();el.style.whiteSpace="normal";
+    el.innerHTML=(note?'<p style="margin:0 0 8px;white-space:pre-wrap">👍 '+esc(note)+'</p>':"")+'<b style="display:block;margin-bottom:4px">'+T("➜ Coses per millorar","➜ Things to improve")+'</b><ul style="margin:0;padding-left:20px">'
+      +tips.map(l=>'<li style="margin:2px 0">'+esc(l.slice(2))+'</li>').join("")+'</ul>';return}
   if(!rows.length&&!fixed){el.textContent=text;return}
   const note=ls.filter(l=>!l.startsWith("✗ ")&&!l.startsWith("✅ ")).join("\n").trim(),td="padding:6px 8px;border-top:1px solid #bbf7d0;vertical-align:top;text-align:left";
   el.style.whiteSpace="normal";
