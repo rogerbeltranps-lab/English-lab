@@ -396,8 +396,8 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // fetched in this visit (FRESH), never from an old copy.
 const CACHE={k:"el_t_cache_v1",db:null,
   open(){return this.db||(this.db=new Promise((ok,no)=>{const r=indexedDB.open("el-teacher",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}))},
-  async get(){try{const d=await this.open();return await new Promise((ok,no)=>{const q=d.transaction("kv").objectStore("kv").get(this.k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>no(q.error)})}catch(e){console.warn("cache",e);return null}},
-  async put(v){try{const d=await this.open();await new Promise((ok,no)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,this.k);t.oncomplete=ok;t.onerror=()=>no(t.error)})}catch(e){console.warn("cache",e)}}};
+  async get(k){try{const d=await this.open();return await new Promise((ok,no)=>{const q=d.transaction("kv").objectStore("kv").get(k||this.k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>no(q.error)})}catch(e){console.warn("cache",e);return null}},
+  async put(v,k){try{const d=await this.open();await new Promise((ok,no)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k||this.k);t.oncomplete=ok;t.onerror=()=>no(t.error)})}catch(e){console.warn("cache",e)}}};
 // Firestore times come back from IndexedDB as plain {seconds, nanoseconds}: give them toMillis/toDate again
 const revive=o=>{if(!o||typeof o!=="object")return o;if(Array.isArray(o)){o.forEach(revive);return o}
   const k=Object.keys(o);if(k.length===2&&typeof o.seconds==="number"&&typeof o.nanoseconds==="number"){o.toMillis=function(){return this.seconds*1e3+Math.floor(this.nanoseconds/1e6)};o.toDate=function(){return new Date(this.toMillis())};return o}
@@ -462,11 +462,27 @@ function build(L){const R=RAW,pg={};Object.entries(R.pg).forEach(([u,x])=>{pg[u]
   // (e.g. marks imported for an account that never signed in); "Not on the list" says what work it holds and links it to a list entry.
   Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:"",stub:true});
   return D}
+// ⚡ The dashboard opens at once from this device's copy (Roger, 21 Nov 2026, on his iPhone: "It took ages to open"; it stayed on
+// "Loading your groups and students…"). Before, every open waited for the light documents from Firestore (LS settings, ticks, problems,
+// checkpoint keys…), and a device with no copy of the students' work (a phone, or Safari after it clears a site's storage) fetched all
+// of it first (~1,600 documents, about 17 MB) before showing anything. Now the light part is kept in the copy too (LIGHT_K, saved after
+// every fresh read), so an open with a copy draws the page from it straight away (D.copy) and reads the light part in the background
+// (start). While D.copy is on, nothing is written from it: no marks so far (progSync), no due announcement emails (annDue), no Time plan
+// ticks (tkOk/ttOk off), no healing of old lock lists (optHeal). The page also asks the browser to keep its storage (navigator.storage.persist).
+const LIGHT_K="el_t_light_v1";
+const saveLight=L=>{try{const o=Object.assign({},L);delete o.tkOk;delete o.ttOk;CACHE.put({v:1,at:Date.now(),light:plainT(o)},LIGHT_K)}catch(e){console.warn("light copy",e)}};
+async function fromCopy(){if(DEMO||RAW)return null;
+  const [c,l]=await Promise.all([CACHE.get(),CACHE.get(LIGHT_K)]);
+  if(!c||c.v!==1||!c.raw||!l||l.v!==1||!l.light)return null;
+  RAW=revive(c.raw);AT=c.at||{all:0,g:{}};
+  const L=Object.assign(revive(l.light),{copy:true,tkOk:false,ttOk:false});["ls","tk","ck","replies"].forEach(k=>L[k]=L[k]||{});["pb","sg","ann"].forEach(k=>L[k]=L[k]||[]);
+  return build(L)}
+try{if(!DEMO&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}catch(e){}
 // mode: undefined = open (the copy if there is one), "all", or a group id
 async function load(mode){
   if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];DEMO.tkOk=true;cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});corrInject(DEMO);return DEMO}
   if(!RAW&&mode!=="all"){const c=await CACHE.get();if(c&&c.v===1&&c.raw){RAW=revive(c.raw);AT=c.at||{all:0,g:{}}}}
-  const L=loadLight();
+  const L=loadLight().then(x=>{saveLight(x);return x});
   if(!RAW||mode==="all")await loadAll();else if(mode&&GR.some(g=>g.id===mode))await loadGroup(mode);
   const D=build(await L);if(mode||!AT.saved){AT.saved=1;saveCache()}return D}
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
@@ -791,13 +807,13 @@ const CPSYNC=new Set();
 // the hashes students check their score against as soon as they send (elCpScore in el-catalog.js): cpHash/{key}, rewritten when the
 // accepted answers change (cpKeys.hv = a short signature of them, so no extra read tells whether it is up to date)
 const cpSig=K=>{const j=JSON.stringify(Object.keys(K.items||{}).sort().map(id=>[id,cpAccepted(K,id)]));let h=5381;for(let i=0;i<j.length;i++)h=(h*33+j.charCodeAt(i))>>>0;return "v1-"+h.toString(36)};
-async function cpHashSync(key,force){const K=S.D.ck[key];if(DEMO||!K||!K.items)return;const sig=cpSig(K);if(!force&&K.hv===sig)return;
+async function cpHashSync(key,force){const K=S.D.ck[key];if(DEMO||!K||!K.items||S.D.copy&&!force)return;const sig=cpSig(K);if(!force&&K.hv===sig)return;
   const items={};for(const id of Object.keys(K.items))items[id]=await Promise.all([...new Set((cpAccepted(K,id)||[]).map(cpNorm))].map(v=>elCpHash(key,id,v)));
   await F.setDoc(F.doc(db(),"cpHash",key),{items,at:F.serverTimestamp()});await F.setDoc(F.doc(db(),"cpKeys",key),{hv:sig},{merge:true});K.hv=sig}
 var CPHASHED=false;   // once per dashboard load, as soon as the keys are there (cpInject)
-function cpHashAll(){if(CPHASHED||DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user)||!S.D||!S.D.ck)return;CPHASHED=true;
+function cpHashAll(){if(CPHASHED||DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user)||!S.D||!S.D.ck||S.D.copy)return;CPHASHED=true;
   Object.keys(S.D.ck).forEach(k=>cpHashSync(k).catch(e=>console.warn("checkpoint hashes",k,e)))}
-function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user))return;
+function cpSync(ls,grp,studs){if(DEMO||S.D.copy||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user))return;
   const key0=ls+"|"+grp.id;if(CPSYNC.has(key0))return;CPSYNC.add(key0);
   const ops=[],info=S.D.ls[ls]||{},kids=studs.filter(s=>!s.tester&&!s.away&&s.group===grp.id);
   acts(ls).filter(a=>a.checkpoint).forEach(a=>{const K=S.D.ck[a.keys[0]];if(!K)return;
@@ -1495,7 +1511,8 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()
 // continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
 // (a missing piece counts 0 once its day has passed, S.dueZero; not marked yet is left out) in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
 // and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
-function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
+function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g))||S.D.copy)return;   // D.copy: the ticks may be old (freshen)
+
   if(g.gv&&g.gv.parts.some(p=>p.games)){loadGames();if(!GAMES[S.g]||GAMES[S.g].busy)return}   // the class games part: wait for the group's games (loadGames renders again)
   S.tickZ=null;const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
   const l=EL_LS.find(x=>x.id===S.ls),segIts=l?withS("yShare","plan",()=>lsItems(l,S.g)).filter(it=>it.seg):[];   // 🔒 closed terms: the daily work split by term
@@ -1536,7 +1553,7 @@ function ttSave(T){const st=elTTStore(T),ps=[F.setDoc(F.doc(db(),"settings","tim
   GR.forEach(g=>ps.push(F.setDoc(F.doc(db(),"live",g.id),{tt:{slots:st.groups[g.id]||[],off:st.off,len:st.len}},{merge:true})));
   return Promise.all(ps)}
 // the group's copy is checked whenever its live document comes in (fsWatch), and written again if it is not the same
-function ttHeal(gid,x){if(DEMO||!x||!window.EL_TIMETABLE)return;const st=elTTStore(EL_TIMETABLE),want={slots:st.groups[gid]||[],off:st.off,len:st.len};
+function ttHeal(gid,x){if(DEMO||(S.D&&S.D.copy)||!x||!window.EL_TIMETABLE)return;const st=elTTStore(EL_TIMETABLE),want={slots:st.groups[gid]||[],off:st.off,len:st.len};
   if(JSON.stringify(x.tt||null)!==JSON.stringify(want))F.setDoc(F.doc(db(),"live",gid),{tt:want},{merge:true}).catch(e=>console.warn("timetable",e))}
 const TTE={d:null,msg:""};   // the draft being edited
 const ttDraft=()=>TTE.d||(TTE.d={groups:Object.fromEntries(GR.map(g=>[g.id,((EL_TIMETABLE.groups||{})[g.id]||[]).slice()])),off:elOffList(EL_TIMETABLE.off).map(o=>o.slice()),len:+EL_TIMETABLE.len||60});
@@ -4878,9 +4895,9 @@ document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target
   if(agSame(AGD,z)){z.classList.remove("agover");const v=agInsAt(z,AGD,e);if(v!=null)AGD.ins=v;return}agInsOff();z.classList.add("agover")});
 document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover","agcopy");agInsOff()}});
 document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");
-  if(z&&agCopyTo(AGD,z)){e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");agInsOff();z.classList.remove("agcopy");if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");return agCopy(k,z,k.ins)}
+  if(z&&agCopyTo(AGD,z)){e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");agInsOff();z.classList.remove("agcopy");if(!S.D.tkOk)return alert(S.D.copy?"Your ticks are still loading: try again in a few seconds.":"Your ticks did not load: reload the page before changing the agenda.");return agCopy(k,z,k.ins)}
   if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
-  agInsOff();if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");
+  agInsOff();if(!S.D.tkOk)return alert(S.D.copy?"Your ticks are still loading: try again in a few seconds.":"Your ticks did not load: reload the page before changing the agenda.");
   if(agSame(k,z)){if(k.ins!=null)agReorder(k,k.from,k.ins);return}agDrop(k,z.dataset.agdrop)});
 // Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
 // (speaking: its transcript), state.finals[key] = {text, changed, at} the improved version; key = step + "_" + route. Older texts
@@ -5126,7 +5143,8 @@ async function annMail(a){const o={hold:S.hold,now:S.mailNow};   // taken now: t
     +(await mailStudents(mailTo(en),"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false),o))}
 // scheduled announcements with ✉️: emailed by the first dashboard open after their time; a transaction marks them mailed first, so two
 // open dashboards (Mac, PC, phone) never send it twice
-function annDue(){if(DEMO||S.annDue)return;const due=(S.D&&S.D.ann||[]).filter(a=>a.mail&&!a.mailed&&a.at&&annMs(a.at)<=Date.now());if(!due.length)return;S.annDue=true;
+function annDue(){if(DEMO||S.annDue||!S.D||S.D.copy)return;   // D.copy: an email may have gone since the copy (freshen)
+const due=(S.D&&S.D.ann||[]).filter(a=>a.mail&&!a.mailed&&a.at&&annMs(a.at)<=Date.now());if(!due.length)return;S.annDue=true;
   (async()=>{for(const a of due){const ref=F.doc(db(),"announcements",a.id);
     const mine=await F.runTransaction(db(),async tx=>{const d=await tx.get(ref);if(!d.exists()||d.data().mailed)return false;tx.update(ref,{mailed:Date.now()});return true}).catch(e=>{console.warn("annDue",e);return false});
     a.mailed=true;if(mine)mailNote(annMail(a),"A scheduled announcement")}})().finally(()=>S.annDue=false)}
@@ -6624,12 +6642,23 @@ function optHeal(D){if(DEMO||!D||!D.ls)return;const ps=[];
   Object.entries(D.ls).forEach(([ls,info])=>Object.entries((info&&info.locked)||{}).forEach(([g,ids])=>{
     if(!Array.isArray(ids)||!ids.some(id=>elOptional(byId(id))))return;const op=(info.open||{})[g];ps.push(api.lpOpen(ls,g,Array.isArray(op)?op:[]))}));
   if(ps.length)Promise.all(ps).catch(e=>console.warn("optHeal",e))}
-const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
+const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;
+  // ⚡ a copy on this device: the page at once, the light part read in the background (fromCopy, freshen)
+  if(!S.D){let C=null;try{C=await fromCopy()}catch(e){console.warn("copy",e)}
+    if(C){S.D=C;ttApply(C);TOUCHED.clear();firstDraw();freshen();return}
+    $("#main").innerHTML=RAW||DEMO?'<p class="muted" id="loading">⏳ Loading your groups and students…</p>'
+      :'<p class="muted" id="loading">⏳ Loading your groups and students…</p><p class="muted small">The first time on this device it fetches all your students\' work, so it can take a minute. Next time the dashboard opens at once.</p>'}
   try{S.D=await load();ttApply(S.D);optHeal(S.D)}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
-  // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
-  TOUCHED.clear();
+  TOUCHED.clear();firstDraw()};
+// the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
+function firstDraw(){
   if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());return}}
-  render();corrFresh();if(hashPb()!=null)toProbs(hashPb())};
+  render();corrFresh();if(hashPb()!=null)toProbs(hashPb())}
+// the light part read while the page shows the copy: then the page is drawn again from it (as liveDraw does: never while typing or
+// with a window open). Something that already replaced the copy (Update all, the daily update, a save's read-back) wins. Failed: again in 1 minute.
+async function freshen(){let D;try{D=await load()}catch(e){console.warn("load",e);S.copyErr=true;loadBar();setTimeout(freshen,60e3);return}
+  S.copyErr=false;if(!S.D||!S.D.copy){loadBar();return}
+  S.D=D;ttApply(D);optHeal(D);LIVE.pend=true;liveDraw();corrFresh()}
 // "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
@@ -6638,7 +6667,8 @@ function loadBar(){const e=$("#loadbar");if(!e||DEMO&&!window.EL_LIVE_DEMO)retur
     +`<button class="mini" data-load="${g.id}" title="Fetch this group's whole work now, with the student list and levels">🔄 Update ${esc(g.name)}</button>`;return}
   e.innerHTML=`Students' work${g?` in <b>${esc(g.name)}</b>: as of ${whenAt(AT.g[g.id])}`:`: ${GR.map(x=>esc(x.name)+" "+whenAt(AT.g[x.id])).join(" · ")}`}. `
     +(g?`<button class="mini" data-load="${g.id}" title="Fetch this group's latest work (about a quarter of everything)">🔄 Update ${esc(g.name)}</button> `:"")
-    +`<button class="g mini" data-load="all" title="Fetch every group's latest work (the most reads: use it rarely)">Update all</button>`}
+    +`<button class="g mini" data-load="all" title="Fetch every group's latest work (the most reads: use it rarely)">Update all</button>`
+    +(S.D&&S.D.copy?(S.copyErr?` <span class="muted">⚠ Messages and settings could not be checked: trying again in a minute.</span>`:` <span class="muted">⏳ Checking new messages and settings…</span>`):"")}
 document.addEventListener("click",async ev=>{const b=ev.target.closest("[data-load]");if(!b)return;const m=b.dataset.load;
   document.querySelectorAll("[data-load]").forEach(x=>x.disabled=true);b.textContent="⏳ Fetching…";
   try{S.D=await load(m);TOUCHED.clear();LIVE.since={};render()}catch(e){console.warn("load",e);alert("Could not fetch: "+e.message);loadBar()}});
