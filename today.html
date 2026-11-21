@@ -35,7 +35,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 @media (max-width:640px){.mkskr{grid-template-columns:minmax(0,1fr)}.mkskr .mkskn{margin-top:2px}}
 .box.mkc{border-radius:18px;padding:16px 20px;margin:0}.mkc h2{margin:0;font-size:1.15rem;letter-spacing:-.01em}
 .mkhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.mksub{color:#64748b;font-size:14px;margin:4px 0 0}.mkbig{flex:none;text-align:right}
-.mksplit{display:flex;gap:4px;height:12px;margin:14px 0 4px}.mksplit span{border-radius:6px;background:#e2e8f0;position:relative;overflow:hidden}.mksplit i{position:absolute;inset:0 auto 0 0;background:#16a34a}
+.mksplit{display:flex;gap:4px;margin:14px 0 4px}.mksplit>div{min-width:0}.mksplit>div>span{display:block;height:12px;border-radius:6px;background:#e2e8f0;position:relative;overflow:hidden}.mksplit i{position:absolute;inset:0 auto 0 0;background:#16a34a}.mksplit small{display:block;margin-top:5px;font-size:13px;font-weight:700;line-height:1.2;color:#475569;overflow-wrap:anywhere}a.hmk{display:block;flex:0 1 430px;min-width:260px;margin-left:auto;padding:8px 14px 6px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;text-decoration:none}a.hmk:hover,a.hmk:focus-visible{border-color:#3157d5}.hmk .hmkh{display:flex;align-items:baseline;gap:8px;font-size:14px}.hmk .hmkh>b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.hmk .hmkv{margin-left:auto;white-space:nowrap;color:#475569;font-size:13px}.hmk .hmkv b{font-size:17px;color:#0f172a}.hmk .hmkv em{font-style:normal;color:#94a3b8;margin-left:6px}.hmk .hmkv .dgm{transform:scale(.85);transform-origin:right center}.hmk .hmkgo{color:#3157d5;font-weight:800}.hmk .mksplit{margin:6px 0 0}.hmk .mksplit>div>span{height:9px}.hmk .mksplit small{font-size:11.5px;margin-top:3px}#lvl a.hmk{margin:8px 0 0;flex:none}.hvtop{display:flex;align-items:center;gap:8px 12px;margin:4px 0 10px}.hvtop .vy-chips{flex:1 1 auto;margin:0;min-width:0}.hvtop a.hmk{flex:0 0 350px}@media (min-width:1180px){.hvtop a.hmk{margin-top:-22px}}@media (max-width:1179px){.hvtop{flex-wrap:wrap}.hvtop a.hmk{flex:1 1 100%;margin-left:0}}
 .mkparts{list-style:none;margin:6px 0 0;padding:0}.mkparts li+li .mkr{border-top:1px solid #f1f5f9}
 .mkr{display:grid;grid-template-columns:34px minmax(0,1fr) auto 16px;gap:12px;align-items:center;width:100%;padding:10px 8px;border-radius:12px;background:none;color:inherit;text-align:left;font:inherit}
 button.mkr:hover{background:#f8fafc}.mki{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:#f1f5f9}
@@ -148,7 +148,7 @@ dialog.fxd{max-width:640px}.fxpt{margin:2px 0 10px;display:flex;flex-direction:c
 <style>/* Simple board (Roger, 6 Nov 2026): a home with one Continue button and four places; Chromebook screens first */
 body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.4em 0 .1em}body[data-place="home"] #sub{font-size:17px;margin:0 0 14px}
 #crumb a.back{display:inline-flex;align-items:center;gap:4px;margin:6px 0 0;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}#crumb a.back:hover{background:#eaf0ff}
-.vy-chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}a.vy-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;text-decoration:none;font-size:14px;font-weight:600}a.vy-chip:hover{border-color:#3157d5}a.vy-chip b{background:#3157d5;color:#fff;border-radius:999px;padding:0 7px;font-size:12px}a.vy-chip.late{background:#fef2f2;border-color:#fca5a5;color:#991b1b}a.vy-chip.news{background:#fff7ed;border-color:#fdba74;color:#9a3412}a.vy-chip.news b{background:#ea580c}
+.vy-chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px}a.vy-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;text-decoration:none;font-size:14px;font-weight:600}a.vy-chip:hover{border-color:#3157d5}a.vy-chip b{background:#3157d5;color:#fff;border-radius:999px;padding:0 7px;font-size:12px}a.vy-chip.late{background:#fef2f2;border-color:#fca5a5;color:#991b1b}a.vy-chip.news{background:#fff7ed;border-color:#fdba74;color:#9a3412}a.vy-chip.news b{background:#ea580c}
 .hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start;margin-top:6px}.hl{display:flex;flex-direction:column;gap:12px;min-width:0}
 .cont{background:#3157d5;color:#fff;border-radius:20px;padding:16px 22px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 24px #3157d533}.cont .ck{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ff}
 .cont .ct{font-size:22px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:16px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
@@ -561,7 +561,7 @@ function homeHtml(lss,ls,info){
   // 🎯 the student's level and route in the free space right of the greeting (Roger, 7 Nov 2026: "here I want their level
   // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
   const lvBox=levelBox(ls);
-  const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
+  const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox+(vyOn(ls)?"":markMini(ls));
   // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
   // estigui on està el requadre blau")
   // ⛵ the voyage: a row of small links (late, news, To do, Homework, My notebook) over the map
@@ -569,7 +569,7 @@ function homeHtml(lss,ls,info){
   if(vyOn(ls)){const chip=(h,i,l,b,cl)=>`<a class="vy-chip${cl?" "+cl:""}" href="${h}">${i} ${l}${b?` <b>${b}</b>`:""}</a>`;
     return voyageHome(ls,info,nx,(miss?chip("#marks","⏰",miss>1?t(`${miss} endarrerides`,`${miss} late`):t("1 endarrerida","1 late"),"","late"):"")
       +(unread?chip("#news","📣",t("Anuncis","News"),unread,"news"):"")+chip("#todo","✅",t("Per fer","To do"),ntd||"")+chip("#homework","📝",t("Deures","Homework"),hwOpen.length||"")
-      +chip(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),""))}
+      +chip(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),""),markMini(ls))}
   const gc=gamesCard(ls);
   // 🌱 My garden right under them, before the current LS (Roger, 17 Nov 2026): gardenHtml
   if(/class="hal games nbk"/.test(gc))return `<div class="hgrid nbswap"><div class="hl">${alerts}${gc}</div><div class="hr">${cont}<div class="tiles">${tiles}</div></div></div>`+gardenHtml(ls,info)+lsNowHtml(ls,info,nx);
@@ -703,9 +703,9 @@ function voyageKeep(ls,V){try{const M=elVoyage.model(V),k=x=>elVoyage.sk(x,EN);
   const sk=elVoyage.skin(V);
   localStorage.setItem("el_voyage_steps",JSON.stringify({u:AS||(U&&U.uid)||"demo",ls:ls.id,at:Date.now(),en:EN,now:V.now,fp:V.fp,vb:[sk.veh.icon,...sk.w.map],
     items:M.items.map(x=>x.port?{p:x.port.f,c:x.port.c,ok:!!x.done}:(o=>({k:x.key,h:x.href,t:x.t,s:o.n,i:o.i,c:o.c,d:!!x.done}))(k(x.sk)))}))}catch(e){}}
-function voyageHome(ls,info,nx,top){S.vy=voyageData(ls,info,nx);voyageRoad(ls,S.vy);voyageKeep(ls,S.vy);
+function voyageHome(ls,info,nx,top,side){S.vy=voyageData(ls,info,nx);voyageRoad(ls,S.vy);voyageKeep(ls,S.vy);
   if(window.elNbFab)elNbFab(new URL(lsHref(ls)+"#notes",location.href).href);   // the floating 📓 button, as the notebook card did
-  return `<div class="vy-chips">${top}</div>`+elVoyage.html(S.vy)+lsNowHtml(ls,info,nx)}
+  return (side?`<div class="hvtop"><div class="vy-chips">${top}</div>${side}</div>`:`<div class="vy-chips">${top}</div>`)+elVoyage.html(S.vy)+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
@@ -907,7 +907,7 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
   if(M&&!M.only)parts.push(["daily","📚",t("Feina de cada dia","Everyday work"),M.w.daily,dSub,M.daily,"daily"]);
   if(hasFp(ls)||(M&&M.w.fp))parts.push(["fp","🎬",t("Producte final","Final product"),M?M.w.fp:0,hasFp(ls)?fpSub(ls):"",M?M.fp:null,hasFp(ls)?"fp":null]);
   parts.push(["ex","📝",t("Examen","Exam"),M?M.w.exam:0,eSub,M?M.exam:null,"exam"]);
-  const bar=M?`<div class="mksplit" aria-hidden="true">${parts.filter(x=>x[3]).map(x=>`<span style="flex:${x[3]}" class="mk-${x[0]}"><i style="width:${x[5]==null?0:Math.max(0,Math.min(100,x[5]*10))}%"></i></span>`).join("")}</div>`:"";
+  const bar=mkSplit(ls,M);
   const lsn=window.elLsNum?elLsNum(ls):"LS",closed=(D.ls[ls.id]||{}).status==="closed";
   const hero=`<section class="box mkc mkhero"><div class="mkhd"><div><h2>${closed?t(`La meva nota de ${lsn}`,`My ${lsn} mark`):t(`La meva nota de ${lsn} fins ara`,`My ${lsn} mark so far`)}</h2><p class="mksub">${closed?t("Aquesta LS ja s'ha acabat. Clica una part per veure'n el detall.","This LS is over. Click a part to see the details."):t("Canvia cada dia amb la teva feina. Clica una part per veure'n el detall.","It changes every day with your work. Click a part to see the details.")}</p></div>`
       +`<div class="mkbig">${PP?`<span class="mkpt"><b>${pt1(PP.got)}<i> / ${pt1(PP.of)}</i></b><small> ${t("punts fins ara","points so far")}</small><em>${t(`${pt1(PP.left)} punts per fer`,`${pt1(PP.left)} points to do`)}</em></span>`:M&&M.total!=null?dgMark(M.total,true):`<span class="mkm no">${t("encara no","not yet")}</span>`}</div></div>${bar}`
@@ -925,6 +925,19 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
         +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftNames(a,o);return `<li><b>${esc(a.title)}</b><small>${ln.length?ln.map(esc).join(" · ")+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${a.path}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
         +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+`</section>`}}
   return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div>${mkSkills(ls)}<div id="ptbox">${pointsLine()}</div>`}
+// The LS mark's parts as one bar: each part as wide as its share of the mark, filled by its mark so far, and its name under it (Roger, 21 Nov
+// 2026: "below each bar what it is: Everyday work, Final Product, Exam"). On 📊 My marks (marksHome) and on My dashboard (markMini).
+function mkSplit(ls,M){if(!M)return "";const ps=[];if(!M.only)ps.push(["daily",M.w.daily,M.daily]);
+  if(hasFp(ls)||M.w.fp)ps.push(["fp",M.w.fp,M.fp]);ps.push(["exam",M.w.exam,M.exam]);
+  return `<div class="mksplit">${ps.filter(x=>x[1]).map(([k,w,m])=>`<div style="flex:${w}" class="mk-${k}"><span aria-hidden="true"><i style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></i></span><small>${t(PT_NM[k][1],PT_NM[k][2])}</small></div>`).join("")}</div>`}
+// 📊 My LS mark so far, small, on My dashboard (Roger, 21 Nov 2026: "I want this here", the empty space under 🎯 My level): the same numbers
+// as 📊 My marks (points until every part has a mark, then the LS mark) and the same bar with each part's name; a click opens My marks.
+// Nothing new is read.
+function markMini(ls){if(!ls||all())return "";const M=lsMarks(ls);if(!M)return "";
+  const P=lsPts(ls,M),PP=P&&!P.all&&!M.only?P:null,lsn=window.elLsNum?elLsNum(ls):"LS",closed=(D.ls[ls.id]||{}).status==="closed";
+  const v=PP?`<b>${pt1(PP.got)}</b> / ${pt1(PP.of)} ${t("punts","points")}`
+    :M.total!=null?dgMark(M.total):t("encara no","not yet");
+  return `<a class="hmk" href="#marks"><span class="hmkh"><b>📊 ${closed?t(`La meva nota de ${lsn}`,`My ${lsn} mark`):t(`La meva nota de ${lsn} fins ara`,`My ${lsn} mark so far`)}</b><span class="hmkv">${v}</span><span class="hmkgo" aria-hidden="true">›</span></span>${mkSplit(ls,M)}</a>`}
 // 📊 How you are doing in each skill, on My marks (Roger, 20 Nov 2026: "this should appear in my marks", the LS home's card, el-ls-home.js
 // skillsCard): for this LS, each skill's % in the activities (all tries, ELCharts.work as 🎓 My progress) and in the exam (its parts), the
 // exam only once its results are out (held or before showFrom: the day they come out instead).
