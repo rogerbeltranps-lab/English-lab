@@ -14,6 +14,8 @@
 // then the column on the right is 🧭 Class steps, the share of the group who did each step (classCol); who(key) gives the names
 // for a tap on a step or a place (teacher only).
 (function(){
+  // loaded once: a second copy of this file would start a second song over the first (Roger, 21 Nov 2026: "im hearing two songs here")
+  if(window.elVoyage)return;
   const BASE=(()=>{try{return new URL("../",document.currentScript.src).href}catch(e){return "shared/"}})();
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   // the ports, in the real order of the voyages; fest = the celebration line and picture for an LS about celebrations
