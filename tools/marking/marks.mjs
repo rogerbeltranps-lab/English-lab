@@ -3,7 +3,10 @@
 // Firestore, so Claude can mark the Reading log, Listening chart and Research card / Fact file without Roger's computer.
 //   node tools/marking/marks.mjs ready                                   steps with hand-ins without a level, per group, and when they are ready
 //   node tools/marking/marks.mjs fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <file> [--apply]
-//        the same for corrections without a level (writing and speaking texts, Talk transcripts, other hand-ins): see "Corrections without a level"
+//        the same for corrections without a level (writing and speaking texts, Talk transcripts, other hand-ins): see "Corrections without a level";
+//        a writing's correction also saves its 5.1 level (Roger, 21 Nov 2026)
+//   node tools/marking/marks.mjs lv-ready | lv-sheet <group> <activity> <step> | lv-apply <group> <activity> <step> <file> [--apply]
+//        a 5.1 level for writings corrected before that (level only, nothing new sent to the student)
 //   node tools/marking/marks.mjs audit                                   is the marking working? ❌ hand-ins ready before the last Wednesday run
 //        and still without a level or correction (exit code 2), ⏰ possible copies waiting for the teacher 7+ days; read-only
 //   node tools/marking/marks.mjs sheet <group> <activity> <step>         the sheet (students as codes, never names)
@@ -120,7 +123,8 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
 
 // ---- Corrections without a level (Roger, 31 Oct 2026: "the idea is that if they work more, they can have all the corrections"): every
 // other piece a student writes in a learning path (writing and speaking panels: the final version, else the text sent for AI feedback;
-// Talk transcripts; other hand-ins) gets the teacher's correction as replies[step], with no level and no effect on marks. fbSig[step]
+// Talk transcripts; other hand-ins) gets the teacher's correction as replies[step], with no effect on marks; a writing also gets a 5.1 level
+// (wCrits below, Roger 21 Nov 2026), the rest no level. fbSig[step]
 // keeps the version corrected, so a new version is corrected again. Left out: the level moments (marked above), the final product
 // (the teacher's), LSs that are only exam + final product (LS1); the Reflect card gets a personal answer instead of a correction, and a hand-in the teacher already answered by hand.
 const sigOf=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
@@ -136,11 +140,32 @@ async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.
       (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title,mode:it.mode})}}
   for(const k in out)out[k].sort((x,y)=>x.s.uid<y.s.uid?-1:1);return out}
 const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk"};
+// A writing's correction also gives a 5.1 level (Roger, 21 Nov 2026: corrected writings count in the Writing skill and criterion 5.1):
+// the LS's 5.1 indicators, saved as results/{activity}.levels[step]["5.1"] + marked[step] with the correction. LSs without 5.1 indicators
+// (LS1, exam + final product only) keep corrections without a level. The level never changes a mark (no grading block reads it); it is
+// evidence for 5.1 (el-grading.js evidence) and the Writing skill of the charts (el-charts.js work).
+const wCrits=a=>{const g=W.EL_GRADING[a.ls]||{};return !g.only&&g.ind&&g.ind["5.1"]?["5.1"]:[]};
+const contentOf=a=>{const d=a.path.replace(/[^/]+\.html$/,m=>"data/"+m.replace(/\.html$/,".js"));return fs.existsSync(path.join(ROOT,d))?d:a.path};
+const lvOpts=a=>{const L=wCrits(a),course=a.ls.split("-")[0],g=W.EL_GRADING[a.ls]||{};
+  return {lvc:L,crit:Object.fromEntries(L.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:Object.fromEntries(L.map(c=>[c,(g.ind||{})[c]||[]])),content:contentOf(a)}};
 function fbSheetOf(grp,a,step,rows){const course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
-  const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
-  const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],crit:{},ind:{},mode:rows[0].mode,
+  const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name])),lo=rows[0].mode==="writing"?lvOpts(a):{lvc:[],crit:{},ind:{}};
+  const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],...lo,mode:rows[0].mode,
     students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
-  return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
+  return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]])),lvc:lo.lvc}}
+
+// Writings corrected before they got a level (Roger, 21 Nov 2026): lv-sheet / lv-apply give each one its 5.1 level only, from the text
+// handed in and the correction already sent (nothing new is sent to the student). Same answer format, with "-" for the correction.
+async function lvTodo(grp,a,step){const out=[],L=wCrits(a);if(!L.length)return out;const skip=new Set(moments(a.ls).filter(m=>m.a===a.id).map(m=>m.step));
+  for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);let state={};try{state=JSON.parse(st.data[a.keys[0]]||"{}")}catch(e){}
+    const it=W.ELMark.fbItems(state,skip,null)[step],res=st.res,sig=(res.fbSig||{})[step];
+    if(!it||it.mode!=="writing"||!sig||sig==="redo"||sig!==sigOf(JSON.stringify(it.fields))||L.every(c=>((res.levels||{})[step]||{})[c]))continue;   // only the version that was corrected
+    out.push({s,h:{f:[...it.fields,{l:"My correction (already sent)",v:(res.replies||{})[step]||""}],ty:it.ty,date:it.date},route:st.route,exam:st.exam,title:it.title,mode:"writing"})}
+  return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
+function lvSheetOf(grp,a,step,rows){const sh=fbSheetOf(grp,a,step,rows);
+  const text=sh.text.replace(" · CORRECTIONS + LEVEL"," · LEVELS ONLY").replace(/\nANSWER FORMAT[\s\S]*$/,"\n"+["THIS RUN: these writings were already corrected (the correction is shown). Give ONLY the level: no new correction, no flag.",
+    "ANSWER FORMAT (strict). Reply with ONLY these lines, in a single code block, nothing before or after:",`EL-MARKS v1 | ${a.id} | ${step} | ${grp.name}`,`<code> | ${sh.lvc.map(c=>c+"=<level>").join("; ")} | -`,"(one line per student, every code above, same order)","END","Levels must be exactly NA, AS, AN or AE."].join("\n"));
+  return {...sh,text}}
 
 // Comments waiting for Claude, every group: same order every time (group, student, activity, step), so the ids of the sheet are found again by `answer`
 // (the line also repeats the student's code and the step, and a line that no longer matches is left out).
@@ -258,21 +283,35 @@ else if(cmd==="fb-ready"){   // pieces waiting for a correction without a level,
 else if(cmd==="fb-sheet"){const [gid,aid,step]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid),rows=a?(await fbTodo(grp,a))[step]||[]:[];
   console.log(rows.length?fbSheetOf(grp,a,step,rows).text:"Nothing to correct.")}
 else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid);if(!a)throw new Error("No activity "+aid);
-  const rows=(await fbTodo(grp,a))[step]||[],sh=fbSheetOf(grp,a,step,rows),r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:a.id,step,crits:[],codes:sh.codes});if(r.err)throw new Error(r.err);
+  const rows=(await fbTodo(grp,a))[step]||[];if(!rows.length){console.log("Nothing to correct.");process.exit(0)}
+  const sh=fbSheetOf(grp,a,step,rows),r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:a.id,step,crits:sh.lvc,codes:sh.codes});if(r.err)throw new Error(r.err);
+  const LV=sh.lvc.length>0;   // a writing: its 5.1 level is saved with the correction
   const rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
     if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
-    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
+    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(LV?Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ":"")+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again
       await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
         {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbAt:fsv({[step]:at}),flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
-    if(x.flag){await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),   // the teacher accepts it (the correction is sent) or asks for it again in class
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at:new Date().toISOString()}})}});continue}
+    if(x.flag){await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),   // the teacher accepts it (the correction and the level are sent) or asks for it again in class
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[step]:{why:x.flag,lv:LV?x.lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at:new Date().toISOString()}})}});continue}
     const at=new Date().toISOString();
-    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at})}})}
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step),...(LV?[...Object.keys(x.lv).map(c=>fp("levels",step,c)),fp("marked",step)]:[])].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at}),...(LV?{levels:fsv({[step]:x.lv}),marked:fsv({[step]:at})}:{})}})}
   console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · sent back automatically (mostly pasted): ${r.rows.filter(x=>x.auto).length} · possible copies for the teacher: ${r.rows.filter(x=>x.flag&&!x.auto).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+else if(cmd==="lv-ready"){const hasW=a=>{try{return /type:\s*'writing'/.test(fs.readFileSync(path.join(ROOT,contentOf(a)),"utf8"))}catch(e){return false}};
+  for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course).filter(hasW))for(const step of ["write"]){const n=(await lvTodo(grp,a,step)).length;if(n)console.log(["LEVEL",grp.id,a.id,step,n+" corrected without a level"].join(" · "))}}
+else if(cmd==="lv-sheet"){const [gid,aid,step]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid),rows=a?await lvTodo(grp,a,step):[];
+  console.log(rows.length?lvSheetOf(grp,a,step,rows).text:"Nothing to level.")}
+else if(cmd==="lv-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid);if(!a)throw new Error("No activity "+aid);
+  const rows=await lvTodo(grp,a,step);if(!rows.length){console.log("Nothing to level.");process.exit(0)}
+  const sh=lvSheetOf(grp,a,step,rows),r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:a.id,step,crits:sh.lvc,codes:sh.codes});if(r.err)throw new Error(r.err);const rk=a.id.replace("/","__");
+  for(const x of r.rows){const row=sh.codes.get(x.code);console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" "));if(!flags.has("--apply"))continue;
+    const at=new Date().toISOString();
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",...Object.keys(x.lv).map(c=>fp("levels",step,c)),fp("marked",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},levels:fsv({[step]:x.lv}),marked:fsv({[step]:at})}})}
+  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m);
   console.log(rows.length?sheetOf(grp,m,rows).text:"Nothing to mark: every hand-in has a level.")}
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
@@ -307,4 +346,4 @@ else if(cmd==="comments"||cmd==="answer"){const its=await comments();
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
     if(NEW&&flags.has("--apply"))await cmtDone();
     console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.filter(x=>x.kind==="ANSWER").length} answers · ${r.rows.filter(x=>x.kind==="FORYOU").length} for the teacher · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}}
-else{console.log("Usage: node tools/marking/marks.mjs tn-ready | tn-apply <answer file> [--apply] | ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}
+else{console.log("Usage: node tools/marking/marks.mjs lv-ready | lv-sheet <group> <activity> <step> | lv-apply <group> <activity> <step> <answer file> [--apply] | tn-ready | tn-apply <answer file> [--apply] | ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}

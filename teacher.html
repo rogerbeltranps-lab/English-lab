@@ -3041,7 +3041,9 @@ function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accep
   const ps=k.m?(ok?[patch(k.u,k.aid,{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()},flags:{[k.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
       :[patch(k.u,k.aid,{flags:{[k.step]:{done}}}),api.reply(k.u,a,k.step,note)])
     // a writing correction: Accept sends it as the version corrected (fbSig), so a new version is corrected again; Redo sends the note
-    :[patch(k.u,k.aid,{flags:{[k.step]:{done}},replies:{[k.step]:ok?k.f.fb||"":note},fbSig:{[k.step]:ok?k.f.v||null:"redo"},fbBy:{[k.step]:null}})];
+    // (and its 5.1 level, Roger 21 Nov 2026: corrected writings count in Writing and criterion 5.1)
+    :[patch(k.u,k.aid,{flags:{[k.step]:{done}},replies:{[k.step]:ok?k.f.fb||"":note},fbSig:{[k.step]:ok?k.f.v||null:"redo"},fbBy:{[k.step]:null},
+      ...(ok&&k.f.lv&&Object.keys(k.f.lv).length?{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()}}:{})})];
   $("#dlg").close();S.cp=null;act(Promise.all(ps))}
 // ---- points (shared/js/el-points.js; root AGENTS.md "Points"): each student's points per term from the class presentations.
 // Here the teacher corrects one student's points (an absent student, a mistake). A change also saves the group's best of the term

@@ -123,7 +123,8 @@ window.EL_GRADING={
         "4.2":{e:[[LP4,"card"],[FP,"source"]]},
         "6.1":{e:[[LP4,"card"],[FP,"research"]]},
         "3.2":{e:[[FP,"part"]]},
-        "5.1":{e:[["exam","writing"],[FP,"email"]]},
+        // the learning-path writings first (their 5.1 level comes with Beltran's correction; Roger, 21 Nov 2026), then the exam and the final product
+        "5.1":{e:[[LP2,"write"],[LP3,"write"],[LP5,"write"],[LP6,"write"],["exam","writing"],[FP,"email"]]},
         "1.1":{e:[[FP,"group"]]},
         "1.2":{e:[[FP,"group"]]},
         "CC1 1.3":{e:[[FP,"email"]]},
@@ -209,7 +210,8 @@ window.EL_GRADING={
         "4.2":{e:[[LP4,"factfile"],[FP,"source"]]},
         "6.2":{e:[[LP4,"factfile"],[FP,"factfile"]]},
         "3.2":{e:[[FP,"edit"]]},
-        "5.1":{e:[["exam","writing"],[FP,"script"]]},
+        // the learning-path writings first (their 5.1 level comes with Beltran's correction; Roger, 21 Nov 2026), then the exam and the final product
+        "5.1":{e:[[LP2,"write"],[LP3,"write"],[LP5,"write"],[LP6,"write"],["exam","writing"],[FP,"script"]]},
         "CD2 2.2":{e:[[FP,"edit"]]},
         "CD4 4.5":{e:[[FP,"tips"]]}
       },
