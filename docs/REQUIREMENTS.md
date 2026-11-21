@@ -345,7 +345,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 2. **Exam day per group** is in `EL_PLAN[ls].exam`; check it with Roger.
 3. **Remind Roger** to decide the versions per level and who takes each. Marks are not converted between levels (6.1).
 4. **Agree the format with Roger before writing** (lesson from LS2: the exam was rebuilt twice).
-5. Look at what students do best and worst in the activities and class games. For LS2 Roger wanted the exam **achievable** ("so that they get good marks", 19 Nov 2026): lean on strengths (choosing is easier than typing), avoid what most failed. Later exams are tailored the same way, the newest decision (Roger, 21 Nov 2026: "this is solved").
+5. Look at what students do best and worst in the activities and class games. For LS2 Roger wanted the exam **achievable** ("so that they get good marks", 19 Nov 2026): lean on strengths (choosing is easier than typing), avoid what most failed. **Ask Roger** if the next exam should be tailored the same way.
 6. **From LS3 on, 10–15 % of the exam is on the core language of earlier LSs** (Research audit, 26 Oct 2026).
 
 ### 6.3 Structure
@@ -643,4 +643,5 @@ Roger, 21 Nov 2026: "when it comes to contradictions, my last decisions are the 
 
 ### 13.3 Still open: nothing newer was decided
 
+- **An exam tailored to strengths again** (6.2): ask when the LS3 exam is planned.
 - **Research audit changes 3–9** (old row 26): several are built (core words, micro-dictation chunks, Catalan-to-English flashcards, the voyage road); Roger to say which of the rest are still wanted.
