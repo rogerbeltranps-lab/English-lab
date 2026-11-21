@@ -29,10 +29,13 @@ var learningSupport = {
   // Wrong answers never repeat the correct option: they only point back to the clue.
   evidence(level, correct, selected, answer, hint, listening) {
     if (!selected) return caLevel(level) ? 'Tria una resposta abans de comprovar.' : 'Choose an answer before checking.';
+    // hint = the question's own hint in the student's language: Catalan (h) for Starter, English (he) for Base (21 Nov 2026).
+    // LS1 pages pass Catalan hints whatever the route, so an English hint is never used there.
+    const ca = caLevel(level);
     return this.feedback(level, correct,
-      hint || (listening ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'),
-      listening ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.'
-        : 'Re-read the text, find the sentence that answers the question and compare it with each option.');
+      (ca && hint) || (listening ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'),
+      (!ca && !/\/my-real-routine\//.test(location.pathname) && hint) || (listening ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.'
+        : 'Re-read the text, find the sentence that answers the question and compare it with each option.'));
   },
   // attempt and model are arrays of words/chunks; the model sentence is never shown.
   order(level, correct, attempt, model) {

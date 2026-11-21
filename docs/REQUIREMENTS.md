@@ -138,7 +138,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **Language by level**
 
-- **Only Starter (and no route) gets Catalan**: instructions, hints, help and feedback in **Catalan**. **Base**, Core, Plus, Pro: **English** (Roger, 21 Nov 2026: "From now on base is also in English, no Catalan help here, the help in English"). Base keeps its extra support (questions shown, slower voice, help words, choosing from options), only now in English; Catalan hints written for Starter are not shown to Base. LS1 (finished) keeps its Base pages in Catalan. English stays the target language for all input and production.
+- **Only Starter (and no route) gets Catalan**: instructions, hints, help and feedback in **Catalan**. **Base**, Core, Plus, Pro: **English** (Roger, 21 Nov 2026: "From now on base is also in English, no Catalan help here, the help in English"). Base keeps its extra support (questions shown, slower voice, help words, choosing from options), only now in English; each question's hint has an English version for Base (`he`, Roger 21 Nov 2026: "Yes add the extra help in English"). LS1 (finished) keeps its Base pages in Catalan. English stays the target language for all input and production.
 - Answers and messages to students go in **both languages**, their language first (20 Nov 2026).
 
 **What students must not see**
