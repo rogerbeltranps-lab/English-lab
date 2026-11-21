@@ -50,7 +50,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   const pr=pReplies.filter(x=>x.uid===s.uid&&!(x.at>Date.now()));if(pr.length)news.push(T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""));
   const uniq=[...new Set(news)];
   if(!tasks.length&&!uniq.length){skipped++;continue}
-  const out=[T("Hola ","Hi ")+s.first+",","",T("Això és el que tens aquesta setmana a English Lab:","This is your English Lab week:"),""];
+  const out=[T("Hola!","Hi!"),"",T("Això és el que tens aquesta setmana a English Lab:","This is your English Lab week:"),""];
   if(tasks.length)out.push(T("🏠 DEURES","🏠 HOMEWORK"),...tasks.map(x=>"• "+WK.taskText(x,lang)),"");
   if(uniq.length)out.push(T("✉️ T'HE CONTESTAT O CORREGIT","✉️ I ANSWERED OR CORRECTED"),...uniq.map(x=>"• "+x),T("Ho tens tot al teu tauler.","It is all on your board."),"");
   out.push(T("Entra amb el teu correu de l'institut: ","Sign in with your school email: ")+SITE+"today.html","",T("Bona setmana!","Have a good week!"),"Roger");

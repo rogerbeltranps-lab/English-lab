@@ -818,6 +818,23 @@ const TESTER_NAME={surname1:"Beltran",surname2:"Porres",first:"Roger"};
 const nameOf=s=>s.ro&&s.ro.surname1?s.ro:s.tester?TESTER_NAME:null;
 const fullName=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2].filter(Boolean).join(" ")+", "+n.first:s.name||s.email||(s.stub?"Unknown account":s.uid)};
 const name=s=>esc(fullName(s));
+// Never the student's name in a draft (Roger, 17 Nov 2026: "don't use their names or surnames since sometimes it feels like AI"; 21 Nov:
+// "I said never use their names or surnames please"). Beltran's drafts written before the rule ("Hola Alejandra! …", "Thanks, Aya.")
+// are cleaned before they reach a box, a preview or a one-click send: "Hola Alejandra!" → "Hola!", "Thanks, Aya." → "Thanks.".
+// nmWords(student, …other names) = the words of their first name and surnames; noNames(text, words) = the text without them (only
+// capitalised words, so "pau" or "mar" inside a sentence stay). The tools refuse new drafts with names (tools/problems/reply-time.mjs).
+const nmBare=w=>String(w||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const nmWords=(s,...more)=>{const n=s?nameOf(s)||{}:{},L=[n.first,n.surname1,n.surname2,s&&s.name,...more];
+  return new Set(L.flatMap(x=>nmBare(x).split(/[^a-z'’-]+/)).filter(w=>w.length>=3&&!["del","las","los","the","van","von","and"].includes(w)))};
+function noNames(text,words){if(!text||!words||!words.size)return text||"";
+  const Z="\u0000",isN=w=>/^\p{Lu}/u.test(w)&&words.has(nmBare(w));
+  let t=String(text).split(/([\p{L}'’-]+)/u).map((p,i)=>i%2&&isN(p)?Z:p).join("").replace(new RegExp(Z+"(?: "+Z+")+","g"),Z);
+  if(!t.includes(Z))return text;
+  t=t.replace(new RegExp("(^|[.!?]\\s+)(hola|hi|hello|hey|dear|bon dia|bona tarda|good morning|benvolguda?)\\s+"+Z+"\\s*[,!.:]?(\\s*)(\\p{L})?","giu"),(m,a,g,sp,l)=>a+g+"!"+(l?" "+l.toUpperCase():""))   // Hola Alejandra! → Hola!
+   .replace(new RegExp("\\s*,\\s*"+Z+"(?=\\s*[.!?,;:)]|$)","g"),"")                                           // Thanks, Aya. → Thanks.
+   .replace(new RegExp("(^|[.!?]\\s+)"+Z+"\\s*[,:]\\s*(\\p{L})","gu"),(m,a,b)=>a+b.toUpperCase())             // Aya, you … → You …
+   .replace(new RegExp(Z,"g"),"").replace(/ {2,}/g," ").replace(/ ([,.!?])/g,"$1");
+  return t.trim()};
 const norm=x=>String(x??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
 const listed=()=>Object.keys(S.D.ro).length>0,isTester=s=>!DEMO&&ELCloud.isTester(s);
 // Everyone on the student list (s.ro; s.away until they first sign in) and everyone who signed in. With a list, its group decides:
@@ -5092,7 +5109,7 @@ const pbStatus=a=>a?PB_ST[a.status]?a.status:a.verdict==="fixed"?"fixed":"you":n
 const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return "";const en=!!x.route&&!elCa(x.route),[lab,btn]=PB_ST[st];
   const sent=(x.msgs||[]).some(m=>m.sug)||x.fixed||(a.verdict==="fixed"&&!a.reply),fixMode=st==="fixed"?"1":st==="nobug"?"close":"";
   return `<div class="pbauto"><span class="pbst ${st}">${lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}${a.go>Date.now()&&!a.shown&&x.fixed&&!x.teacher?`<div class="pbhold">🕗 Not shown yet: the student gets Beltran's ✅ card at ${goWhen(a.go)} (school hours, at least 2 hours after the report).<button class="g" data-do="pbnow" data-id="${esc(x.id)}" title="The card shows on the student's next page from now">📨 Show it now</button></div>`:""}</div>`
-    +(a.reply&&!sent&&!x.teacher?`<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(${en?"English":"Catalan"} first, like their route${a.reply2?`, and the ${en?"Catalan":"English"} version under it`:"; ✏️ Edit first adds the other language"}; they see it on a card the next time they open a page)</small><p>${esc(a.reply)}</p>${a.reply2?`<p><span class="muted">🌐 ${en?"Catalan":"English"}:</span> ${esc(a.reply2)}</p>`:""}
+    +(a.reply&&!sent&&!x.teacher?`<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(${en?"English":"Catalan"} first, like their route${a.reply2?`, and the ${en?"Catalan":"English"} version under it`:"; ✏️ Edit first adds the other language"}; they see it on a card the next time they open a page)</small><p>${esc(pbRe(x,"reply"))}</p>${a.reply2?`<p><span class="muted">🌐 ${en?"Catalan":"English"}:</span> ${esc(pbRe(x,"reply2"))}</p>`:""}
     <button data-do="pbsug" data-id="${esc(x.id)}" data-f="${fixMode}" title="${st==="fixed"?"One card: the ✅ fixed note with this message under it":st==="nobug"?"The student gets this message and the report is closed":"The student gets this message; the report stays open"}">📨 ${btn}</button> <button class="g" data-do="pbsuged" data-id="${esc(x.id)}">✏️ Edit first</button></div>`:"")};
 // the card a student gets for an answer to their suggestion: in the language of their level now (Catalan for Starter, Base or no level yet)
 const sgEn=x=>{const s=S.P[x.uid];return !!s&&msgCa(s)===false};
@@ -5102,7 +5119,7 @@ const sgNote=(x,msg)=>{const en=sgEn(x),r=replyText(sgReply(x),en);return `<div 
 // the instant task (docs/general/problem-reports-auto.md, tools/problems/auto.mjs idea) saves suggestions/{id}.auto = {en, ca, note, at}
 // a few minutes after the idea arrives. ↩ Answer opens with it in the boxes (the language Roger writes in first), to change and send;
 // nothing goes by itself. Not shown once the idea is answered.
-const sgDraft=x=>{const a=x.auto;return a&&a.en&&a.ca&&!(x.msgs||[]).length?a:null};
+const sgDraft=x=>{const a=x.auto;if(!(a&&a.en&&a.ca&&!(x.msgs||[]).length))return null;const w=nmWords(S.P[x.uid],x.name);return Object.assign({},a,{en:noNames(a.en,w),ca:noNames(a.ca,w)})};
 const sgPre=x=>{const a=sgDraft(x);if(!a)return null;const L=rpLang();return {text:L==="ca"?a.ca:a.en,other:L==="ca"?a.en:a.ca,lang:L}};
 const sgDraftHtml=x=>{const a=sgDraft(x);if(!a)return "";return `<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(Beltran's draft; ↩ Answer opens it, ready to change; nothing is sent until you press Send)</small>${a.note?`<p class="muted">${esc(a.note)}</p>`:""}<p>${esc(a.ca)}</p><p><span class="muted">🌐 English:</span> ${esc(a.en)}</p></div>`};
 function sgAnswer(id){
@@ -5116,7 +5133,8 @@ function sgAnswer(id){
   S.rpW=null;S.rpW=rpWire("sgt",{en:"For example: Great idea! From next week you will see your marks on every activity.",ca:"Per exemple: Bona idea! A partir de la setmana que ve veuràs les notes a cada activitat."},draw,pre);
   $("#sgt").addEventListener("input",draw);draw();$("#sgt").focus()}
 // also ↩ Answer (Roger, 20 Nov 2026: a draft ready in every answer box), while that reply has not been sent and the report is open
-const pbPre=x=>{const a=x.auto||{};return a.reply&&!x.fixed&&!(x.msgs||[]).some(m=>m.sug)?{text:a.reply,other:a.reply2||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
+const pbNm=x=>nmWords(S.P[x.uid],x.name),pbRe=(x,k)=>noNames((x.auto||{})[k],pbNm(x));   // the suggested reply without the student's name (noNames)
+const pbPre=x=>{const a=x.auto||{};return a.reply&&!x.fixed&&!(x.msgs||[]).some(m=>m.sug)?{text:pbRe(x,"reply"),other:pbRe(x,"reply2")||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
 // "💬 Answer": write to the student. The card's own words follow the report's language; the message goes as written.
 function pbAnswer(id,pre){
   const x=S.D.pb.find(y=>y.id===id);if(!x)return;const en=!!x.route&&!elCa(x.route),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
@@ -5372,7 +5390,7 @@ function msgDialog(u,id){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==tr
   t.oninput=draw;draw();t.focus();
   if(a&&msgWait(a))msgDraft(a).then(dr=>{const p=$("#msgdr");if(!p||!t.isConnected)return;
     if(!dr){p.textContent="No draft for this answer yet: Beltran writes one a few minutes after the student answers.";return}
-    if(!t.value.trim()){t.value=ca===false?dr.en:dr.ca;draw()}
+    if(!t.value.trim()){t.value=noNames(ca===false?dr.en:dr.ca,nmWords(s));draw()}   // never the student's name (noNames)
     if(t.scrollHeight>t.clientHeight)t.style.height=Math.min(t.scrollHeight+4,320)+"px";t.setSelectionRange(0,0);t.scrollTop=0;
     p.textContent="✏️ Beltran's draft is ready in the box. Change anything you like; nothing goes until you press Send."+(dr.note?" ("+dr.note.replace(/\.$/,"")+")":"")})}
 function msgSend(u,id){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_MAX),a=id&&(S.D.ann||[]).find(x=>x.id===id);if(!s||!text)return;
@@ -6298,8 +6316,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     pbmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(api.pbMsg(k.id,v,!!k.f))})},
     // Beltran's suggested reply goes in both languages (auto.reply in the report's language, auto.reply2 the other one); an older one
     // with only one version opens ✏️ Edit first, where Google Translate writes the other version for him to read
-    pbsug:()=>{const x=S.D.pb.find(y=>y.id===k.id),a=x&&x.auto,r=a&&a.reply;if(!r)return;if(!a.reply2)return pbAnswer(k.id,pbPre(x));
-      const en=!!x.route&&!elCa(x.route),v={text:r,en:en?r:a.reply2,ca:en?a.reply2:r};lateAsk(()=>act(api.pbMsg(k.id,v,k.f==="1"?true:k.f==="close"?"close":false,true)))},
+    pbsug:()=>{const x=S.D.pb.find(y=>y.id===k.id),a=x&&x.auto;if(!a||!a.reply)return;   // sent without the student's name (pbRe → noNames)
+     if(!a.reply2)return pbAnswer(k.id,pbPre(x));
+      const en=!!x.route&&!elCa(x.route),r=pbRe(x,"reply"),r2=pbRe(x,"reply2"),v={text:r,en:en?r:r2,ca:en?r2:r};lateAsk(()=>act(api.pbMsg(k.id,v,k.f==="1"?true:k.f==="close"?"close":false,true)))},
     pbnow:()=>act(api.pbNow(k.id)),
     pbsuged:()=>{const x=S.D.pb.find(y=>y.id===k.id);if(x)pbAnswer(k.id,pbPre(x))},
     pbcopy:async()=>{const txt=$("#pbq").value,app=k.v==="app";let ok=true;try{await navigator.clipboard.writeText(txt)}catch(e){ok=false;$("#pbq").select()}

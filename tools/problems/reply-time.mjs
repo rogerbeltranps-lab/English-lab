@@ -5,8 +5,8 @@
 //                            time, with a few random minutes so answers never all land on the hour. A time after 18:00 moves to the next
 //                            day from 08:00. The answer is saved at once with this time; students' pages show it only from then
 //                            (el-cloud.js problemReplies .at, el-corrections.js answers[step].at), like the 🌙 21:00-7:30 hold (PR #634).
-//   namesIn(text, names)   → the words of the student's name or surnames found in the text (empty: fine). Both tools refuse to save
-//                            an answer that uses them.
+//   namesIn(text, names)   → the words of the student's name or surnames found in the text, and any name after a greeting
+//                            ("Hola Alejandra!"), empty: fine. Both tools refuse to save an answer or draft that uses them.
 // Every day of the week, as Roger said it (no weekend rule). `--now` on either tool sends at once: only when Roger asks for it in a thread.
 const TZ="Europe/Madrid",FROM=8*60,TO=18*60,GAP=2*36e5;
 // Madrid wall clock of an instant: {y, mo, d, h, mi}
@@ -21,7 +21,12 @@ export function replyAt(from=Date.now(),rand=Math.random,now=Date.now()){
 }
 export const whenText=ms=>new Date(ms).toLocaleString("en-GB",{timeZone:TZ,weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const bare=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+// Also any greeting followed by a capitalised word ("Hola Alejandra!", "Hi Ammy,"), so a classmate's name or a name that is not on the
+// report is caught too (Roger, 21 Nov 2026: "I said never use their names or surnames please"). Start with "Hola!" / "Hi!" or the answer.
+const GREET=/(?:^|[.!?]\s+)(?:hola|hi|hello|hey|dear|bon dia|bona tarda|good morning|benvolguda?)\s+(\p{Lu}[\p{L}'’-]*)/gu;
 export function namesIn(text,names){
   const words=[...new Set(names.flatMap(n=>bare(n).split(/[^a-z'-]+/)).filter(w=>w.length>=3&&!["del","las","los","the","van","von","and"].includes(w)))];
-  const t=" "+bare(text).replace(/[^a-z'-]+/g," ")+" ";return words.filter(w=>t.includes(" "+w+" "));
+  const t=" "+bare(text).replace(/[^a-z'-]+/g," ")+" ",found=words.filter(w=>t.includes(" "+w+" "));
+  for(const m of String(text||"").matchAll(new RegExp(GREET.source,"giu"))){const w=bare(m[1]);if(m[1][0]!==m[1][0].toLowerCase()&&!found.includes(w))found.push(w)}
+  return found;
 }

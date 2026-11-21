@@ -508,7 +508,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 **Timing and wording of every automatic answer** (17 Nov 2026)
 
 - Shown to the student only **between 08:00 and 18:00 Madrid time and at least 2 hours** after the report or comment arrived. Never `--now` unless Roger asks.
-- **Never use the student's first name or surnames** (no "Hola X").
+- **Never use a student's first name or surnames** (17 Nov 2026; Roger again, 21 Nov 2026: "I said never use their names or surnames please"): no "Hola X", no "Thanks, X", not a classmate's name either. This covers every draft and suggested reply in a 💬 Answer box, every automatic answer and the automatic emails to students ("Hola!" / "Hi!" or straight to the answer). The tools refuse a text with a name, and the dashboard takes names out of drafts written before the rule.
 - **Both languages**, their language first (20 Nov 2026).
 - Roger's own sends from the dashboard after 21:00: **always ask him** "send now or hold until 7:30" (14 Nov 2026).
 
