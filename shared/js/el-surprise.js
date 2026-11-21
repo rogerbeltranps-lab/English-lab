@@ -9,7 +9,8 @@
    - The student presses ● Start: the recording starts at once (el-mic.js keeps the clip of the Start button), and only then do the
      questions appear, one at a time, never before. One question per step of the bank, drawn at random: 1 About you · 2 Describe it ·
      3 the LS grammar · 4 Your opinion (bank tiers). Each tier has several questions per level, so classmates side by side get different ones.
-   - By level (CFG): Starter reads the question with the Catalan and a sentence starter, Base with the Catalan and help words, both
+   - By level (CFG): Starter reads the question with the Catalan and a sentence starter, Base in English only with help words (Roger,
+     21 Nov 2026: "base is also in English"), both
      hear it slower; Core hears it first (the text shows when the voice ends) and can tap 💡 for two key words (the teacher sees it);
      Plus and Pro hear it, no help, longer answers. A few seconds to think, then the answer time (it grows from question 1 to 4);
      Next is ready after NEXT_AFTER seconds of answering, and the next question comes by itself when the time runs out.
@@ -148,7 +149,7 @@
     function spend() { const S = X.state; S.sq = S.sq || {}; S.sq[id] = { last: R.qs.map(q => q.q), at: new Date().toISOString() }; X.save(); }
     function ask() {
       stopTimers(); const c = cfg(), q = R.qs[R.k];
-      R.phase = 'think'; R.left = c.think; R.heard = X.ca(); R.pop = true; paint();
+      R.phase = 'think'; R.left = c.think; R.heard = X.ca() || c.help === 'chips'; R.pop = true; paint();
       // Core and up hear the question first: its text shows when the voice ends (or after a few seconds if the voice does not start)
       let once = false; const heard = () => { if (once) return; once = true; if (!R.heard && R.phase !== 'idle') { R.heard = true; paint(); } };
       X.sayLine(q.q, c.rate, heard); setTimeout(heard, 6000);

@@ -287,7 +287,7 @@ async function joinLive(u){
   Q={S,ref:S.doc(db,"live",liveGroup,"answers",em)};
   // Catalan for Insecure and Beginners: the student's level, the same in every LS (elRouteOf in el-catalog.js)
   if(bar.dataset.ls)S.getDocs(S.collection(db,"students",u.uid,"levels")).then(qs=>{const m={},ls=bar.dataset.ls;qs.forEach(d=>m[d.id]=d.data());
-    const l=window.elRouteOf?elRouteOf(m,ls).level:(m[ls]||{}).level;if((l==="insecure"||l==="beginners")&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});
+    const l=window.elRouteOf?elRouteOf(m,ls).level:(m[ls]||{}).level;if(l==="beginners"&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});
   liveStop=S.onSnapshot(S.doc(db,"live",liveGroup),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot join this class.","No pots entrar a aquesta classe.")}`;playerDraw()});
 }
 function signInBtn(){const b=document.createElement("button");b.type="button";b.innerHTML=B("Sign in","Entra");

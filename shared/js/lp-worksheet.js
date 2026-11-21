@@ -14,7 +14,7 @@
   // sections for those who don't have a Chromebook": shared/print/today.html puts several of these on one sheet)
   const tabs = (q.get('tabs') || '').split(',').filter(Boolean), bare = q.get('bare') === '1';
   const base = '../../' + ls + '/';
-  const ca = level === 'insecure' || level === 'beginners';
+  const ca = level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
   // the same as ls2-engine.js: beginners → insecure, native (Pro, 4 ESO) → daring
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);

@@ -109,7 +109,7 @@ if(cmd==="open"){
 
 // A draft for an idea (suggestions/{id}.auto) or for an answer to a private message (msgDrafts/{announcement id}, teacher only, n = the thread length it
 // answers, so a newer answer from the student needs a new draft). Both languages: the dashboard puts the one Roger writes in (I write in)
-// in the box, and the other one under it for an idea (a private message goes in one language: Catalan for Starter, Base and no route).
+// in the box, and the other one under it for an idea (a private message goes in one language: Catalan for Starter and no route; Base reads English since 21 Nov 2026).
 if(cmd==="idea"||cmd==="msg"){
   if(!id)throw new Error("Which one? node tools/problems/auto.mjs "+cmd+" <id> --note \"…\" --en \"…\" --ca \"…\" [--apply]");
   const coll=cmd==="idea"?"suggestions":"announcements",x=doc(await api("GET",DOCS+coll+"/"+id));if(!x)throw new Error("No "+coll+"/"+id);

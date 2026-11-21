@@ -34,7 +34,7 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   if(!seesAll&&st!=="open")return;
   const rs={};try{const all=results?await results():null;if(all)for(const [id,r] of Object.entries(all))rs[r.activity||id.replace("__","/")]=r;
     else (await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
-  const ca=!seesAll&&(!lv||!lv.level||lv.level==="insecure"||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;   // no route yet: the Insecure version, in Catalan
+  const ca=!seesAll&&(!lv||!lv.level||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;   // Catalan: Starter, and no route yet (Base reads English since 21 Nov 2026)
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];

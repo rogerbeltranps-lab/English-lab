@@ -42,7 +42,7 @@ body.locked #gate{display:block}
   const q = new URLSearchParams(location.search);
   const ROUTES = ['beginners', 'insecure', 'safe', 'daring'], NAME = { beginners: 'Starter', insecure: 'Base', safe: 'Core', daring: 'Plus', native: 'Pro' };
   const route = ROUTES.concat('native').includes(q.get('route')) ? q.get('route') : 'insecure', key = q.get('key') === '1';
-  const ca = route === 'insecure' || route === 'beginners', T = (c, e) => ca ? c : e;
+  const ca = route === 'beginners', T = (c, e) => ca ? c : e;
   const items = (q.get('items') || '').split('|').filter(Boolean).map(s => { const i = s.indexOf(':'), p = i < 0 ? s : s.slice(0, i), t = i < 0 ? '' : s.slice(i + 1); const k = p.lastIndexOf('/'); return { ls: p.slice(0, k), lp: p.slice(k + 1), tabs: t.split('.').filter(Boolean) }; });
   const games = (q.get('games') || '').split(',').filter(Boolean);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

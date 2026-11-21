@@ -319,7 +319,7 @@ const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) 
 const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
 // 🔊 Kokoro recordings, voice Heart, American English (shared/js/el-voice.js; Roger, 7 Nov 2026); a text with no recording uses the
 // browser's American voice. say([word, example]) plays one after the other.
-const say = s => { try { window.ELVoice.say(s, elCa(base(S.level)) ? .85 : 1); } catch (e) {} };
+const say = s => { try { window.ELVoice.say(s, /^(beginners|insecure)$/.test(base(S.level)) ? .85 : 1); } catch (e) {} };
 
 /* 🃏 Word cards: turn the card over, or test yourself (Catalan → English, checked at once). Pro cards from Pro panels carry an
    English meaning instead of the Catalan, so the Test me instruction says "meaning" on that level (fix 2 Nov 2026).

@@ -232,7 +232,7 @@ function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#prog
 // on a phone the open step stays in view in the strip of steps
 function markTabs(){let next=false;STEPS.forEach(k=>{const t=document.querySelector('.tab[data-panel="'+k+'"]');if(!t)return;const d=!!state.done[k];t.classList.toggle("done",d);t.classList.toggle("next",!d&&!next);t.dataset.next=ca()?"SEGÜENT":"NEXT";if(!d)next=true});
   const a=$(".lp-body>.tabs .tab.active");if(a&&innerWidth<1000&&markTabs.on!==a.dataset.panel){markTabs.on=a.dataset.panel;a.parentNode.scrollLeft=a.offsetLeft-a.parentNode.offsetLeft-16}}
-const ca=()=>level==="insecure"||level==="beginners";
+const ca=()=>level==="beginners";
 const need=n=>Math.ceil(n*0.8);
 // a step is done once every question is answered and checked, whatever the score (Roger, 6 Nov 2026); the score still shows
 const allIn=(prefix,n)=>{for(let i=0;i<n;i++){const r=document.querySelector('input[name="'+prefix+i+'"]');if(r){if(!document.querySelector('input[name="'+prefix+i+'"]:checked'))return false}else{const t=document.getElementById(prefix+i);if(t&&!String(t.value).trim())return false}}return true};

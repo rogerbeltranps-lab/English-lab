@@ -43,7 +43,7 @@ const PROJECT="english-lab-ietm",ROOT=path.join(path.dirname(fileURLToPath(impor
 const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.env.EL_TODAY;   // a date for tests
 vm.createContext(ctx);
 for(const f of ["el-catalog.js","el-criteria.js","el-plan.js","el-week.js","el-grading.js","el-marking.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js",f),"utf8"),ctx,{filename:f});
-const W=ctx.window,CA_RT=["beginners","insecure"];
+const W=ctx.window,CA_RT=["beginners"];
 // A possible copy that was clearly pasted (ELMark.pasted: most of the text pasted, little typed) is sent back at once instead of waiting
 // in the teacher's To do (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): the flag
 // is saved as done "redo" (auto) and the student gets the Redo note with the reason from the writing log (ELMark.redoNote). Never the Pro route.

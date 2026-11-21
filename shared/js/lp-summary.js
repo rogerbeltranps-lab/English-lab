@@ -13,7 +13,7 @@
   const q = new URLSearchParams(location.search);
   const ls = q.get('ls') || '', level = ROUTES.includes(q.get('route')) ? q.get('route') : 'insecure';
   const base = '../../' + ls + '/', pro = level === 'native';
-  const ca = level === 'insecure' || level === 'beginners';
+  const ca = level === 'beginners';
   const T = (c, e) => ca ? c : e;
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
   const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level))) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
