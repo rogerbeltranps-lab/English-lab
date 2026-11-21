@@ -10,7 +10,7 @@ button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px
 .vysea .vyport{position:absolute;top:8px;background:#fbf3df;border:1px solid #b08a52;border-radius:10px;padding:2px 10px;font:700 13px Georgia,serif;color:#4a2f0e}.vysea .vyport.l{left:10px}.vysea .vyport.r{right:10px;max-width:45%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vysea .vyb{position:absolute;display:flex;align-items:center;gap:2px;width:40px}.vysea .vyb img{width:34px;height:34px}.vysea .vyb b{font-size:10.5px;color:#fff;border-radius:999px;padding:0 6px;border:1.5px solid #fff;white-space:nowrap;background:#16a34a}.vysea .vyb.amber b{background:#ea580c}.vysea .vyb.red b{background:#dc2626}
 table.vyt td,table.vyt th{padding:6px 8px;text-align:left}table.vyt tr.vy-red{background:#fef2f2}table.vyt tr.vy-amber{background:#fff7ed}table.vyt tr.vyline td{border-top:3px dashed #dc2626;color:#b91c1c;font-weight:700;font-size:13px;padding:4px 8px;background:#fff}
-.vybar{display:inline-block;width:90px;height:8px;border-radius:9px;background:#e2e8f0;overflow:hidden;vertical-align:middle}.vybar i{display:block;height:100%;background:#15803d}td.vytodo{max-width:360px;white-space:normal;font-size:13px}
+.vybar{display:inline-block;width:90px;height:8px;border-radius:9px;background:#e2e8f0;overflow:hidden;vertical-align:middle}.vybar i{display:block;height:100%;background:#15803d}td.vytodo{max-width:360px;white-space:normal;font-size:13px}td.vystp{white-space:nowrap}td.vypts{white-space:nowrap;font-size:13px;line-height:1.5}.vyp{display:inline-block;margin-right:10px}.vyp b{font-size:14.5px}.vyp small{color:#64748b}.vyp.no{color:#94a3b8}.vyp em{font-style:normal;font-size:11.5px;color:#94a3b8}
 a.lsgo{background:#0f766e;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;text-decoration:none}a.lsgo:hover{background:#115e59}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
 table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}table.plan tr.now td{background:#ecfdf5}
@@ -309,7 +309,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
-<script src="shared/js/el-points.js"></script>
+<script src="shared/js/el-points.js?v=20261121a"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="lab/game/decks/index.js"></script>
 <script src="shared/print/lp-list.js"></script>
@@ -1906,14 +1906,17 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
   const me=studs.find(s=>s.uid===S.prU)||null;if(!me)S.prU="";const sel=PR_SK[S.prSk]?S.prSk:"all";
   const X=studs.map(s=>({s,x:prStu(s.uid)}));
   // ---- the four cards: this LS, the group (as ⛵ Class voyage: steps of the open tabs, the LS mark so far)
-  const fa=fpAct(ls),rows=studs.map(s=>{const v=vySteps(s,ls,grp.id,fa);let m=null;try{const pr=res(s.uid,asId(ls)).progress;m=pr&&pr.total!=null?pr.total:G()?grade(s).total:null}catch(e){m=null}return {v,m}});
-  const mk=prAvg(rows.map(r=>r.m)),sd=rows.reduce((n,r)=>n+r.v.done,0),stt=rows.reduce((n,r)=>n+r.v.total,0);
+  const fa=fpAct(ls),rows=studs.map(s=>({v:vySteps(s,ls,grp.id,fa),...lsPtsOf(s,ls)}));
+  // in points while a part has no mark yet (as ⛵ Class voyage; Roger, 21 Nov 2026): the group's average points of each part marked so far
+  const mk=prAvg(rows.map(r=>r.m)),pk=rows.map(r=>r.pt).filter(Boolean),pAll=pk.length&&pk.every(p=>p.all),pPart=k=>prAvg(pk.map(p=>(p.parts.find(x=>x.k===k)||{}).pts??null));
+  const pDone=pk.length?pk[0].parts.filter(x=>pPart(x.k)!=null):[],pLeft=pk.length?pk[0].parts.filter(x=>pPart(x.k)==null):[],sd=rows.reduce((n,r)=>n+r.v.done,0),stt=rows.reduce((n,r)=>n+r.v.total,0);
   let cw=0,cd=0;try{const c=corrScan(),mine=i=>i.gid===grp.id&&i.ls===ls;cw=c.wait.filter(i=>mine(i)&&i.k!=="copy").length;cd=c.done.filter(i=>mine(i)&&!["answer","back","copy"].includes(i.k)).length}catch(e){}
   const actAvg=prAvg(X.map(({x})=>prAvg(Object.values((x.act[ls])||{}).map(z=>z.s/z.n*100))));
   const card=(ic,lab,big,sub,cls)=>`<div class="prcard ${cls||""}"><span class="prci">${ic}</span><span><small>${lab}</small><b>${big}</b><em>${sub}</em></span></div>`;
   const cards=`<div class="prstats">`
-    +card("🎓","LS mark so far",mk==null?"–":f1(mk)+"<i>/10</i>",`${rows.filter(r=>r.m!=null).length} of ${studs.length} students with a mark`)
-    +card("👣","Steps done",stt?Math.round(sd/stt*100)+"<i> %</i>":"–",stt?`${sd} of ${stt} open steps, whole group`:"no open steps yet")
+    +(pk.length&&!pAll&&pDone.length?card("🎓","LS mark so far",pDone.map(x=>pt1(pPart(x.k))+`<i>/${pt1(x.max)}</i>`).join(" + "),`${pDone.map(x=>VY_PI[x.k][1].toLowerCase()).join(" + ")} (average points)${pLeft.length?` · still to do: ${pLeft.map(x=>VY_PI[x.k][1].toLowerCase()+" "+pt1(x.max)).join(", ")}`:""}`)
+      :card("🎓","LS mark so far",mk==null?"–":f1(mk)+"<i>/10</i>",`${rows.filter(r=>r.m!=null).length} of ${studs.length} students with a mark`))
+    +card("👣","Steps done",stt?Math.round(sd/stt*100)+"<i> %</i>":"–",stt?`${sd} of ${stt} steps done in class or set as homework, whole group`:"no steps done in class yet")
     +card("✏️","Work marked",cd+cw?cd+"<i> of "+(cd+cw)+"</i>":"–",cw?`${cw} waiting for Beltran`:"nothing waiting",cw?"warn":"")
     +card("📊","Activities average",prPc(actAvg),actAvg==null&&((window.EL_GRADING||{})[ls]||{}).only?"this LS's pages kept no scores: see its exam and final product below":"all tries, every skill (as the LS page)")+`</div>`;
   // ---- 📈 skill mastery over time: week by week, the whole school year
@@ -2109,15 +2112,28 @@ const VOY_COURSES=["4eso","2eso"],VY_ART={"4eso":["voyage/sea.webp","voyage/boat
 function vyOnPlan(ls,gid){const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,gid):-1,ag=gi>=0&&p._ag&&p._ag[gi];if(!ag||!ag.days)return null;
   const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));return on}
 const vyTab=(a,k)=>{const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);k=window.elTabOf?elTabOf(a.id,k):k;return xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k};
-function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0;const miss=[],on=vyOnPlan(ls,gid);
+// Steps done counts only the steps due so far (Roger, 21 Nov 2026, 4ESO A: "realment els hi falten tantes activitats per fer?": 19/23 for
+// students who had done everything, the 4 others planned for next week): the tabs done in class or set as homework (elDueBefore, the same
+// test as ✅ To do, ⏰ late and the Learning paths table). done/total/miss = those; later = the steps on the Time plan still to come (not
+// counted); all/allDone = every stop of the map (the boats' place on the map). No agenda: every open tab counts, as before.
+function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0,later=0,all=0,allDone=0;const miss=[],on=vyOnPlan(ls,gid),db=window.elDueBefore?elDueBefore(info,gid):null;
+  const due=(a,g)=>{if(!db||db.acts.has(a.id))return true;const ps=db.tabs[a.id];if(!ps)return false;const id=vyTab(a,g[0]);return [...ps].some(p=>g.includes(p)||vyTab(a,p)===id)};
   acts(ls).filter(a=>!a.optional&&!a.manual&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,gid)).forEach(a=>{
     const ds=doneSet(s.uid,a),ks=(EL_ACTIONS[a.id]||[]).filter(k=>!(a.skip||[]).includes(k)),off=elSecLockedFor(a,info,gid,ds)||[],lk=k=>off.includes(k)||(k==="cards"||k==="practice")&&off.includes("vocab");
-    elTabGroups(a,ks).forEach(g=>{if(on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+vyTab(a,g[0])))return;const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;total++;if(d)done++;else miss.push([a,g[0]])})});
-  return {done,total,miss}}
+    elTabGroups(a,ks).forEach(g=>{const pl=!on||on.has(a.id+"#")||on.has(a.id+"#"+vyTab(a,g[0])),du=due(a,g);if(!pl&&!du)return;const d=g.every(k=>ds.has(k));if(!d&&g.every(lk))return;
+      if(pl){all++;if(d)allDone++}
+      if(!du){if(!d)later++;return}
+      total++;if(d)done++;else miss.push([a,g[0]])})});
+  return {done,total,miss,later,all,allDone}}
+// a student's LS mark so far (m, out of 10, as stored by progSync) and its parts in points (pt, elLsPts)
+function lsPtsOf(s,ls){const P=(ls,v)=>window.elLsPts?elLsPts(ls,v):null,dOf=(ls,p)=>window.elDailyOf?elDailyOf(ls,p):null;try{const pr=((S.D.rs[s.uid]||{})[asId(ls)]||{}).progress;
+    if(pr&&pr.total!=null)return {m:pr.total,pt:P(ls,{daily:dOf(ls,pr),exam:pr.exam,fp:pr.fp})};
+    if(G()){const gr=grade(s);return {m:gr.total,pt:P(ls,{daily:dOf(ls,{gv:gr.B.gv&&gr.B.gv.mark,other:gr.B.other}),exam:gr.B.exam,fp:gr.B.fp})}}}catch(e){}
+  return {m:null,pt:null}}
 function vyRank(grp,ls,studs){
   const fa=fpAct(ls),srt=S.vySort||"steps",gid=grp.id,art=VY_ART[grp.course]||VY_ART["4eso"];
-  const rows=studs.filter(s=>s.uid).map(s=>{const v=vySteps(s,ls,gid,fa);let m=null;try{const pr=((S.D.rs[s.uid]||{})[asId(ls)]||{}).progress;m=pr&&pr.total!=null?pr.total:G()?grade(s).total:null}catch(e){m=null}
-    const n=v.total-v.done,st=n>=5?"red":n>=2||m!=null&&m<5?"amber":"green";return {s,...v,n,m,st}});
+  const rows=studs.filter(s=>s.uid).map(s=>{const v=vySteps(s,ls,gid,fa),{m,pt}=lsPtsOf(s,ls);
+    const n=v.total-v.done,st=n>=5?"red":n>=2||m!=null&&m<5?"amber":"green";return {s,...v,n,m,pt,st}});
   const nm=r=>fullName(r.s),bym=(a,b)=>(b.m??-1)-(a.m??-1);
   rows.sort(srt==="name"?(a,b)=>nm(a).localeCompare(nm(b),"ca"):srt==="mark"?(a,b)=>bym(a,b)||b.done-a.done||nm(a).localeCompare(nm(b),"ca"):(a,b)=>b.done-a.done||bym(a,b)||nm(a).localeCompare(nm(b),"ca"));
   const ST={green:["🟢","On course"],amber:["🟠","Drifting"],red:["🔴","Needs a push"]},T=Math.max(0,...rows.map(r=>r.total)),first=s=>(shortName(s).short||"").split(" ")[0];
@@ -2135,8 +2151,13 @@ function body0(rows,srt,ST,nm){let red=false;
   return rows.map((r,i)=>{const line=srt==="steps"&&r.st==="red"&&!red?(red=true,`<tr class="vyline"><td colspan="6">🔴 From here: needs a push (5 or more steps missing)</td></tr>`):"";
     const nx=r.miss[0],todo=nx?`${stepName(nx[0].id,nx[1])}${r.miss.length>1?` <small class="muted">+${r.miss.length-1}</small>`:""}`:`<span class="muted">nothing: all done ✓</span>`;
     return line+`<tr class="vy-${r.st}"><td class="muted">${i+1}</td><td class="stu"><a data-do="stu" data-u="${esc(r.s.uid)}">${name(r.s)}</a></td>`
-      +`<td><span class="vybar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></span> <b>${r.done}</b> <small class="muted">/ ${r.total}</small></td>`
-      +`<td class="vytodo">${todo}</td><td><b>${f1(r.m)}</b></td><td>${ST[r.st][0]} ${ST[r.st][1]}</td></tr>`}).join("")}
+      +`<td class="vystp"><span class="vybar"><i style="width:${r.total?Math.round(r.done/r.total*100):0}%"></i></span> <b>${r.done}</b> <small class="muted">/ ${r.total}</small>${r.later?`<br><small class="muted" title="Steps on the Time plan for the coming classes: not counted yet">+${r.later} coming</small>`:""}</td>`
+      +`<td class="vytodo">${todo}</td><td class="vypts">${vyPts(r)}</td><td>${ST[r.st][0]} ${ST[r.st][1]}</td></tr>`}).join("")}
+// the LS mark so far as its parts in points of the LS's 10 (elLsPts in el-points.js; Roger, 21 Nov 2026: "2,5/4; 0/3,5 (per fer) 0/2,5
+// (per fer)"): 📚 daily work · 📝 exam · 🎬 final product; a part without a mark yet is "0 / 3.5 to do". Every part marked: the LS mark too.
+const VY_PI={daily:["📚","Daily work"],exam:["📝","Exam"],fp:["🎬","Final product"]},pt1=x=>(Math.round(x*10)/10).toLocaleString("en",{maximumFractionDigits:1});
+function vyPts(r){const P=r.pt;if(!P)return `<b>${f1(r.m)}</b>`;
+  return (P.all?`<b>${f1(r.m)}</b> <small class="muted">/ 10</small><br>`:"")+P.parts.map(p=>`<span class="vyp${p.v==null?" no":""}" title="${VY_PI[p.k][1]}: ${p.v==null?"no mark yet":f1(p.v)+" / 10"} · ${p.w} % of the LS mark">${VY_PI[p.k][0]} <b>${p.v==null?0:pt1(p.pts)}</b><small>/${pt1(p.max)}</small>${p.v==null?" <em>to do</em>":""}</span>`).join("")}
 // ⛵ the class map on the group's page itself (Roger, 21 Nov 2026: "I said I wanted to see this on the teacher's dashboard"): the students'
 // own map with every student's boat or van, under the class briefing; the list of who needs a push stays in ⛵ Class voyage
 function vyHome(grp,ls,studs){if(!VOY_COURSES.includes(grp.course)||!window.elVoyage)return "";
@@ -2144,11 +2165,11 @@ function vyHome(grp,ls,studs){if(!VOY_COURSES.includes(grp.course)||!window.elVo
   const map=vyMap(grp,ls,rows,fa,first);if(!map)return "";
   return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a></h2><div class="vymap">${map}</div></div>`}
 function vyBox(rows,srt,cnt,sea,body){
-  return `<div class="box vyrank"><h2>⛵ Class voyage: who needs a push</h2><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map: the Time plan's activities in open learning paths and sections, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>`
+  return `<div class="box vyrank"><h2>⛵ Class voyage: who needs a push</h2><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map done in class or set as homework so far, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>`
     +`<div class="bar"><span class="muted">Order by ·</span> ${[["steps","Steps done"],["mark","LS mark"],["name","Name"]].map(([k,l])=>`<button class="chip ${srt===k?"on":""}" data-do="vysort" data-s="${k}">${l}</button>`).join("")}`
     +` <span class="muted">· 🟢 ${cnt("green")} on course · 🟠 ${cnt("amber")} drifting · 🔴 ${cnt("red")} need a push</span></div>${sea}`
-    +`<div class="wrap"><table class="vyt"><thead><tr><th>#</th><th>Student</th><th>Steps done</th><th>Still to do</th><th>LS mark so far</th><th>Status</th></tr></thead><tbody>${body}</tbody></table></div>`
-    +`<p class="muted">🟢 On course: at most 1 step missing and a mark of 5 or more · 🟠 Drifting: 2 to 4 steps missing, or a mark under 5 · 🔴 Needs a push: 5 or more steps missing.</p></div>`}
+    +`<div class="wrap"><table class="vyt"><thead><tr><th>#</th><th>Student</th><th>Steps done</th><th>Still to do</th><th title="Points of the LS's 10 so far, part by part: 📚 daily work, 📝 exam, 🎬 final product">LS mark so far (points)</th><th>Status</th></tr></thead><tbody>${body}</tbody></table></div>`
+    +`<p class="muted">Steps done: only the steps done in class or set as homework so far; the ones planned for the coming classes show as "+N coming" and don't count yet. LS mark so far: the points each part gives of the LS's 10 (📚 daily work · 📝 exam · 🎬 final product); a part without a mark yet is "to do".<br>🟢 On course: at most 1 step missing and a mark of 5 or more · 🟠 Drifting: 2 to 4 steps missing, or a mark under 5 · 🔴 Needs a push: 5 or more steps missing.</p></div>`}
 // the students' map for the whole group: stops = the tabs on the group's Time plan (vyOnPlan) of its open learning paths, locked ones hidden
 let VYV=null;
 function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.D.ls[ls]||{},gid=grp.id,on=vyOnPlan(ls,gid),L=EL_LS.find(l=>l.id===ls);
@@ -2160,7 +2181,7 @@ function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.
     return {id:a.id,kind:a.checkpoint?"cp":"lp",plants}}).filter(b=>b.plants.length);
   if(!beds.length)return "";
   VYV={ls:window.elLsNum&&L?elLsNum(L):"",skin:ls,en:true,beds,now:null,fp:{title:fa?fa.title.replace(/\s*\([^)]*\)\s*$/,"").replace(/^final product:\s*/i,""):"",href:fa&&fa.path||"#",done:false},
-    me:null,mates:rows.map(r=>({n:first(r.s),s:r.done})),cont:null,store:null,save:false,
+    me:null,mates:rows.map(r=>({n:first(r.s),s:r.allDone??r.done})),cont:null,store:null,save:false,
     // music on, except in the group's class time (the 🎵 button can still turn it on)
     quiet:()=>!!(window.elSlotNow&&window.elTT&&elSlotNow(elTT(gid)))};
   // wired once the box is on the page; the view starts at the middle of the class (no "You" here)

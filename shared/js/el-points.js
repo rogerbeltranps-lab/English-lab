@@ -51,3 +51,15 @@ window.elMissing=(gid,term,isDone,infoOf,left)=>elDueWork(gid,term,infoOf).filte
 // every block of EL_GRADING[ls] except the final exam and the final product (from LS2 on: grammar, vocabulary and skills 35 % + other competences 5 % = 40 %).
 window.elFormativeShare=ls=>{const g=(window.EL_GRADING||{})[ls];if(!g||g.only||!g.blocks)return 0;
   return g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp").reduce((s,b)=>s+(+b.w||0),0)};
+// The LS mark in its parts, in points out of the LS's 10 (Roger, 21 Nov 2026: "Potser podriem posar la nota de la LS en 3 parts: 2,5/4;
+// 0/3,5 (per fer) 0/2,5 (per fer)", "perque ara com ho veuen es pensen que van millor del que van"): an 8.5 in the daily work alone read as
+// an 8.5 LS mark, so until every part has a mark the board and the dashboard show each part as points (daily work 3.4 / 4 · exam – / 3.5 ·
+// final product – / 2.5) and no single mark. v = {daily, exam, fp}, each out of 10 or null. Returns {parts: [{k, w, max, v, pts}], all,
+// got (points so far), left (points of the parts still to do)}, or null for an LS without blocks. LS1 (only exam and final product): two parts.
+window.elLsPts=function(ls,v){const g=(window.EL_GRADING||{})[ls];if(!g||!g.blocks)return null;const W=id=>+((g.blocks.find(b=>b.id===id)||{}).w)||0;
+  const parts=[["daily",g.only?0:elFormativeShare(ls)],["exam",W("exam")],["fp",W("fp")]].filter(([,w])=>w)
+    .map(([k,w])=>{const m=v&&v[k]!=null&&!isNaN(v[k])?+v[k]:null;return {k,w,max:w/10,v:m,pts:m==null?null:m*w/100}});
+  const kn=parts.filter(p=>p.v!=null);return {parts,all:!!parts.length&&kn.length===parts.length,got:kn.reduce((n,p)=>n+p.pts,0),left:parts.filter(p=>p.v==null).reduce((n,p)=>n+p.max,0)}};
+// the daily work out of 10 from a stored progress ({gv, other, …}; results/{ls}__assessment.progress): its blocks by weight, the ones with a mark
+window.elDailyOf=function(ls,p){const g=(window.EL_GRADING||{})[ls];if(!g||!g.blocks||g.only||!p)return null;
+  const cs=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"&&p[b.id]!=null),w=cs.reduce((n,b)=>n+(+b.w||0),0);return w?cs.reduce((n,b)=>n+p[b.id]*b.w,0)/w:null};
