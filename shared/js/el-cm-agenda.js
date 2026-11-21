@@ -81,6 +81,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag .it:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .it .go{margin-left:auto;color:#4338ca;font-weight:800;white-space:nowrap}
 #el-cmag .crt{display:block;margin:-2px 0 6px auto;padding:3px 10px;border:1.5px solid #86efac;border-radius:999px;background:#f0fdf4;color:#166534;font:700 13px system-ui,sans-serif;cursor:pointer}#el-cmag .crt:hover{border-color:#16a34a}
 #el-cmag.dock .crt{font-size:12px;padding:2px 8px}
+#el-cmag .shmap{display:block;width:100%;margin:0 0 8px;padding:7px 10px;border:1.5px solid #d9b26a;border-radius:999px;background:#fdf2d6;color:#7c4a03;font:800 14px system-ui,sans-serif;cursor:pointer}#el-cmag .shmap:hover{border-color:#b45309}
 #el-cmag .tbs{display:flex;gap:6px;margin:0 0 8px}#el-cmag .tbs button{flex:1;padding:6px 8px;border:1.5px solid #c7d2fe;border-radius:999px;background:#fff;color:#3730a3;font:700 14px system-ui,sans-serif;cursor:pointer}#el-cmag .tbs button.on{background:#3730a3;color:#fff;border-color:#3730a3}#el-cmag .pt{margin:14px 2px 0;padding-bottom:2px;font:700 15px Georgia,serif;color:#4a2f0e;border-bottom:1px dashed #d9c294}
 #el-cmag .it.nt{background:#fef9c3;border-color:#fde047;cursor:default}#el-cmag .it.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6;cursor:pointer}
 #el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag button.it.ex{cursor:pointer}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
@@ -250,7 +251,7 @@ const VOYF={"4eso":[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🇺🇸","USA"
   "2eso":[["🏴󠁧󠁢󠁥󠁮󠁧󠁿","England"],["🏴󠁧󠁢󠁳󠁣󠁴󠁿","Scotland"],["🇺🇸","USA"],["🇨🇦","Canada"],["🇯🇲","Jamaica"],["🇦🇺","Australia"]]},VOY=Object.keys(VOYF);
 let TB="today";
 const crsC=()=>C?((window.EL_GROUPS||[]).find(x=>x.id===C.g)||{}).course||(String(C.g).match(/^\d+eso/i)||[""])[0].toLowerCase():"",voyC=()=>VOY.includes(crsC());
-const tbBar=()=>voyC()?`<div class="tbs" role="tablist"><button data-tb="today" class="${TB==="today"?"on":""}" role="tab" aria-selected="${TB==="today"}">📋 Today</button><button data-tb="steps" class="${TB==="steps"?"on":""}" role="tab" aria-selected="${TB==="steps"}">🧭 Class steps</button></div>`:"";
+const tbBar=()=>voyC()?`<div class="tbs" role="tablist"><button data-tb="today" class="${TB==="today"?"on":""}" role="tab" aria-selected="${TB==="today"}">📋 Today</button><button data-tb="steps" class="${TB==="steps"?"on":""}" role="tab" aria-selected="${TB==="steps"}">🧭 Class steps</button></div>`+`<button class="shmap" data-map="1" title="The class map with the % of students who did each step, full screen on the projector; every student's screen says 👀 Look at the screen">⛵ Show the class map</button>`:"";
 // the LS: the one with steps today, else the one of this page, else the latest with an agenda (C.lsInfo: the page's cached read of the LS)
 async function stepsLs(){const t=todayLs()[0];if(t)return t;
   const a=(window.EL_CATALOG||[]).find(z=>z.path&&new URL(z.path,C.root).pathname===location.pathname),y=a&&(L||[]).find(z=>z.ls.id===a.ls);if(y)return y;
@@ -313,7 +314,7 @@ function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];
   box.innerHTML=`<div class="hd"><b>➕ Add a step</b><button class="x" data-x="1" title="Hide">✕</button></div><button class="back" data-back="1">‹ Back to today</button>`+msg()
     +`<p class="msg" style="margin-top:0">It goes on today's class on the Time plan, opens for ${E(C.gname)} and students can do it (👥).</p>`+(body||`<p class="msg">No learning paths found.</p>`);
   box._add=its}
-function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.tb){TB=b.dataset.tb;ADD=false;MO=null;return draw()}if(b.dataset.wu)return warmOpen();
+function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.map)return mapOpen();if(b.dataset.tb){TB=b.dataset.tb;ADD=false;MO=null;return draw()}if(b.dataset.wu)return warmOpen();
   if(b.dataset.ex){location.href=new URL(b.dataset.ex,C.root).href;return}
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
@@ -378,6 +379,31 @@ export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}con
 // live/{group}.go.rem = {s: this class mode, at}: each student in this class mode sees ✅ Finish all your activities once (el-cloud.js
 // cmRemind). One write per class; Stop clears it with the rest of go.
 export function remind(){if(!C||!C.s)return Promise.resolve();return C.setDoc(C.doc(C.db,"live",C.g),{go:{rem:{s:C.s,at:Date.now()}}},{merge:true})}
+// ⛵ Show the class map (Roger, 21 Nov 2026: "In class mode I want to be able to show this to students, when I show it on the panel, they
+// see look at the panel"): the class map of the dashboard's group page, full screen over the class tab (the projector), with 🧭 Class steps
+// (the % of students who did each step and place; no tap for names here). It is the dashboard's copy in this browser (teacher.html vyMap,
+// localStorage el_vymap_<group>, kept each time the group page is drawn): no reads. While it shows, live/{group}.go.look = {s, at} and every
+// student's screen in this class mode says 👀 Look at the screen (el-cloud.js cmLook); ✕ Close (or Esc) takes it off. Stop clears it with go.
+let mapBox=null;
+const mapCopy=()=>{try{const x=JSON.parse(localStorage.getItem("el_vymap_"+C.g)||"null");return x&&x.V&&x.V.beds?x:null}catch(e){return null}};
+const lookSet=on=>C&&C.s?C.setDoc(C.doc(C.db,"live",C.g),{go:{look:on?{s:C.s,at:Date.now()}:null}},{merge:true}).catch(e=>console.warn("look at the screen",e)):null;
+export async function mapOpen(){if(!C||mapBox)return;const x=mapCopy();
+  if(!x){const m=box&&box.querySelector(".shmap");if(m)m.insertAdjacentHTML("afterend",`<p class="msg err">Open ${E(C.gname)}'s page on the dashboard once first: the map comes from there.</p>`);return}
+  await load("shared/js/el-voyage.js",()=>!!window.elVoyage);if(!window.elVoyage)return;
+  if(!document.getElementById("el-cmmap-css")){const st=document.createElement("style");st.id="el-cmmap-css";st.textContent=`
+#el-cmmap{position:fixed;inset:0;z-index:2147482600;background:#fbf6ea;display:flex;flex-direction:column;padding:10px 14px 12px;font:16px system-ui,sans-serif}
+#el-cmmap .hd{display:flex;align-items:center;gap:12px;margin:0 0 8px}#el-cmmap .hd b{font:700 22px Georgia,serif;color:#4a2f0e}#el-cmmap .hd small{color:#8a5a1f;font-weight:600}
+#el-cmmap .hd button{margin-left:auto;padding:7px 16px;border:0;border-radius:999px;background:#4338ca;color:#fff;font:800 15px system-ui,sans-serif;cursor:pointer}
+#el-cmmap .vy{margin:0;flex:1;min-height:0;display:flex;flex-direction:column}#el-cmmap .vy-row{height:auto;flex:1;min-height:0}#el-cmmap .vy-go,#el-cmmap .vy-down{display:none}
+#el-cmmap .vy-steps{width:min(400px,30vw)}#el-cmmap .vy-steps li.s a{font-size:15px}#el-cmmap .vy-steps .pc{font-size:14px;min-width:52px}#el-cmmap .vy-steps .pt{font-size:15px}`;document.head.append(st)}
+  const V=Object.assign({},x.V,{later:new Set(x.V.later||[]),view:"cm:"+C.g,quiet:()=>false});
+  const at=new Date(x.at||Date.now()),hm=at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),day=at.toDateString()===new Date().toDateString()?hm:dLab(at.toLocaleDateString("en-CA"))+" "+hm;
+  mapBox=document.createElement("div");mapBox.id="el-cmmap";
+  mapBox.innerHTML=`<div class="hd"><b>⛵ ${E(x.gname||C.gname)}</b><small>· the class on the map · numbers from the dashboard, ${E(day)}</small><button data-close="1">✕ Close</button></div><div class="vymap">${elVoyage.html(V)}</div>`;
+  document.body.append(mapBox);mapBox.querySelector("[data-close]").onclick=mapClose;addEventListener("keydown",mapKey);addEventListener("pagehide",mapClose,{once:true});
+  elVoyage.wire(mapBox.querySelector(".vymap"),V);lookSet(true)}
+function mapKey(e){if(e.key==="Escape")mapClose()}
+export function mapClose(){if(!mapBox)return;mapBox.remove();mapBox=null;removeEventListener("keydown",mapKey);removeEventListener("pagehide",mapClose);try{window.elVoyage&&elVoyage.SND.stopBg()}catch(e){}lookSet(false)}
 export function refresh(){if(box&&L)draw()}
 
 // ⏹ The end of the class: each of today's steps ✔ Finished, ⏭ Next class or 🏠 Homework (Roger, 12 Nov 2026: "When I finish the class mode, a
