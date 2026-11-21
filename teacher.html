@@ -162,7 +162,7 @@ ul.ibl{list-style:none;padding:0;margin:8px 0;border-top:1px solid #e5e7eb}ul.ib
 .ibrow .ibmeta{display:flex;gap:10px;align-items:center;white-space:nowrap;font-size:13px;color:#5f6368}
 .ibrow.new{background:#fff}.ibrow.new .ibwho,.ibrow.new .ibsub b,.ibrow.new time{font-weight:700;color:#202124}
 .iblab{display:inline-block;font-size:12px;color:#444746;background:#e8eaed;border-radius:4px;padding:1px 6px;margin-right:8px;vertical-align:1px;font-weight:500}.iblab.you{background:#fde68a;color:#78350f}
-.ibx .pbst{display:inline-block;font-weight:700;border-radius:999px;padding:1px 8px;font-size:12px}.ibx .pbst.fixed{background:#dcfce7;color:#166534}.ibx .pbst.nobug{background:#dbeafe;color:#1e40af}.ibx .pbst.you{background:#fef3c7;color:#92400e}.ibx .pbst.done{background:#e2e8f0;color:#475569}
+.ibx .pbst{display:inline-block;font-weight:700;border-radius:999px;padding:1px 8px;font-size:12px}.ibx .pbst.fixed{background:#dcfce7;color:#166534}.ibx .pbst.nobug{background:#dbeafe;color:#1e40af}.ibx .pbst.you{background:#fef3c7;color:#92400e}.ibx .pbst.done{background:#e2e8f0;color:#475569}.ibx .pbst.ans{background:#e0e7ff;color:#3730a3}
 .ibback{margin:0 0 4px}details.ibdone>summary{font-size:14px;color:#475569;margin-top:6px}
 .mail{max-width:820px}.mail .msubj{font-size:1.35rem;margin:6px 0 14px;line-height:1.3}.mail .mfrom{display:flex;gap:12px;align-items:center;margin:0 0 14px}
 .mail .mav{flex:none;width:44px;height:44px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px}.mail .mname{font-size:17px}.mail .mgrp{color:#475569;font-weight:600;font-size:14px;margin-left:4px}
@@ -5182,7 +5182,7 @@ function sgBox(){
   const how=`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. Open one to read it all: the student, group, page and time. A few minutes after an idea arrives, Beltran writes a draft reply (in your voice, both languages; "Reply ready" in the list): ↩ Answer opens it in the box, ready to change, and nothing goes until you press Send. 💬 Answer sends the student your words: they see them on a card at the top of the next page they open (in Catalan or English like their level), and here you see if they have read it. Opening an idea marks it as read.</p></details>`;
   const x=S.sgOpen&&L.find(y=>y.id===S.sgOpen);
   if(x)return `<div class="box ibx" id="sugg"><button class="g ibback" data-do="sgview" data-id="">‹ All ideas</button><div class="pbl">${li(x)}</div></div>`;
-  const row=x=>ibRow(x,"sgview",!x.read,esc(ibSender(x)),gr(x),"💡 "+esc(x.text),"",(x.msgs||[]).length,sgWhen(x),sgDraft(x)?'<span class="iblab" title="Beltran wrote a reply: ↩ Answer opens it, ready to change and send">Reply ready</span>':"");
+  const row=x=>ibRow(x,"sgview",!x.read&&!(x.msgs||[]).length,esc(ibSender(x)),gr(x),"💡 "+esc(x.text),"",(x.msgs||[]).length,sgWhen(x),sgDraft(x)?'<span class="iblab" title="Beltran wrote a reply: ↩ Answer opens it, ready to change and send">Reply ready</span>':"");
   return `<div class="box ibx" id="sugg"><h2>💡 Ideas from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small></h2>${how}`
     +(L.length?`<ul class="ibl">${L.map(row).join("")}</ul>`:'<p class="muted">No ideas yet.</p>')+`</div>`;
 }
@@ -5193,13 +5193,19 @@ function sgBox(){
 // 📣 Announcements, each with its own count, and only the chosen one below. With no tab chosen (the menu, the bottom bar) it opens the
 // first one with something new, else Problems while one is open, else Announcements. The Home alerts and Read buttons open their own tab.
 // "Can you make a way to unmark all the messages" (same day): ✓ Mark all as read clears every count at once (msgsSeen).
-function pbNew(){return ((S.D||{}).pb||[]).filter(x=>!x.fixed&&!x.seen)}
-function sgNew(){return ((S.D||{}).sg||[]).filter(x=>!x.read)}
+// A report Roger has answered counts as dealt with (Roger, 21 Nov 2026, on a "✋ Needs you" report with its suggested reply still showing
+// above "You answered … read ✓": "Pensava q això ja ho havia contestat"): any answer sent and not taken back, whichever button sent it
+// (📨 Send, ✏️ Edit first or ↩ Answer). It leaves the open list and every count, shows "💬 Answered", and its suggested reply goes away.
+const pbAns=x=>!x.teacher&&(x.msgs||[]).some(m=>!m.back);
+const pbDone=x=>!!x.fixed||pbAns(x);
+function pbNew(){return ((S.D||{}).pb||[]).filter(x=>!pbDone(x)&&!x.seen)}
+// an idea you answered is not new any more, even if it was never marked as read (same rule as pbAns)
+function sgNew(){return ((S.D||{}).sg||[]).filter(x=>!x.read&&!(x.msgs||[]).length)}
 function msgsN(){return pbNew().length+sgNew().length+msgNew().length}
 const MSG_TABS=[["pb","⚠️","Problems"],["sg","💡","Ideas"],["ann","📣","Announcements"]];
 function msgsBoxes(){
   const n={pb:pbNew().length,sg:sgNew().length,ann:(S.D.ann||[]).filter(annMine).filter(msgWait).length};
-  const t=MSG_TABS.some(([k])=>k===S.msgTab)?S.msgTab:["pb","sg","ann"].find(k=>n[k])||(S.D.pb.some(x=>!x.fixed)?"pb":"ann"),all=msgsN();
+  const t=MSG_TABS.some(([k])=>k===S.msgTab)?S.msgTab:["pb","sg","ann"].find(k=>n[k])||(S.D.pb.some(x=>!pbDone(x))?"pb":"ann"),all=msgsN();
   const tabs=`<div class="msgtabs" role="tablist">${MSG_TABS.map(([k,ic,l])=>`<button role="tab" aria-selected="${k===t}" class="${k===t?"on":"g"}" data-do="msgtab" data-t="${k}">${ic} ${l}${n[k]?` <b class="${k==="pb"?"late":""}">${n[k]}</b>`:""}</button>`).join("")}`
     +(all?`<button class="g seenall" data-do="msgsseen" title="Every count goes back to 0: new problem reports stay open (only the &quot;new&quot; mark goes), ideas are marked as read, new answers to your messages as seen. Nothing is sent to students.">✓ Mark all as read <small class="muted">(${all})</small></button>`:"")+`</div>`;
   return tabs+(t==="pb"?pbBox():t==="sg"?sgBox():annBox())}
@@ -5210,7 +5216,7 @@ async function msgsSeen(){const pb=pbNew(),sg=sgNew(),an=msgNew();
     ...an.map(a=>b=>b.update(F.doc(db(),"announcements",a.id),{tDone:(a.thread||[]).length}))];
   for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}}
 function pbBox(){
-  const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
+  const L=[...S.D.pb].sort((a,b)=>(pbDone(a)-pbDone(b))||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!pbDone(x)).length;
   // the teacher's own reports (⚠️ Problem in the bottom bar of the dashboard, the class tab or any page; Roger, 13 Nov 2026): "👨‍🏫 You",
   // with no 💬 Answer and no suggested reply (there is no student to tell)
   const who=x=>x.teacher?"<b>👨‍🏫 You</b>":S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
@@ -5223,13 +5229,13 @@ function pbBox(){
     return ibMail("pb-"+esc(x.id),esc(PB_KIND[x.kind]||x.kind),tags,x,gr(x),x.route?" "+route(x.route):"",pbWhen(x),wh,x.text,rest,tools)};
   const x=S.pbOpen&&L.find(y=>y.id===S.pbOpen);
   if(x)return `<div class="box ibx" id="probs"><button class="g ibback" data-do="pbview" data-id="">‹ All reports</button><div class="pbl">${li(x)}</div></div>`;
-  const st=x=>{if(x.fixed)return `<span class="iblab">${x.nobug?"Closed":"Fixed"}</span>`;const k=pbStatus(x.auto),todo=x.auto&&x.auto.reply&&!x.teacher&&!(x.msgs||[]).some(m=>m.sug);
+  const st=x=>{if(x.fixed)return `<span class="iblab">${x.nobug?"Closed":"Fixed"}</span>`;if(pbAns(x))return '<span class="iblab" title="You answered the student">Answered</span>';const k=pbStatus(x.auto),todo=x.auto&&x.auto.reply&&!x.teacher;
     return k?`<span class="iblab ${k==="you"?"you":""}" title="Beltran's check${todo?": a reply is ready for you to send":""}">${{fixed:"Fixed",nobug:"Not a bug",you:"Needs you"}[k]}${todo?" · reply ready":""}</span>`:""};
-  const open=L.filter(x=>!x.fixed),done=L.filter(x=>x.fixed),row=x=>ibRow(x,"pbview",!x.fixed&&!x.seen,x.teacher?"<b>👨‍🏫 You</b>":esc(ibSender(x)),gr(x),esc(PB_KIND[x.kind]||x.kind),x.text,(x.msgs||[]).length,pbWhen(x),st(x));
+  const open=L.filter(x=>!pbDone(x)),done=L.filter(pbDone),row=x=>ibRow(x,"pbview",!pbDone(x)&&!x.seen,x.teacher?"<b>👨‍🏫 You</b>":esc(ibSender(x)),gr(x),esc(PB_KIND[x.kind]||x.kind),x.text,(x.msgs||[]).length,pbWhen(x),st(x));
   return `<div class="box ibx" id="probs"><h2>⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small></h2>`
     +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Open a report to read it all and act on it (opening it marks it as read). Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page; so can you (👨‍🏫 You: from the dashboard, the class tab or any page, Beltran looks at it straight away). Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Beltran copies the whole report and opens the English Lab project (the app or the browser), where you paste it to start a thread. 💬 Answer sends the student your own message (to explain something, or to ask for more details). ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. Under each report, Beltran says where it stands (✅ Fixed, 👍 Not a bug or ✋ Needs you, with what to do first) and suggests a reply: 📨 sends it with one click, ✏️ Edit first lets you change it. The 🔔 in the bottom bar of every page and the 💬 Messages count show the new ones; ✓ Mark all as read clears the counts (open reports stay open, with nothing sent to students).</p></details>`
     +(open.length?`<ul class="ibl">${open.map(row).join("")}</ul>`:'<p class="muted">No open problem reports. 🎉</p>')
-    +(done.length?`<details class="ibdone"><summary>Fixed and closed <small class="muted">(${done.length})</small></summary><ul class="ibl">${done.map(row).join("")}</ul></details>`:"")+`</div>`;
+    +(done.length?`<details class="ibdone"><summary>Fixed, closed and answered <small class="muted">(${done.length})</small></summary><ul class="ibl">${done.map(row).join("")}</ul></details>`:"")+`</div>`;
 }
 // ---- answers to students in both languages (Roger, 20 Nov 2026, on an answer in English only to a student who wrote in Catalan: "It
 // should also have the catalan version"). Like 📣 Announcements: he writes in English or Catalan (I write in, kept on this computer,
@@ -5291,9 +5297,9 @@ const pbSent=x=>(x.msgs||[]).length?`<div class="pbsent">${x.msgs.map(m=>{const 
 // ✏️ Edit first opens 💬 Answer with it. It goes away once sent with that button or once the report is fixed or closed.
 const PB_ST={fixed:["✅ Fixed","Send and mark as fixed"],nobug:["👍 Not a bug","Send and close the report"],you:["✋ Needs you","Send"]};
 const pbStatus=a=>a?PB_ST[a.status]?a.status:a.verdict==="fixed"?"fixed":"you":null;
-const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return "";const en=!!x.route&&!elCa(x.route),[lab,btn]=PB_ST[st];
-  const sent=(x.msgs||[]).some(m=>m.sug)||x.fixed||(a.verdict==="fixed"&&!a.reply),fixMode=st==="fixed"?"1":st==="nobug"?"close":"";
-  return `<div class="pbauto"><span class="pbst ${st}">${lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}${a.go>Date.now()&&!a.shown&&x.fixed&&!x.teacher?`<div class="pbhold">🕗 Not shown yet: the student gets Beltran's ✅ card at ${goWhen(a.go)} (school hours, at least 2 hours after the report).<button class="g" data-do="pbnow" data-id="${esc(x.id)}" title="The card shows on the student's next page from now">📨 Show it now</button></div>`:""}</div>`
+const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return "";const en=!!x.route&&!elCa(x.route),[lab,btn]=PB_ST[st],ans=pbAns(x)&&!x.fixed;
+  const sent=pbAns(x)||x.fixed||(a.verdict==="fixed"&&!a.reply),fixMode=st==="fixed"?"1":st==="nobug"?"close":"";
+  return `<div class="pbauto"><span class="pbst ${ans?"ans":st}">${ans?"💬 Answered":lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed&&!ans?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}${a.go>Date.now()&&!a.shown&&x.fixed&&!x.teacher?`<div class="pbhold">🕗 Not shown yet: the student gets Beltran's ✅ card at ${goWhen(a.go)} (school hours, at least 2 hours after the report).<button class="g" data-do="pbnow" data-id="${esc(x.id)}" title="The card shows on the student's next page from now">📨 Show it now</button></div>`:""}</div>`
     +(a.reply&&!sent&&!x.teacher?`<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(${en?"English":"Catalan"} first, like their route${a.reply2?`, and the ${en?"Catalan":"English"} version under it`:"; ✏️ Edit first adds the other language"}; they see it on a card the next time they open a page)</small><p>${esc(pbRe(x,"reply"))}</p>${a.reply2?`<p><span class="muted">🌐 ${en?"Catalan":"English"}:</span> ${esc(pbRe(x,"reply2"))}</p>`:""}
     <button data-do="pbsug" data-id="${esc(x.id)}" data-f="${fixMode}" title="${st==="fixed"?"One card: the ✅ fixed note with this message under it":st==="nobug"?"The student gets this message and the report is closed":"The student gets this message; the report stays open"}">📨 ${btn}</button> <button class="g" data-do="pbsuged" data-id="${esc(x.id)}">✏️ Edit first</button></div>`:"")};
 // the card a student gets for an answer to their suggestion: in the language of their level now (Catalan for Starter, Base or no level yet)
@@ -5319,7 +5325,7 @@ function sgAnswer(id){
   $("#sgt").addEventListener("input",draw);draw();$("#sgt").focus()}
 // also ↩ Answer (Roger, 20 Nov 2026: a draft ready in every answer box), while that reply has not been sent and the report is open
 const pbNm=x=>nmWords(S.P[x.uid],x.name),pbRe=(x,k)=>noNames((x.auto||{})[k],pbNm(x));   // the suggested reply without the student's name (noNames)
-const pbPre=x=>{const a=x.auto||{};return a.reply&&!x.fixed&&!(x.msgs||[]).some(m=>m.sug)?{text:pbRe(x,"reply"),other:pbRe(x,"reply2")||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
+const pbPre=x=>{const a=x.auto||{};return a.reply&&!x.fixed&&!pbAns(x)?{text:pbRe(x,"reply"),other:pbRe(x,"reply2")||"",lang:!!x.route&&!elCa(x.route)?"en":"ca"}:null};
 // "💬 Answer": write to the student. The card's own words follow the report's language; the message goes as written.
 function pbAnswer(id,pre){
   const x=S.D.pb.find(y=>y.id===id);if(!x)return;const en=!!x.route&&!elCa(x.route),who=S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email);
@@ -6522,7 +6528,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>lateAsk(()=>msgSend(u,k.id)),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annAtMs()?annSendNow():lateAsk(annSendNow),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),msgtab:()=>{S.msgTab=k.t;S.pbOpen=S.sgOpen=null;render()},
-    pbview:()=>{S.pbOpen=k.id||null;const x=k.id&&S.D.pb.find(y=>y.id===k.id);scrollTo(0,0);if(x&&!x.fixed&&!x.seen)act(api.pbSeen(x.id));else render()},
+    pbview:()=>{S.pbOpen=k.id||null;const x=k.id&&S.D.pb.find(y=>y.id===k.id);scrollTo(0,0);if(x&&!pbDone(x)&&!x.seen)act(api.pbSeen(x.id));else render()},
     sgview:()=>{S.sgOpen=k.id||null;const x=k.id&&(S.D.sg||[]).find(y=>y.id===k.id);scrollTo(0,0);if(x&&!x.read)act(api.sgRead(x.id,true));else render()},msgsseen:()=>act(msgsSeen()),sgmsg:()=>sgAnswer(k.id),
     sgmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(api.sgMsg(k.id,v))})},sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";S.msgTab="pb";S.pbOpen=null;render();$("#probs").scrollIntoView({behavior:"smooth"})},
@@ -6635,7 +6641,7 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
 
 // the teacher's 🔔 (shared/js/el-bell.js): "All reports" lands on #probs and one report on #pb-<id> (from another page), or it sends
 // el-probs (detail = the report's id) on this page; the list is reloaded and that report is shown in the middle, lit up for a moment
-const toProbs=async id=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.warn("problems",e)}S.open.add("probs");S.place="msgs";S.msgTab="pb";S.pbOpen=id||null;if(id){const x=S.D.pb.find(y=>y.id===id);if(x&&!x.fixed&&!x.seen)await act(api.pbSeen(id))}render();
+const toProbs=async id=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.warn("problems",e)}S.open.add("probs");S.place="msgs";S.msgTab="pb";S.pbOpen=id||null;if(id){const x=S.D.pb.find(y=>y.id===id);if(x&&!pbDone(x)&&!x.seen)await act(api.pbSeen(id))}render();
   const r=id&&document.getElementById("pb-"+id),b=r||$("#probs");if(!b)return;b.scrollIntoView({behavior:"smooth",block:r?"center":"start"});
   if(r&&r.animate)r.animate([{background:"#fef3c7"},{background:"#fef3c7",offset:.6},{background:"transparent"}],{duration:2200})};
 addEventListener("el-probs",e=>toProbs(e.detail));

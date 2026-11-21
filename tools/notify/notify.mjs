@@ -7,7 +7,7 @@
 //     1. the class sessions not ticked, per group: the same list as the dashboard's "⚠ Weekend check" (pending() in teacher.html: sessions before
 //        today, not ticked in teacherPlan/{group}.ticks, not set as homework, not "Homework by …", "moved to" or self-study lines). Left
 //        alone they move to next week's list (↪), so the email suggests ticking them or 🏠 Set as homework.
-//     2. the problem reports not marked as fixed and the ideas of the last 7 days.
+//     2. the problem reports and ideas of the last 7 days that are not fixed, closed or answered yet.
 // Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) to Roger's school inbox roger.beltran@ietramuntana.cat
 // (TEACHER_TO; never his personal Gmail, Roger 19 Nov 2026); no school relay or password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
 // The Action log is public (the repo is public): counts only, never names or text.
@@ -103,8 +103,11 @@ const nBehind=behind.reduce((a,[,ps])=>a+ps.length,0);
 
 // ---- 2. problem reports and ideas of the last 7 days
 const weekAgo=new Date(Date.now()-7*864e5).toISOString();
-const [allProbs,ideas]=await Promise.all([since("problems",weekAgo),since("suggestions",weekAgo)]);
-const probs=allProbs.filter(x=>!x.fixed),nFixed=allProbs.length-probs.length;   // the ones already marked as fixed need nothing
+const [allProbs,allIdeas]=await Promise.all([since("problems",weekAgo),since("suggestions",weekAgo)]);
+// the ones already fixed, closed or answered need nothing (Roger, 21 Nov 2026, on this email listing reports he had already answered:
+// "he rebut aquest mail amb problemes que ja he solucionat"). Answered = an answer sent and not taken back (msgs[].back), as on the dashboard.
+const answered=x=>(x.msgs||[]).some(m=>!m.back);
+const [probs,ideas]=[allProbs.filter(x=>!x.fixed&&!answered(x)),allIdeas.filter(x=>!answered(x))],nFixed=allProbs.length-probs.length,nIdeasDone=allIdeas.length-ideas.length;
 // ---- 3. website problems found by the weekly site check (Roger, 1 Nov 2026: "send me a mail if theres any prob"). The check runs on Saturday
 // at 5:45 Madrid time, before this email, and opens a GitHub issue labelled site-check for each problem it finds; Roger closes it when it is fixed.
 let siteIssues=[];
@@ -119,8 +122,8 @@ if(!nBehind&&!probs.length&&!ideas.length&&!siteIssues.length){console.log("Noth
 const out=["Good morning! Here is your English Lab week.",""];
 if(nBehind)out.push("⚠ SESSIONS NOT TICKED ("+nBehind+")","Tick the ones you did. For the others, 🏠 Set as homework so students do them at home, or leave them: they move to next week's list.","",
   ...behind.flatMap(([x,ps])=>[x.name+":",...ps.map(y=>"   ☐ "+y.line),""]),"Open the Time plan: "+SITE+"teacher.html","");
-if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already marked as fixed.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
-if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
+if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already fixed or answered.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
+if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),(nIdeasDone?"("+n(nIdeasDone,"more idea","more ideas")+" this week already answered.)\n":"")+"Open them: "+SITE+"teacher.html","");
 if(siteIssues.length)out.push("🛠️ WEBSITE PROBLEMS FOUND BY THE WEEKLY CHECK ("+siteIssues.length+")","",...siteIssues.map(x=>"• "+x.title+"\n   "+x.html_url+"\n"),"Close each one on GitHub when it is fixed.","");
 out.push("—","English Lab sends this every Saturday morning, only when there is something. Students do not see it.");
 const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):"",siteIssues.length?n(siteIssues.length,"website problem","website problems"):""].filter(Boolean);
