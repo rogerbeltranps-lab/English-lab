@@ -1999,16 +1999,18 @@ const spkGet=(gid,ls,u,fid)=>((SPK.d[spkDoc(ls,gid)]||{})[u]||{})[fid]||null;
 // Classroom or by a link (fpgVideo, as 🎬 Final product); group videos are left out (Roig can't tell which voice is the student) and so
 // are YouTube links (no file).
 function spkRecs(studs,lss){const out=[];studs.forEach(s=>lss.forEach(ls=>acts(ls).forEach(a=>{const st=pstate(s.uid,a).steps||{};
-  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""})})})));
+  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
   lss.forEach(ls=>{const a=fpAct(ls);if(a)studs.forEach(s=>{const r=spkFpRec(s,a);if(r)out.push(r)})});
   return out.sort((p,q)=>tms(q.at)-tms(p.at))}
 const spkLevels=an=>SPK_LV.map(([k])=>an&&an[k]&&an[k].level!=null?+an[k].level:null);
 const spkScore=an=>prAvg(spkLevels(an));   // 0-4, the average of the four levels
 const spkFpRec=(s,a)=>{let v=null;try{v=fpgVideo(s.uid,a)}catch(e){}return v&&v.id&&!v.by?{u:s.uid,s,a,k:"fp",ls:a.ls,fid:v.id,ids:v.ids||[],secs:null,at:v.at||null,title:"",fp:true}:null};
-const spkTask=(a,k,title)=>k==="fp"?(a.title||"Final product")+" (the final product: a spoken presentation)":(a.title||a.id)+" · "+(title||tabName(a,k)||cpName(a.id,k));
+// 🎲 a Surprise questions recording (sq): the four questions it answered go with the task, so the analysis judges the answers to them
+const spkQs=x=>{const f=((x&&x.f)||[]).find(y=>y.l==="Questions asked");return x&&x.sq&&f?String(f.v||"").replace(/\s*\n\s*/g," / "):""};
+const spkTask=(a,k,title,qs)=>k==="fp"?(a.title||"Final product")+" (the final product: a spoken presentation)":(a.title||a.id)+" · "+(title||tabName(a,k)||cpName(a.id,k))+(qs?" · four surprise questions answered without preparation, easy to harder: "+qs:"");
 const spkCost=list=>list.reduce((n,r)=>n+(r.fp?SPK_EUR_FP:SPK_EUR),0);
 const spkCefr=ls=>/my-real-routine/.test(ls)&&ls.startsWith("2eso")?"A1":"A2+";
-async function spkOne(r,gid){const j=await fpgCall({action:"speak_an",fileId:r.fid,fp:!!r.fp,fileIds:r.ids||[],task:spkTask(r.a,r.k,r.title),level:level(r.u,r.ls),course:r.ls.startsWith("2eso")?"2 ESO":"4 ESO",cefr:spkCefr(r.ls)});
+async function spkOne(r,gid){const j=await fpgCall({action:"speak_an",fileId:r.fid,fp:!!r.fp,fileIds:r.ids||[],task:spkTask(r.a,r.k,r.title,r.qs),level:level(r.u,r.ls),course:r.ls.startsWith("2eso")?"2 ESO":"4 ESO",cefr:spkCefr(r.ls)});
   const rec={a:r.a.id,k:r.k,at:r.at||null,an:j.an,model:j.model||"",eur:j.eur==null?null:j.eur,done:new Date().toISOString()},id=spkDoc(r.ls,gid),d=SPK.d[id]=SPK.d[id]||{};
   (d[r.u]=d[r.u]||{})[r.fid]=rec;SPK.v++;FPG.cost=null;await put(["settings",id],{[r.u]:{[r.fid]:rec}});return rec}
 // analyse a list of recordings, three at a time; the line at the top of the page shows how far it is; ⏸ Stop finishes the ones running
@@ -2037,7 +2039,7 @@ function spkCard(rec,r){const an=(rec||{}).an;if(!an)return "";const V=an.voc||{
 // under the 🔊 player in the recording window (wrOpen): the analysis, or a button to make it
 function spkBox(u,aid,step){const a=byId(aid),x=((pstate(u,a)||{}).steps||{})[step],s=S.P[u];if(!a||!s||!x||!x.audio||!x.audio.id)return "";
   const gid=s.group;if(!SPK.d[spkDoc(a.ls,gid)]){spkLoad(a.ls,gid).then(()=>{if(redraw&&$("#dlg").open)redraw()});return `<p class="muted">🗣 Loading the speaking analysis…</p>`}
-  const r={u,s,a,k:step,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""},rec=spkGet(gid,a.ls,u,x.audio.id);
+  const r={u,s,a,k:step,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)},rec=spkGet(gid,a.ls,u,x.audio.id);
   if(rec)return spkCard(rec,r);
   return `<p class="muted">🗣 <b>No speaking analysis yet</b> (words said well and wrong, vocabulary, grammar, structure: only for you). <button class="g mini" data-do="spkagain" data-u="${esc(u)}" data-a="${esc(aid)}" data-s="${esc(step)}">🔍 Analyse it</button> <small>about €${SPK_EUR.toFixed(3)}</small></p>`}
 // the collection: what many recordings have in common, most common first. one = a single student (their own lists, no student counts)
@@ -3538,9 +3540,10 @@ const stepLink=(a,k)=>{const t=stepTab(a,k),n=t&&(((window.EL_SECTIONS||{})[a.id
 // A step with no tab of its own (a recall checkpoint) keeps its own column. Only the names and grouping change: the steps, the ✔, the tries
 // and the score are counted as before (a.points still counts the two vocabulary steps). LS1 keeps its step keys (Roger: leave LS1 alone).
 const isLS1=a=>/-my-real-routine$/.test(a.ls),STEPNM={check:"Checkpoint"},cap=k=>k.charAt(0).toUpperCase()+k.slice(1);
-const secName=(a,t)=>((((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[])[1]||cap(t)).replace(/^\W+\s*/,"");
+const secName=(a,t)=>{const s=(((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[])[1]||cap(t);return a.sq?s:s.replace(/^\W+\s*/,"")};   // 🎲 Surprise questions keep the die: "🎲 2"
 const COLS=new Map();
-function lpCols(a){if(COLS.has(a.id))return COLS.get(a.id);const ks=steps(a);let out;
+function lpCols(a){if(COLS.has(a.id)&&!a.sq)return COLS.get(a.id);   // 🎲 Surprise questions: its tabs change when one is made (elSqSync)
+  const ks=steps(a);let out;
   if(isLS1(a))out=ks.map(k=>({ks:[k],t:stepTab(a,k),n:k}));
   else if(elBookPath(a))out=ks.map(k=>({ks:[k],t:"book",n:"Chapter "+k.replace(/^ch/,"")}));   // 📖 one tab, but a column per chapter: each student's pace
   else{const by=new Map(),rest=[];ks.forEach(k=>{const t=stepTab(a,k);if(t){if(!by.has(t))by.set(t,[]);by.get(t).push(k)}else rest.push(k)});
@@ -3583,6 +3586,8 @@ function scDone(u,a,c0,d,x,vc){const req=vc.flatMap(([c])=>c.ks).filter(k=>!(a.s
   return {t,c:(a.graded?"":"na")+(ok?" sub":""),tip:`${n} of ${req.length} steps done of the tabs done in class so far${miss.length?"\nMissing: "+[...new Set(miss.map(k=>tabName(a,k)))].join(", "):"\nAll done"}${c0.tip?"\nWhole learning path (📋 All activities): "+c0.tip.split("\n")[0]:""}`}}
 const allBtn=()=>`<button class="g allb${S.allActs?"":" on"}" data-do="allacts" title="${S.allActs?"Show only the activities done in class so far (a class day of the Time plan before today, ticked as done, or set as homework)":"Every learning path and tab of the LS, also the ones still to do in class, not planned or locked"}">${S.allActs?"🏫 Only done in class":"📋 All activities"}</button>`;
 function progress(studs,list,stu,ids){
+  // 🎲 Surprise questions after the LS's learning paths and checkpoints (its catalog place is before checkpoint 1, so no checkpoint closes it)
+  list=list.slice();list.filter(a=>a.sq).forEach(s=>{list.splice(list.indexOf(s),1);let j=-1;list.forEach((a,k)=>{if(a.ls===s.ls&&(isLpA(a)||/checkpoint/i.test(a.title)))j=k});list.splice(j+1,0,s)});
   ids=ids&&ids.length?ids:[S.ls];const multi=stu&&ids.length>1;
   loadGames();const ex=stu&&list.length&&!multi&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
   const lsG=ex?G():null,lsM=!!(lsG&&lsG.only),lsW=lsM?lsG.blocks.map(b=>(b.id==="fp"?"final product":b.name.replace(/^Final /,"").toLowerCase())+" "+b.w+" %").join(" · "):"";
@@ -4330,9 +4335,10 @@ const tkOf=x=>(S.D.tk[x.gid]||{}).ticks||{};
 const itKey=(d,it)=>"@"+d+"#"+it;
 const nrm=s=>String(s).toLowerCase().replace(/[·:()\-–,.!?]/g," ").replace(/\s+/g," ").trim();
 const shortTi=a=>a.title.split(/[:(]/)[0].trim();
-const isLpA=a=>!a.optional&&!/checkpoint|sample exam|first exam|final product|reflect/i.test(a.title);   // the optional practice exam ("Sample exam 1" since 21 Nov 2026; it was "First exam" 19–21 Nov) is never a learning path: no LP number
+const isLpA=a=>!a.optional&&!a.sq&&!/checkpoint|sample exam|first exam|final product|reflect/i.test(a.title);   // the optional practice exam ("Sample exam 1" since 21 Nov 2026; it was "First exam" 19–21 Nov) is never a learning path: no LP number
 // "LP3 Now or usually?" (its number in the plan, else its place among the LS's learning paths), "Final product", else the short title
 function agLab(x,a){if(/final product/i.test(a.title))return "Final product";
+  if(a.sq)return "🎲 Surprise questions";   // 🎲 no LP number either (elSqSync in el-catalog.js)
   if(a.agendaDue)return "📖 "+a.title;   // the Book (Roger, 12 Nov 2026): no LP number, and it never shifts the others' numbers
   const n=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0]||(isLpA(a)?String(acts(x.ls).filter(b=>isLpA(b)&&!b.agendaDue).indexOf(a)+1):null);
   return n?"LP"+n+" "+shortTi(a):shortTi(a)}
@@ -4450,7 +4456,7 @@ function agOpenSync(x,its,to){const info=S.D.ls[x.ls]||{},ag=agOf(x)||{days:{}},
 const hwItems=x=>{const s=new Map(),t=ELWeek.today(),put=(k,h)=>{const o=s.get(k);if(!o||h.by>o.by)s.set(k,h)};Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
   Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>put(id+"#"+p,h));if(!secOf(a).length)put(id+"#",h)})});return s};
 const itName=(it)=>{if(it==="exam")return "📝 Exam";if(/^note:/.test(it))return it.slice(5);const [id,p]=[it.slice(0,it.indexOf("#")),it.slice(it.indexOf("#")+1)],a=byId(id);
-  if(!a)return it;if(!p)return shortTi(a);const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:isCb(p)?cbName(p):p};
+  if(!a)return it;if(!p)return shortTi(a);if(a.sq){const q=elSqList(a.ls).find(y=>y.id===p);if(q)return elSqName(q)}const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:isCb(p)?cbName(p):p};
 const dayLab=d=>ELWeek.date(d);
 // Individual or group work (Roger, 7 Nov 2026: "I want a tick in each SLP on the right where I can switch from individual to grupal so that I
 // organise my classes this way"; 9 Nov 2026: "actually I want individually, in pairs and in group and whole class (games are whole class as
@@ -4621,12 +4627,44 @@ const offDay=(x,d)=>`<div class="agday off"><div class="agdh"><b>${esc(dayLab(d)
 const wkName=(m,t)=>{const tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));return m===cur?"This week":m===ELWeek.add(cur,7)?"Next week":""};
 function agWeek(x,m,dd,c){const t=ELWeek.today(),nm=wkName(m,t);
   return `<div class="agwk"><h3>${nm?nm+" · ":""}${esc(ELWeek.week({from:m}))}</h3><div class="agdays">${dd.map(([d,on])=>on?agDay(x,d,c):offDay(x,d)).join("")}</div></div>`}
+// 🎲 Surprise questions on the Time plan (Roger, 21 Nov 2026: "they must be like a game or shadowing that are anywhere, with random
+// questions taken from the slp, so when select it I choose the SLP that I want to include and set an activity which can be done in that
+// moment or set as homework, once I create the activity, it appears on their path and here"): one row in the list with ＋ New. The dialog
+// ticks the SLPs (the tabs done in class so far are ticked already), then In class on a day (it goes on that day and opens, like a tab
+// dragged there) or 🏠 Homework (the usual Set as homework dialog with that tab). Each activity is a tab of the LS's Surprise questions
+// activity (ls/{id}.sq, elSqSync in el-catalog.js): drag it, tick it, take it off like any other tab.
+const sqTabsName=(x,tabs)=>(tabs||[]).map(t=>{const i=t.indexOf("#"),a=byId(t.slice(0,i));if(!a)return "";const z=secOf(a).find(q=>q[0]===t.slice(i+1));
+  const n=(String(agLab(x,a)).match(/^LP(\d+)/)||[])[1];return (n?"LP"+n+" ":"")+(z?z[1]:t.slice(i+1))}).filter(Boolean).join(", ");
+function sqRow(x,a,where,st,sm,D,hw){const L=elSqList(x.ls),open=elLpOpen(a,S.D.ls[x.ls]||{},x.gid);
+  return {open:true,h:`<div class="agla sq"><div class="aglh" ${D}><span class="agdot">🎲</span><span class="agln"><b>Surprise questions</b><small>4 random questions from the SLPs you choose, by level · recorded</small></span>`
+    +`<button type="button" class="agx" data-do="sqnew" ${D} title="New Surprise questions: choose the SLPs, then in class or homework" style="font-weight:800">＋ New</button></div>`
+    +(L.length?`<div class="agcs">${L.map(q=>{const it=a.id+"#"+q.id,w=where[it]||[],s=st(it,w);
+      return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${esc(elSqName(q)+" · questions from: "+sqTabsName(x,q.tabs))}">${s==="on"?"✓ ":s==="hw"?`<button type="button" class="aghw on" data-do="aghw1" data-it="${esc(it)}" ${D} aria-pressed="true" title="Homework · click to take it off the homework">🏠</button>`:""}${agLk(a,q.id,"🎲 "+q.n)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}</span>`}).join("")}</div>`:"")+`</div>`}}
+function sqOpen(x){const a=elSqAct(x.ls);if(!a)return;const ag=agOf(x)||{days:{}},t=ELWeek.today();
+  const past=new Set(Object.entries(ag.days).filter(([d])=>d<=t).flatMap(([,its])=>its));
+  const lps=acts(x.ls).filter(b=>isLpA(b)&&!b.agendaDue&&secOf(b).length&&!((x.p._dropped||{})[x.gi]||[]).includes(b.id));
+  const days=ELWeek.classDays(x.gid,t,ELWeek.add(t,40)).slice(0,6),gn=(GR.find(g=>g.id===x.gid)||{}).name||x.gid;
+  dlg(`<h3>🎲 New Surprise questions · ${esc(gn)}</h3><p class="muted">Students press Start and answer four questions they haven't seen, easy → harder, at their level, taken from the SLPs you tick. They hand in the recording; the Wednesday correction gives them things to improve.</p>`
+    +`<div id="sq-tabs" style="max-height:46vh;overflow:auto;border:1px solid var(--line,#e2e8f0);border-radius:12px;padding:8px 12px">${lps.map(b=>`<div style="margin:6px 0"><b>${esc(agLab(x,b))}</b> <button type="button" class="g" data-do="sqall" style="padding:2px 8px;font-size:12px">all</button><div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:3px">`
+      +secOf(b).filter(([p])=>p!=="recall").map(([p,nm])=>{const it=b.id+"#"+p;return `<label style="font-weight:400;white-space:nowrap"><input type="checkbox" value="${esc(it)}" ${past.has(it)||past.has(b.id+"#")?"checked":""} style="width:auto;margin-right:4px">${esc(nm)}</label>`}).join("")+`</div></div>`).join("")}</div>`
+    +`<p class="muted" style="margin:6px 0 10px">Ticked already: the SLPs you've done in class so far.</p>`
+    +`<div class="row" style="align-items:center;gap:10px"><label style="font-weight:600"><input type="radio" name="sq-when" value="class" checked style="width:auto"> 🏫 In class on</label> <select id="sq-day">${days.map(d=>`<option value="${d}">${esc(ELWeek.date(d))}${d===t?" (today)":""}</option>`).join("")}</select>`
+    +` <label style="font-weight:600"><input type="radio" name="sq-when" value="hw" style="width:auto"> 🏠 As homework</label></div>`
+    +`<div class="row"><button data-do="sqmake" data-gid="${x.gid}" data-ls="${x.ls}">Create</button> <span id="sq-err" class="muted"></span></div>`,true)}
+function sqMake(x){const a=elSqAct(x.ls);if(!a)return;const tabs=[...document.querySelectorAll("#sq-tabs input:checked")].map(i=>i.value);
+  if(!tabs.length){$("#sq-err").textContent="Tick at least one SLP.";return}
+  const cur=Object.assign({},EL_SQ[x.ls]||{}),n=Math.max(0,...Object.values(cur).map(q=>+q.n||0))+1,id="sq"+n,o={n,tabs,at:new Date().toISOString()},all=Object.assign(cur,{[id]:o});
+  const hw=(document.querySelector('input[name="sq-when"]:checked')||{}).value==="hw",day=$("#sq-day").value,it=a.id+"#"+id;
+  const i=S.D.ls[x.ls]=S.D.ls[x.ls]||{status:"hidden",enabled:[]};i.sq=all;elSqSync(x.ls,all,true);
+  const w=api.ls(x.ls,{sq:DEMO?all:{[id]:o}});
+  if(hw){hwOpen(x,elSqName(o),ELWeek.today(),"");S.hwX.tabs={[a.id]:[id]};hwTabs();hwFill();return Promise.resolve(w).catch(e=>alert("Could not save: "+e.message))}
+  $("#dlg").close();Promise.resolve(w).then(()=>{agMove(x,[it],"",day);agOpenSync(x,[it],day)},e=>alert("Could not save: "+e.message))}
 // the list on the left: every activity, where its tabs are on the agenda, students done; drag from here
 function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr=(x.p._dropped||{})[x.gi]||[],t=ELWeek.today(),D=`data-gid="${x.gid}" data-ls="${x.ls}"`;
   const where={};Object.entries(ag.days).forEach(([d,its])=>its.forEach(it=>{(where[it]=where[it]||[]).push(d)}));
   const st=(it,ds)=>ds.length&&ds.every(d=>tkOf(x)[x.ls+"|"+itKey(d,it)])?"on":ds.length?"pl":hw.has(it)?"hw":"np";
   const sm=d=>ELWeek.date(d).replace(/ \w+$/,"");
-  const rows=acts(x.ls).map(a=>{const its=agItems(a),ds=[...new Set(its.flatMap(it=>where[it]||[]))].sort(),open=elLpOpen(a,info,x.gid),nos=!secOf(a).length,drop=dr.includes(a.id);
+  const rows=acts(x.ls).map(a=>{if(a.sq)return sqRow(x,a,where,st,sm,D,hw);const its=agItems(a),ds=[...new Set(its.flatMap(it=>where[it]||[]))].sort(),open=elLpOpen(a,info,x.gid),nos=!secOf(a).length,drop=dr.includes(a.id);
     const nd=studs.length&&(secOf(a).length||isCp(a))?studs.filter(s=>isDone(s.uid,a)).length:null,stA=nos?st(a.id+"#",where[a.id+"#"]||[]):"";
     const left=its.filter(it=>st(it,where[it]||[])==="np").length;
     return {open,h:`<div class="agla ${drop?"drp":""} ${stA}"><div class="aglh" draggable="true" data-ag="${nos?"it":"act"}" data-a="${esc(a.id)}" data-it="${esc(a.id+"#")}" data-from="" ${D} title="Drag it to a class day">`
@@ -6294,6 +6332,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     agtick:()=>{e.stopPropagation();agTick(planX(k.ls,k.gid),k.d,k.it,t.checked)},
+    sqnew:()=>{e.preventDefault();e.stopPropagation();sqOpen(planX(k.ls,k.gid))},   // 🎲 New Surprise questions (sqOpen)
+    sqmake:()=>{e.preventDefault();sqMake(planX(k.ls,k.gid))},
+    sqall:()=>{e.preventDefault();const b=t.parentElement.querySelectorAll("input");const on=[...b].some(i=>!i.checked);b.forEach(i=>{i.checked=on})},
     aghw1:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),i=k.it.indexOf("#"),a=byId(k.it.slice(0,i)),p=k.it.slice(i+1);if(!a)return;
       // one tab as homework for the next class (Roger, 7 Nov 2026: "I could say at the end of the class, this SLP is homework for next class"):
       // like 🏠 Set as homework with only that tab and the next class of the group as its day; students see it in their Homework box

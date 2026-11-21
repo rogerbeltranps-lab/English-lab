@@ -13,11 +13,12 @@ var LS2 = (function () {
     ['recall-checkpoint-1.html', 'Recall checkpoint 1'],
     ['now-or-usually.html', '3 · Now or usually?'],
     ['recall-checkpoint-2.html', 'Recall checkpoint 2'],
-    ['check-the-source.html', '4 · Check the source'],
-    ['likes-and-screen-tips.html', '5 · Likes and screen tips'],
+    // no gap in the numbers (Roger, 21 Nov 2026): Check the source (dropped for now) is LP6, after the paths students do, as in EL_CATALOG
+    ['likes-and-screen-tips.html', '4 · Likes and screen tips'],
     ['recall-checkpoint-3.html', 'Recall checkpoint 3'],
-    ['write-your-vlog-script.html', '6 · Write your vlog script'],
+    ['write-your-vlog-script.html', '5 · Write your vlog script'],
     ['recall-checkpoint-4.html', 'Recall checkpoint 4'],
+    ['check-the-source.html', '6 · Check the source'],
     ['sample-exam.html', 'Sample exam 1'],
     ['free-time-vlog.html', '7 · Final product'],
     ['reflect.html', 'Reflect']
@@ -1548,6 +1549,10 @@ var LS2 = (function () {
     };
   };
 
+  /* 🎲 Surprise questions (Roger, 21 Nov 2026: "press record and then a random question about the LS will pop up"): shared/js/el-surprise.js
+     draws the step (type 'surprise', bank in data/surprise.js); the engine lends it its recorder hand-in, voice and progress helpers. */
+  R.surprise = p => window.elSurprise ? elSurprise.panel(p, { get level() { return level; }, ca, tx, get state() { return state; }, save, complete, handRec, recSecs, cantRow, sayLine, stopSay }) : { html: '', bind() {} };
+
   /* Shadowing (four skills, Roger 30 Oct 2026: "I usually do 5 minutes of shadowing at the beginning of each class … add that to the LS and
      count it"). p.clip = a 25–45 s part of a recording the LS already has, played as it is (the listenings never change): src and slow
      (-slow copy), t / ts = [from, to] seconds in each, lines = the script of that part ([speaker, text]), video: true for an mp4.
@@ -1799,6 +1804,7 @@ var LS2 = (function () {
      the hero's "Remember before you look" and the tracking note fold into one "How this learning path works" row (closed), and on a
      computer the tabs become a list of steps beside the open step, each with ✓ when done and the next one marked (progress()). */
   function howTo() {
+    if (typeof LP.dyn === 'function') return '';   // 🎲 Surprise questions: not a learning path
     const warm = document.querySelector('.hero .warm-note');
     if (warm) warm.hidden = true;
     return '<details class="lp-how"><summary>ⓘ ' + (ca() ? 'Com funciona aquest learning path' : 'How this learning path works') + '</summary>' + (warm ? '<p class="track-note">💡 ' + warm.innerHTML + '</p>' : '') + trackNote() + '</details>';
@@ -1837,6 +1843,10 @@ var LS2 = (function () {
     sectionNext.init({ level: () => level, panels: LP.panels.slice(0, -1).map(p => ({ id: p.id, done: () => stepDone(p), detail: c => c ? 'Respon i comprova totes les activitats d’aquesta secció.' : 'Answer and check every activity in this section.' })) });
     sectionNext.final({ id: last.id, level: () => level, done: () => stepDone(last), detail: c => c ? 'Completa l’última activitat.' : 'Finish the last activity.' });
   }
+  /* 🎲 Panels made from data that arrives later (LP.dyn, the Surprise questions page: one tab per activity the teacher made on the
+     Time plan, el-catalog.js elSqSync): built at init from this browser's copy and again when "el-sq" brings the LS document's list. */
+  function addDyn() { if (!LP || typeof LP.dyn !== 'function') return false; const ps = LP.dyn(), ids = ps.map(p => p.id).join('|'); if (ids === LP._dyn) return false; LP._dyn = ids; LP.panels = ps; return true; }
+  window.addEventListener('el-sq', () => { if (addDyn()) render(); });
   function init(config) {
     if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.lp-how{margin:0 0 14px;background:#fff;border:1px solid var(--line,#dbe5f1);border-radius:14px;padding:0 14px}.lp-how>summary{cursor:pointer;padding:12px 0;font-weight:750;color:var(--dark,#234777)}.lp-how .track-note{margin:0 0 12px}'
       + '.tab .tn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:24px;height:24px;border-radius:999px;font-size:.85rem}.tab.done .tn{background:#16a34a!important;color:#fff!important;font-size:0}.tab.done .tn::after{content:"✓";font-size:.85rem}.tab.next:not(.active){box-shadow:inset 0 0 0 2px var(--accent,#315f9f)}'
@@ -1845,7 +1855,7 @@ var LS2 = (function () {
       + '.hero{padding:24px 0 18px!important}.hero h1{font-size:clamp(2rem,3.4vw,2.8rem)!important;margin:.15em 0 .2em!important}.lp-top+.plan-card{padding:12px 16px!important;margin-bottom:14px}.lp-top+.plan-card h3{display:inline;font-size:1rem;margin:0}.lp-top+.plan-card .instruction{display:inline;margin:0 0 0 6px;font-size:.92rem}.lp-top+.plan-card input{display:block;width:100%;box-sizing:border-box;margin-top:8px}'
       + '@media (max-width:640px){.topbar{position:static!important}.hero{padding:14px 0 10px!important}.hero h1{font-size:1.75rem!important}.hero .lead{font-size:.98rem;margin:.2em 0 .6em}.hero .eyebrow{font-size:.72rem}.lp-body>.tabs{position:sticky;top:0;z-index:25;margin:0 -16px 10px;padding:8px 16px;background:var(--bg,#f4f7fb);box-shadow:0 6px 10px -8px #0f172a40;gap:6px;scrollbar-width:none}.lp-body>.tabs::-webkit-scrollbar{display:none}.lp-body .tab{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;font-size:.92rem;border-radius:11px}.lp-body .tab .tn{min-width:22px;height:22px}.panel{padding:16px!important;border-radius:16px!important}.panel-head h2{font-size:1.35rem}.lp-how>summary{padding:11px 0}}'
       + '.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}.redo-sec{justify-content:flex-end;align-items:center;margin:0 0 12px}.redo-sec[hidden]{display:none}.redo-sec .tiny{margin:0}</style>');
-    LP = config;
+    LP = config; addDyn();
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }
@@ -1862,8 +1872,9 @@ var LS2 = (function () {
       // the cloud copy gets it with a normal save once the page has pulled the student's progress (el-cloud.js loads after this)
       setTimeout(() => { try { save(); } catch (e) {} }, 4000);
     });
+    // a page outside the learning paths (🎲 Surprise questions) gets its own first option, so it has no LP number
     const sel = $('#sessionJump');
-    if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
+    if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = (PAGES.some(([f]) => f === here) ? '' : '<option value="' + here + '" selected>🎲 ' + (ca() ? 'Preguntes sorpresa' : 'Surprise questions') + '</option>') + PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
     $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });
     render();
     learningSupport.apply(level);
