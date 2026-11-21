@@ -1,6 +1,6 @@
-/* 2 ESO · LS2 Free Time, Live! · Learning Path 5 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
+/* 2 ESO · LS2 Free Time, Live! · Learning Path 4 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
 window.LP = {
-  key: 'ls2Tips2ESO', n: 5, starter: true, title: 'Likes and screen tips',
+  key: 'ls2Tips2ESO', n: 4, starter: true, title: 'Likes and screen tips',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -28,8 +28,8 @@ window.LP = {
         { r: 'daring', g: 'Why it matters (Daring)', items: [['addictive', 'addictiu', 'Some games are very addictive.'], ['concentrate', 'concentrar-se', 'I can’t concentrate with notifications.'], ['instead of', 'en lloc de', 'Go outside instead of watching videos.'], ['a habit', 'un hàbit', 'Checking your phone every minute is a bad habit.'], ['healthy / unhealthy', 'saludable / poc saludable', 'Two hours of screen time a day is not healthy for sleep.']] }
       ],
       review: [
-        { g: 'Learning Path 4', items: [['watch videos', 'mirar vídeos', 'I watch videos at night.'], ['play online', 'jugar en línia', 'He plays online every day.'], ['send a message', 'enviar un missatge', 'Send me a message.']] },
-        { r: 'safe', g: 'Learning Path 4', items: [['social media', 'xarxes socials', 'The club is on social media.'], ['download an app', 'descarregar una app', 'Download the app.']] }
+        { g: 'Learning Path 6', items: [['watch videos', 'mirar vídeos', 'I watch videos at night.'], ['play online', 'jugar en línia', 'He plays online every day.'], ['send a message', 'enviar un missatge', 'Send me a message.']] },
+        { r: 'safe', g: 'Learning Path 6', items: [['social media', 'xarxes socials', 'The club is on social media.'], ['download an app', 'descarregar una app', 'Download the app.']] }
       ],
       practice: [
         { q: 'I ___ skating: it’s my favourite hobby! (m’encanta)', a: ['love'] },

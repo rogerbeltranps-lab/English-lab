@@ -65,7 +65,7 @@ for(const s of studs){
   const pr=pReplies.filter(x=>x.uid===s.uid);if(pr.length)news.push(["🛠",T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""),""]);
   const seen=new Set(),list=news.filter(([,x])=>!seen.has(x)&&seen.add(x));
   if(!list.length){none++;continue}
-  const out=[T("Hola ","Hi ")+s.first+",","",T("Tens coses noves al teu tauler d'English Lab:","There is something new on your English Lab board:"),"",
+  const out=[T("Hola!","Hi!"),"",T("Tens coses noves al teu tauler d'English Lab:","There is something new on your English Lab board:"),"",
     ...list.map(([i,x,q])=>i+" "+x+(q?"\n   "+SITE+"today.html"+q:"")),"",
     T("Entra amb el teu correu de l'institut: ","Sign in with your school email: ")+SITE+"today.html","","Roger"];
   const subject=list.some(([i])=>i==="📝")?T("English Lab: ja tens els resultats de l'examen","English Lab: your exam results are ready")

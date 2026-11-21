@@ -14,7 +14,8 @@ since u receive the message o report, don't use their names or surnames since so
 but `auto.mjs fixed` and `marks.mjs answer` save the student's card or answer with a later time (`tools/problems/reply-time.mjs`: at least
 2 hours after the report or comment, inside 08:00-18:00 Madrid time); the student sees it only from then and the tool prints when. Never
 pass `--now` (only Roger can ask for it, in a thread). Never write the student's first name or surnames in `--msg`, `--reply` or an
-answer, not even "Hola …": start with the answer itself. The tools refuse a text that uses them; write it again without them.
+answer, not even "Hola …", and no classmate's name either: start with "Hola!" / "Hi!" or the answer itself (Roger again, 21 Nov 2026:
+"I said never use their names or surnames please"). The tools refuse a text that uses them, or any greeting followed by a name; write it again without them.
 
 **Always both languages (Roger, 20 Nov 2026: "It should also have the catalan version"):** every `--msg` comes with `--msg2` and every
 `--reply` with `--reply2`: the same words in the other language (Catalan when the report is in English, English when it is in Catalan),

@@ -1,7 +1,7 @@
-/* LS2 · Learning Path 6 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
+/* LS2 · Learning Path 5 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
 window.LP.study = {
   next: 4,
-  covers: { ca: 'tot Free Time, Live! (Learning Paths 1–3, 5 i 6)', en: 'everything in Free Time, Live! (Learning Paths 1–3, 5 and 6)' },
+  covers: { ca: 'tot Free Time, Live! (Learning Paths 1–5)', en: 'everything in Free Time, Live! (Learning Paths 1–5)' },
   today: { ca: 'com comença i com acaba un vlog, i una frase per a ara, normalment, gustos i un consell', en: 'how a vlog starts and ends, and one sentence each for now, usually, likes and a tip' },
   exam: { ca: 'surt tot el que has après: el Listening, el Vocabulary i el Grammar de tota la LS (ara o normalment, like + -ing, imperatius) i el Writing, que s’assembla al teu guió del vlog.', en: 'everything you have learnt comes up: the Listening, the Vocabulary and the Grammar of the whole LS (now or usually, like + -ing, imperatives, linking words) and the Writing, which is like your vlog script.' },
   check: [

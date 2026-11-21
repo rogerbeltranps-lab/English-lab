@@ -11,8 +11,8 @@ window.LP = {
    "type": "recall",
    "tab": "Checkpoint",
    "title": {
-    "ca": "Checkpoint 4: everything (Learning Paths 1–3, 5 and 6)",
-    "en": "Checkpoint 4: everything (Learning Paths 1–3, 5 and 6)"
+    "ca": "Checkpoint 4: everything (Learning Paths 1–5)",
+    "en": "Checkpoint 4: everything (Learning Paths 1–5)"
    },
    "pill": {
     "ca": "Sense apunts · una pregunta cada vegada",

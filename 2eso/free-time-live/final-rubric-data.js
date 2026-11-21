@@ -25,7 +25,7 @@
     '5 of the 6 steps handed in, or all 6 with one late or very general.',
     '3 or 4 of the 6 steps handed in.',
     'Fewer than 3 of the 6 steps handed in.'] };
-  const factEn = { name: 'My fact file and credits', sub: 'LP4 piece 3 and the last slide (6.2)', pct: 15, round: 1, cells: [
+  const factEn = { name: 'My fact file and credits', sub: 'LP6 piece 3 and the last slide (6.2)', pct: 15, round: 1, cells: [
     'All 4 facts accurate and in my own words, from two well-chosen sources that I compared; every photo and source credited completely on the last slide.',
     '3 or 4 of the 4 facts right, in key words from two sources; 7 in 10 credits complete (photos and sources on the last slide).',
     '2 of the 4 facts right, with help and partly copied; at least half of the credits, some incomplete.',
@@ -72,7 +72,7 @@
           'He entregat 5 dels 6 passos, o tots 6 amb un de tard o molt general.',
           'He entregat 3 o 4 dels 6 passos.',
           'He entregat menys de 3 dels 6 passos.'] },
-        { name: 'La meva fitxa de dades i els crèdits', sub: 'Peça 3 del LP4 i l’última diapositiva (6.2)', pct: 15, round: 1, cells: [
+        { name: 'La meva fitxa de dades i els crèdits', sub: 'Peça 3 del LP6 i l’última diapositiva (6.2)', pct: 15, round: 1, cells: [
           'Les 4 dades correctes amb les meves paraules; totes les fotos i la font citades completes a l’última diapositiva, pel meu compte.',
           '3 o 4 de les 4 dades correctes, en paraules clau de la font donada; 7 de cada 10 crèdits complets (la font i les fotos a l’última diapositiva).',
           '2 de les 4 dades correctes, amb ajuda i en part copiades; la meitat o més dels crèdits, algun incomplet.',
@@ -144,7 +144,7 @@
         'Hi ha la majoria de parts de la pauta; la meitat o més dels verbs ben fets; falta la frase d’“ara” o la de “normalment”, o un consell.',
         'Incomplet o no s’entén; sense parts clares; menys de la meitat dels verbs ben fets.'] },
       ins.rows[2], ins.rows[3],
-      { name: 'La meva fitxa de dades i els crèdits', sub: 'Peça 3 del LP4 i l’última diapositiva (6.2)', pct: 15, round: 1, cells: [
+      { name: 'La meva fitxa de dades i els crèdits', sub: 'Peça 3 del LP6 i l’última diapositiva (6.2)', pct: 15, round: 1, cells: [
         'Les 2 dades correctes amb les meves paraules; totes les fotos i la font citades completes a l’última diapositiva, pel meu compte.',
         'Les 2 dades correctes en paraules clau de la font donada; 7 de cada 10 crèdits complets (la font i les fotos a l’última diapositiva).',
         '1 de les 2 dades correcta, amb ajuda i en part copiada; la meitat o més dels crèdits, algun incomplet.',
