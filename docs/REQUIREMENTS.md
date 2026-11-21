@@ -1,6 +1,6 @@
 # How we work - Work requirements
 
-**Every rule Claude follows when it works for Roger on English Lab, in one organised document.** First version 20 Nov 2026, **for Roger to revise** (start with [section 13](#13-to-revise-what-is-outdated-and-what-contradicts)).
+**Every rule Claude follows when it works for Roger on English Lab, in one organised document.** First version 20 Nov 2026, **for Roger to revise**; contradictions settled 21 Nov 2026 ([section 13](#13-what-changed-and-what-is-still-open)).
 
 It unifies:
 
@@ -8,7 +8,7 @@ It unifies:
 - the project instructions and the project memory's standing rules;
 - the root [AGENTS.md](../AGENTS.md), the LS `AGENTS.md` files and the notes in [docs/general/](general/) (21 Nov 2026: every rule moved here; the notes keep only how each feature works).
 
-Duplicates are merged into one line. Each rule says where it comes from and when Roger set it. Where two sources disagree, Claude follows the **newer** rule until Roger decides, and the clash is listed in [section 13](#13-to-revise-what-is-outdated-and-what-contradicts).
+Duplicates are merged into one line. Each rule says where it comes from and when Roger set it. **Where two rules disagree, Roger's newest decision is the valid one** (Roger, 21 Nov 2026: "when it comes to contradictions, my last decisions are the ones that are valid"). The rules below are written that way; [section 13](#13-what-changed-and-what-is-still-open) logs each clash and the few questions Roger has not decided yet.
 
 ## 0. About this document
 
@@ -30,6 +30,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 - The technical detail of a rule (file names, functions, data) goes in `AGENTS.md`, in the same PR.
 - Each rule carries its date, so the newest is easy to see.
+- **When two rules clash, the newest decision wins** (Roger, 21 Nov 2026). Claude follows it without asking, and in the same PR fixes the older line (here, in `AGENTS.md`, a note or a Drive guide) or marks it as replaced. Ask Roger only when nothing newer was decided.
 - A rule for one LS only goes in that LS's `AGENTS.md`, not here.
 - **The website and this file move together** (Roger, 20 Nov 2026: "I've been making changes (and I will continue) and I will change rules"): every PR that changes what students or Roger see, or how something is marked, checks this file and updates the line it changes, in the same PR. When Roger changes a rule in a thread, the old line is replaced, never kept next to the new one.
 
@@ -318,8 +319,8 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 **Final product**
 
 - A spoken video: students upload it on the site; it goes to Roger's Drive. **No spoken video = 0.**
-- Only the video is marked as a group; everything else per student. Marked in two rounds, midway and at the end, with a marking PDF per round; a rubric per route in Word (Playbook). Group make-up: see contradiction 29.
-- Procediment (21 Oct 2026): a video made with Google Slides, the student's face visible in picture-in-picture; audio alone only for practice (still the format? see section 13).
+- Only the video is marked as a group; everything else per student. Marked in two rounds, midway and at the end, with a marking PDF per round; a rubric per route in Word (Playbook). Groups mix routes (Research audit rule above).
+- Format: a spoken video uploaded on the site (Nov 2026). The Procediment's Google Slides video with the face in picture-in-picture (21 Oct 2026) is replaced; audio alone only for practice.
 
 **Audio and video**
 
@@ -339,18 +340,18 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 | LS1 (both courses) | Exam **75 %** · final product **25 %** (learning paths were practice) |
 | LS2 and every later LS | Exam **35 %** · final product **25 %** · daily work in the learning paths **40 %** (2 Nov 2026) |
 
-- **One exam per LS. Grade = points ÷ 10** (exam out of 100), the same for every level; no maximum-grade caps (Exams doc).
+- **One exam per LS. Grade = points ÷ 10** (exam out of 100), the same for every level; no maximum-grade caps (Exams doc). **Marks are never converted between levels** (Roger, 21 Nov 2026: "we won't do this"; the 1 Nov idea "an 8 from a Base will be a 6" is dropped).
 - Each section carries its criteria; vocabulary and grammar count for **4.1 and 5.1** alike (Use of English is reading and writing, 30 Oct 2026).
 - Scale: NA 2.5 · AS 5 · AN 7.5 · AE 10. Mark to degree: under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.
 - A percentage alone never sets the degree of 4.1 or 2.2: their indicators describe a task (reading log, listening chart); the exam scores are supporting evidence.
-- **LS1's harder (Daring) exam counts ×1.2**, capped at 10 (17 Nov 2026). Levels are still set from the raw points. **Ask Roger** whether the harder paper of later exams gets a bonus too.
+- **LS1's harder (Daring) exam counts ×1.2**, capped at 10 (17 Nov 2026). Levels are still set from the raw points. From LS2 on, the Core paper gets **no bonus** (none was set for LS2; Roger, 21 Nov 2026: "this is solved").
 - The exam is not the whole LS: the number of activities done never raises an exam mark, but it counts in the LS mark (Rubrics doc).
 
 ### 6.2 Before writing it
 
 1. **Find what each group has really done**: the Time plan ticks and class days, dropped learning paths (not in the exam for that group), the class games played. The exam asks only that (19 Nov 2026: "only what both groups did"). Respect the objectives, vocabulary, phrasal verbs, expressions and grammar really worked (Prompts).
 2. **Exam day per group** is in `EL_PLAN[ls].exam`; check it with Roger.
-3. **Remind Roger** to decide: the versions per level and who takes each; how a mark converts between levels ("an 8 from a Base will be a 6": still undecided, nothing built).
+3. **Remind Roger** to decide the versions per level and who takes each. Marks are not converted between levels (6.1).
 4. **Agree the format with Roger before writing** (lesson from LS2: the exam was rebuilt twice).
 5. Look at what students do best and worst in the activities and class games. For LS2 Roger wanted the exam **achievable** ("so that they get good marks", 19 Nov 2026): lean on strengths (choosing is easier than typing), avoid what most failed. **Ask Roger** if the next exam should be tailored the same way.
 6. **From LS3 on, 10–15 % of the exam is on the core language of earlier LSs** (Research audit, 26 Oct 2026).
@@ -358,7 +359,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 ### 6.3 Structure
 
 - **Sections in this order, by criterion** (Exams doc; Prompts): 1 **Listening** (2.1) → 2 **Reading** (4.1) → 3 **Language in Use**: Vocabulary + Grammar (4.1 / 5.1) → 4 **Writing** (5.1 + 5.2).
-- Current weights (LS2, both courses, 19 Nov 2026): **Listening 20 · Reading 20 · Vocabulary 35 · Grammar 15 · Writing 10** = 100.
+- Weights (from LS2, both courses, 19 Nov 2026): **Listening 20 · Reading 20 · Vocabulary 35 · Grammar 15 · Writing 10** = 100.
 - **Two papers by level** (19 Nov 2026): **Base** for Starter and Base (and students with no level), **Core** for Core, Plus and Pro.
 - **Several versions per paper so neighbours can't copy** (A/B/C, given by account). Every version has the same structure, points and difficulty, with different texts and questions. No listening question is shared between versions of the same paper.
 - Every question is assigned to the criterion it really assesses; vocabulary and grammar are tools to understand and produce messages, not isolated knowledge (Prompts).
@@ -377,13 +378,14 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 - **Everything except the writing is 4-option multiple choice or a short gap (1–3 words)** (Exams doc; 25 Oct 2026), so it marks itself.
 - **One box per gap** (20 Nov 2026): a two-word gap is two boxes (`split: true`).
 - **Keys accept every correct answer, not only the target expression**: contractions = full forms (I'm watching = am watching), capitals, extra spaces, apostrophe type and a final full stop don't matter (Exams doc; Prompts); the words alone, the chunk or the whole sentence; extra words taken from the question are fine; in "Correct the mistake" only the gap sentence counts (20 Nov 2026).
-- Spelling slips: see contradiction 21 in section 13.
+- **A spelling slip is wrong** (18 Nov 2026: Roger did not accept "donw" for "down"). The Exams doc's "small spelling variants" no longer applies.
+- No "I don't know" option (web exams, Nov 2026).
 
 ### 6.6 Listening
 
 - **First section, one shared audio** for all versions and levels, with different questions per version and level; played in class, all together. "Listening finished" opens the rest. A make-up student may play it at most twice, no pause or rewind.
 - **Short: about 1.5 minutes**; plan fewer audio facts (Exams doc).
-- Claude delivers the full script and a plain dialogue `.txt` (`SPEAKER: line`). Who records it: see contradiction 18.
+- Claude delivers the full script and a plain dialogue `.txt` (`SPEAKER: line`). The audio: as in LS2, reuse a recording the LS already has (LS2 used a learning-path video's audio, Nov 2026); a new recording only with Roger's OK for that generation (section 1).
 
 ### 6.7 Writing task
 
@@ -413,7 +415,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 - On the exam day of the Time plan, 🎓 Class mode opens the exam page. 📝 **Exam mode** pulls the group's students to it; Roger explains the rules, then ▶ **Start the exam** starts every waiting exam at once.
 - Exam mode starts by itself only during the group's class time; outside it there is a button (19 Nov 2026).
 - Full screen; leaving it, another tab or app for more than 0.4 s, or a reload stops the exam; Roger types his password on the student's screen to let them back in. Changes after coming back are logged.
-- After listening, students move freely between Reading, Vocabulary, Grammar and Writing and see ✅ Review (blanks in red) before 🏁 Turn in (see contradiction 17).
+- After listening, students move freely between Reading, Vocabulary, Grammar and Writing and see ✅ Review (blanks in red) before 🏁 Turn in. The reading stays open, so rule 6.4 (the reading never gives away the writing) is what protects the writing.
 - **Roger closes the exam himself** (🔒 Close). Nothing closes a started exam automatically (19 Nov 2026).
 - Make-ups and single students: 👤 Only some students…; class mode goes on for the others.
 - On a Chromebook in full screen, the 🔍 Search key, Alt+Tab, the top-row keys and Ctrl+W/T/N do nothing (20 Nov 2026; still to test on a real Chromebook).
@@ -433,7 +435,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 ### 6.12 The Google Forms format (LS1, Oct 2026)
 
-Kept from *How we make exams* and *Prompts* for paper or Forms exams; **Ask Roger** whether any of it is still wanted (section 13).
+**Replaced by the web exams** (Nov 2026). Kept from *How we make exams* and *Prompts* only in case Roger asks for a Forms exam again.
 
 - Four models A–D, each with the three itineraries, 35 items, 100 points, 50 minutes. Word versions first (editable, printable) and a teacher guide: keys, writing rubric, points, question-to-criterion map, pedagogical reasons.
 - Two Google Forms per model: Form 1 (listening, reading, language in use; free navigation until submit; one response, no editing), then a link to Form 2 (writing), so students can't go back to the reading.
@@ -472,7 +474,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - Has descriptors for a notable and an excellent text.
 - **Indicators say how many times** (10 Nov 2026): fewer than half = NA, half = AS, 7 in 10 = AN, 9 in 10 = AE, plus the quality; each starts with what the student CAN DO.
 - Final product: **Very good = 10/10** (a row at level 4 is always 10; Good / Fair / Developing 7.5 / 5 / 2.5 on a click) (14 Nov 2026).
-- Comes with a ready-to-paste marking prompt (Rubrics doc says ChatGPT; see contradiction 25).
+- Comes with a ready-to-paste marking prompt: for a final product, the agreed prompt for ✨ Correct in my Roig (Roger's Gemini app, 20 Nov 2026); writings are marked by Claude (section 8). Not ChatGPT.
 
 ---
 
@@ -591,11 +593,11 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 ---
 
-## 13. To revise: what is outdated and what contradicts
+## 13. What changed and what is still open
 
 ### 13.1 The Drive guides, one by one
 
-| Guide | Still true | Outdated or to confirm |
+| Guide | Still true | Outdated (replaced by the newer rule) |
 | --- | --- | --- |
 | How we make exams | Reading never gives away the writing; section order by criterion; good-item rules; keys accept every correct answer; short shared listening; grade = points ÷ 10; exams only in Drive. | Google Forms, two forms, four models A–D, three itineraries, 35 items in 50 minutes, writing 20 points, "I don't know" option (now web exams: 6.12, rows 16–20). |
 | How we make rubrics | All six principles and the C1–C4 rubric (still used to mark writings). | "A ready-to-paste ChatGPT prompt" (row 25). |
@@ -612,40 +614,44 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - Move *Prompts* (01_How we work) and *Procediment_LS_per_curs.md* (08_Reference docs) to `Archive` by hand: Drive refused Claude's move.
 - 08_Reference docs has **two folders called Archive** (made 26 Oct and 31 Oct); the guides went to the 31 Oct one.
 
-### 13.2 Contradictions
+### 13.2 Contradictions, settled (21 Nov 2026)
 
-Until Roger answers, Claude follows the **newer** rule (in bold).
+Roger, 21 Nov 2026: "when it comes to contradictions, my last decisions are the ones that are valid". So each row below follows the newest decision. That rule is the one written in sections 1 to 11, and the older text was fixed or marked as replaced in the same PR. Rows marked *(from practice)* follow what was last done, because Roger never said it in words.
 
-| # | Topic | The older text says | The newer rule says | Where to fix |
-| --- | --- | --- | --- | --- |
-| 1 | Committing | AGENTS.md › Verification: "Do not commit or push unless explicitly asked." | **Claude opens PRs for every change and merges on "merge"** (how every thread has worked since October). | Reword the AGENTS.md line. |
-| 2 | Exam delivery | Exams doc, Prompts, AGENTS.md › Exams, the playbook and 4ESO LS2 `grading.md`: Word papers + a Google Form per model, writing 30 (or 20) points. | **Web exams on the site (1 and 17 Nov 2026), Base/Core papers with versions A/B/C, L20 R20 V35 G15 W10.** | Playbook step 10, both LS2 `grading.md`; Ask Roger if Forms are still wanted for anything. |
-| 3 | Exam versions | `el-web-exam.js` header and AGENTS.md: versions A or B. | **A/B/C** (19 Nov 2026). | Comment and AGENTS.md line. |
-| 4 | Web exam writing | AGENTS.md: Roger clicks a 5.1 level (NA 8 · AS 15 · AN 23 · AE 30 of 30). | **Claude marks it with C1–C4 (8/4/4/4 of 20)** (17 Nov 2026). Keep the click as a manual backup? | Ask Roger. |
-| 5 | Speaking hand-in | AGENTS.md (3 and 7 Nov), Research audit change 2: hand in the transcript (and an improved version). | **Recording only, no transcript** (14 and 16 Nov 2026). | Remove the transcript lines from AGENTS.md. |
-| 6 | Writing revisions | Playbook Part 1, Research audit change 2: a first version, then an improved final version with "What I changed". | **Every writing is handed in once and Claude corrects it** (1–2 Nov 2026). | Update the playbook row. |
-| 7 | Daily work split | Playbook: practice 7.5. Research audit change 1: checkpoints 50 % · warm-ups 25 % · practice 25 % of the grammar and vocabulary block. | **Checkpoints 10 · warm-ups 2.5 · practice 5 · class games 2.5** (9 Nov 2026). | Playbook LS mark row; Research audit Doc. |
-| 8 | Compulsory questions | AGENTS.md (14 Nov): split grammar steps and Prepositions + vocab have 7 compulsory + 7 extra. | **4 compulsory per grammar block** (16 Nov 2026). Does Prepositions + vocab keep 7? | Ask Roger, then fix AGENTS.md. |
-| 9 | "Optional" labels | Memory (26 Oct): no "optional" labels on student pages. | **The sample exam shows "🎯 Test yourself (optional)"** (9 Nov 2026), on Roger's request. | Keep the exception. |
-| 10 | Continue card | Memory: every LS has a Continue card. | **Simple LS home (20 Nov 2026) hides it on the LS page**; the board keeps ▶ Continue. | Confirm with Roger. |
-| 11 | Mixed games | AGENTS.md (6 Nov): "never a mixed game again". | **Decks stay a pair, but the board can play both together** (19 Nov 2026). | Both true; wording clear here. |
-| 12 | FP videos with Gemini | Memory (19 Nov): finish LS2 with the paid Gemini API. | **Roger's own Gemini app now** (20 Nov 2026). | Done (memory updated). |
-| 13 | Students' week | Playbook: students have a "My week" button. | **No week plan for students** (6 Nov 2026): ✅ To do and 🏠 Homework only. | Playbook Calendar row. |
-| 14 | Routes | Exams doc, Prompts, Procediment, AGENTS.md, playbook: three itineraries Insecure / Safe / Daring. | **Starter, Base, Core, Plus (+ Pro in 4 ESO); exams in two papers, Base and Core.** | Wording; the level table in section 4 maps them. |
-| 15 | Level conversion | Memory (1 Nov): convert marks by level ("an 8 from a Base will be a 6"). | **Nothing decided or built.** | Ask Roger before the next exams. |
-| 16 | Exam writing points | Exams doc: writing 20 of 100. | **LS2 web exam: writing 10 of 100** (rubric still out of 20, halved). | Ask Roger which he wants from LS3. |
-| 17 | Reading during the writing | Exams doc: two forms so students can't go back to the reading while writing. | **Web exam: free movement between sections and a review page** (Nov 2026). The reading rule (6.4) is the only protection. | Ask Roger: lock the reading once the writing starts? |
-| 18 | Who records the listening | Exams doc: Roger records it himself (Claude gives the script). Playbook: ElevenLabs audio. | **LS2 reused the audio of a learning-path video.** | Ask Roger which way from LS3. |
-| 19 | Length and models | Exams doc: four models A–D, 35 items, 50 minutes. | **Two papers × versions A/B/C**; number of items and time not fixed. | Ask Roger: keep 35 items / 50 minutes? |
-| 20 | "I don't know" option | Exams doc, Prompts: on every multiple-choice item (0 points). | **Web exam has none.** | Ask Roger if he wants it. |
-| 21 | Spelling slips in keys | Exams doc: keys accept "small spelling variants". | **18 Nov 2026: Roger did not accept "donw" for "down"** in a late LS1 exam. | Ask Roger: typos right or wrong? |
-| 22 | Language to Roger | Prompts: explain to Roger in Catalan. | **Always English** (Memory, standing rule). | Prompts is only for Forms scripts; confirm. |
-| 23 | Exam location | Exams doc: exams live only in Teacher Studio › Exam. | **Web exam source and keys are in project files** (`web-exam-<course>-<ls>/`), plus Drive. | Confirm both are fine. |
-| 24 | FP format | Procediment: a video with Google Slides, face in picture-in-picture. | **A spoken video uploaded on the site** (no format rule since). | Confirm the Slides + face rule. |
-| 25 | Rubric marking prompt | Rubrics doc: every rubric has a ready-to-paste ChatGPT prompt. | **Claude marks writings; Roger marks FPs in his Gemini app with the agreed prompt** (20 Nov 2026). | Keep "a ready-to-paste prompt" without naming ChatGPT? |
-| 26 | Research audit status | Research audit Doc: changes 3–9 "to do". | Several are built (core words, micro-dictation chunks, Catalan-to-English flashcards, the voyage road). | Roger to confirm which are still wanted. |
-| 27 | Class game theory | Class games guide (5 Nov): theory and explanation slides between the questions. | **Questions only, no theory slides** (16 Nov 2026). | Done: the guide now points here. |
-| 28 | Storing recordings | Roadmap (Oct 2026): never store audio recordings (the most sensitive data). | **Speaking recordings and FP videos are stored** in Drive › 04_Students (private) (Nov 2026). | Confirm, and check it is in the data-protection approval. |
-| 29 | Final product groups | Playbook: groups from the same route. | **Research audit (26 Oct 2026): mixed routes**, at least one Core or Plus student per group. | Ask Roger which from LS3. |
-| 30 | Sample exam timing | Playbook: taken the session before the exam. | **Research audit: open a week before the exam** (and it is always open, 9 Nov 2026). | Wording only. |
-| 31 | Flashcards typing | Playbook Part 1 (26 Oct): the student types or says the English before turning the card. | **No typing on the cards** (20 Nov 2026). | Done: playbook points here. |
+| # | Topic | Valid rule (newest) | Older text, now replaced |
+| --- | --- | --- | --- |
+| 1 | Committing | Claude opens a PR for every change and merges on "merge". | AGENTS.md "Do not commit or push unless explicitly asked" (fixed). |
+| 2 | Exam delivery | Web exams on the site: Base and Core papers, versions A/B/C, L20 R20 V35 G15 W10 (17–19 Nov 2026). | Word papers + a Google Form per model (Exams doc, Prompts, AGENTS.md, playbook step 10, 4ESO LS2 `grading.md`: fixed or marked replaced). |
+| 3 | Exam versions | A, B or C: as many versions as the exam has (19 Nov 2026). | "A or B" (`el-web-exam.js`, AGENTS.md: fixed). |
+| 4 | Exam writing | Claude marks it with C1–C4 (17 Nov 2026); the dashboard's 5.1 click is only a manual backup. | AGENTS.md: Roger clicks a 5.1 level (fixed). |
+| 5 | Speaking hand-in | Recording only, no transcript (14 and 16 Nov 2026). | AGENTS.md (3 and 7 Nov), Research audit change 2 (marked replaced). |
+| 6 | Writing revisions | Every writing is handed in once and Claude corrects it (1–2 Nov 2026). | A first and an improved version with "What I changed" (AGENTS.md "Revision counts", Research audit change 2: marked replaced). |
+| 7 | Daily work split | Checkpoints 10 · warm-ups 2.5 · practice 5 · class games 2.5 (9 Nov 2026). | Playbook practice 7.5; Research audit 50/25/25. |
+| 8 | Compulsory questions | 4 per grammar block (3 questions + own example), the rest extra; 💬 Expressions 6 + 4 (16 Nov 2026). 4ESO LS2 LP3 keeps its 7 because students already started it. | AGENTS.md 7 compulsory + 7 extra (14 Nov: marked replaced). |
+| 9 | "Optional" labels | The sample exam shows "🎯 Test yourself (optional)" (9 Nov 2026). | Memory: no "optional" labels. |
+| 10 | Continue card | Not on the LS page (simple LS home, 20 Nov 2026); the board keeps ▶ Continue. | Memory: every LS has a Continue card. |
+| 11 | Mixed games | Decks stay a pair; the board can play both together (19 Nov 2026). | AGENTS.md "never a mixed game again" (marked replaced). |
+| 12 | FP videos | Marked in Roger's own Gemini app (20 Nov 2026). | Paid Gemini API. |
+| 13 | Students' week | No week plan for students: ✅ To do and 🏠 Homework (6 Nov 2026). | Playbook "My week" (fixed). |
+| 14 | Routes | Starter · Base · Core · Plus · Pro; exams in two papers, Base and Core. | Three itineraries Insecure / Safe / Daring. |
+| 15 | Level conversion | Marks are never converted between levels (Roger, 21 Nov 2026). | Memory (1 Nov): "an 8 from a Base will be a 6". |
+| 16 | Exam writing points | 10 of 100 (LS2, 19 Nov 2026); the rubric stays out of 20, halved. | Exams doc: 20 of 100. |
+| 17 | Reading during the writing | Free movement between sections and a review page (web exams). | Two forms so the reading closes before the writing. |
+| 18 | The listening audio | Reuse a recording the LS already has, as in LS2 *(from practice)*. | Roger records it; ElevenLabs. |
+| 19 | Length and models | Two papers × versions A/B/C; items and time agreed with Roger with the format (6.2). | Four models A–D, 35 items, 50 minutes. |
+| 20 | "I don't know" option | None (web exams). | On every multiple-choice item. |
+| 21 | Spelling slips | Wrong (18 Nov 2026: "donw" not accepted for "down"). | Keys accept "small spelling variants". |
+| 22 | Language to Roger | Always English. | Prompts: explain in Catalan. |
+| 23 | Exam location | Project files (`web-exam-<course>-<ls>/`) and Drive, never the repo. | Drive only. |
+| 24 | FP format | A spoken video uploaded on the site *(from practice, Nov 2026)*. | Procediment: Google Slides video with the face in picture-in-picture. |
+| 25 | Rubric marking prompt | FPs: the agreed prompt for Roger's Roig; writings: Claude (20 Nov 2026). | Rubrics doc: a ChatGPT prompt. |
+| 27 | Class game theory | Questions only, no theory slides (16 Nov 2026). | Class games guide (5 Nov). |
+| 28 | Storing recordings | Speaking recordings and FP videos are stored in Drive › 04_Students (private) (Nov 2026); Roger confirmed the data-protection side is fine (21 Nov 2026). | Roadmap: never store recordings. |
+| 29 | Final product groups | Mixed routes, at least one Core or Plus student per group (Research audit, 26 Oct 2026). | Playbook: groups from the same route. |
+| 30 | Sample exam timing | Always open; opened a week before the exam (9 Nov 2026). | Playbook: the session before the exam. |
+| 31 | Flashcards typing | No typing on the cards (20 Nov 2026). | Playbook Part 1 (26 Oct). |
+
+### 13.3 Still open: nothing newer was decided
+
+- **An exam tailored to strengths again** (6.2): ask when the LS3 exam is planned.
+- **Research audit changes 3–9** (old row 26): several are built (core words, micro-dictation chunks, Catalan-to-English flashcards, the voyage road); Roger to say which of the rest are still wanted.

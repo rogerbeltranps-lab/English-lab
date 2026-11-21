@@ -3,7 +3,7 @@
    their answers before turning in the exam… questions according to their level… randomized… 2 versions of each level").
    The page (e.g. 2eso/free-time-live/exam.html) has window.EL_EXAM (data/exam.js, built by tools/web-exam/build.mjs): the questions of
    four papers (base-A, base-B, core-A, core-B) and NO answers; the key is in cpKeys/{key}.web (teacher only), marked on the dashboard.
-   - Starter and Base take the base paper, Core and Plus the core one (the student's route); version A or B comes from the account, so
+   - Starter and Base take the base paper, Core and Plus the core one (the student's route); version A, B or C (as many as the exam has) comes from the account, so
      classmates get different papers; the questions of each section and the options of each question are shuffled per student.
    - Sections: 🎧 Listening first (the teacher plays the audio twice for the class; once a student presses "Listening finished" those
      answers are locked), then 📖 Reading, 📚 Vocabulary, 🧩 Grammar in any order, and ✅ Review: every answer, blanks in red, before 🏁 Turn in.
@@ -547,7 +547,7 @@
   function teacherPick(note) {
     ca = false;
     root.innerHTML = '<div class="wx-card"><h2>📝 Exam preview (teacher)</h2>' + (note ? '<p class="wx-done">' + esc(note) + '</p>' : '') +
-      '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A or B from their account, with the questions in order (as in the audio and the texts) and the options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
+      '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A, B or C from their account, with the questions in order (as in the audio and the texts) and the options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
       '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') + '</p>' +
       '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button>' + (X.games ? ' <button class="wx-btn sec" id="wxTryGames">🎮 Try the games (after turning in)</button>' : '') + '</p></div><div id="wxGames"></div>';
     const tg = $('#wxTryGames'); if (tg) tg.onclick = () => { tg.disabled = true; games(); $('#wxGames').scrollIntoView({ behavior: 'smooth' }); };
