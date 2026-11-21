@@ -3,19 +3,19 @@
 window.LP = {
   key: 'tnTeacher', n: 4, title: 'Writing like a teacher',
   panels: [
-    { id: 'spot', type: 'mc', tab: '🔍 Spot the mistake', title: 'Spot the mistake: school English', pill: 'Warm-up',
-      intro: 'Your own sentences about school, typing slips already fixed. One mistake each.',
+    { id: 'spotw', type: 'rewrite', tab: '🔍 Spot the mistake', title: 'Spot the mistake: school English', pill: 'Warm-up',
+      intro: 'Your own sentences about school, typing slips already fixed. One mistake each. Write the whole sentence correctly, then read why.',
       items: [
-        { q: '“Now I want you to do the same with the LSs of 2n of ESO.”', o: ['the LSs of 2n of ESO', 'I want you to', 'the same'], ex: '<strong>the 2nd ESO LSs</strong>: no <em>of</em>, ordinal number.' },
-        { q: '“Each objective has one assessment criteria.”', o: ['one assessment criteria', 'Each objective', 'has'], ex: 'one <strong>criterion</strong>, two <strong>criteria</strong>.' },
-        { q: '“I mean this indicators.”', o: ['this indicators', 'I mean', 'I'], ex: '<strong>these</strong> + plural.' },
-        { q: '“During a LS, students work in groups.”', o: ['a LS', 'During', 'in groups'], ex: '<strong>an LS</strong>: it starts with the sound /e/.' },
-        { q: '“This project has too many info.”', o: ['too many info', 'This project', 'has'], ex: 'info is uncountable: <strong>too much info</strong>.' },
-        { q: '“The dashboard need a new button.”', o: ['need', 'The dashboard', 'a new button'], ex: 'he / she / it + <strong>-s</strong>: the dashboard needs.' },
-        { q: '“Create a document mare with all the competences.”', o: ['a document mare', 'Create', 'all the competences'], ex: '<strong>a master document</strong>.' },
-        { q: '“For the next course I’ll change the programme.”', o: ['the next course', 'I’ll change', 'the programme'], ex: '<em>el curs vinent</em> → <strong>next school year</strong>.' },
-        { q: '“Send me a list of mails.”', o: ['a list of mails', 'Send me', 'Send'], ex: '<strong>a list of emails</strong> (mail = the post, uncountable).' },
-        { q: '“The criteria is only shown to the teacher.”', o: ['The criteria is', 'only shown', 'to the teacher'], ex: 'criteria is plural: <strong>the criteria are shown</strong>.' }
+        { s: 'Now I want you to do the same with the LSs of 2n of ESO.', a: ['Now I want you to do the same with the 2nd ESO LSs.', 'Now I want you to do the same with the LSs of 2nd ESO.', 'Now I want you to do the same with the 2 ESO LSs.', 'Now I want you to do the same with the LSs for 2nd ESO.', 'Now I want you to do the same with the LSs for 2 ESO.'], ex: '<strong>the 2nd ESO LSs</strong>: no <em>of</em>, ordinal number.' },
+        { s: 'Each objective has one assessment criteria.', a: ['Each objective has one assessment criterion.'], ex: 'one <strong>criterion</strong>, two <strong>criteria</strong>.' },
+        { s: 'I mean this indicators.', a: ['I mean these indicators.'], ex: '<strong>these</strong> + plural.' },
+        { s: 'During a LS, students work in groups.', a: ['During an LS, students work in groups.'], ex: '<strong>an LS</strong>: it starts with the sound /e/.' },
+        { s: 'This project has too many info.', a: ['This project has too much info.'], ex: 'info is uncountable: <strong>too much info</strong>.' },
+        { s: 'The dashboard need a new button.', a: ['The dashboard needs a new button.'], ex: 'he / she / it + <strong>-s</strong>: the dashboard needs.' },
+        { s: 'Create a document mare with all the competences.', a: ['Create a master document with all the competences.'], ex: '<strong>a master document</strong>.' },
+        { s: 'For the next course I’ll change the programme.', a: ['Next school year I’ll change the programme.', 'For next school year I’ll change the programme.', 'For the next school year I’ll change the programme.'], ex: '<em>el curs vinent</em> → <strong>next school year</strong>.' },
+        { s: 'Send me a list of mails.', a: ['Send me a list of emails.', 'Send me a list of email addresses.'], ex: '<strong>a list of emails</strong> (mail = the post, uncountable).' },
+        { s: 'The criteria is only shown to the teacher.', a: ['The criteria are only shown to the teacher.'], ex: 'criteria is plural: <strong>the criteria are shown</strong>.' }
       ] },
 
     { id: 'vocab', type: 'vocab', tab: 'Vocabulary', title: 'School English without Catalan',

@@ -273,11 +273,11 @@ var LS2 = (function () {
       sec = it.p; inX = false; const pt = parts.find(x => x.id === it.p);
       return pt ? '<div class="gpart"><h3>' + (++np) + ' · ' + tx(pt.title) + ' <span class="gcount" data-part="' + esc(it.p) + '"></span></h3>' + (pt.note ? '<div class="gnote">' + tx(pt.note) + '</div>' : '') + '</div>' : ''; };
     return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
-      items.map((it, i) => { const m = itemMode(it, mode, parts), pk = picking(it); return head(it) + '<div class="question' + (EXTRA.has(it) ? ' gx' : '') + '">' + (parts ? kindChip(it, m) : '') + (m === 'listen'
+      items.map((it, i) => { const m = itemMode(it, mode, parts), pk = picking(it); return head(it) + '<div class="question' + (EXTRA.has(it) ? ' gx' : '') + (it.whole ? ' whole' : '') + '">' + (parts ? kindChip(it, m) : '') + (m === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      (one ? '<div class="el-onerow">' : '') + '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (one ? oneBtn(prefix, i) + '</div>' : '') +
+      (one ? '<div class="el-onerow">' : '') + '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.whole ? ' placeholder="Write the correct sentence"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (one ? oneBtn(prefix, i) + '</div>' : '') +
       (pk ? picksHtml(it, items, prefix, i, m) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
@@ -286,6 +286,24 @@ var LS2 = (function () {
      whole sentence for "I ___ (watch) a basketball match right now." counts when it is a run of words of the sentence with the gap filled
      that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails. */
   const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  /* ✍️ Write the correct sentence (Towards Nativeness 🔍 Spot the mistake, Roger 21 Nov 2026: "I want to write the correct sentence, not choose"):
+     the whole sentence counts when it matches an accepted version. Case, punctuation, quotes and contractions never matter, and a word of 5+
+     letters may have one typing slip (insert, drop, swap or change one letter), unless the typed word is one of the original wrong sentence
+     (so "need" for "needs" or "mails" for "emails" still fails). The original sentence typed again is never right. */
+  const lev1 = (a, b) => { if (a === b) return true; const la = a.length, lb = b.length; if (Math.abs(la - lb) > 1) return false;
+    let i = 0; while (i < la && i < lb && a[i] === b[i]) i++;
+    if (la === lb) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+    return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1); };
+  // two ways to read a sentence: contractions written out (it's = it is), or apostrophes dropped (dont = don't, as Roger types on his phone)
+  const flat = x => norm(x).replace(/'/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function wholeOk(it, typed) {
+    return [bare, flat].some(c => {
+      const t = c(typed); if (!t || t === c(it.whole)) return false;
+      const tw = t.split(' '), orig = new Set(c(it.whole).split(' '));
+      return (it.a || []).some(a => { const w = c(a).split(' ');
+        return w.length === tw.length && w.every((x, j) => x === tw[j] || (x.length >= 5 && !orig.has(tw[j]) && lev1(x, tw[j]))); });
+    });
+  }
   function fits(q, answers, typed) {
     const v = norm(typed); if (!v) return false;
     if (answers.some(a => norm(a) === v)) return true;
@@ -338,7 +356,7 @@ var LS2 = (function () {
   function checkTyped(items, prefix, reveal, count, only) {
     let score = 0; got = [];
     items.forEach((it, i) => {
-      const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
+      const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : it.whole ? wholeOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
       if (only && !only.includes(i)) return;
       const key = prefix + i;
@@ -347,6 +365,11 @@ var LS2 = (function () {
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
       if (!v && EXTRA.has(it)) { f.innerHTML = ''; f.className = 'feedback'; return; }
+      if (it.whole && v) { const model = '<strong>' + esc(it.show || it.a[0]) + '</strong>';
+        f.innerHTML = ok ? 'Correct! ' + model + '<br><span class="tiny">' + why + '</span>'
+          : [bare, flat].some(c => c($('#' + prefix + i).value) === c(it.whole)) ? 'That’s still your original sentence. Find the mistake and change it.'
+          : 'Not yet. ' + (show ? 'The natural version: ' + model + '<br><span class="tiny">' + why + '</span>' : 'Read it again: one part is wrong. Try again.');
+        f.className = 'feedback ' + (ok ? 'ok' : 'no'); return; }
       f.innerHTML = ok ? (it.own ? (ca() ? 'Molt bé! El professor pot llegir la teva frase.' : 'Well done! Your teacher can read your sentence.') : (ca() ? 'Correcte!' : 'Correct!'))
         : !v ? (picking(it) ? (ca() ? 'Tria una resposta.' : 'Choose an answer.') : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
@@ -400,6 +423,7 @@ var LS2 = (function () {
     if (document.getElementById('el-one-css')) return;
     const st = document.createElement('style'); st.id = 'el-one-css';
     st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
+      '.question.whole .el-onerow{flex-wrap:wrap}.question.whole .el-onerow>input.typed{flex:1 1 100%;max-width:none;font-size:16px}' +
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
       '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}' +
       '.el-nbink .question.el-nbopen .el-one{display:inline-block!important}.el-nbfix{display:inline-block;margin-top:6px;padding:6px 14px!important;font-size:.9em!important;min-height:0!important}' +
@@ -1088,6 +1112,10 @@ var LS2 = (function () {
       stays(p.id, p.id, p.id + 'List', items, (count, only) => { checkTyped(items, p.id, false, count, only); if (count) firsts(p.id, p.id, p.items, items, all, marked(items, p.id, only), got); const C = chk(p.id), s = all.filter(i => C.has(i) && got[i][0]).length, ok = doneNow(p.id, p.id, items, p.id, all); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items, all);
     }
   });
+
+  // 🔍 Spot the mistake, written (Roger, 21 Nov 2026): items { s: the sentence as Roger wrote it, a: [accepted correct sentences], ex: the rule }.
+  // A typed panel where each answer is the whole corrected sentence (wholeOk); the model and the rule show once it is right, or after two tries.
+  R.rewrite = p => R.typed(Object.assign({}, p, { type: 'typed', items: p.items.map(it => ({ q: '“' + it.s + '”' + (it.note ? ' <span class="tiny">(' + it.note + ')</span>' : ''), a: it.a, whole: it.s, show: it.a[0], en: it.ex })) }));
 
   // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
   function partsBind(p) {

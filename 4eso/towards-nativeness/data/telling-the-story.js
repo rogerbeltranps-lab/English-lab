@@ -4,19 +4,19 @@
 window.LP = {
   key: 'tnStory', n: 3, title: 'Telling the story of your app',
   panels: [
-    { id: 'spot', type: 'mc', tab: '🔍 Spot the mistake', title: 'Spot the calque', pill: 'Warm-up',
-      intro: 'These are built from Catalan and then translated. A native speaker understands them, but can tell. Choose the part that gives you away.',
+    { id: 'spotw', type: 'rewrite', tab: '🔍 Spot the mistake', title: 'Spot the calque', pill: 'Warm-up',
+      intro: 'These are built from Catalan and then translated. A native speaker understands them, but can tell. Write each one the way a native speaker would, then read why.',
       items: [
-        { q: '“It’s trigging a lot.”', o: ['trigging a lot', 'It’s', 'a lot'], ex: '<em>trigar molt</em> → <strong>It’s taking ages / a long time.</strong>' },
-        { q: '“I want that you check it.”', o: ['want that you check', 'I', 'it'], ex: '<strong>I want you to check it.</strong>' },
-        { q: '“I recommend you to start small.”', o: ['recommend you to start', 'I', 'small'], ex: '<strong>recommend + that</strong> or <strong>-ing</strong>: I recommend that you start small / I recommend starting small.' },
-        { q: '“I’m looking forward to show you the app.”', o: ['looking forward to show', 'I’m', 'the app'], ex: 'After look forward to / get used to, the <em>to</em> is a preposition: <strong>looking forward to showing</strong>.' },
-        { q: '“I figured out it after an hour.”', o: ['figured out it', 'I', 'after an hour'], ex: 'A pronoun goes in the middle of a phrasal verb: <strong>I figured it out.</strong>' },
-        { q: '“Maintain the design, please.”', o: ['Maintain', 'the design', 'please'], ex: '<em>mantenir</em> → <strong>keep</strong> the design.' },
-        { q: '“It works in here.”', o: ['in here', 'It works', 'It'], ex: '<em>aquí dins</em> → just <strong>here</strong>: It works here.' },
-        { q: '“It’s normal that it fails.”', o: ['It’s normal that', 'it fails', 'fails'], ex: '<strong>No wonder it fails. / It’s no surprise it fails.</strong>' },
-        { q: '“When I had the idea, I never built an app.”', o: ['I never built', 'When I had the idea', 'an app'], ex: 'What came before another past event: past perfect. <strong>I had never built an app.</strong>' },
-        { q: '“Some students will have different paces when reading.”', o: ['will have different paces', 'Some students', 'when reading'], ex: '<strong>Some students will read at different paces.</strong> (read at your own pace)' }
+        { s: 'It’s trigging a lot.', a: ['It’s taking ages.', 'It’s taking a long time.', 'It’s taking a lot of time.', 'It’s taking forever.'], ex: '<em>trigar molt</em> → <strong>It’s taking ages / a long time.</strong>' },
+        { s: 'I want that you check it.', a: ['I want you to check it.'], ex: '<strong>I want you to check it.</strong>' },
+        { s: 'I recommend you to start small.', a: ['I recommend that you start small.', 'I recommend starting small.', 'I recommend you start small.'], ex: '<strong>recommend + that</strong> or <strong>-ing</strong>: I recommend that you start small / I recommend starting small.' },
+        { s: 'I’m looking forward to show you the app.', a: ['I’m looking forward to showing you the app.'], ex: 'After look forward to / get used to, the <em>to</em> is a preposition: <strong>looking forward to showing</strong>.' },
+        { s: 'I figured out it after an hour.', a: ['I figured it out after an hour.'], ex: 'A pronoun goes in the middle of a phrasal verb: <strong>I figured it out.</strong>' },
+        { s: 'Maintain the design, please.', a: ['Keep the design, please.'], ex: '<em>mantenir</em> → <strong>keep</strong> the design.' },
+        { s: 'It works in here.', a: ['It works here.'], ex: '<em>aquí dins</em> → just <strong>here</strong>: It works here.' },
+        { s: 'It’s normal that it fails.', a: ['No wonder it fails.', 'It’s no surprise it fails.', 'It’s no surprise that it fails.', 'It’s normal for it to fail.', 'No wonder it’s failing.'], ex: '<strong>No wonder it fails. / It’s no surprise it fails.</strong>' },
+        { s: 'When I had the idea, I never built an app.', a: ['When I had the idea, I had never built an app.', 'When I had the idea, I’d never built an app.'], ex: 'What came before another past event: past perfect. <strong>I had never built an app.</strong>' },
+        { s: 'Some students will have different paces when reading.', a: ['Some students will read at different paces.', 'Some students will read at different speeds.'], ex: '<strong>Some students will read at different paces.</strong> (read at your own pace)' }
       ] },
 
     { id: 'vocab', type: 'vocab', tab: 'Vocabulary', title: 'Expressions for telling the story (your vocabulary sheet)',
