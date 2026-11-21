@@ -5436,7 +5436,12 @@ function gfs(on){S.gfs=on;const box=document.querySelector("#main .lpall");docum
   if(!on)S.gfsB=false;if(S.gz==="fit")requestAnimationFrame(gzApply)}
 // ⛵ Class voyage full screen: the same way, the whole box (map, order buttons, table) on the window; the header stays at its top.
 // vfs(true,true) = ▦ Table full screen (Roger, 21 Nov 2026: "table full screen missing here"): the same without the map
-function vfs(on,tab){S.vfs=on;S.tfs=!!(on&&tab);const box=document.querySelector("#main .vyrank");document.body.classList.toggle("vfs",!!(on&&box));document.body.classList.toggle("tfs",!!(S.tfs&&box));
+function vfs(on,tab){
+  // from the map full screen, ▦ Table full screen or ⛶ Full screen leave it first (Roger, 21 Nov 2026: "The table full screen button doesn't
+  // work here": body.hfs kept hiding the table); a browser full screen it opened stays and now belongs to this one
+  if(on&&S.hfs){S.hfs=false;document.body.classList.remove("hfs");if(S.hfsB){S.vfsB=true;S.hfsB=false}
+    const hb=document.querySelector("#main .vyrank [data-do=hfs]");if(hb){hb.textContent="⛶ Map full screen";hb.title="Only the class map and 🧭 Class steps, on the whole screen"}}
+  S.vfs=on;S.tfs=!!(on&&tab);const box=document.querySelector("#main .vyrank");document.body.classList.toggle("vfs",!!(on&&box));document.body.classList.toggle("tfs",!!(S.tfs&&box));
   const b=box&&box.querySelector("[data-do=vfs]"),bt=box&&box.querySelector("[data-do=tfs]"),w=on&&!S.tfs;
   if(b){b.textContent=w?"✕ Exit full screen":"⛶ Full screen";b.title=w?"Back to the dashboard (Esc)":"This page on the whole screen, with the order buttons"}
   if(bt){bt.textContent=S.tfs?"✕ Exit table full screen":"▦ Table full screen";bt.title=S.tfs?"Back (Esc)":"Only the table, with the order buttons, on the whole screen"}

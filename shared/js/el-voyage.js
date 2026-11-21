@@ -172,7 +172,7 @@
 .vy-sea{position:relative;flex:1;min-width:0;border-radius:20px;overflow:hidden;border:3px solid #b08a52;background:var(--vy-bgc)}
 .vy-sea::before{content:"";position:absolute;top:0;bottom:0;left:0;right:calc(-1*var(--vy-bgs));background:linear-gradient(var(--vy-wash),var(--vy-wash)),var(--vy-bg) 0 0/var(--vy-bgs) repeat;animation:vydrift 60s linear infinite}
 @keyframes vydrift{to{translate:calc(-1*var(--vy-bgs)) 0}}.vy-sea.still::before{animation:none}
-.vy-top{position:absolute;left:0;right:0;top:0;z-index:6;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;background:linear-gradient(#f6ead0f2,#f6ead000);pointer-events:none}
+.vy-top{position:absolute;left:0;right:0;top:0;z-index:6;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;background:#f6ead0;border-bottom:2px solid #d9c08a;box-shadow:0 2px 6px #0002;pointer-events:none}
 .vy-top small{display:block;font-size:11px;color:#8a5a1f;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.vy-top b{font:700 17px Georgia,serif;color:#4a2f0e}
 .vy-sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.vy-map{position:relative}.vy-map>svg{position:absolute;left:0;top:0;pointer-events:none}
 .vy-st{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;background:var(--vy-st) center/contain no-repeat;display:grid;place-items:center;font-size:23px;padding-bottom:8px;z-index:2;text-decoration:none;border-radius:50%}
