@@ -220,9 +220,3 @@ window.LP = {
       model: { beginners: 'I love playing football. I don’t like tidying my room. I spend two hours on screens.', insecure: 'I love playing football with my friends. I hate tidying my room. I spend about two hours a day on screens. You should take a break after thirty minutes.', safe: 'I love playing football and I enjoy drawing comics. I can’t stand getting up early on Saturdays! I spend about two hours a day on screens, mostly watching videos. I don’t switch off my phone before bed, but I should. I enjoy skating in the park with my friends.', daring: 'I love playing football and I really enjoy drawing comics, because I can invent stories. I can’t stand tidying my room. I spend about two hours a day on screens, which is less than the school average, but at weekends it’s more. I think three and a half hours is too much, because you have less time for friends and sport, and you sleep worse. My tip is: leave your phone in the kitchen at night.' } }
   ]
 };
-/* 🎲 Surprise questions (Roger, 21 Nov 2026), in preview: only the teacher and the test account see this tab until a week's plan uses it
-   (then it moves into panels, EL_CATALOG gets the step and the Time plan the tab). Bank: data/surprise.js, questions from LP1 to LP4. */
-window.LP.preview = [
-  { id: 'speakSurprise', type: 'surprise', bank: '2eso-free-time-live', upTo: 4, tab: { ca: '🎲 Preguntes sorpresa', en: '🎲 Surprise questions' }, title: { ca: '🎲 Preguntes sorpresa', en: '🎲 Surprise questions' },
-    intro: { ca: 'Quatre preguntes que no has vist abans sobre el que hem après en aquesta LS. Respon-les en veu alta.', en: 'Four questions you haven’t seen before about what we’ve learned in this LS. Answer them out loud.' } }
-];

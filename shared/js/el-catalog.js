@@ -114,6 +114,7 @@ window.EL_CATALOG=(function(){
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.2"],"ls2GettingStarted4ESO",5,{graded:false}),
         // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
         L("book.html","Book: Lantern Night",["4.1"],"ls2Book4ESO",6,{agendaDue:true}),
+        L("surprise-questions.html","Surprise questions",["3.2"],"ls2Surprise4ESO",0,{sq:true}),   // 🎲 one tab per activity made on the Time plan (elSqSync)
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",10,{steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["2.2","4.1","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -136,6 +137,8 @@ window.EL_CATALOG=(function(){
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
         // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
         L("book.html","Book: Maya Live!",["4.1"],"ls2Book2ESO",6,{agendaDue:true}),
+        // 🎲 Surprise questions (Roger, 21 Nov 2026: "like a game or shadowing that are anywhere"): one tab per activity the teacher makes on the Time plan (ls/{id}.sq, elSqSync below), so it is before checkpoint 1 and no checkpoint closes it
+        L("surprise-questions.html","Surprise questions",["3.2"],"ls2Surprise2ESO",0,{sq:true}),
         L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",13,{steps:[["log","Reading log"],["talk","Talk"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
         L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -695,7 +698,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
     "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,vocabEx:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,vocabEx:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-check-the-source":{shadow:SH,cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
-    "2eso/ls2-likes-and-screen-tips":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S,speakSurprise:["3.2"]},
+    "2eso/ls2-likes-and-screen-tips":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S},
     "2eso/ls2-write-your-vlog-script":{shadow:SH,cards:RS,read:["4.1"],parts:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-recall-checkpoint-1":ck,"2eso/ls2-recall-checkpoint-2":ck,"2eso/ls2-recall-checkpoint-3":ck,"2eso/ls2-recall-checkpoint-4":ck,
     "2eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
@@ -854,4 +857,35 @@ window.elMiniRail=function(r){
     // a narrow window: no room for the docked agenda (it floats above the chip), so no empty strip either
     + "@media (max-width:980px){html.elcmtab .elrail{display:none!important}html.elcmtab body.elapp.elhas-rail{padding-left:0!important}}";
   (document.head || h).append(st);
+})();
+// 🎲 Surprise questions (Roger, 21 Nov 2026: "like a game or shadowing that are anywhere, with random questions taken from the slp … once
+// I create the activity, it appears on their path and here"). Each LS2-engine LS has one catalog activity with sq:true (its page
+// surprise-questions.html); its tabs are the activities the teacher makes on the Time plan: ls/{id}.sq = {s1: {n: 1, tabs: ["activity#panel",
+// …], at}, …}, the SLPs whose questions it draws. elSqSync(ls, sq) turns that list into the activity's tabs everywhere (EL_SECTIONS,
+// EL_ACTIONS, EL_STEP_CRITERIA 3.2, EL_STEP_TITLES, points = one per activity), keeps a copy in this browser (el_sq_<ls>) so the next
+// page load has the tabs before Firestore answers, and sends "el-sq". The tabs then work like any other tab: on a day of the Time plan
+// agenda, set as homework, a stop on the road, a column of the Learning paths table. No new Firestore reads: ls/{id} is read already.
+(function(){
+  const W=window,K=ls=>"el_sq_"+ls;
+  W.EL_SQ=W.EL_SQ||{};
+  W.elSqAct=ls=>(W.EL_CATALOG||[]).find(a=>a.sq&&a.ls===ls)||null;
+  W.elSqList=ls=>{const o=W.EL_SQ[ls]||{};return Object.keys(o).filter(k=>o[k]&&!o[k].off).map(k=>Object.assign({id:k},o[k])).sort((a,b)=>(a.n||0)-(b.n||0))};
+  W.elSqName=(x,en)=>(en===false?"🎲 Preguntes sorpresa ":"🎲 Surprise questions ")+(x&&x.n||"");
+  W.elSqApply=function(){(W.EL_CATALOG||[]).filter(a=>a.sq).forEach(a=>{const L=W.elSqList(a.ls),ids=L.map(x=>x.id);
+    a.points=ids.length;
+    if(W.EL_ACTIONS)W.EL_ACTIONS[a.id]=ids;
+    if(W.EL_STEP_CRITERIA)W.EL_STEP_CRITERIA[a.id]=Object.fromEntries(ids.map(k=>[k,["3.2"]]));
+    const sec=W.__elSec,tt=W.__elTt;
+    if(sec)sec[a.id]=L.map(x=>[x.id,"🎲 "+x.n]);
+    if(tt)tt[a.id]=Object.fromEntries(L.map(x=>[x.id,["speaking",W.elSqName(x),W.elSqName(x,false)]]))})};
+  // el-sections.js and el-step-titles.js load after this file and set their globals whole: the tabs go in again each time
+  ["EL_SECTIONS","EL_STEP_TITLES"].forEach(g=>{const h=g==="EL_SECTIONS"?"__elSec":"__elTt";W[h]=W[g];
+    try{Object.defineProperty(W,g,{configurable:true,get(){return W[h]},set(v){W[h]=v;try{W.elSqApply()}catch(e){}}})}catch(e){}});
+  W.elSqSync=function(ls,sq,quiet){if(!ls)return;const v=sq&&typeof sq==="object"?sq:{},s=JSON.stringify(v);
+    const same=JSON.stringify(W.EL_SQ[ls]||{})===s;W.EL_SQ[ls]=v;
+    try{if(typeof localStorage!=="undefined")s==="{}"?localStorage.removeItem(K(ls)):localStorage.setItem(K(ls),s)}catch(e){}
+    W.elSqApply();if(!same&&!quiet&&typeof dispatchEvent==="function")try{dispatchEvent(new CustomEvent("el-sq",{detail:{ls}}))}catch(e){}};
+  // the copy kept in this browser, at once
+  (W.EL_CATALOG||[]).filter(a=>a.sq).forEach(a=>{try{if(typeof localStorage!=="undefined")W.EL_SQ[a.ls]=JSON.parse(localStorage.getItem(K(a.ls))||"{}")}catch(e){}});
+  W.elSqApply();
 })();

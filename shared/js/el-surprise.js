@@ -1,7 +1,11 @@
 /* 🎲 Surprise questions / Preguntes sorpresa (Roger, 21 Nov 2026: "They will press record and then a random question about the LS will
    pop up so that they have to use what we've learned. There will be 4 questions, from easy to more complex and according to their level.
    We will provide feedback to improve and we will mark them like the rest of the speaking but students will only see done, not done and
-   things to improve"). A learning path step of the LS2 engines (type 'surprise'):
+   things to improve"; 21 Nov: "like a game or shadowing that are anywhere … I choose the SLP that I want to include and set an activity
+   which can be done in that moment or set as homework"). Not a learning path step: the teacher makes each one on the Time plan
+   (teacher.html sqOpen/sqMake → ls/{id}.sq = {sq1: {n, tabs: ["activity#panel"…], at}}), and each is a tab of the LS's
+   surprise-questions.html (panels(ls, bank) below; the page's data/surprise-questions.js LP.dyn). el-catalog.js elSqSync/elSqApply give
+   the catalog activity its tabs. Each tab (renderer type 'surprise' in both ls2-engine.js) works like this:
    - The student presses ● Start: the recording starts at once (el-mic.js keeps the clip of the Start button), and only then do the
      questions appear, one at a time, never before. One question per step of the bank, drawn at random: 1 About you · 2 Describe it ·
      3 the LS grammar · 4 Your opinion (bank tiers). Each tier has several questions per level, so classmates side by side get different ones.
@@ -14,9 +18,12 @@
      questions as the first field and sq: 1, so the Wednesday run writes "Things to improve" (el-marking.js mode 'surprise', sqText) and
      never a level. The teacher's 🔍 Analyse gives the speaking levels as for every recording. Students see only Done / Not done
      (the step's tick, To do) and the correction at the top of the tab.
-   The bank is window.EL_SURPRISE[p.bank] (the LS's data/surprise.js): {tiers:[{en,ca}×4], <route>:[[{q, ca?, h?, lp}…]×4]}; h = the
-   sentence starter (Starter) or the help words (Base, Core); lp = the learning path a question needs: a step with upTo: n draws only
-   questions with lp ≤ n. ctx = the engine's helpers (ls2-engine.js R.surprise). */
+   Questions (Roger chose "Both", 21 Nov 2026): written ones where the LS has them, automatic ones for the rest. Written bank =
+   window.EL_SURPRISE[bank] (the LS's data/surprise.js): {tiers:[{en,ca}×4], lps:{path: n}, kind:{panel: 'v'|'g'}, <route>:[[{q, ca?, h?,
+   lp, k?}…]×4]}; h = the sentence starter (Starter) or help words (Base, Core); lp = the learning path a question needs, k = vocabulary or
+   grammar. Automatic = window.EL_SURPRISE_AUTO[bank]["activity#panel"][route] (data/surprise-auto.js, made by tools/surprise/auto.mjs
+   from each tab's own words, grammar and speaking task). draw(): per tier, first a written question of a chosen tab, then an automatic
+   one of a chosen tab, then a written one of an earlier path; never last round's questions. ctx = the engine's helpers (R.surprise). */
 (function () {
   if (window.elSurprise) return;
   const CFG = {
@@ -42,17 +49,44 @@
     + '.sq-st{font-weight:700;color:var(--dark,#174d3d);font-variant-numeric:tabular-nums;margin:0}.sq-big{font-size:3.2rem;font-weight:800;text-align:center;color:var(--accent,#1f6b52);padding:26px 0;margin:0}'
     + '@media (max-width:640px){.sq-steps{grid-template-columns:1fr}.sq-qt{font-size:1.15rem}}@media (prefers-reduced-motion:reduce){.sq-q.pop{animation:none}.sq-rec i{animation:none}.sq-bar i{transition:none}}</style>');
 
+  /* The questions of a step come from the SLPs it was made with (p.tabs = ["activity#panel", …], Roger, 21 Nov 2026: "random questions
+     taken from the slp"; "Both" on the decision card): an SLP with written questions gives those (bank rows: lp = its learning path,
+     k = 'v' words or 'g' grammar when it needs one kind of tab; bank.lps = activity → learning path, bank.kind = panel → 'v' or 'g'),
+     an SLP without gives the automatic ones made from its own words, grammar and texts (EL_SURPRISE_AUTO, tools/surprise/auto.mjs).
+     One question per tier, easy → harder; a tier with nothing takes another tier's question; too few at all: the written questions of
+     the paths before. Never one of the last round's when there is another. Old steps with upTo: n draw lp ≤ n. */
   function bankOf(p, level) {
     const B = (window.EL_SURPRISE || {})[p.bank]; if (!B) return null;
-    const rows = B[level] || (level === 'native' ? B.daring : null) || B.insecure; return rows ? { tiers: B.tiers || [], rows } : null;
+    const rows = B[level] || (level === 'native' ? B.daring : null) || B.insecure; return rows ? { B, tiers: B.tiers || [], rows } : null;
   }
-  // one question per tier, from the paths done (lp ≤ upTo), not one of the last round's when there is another
+  /* The candidates of each tier, best first: W = written questions of the ticked SLPs, A = their automatic ones, E = written questions of
+     the paths before (lp ≤ the latest ticked path: content they know, so an easy start when the SLPs give nothing for a tier). */
+  function pool(p, level) {
+    const K = bankOf(p, level); if (!K) return [];
+    const B = K.B, all = K.rows.flatMap((t, i) => t.map(q => Object.assign({ tier: i }, q)));
+    if (!p.tabs) return all.filter(q => !p.upTo || (q.lp || 1) <= p.upTo);
+    const A = ((window.EL_SURPRISE_AUTO || {})[p.bank]) || {}, lv = level === 'native' ? 'daring' : level;
+    const lpOf = t => (B.lps || {})[t.split('#')[0]] || 0, kOf = t => (B.kind || {})[t.split('#')[1]] || null;
+    const fits = (q, t) => lpOf(t) === (q.lp || 1) && (!q.k || !kOf(t) || kOf(t) === q.k);
+    const out = [], add = (q, src) => { if (!out.some(o => o.q === q.q)) out.push(Object.assign({ src }, q)); };
+    p.tabs.forEach(t => all.filter(q => fits(q, t)).forEach(q => add(q, 'W')));
+    p.tabs.forEach(t => ((A[t] || {})[lv] || (A[t] || {}).insecure || []).forEach(q => add(Object.assign({ auto: 1 }, q), 'A')));
+    const top = Math.max(0, ...p.tabs.map(lpOf)); all.filter(q => (q.lp || 1) <= top).forEach(q => add(q, 'E'));
+    return out;
+  }
   function draw(p, level, last) {
-    const B = bankOf(p, level); if (!B) return [];
-    return B.rows.map((tier, i) => {
-      const pool = tier.filter(q => !p.upTo || (q.lp || 1) <= p.upTo), fresh = pool.filter(q => !(last || []).includes(q.q)), from = fresh.length ? fresh : pool;
-      return from.length ? Object.assign({ tier: i }, from[Math.floor(Math.random() * from.length)]) : null;
-    }).filter(Boolean);
+    const P = pool(p, level), used = new Set(), old = q => (last || []).includes(q.q);
+    const pick = arr => { const f = arr.filter(q => !used.has(q) && !old(q)), from = f.length ? f : arr.filter(q => !used.has(q)); if (!from.length) return null; const q = from[Math.floor(Math.random() * from.length)]; used.add(q); return q; };
+    const got = [0, 1, 2, 3].map(i => { const T = P.filter(q => q.tier === i); return pick(T.filter(q => q.src === 'W')) || pick(T.filter(q => q.src === 'A')) || pick(T); });
+    got.forEach((q, i) => { if (!q) got[i] = pick(P); });
+    return got.filter(Boolean).sort((a, b) => a.tier - b.tier);
+  }
+  // the panels of the LS's Surprise questions page: one per activity the teacher made on the Time plan (elSqList in el-catalog.js)
+  function panels(ls, bank) {
+    const L = window.elSqList ? elSqList(ls) : [];
+    return L.map(x => ({ id: x.id, type: 'surprise', bank, tabs: x.tabs || [], tab: { ca: '🎲 Preguntes sorpresa ' + x.n, en: '🎲 Surprise questions ' + x.n },
+      title: { ca: '🎲 Preguntes sorpresa ' + x.n, en: '🎲 Surprise questions ' + x.n },
+      intro: { ca: 'Quatre preguntes que no has vist abans sobre el que hem fet a classe. Respon-les en veu alta.', en: 'Four questions you haven’t seen before about what we’ve done in class. Answer them out loud.' } }));
   }
 
   function panel(p, X) {
@@ -173,5 +207,5 @@
       }
     };
   }
-  window.elSurprise = { panel, draw, CFG };
+  window.elSurprise = { panel, draw, pool, panels, CFG };
 })();

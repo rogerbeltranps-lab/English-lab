@@ -13,7 +13,7 @@
     grammar:/^(grammar\w*|mixed)$/,
     read:/^(read|log|book|ch\d+|sources|register|respect|notes|credit|parts)$/,
     listen:/^(listen|again|chart)$/,
-    speak:/^(speak|talk|shadow|shadowing|speakSurprise)$/,
+    speak:/^(speak|talk|shadow|shadowing|sq\d+)$/,
     write:/^(write|email|factfile|card|script|slides|plan)$/,
     recall:/^(recall|check|self|scores|reflect)$/,
   };

@@ -155,6 +155,7 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
+  if(window.elSqSync&&window.elSqAct&&elSqAct(id))elSqSync(id,d.sq||{});   // 🎲 the Surprise questions activities of this LS become its tabs (el-catalog.js)
   const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{},webExam:d.webExam||{}};
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
@@ -329,9 +330,6 @@ const BOARD=BOARD0;
 const dashHere=(()=>{const c=relPath.match(/^((2|4)eso)\//);if(!c)return DASH;const u=new URL(DASH);u.searchParams.set("course",c[1]);
   if(lsId)u.searchParams.set("ls",lsId);return u.href})();
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
-// 🎲 Steps still in preview (LP.preview on an LS2 engine page, e.g. a new Surprise questions step to try; Roger, 21 Nov 2026): only the
-// teacher (never in the 👁 student view) and the test account (not in a group's student view) see them (ls2-engine.js addPreview).
-function previewOn(){document.documentElement.classList.add("el-preview-on");dispatchEvent(new Event("el-preview"))}
 async function gate(u){
   const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
   if(!u&&c){signInBlock();return}   // course pages are for signed-in users only
@@ -343,11 +341,10 @@ async function gate(u){
   if(!u&&!AS){signInBlock();return}   // signed out: the Sign in screen at once (it came after reading the LS, the same way)
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS&&!tnMe(u)){previewOn();if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
+  if(isTeacher(u)&&!AS&&!tnMe(u)){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
   else if(!u||!learner(u)){signInBlock();return}
   const tester=!AS&&(seesAll(u)||tnMe(u)),vg=!AS&&viewGroup(u);
-  if(!AS&&seesAll(u)&&!vg)previewOn();
   if(tester&&!tnMe(u))banner("Test account: you see every LS and activity.","#7c3aed");
   if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
   // The student's level: one per course, the same in every LS (elRouteOf). With none yet, a student works on the Insecure
