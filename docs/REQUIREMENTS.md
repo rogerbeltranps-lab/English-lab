@@ -395,7 +395,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 ### 6.9 The sample exam
 
 - On the site, **same format and points** as the exam, **new sentences** (no overlap with the real exam), built only on what the groups covered.
-- Its label is **Sample exam 1** (then 2, 3… if an LS has more), never with an LP number (Roger, 21 Nov 2026: "Sample Exam 1 is perfect"; it was "First exam" from 19 Nov).
+- Its label is **Sample exam 1**, never with an LP number (Roger, 21 Nov 2026: "Sample Exam 1 is perfect"; it was "First exam" from 19 Nov).
 - **Optional and always open** (9 Nov 2026): never homework, never To do, never late, never in the bonus; shown as "🎯 Test yourself". Every new LS's sample exam gets `optional: true`. Open it **a week before the exam**, with each section's result linked to what to review (Research audit).
 - Its first tab is the LS shadowing video (information only).
 - Its writing opens the **student's own ChatGPT** with a prompt that asks only for a **mistakes table** (No. · Criterion C2/C3/C4 · Mistake · Correction · Why) and the corrected text: **never a mark, level or points** (20 Nov 2026).
