@@ -76,6 +76,10 @@ fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, "/* Web exam " + S.key + " (shared/js/el-web-exam.js): built by tools/web-exam/build.mjs from a source kept outside the repo.\n" +
   "   No answers here: the key is in cpKeys/" + S.key + " (teacher only). pass = a PBKDF2 hash of the re-entry password, never the password. */\n" +
   "window.EL_EXAM = " + JSON.stringify(data, null, 1) + ";\n");
+// the same games on the Games page (lab/index.html 🏗 Exam games; Roger, 21 Nov 2026: fast finishers "go to games (include the ones of
+// the exam)"): a file of their own next to exam.js, so the Games page never loads the exam's questions
+if (games) fs.writeFileSync(path.join(path.dirname(out), "exam-games.js"), "/* The web exam's games (Hangman, Quick quiz) for the Games page: built by tools/web-exam/build.mjs with exam.js.\n" +
+  "   LS words and practice questions, never exam items. */\n(window.EL_EXAM_GAMES = window.EL_EXAM_GAMES || {})[" + JSON.stringify(S.ls) + "] = " + JSON.stringify(Object.assign({ key: S.key }, games), null, 1) + ";\n");
 const kf = path.join(path.dirname(path.resolve(src)), "keys.json");
 fs.writeFileSync(kf, JSON.stringify({ [S.key]: { web: keys } }, null, 1));
 const n = Object.values(papers).map(P => SECTIONS.map(s => P.sections[s].length).join("+"));

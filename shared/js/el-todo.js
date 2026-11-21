@@ -12,7 +12,12 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{Storage.prototype.setItem.call(localStorage,k,v)}catch(e){}}};
 
 let REM=null,remReady;const remP=new Promise(r=>remReady=r);
-export async function start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
+// ⚡ Finished early? (el-cloud.js ffCard, Roger 21 Nov 2026: "if they are done, they can do pending tasks (button to go to pending task)"):
+// window.elTodoReady = a Promise of elTodoPending(), the same work as this list, one entry per task [{u: path, p: tab or "", n: name}]
+// (the list's todo() and the homework not done); an empty list when this page has no To do (no group, no plan, the LS not open).
+export async function start(o){let fin;window.elTodoReady=new Promise(r=>fin=r);
+  try{const x=await start0(o);fin(x&&x.pending||(()=>[]));return x}catch(e){fin(()=>[]);throw e}}
+async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   if(!group)return;
   if(!window.EL_PLAN)await load(new URL("shared/js/el-plan.js",root).href);
   if(!window.ELWeek)await load(new URL("shared/js/el-week.js",root).href);
@@ -43,7 +48,7 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   const hws=()=>W.studentHw(p,gi,((info||{}).homework||{})[group]).map(x=>{const tg=window.elHwTargets?elHwTargets(x,ls,p,gi)||{}:{};
     const left=Object.entries(tg).flatMap(([id,ps])=>{const a=acts.find(y=>y.id===id);if(!a)return [];const d=doneOf(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(k=>elSecSteps(a,k).length);
       return ((ps&&ps.length)?ps:all.length?all:[""]).filter(k=>k?!elSecSteps(a,k).every(z=>d.has(z)):!isDone(a)).map(k=>[a,k])});
-    return {x,done:Object.keys(tg).length>0&&!left.length,href:left.length?href(left[0][0],left[0][1]):null}});
+    return {x,left,done:Object.keys(tg).length>0&&!left.length,href:left.length?href(left[0][0],left[0][1]):null}});
   // the homework (set by the teacher) a learning path belongs to, for its 📝 homework by … tag; no blue 🏫 "from class" tag (Roger, 20 Nov 2026: "this shouldnt appear")
   const hwOf=a=>{const xs=W.studentHw(p,gi,((info||{}).homework||{})[group]);for(const x of xs){const tg=window.elHwTargets?elHwTargets(x,ls,p,gi)||{}:{};if(tg[a.id])return x}return null};
   // 🎯 Test yourself (Roger, 9 Nov 2026: the sample exam is optional, never a to-do item): the LS's optional practice, as a link under the list
@@ -112,7 +117,14 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   remReady();
   // progress made on this page shows when the student comes back to the tab or reopens the list
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)draw()});
-  return {draw};
+  // ⚡ the pending tasks for the Finished early? card: the list's own order (late first), then the homework not done yet
+  const secName=(a,k)=>(((window.EL_SECTIONS||{})[a.id]||[]).find(z=>z[0]===k)||[])[1]||"";
+  const pending=()=>{const out=[],add=(u,p,n)=>{if(!out.some(y=>y.u===u&&y.p===p))out.push({u,p,n})},t0=a=>a.title.split(/[:(]/)[0].trim(),lp=a=>num(a)+t0(a),pre=a=>num(a)||t0(a)+" · ";
+    if(seesAll)return out;
+    todo().forEach(x=>{if(x.cp)add(x.cp.path,"",x.cp.title);else if(x.tabs.length)x.tabs.forEach(([id,nm])=>add(x.a.path,id,pre(x.a)+nm));else add(x.a.path,"",lp(x.a))});
+    hws().forEach(h=>(h.left||[]).forEach(([a,k])=>add(a.path,k,k?pre(a)+(secName(a,k)||k):lp(a))));
+    return out};
+  return {draw,pending};
 }
 
 // ✅ Finish your activities (Roger, 21 Nov 2026: "At the beginning of the class, after the games, I want the students to see something like
