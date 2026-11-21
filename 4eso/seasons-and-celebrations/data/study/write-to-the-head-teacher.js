@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 6 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
+/* LS2 · Learning Path 5 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's). */
 window.LP.study = {
   next: 4,
   covers: { ca: 'tot Seasons & Celebrations', en: 'everything in Seasons & Celebrations' },

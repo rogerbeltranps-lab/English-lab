@@ -71,5 +71,8 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 | Grammar · Customs, dates and It is celebrated | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (Present Simple for customs, on / in / at, It is celebrated / takes place / is held) |
 | Vocabulary · Origins, comparing and change | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (verb + preposition, dates, comparing cultures, places, change and debate; replaces Where traditions come from: choose it, write it) |
 | Grammar · Origins, relatives and contrast | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (Past Simple or used to, defining relatives, whereas / unlike / although / however, non-defining relatives, -ed / -ing adjectives since 16 Nov 2026) |
+| Grammar · Likes and tips | 2 ESO | LS2 Free Time, Live!, LP4 Likes and screen tips (love / like / don't mind / hate + -ing, imperatives for tips, because / so; LS2 wrap-up week 1, 21 Nov 2026) |
+| Vocabulary · Planning an event | 4 ESO | LS2 Seasons & Celebrations, LP4 Plan the day (book, invite, set up, put up, run a stall, take place, be held; guests, family-friendly, inclusive; LS2 wrap-up week 1, 21 Nov 2026) |
+| Grammar · Future plans | 4 ESO | LS2 Seasons & Celebrations, LP4 Plan the day (going to, will, there will be; arrangements, timetables, predictions; going to with evidence; LS2 wrap-up week 1, 21 Nov 2026) |
 
 One known limit: the deck files are public on the site, so a student who knows the address could read the answers. Nothing on the student side links to them.

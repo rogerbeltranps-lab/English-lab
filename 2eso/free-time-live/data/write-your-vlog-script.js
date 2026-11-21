@@ -1,8 +1,8 @@
-/* 2 ESO · LS2 Free Time, Live! · Learning Path 6 · Write your vlog script (LS criterion 5.1: the script and the slide text, following a model) */
+/* 2 ESO · LS2 Free Time, Live! · Learning Path 5 · Write your vlog script (LS criterion 5.1: the script and the slide text, following a model) */
 window.LP = {
-  key: 'ls2Script2ESO', n: 6, starter: true, title: 'Write your vlog script',
+  key: 'ls2Script2ESO', n: 5, starter: true, title: 'Write your vlog script',
   panels: [
-    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3 i 5', en: 'Recall: Learning Paths 3 and 5' }, pill: { ca: 'Sense apunts', en: 'No notes' },
+    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3 i 4', en: 'Recall: Learning Paths 3 and 4' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
       items: [
         { q: 'I love ___ (skate).', a: ['skating'] },
@@ -27,9 +27,9 @@ window.LP = {
         { r: 'daring', g: 'Opinions with state verbs (Daring)', items: [['I think (that)…', 'crec que…', 'I think skating is the best sport.'], ['I believe…', 'crec…', 'I believe everyone can learn.'], ['I prefer… to…', 'prefereixo… a…', 'I prefer the park to the sports hall.'], ['it means…', 'vol dir…', 'For me, climbing means freedom.'], ['I don’t need…', 'no necessito…', 'I don’t need expensive kit.']] }
       ],
       review: [
-        { g: 'Learning Paths 1–5', items: [['go cycling', 'anar amb bici', 'I go cycling on Sundays.'], ['helmet', 'casc', 'Wear a helmet.'], ['It’s windy', 'fa vent', 'It’s windy today.'], ['right now', 'ara mateix', 'Right now I’m filming.'], ['record a video', 'gravar un vídeo', 'I’m recording a video.'], ['take a break', 'fes una pausa', 'Take a break!']] },
-        { r: 'safe', g: 'Learning Paths 1–5', items: [['a tournament', 'un torneig', 'We’re in a tournament.'], ['upload a video', 'pujar un vídeo', 'We upload a video on Sundays.'], ['set a time limit', 'posa un límit de temps', 'Set a time limit.']] },
-        { r: 'daring', g: 'Learning Paths 1–5', items: [['the crowd', 'el públic', 'The crowd is cheering.'], ['a reliable source', 'una font fiable', 'Use a reliable source.'], ['instead of', 'en lloc de', 'Go outside instead of playing online.']] }
+        { g: 'Learning Paths 1–4 and 6', items: [['go cycling', 'anar amb bici', 'I go cycling on Sundays.'], ['helmet', 'casc', 'Wear a helmet.'], ['It’s windy', 'fa vent', 'It’s windy today.'], ['right now', 'ara mateix', 'Right now I’m filming.'], ['record a video', 'gravar un vídeo', 'I’m recording a video.'], ['take a break', 'fes una pausa', 'Take a break!']] },
+        { r: 'safe', g: 'Learning Paths 1–4 and 6', items: [['a tournament', 'un torneig', 'We’re in a tournament.'], ['upload a video', 'pujar un vídeo', 'We upload a video on Sundays.'], ['set a time limit', 'posa un límit de temps', 'Set a time limit.']] },
+        { r: 'daring', g: 'Learning Paths 1–4 and 6', items: [['the crowd', 'el públic', 'The crowd is cheering.'], ['a reliable source', 'una font fiable', 'Use a reliable source.'], ['instead of', 'en lloc de', 'Go outside instead of playing online.']] }
       ],
       practice: [
         { q: 'Hi ___! Welcome to my vlog. (tothom)', a: ['everyone', 'everybody'] },

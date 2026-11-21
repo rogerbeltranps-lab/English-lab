@@ -1,8 +1,8 @@
-/* LS2 · Learning Path 4 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's).
-   Checkpoint 3 covers LS1, Learning Paths 1–3 and 5 (not this one), so the checkpoint practice here is spaced review of 1–3. */
+/* LS2 · Learning Path 6 · Study guide (shared/js/el-study.js). Practice only, new items (not the checkpoint's or the sample exam's).
+   Checkpoint 3 covers LS1, Learning Paths 1–4 (not this one), so the checkpoint practice here is spaced review of 1–3. */
 window.LP.study = {
   next: 3,
-  covers: { ca: 'LS1, Learning Paths 1–3 i 5', en: 'LS1, Learning Paths 1–3 and 5' },
+  covers: { ca: 'LS1, Learning Paths 1–4', en: 'LS1, Learning Paths 1–4' },
   today: { ca: 'tres coses que has de mirar en una font i cinc paraules dels Learning Paths 1–3', en: 'three things to check in a source and five words from Learning Paths 1–3' },
   exam: { ca: 'el que aprens aquí t’ajuda al Reading (prendre notes com al reading log). Aprofita aquest Learning Path per repassar el vocabulari i la gramàtica dels Learning Paths 1–3.', en: 'what you learn here helps in the Reading (taking notes, like the reading log). Use this Learning Path to review the vocabulary and grammar of Learning Paths 1–3.' },
   check: [

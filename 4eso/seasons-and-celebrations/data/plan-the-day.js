@@ -1,8 +1,8 @@
-/* LS2 · Learning Path 5 · Plan the day (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
+/* LS2 · Learning Path 4 · Plan the day (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Plan4ESO', n: 5, starter: true, title: 'Plan the day',
+  key: 'ls2Plan4ESO', n: 4, starter: true, title: 'Plan the day',
   panels: [
-    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2–4', en: 'Recall: Learning Paths 2–4' }, pill: { ca: 'Sense apunts', en: 'No notes' },
+    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2, 3 and 6', en: 'Recall: Learning Paths 2, 3 and 6' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
       items: [
         { q: 'How many sources do you need for each fact? (a number word)', a: ['two', '2'] },

@@ -1,8 +1,8 @@
-/* LS2 · Learning Path 6 · Write to the head teacher (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
+/* LS2 · Learning Path 5 · Write to the head teacher (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Email4ESO', n: 6, starter: true, title: 'Write to the head teacher',
+  key: 'ls2Email4ESO', n: 5, starter: true, title: 'Write to the head teacher',
   panels: [
-    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3–5', en: 'Recall: Learning Paths 3–5' }, pill: { ca: 'Sense apunts', en: 'No notes' },
+    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3, 4 and 6', en: 'Recall: Learning Paths 3, 4 and 6' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
       items: [
         { q: '“We need chairs!” “I ___ get them.”', a: ['will', "'ll"] },
@@ -72,7 +72,7 @@ window.LP = {
         { r: 'daring', q: 'Answer before Friday, OK?', o: ['I would be grateful if you could reply before Friday.', 'Reply before Friday, OK?', 'You must answer before Friday.'] }
       ] },
     { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: els fets per al correu', en: 'Listen again: the facts for your email' }, pill: { ca: 'Àudio', en: 'Audio' },
-      intro: { ca: 'Escolta la reunió de l’LP5 i comprova els fets que la directora necessita saber. Els faràs servir al correu.', en: 'Listen to the LP5 meeting and check the facts the head teacher needs. You will use them in your email.' },
+      intro: { ca: 'Escolta la reunió de l’LP4 i comprova els fets que la directora necessita saber. Els faràs servir al correu.', en: 'Listen to the LP4 meeting and check the facts the head teacher needs. You will use them in your email.' },
       media: { audio: 'audio/student-council-meeting.mp3', title: 'Student council meeting', script: [
         ['Laia', 'OK, everyone. We’re meeting the head teacher on Monday, so we need a plan today.'],
         ['Omar', 'Right. The event is going to be about festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas.'],

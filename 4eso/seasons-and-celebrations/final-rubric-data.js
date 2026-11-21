@@ -29,7 +29,7 @@
     'Two concrete, realistic actions for students and families (explaining the customs, inviting families, an alternative for those who do not celebrate it).',
     'One concrete action, or two very general ones close to the model.',
     'No concrete action, or only a vague one (<i>everybody can come</i>).'] };
-  const researchEn = { name: 'My research card', sub: 'LP4 piece 3, my own card (6.1)', pct: 10, round: 1, cells: [
+  const researchEn = { name: 'My research card', sub: 'LP6 piece 3, my own card (6.1)', pct: 10, round: 1, cells: [
     'Varied, well-chosen sources; 9 in 10 notes in my own words and organised; precise reliability reasons, including purpose and channel; all three sources credited completely; a disagreement resolved by choosing the more reliable source.',
     'Three sources; 7 in 10 notes in my own words; full credit lines; two relevant reasons for each source and the most trusted one explained; one point where they agree or differ.',
     'Three sources with key information, with help; at least half of the notes in my own words; reasons copied from the checklist; credits partly complete; agreement or difference missing or vague.',
@@ -101,7 +101,7 @@
           'Dues accions concretes i realistes per als alumnes i les famílies (explicar els costums, convidar les famílies, una alternativa per a qui no ho celebra).',
           'Una acció concreta, o dues de molt generals copiades del model.',
           'Cap acció concreta, o només una idea vaga (<i>everybody can come</i>).'] },
-        { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP4, la meva fitxa (6.1)', pct: 10, round: 1, cells: [
+        { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP6, la meva fitxa (6.1)', pct: 10, round: 1, cells: [
           'Fonts ben triades i notes ordenades, 9 de cada 10 amb les meves paraules; raons precises de per què cada font és fiable (qui, quan, per què, on es publica); si dues fonts no coincideixen, trio la més fiable; les dues fonts citades completes.',
           'Dues fonts; 7 de cada 10 notes amb paraules meves; referències completes; dues raons per a cada font, la font de què em refio més, i una cosa en què coincideixen o són diferents.',
           'Dues fonts amb la informació clau, amb ajuda; la meitat o més de les notes amb paraules meves; raons copiades de la llista; una referència incompleta, o no comparo les fonts.',
@@ -178,7 +178,7 @@
         'La plantilla gairebé completa: falta una part (la petició, l’acció de benvinguda o la data); la meitat o més dels buits ben omplerts.',
         'Menys de la meitat dels buits ben omplerts; no s’entén per què escric; o és informal (<i>Hi</i>, <i>bye</i>).'] },
       ins.rows[2], ins.rows[3], ins.rows[4], ins.rows[5],
-      { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP4, la meva fitxa (6.1)', pct: 10, round: 1, cells: [
+      { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP6, la meva fitxa (6.1)', pct: 10, round: 1, cells: [
         'Una font ben triada, notes ordenades, 9 de cada 10 amb les meves paraules, la referència completa i les 2 raons precises de per què és fiable (qui, quan, per a què, on es publica).',
         'Una font amb la informació clau, 7 de cada 10 notes amb paraules meves, la referència completa i les 2 raons per dir si és fiable.',
         'Una font amb la informació clau, amb ajuda; la meitat o més de les notes amb paraules meves; 1 de les 2 raons, copiada de la llista; la referència incompleta.',
@@ -192,7 +192,7 @@
   window.finalRubricData.native = {
     ui: dar.ui,
     intro: 'See what is assessed and which level you are at. You are on the Native route (C2 Proficiency): the same final product as your group, judged against C2 Proficiency standards.',
-    note: 'Your part of the video is the most demanding one in the group: the meaning of the celebration and why it belongs at school, argued with nuance for an audience that does not know it. Your email is the formal letter from Learning Path 6 (280–320 words) and is marked on the four Cambridge C2 writing scales: Content, Communicative Achievement, Organisation and Language.',
+    note: 'Your part of the video is the most demanding one in the group: the meaning of the celebration and why it belongs at school, argued with nuance for an audience that does not know it. Your email is the formal letter from Learning Path 5 (280–320 words) and is marked on the four Cambridge C2 writing scales: Content, Communicative Achievement, Organisation and Language.',
     rows: [
       { name: 'My part of the video', sub: 'Plan, rehearse and record with the group (3.2) · C2 standard', pct: 30, round: 2, video: true, cells: [
         'I help to lead the group; my part develops a clear position with nuance (a concession and a turn), is perfectly adapted to the audience, flows naturally from and into the next speaker, and uses precise, idiomatic language without reading; 35–45 s.',

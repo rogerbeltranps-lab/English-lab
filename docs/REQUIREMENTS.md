@@ -145,6 +145,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - **Never show locked or future work** (7 Nov 2026): no 🔒, "not open", "checkpoint first", or totals that include closed steps. Only learning paths and sections Roger has opened.
 - **No class work shown in advance** (20 Nov 2026): a tab planned for a later class is hidden, like a locked tab, until its class opens it (5 minutes before class, or class mode); never shown in blue. Its steps still count in the path's progress.
 - **Students are never told which activities are assessed**: no "this counts", "first try" or "checkpoint" labels (26 Oct 2026). Only the general note that all work is part of continuous assessment (40 % of the LS mark from LS2).
+- **No gaps in learning path numbers** (Roger, 21 Nov 2026: "students mustnt see any gap"): when a learning path is dropped, the paths students will do are renumbered in order (LP1, LP2, LP3, LP4…) and the dropped one moves to the end, hidden.
 - Students never see **send times** of messages (14 Nov 2026), never classmates' marks, never where Practise content comes from.
 - "Not late yet" counts are never shown to students (19 Nov 2026).
 - The public home page shows no screenshots or pictures of the app and never mentions the full screen mode (7 Nov 2026).
@@ -227,6 +228,8 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 
 **Before building**
 
+- **Plan week by week, then build only that week** (Roger, 21 Nov 2026: "this web is to teach, not a self-study web… otherwise you prepare a lot of activities that we don't have time to do; and that's a waste of money"). The site supports teaching in class. An overview guide for the whole LS is fine, but activities are built one week at a time: 🤖 Claude drafts what happens in each class of the coming week, 👤 Roger checks it and says what to build, 🤖 Claude builds only that. Never build activities ahead of the agreed weekly plan. The weekly plan numbers the classes (class 1, 2, 3), not dates: if a class is lost or something changes, Roger says at the end of the week what was really done, and the next week's plan starts from there.
+- **Plan for the real pace** (Roger, 21 Nov 2026): about **two main activities per class**, each in a simple format (grammar: explanation, exercises, correction · listening: questions, correction, doubts and difficult words · reading: read, questions, correction · writing: model, write, hand in · speaking: model, prepare in pairs, say it). Every class: warm-up (5 min) · shadowing (5) · activity 1 (20) · activity 2 (20) · a game on that day's grammar and/or vocabulary (10).
 - Remind Roger of the **integrated-competence gaps** (31 Oct 2026): CE7 serial story, CE8 mediation step (assessed a second time in 2 ESO LS5/LS6 and 4 ESO LS5), CE1 intercultural element for 4 ESO LS4, CE6 source check in LS3.
 - **Content first** (AGENTS): only content Roger approved goes on the site. Never invent or change pedagogical content during implementation; flag gaps and contradictions first.
 - Confirm the programme section is final. Check grammar and vocabulary against the programme and the Drive grammar and lexicon maps (section 4).
