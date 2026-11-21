@@ -35,6 +35,7 @@ thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}t
 body.gfs{overflow:hidden}body.gfs .lpall{position:fixed;inset:0;z-index:1005;margin:0;border-radius:0;border:0;display:flex;flex-direction:column;padding:8px 14px 10px;overflow:hidden}body.gfs .lpall>details[data-k=lpall]{display:flex;flex-direction:column;flex:1;min-height:0}body.gfs .lpall .wrap{flex:1;min-height:0;max-height:none}body.gfs .lpall h2,body.gfs .lpall summary{margin:.1em 0 .2em}.gfsb{margin-left:auto}
 .vyrank .vyhd{position:sticky;top:0;z-index:40;background:#fff;margin:0 -6px;padding:2px 6px 6px;border-bottom:1px solid #eef2f7}.vyrank .vyfsb{margin-left:10px}
 body.vfs{overflow:hidden}body.vfs .vyrank{position:fixed;inset:0;z-index:1005;margin:0;border-radius:0;border:0;overflow:auto;padding:0 14px 12px}body.vfs .vyrank .vyhd{margin:0 -14px;padding:6px 14px 8px}body.vfs .vyrank .wrap{max-height:none}
+body.hfs{overflow:hidden}body.hfs .vyrank{position:fixed;inset:0;z-index:1006;margin:0;border-radius:0;border:0;display:flex;flex-direction:column;padding:6px 14px 10px;overflow:hidden}body.hfs .vyrank h2{margin:.1em 0 .3em}body.hfs .vyrank>p,body.hfs .vyrank>.wrap{display:none}body.hfs .vyrank .vyhd{position:static;margin:0;padding:0 0 6px}body.hfs .vyrank .vymap{flex:1;min-height:0;display:flex;flex-direction:column}body.hfs .vyrank .vy{flex:1;min-height:0;display:flex;flex-direction:column;margin:0}body.hfs .vyrank .vy-row{height:auto;flex:1;min-height:0}
 /* 🔍 Table size (Roger, 9 Nov 2026: "make this smaller to see the entire class at once"): − / + zoom the table, ↕ Whole class fits every row */
 .gzc{display:inline-flex;align-items:center;gap:3px;margin-left:10px}.gzc .muted{font-size:13px;margin-right:2px}.gzc button{padding:6px 10px}.gzc button.gzv{min-width:58px;font-variant-numeric:tabular-nums}.gzc button.on{background:#0f766e;color:#fff}
 /* smaller than 100%: compact rows (first try → latest on one line, small game rings without the number: hover shows it, shorter headers) */
@@ -1859,6 +1860,7 @@ function render0(){
       +gamesTile(grp,ls)+`</div>`}
   document.body.classList.toggle("gfs",!!(S.gfs&&document.querySelector("#main .lpall .wrap")));
   if(S.vfs&&!document.querySelector("#main .vyrank .vyhd"))vfs(false);else document.body.classList.toggle("vfs",!!S.vfs);
+  if(S.hfs&&!document.querySelector("#main .vyrank .vymap"))hfs(false);else document.body.classList.toggle("hfs",!!S.hfs);
   const w=document.querySelector("#main .wrap"),h=w&&w.querySelector("thead tr");if(h)w.style.setProperty("--h1",h.offsetHeight+"px");
   sumApply();gzApply();
 
@@ -2166,13 +2168,14 @@ function vyPts(r){const P=r.pt;if(!P)return `<b>${f1(r.m)}</b>`;
 function vyHome(grp,ls,studs){if(!VOY_COURSES.includes(grp.course)||!window.elVoyage)return "";
   const fa=fpAct(ls),rows=studs.filter(s=>s.uid).map(s=>({s,...vySteps(s,ls,grp.id,fa)})),first=s=>(shortName(s).short||"").split(" ")[0];
   const map=vyMap(grp,ls,rows,fa,first);if(!map)return "";
-  return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a></h2><div class="vymap">${map}</div></div>`}
+  // ⛶ Full screen (Roger, 21 Nov 2026: "I also want a full-screen button for the [class map]"): the map and 🧭 Class steps on the whole screen
+  return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a> <button class="chip vyfsb" data-do="hfs" title="${S.hfs?"Back to the dashboard (Esc)":"The class map on the whole screen"}">${S.hfs?"✕ Exit full screen":"⛶ Full screen"}</button></h2><div class="vymap">${map}</div></div>`}
 function vyBox(rows,srt,cnt,sea,body){
   // the title, Order by and the counts stay at the top while the table scrolls, and ⛶ Full screen shows the whole box on the screen with
   // them (Roger, 21 Nov 2026: "I want this frozen so that when I scroll down I can see the table. And I want a full screen with the above menu")
   return `<div class="box vyrank"><div class="vyhd"><h2>⛵ Class voyage: who needs a push</h2>`
     +`<div class="bar"><span class="muted">Order by ·</span> ${[["steps","Steps done"],["mark","LS mark"],["name","Name"]].map(([k,l])=>`<button class="chip ${srt===k?"on":""}" data-do="vysort" data-s="${k}">${l}</button>`).join("")}`
-    +` <span class="muted">· 🟢 ${cnt("green")} on course · 🟠 ${cnt("amber")} drifting · 🔴 ${cnt("red")} need a push</span> <button class="chip vyfsb" data-do="vfs" title="${S.vfs?"Back to the dashboard (Esc)":"This page on the whole screen, with the order buttons"}">${S.vfs?"✕ Exit full screen":"⛶ Full screen"}</button></div></div><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map done in class or set as homework so far, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>${sea}`
+    +` <span class="muted">· 🟢 ${cnt("green")} on course · 🟠 ${cnt("amber")} drifting · 🔴 ${cnt("red")} need a push</span>${sea.includes('class="vymap"')?` <button class="chip vyfsb" data-do="hfs" title="${S.hfs?"Back (Esc)":"Only the class map and 🧭 Class steps, on the whole screen"}">${S.hfs?"✕ Exit map full screen":"⛶ Map full screen"}</button>`:""} <button class="chip vyfsb" data-do="vfs" title="${S.vfs?"Back to the dashboard (Esc)":"This page on the whole screen, with the order buttons"}">${S.vfs?"✕ Exit full screen":"⛶ Full screen"}</button></div></div><p class="muted">The students' own map with everyone on it, then the list: steps done (the stops of their map done in class or set as homework so far, not the final product or the book), then the LS mark so far. Click a name for the student's details.</p>${sea}`
     +`<div class="wrap"><table class="vyt"><thead><tr><th>#</th><th>Student</th><th>Steps done</th><th>Still to do</th><th title="Points of the LS's 10 so far, part by part: 📚 daily work, 📝 exam, 🎬 final product">LS mark so far (points)</th><th>Status</th></tr></thead><tbody>${body}</tbody></table></div>`
     +`<p class="muted">Steps done: only the steps done in class or set as homework so far; the ones planned for the coming classes show as "+N coming" and don't count yet. LS mark so far: the points each part gives of the LS's 10 (📚 daily work · 📝 exam · 🎬 final product); a part without a mark yet is "to do".<br>🟢 On course: at most 1 step missing and a mark of 5 or more · 🟠 Drifting: 2 to 4 steps missing, or a mark under 5 · 🔴 Needs a push: 5 or more steps missing.</p></div>`}
 // the students' map for the whole group: stops = the tabs on the group's Time plan (vyOnPlan) of its open learning paths, locked ones hidden
@@ -5435,6 +5438,17 @@ function vfs(on){S.vfs=on;const box=document.querySelector("#main .vyrank");docu
   // the map is drawn for its width: draw it again for the new one
   setTimeout(()=>{const r=document.querySelector(".vyrank .vymap");if(r&&VYV)elVoyage.wire(r,VYV)},60)}
 ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.vfs&&S.vfsB){S.vfsB=false;vfs(false)}}));
+// ⛵ the class map on a group's page, full screen: the map and its 🧭 Class steps column fill the window (as on the projector in class mode)
+function hfs(on){S.hfs=on;const m=document.querySelector("#main .vyrank .vymap"),box=m&&m.closest(".vyrank");document.body.classList.toggle("hfs",!!(on&&box));
+  const b=box&&box.querySelector("[data-do=hfs]"),pg=!!(box&&!box.classList.contains("vyhome"));
+  if(b){b.textContent=on?(pg?"✕ Exit map full screen":"✕ Exit full screen"):(pg?"⛶ Map full screen":"⛶ Full screen");b.title=on?"Back (Esc)":"The class map on the whole screen"}
+  const d=document,fe=d.fullscreenElement||d.webkitFullscreenElement;
+  if(on&&!fe&&!elIOS()){const r=d.documentElement.requestFullscreen||d.documentElement.webkitRequestFullscreen;if(r)try{const x=r.call(d.documentElement);if(x&&x.catch)x.catch(()=>{});S.hfsB=true}catch(e){}}
+  if(!on&&fe&&S.hfsB){const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}
+  if(!on)S.hfsB=false;
+  [60,400].forEach(t=>setTimeout(()=>{const r=document.querySelector("#main .vyrank .vymap");if(r&&VYV)elVoyage.wire(r,VYV)},t))}
+["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.hfs&&S.hfsB){S.hfsB=false;hfs(false)}}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.hfs&&!$("#dlg").open){e.preventDefault();hfs(false)}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.vfs&&!$("#dlg").open){e.preventDefault();vfs(false)}});
 ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.gfs&&S.gfsB){S.gfsB=false;gfs(false)}}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.gfs&&!$("#dlg").open){e.preventDefault();gfs(false)}});
@@ -6470,7 +6484,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       if(S.D.ro[id]&&id!==old)return alert("This student is already on the list.");
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
-    fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),vfs:()=>vfs(!S.vfs),gz:()=>gz(k.z),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
+    fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),vfs:()=>vfs(!S.vfs),hfs:()=>hfs(!S.hfs),gz:()=>gz(k.z),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";S.msgTab="sg";S.sgOpen=null;render();$("#sugg").scrollIntoView({behavior:"smooth"})},
     annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>lateAsk(()=>msgSend(u,k.id)),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annAtMs()?annSendNow():lateAsk(annSendNow),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
