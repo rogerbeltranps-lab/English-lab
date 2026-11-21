@@ -375,7 +375,7 @@ function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(
 // ✅ then its last slide, Finish all your activities, tells every student's screen to show their own list (remind); a class with no warm-up game
 // gets only that slide when class mode starts (Roger, 21 Nov 2026)
 export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}const w=warmDecks(),only=auto&&!w.decks.length?"rem":"";
-  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s,onRemind:remind,only},w))}
+  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s,onRemind:remind,onRace:voyC()?mapOpen:null,only},w))}
 // live/{group}.go.rem = {s: this class mode, at}: each student in this class mode sees ✅ Finish all your activities once (el-cloud.js
 // cmRemind). One write per class; Stop clears it with the rest of go.
 export function remind(){if(!C||!C.s)return Promise.resolve();return C.setDoc(C.doc(C.db,"live",C.g),{go:{rem:{s:C.s,at:Date.now()}}},{merge:true})}
@@ -388,7 +388,10 @@ let mapBox=null;
 const mapCopy=()=>{try{const x=JSON.parse(localStorage.getItem("el_vymap_"+C.g)||"null");return x&&x.V&&x.V.beds?x:null}catch(e){return null}};
 const lookSet=on=>C&&C.s?C.setDoc(C.doc(C.db,"live",C.g),{go:{look:on?{s:C.s,at:Date.now()}:null}},{merge:true}).catch(e=>console.warn("look at the screen",e)):null;
 export async function mapOpen(){if(!C||mapBox)return;const x=mapCopy();
-  if(!x){const m=box&&box.querySelector(".shmap");if(m)m.insertAdjacentHTML("afterend",`<p class="msg err">Open ${E(C.gname)}'s page on the dashboard once first: the map comes from there.</p>`);return}
+  if(!x){const t=`Open ${E(C.gname)}'s page on the dashboard once first: the map comes from there.`,m=box&&box.querySelector(".shmap");
+    if(m)m.insertAdjacentHTML("afterend",`<p class="msg err">${t}</p>`);
+    else{const d=document.createElement("div");d.style.cssText="position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:2147482700;background:#7f1d1d;color:#fff;padding:10px 18px;border-radius:12px;font:700 16px system-ui,sans-serif";d.textContent=t.replace(/&#?\w+;/g,"'");document.body.append(d);setTimeout(()=>d.remove(),6000)}
+    return}
   await load("shared/js/el-voyage.js",()=>!!window.elVoyage);if(!window.elVoyage)return;
   if(!document.getElementById("el-cmmap-css")){const st=document.createElement("style");st.id="el-cmmap-css";st.textContent=`
 #el-cmmap{position:fixed;inset:0;z-index:2147482600;background:#fbf6ea;display:flex;flex-direction:column;padding:10px 14px 12px;font:16px system-ui,sans-serif}

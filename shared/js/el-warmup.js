@@ -139,6 +139,7 @@ function guess(c){const s=S.st;if(!s||s.shown||s.got.has(c)||s.miss.includes(c)|
 
 function click(e){const b=e.target.closest("button");if(!b||!S&&!b.dataset.x)return;
   if(b.dataset.x)return S&&S.view!=="rem"&&S.o.onRemind&&!remDone(S.o.s)?toRem():close();
+  if(b.dataset.race){const f=S&&S.o.onRace;close();if(f)f();return}
   if(b.dataset.say){S.sayOpen=!S.sayOpen;return draw()}
   if(b.dataset.tosay){S.view="say";return draw()}
   if(b.dataset.togame)return toGame();
@@ -217,6 +218,8 @@ function drawSpot(){const s=S.st,ws=s.it.ws;
 // and o.onRemind() then shows every student their own list on their screen (el-cm-agenda.js remind → el-cloud.js cmRemind → el-todo.js
 // remind). The numbers are the dashboard's copy in this browser (teacher.html remSave, localStorage el_rem_<group>): what the group did in
 // class before today or has as homework; the share of students per step; never a name. No copy (or one over 12 hours old): the message only.
+// Then ⛵ Who's winning the race? (Roger, 21 Nov 2026: the class starts with the saying, the warm-up games, "see who is winning the race (to
+// remind them to do the activities)", shadowing…): closes the warm-up and opens the class map (o.onRace: el-cm-agenda.js mapOpen).
 const REM_K="el_wu_rem";
 const remDone=s=>{try{return !!s&&sessionStorage.getItem(REM_K)===String(s)}catch(e){return false}};
 function toRem(){S.view="rem";if(!remDone(S.o.s)){try{sessionStorage.setItem(REM_K,String(S.o.s))}catch(e){}try{const r=S.o.onRemind&&S.o.onRemind();if(r&&r.catch)r.catch(e=>console.warn("finish reminder",e))}catch(e){console.warn("finish reminder",e)}}draw()}
@@ -225,13 +228,13 @@ const pcCol=p=>window.elPctCol?elPctCol(p):p==null?"#cbd5e1":p<50?"#dc2626":p<60
 function drawRem(){const d=remData(S.o.g),hm=t=>new Date(t).toTimeString().slice(0,5);
   const lps=d&&d.lps.length?d.lps.map(z=>`<li><span class="rn">${E(z.lab)}</span><span class="rb"><i style="width:${z.pc||0}%;background:${pcCol(z.pc)}"></i></span><b>${z.pc??0} %</b><small>${z.fin}/${d.N} finished</small></li>`).join(""):"";
   const steps=d&&d.steps.length?d.steps.map(x=>x.port?`<li class="rp">${E(x.port)}</li>`:`<li class="rs"><span class="rt"><small style="color:${E(x.sk.c)}">${E(x.sk.n)}</small>${E(x.t)}</span><span class="rb sm"><i style="width:${x.pc||0}%;background:${pcCol(x.pc)}"></i></span><b>${x.pc??0} %</b></li>`).join(""):"";
-  box.innerHTML=`<div class="wu-top"><b>✅ Before we start · ${E(S.o.gname||S.o.g)}</b><span class="wu-tabs"></span><button class="wu-b go" data-x="1" title="Close and start the class (Esc)">▶ Start the class</button></div>
+  box.innerHTML=`<div class="wu-top"><b>✅ Before we start · ${E(S.o.gname||S.o.g)}</b><span class="wu-tabs"></span>${S.o.onRace?`<button class="wu-b ghost" data-race="1" title="The class map on the projector">⛵ Who's winning the race?</button>`:""}<button class="wu-b go" data-x="1" title="Close and start the class (Esc)">▶ Start the class</button></div>
   <div class="wu-c wu-remc"><div class="wu-remhd"><span class="nb-postit k-other">✅ Every activity counts</span>
     <div class="nb-slip wu-remsay">Finish all your activities!</div></div>
     <p class="wu-remsub">👀 Look at your screen: it shows what <u>you</u> still have to do.</p>
     ${lps||steps?`<div class="wu-rem">${lps?`<div class="wu-rcol"><h3>Work done in each learning path</h3><ul class="wu-rl">${lps}</ul></div>`:""}${steps?`<div class="wu-rcol"><h3>🧭 Our steps <small>· students who did each one</small></h3><ul class="wu-rsl">${steps}</ul></div>`:""}</div>
     <p class="wu-sm wu-remft">${E(d.ls)} · what we did in class before today and homework · ${d.N} students · updated ${hm(d.at)}</p>`:""}
-    <div class="wu-row"><button class="wu-b go" data-x="1">▶ Start the class</button></div></div>`}
+    <div class="wu-row">${S.o.onRace?`<button class="wu-b" data-race="1" title="The class map with every student's vehicle and the % who did each step; students' screens say 👀 Look at the screen">⛵ Who's winning the race?</button>`:""}<button class="wu-b go" data-x="1">▶ Start the class</button></div></div>`}
 
 const CSS=`
 #el-wu{position:fixed;inset:0;z-index:2147483000;color:var(--nb-black,#23262b);font:400 clamp(18px,1.75vw + 8px,44px)/1.35 var(--nb-teacher,"Kalam",cursive);display:flex;flex-direction:column;overflow:auto;
