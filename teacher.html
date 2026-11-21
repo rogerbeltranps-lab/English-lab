@@ -1669,7 +1669,26 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
   ["Listening","Reading","Speaking","Vocabulary","Grammar","Writing"].forEach(k=>{cw[k]=mix(avgP(FT[k]||[]),k==="Grammar"?gs.grammar??null:k==="Vocabulary"?gs.vocab??null:null);cw.n[k]=(FT[k]||[]).length});
   return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr,cw}}
 const bCol=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol)
-function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
+// ✅ Finish your activities, on the projector after the warm-up (Roger, 21 Nov 2026: the Work done in each learning path bars, "and on the
+// right … this [🧭 Your steps] with the percentage of students who've done them"): the class tab (el-warmup.js) draws it from this browser's
+// copy, so it costs no reads. Kept for each group's current LS each time its card is drawn: only what the group has done in class before
+// today or has as homework (elDueBefore), the stops of the students' own map (elVoyage.model), the share of the group's students who
+// finished each step and each path's average. Numbers only, never a name.
+function remSave(g,b){try{const n=ELWeek.now(g.id);if(!n||n.ls!==b.ls||!b.studs.length)return;const ls=b.ls,info=S.D.ls[ls]||{},db=elDueBefore(info,g.id);if(!db)return;
+  const fa=fpAct(ls),N=b.studs.length,due=(a,id)=>db.acts.has(a.id)||[...(db.tabs[a.id]||[])].some(p=>vyTab(a,p)===id),lps=[],beds=[],pc={};
+  acts(ls).filter(a=>!a.manual&&!a.optional&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,g.id)).forEach(a=>{
+    const ks=(EL_ACTIONS[a.id]||[]).filter(k=>!(a.skip||[]).includes(k)),secs=(window.EL_SECTIONS||{})[a.id]||[],gs=[],seen=new Set();
+    elTabGroups(a,ks).forEach(q=>{const id=vyTab(a,q[0]);if(seen.has(id)||!due(a,id))return;seen.add(id);gs.push({id,ks:q})});if(!gs.length)return;
+    const ds=b.studs.map(s=>doneSet(s.uid,a)),plants=gs.map(q=>{const k=a.id+"#"+q.id;pc[k]=Math.round(ds.filter(d=>q.ks.every(x=>d.has(x))).length/N*100);
+      return {id:q.id,key:k,name:((secs.find(x=>x[0]===q.id)||[])[1])||q.id,href:"#",st:"sprout"}});
+    const all=gs.flatMap(q=>q.ks),sh=ds.map(d=>all.filter(k=>d.has(k)).length/all.length*100);
+    if(!a.checkpoint)lps.push({lab:agLabOf(g.id,a),pc:avgP(sh),fin:ds.filter(d=>all.every(k=>d.has(k))).length});
+    beds.push({id:a.id,kind:a.checkpoint?"cp":"lp",plants})});
+  const V={skin:ls,en:true,beds},M=window.elVoyage?elVoyage.model(V):null;
+  const steps=M?M.items.map(x=>x.port?{port:x.port.f+" "+x.port.c}:{sk:elVoyage.sk(x.sk,true),t:x.t,pc:pc[x.key]}):beds.flatMap(z=>z.plants.map(q=>({sk:{n:"",i:"",c:"#475569"},t:q.name,pc:pc[q.key]})));
+  const L=EL_LS.find(y=>y.id===ls);localStorage.setItem("el_rem_"+g.id,JSON.stringify({at:Date.now(),g:g.id,gname:g.name,ls:L?lsLabel(L):ls,N,lps,steps}))}catch(e){console.warn("finish reminder",e)}}
+const agLabOf=(gid,a)=>{const x=ELWeek.now(gid);return x&&x.p?agLab(Object.assign({gid},x),a):shortTi(a)};
+function briefBox(g,ls0){const b=brief(g,ls0);remSave(g,b);const t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
   const N=b.studs.length,stat=(ic,lab,p,tip,go)=>`<a class="bst" href="${go.href||"#"}" ${go.href?`target="_blank" rel="noopener"`:`data-do="bgo" data-g="${g.id}" data-p="${go.p}" data-ls="${b.ls}"`} title="${esc(tip)} · ${esc(go.t)}">${elRing(p,"",40,tip)}<span><b>${ic} ${lab}</b><small>${p==null?"nothing yet":p+" % right"}</small></span></a>`;
   const gl=((window.EL_GAMES||[]).find(z=>z.course===g.course&&l&&String(z.ls||"").toLowerCase().endsWith(l.title.split(" · ").pop().toLowerCase()))||{}).ls||"",

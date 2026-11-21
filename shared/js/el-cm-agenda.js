@@ -371,8 +371,13 @@ function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(
   vid.querySelector("button").onclick=()=>{vid.remove();vid=null};document.body.append(vid)}
 // the "now" mark follows the class tab (a tab clicked on the page)
 // 🔥 the warm-up game over the class tab (el-warmup.js); also when class mode starts (el-cloud.js cmTeacher)
-export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}const w=warmDecks();if(auto&&!w.decks.length)return;
-  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s},w))}
+// ✅ then its last slide, Finish all your activities, tells every student's screen to show their own list (remind); a class with no warm-up game
+// gets only that slide when class mode starts (Roger, 21 Nov 2026)
+export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}const w=warmDecks(),only=auto&&!w.decks.length?"rem":"";
+  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s,onRemind:remind,only},w))}
+// live/{group}.go.rem = {s: this class mode, at}: each student in this class mode sees ✅ Finish all your activities once (el-cloud.js
+// cmRemind). One write per class; Stop clears it with the rest of go.
+export function remind(){if(!C||!C.s)return Promise.resolve();return C.setDoc(C.doc(C.db,"live",C.g),{go:{rem:{s:C.s,at:Date.now()}}},{merge:true})}
 export function refresh(){if(box&&L)draw()}
 
 // ⏹ The end of the class: each of today's steps ✔ Finished, ⏭ Next class or 🏠 Homework (Roger, 12 Nov 2026: "When I finish the class mode, a
