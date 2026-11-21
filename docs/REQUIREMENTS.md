@@ -521,6 +521,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - **Technical bug** → fix it, squash-merge without asking, answer the student in Roger's voice, and email Roger with an **⚠️ IMPORTANT** subject (8 Nov 2026).
 - **Design, pedagogy, marks, routes, deadlines, unclear, or LS1 content** → change nothing; leave it for Roger with a status (✅ fixed / 👍 not a bug / ✋ needs you), a note and a suggested reply in both languages.
 - Roger's own reports: "✅ Merge straight away" for small tweaks; big changes or "⏸ Don't merge yet" → a PR with preview or a plan, and a thread.
+- **An answered report or idea is dealt with** (Roger, 21 Nov 2026: "Pensava q això ja ho havia contestat"; "he rebut aquest mail amb problemes que ja he solucionat"): once Roger has sent an answer (📨 Send, ✏️ Edit first or ↩ Answer, not taken back), it shows **💬 Answered** instead of ✋ Needs you, its suggested reply and "👉 First" go away, it moves to *Fixed, closed and answered*, and it leaves every count and badge and the Saturday *your week* email. ✅ Mark as fixed and ↩ Answer still work on it.
 
 **Timing and wording of every automatic answer** (17 Nov 2026)
 
