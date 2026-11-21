@@ -365,7 +365,7 @@ var LS2 = (function () {
     let score = 0; got = [];
     items.forEach((it, i) => {
       const v = norm($('#' + prefix + i).value), ok = it.own ? ownOk(it, $('#' + prefix + i).value) : it.whole ? wholeOk(it, $('#' + prefix + i).value) : fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
-      got.push([ok, typedAs($('#' + prefix + i))]);
+      got.push([ok, it.whole ? String($('#' + prefix + i).value || '').trim().slice(0, 160) : typedAs($('#' + prefix + i))]);   // a whole sentence is kept whole for the notebook
       if (only && !only.includes(i)) return;
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
