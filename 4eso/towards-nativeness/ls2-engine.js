@@ -287,7 +287,7 @@ var LS2 = (function () {
      that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails. */
   const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
   /* ✍️ Write the correct sentence (Towards Nativeness 🔍 Spot the mistake, Roger 21 Nov 2026: "I want to write the correct sentence, not choose"):
-     the whole sentence counts when it matches an accepted version. Case, punctuation, quotes and contractions never matter, and a word of 5+
+     the whole sentence, or only the corrected part of it (every changed word, words around it allowed), counts when it matches an accepted version. Case, punctuation, quotes and contractions never matter, and a word of 5+
      letters may have one typing slip (insert, drop, swap or change one letter), unless the typed word is one of the original wrong sentence
      (so "need" for "needs" or "mails" for "emails" still fails). The original sentence typed again is never right. */
   const lev1 = (a, b) => { if (a === b) return true; const la = a.length, lb = b.length; if (Math.abs(la - lb) > 1) return false;
@@ -300,8 +300,16 @@ var LS2 = (function () {
     return [bare, flat].some(c => {
       const t = c(typed); if (!t || t === c(it.whole)) return false;
       const tw = t.split(' '), orig = new Set(c(it.whole).split(' '));
+      const same = (x, y) => x === y || (x.length >= 5 && !orig.has(y) && lev1(x, y)), ow = c(it.whole).split(' ');
       return (it.a || []).some(a => { const w = c(a).split(' ');
-        return w.length === tw.length && w.every((x, j) => x === tw[j] || (x.length >= 5 && !orig.has(tw[j]) && lev1(x, tw[j]))); });
+        if (w.length === tw.length && w.every((x, j) => same(x, tw[j]))) return true;
+        // only the corrected part (Roger, 21 Nov 2026: "on my cellphone" should be right): a run of the right sentence's words that holds every word changed
+        let p = 0; while (p < w.length && p < ow.length && w[p] === ow[p]) p++;
+        let q = 0; while (q < w.length - p && q < ow.length - p && w[w.length - 1 - q] === ow[ow.length - 1 - q]) q++;
+        let lo = p, hi = w.length - q; if (hi <= lo) { lo = Math.max(0, p - 1); hi = Math.min(w.length, p + 1); }
+        for (let k = 0; k <= lo && k + tw.length <= w.length; k++)
+          if (k + tw.length >= hi && tw.every((y, j) => same(w[k + j], y))) return true;
+        return false; });
     });
   }
   function fits(q, answers, typed) {
