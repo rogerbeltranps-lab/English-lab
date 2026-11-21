@@ -1,0 +1,37 @@
+# Database copy to Drive (Roger, 20 Nov 2026: "I want a copy every friday"), free (GitHub Actions in a public repo): every Friday evening
+# it copies the whole Firestore database (about 3,100 reads, a few MB compressed) into Teacher Studio › 04_Students (private) ›
+# English Lab database copies, through the school Apps Script (tools/backup/firestore-copy.mjs). Secrets already there:
+# FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM (read only), SCHOOL_MAIL_URL, SCHOOL_MAIL_KEY. The log is public: counts and sizes only.
+# A failed run emails the repo owner (GitHub's own notice). By hand: Actions → Database copy to Drive → Run workflow.
+name: Database copy to Drive
+
+on:
+  schedule:
+    - cron: "0 20 * * 5"   # Friday 20:00 UTC = 21:00 Madrid in winter, 22:00 in summer (GitHub may start it a little late)
+  workflow_dispatch:
+
+concurrency:
+  group: database-copy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  copy:
+    if: github.repository == 'rogerbeltranps-lab/English-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      SCHOOL_MAIL_URL: ${{ secrets.SCHOOL_MAIL_URL }}
+      SCHOOL_MAIL_KEY: ${{ secrets.SCHOOL_MAIL_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/backup
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Copy the database to Drive
+        run: node tools/backup/firestore-copy.mjs
