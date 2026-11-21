@@ -109,8 +109,10 @@ export async function open(o){root=o.root;close();
   box.innerHTML='<div class="wu-c"><p class="wu-msg">Getting the warm-up ready…</p></div>';box.onclick=click;document.body.append(box);
   keyH=e=>{if(!box||!S||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==="Escape"){close();return}
     if(S.view==="say"){if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"||e.key==="PageDown"){e.preventDefault();toGame()}return}
+    if(S.view==="rem"){if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"||e.key==="PageDown"){e.preventDefault();close()}return}
     if(S.game==="hang"&&/^[a-z]$/i.test(e.key)){e.preventDefault();guess(e.key.toLowerCase())}};
   document.addEventListener("keydown",keyH,true);
+  if(o.only==="rem"){S={o,view:"rem",pool:[],game:null,round:0,items:[],st:null};return toRem()}
   const pool=await loadPool(o.decks||[]).catch(()=>[]);
   const cur=curGet(o.s);
   if(cur&&GAMES.some(x=>x.id===cur.game)&&Array.isArray(cur.items)&&cur.items.length){S={o,say:sayOfDay(o),sayOpen:false,view:"game",pool,game:cur.game,round:Math.min(+cur.round||0,cur.items.length),items:cur.items,st:null};newRound();return}
@@ -136,7 +138,7 @@ function guess(c){const s=S.st;if(!s||s.shown||s.got.has(c)||s.miss.includes(c)|
   if(letters(s.it.w).includes(c))s.got.add(c);else s.miss.push(c);if(hangWon()||s.miss.length>=LIVES)s.shown=true;draw()}
 
 function click(e){const b=e.target.closest("button");if(!b||!S&&!b.dataset.x)return;
-  if(b.dataset.x)return close();
+  if(b.dataset.x)return S&&S.view!=="rem"&&S.o.onRemind&&!remDone(S.o.s)?toRem():close();
   if(b.dataset.say){S.sayOpen=!S.sayOpen;return draw()}
   if(b.dataset.tosay){S.view="say";return draw()}
   if(b.dataset.togame)return toGame();
@@ -153,7 +155,7 @@ function click(e){const b=e.target.closest("button");if(!b||!S&&!b.dataset.x)ret
 // the words of the wrong form (it can be more than one word: "is celebrate")
 function inWrong(i){const ws=S.st.it.ws;let on=false;for(let k=0;k<=i;k++){if(/\u0001/.test(ws[k]))on=true;if(k===i)return on;if(/\u0002/.test(ws[k]))on=false}return false}
 
-function draw(){if(!box||!S)return;if(S.view==="say")return drawSay();const g=GAMES.find(x=>x.id===S.game),n=S.items.length,end=S.round>=n;
+function draw(){if(!box||!S)return;if(S.view==="say")return drawSay();if(S.view==="rem")return drawRem();const g=GAMES.find(x=>x.id===S.game),n=S.items.length,end=S.round>=n;
   const tabs=GAMES.filter(x=>itemsFor(x.id,S.pool).length).map(x=>`<button class="wu-t ${x.id===S.game?"on":""}" data-g="${x.id}" title="Play ${E(x.name)} instead">${x.em} ${E(x.name)}</button>`).join("");
   let body="";
   if(end)body=`<div class="wu-end"><div class="wu-big">🎉</div><h2>Warm-up done!</h2><p>${E(S.o.title||"")}</p><div class="wu-row"><button class="wu-b" data-again="1">↻ Play again</button><button class="wu-b go" data-x="1">▶ Start the class</button></div></div>`;
@@ -208,6 +210,29 @@ function drawSpot(){const s=S.st,ws=s.it.ws;
   const t=ws.map((w,i)=>{const bad=inWrong(i),cls=s.shown&&bad?"bad":s.pick===i&&!bad?"miss":"";return `<button class="wu-sw ${cls}" data-w="${i}" ${s.shown?"disabled":""}>${E(w.replace(/[\u0001\u0002]/g,""))}</button>`}).join("");
   return `<div class="wu-sent">${t}</div>${s.shown?`<p class="wu-ok">✔ ${E(s.it.ok)}</p><p class="wu-sm">Not <s>${E(s.it.w)}</s> but <b>${E(s.it.a)}</b></p>`:s.pick>=0?'<p class="wu-no">That one is fine. Try again!</p>':""}`}
 
+// ✅ Finish all your activities (Roger, 21 Nov 2026: "At the beginning of the class, after the games, I want the students to see something
+// like this [the dashboard's Work done in each learning path]. I want to remind them that they need to do all the activities. I also want
+// them to see what activities they need to do"; then "on the right, I also want to see this [🧭 Your steps] with the percentage of students
+// who've done them"). The last slide, once per class mode: ▶ Start the class (or the end of the game) brings it up instead of closing,
+// and o.onRemind() then shows every student their own list on their screen (el-cm-agenda.js remind → el-cloud.js cmRemind → el-todo.js
+// remind). The numbers are the dashboard's copy in this browser (teacher.html remSave, localStorage el_rem_<group>): what the group did in
+// class before today or has as homework; the share of students per step; never a name. No copy (or one over 12 hours old): the message only.
+const REM_K="el_wu_rem";
+const remDone=s=>{try{return !!s&&sessionStorage.getItem(REM_K)===String(s)}catch(e){return false}};
+function toRem(){S.view="rem";if(!remDone(S.o.s)){try{sessionStorage.setItem(REM_K,String(S.o.s))}catch(e){}try{const r=S.o.onRemind&&S.o.onRemind();if(r&&r.catch)r.catch(e=>console.warn("finish reminder",e))}catch(e){console.warn("finish reminder",e)}}draw()}
+function remData(g){try{const d=JSON.parse(localStorage.getItem("el_rem_"+g)||"null");return d&&d.g===g&&Date.now()-d.at<12*36e5?d:null}catch(e){return null}}
+const pcCol=p=>window.elPctCol?elPctCol(p):p==null?"#cbd5e1":p<50?"#dc2626":p<60?"#ea580c":p<80?"#16a34a":p<90?"#2563eb":"#8b5cf6";
+function drawRem(){const d=remData(S.o.g),hm=t=>new Date(t).toTimeString().slice(0,5);
+  const lps=d&&d.lps.length?d.lps.map(z=>`<li><span class="rn">${E(z.lab)}</span><span class="rb"><i style="width:${z.pc||0}%;background:${pcCol(z.pc)}"></i></span><b>${z.pc??0} %</b><small>${z.fin}/${d.N} finished</small></li>`).join(""):"";
+  const steps=d&&d.steps.length?d.steps.map(x=>x.port?`<li class="rp">${E(x.port)}</li>`:`<li class="rs"><span class="rt"><small style="color:${E(x.sk.c)}">${E(x.sk.n)}</small>${E(x.t)}</span><span class="rb sm"><i style="width:${x.pc||0}%;background:${pcCol(x.pc)}"></i></span><b>${x.pc??0} %</b></li>`).join(""):"";
+  box.innerHTML=`<div class="wu-top"><b>✅ Before we start · ${E(S.o.gname||S.o.g)}</b><span class="wu-tabs"></span><button class="wu-b go" data-x="1" title="Close and start the class (Esc)">▶ Start the class</button></div>
+  <div class="wu-c wu-remc"><div class="wu-remhd"><span class="nb-postit k-other">✅ Every activity counts</span>
+    <div class="nb-slip wu-remsay">Finish all your activities!</div></div>
+    <p class="wu-remsub">👀 Look at your screen: it shows what <u>you</u> still have to do.</p>
+    ${lps||steps?`<div class="wu-rem">${lps?`<div class="wu-rcol"><h3>Work done in each learning path</h3><ul class="wu-rl">${lps}</ul></div>`:""}${steps?`<div class="wu-rcol"><h3>🧭 Our steps <small>· students who did each one</small></h3><ul class="wu-rsl">${steps}</ul></div>`:""}</div>
+    <p class="wu-sm wu-remft">${E(d.ls)} · what we did in class before today and homework · ${d.N} students · updated ${hm(d.at)}</p>`:""}
+    <div class="wu-row"><button class="wu-b go" data-x="1">▶ Start the class</button></div></div>`}
+
 const CSS=`
 #el-wu{position:fixed;inset:0;z-index:2147483000;color:var(--nb-black,#23262b);font:400 clamp(18px,1.75vw + 8px,44px)/1.35 var(--nb-teacher,"Kalam",cursive);display:flex;flex-direction:column;overflow:auto;
   background:linear-gradient(90deg,transparent 2.8em,var(--nb-margin,#ef9a9a) 2.8em calc(2.8em + 2px),transparent calc(2.8em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line,#c7d9ee) 1.6em calc(1.6em + 1px)) var(--nb-paper,#fffef8);background-attachment:local}
@@ -256,6 +281,21 @@ const CSS=`
 #el-wu .wu-mean{font:400 1.45em/1.3 var(--nb-teacher);color:#23262b;max-width:34em}
 #el-wu .wu-cat{font:700 1.35em/1.3 var(--nb-hand);color:var(--nb-ink)}#el-wu .wu-cat small{font:600 .6em system-ui,sans-serif;color:var(--nb-pencil);margin-right:.3em}
 #el-wu .wu-msg{color:var(--nb-pencil)}
+#el-wu .wu-remc{gap:.35em;justify-content:flex-start;padding-top:.5em}#el-wu .wu-remhd{display:flex;align-items:center;gap:.8em;flex-wrap:wrap;justify-content:center}
+#el-wu .wu-remhd .nb-postit{margin:0;font-size:.9em;line-height:1.3}
+#el-wu .wu-remsay{margin:.25em 0 0;padding:.3em 1em .25em;font:700 1.6em/1.15 var(--nb-teacher);color:#23262b;transform:rotate(-.6deg)}
+#el-wu .wu-remsub{font:400 1em/1.3 var(--nb-teacher);color:#23262b}#el-wu .wu-remsub u{text-decoration-color:var(--nb-red,#e53935);text-decoration-thickness:.08em}
+#el-wu .wu-rem{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr);align-items:start;gap:1em;width:min(64em,100%);text-align:left;font:400 clamp(13px,.55vw + 9px,22px)/1.3 system-ui,sans-serif;margin-top:.3em}
+#el-wu .wu-rcol{background:#fff;border:1px solid #e0d8bd;border-radius:.7em;padding:.6em .9em;box-shadow:0 2px 5px rgba(0,0,0,.1);min-width:0}
+#el-wu .wu-rcol h3{margin:0 0 .4em;font:800 .78em system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#64748b}#el-wu .wu-rcol h3 small{text-transform:none;letter-spacing:0;font-weight:600}
+#el-wu .wu-rem ul{list-style:none;margin:0;padding:0}
+#el-wu .wu-rl li{display:grid;grid-template-columns:minmax(0,1fr) 3.6em;grid-template-areas:"n n" "b p" "f f";row-gap:.2em;column-gap:.6em;align-items:center;gap:.6em;padding:.35em .4em;border-radius:.4em}#el-wu .wu-rl li:nth-child(odd){background:#f8fafc}
+#el-wu .rn{grid-area:n;font-weight:600}#el-wu .wu-rl .rb{grid-area:b}#el-wu .wu-rl b{grid-area:p}#el-wu .wu-rl small{grid-area:f}#el-wu .wu-rem b{text-align:right;font-weight:800}#el-wu .wu-rl small{color:#64748b;font-size:.85em}
+#el-wu .rb{height:.75em;border-radius:999px;background:#e2e8f0;overflow:hidden}#el-wu .rb i{display:block;height:100%;border-radius:999px;min-width:.35em}#el-wu .rb.sm{height:.55em}
+#el-wu .wu-rsl{columns:2 15em;column-gap:1.2em}#el-wu .wu-rsl li{break-inside:avoid}#el-wu .wu-rsl li.rp{break-after:avoid;font-weight:700;color:#4a2f0e;padding:.45em .2em .15em;border-bottom:1px dashed #d9c294;margin-bottom:.15em}
+#el-wu .wu-rsl li.rs{display:grid;grid-template-columns:minmax(0,1fr) 22% 3.2em;align-items:center;gap:.55em;padding:.25em .2em}
+#el-wu .wu-remft{font:400 clamp(11px,.4vw + 8px,16px) system-ui,sans-serif}#el-wu .rt{min-width:0;font-size:.95em;line-height:1.2}#el-wu .rt small{display:block;font-size:.66em;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+@media (max-width:700px){#el-wu .wu-rem{grid-template-columns:1fr}}
 @media (max-width:700px){#el-wu .wu-c{padding-left:1.2em}#el-wu{background:var(--nb-paper,#fffef8)}#el-wu .wu-bigsay{font-size:2em}}
 @keyframes wuShake{25%{translate:-.2em 0}75%{translate:.2em 0}}
 @media (prefers-reduced-motion:reduce){#el-wu *{animation:none!important;transition:none!important}}`;

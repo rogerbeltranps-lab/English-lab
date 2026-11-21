@@ -11,6 +11,7 @@ const load=src=>new Promise(r=>{const s=document.createElement("script");s.src=s
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{Storage.prototype.setItem.call(localStorage,k,v)}catch(e){}}};
 
+let REM=null,remReady;const remP=new Promise(r=>remReady=r);
 export async function start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   if(!group)return;
   if(!window.EL_PLAN)await load(new URL("shared/js/el-plan.js",root).href);
@@ -95,7 +96,63 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   // Closed unless the student left it open (no more "once a week": there is no week plan for students, Roger 6 Nov 2026).
   box.hidden=store.get("el_todo_open")!=="1";
   draw();
+  // ✅ Finish your activities (Roger, 21 Nov 2026): what remind() below shows in class, from the same pieces as the list above
+  REM=()=>{const db=window.EL_RAW_OPEN?null:window.elDueBefore(info,group),dr=((p._dropped||{})[gi])||[],secOf=a=>(window.EL_SECTIONS||{})[a.id]||[];
+    const dueA=a=>!db||db.acts.has(a.id)||!!db.tabs[a.id],dueT=(a,id)=>!db||db.acts.has(a.id)||!!(db.tabs[a.id]&&db.tabs[a.id].has(id));
+    const td=todo(),left=new Map(td.map(x=>[x.a.id,x]));
+    const lps=seesAll?[]:acts.filter(a=>!a.manual&&!a.optional&&!a.checkpoint&&!dr.includes(a.id)&&canDo(a)&&dueA(a)).map(a=>{const d=doneOf(a),ss=secOf(a);let ks;
+      if(ss.length){const off=window.elSecLockedFor(a,info,group,d);ks=[...new Set(ss.filter(([id])=>!off.includes(id)&&dueT(a,id)).flatMap(([id])=>elSecSteps(a,id)))]}
+      else ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
+      const all=isDone(a),n=all?ks.length:ks.filter(k=>d.has(k)).length,x=left.get(a.id);
+      return {a,lab:num(a)+a.title.split(/[:(]/)[0].trim(),n,of:ks.length,pc:all||!ks.length?(all?100:0):Math.round(n/ks.length*100),x}}).filter(z=>z.of||z.x);
+    // checkpoints and anything else on the list that has no bar of its own
+    td.filter(x=>!lps.some(z=>z.a===x.a)).forEach(x=>lps.push({a:x.a,lab:num(x.a)+x.a.title.split(/[:(]/)[0].trim(),n:0,of:0,pc:null,x}));
+    const ex=W.exam(p,gi),dn=ex?W.days(today,ex):null;
+    return {ca,lps,hw:hws().filter(h=>!h.done),exam:ex&&dn>=0?{d:W.date(ex,lang),n:dn}:null}};
+  remReady();
   // progress made on this page shows when the student comes back to the tab or reopens the list
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)draw()});
   return {draw};
 }
+
+// ✅ Finish your activities (Roger, 21 Nov 2026: "At the beginning of the class, after the games, I want the students to see something like
+// this [the dashboard's Work done in each learning path bars]. I want to remind them that they need to do all the activities. I also want
+// them to see what activities they need to do"). When the teacher's class tab ends the warm-up (el-warmup.js, live/{group}.go.rem), every
+// student in class mode sees this card once (el-cloud.js cmRemind): their own work only, never anyone else's. One bar per learning path the
+// group has worked on (what was done in class before today or set as homework, elDueBefore: the share of those steps done; a tab for a later
+// class is never shown or counted here), the tabs still to do under it (the ✅ To do list, elTodoList), homework not done and the exam day.
+// No links: in class mode the class follows the teacher; ✅ To do on every page has them. Catalan for Starter/Base. No reads of its own.
+export async function remind(){const r=await Promise.race([remP,new Promise(z=>setTimeout(z,20000))]);if(!REM||document.getElementById("el-rem"))return false;
+  const D=REM(),t=(c,e)=>D.ca?c:e,col=p=>window.elPctCol?elPctCol(p):"#16a34a";
+  const todo=D.lps.filter(z=>z.x).length+D.hw.length;
+  const rows=D.lps.map(z=>{const x=z.x,ok=!x;
+    const tabs=x?(x.cp?`<span class="tb">⏱ ${t(`Primer el ${esc(x.cp.title)}`,`First ${esc(x.cp.title)}`)}</span>`:x.tabs.length?x.tabs.map(([,nm])=>`<span class="tb">${esc(nm)}</span>`).join(""):`<span class="tb">${z.a.checkpoint?t("Fes-lo","Do it"):t("Tot","All of it")}</span>`):"";
+    return `<li class="${ok?"ok":""}"><div class="r"><span class="n">${esc(z.lab)}</span>${z.pc==null?"<span></span><b></b>":`<span class="bar"><i style="width:${z.pc}%;background:${col(z.pc)}"></i></span><b>${z.pc} %</b>`}<small>${ok?"✔ "+t("Fet","Done"):x.late?"⏰ "+t("Endarrerida","Late"):""}</small></div>${tabs?`<div class="tbs"><span class="lb">${t("Et falta:","Still to do:")}</span>${tabs}</div>`:""}</li>`}).join("");
+  const hw=D.hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b>${D.hw.map(h=>`<div>${esc(ELWeek.taskText(h.x,D.ca?"ca":"en"))}</div>`).join("")}</div>`:"";
+  const exam=D.exam?`<div class="ex">📝 ${t("Examen","Exam")}: ${D.exam.d}${D.exam.n>1?t(` · d'aquí a ${D.exam.n} dies`,` · in ${D.exam.n} days`):D.exam.n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
+  const st=document.createElement("style");st.id="el-rem-css";st.textContent=`
+#el-rem{position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;font:16px/1.35 system-ui,sans-serif;color:#0f172a}
+#el-rem .bx{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.35);width:min(720px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;text-align:left}
+#el-rem .hd{background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;padding:16px 22px}#el-rem h2{margin:0;font:800 clamp(22px,2.6vw,30px)/1.2 system-ui,sans-serif}#el-rem .hd p{margin:6px 0 0;font-size:15px;opacity:.95}
+#el-rem .bd{padding:12px 22px 6px;overflow:auto}#el-rem h3{margin:4px 0 6px;font:800 13px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
+#el-rem ul{list-style:none;margin:0;padding:0}#el-rem li{padding:8px 10px;border-radius:10px}#el-rem li:nth-child(odd){background:#f8fafc}
+#el-rem .r{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,200px) 58px 118px;align-items:center;gap:12px}
+#el-rem .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#el-rem .bar{height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden}#el-rem .bar i{display:block;height:100%;border-radius:999px;min-width:6px}
+#el-rem .r b{text-align:right;font-size:18px}#el-rem .r small{color:#64748b;font-size:13px;white-space:nowrap}#el-rem li:not(.ok) .r small{color:#b91c1c;font-weight:600}#el-rem li.ok .r small{color:#16a34a;font-weight:600}
+#el-rem .tbs{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}#el-rem .lb{font-size:13px;color:#b91c1c;font-weight:700;margin-right:2px}
+#el-rem .tb{font-size:13px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:2px 10px}
+#el-rem .hw{background:#ecfeff;color:#155e75;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:15px}#el-rem .ex{background:#fef3c7;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:15px}
+#el-rem .all{background:#f0fdf4;color:#166534;border-radius:10px;padding:10px 12px;font-weight:700;margin:4px 0 8px}
+#el-rem .ft{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 22px 16px;border-top:1px solid #f1f5f9}#el-rem .ft p{margin:0;color:#475569;font-size:14px}
+#el-rem .ft button{border:0;border-radius:999px;background:#4338ca;color:#fff;font:800 17px system-ui,sans-serif;padding:11px 26px;cursor:pointer;white-space:nowrap}
+@media (max-width:640px){#el-rem{padding:8px}#el-rem .hd,#el-rem .bd,#el-rem .ft{padding-left:14px;padding-right:14px}#el-rem .r{grid-template-columns:minmax(0,1fr) 52px;gap:4px 10px}#el-rem .bar{grid-column:1/-1;grid-row:2}#el-rem .r small{grid-column:1/-1}#el-rem .ft{flex-direction:column;align-items:stretch}}
+@media print{#el-rem{display:none}}`;
+  if(!document.getElementById("el-rem-css"))document.head.append(st);
+  const o=document.createElement("div");o.id="el-rem";o.className="notranslate";o.translate=false;
+  o.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-rem-h"><div class="hd"><h2 id="el-rem-h">✅ ${todo?t("Acaba totes les activitats!","Finish all your activities!"):t("Ho tens tot fet!","You're up to date!")}</h2>
+    <p>${todo?t("Totes les activitats compten. Aquí tens el que vam fer a classe i el que encara et falta.","Every activity counts. Here is what we have done in class and what you still have to do."):t("Has fet totes les activitats que hem fet a classe. Molt bé!","You have done every activity we did in class. Well done!")}</p></div>
+    <div class="bd">${D.lps.length?`<h3>${t("La meva feina a cada learning path","My work in each learning path")}</h3><ul>${rows}</ul>`:""}${hw}${exam}</div>
+    <div class="ft"><p>${todo?t("Acaba-les a casa o a classe quan acabis abans.","Finish them at home, or in class when you finish early."):t("Continua així!","Keep it up!")}</p><button type="button" data-x>👍 ${t("D'acord","OK")}</button></div></div>`;
+  const shut=()=>{o.remove();clearTimeout(tm)},tm=setTimeout(shut,5*60e3);   // gone after 5 minutes if nobody presses OK
+  o.addEventListener("click",e=>{if(e.target.closest("[data-x]")||e.target===o)shut()});
+  document.body.append(o);o.querySelector("[data-x]").focus();return true}

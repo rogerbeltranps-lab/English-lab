@@ -634,6 +634,18 @@ function vyPlanned(ls,beds){beds=beds.filter(b=>!(window.elBookPath&&elBookPath(
     if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));
   const out=beds.map(b=>b.kind==="fp"?b:Object.assign({},b,{plants:b.plants.filter(x=>on.has(b.id+"#")||on.has(x.key))})).map(one).filter(b=>b.plants.length);
   return out.filter(b=>b.kind!=="fp").concat(out.filter(b=>b.kind==="fp"))}
+// 🏁 To win the race (Roger, 21 Nov 2026: "A message could pop up saying that to win the race they need to do all the activities pending"):
+// once a day, on the board's map, a card over the map when ✅ To do has something (the same count as the To do tile); ✅ See them opens it.
+// Not in class time or class mode (the class gets its own ✅ Finish all your activities card after the warm-up, el-todo.js remind).
+function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyClass())return;const n=todoItems(lss).reduce((k,x)=>k+todoTabs(x),0);if(!n)return;
+  const k="el_race_"+(AS||(U&&U.uid)||"demo"),d=new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
+  try{if(localStorage.getItem(k)===d)return}catch(e){}   // seen once it is closed (the board draws again when the road arrives)
+  const ic=elVoyage.skin(S.vy).veh.icon;
+  O.innerHTML=`<div class="card"><div style="font-size:46px;line-height:1.1">${ic} 🏁</div><h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
+    +`<p>${t("Acaba totes les activitats pendents! Cada activitat que acabes et fa avançar.","Finish all your pending activities! Every activity you finish moves you forward.")}</p>`
+    +`<p class="ce">${t(`Et falten ${nAct(n)}.`,`You have ${nAct(n)} left to do.`)}</p>`
+    +`<button type="button" data-r="todo">✅ ${t("Mira-les","See them")}</button> <button type="button" data-r="ok" style="background:#fff;color:#4a2f0e;box-shadow:0 4px 0 #d9c294">${t("D'acord","OK")}</button></div>`;
+  O.classList.add("on");O.onclick=e=>{const b=e.target.closest("button[data-r]");if(!b)return;O.classList.remove("on");O.onclick=null;try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}if(b.dataset.r==="todo")location.hash="#todo"}}
 // the road document: read once per LS, then my own line written when my steps done change (never in the teacher's or a tester's view)
 function voyageRoad(ls,V){
   if(DEMO||!F||!D.me.group)return;const db=ELCloud.db,ref=F.doc(db,"road",ls.id,"groups",D.me.group);
@@ -962,7 +974,7 @@ function render(){
   const n=S.pend.length;
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
-    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy)elVoyage.wire($("#main"),S.vy)}
+    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy){elVoyage.wire($("#main"),S.vy);vyRace(lss)}}
   else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
