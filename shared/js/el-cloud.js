@@ -1711,6 +1711,7 @@ const fsChanged=()=>{fsCheck();hereTick()},FSEV=["fullscreenchange","webkitfulls
 if(inShell){addEventListener("pagehide",()=>FSEV.forEach(t=>FD.removeEventListener(t,fsChanged)));addEventListener("pageshow",e=>{if(e.persisted)FSEV.forEach(t=>FD.addEventListener(t,fsChanged))})}
 function goTo(g,first){
   cmCheer(g);   // 🌟 the first 4 minutes of class mode (gone when it stops)
+  cmRemind(g);   // ✅ Finish all your activities, once, when the teacher's warm-up ends
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
@@ -1791,6 +1792,15 @@ function cmGo(g){
 // tell them positive things, can you make it visible for 4 minutes once I start the class mode? on the top of their screen"): the same
 // "Hi Pau, …" line as their board (ELCheer.student in el-cheer.js, Catalan for Starter/Base), in a bar at the top of whatever page class
 // mode takes them to, for the first 4 minutes after the teacher started it (go.s), then it goes away. No extra reads or writes.
+// ✅ Finish all your activities (Roger, 21 Nov 2026: after the warm-up games, "I want to remind them that they need to do all the activities. I
+// also want them to see what activities they need to do"): when the teacher's class tab ends the warm-up it writes go.rem = {s, at}
+// (el-cm-agenda.js remind); each student in that class mode gets their own card once (el-todo.js remind: their bars and the tabs still to
+// do, from the ✅ To do list's own reads). A student who joins later in the first 20 minutes gets it too. Not on the dashboard.
+const REM_MS=20*60e3;
+function cmRemind(g){const r=g&&g.cm&&g.rem;if(!r||r.s!==g.s||!(Date.now()-r.at<REM_MS)||onDash||!user||!(isStudent(user)||AS))return;
+  const k="el_rem_seen";let was="";try{was=localStorage.getItem(k)||""}catch(e){}if(was===String(r.s))return;
+  try{origSet.call(localStorage,k,String(r.s))}catch(e){}
+  import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.remind()).catch(e=>console.warn("finish reminder",e))}
 const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
 // the 🌟 line sits under the 🎓 class mode bar: lockPad moves the page down by both (one place for it, #550 + #551)
