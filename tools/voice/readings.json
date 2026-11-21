@@ -1,0 +1,499 @@
+[
+ {
+  "key": "7a0fd8cd",
+  "say": [
+   "You want facts for your vlog. Before you use a web page, ask four questions.",
+   "1. Who is the author? Look for a name: a club, a museum, a school. No name? Be careful.",
+   "2. When is it from? Look for a date. Old pages have old information.",
+   "3. Why is it there? Some pages inform you. Other pages want your money: a shop says \"the best skateboard in the world\".",
+   "4. What type of website is it? An official website or an encyclopedia is better than a video with no sources.",
+   "At the end of your vlog, credit your source and your photos: the title, the website and the year.",
+   ""
+  ],
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "8a092c73",
+  "say": [
+   "You want facts about your hobby for your vlog. Before you use a web page, ask four questions.",
+   "1. Who is the author? Look for a name or an organisation: a sports club, a museum, a school, an official website. No name? Be careful.",
+   "2. When is it from? Look for a date. Old pages can have old information: the price of a ticket, the time of a class, the rules of a sport.",
+   "3. Why is it there? Some pages inform you. Other pages want to sell you something: trainers, a game, a course. A shop says \"the best skateboard in the world\" because it wants your money.",
+   "4. What type of website is it? An official website, an encyclopedia or a club website is usually better than a social media post or a video with no sources.",
+   "Use two pages for each fact. At the end of your vlog, credit your sources and your photos: the title of the page, the website and the year."
+  ],
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "4eaaddc0",
+  "say": [
+   "You want facts about your hobby or event for your vlog. Before you use a web page, ask four questions.",
+   "1. Who is the author? Look for a name or an organisation: a sports federation, a museum, a school, an official tourism website. If you can't find who wrote it, be careful: anyone can publish online.",
+   "2. When was it written or updated? Look for a date. Old pages can have old information: ticket prices, class times, the rules of a sport, the date of a festival.",
+   "3. Why was it written? Some pages want to inform you. Others want to sell you something, like trainers, a game or a course, or they just want lots of views. A shop says \"the best skateboard in the world\" because it wants your money, not because it is true.",
+   "4. What type of website is it? An official website, an encyclopedia with references or a club website is usually more reliable than a social media post or a short video with no sources.",
+   "Check each fact in two pages. If they don't agree, choose the more reliable one. At the end of your vlog, credit your sources and your photos: the title of the page, the website and the year. Don't copy sentences: take notes with key words and write your own sentences."
+  ],
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "7decb6f7",
+  "say": [
+   "You want facts about your hobby or event for your vlog, and you want them to be correct. Before you use a web page, ask four questions.",
+   "1. Who is the author? Look for a name or an organisation whose job is to inform: a sports federation, a museum, a school, an official tourism website. If no author or organisation is given, be careful: anyone can publish anything online.",
+   "2. When was it written or updated? Look for a date. Old pages often contain old information: ticket prices, class times, the rules of a sport or the date of a festival change, so a page from 2019 may be wrong today.",
+   "3. Why was it written? Some pages are written to inform; others are written to sell you something, like trainers, a game or a course, or simply to get as many views as possible. A shop that says \"the best skateboard in the world\" wants your money, so its opinion is not a fact.",
+   "4. What type of website is it? An official website, an encyclopedia with references or a club website is usually more reliable than a social media post or a short video with no sources, because somebody checks the information before it is published.",
+   "Confirm each fact in two pages, and if they disagree, choose the more reliable one or say that they disagree. At the end of your vlog, credit your sources and your photos: the title of the page, the website and the year. Never copy whole sentences: take notes with key words and then write your own sentences."
+  ],
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "14c8bd12",
+  "say": [
+   "Post 1, Marta, 10:30. Hi! I'm at the skate park. It's sunny. I'm here with Pol and Aina. Pol is skating. Aina is taking photos. I usually come here on Saturdays. Today there is a competition at 12. Come and watch!",
+   "Post 2, Hugo, 16:45. Hi! I'm at home. It's raining. No football today. I usually play football on Saturdays. Now I'm playing video games with my brother. Boring!",
+   ""
+  ],
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "c59a0518",
+  "say": [
+   "Post 1, Marta, 10:30. Good morning from the skate park! It's sunny today. I'm here with Pol and Aina. Pol is skating and Aina is taking photos. I usually come on Saturdays, but today is special: there is a competition at 12! Come and watch us!",
+   "Post 2, Hugo, 16:45. Hi! I'm at home. It's raining now, so no football today. I usually play football on Saturday afternoons. Now I'm playing video games with my brother and we're listening to music. Boring day!"
+  ],
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "3018336e",
+  "say": [
+   "Post 1, Marta, 10:30. Good morning from the skate park! It's sunny and a bit windy today. I'm here with Pol and Aina. Pol is skating on the big ramp and Aina is taking photos for our club channel. I usually come here on Saturday mornings to practise, but today is special: there is a competition at 12 o'clock and lots of people are watching. Come and support us!",
+   "Post 2, Hugo, 16:45. Hi everyone! I'm at home. It's raining now, so there is no football today. I usually play football on Saturday afternoons and then I meet my friends in the square. Right now I'm playing video games with my brother and we're listening to music. What are you doing? Send photos!"
+  ],
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "9a93dbf2",
+  "say": [
+   "Post 1, Marta, 10:30. Good morning from the skate park! It's sunny and a bit windy today, perfect for skating. I'm here with Pol and Aina. Pol is skating on the big ramp and Aina is taking photos for our club channel, because we're uploading a video tonight. I usually come here on Saturday mornings to practise, but today is special: there is a competition at 12 o'clock and lots of people are already watching. Come and support us, we need fans!",
+   "Post 2, Hugo, 16:45. Hi everyone! I'm at home, and I'm not happy. It's raining now, so there is no football today. I usually play football on Saturday afternoons and then I meet my friends in the square. Right now I'm playing video games with my brother and we're listening to music, which is fine, but I prefer the football pitch. What are you doing? Send photos, I need ideas!"
+  ],
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "9597c659",
+  "say": [
+   "Text A, Post, Climb Up Club, Saturday 14 November, 11:05. Live from the climbing wall! Today our climbers are training for a competition. Nil is climbing the red route. His friends are cheering. It's cold outside, but it's warm inside. We usually train on Saturday mornings. Come and try! First class free.",
+   "Text B, Web page, Autumn Fun Run. Sunday 22 November, 10:00, Parc Central. Run 3 km with your family and friends! Every runner gets a T-shirt and a medal. Tickets: 5 euros. Sign up now: only 200 places!",
+   ""
+  ],
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "a7dba374",
+  "say": [
+   "Text A, Post, Climb Up Club, Saturday 14 November, 11:05. Live from the climbing wall! Today our young climbers are training for the regional competition. Nil is climbing the red route and his friends are cheering. It's cold outside, but it's warm inside. We usually train on Saturday mornings. Come and try! First class free.",
+   "Text B, Web page, Autumn Fun Run. Sunday 22 November, 10:00, Parc Central. Run 3 km with your family and friends! Every runner gets a T-shirt and a medal. Tickets: 5 euros (children under 6: free). There is a food market after the run. Sign up now: only 200 places!"
+  ],
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "a423e424",
+  "say": [
+   "Text A, Post, Climb Up Club, Saturday 14 November, 11:05. Live from the climbing wall! Today our young climbers are training for the regional competition. Nil is climbing the red route, the hardest one, and his friends are cheering. It's cold and windy outside, but it's nice and warm inside. We usually train on Saturday mornings from ten to twelve, and we always finish with a game. Do you want to try? Your first class is free: just send us a message.",
+   "Text B, Web page, Autumn Fun Run. Sunday 22 November, 10:00, Parc Central. Run or walk 3 km with your family and friends! Every runner gets a T-shirt and a medal , and there is a food market with hot chocolate after the run. Tickets: 5 euros (children under 6: free). The money goes to the local animal shelter. Sign up now: there are only 200 places and they are selling fast!"
+  ],
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "ba4e4f41",
+  "say": [
+   "Text A, Post, Climb Up Club, Saturday 14 November, 11:05. Live from the climbing wall! Today our young climbers are training for the regional competition next month. Nil is climbing the red route, the hardest one on the wall, and his friends are cheering him on from the mats. It's cold and windy outside, but it's nice and warm inside. We usually train on Saturday mornings from ten to twelve, and we always finish with a game, because climbing is also about having fun. Do you want to try? Your first class is free: just send us a message and bring comfortable clothes.",
+   "Text B, Web page, Autumn Fun Run. Sunday 22 November, 10:00, Parc Central. Run or walk 3 km with your family and friends! Every runner gets a T-shirt and a medal , and there is a food market with hot chocolate after the run. Tickets: 5 euros (children under 6: free). All the money goes to the local animal shelter, so you are running for a good cause. Sign up now: there are only 200 places and they are selling fast!"
+  ],
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "9e3bad81",
+  "say": [
+   "Slide 1, Hi! Hi everyone! I'm Noa. This is my vlog about climbing.",
+   "Slide 2, Now. Today I'm at the climbing wall. It's cold outside. I'm wearing a T-shirt. My friend Nil is climbing.",
+   "Slide 3, Usually. I usually climb on Saturday mornings.",
+   "Slide 4, Photo. In this photo, we're at a competition. Nil is climbing. We're cheering.",
+   "Slide 5, I like…. I love climbing. I don't like falling!",
+   "Slide 6, Tips. Two tips: take a break. Don't use your phone in bed.",
+   "Slide 7, Credits. Photos: me. Facts: \"Climbing\", Encyclopedia website, 2026. Thanks for watching!",
+   ""
+  ],
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "a31cbfc7",
+  "say": [
+   "Slide 1, Hi! Hi everyone! I'm Noa and this is my vlog about climbing.",
+   "Slide 2, Now. Today I'm at the climbing wall. It's cold outside, but it's warm here. I'm wearing a T-shirt and climbing shoes. My friend Nil is climbing the red route.",
+   "Slide 3, Usually. I usually climb on Saturday mornings. I train with my club.",
+   "Slide 4, Photo. In this photo, we're at a competition. Nil is climbing and we're cheering.",
+   "Slide 5, I like…. I love climbing because it's like a puzzle. I don't like falling!",
+   "Slide 6, Tips. Two tips: take a break after thirty minutes on a screen. Don't use your phone in bed.",
+   "Slide 7, Credits. Photos: me and Climb Up Club. Facts: \"Climbing\", Encyclopedia website, 2026. Thanks for watching! See you next time!"
+  ],
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "15d7f0ef",
+  "say": [
+   "Slide 1, Hi! Hi everyone! I'm Noa and welcome to my vlog about climbing.",
+   "Slide 2, Live now. Today I'm at the climbing wall in my town. It's cold and windy outside, about five degrees, but it's nice and warm in here. I'm wearing a T-shirt, shorts and climbing shoes. Right now my friend Nil is climbing the red route, the hardest one, and the others are cheering.",
+   "Slide 3, Usually. I usually climb on Saturday mornings with my club, and we always finish with a game. I practise twice a week because I want to get better.",
+   "Slide 4, Photo. In this photo, we're at the regional competition. Nil is climbing and we're cheering. It's a great memory!",
+   "Slide 5, I like…. I love climbing because every route is like a puzzle, and I like meeting new people at the wall. I hate falling, but you learn from it.",
+   "Slide 6, Screen tips. I watch climbing videos, but here are three tips: set a time limit of one hour. Take a break every thirty minutes. And don't use your phone in bed: keep it out of your bedroom.",
+   "Slide 7, Credits. Photos: me and Climb Up Club. Facts: \"Climbing\", Encyclopedia website, 2026. Thanks for watching! See you next time!"
+  ],
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "2b9e7f33",
+  "say": [
+   "Slide 1, Hi! Hi everyone! I'm Noa and welcome to my vlog about climbing, my favourite hobby.",
+   "Slide 2, Live now. Today I'm at the climbing wall in my town. It's cold and windy outside, about five degrees, but it's nice and warm in here. I'm wearing a T-shirt, shorts and climbing shoes, because you don't need expensive kit. Right now my friend Nil is climbing the red route, the hardest one, and the others are cheering him on.",
+   "Slide 3, Usually. I usually climb on Saturday mornings with my club, and we always finish with a game. This month I'm training three times a week, because the regional competition is in December and I want to get better.",
+   "Slide 4, Facts. Did you know? Climbing is an Olympic sport since 2021, and there are three types: speed, bouldering and lead. I think bouldering is the most fun, because the routes are short and you don't need a rope.",
+   "Slide 5, I like…. I love climbing because every route is like a puzzle, and I like meeting new people at the wall. I hate falling, but I believe you learn more from a fall than from an easy route.",
+   "Slide 6, Screen tips. I watch climbing videos, but here are my tips: set a time limit of one hour, because one hour is enough. Take a break every thirty minutes, so your eyes can rest. And keep your phone out of your bedroom, because the light keeps you awake. That's the one I'm going to apply.",
+   "Slide 7, Credits. Photos: me and Climb Up Club. Facts: \"Climbing\", Encyclopedia website, 2026; \"Sport climbing\", Olympics website, 2025. Thanks for watching! See you next time!"
+  ],
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "fddc8bea",
+  "say": [
+   "New skate park in Olot",
+   "The new skate park in Olot opens on Saturday 14 November at 11:00. It is in Firal Park, next to the sports centre. Entry is free, but you must wear a helmet. There is a competition for under-16s at 12:00, and the winner gets a new skateboard.",
+   "Olot Town Council website, 2026"
+  ],
+  "src": "2eso/free-time-live/data/study/check-the-source.js"
+ },
+ {
+  "key": "956f7505",
+  "say": [
+   "New skate park in Olot",
+   "Olot's new skate park opens on Saturday 14 November at 11:00. It is in Firal Park, right next to the sports centre, and it has ramps for beginners and for experts. Entry is free, but everybody must wear a helmet, and under-12s need an adult with them. At 12:00 there is a competition for under-16s: the winner gets a new skateboard.",
+   "Olot Town Council website, updated 2026"
+  ],
+  "src": "2eso/free-time-live/data/study/check-the-source.js"
+ },
+ {
+  "key": "cc6335f7",
+  "say": [
+   "Diwali. Diwali is the festival of lights. It is in October or November. People decorate their houses and light small oil lamps called diyas. Families give presents and eat sweets. There are fireworks at night.",
+   "Hanukkah. Hanukkah is a Jewish festival in December. It lasts eight nights. Every night, families light one more candle. Children play with a spinning top.",
+   "Lunar New Year. Lunar New Year is in late January or February. Families have a big dinner together. There are red lanterns and dragon dances in the streets.",
+   "Castanyada. In Catalonia, we celebrate the Castanyada on 31 October. We eat chestnuts, sweet potatoes and panellets.",
+   ""
+  ],
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "bacf5a96",
+  "say": [
+   "Diwali. Diwali is the festival of lights. Hindus, Sikhs and Jains celebrate it in October or November. It lasts five days. People clean and decorate their houses, and they light small oil lamps called diyas. Families visit their relatives, give presents and eat sweets. There are fireworks at night. For many people, the lights mean that good is stronger than evil.",
+   "Hanukkah. Hanukkah is a Jewish festival. It is usually in December, and it lasts eight nights. Every night, families light one more candle on a menorah (a special candle holder). People eat food cooked in oil, like potato pancakes and doughnuts. Children play a game with a spinning top called a dreidel.",
+   "Lunar New Year. People celebrate Lunar New Year in China, Vietnam, Korea and other countries. It is in late January or February. Before the festival, people clean their houses to sweep away bad luck (to take bad luck out of the house). On New Year's Eve, families have a big dinner together. There are red lanterns in the streets and dragon dances. Children get red envelopes with money.",
+   "Castanyada. In Catalonia, we celebrate the Castanyada on 31 October. Families and friends roast chestnuts and sweet potatoes and eat panellets. In some schools, a student dresses up as a castanyera, an old woman who sells chestnuts."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "aa40645f",
+  "say": [
+   "Diwali. Diwali is the festival of lights. Hindus, Sikhs and Jains celebrate it in October or November, and it lasts five days. People clean and decorate their homes, light small oil lamps called diyas and make colourful patterns on the floor. Families visit relatives, exchange gifts and share sweets. In many cities there are fireworks at night. For many people, the lights mean that good wins over evil and light wins over darkness.",
+   "Hanukkah. Hanukkah is a Jewish festival. It usually takes place in December and lasts eight nights. Every night, families light one more candle on a menorah, so on the last night there are eight candles. People eat food cooked in oil, like potato pancakes and doughnuts, and children play a game with a spinning top called a dreidel.",
+   "Lunar New Year. Lunar New Year is celebrated in China, Vietnam, Korea and many other places in late January or February. Before the festival, people clean their houses to sweep away bad luck. On New Year's Eve, families get together for a big reunion dinner, and many people travel home for the holidays. The streets are full of red lanterns, and there are parades with dragon and lion dances. Children get red envelopes with money.",
+   "Castanyada. In Catalonia, the Castanyada is held on 31 October, the night before All Saints' Day. Families and friends get together to roast chestnuts and sweet potatoes and eat panellets. In some schools, a student dresses up as a castanyera, an old woman who sells chestnuts in the street."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1a6ff8fe",
+  "say": [
+   "Diwali. Diwali, which is known as the festival of lights, is celebrated by Hindus, Sikhs and Jains in October or November, and it lasts five days. Its date depends on the moon, so it changes every year. Before the festival, homes are cleaned and decorated, small oil lamps called diyas are lit, and colourful patterns called rangoli are made on the floor. Families visit relatives, exchange gifts and share sweets, and in many cities the night sky is filled with fireworks. For many people, the lights represent the victory of good over evil and of light over darkness. Today Diwali is also celebrated far from India: in Leicester, in the UK, tens of thousands of people join the street celebrations every year.",
+   "Hanukkah. Hanukkah, which is a Jewish festival, usually takes place in December and lasts eight nights. According to Jewish tradition, it remembers an old story in which a small amount of oil burned for eight days in the Temple in Jerusalem. That is why one more candle is lit on the menorah every night, until eight candles are burning on the last night, and why food cooked in oil, such as potato pancakes (latkes) and doughnuts, is eaten. Children play with a dreidel, a spinning top with Hebrew letters on it.",
+   "Lunar New Year. Lunar New Year is celebrated in China, Vietnam, Korea and many other places in late January or February, when a new year begins in the lunar calendar. Before the festival, houses are cleaned to sweep away bad luck. On New Year's Eve, families get together for a big reunion dinner, and millions of people travel home, which makes it one of the busiest travel periods in the world. The streets are decorated with red lanterns, because red is associated with good luck, and there are parades with dragon and lion dances. Children are given red envelopes with money.",
+   "Castanyada. In Catalonia, the Castanyada is held on 31 October, the night before All Saints' Day. Families and friends get together to roast chestnuts and sweet potatoes and eat panellets, which are small sweets made with almonds and pine nuts. In some schools, a student dresses up as a castanyera, an old woman who sells chestnuts in the street. Although Halloween has become popular among young people, many families keep the tradition alive."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "31ed33ea",
+  "say": [
+   "Before you put information on a slide, check it. Ask four questions.",
+   "1. Who wrote it? Look for a name: an author, a museum, a university or an official website. No name? Be careful.",
+   "2. When is it from? Diwali, Hanukkah and Lunar New Year change their date every year. Check that the information is for this year.",
+   "3. Why did they write it? Some pages inform you. Other pages want to sell you something, like costumes.",
+   "4. Do other pages say the same? Find each fact in at least two good sources.",
+   "At the end, write your sources: the title, the website and the year. Don't copy sentences: write your own.",
+   ""
+  ],
+  "src": "4eso/seasons-and-celebrations/data/research-it-right.js"
+ },
+ {
+  "key": "c0325ff2",
+  "say": [
+   "Before you put information on a slide, check it. Ask four questions.",
+   "1. Who wrote it? Look for the name of an author or an organisation, like a museum, a university, an encyclopedia or an official tourism website. No name? Be careful.",
+   "2. When is it from? Some festivals change their date every year, like Diwali, Hanukkah and Lunar New Year. Check that the information is for this year.",
+   "3. Why did they write it? Some pages give you information. Other pages want to sell you something, like costumes or trips. A shop may say that a tradition is \"ancient\" (very, very old) because it sounds good.",
+   "4. Do other pages say the same? Don't use only one source. Find each fact in at least two good sources.",
+   "When you write about a religious celebration, give information. Write \"Hindus believe that…\" or \"For many Jewish families, the candles mean…\".",
+   "At the end, write your sources: the title of the page, the website and the year. Don't copy sentences. Write key words and then write your own sentences."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/research-it-right.js"
+ },
+ {
+  "key": "e6eef731",
+  "say": [
+   "Before you put information on a slide, check it. Ask four questions.",
+   "1. Who wrote it? Look for an author or an organisation, for example a museum, a university, an encyclopedia or an official tourism website. If you can't find who wrote it, be careful.",
+   "2. When was it written or updated? The dates of some festivals change every year, especially festivals that follow the moon, like Diwali, Hanukkah and Lunar New Year. Check that the information is for this year.",
+   "3. Why was it written? Some pages want to inform you. Others want to sell you something, like costumes or trips, or just want lots of views. A shop may say that a tradition is \"ancient\" because it sounds good.",
+   "4. Do other sources say the same? Never trust only one source. Find each fact in at least two reliable sources. If they don't agree, choose the more reliable one or say that the sources disagree.",
+   "When you explain a religious celebration, present it as information, not as belief: \"Hindus believe that…\", \"For many Jewish families, the candles mean…\".",
+   "Finally, credit your sources: write the title of the page, the website or author, and the year. Don't copy whole sentences. Take notes with key words and then write your own sentences."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/research-it-right.js"
+ },
+ {
+  "key": "abefedfb",
+  "say": [
+   "Before any information goes on your slides, it should be checked. Good researchers ask four questions.",
+   "1. Who wrote it? Look for an author or an organisation whose job is to inform, such as a museum, a university, an encyclopedia or an official tourism website. If no author or organisation is given, be careful: anyone can publish online.",
+   "2. When was it written or updated? The dates of festivals that follow the moon, such as Diwali, Hanukkah and Lunar New Year, change every year, so information that was correct last year may be wrong now. Check that it has been updated for this year.",
+   "3. Why was it written? Some pages are written to inform; others are written to sell costumes or trips, or simply to get as many views as possible. A shop may describe a tradition as \"ancient\" because it sounds good and helps it sell, even if the tradition only dates back a few decades.",
+   "4. Do other sources say the same? Never rely on a single source. Each fact should be confirmed by at least two reliable sources. If they disagree, choose the more reliable one, or say clearly that the sources disagree.",
+   "Be careful with your wording, too. A religious celebration should be presented as information, not as belief: \"Hindus believe that…\", \"For many Jewish families, the candles mean…\". Avoid stereotypes and generalisations such as \"all Chinese people…\", and remember that a sacred symbol is not a costume.",
+   "Finally, credit your sources: the title of the page, the website or author, and the year. Images need credits too. Never copy whole sentences: take notes with key words and then write your own sentences."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/research-it-right.js"
+ },
+ {
+  "key": "1ebc1c06",
+  "say": [
+   "The Castanyada. In Catalonia, we celebrate the Castanyada on 31 October. A long time ago, bell ringers rang the church bells all night for the dead. Their families brought them roasted chestnuts. The chestnuts gave them energy.",
+   "Today families eat chestnuts, sweet potatoes and panellets at home. On 1 November, many people visit the cemetery with flowers.",
+   "Bonfire Night. In the UK, people celebrate Bonfire Night on 5 November. It comes from a story from 1605. A man called Guy Fawkes wanted to blow up the Parliament in London. But guards found him under the building with gunpowder. People lit bonfires because the king was safe.",
+   "Children used to make a \"guy\": a figure with old clothes. Today people watch fireworks and eat toffee apples next to a big bonfire.",
+   ""
+  ],
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "30660357",
+  "say": [
+   "The Castanyada. In Catalonia, we celebrate the Castanyada on 31 October, the night before All Saints' Day. It is a very old tradition. A long time ago, on the night of All Saints, bell ringers rang the church bells all night for the dead. It was hard work, so their families and friends brought them roasted chestnuts and sweet wine. The chestnuts gave them energy.",
+   "Chestnuts were also an important food of the autumn harvest. In the past, women called castanyeres used to sell hot chestnuts in the streets. Today families and friends eat chestnuts, sweet potatoes and panellets at home. On 1 November, many people visit the cemetery with flowers to remember their family.",
+   "Bonfire Night. In the UK, people celebrate Bonfire Night on 5 November. It comes from a story from 1605. A man called Guy Fawkes and a group of friends wanted to blow up the Houses of Parliament in London and kill King James I. But on the night of 4 November, guards found Guy Fawkes under the building with 36 barrels (big wooden containers) of gunpowder. People in London lit bonfires because the king was safe.",
+   "Children used to make a \"guy\": a figure with old clothes and newspaper. They took it into the streets and asked for \"a penny (a small coin) for the guy\". Today people watch fireworks and eat toffee apples and hot potatoes next to a big bonfire. It is not a holiday: on 5 November people go to school and work as usual."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "4b7d5710",
+  "say": [
+   "The Castanyada. In Catalonia, the Castanyada is held on 31 October, the night before All Saints' Day. It is a very old tradition, and nobody knows exactly how it started, but there is a popular story. A long time ago, on the night of All Saints, bell ringers rang the church bells all night to remember the dead. It was hard work, so their families and neighbours brought them roasted chestnuts and sweet wine, which gave them energy to keep going.",
+   "Chestnuts were also an important food of the autumn harvest, when families got ready for winter. In the past, women called castanyeres, who wore a headscarf and a shawl, used to sell hot chestnuts in the streets. Today families and friends get together to eat chestnuts, sweet potatoes and panellets, small sweets made with almonds and pine nuts. On 1 November, many people visit the cemetery with flowers to remember the members of their family who have died.",
+   "Bonfire Night. In the UK, Bonfire Night, which is also called Guy Fawkes Night, is celebrated on 5 November. It comes from a story from 1605. Catholics were treated badly in England at that time, so a group of angry Catholic men, including Guy Fawkes, planned to blow up the Houses of Parliament in London and kill King James I. But on the night of 4 November, guards found Guy Fawkes under the building with 36 barrels of gunpowder. People in London lit bonfires to celebrate that the king was safe, and the next year a law made 5 November a day of thanksgiving.",
+   "Children used to make a \"guy\", a figure made of old clothes and newspaper, and they took it into the streets to ask for \"a penny for the guy\". Today towns organise big fireworks displays, and people eat toffee apples and baked potatoes next to the bonfire. Bonfire Night is not a holiday: children go to school as usual on 5 November, whereas in Catalonia 1 November, All Saints' Day, is a holiday."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "6bbfcf3e",
+  "say": [
+   "The Castanyada. In Catalonia, the Castanyada is held on 31 October, the night before All Saints' Day. It is a tradition that dates back centuries, and nobody knows exactly how it started, but there is a popular story. A long time ago, on the night of All Saints, bell ringers rang the church bells all night to remember the dead. It was hard work, so their families and neighbours brought them roasted chestnuts and sweet wine, which gave them energy to keep going.",
+   "Chestnuts were also an important food of the autumn harvest, when families got ready for winter. Some people believe the custom is connected with older autumn festivals for the dead, similar to the Celtic Samhain, which existed long before Christianity. In the past, women called castanyeres, who wore a headscarf and a shawl, used to sell hot chestnuts in the streets. Today families and friends get together to eat chestnuts, sweet potatoes and panellets, small sweets made with almonds and pine nuts. On 1 November, many people visit the cemetery with flowers to remember the members of their family who have died.",
+   "Bonfire Night. In the UK, Bonfire Night, which is also called Guy Fawkes Night, is celebrated on 5 November. It comes from a story from 1605. Catholics were treated badly in England at that time, so a group of angry Catholic men, including Guy Fawkes, planned to blow up the Houses of Parliament in London and kill King James I. But on the night of 4 November, guards found Guy Fawkes, who was in charge of the explosives, under the building with 36 barrels of gunpowder. People in London lit bonfires to celebrate that the king was safe, and the next year a law made 5 November a day of thanksgiving. That law lasted until 1859, but by then Bonfire Night had become a popular tradition that did not need a law.",
+   "Children used to make a \"guy\", a figure made of old clothes and newspaper, and they took it into the streets to ask for \"a penny for the guy\". Today towns organise big fireworks displays, and people eat toffee apples and baked potatoes next to the bonfire. Bonfire Night is not a holiday: children go to school as usual on 5 November, whereas in Catalonia 1 November, All Saints' Day, is a holiday.",
+   "In recent years, both traditions have had a rival: Halloween. In the UK, many children now prefer trick or treating to making a guy, and some people worry about the noise of fireworks, which frightens pets. In Catalonia, Halloween has become popular among young people, but many families keep the Castanyada alive. Both traditions have evolved, but neither of them has died out."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "f7cd252f",
+  "say": [
+   "Subject: Lights of the World Day",
+   "Dear Ms Puig",
+   "I am writing to propose a celebration day for our school on Friday 11 December.",
+   "Our class would like to organise a \"Lights of the World Day\" about four festivals of light. The event will take place in the school hall from 10.00 to 13.30. There will be four stalls, music and food. To make everyone feel welcome, we will explain the customs in simple words and invite families.",
+   "Could we use the school hall on that day?",
+   "I look forward to hearing from you.",
+   "Yours sincerely, Omar Haddad. 4t ESO B",
+   ""
+  ],
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "70132bdf",
+  "say": [
+   "Subject: Lights of the World Day",
+   "Dear Ms Puig",
+   "I am writing to propose a celebration day for our school on Friday 11 December.",
+   "Our class wants to organise a \"Lights of the World Day\" about four festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas. The event will take place in the school hall from 10.00 to 13.30. There will be four stalls. To make everyone feel welcome, each stall will explain the customs of one festival in simple words, and we are also inviting families.",
+   "We think this day is a good idea because students can learn about other cultures.",
+   "Could we use the school hall and the gym on that day? Would it be possible to use the school's speakers for the music?",
+   "I look forward to hearing from you.",
+   "Yours sincerely, Omar Haddad. 4t ESO B"
+  ],
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "257c4b3d",
+  "say": [
+   "Subject: Proposal: Lights of the World Day",
+   "Dear Ms Puig",
+   "I am writing to propose a celebration day for our school on Friday 11 December.",
+   "Our class would like to organise a \"Lights of the World Day\" about four festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas. The event will take place in the school hall from 10.00 to 13.30. There will be four stalls, and Class 4B is going to make paper lanterns for the decorations. To make everyone feel welcome, each stall will explain the customs in simple words, so students who do not celebrate these festivals can join in. We are also inviting families and the primary school.",
+   "We think this event will help students learn about different cultures and feel proud of their own traditions. All our information comes from at least two reliable sources.",
+   "Could we use the school hall and the gym on that day? Would it be possible to use the school's speakers for the music?",
+   "Please let us know if you need more information. I look forward to hearing from you.",
+   "Yours sincerely, Omar Haddad. 4t ESO B"
+  ],
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "8ed01d8e",
+  "say": [
+   "Subject: Proposal: Lights of the World Day on Friday 11 December",
+   "Dear Ms Puig",
+   "I am writing on behalf of 4t ESO B to propose a celebration day for our school on Friday 11 December.",
+   "We would like to organise a \"Lights of the World Day\" about four festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas, all of which use light as a symbol of hope. The event will take place in the school hall from 10.00 to 13.30. There will be four stalls, where students will explain the origin and meaning of each festival, and Class 4B is going to make paper lanterns for the decorations. To make every student and family feel welcome, each stall will explain the customs in simple words, so that students who do not celebrate these festivals can join in, and we are also inviting families and the primary school.",
+   "We believe this event will help students learn about different cultures, avoid stereotypes and feel proud of their own traditions. All our information has been checked in at least two reliable sources. We also understand that supervision may be a concern: each stall will have two students in charge, and our tutor, Mr Vidal, has agreed to supervise the hall during the event.",
+   "I would be grateful if you could let us use the school hall and the gym on that day. Would it also be possible to use the school's speakers for the music?",
+   "Please let me know if you need any further information. I look forward to hearing from you.",
+   "Yours sincerely, Omar Haddad. 4t ESO B"
+  ],
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "75a678b1",
+  "say": [
+   "Why we light up the darkest days",
+   "It is tempting to treat the festivals of light that cluster around the turn of the year as a happy coincidence: Diwali in the autumn, Hanukkah and Christmas in December, Lunar New Year as winter loosens its grip. Yet coincidence is a lazy explanation for something so persistent. Wherever the nights grow long, people seem compelled to answer the dark with flame, and to do so together.",
+   "The anthropologist's answer is that these festivals are, at bottom, acts of collective reassurance. A community that gathers to light lamps is not merely decorating; it is rehearsing, year after year, the conviction that the darkness is temporary. That such rituals outlived the agricultural calendars that gave rise to them is hardly surprising. The fear they address, that things may not get better, has proved rather more durable than the threshing floor.",
+   "What is surprising is how readily the meaning of each festival is renegotiated. Hanukkah, a relatively minor date in the religious calendar, acquired its present prominence partly because it falls so close to Christmas. Lunar New Year, once an intensely local affair of village shrines and family altars, now triggers the largest annual migration on the planet. Diwali lamps are as likely to be LED strings bought online as clay diyas shaped by hand. Purists lament each of these shifts, and they are not entirely wrong to do so: something is lost when a ritual becomes a product.",
+   "But the lament usually rests on a fiction, namely that there was once an original, uncontaminated version from which everything since has declined. Festivals have always borrowed, absorbed and adapted. The evergreen tree, the Yule log and the midwinter feast were folded into Christmas centuries ago; few of those who now defend a \"traditional\" Christmas would recognise the one they imagine they are defending. Tradition, in other words, is less a fixed inheritance than a conversation each generation conducts with the last.",
+   "None of this makes the festivals less meaningful. If anything, their adaptability is the source of their strength. A ritual that could not survive the move from candle to bulb, or from village to megacity, would long since have been abandoned. The light changes; the gesture endures."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d0b8d491",
+  "say": [
+   "The pagan origins myth machine",
+   "Every December, a familiar genre of article resurfaces. Christmas, we are told, is \"really\" a pagan festival in disguise: the date was stolen from the Roman Saturnalia, the tree from Germanic tree-worship, the whole thing a thin Christian coat of paint over something older and, by implication, more authentic. The articles are shared widely, partly because they flatter the reader with the sense of having seen through an official story.",
+   "The trouble is that much of this is, at best, unproven. Historians who work on the period point out that the earliest sources linking 25 December to Christ's birth do not mention Saturnalia at all, and that the decorated indoor tree is documented only from the sixteenth century onwards, some fifteen hundred years after the Germanic practices it is supposed to have absorbed. Some connections are plausible; others rest on nothing firmer than resemblance. Two things looking alike, as any researcher learns early, does not mean that one came from the other.",
+   "How, then, do such claims acquire the status of common knowledge? Part of the answer is circular reporting. A popular website repeats a claim from a nineteenth-century writer whose own source was speculation; a newspaper cites the website; an encyclopedia entry cites the newspaper; and the website, updated, now cites the encyclopedia. Each step lends the claim a little more apparent authority, and none of them involves anybody checking the original evidence.",
+   "None of this means that the opposite view, that Christmas is pure and untouched, is correct. Festivals borrow; that much is not in dispute. The point is narrower and more useful: a confident claim about origins should prompt the question \"says who, and based on what?\" before it is repeated. It is a question that serves the student researching a school project as well as it serves the professional historian, and one that is asked far less often than it should be."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/native/research-it-right.js"
+ },
+ {
+  "key": "3fb9bfc1",
+  "say": [
+   "Old fires, new stories",
+   "Every November, two very different communities perform rituals they believe to be ancient. In Catalonia, families gather on the eve of All Saints to roast chestnuts and eat panellets; in Britain, towns build bonfires and fill the sky with fireworks on the fifth of the month. Ask almost anyone why, and you will be offered an origin story, delivered with the confidence of settled fact.",
+   "The Catalan story is a touching one. Bell ringers, it is said, tolled the church bells through the night to honour the dead, and neighbours kept them going with roasted chestnuts and sweet wine. It may well be true; it may equally be the kind of explanation that gets attached to a custom after the event, to lend it dignity. Chestnuts were, after all, the staple of the autumn harvest, and a seasonal food hardly needs a legend to justify its place on the table.",
+   "Bonfire Night, by contrast, has an origin that can be dated almost to the hour. Shortly after midnight on 5 November 1605, Guy Fawkes was discovered beneath the House of Lords with thirty-six barrels of gunpowder, and Londoners lit bonfires in relief that King James had survived. Yet the precision of the date conceals how thoroughly the festival has since been reshaped. For two and a half centuries an Act of Parliament made the day an occasion of official thanksgiving, with a pointedly anti-Catholic tone; once the law was repealed in 1859, the celebration did not wither but drifted, shedding its sectarian edge and becoming a largely secular excuse for a party.",
+   "What both cases suggest is that the authority of a tradition rests less on the accuracy of its origin story than on its usefulness to the present. Whether the bell ringers ever existed matters far less than the fact that the story gives a family meal a sense of continuity. And as Halloween encroaches on both nights, it is not historical truth that will decide which customs survive, but whether people still find in them something worth repeating."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "4aa2bf1e",
+  "say": [
+   "Sant Jordi",
+   "On 23 April, Catalonia celebrates Sant Jordi. It is a day of books and roses. People give a rose or a book to someone they love. The streets of Barcelona are full of stalls, and writers sign their books.",
+   "The story says that Sant Jordi killed a dragon, and a red rose grew from its blood. In 1995, UNESCO made 23 April World Book Day, so now people in many countries celebrate books on this day."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/study/research-it-right.js"
+ },
+ {
+  "key": "a4255082",
+  "say": [
+   "Sant Jordi",
+   "Every year on 23 April, Catalonia celebrates Sant Jordi, a day of books and roses. Traditionally, people give a rose or a book to someone they love, although today many people give both. The streets of Barcelona fill with stalls, and queues form in front of famous writers who sign their books.",
+   "According to the legend, Sant Jordi killed a dragon, and a red rose grew from its blood. The day became even more international in 1995, when UNESCO chose 23 April as World Book Day, the date when both Cervantes and Shakespeare died."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/study/research-it-right.js"
+ },
+ {
+  "key": "c4500265",
+  "say": [
+   "Bonfire Night",
+   "Bonfire Night is on 5 November in the UK. In 1605, a man called Guy Fawkes wanted to blow up the Houses of Parliament in London. He didn't do it, and people lit bonfires because the king was safe.",
+   "Today, families go to firework displays in parks, and many towns have a big bonfire. In the past, children made a \"guy\", a doll with old clothes, and asked people for money. People eat hot food outside, like baked potatoes, because it is cold."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/study/where-traditions-come-from.js"
+ },
+ {
+  "key": "dd83c43d",
+  "say": [
+   "Bonfire Night",
+   "Bonfire Night takes place in the UK on the fifth of November. It dates back to 1605, when a man called Guy Fawkes tried to blow up the Houses of Parliament in London. He failed, and people lit bonfires to celebrate that the king was safe.",
+   "Today, families go to big firework displays in parks, and many towns have a huge bonfire. Children used to make a \"guy\", a doll made of old clothes, and ask people for \"a penny for the guy\". Now very few children do this. People eat hot food outside, like baked potatoes and toffee apples, because it is usually cold and wet."
+  ],
+  "src": "4eso/seasons-and-celebrations/data/study/where-traditions-come-from.js"
+ },
+ {
+  "key": "c4c14970",
+  "say": [
+   "The polite machine",
+   "I used to think that typing \"please\" to a chatbot was a waste of keystrokes. After all, the machine doesn't have feelings to hurt, and it will do the job whether I ask nicely or bark an order. Then I spent a term watching my colleagues work with AI assistants, and I changed my mind.",
+   "The teachers who got the best results were not the ones who knew the most about technology. They were the ones who wrote instructions the way they would brief a new colleague: I'd like you to check every page, and I want the changes to be small. Please don't make any decisions about the design without asking me first. Compare that with the typical message typed in a hurry between two classes: do the changes, maybe is better. The machine copes with both, but the first one leaves far less room for guesswork.",
+   "Part of the difference is grammar. I want you to…, Could you…? and Let them choose are not just polite; they are precise. They say who does what. A sentence with no subject forces the reader, human or not, to fill the gap, and the gap is exactly where misunderstandings live.",
+   "There is also a habit worth picking up from good project managers: saying what you are doing as you do it. I'm attaching the grid. I've just uploaded the photos. It sounds trivial, but it tells the reader where to look and what has already happened, which saves a round of \"Which file?\" messages.",
+   "None of this means we should write essays to our software. The best instructions I saw were short. But they were complete: every verb had a subject, every request had a person and an action, and every change had a reason. It turns out that the skills we spend years teaching our students, clarity, courtesy and a sense of the reader, are exactly the ones the machines reward. I am not sold on the idea that AI will make us lazier writers. If anything, it might make us better ones."
+  ],
+  "src": "4eso/towards-nativeness/data/getting-things-done.js"
+ },
+ {
+  "key": "34212863",
+  "say": [
+   "Where do websites live?",
+   "Ask a Catalan speaker where they saw a typo and you will probably hear a la web. Ask an English speaker and they will say they saw it on the website, on their phone, or on page three. For a learner, this looks like an arbitrary rule. It turns out it is anything but.",
+   "English quietly treats a screen as a surface. Things appear on it the way a poster appears on a wall: you see the message on your laptop, you post a photo on Instagram, and your code lives on GitHub. Software, on the other hand, is treated as a container. You open a document in Word, you find a setting in the menu and you test a page in Safari. The logic is spatial, not grammatical: if you can imagine yourself looking at something, it is on; if you can imagine yourself inside something, it is in.",
+   "Then there is at, the preposition of points. A button is not on the top of a page; it sits at the top, at the bottom or at the top right, because English thinks of those places as single spots rather than surfaces. The same idea explains why you are at a level, not in one: a level is a point on a scale.",
+   "None of this is taught as a rule in most coursebooks, which is why even very advanced speakers keep tripping over it. They have the knowledge; what they lack is the habit. The fix, linguists say, is not to memorise lists but to notice chunks. Instead of learning on, you learn on my phone, at the top right, in full screen, as if each were a single word. After a few hundred encounters, the chunk comes out by itself, and the Catalan version simply stops knocking on the door.",
+   "So the next time a bug report starts with \"It doesn't work in my iPhone\", don't blame the grammar. Blame the chunk you haven't met often enough yet."
+  ],
+  "src": "4eso/towards-nativeness/data/talking-to-your-tech.js"
+ },
+ {
+  "key": "f5829e5e",
+  "say": [
+   "From a tablecloth sketch to 120 users",
+   "When Marta Vidal came up with the idea for her vocabulary app, she had never written a line of code. She was sitting in a café after a parents' evening, doodling on a paper tablecloth, when it struck her that her students forgot most of the words she taught them within a week. \"I'd tried flashcards, games, everything,\" she says. \"What I hadn't tried was making them come back to the words at the right moment.\"",
+   "Getting the project off the ground was, by her own admission, a daunting task. She spent the summer brushing up on the basics with online courses, and she came across an AI coding assistant almost by accident. \"At first I second-guessed myself constantly. I'd ask it to make a change and then spend an hour trying to figure out what it had actually done.\" But she stuck with it, and by October she had a working prototype up and running.",
+   "Then she hit a wall. On the first day she used the app with a full class, the server couldn't cope with thirty students logging in at once, and the whole thing crashed. \"It was a close call,\" she remembers. \"I nearly gave up. But the students picked up on how much it mattered to me, and they kept asking when it would be back.\" She soldiered on, worked around the problem with a simpler login, and ironed out the remaining bugs over the Christmas holidays.",
+   "Since then, the app has taken off. More than a hundred and twenty students now use it every week, and Marta has ended up rebuilding most of it twice. Some lessons, she says, almost run themselves. Asked what she would recommend to other teachers, she doesn't hesitate. \"I'd recommend that they start small and keep in mind that it doesn't have to be perfect. At the end of the day, what I'm getting at is simple: the students don't care how clever the code is. They care whether it helps them.\""
+  ],
+  "src": "4eso/towards-nativeness/data/telling-the-story.js"
+ },
+ {
+  "key": "eb71509a",
+  "say": [
+   "Subject: A few tips before your first parents' emails",
+   "Dear Laia",
+   "Welcome to the department! As promised at yesterday's staff meeting, here are a few tips for writing to families. None of this is in the official guide, but it has saved me a lot of trouble over the years.",
+   "First, keep it short. Parents read our emails on their phones, usually at the end of a long day. Three short paragraphs are plenty: what has happened, what you would like them to do, and when. If there is a deadline, put it in the first two lines. A good test is whether the email still makes sense if they only read the subject line and the first sentence.",
+   "Second, avoid our own jargon. We talk about LSs, criteria and indicators all day, but most families have no idea what an LS is. Write \"the project we're doing this term\" instead. The same goes for the words we borrow from Catalan without noticing: in English it is next school year, not the next course, and the building we work in is the school, not the centre.",
+   "Third, be careful with feedback. Feedback is uncountable, so you give some feedback or a piece of feedback, never a feedback. More importantly, start with something the student has done well, even if it is small. Families are far more likely to support you if they feel you've noticed their child.",
+   "Finally, never send anything in anger. If an email from a family upsets you, write your reply, save it as a draft and read it again the next morning. You will almost always end up changing it, and you will rarely regret the delay.",
+   "I'm attaching the template I use for the first email of the year. Feel free to adapt it to your own style.",
+   "Best wishes, Montse"
+  ],
+  "src": "4eso/towards-nativeness/data/writing-like-a-teacher.js"
+ }
+]

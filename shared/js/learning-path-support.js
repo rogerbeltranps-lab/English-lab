@@ -88,3 +88,11 @@ var learningSupport = {
   const me = document.currentScript && document.currentScript.src; if (!me) return;
   const s = document.createElement('script'); s.src = new URL('el-voice.js', me).href; document.head.appendChild(s);
 })();
+
+// 🔊 Read aloud (Roger, 21 Nov 2026): every reading text of a learning path gets a Listen button with its Kokoro Heart recording
+// (shared/js/el-read-aloud.js, audio/read/). Never on an exam, sample exam or recall checkpoint page ("Not in the exams").
+(function () {
+  if (window.ELRead || document.querySelector('script[src*="el-read-aloud.js"]') || /exam|checkpoint/i.test(location.pathname)) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-read-aloud.js?v=1', me).href; document.head.appendChild(s);
+})();
