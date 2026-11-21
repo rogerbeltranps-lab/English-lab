@@ -288,7 +288,8 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
   const LV=sh.lvc.length>0;   // a writing: its 5.1 level is saved with the correction
   const rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
-    if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
+    if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);
+    else if(row.mode==="surprise")x.fb=W.ELMark.sqText(x.fb);   // 🎲 one sentence + "➜ " things to improve (el-corrections.js)   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(LV?Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ":"")+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again

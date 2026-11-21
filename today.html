@@ -43,7 +43,7 @@ button.mkr:hover{background:#f8fafc}.mki{width:34px;height:34px;border-radius:10
 .mkn b{display:block;font-size:15.5px}.mkn small{color:#64748b;font-size:13.5px}.mkw{font-size:12px;font-weight:700;color:#475569;background:#f1f5f9;border-radius:999px;padding:1px 8px;vertical-align:2px;white-space:nowrap}
 .mkm{font-weight:800;font-size:18px;text-align:right;white-space:nowrap}.mkm.sm{font-size:15px}.mkm.no{font-size:13.5px;font-weight:600;color:#94a3b8}.mka{color:#94a3b8;font-size:20px}.mkred{color:#b91c1c;font-weight:600}
 .mktodo{border-top:5px solid #dc2626}.mktodo h2{color:#b91c1c}.mktodo.ok{border-top-color:#16a34a}.mktodo.ok h2{color:#15803d}
-.mklead{color:#475569;font-size:14px;margin:6px 0 10px}.mkok{background:#ecfdf3;border-radius:12px;padding:12px 14px;margin:10px 0 0;font-size:14.5px}.mkok b{display:block}
+.mklead{color:#475569;font-size:14px;margin:6px 0 10px}.ptv{white-space:nowrap}.ptv b{font-weight:800}.ptv small{color:#64748b;font-weight:600}.ptv.no b,.ptv.no small{color:#94a3b8}.ptv em{font-style:normal;font-size:12px;font-weight:700;color:#94a3b8;margin-left:6px}.ptl{display:inline-flex;flex-wrap:wrap;gap:6px 8px;align-items:center}.ptc{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:3px 9px;font-size:14px;white-space:nowrap}.ptc.no{background:#fff}.mkpt{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.15}.mkpt b{font-size:30px;font-weight:800;color:#0f172a}.mkpt b i{font-style:normal;font-size:18px;font-weight:700;color:#64748b}.mkpt small{font-size:13px;color:#475569;font-weight:600}.mkpt em{font-style:normal;font-size:12.5px;color:#94a3b8;font-weight:700;margin-top:2px}.mkptx{color:#475569;font-size:13.5px;margin:8px 0 0}.pgpt{display:block;font-size:13px}.pgpt b{font-size:16px}.pgpt small{display:block;color:#94a3b8}@media (max-width:640px){.mkpt{align-items:flex-start}}.mkok{background:#ecfdf3;border-radius:12px;padding:12px 14px;margin:10px 0 0;font-size:14.5px}.mkok b{display:block}
 .mklate{list-style:none;margin:0;padding:0;display:grid;gap:8px}.mklate li{background:#fef2f2;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center}
 .mklate b{font-size:14.5px}.mklate small{color:#7f1d1d;font-size:13px;grid-column:1}.mklate a.mkdo{grid-row:1/3;grid-column:2;background:#b91c1c;color:#fff;text-decoration:none;font-weight:700;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap}
 .mkopen{font-size:14px;color:#475569;margin:10px 0 0}.mkopen a{font-weight:700}
@@ -317,7 +317,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
-<script src="shared/js/el-points.js"></script>
+<script src="shared/js/el-points.js?v=20261121b"></script>
 <script src="shared/js/el-sound.js"></script>
 <script src="shared/js/el-garden.js"></script>
 <script src="shared/js/el-step-titles.js"></script>
@@ -589,7 +589,7 @@ function lsBeds(ls,info){
   const order=L&&L.lps?L.lps.map(r=>r.id):[],at=id=>{const i=order.indexOf(id);return i<0?999:i};
   const beds=EL_CATALOG.filter(a=>a.ls===ls.id&&!dr.includes(a.id)&&canDo(a,info)).sort((x,y)=>at(x.id)-at(y.id)).map(a=>{
     const ds=doneSet(a),gs=tabGroups(a,visSteps(a,info).filter(k=>!(a.skip||[]).includes(k))),r=order.length?L.lps.find(x=>x.id===a.id):null,n=r&&r.n||"";
-    return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional?"bonus":"lp",
+    return {id:a.id,label:/^\d+$/.test(n)?"LP"+n:n,title:a.title.replace(/\s*\([^)]*\)\s*$/,""),kind:a.checkpoint?"cp":a.id===fp?"fp":a.optional||a.sq?"bonus":"lp",
       plants:gs.map(g=>{const id=panelOf(a,g[0]),k=g.filter(x=>ds.has(x)).length;
         return {id,key:a.id+"#"+id,name:tabName(a.id,g[0]),href:tabHref(a,g[0]),later:g.every(x=>secOff(a,info,x)),st:k===g.length?"bloom":!a.optional&&(thirsty.has(a.id+"#"+id)||thirsty.has(a.id+"#*"))?"thirsty":k?"bud":"sprout"}})}}).filter(b=>b.plants.length);
   return beds}
@@ -633,7 +633,14 @@ function vyPlanned(ls,beds){beds=beds.filter(b=>!(window.elBookPath&&elBookPath(
   const on=new Set();Object.values(ag.days).forEach(its=>(its||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.*)$/.exec(it||"");
     if(m)on.add(m[1]+"#"+(window.elTabOf?elTabOf(m[1],m[2]):m[2]))}));
   const out=beds.map(b=>b.kind==="fp"?b:Object.assign({},b,{plants:b.plants.filter(x=>on.has(b.id+"#")||on.has(x.key))})).map(one).filter(b=>b.plants.length);
+  vySq(ls,out);
   return out.filter(b=>b.kind!=="fp").concat(out.filter(b=>b.kind==="fp"))}
+// 🎲 each Surprise questions activity is a stop right after the last learning path it takes questions from (its SLPs, el-catalog.js
+// elSqList), so it sits where the class is on the road, not all of them at one place
+function vySq(ls,out){const A=window.elSqAct&&elSqAct(ls.id),i=A?out.findIndex(b=>b.id===A.id):-1;if(i<0)return;
+  const sb=out.splice(i,1)[0],L=elSqList(ls.id);
+  sb.plants.forEach(pl=>{const q=L.find(x=>x.id===pl.id),ids=new Set(((q&&q.tabs)||[]).map(t=>t.split("#")[0]));let at=-1;
+    out.forEach((b,j)=>{if(b.kind!=="fp"&&ids.has(b.id))at=j});out.splice(at<0?out.length:at+1,0,Object.assign({},sb,{kind:"bonus",plants:[pl]}))})}
 // 🏁 To win the race (Roger, 21 Nov 2026: "A message could pop up saying that to win the race they need to do all the activities pending"):
 // once a day, on the board's map, a card over the map when ✅ To do has something (the same count as the To do tile); ✅ See them opens it.
 // Not in class time or class mode (in class the warm-up's games lead to the race map on the projector).
@@ -888,7 +895,9 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
   const pr=D.me.group?(ELWeek.plans(D.me.group)||[]).find(y=>y.ls===ls.id):null,exDay=pr?ELWeek.exam(pr.p,pr.gi):null;
   const mk=m=>m==null?`<span class="mkm no">${t("encara no","not yet")}</span>`:`<span class="mkm">${f1(m)}</span>`;
   const row=(k,i,name,w,sub,m,tab)=>{const tg=tab?`button type="button" data-do="tab" data-t="${tab}"`:"div";
-    return `<li><${tg} class="mkr mk-${k}"><span class="mki" aria-hidden="true">${i}</span><span class="mkn"><b>${name}${w?` <span class="mkw">${w} %</span>`:""}</b>${sub?`<small>${sub}</small>`:""}</span>${m}<span class="mka" aria-hidden="true">${tab?"›":""}</span></${tab?"button":"div"}></li>`};
+    return `<li><${tg} class="mkr mk-${k}"><span class="mki" aria-hidden="true">${i}</span><span class="mkn"><b>${name}${w&&!PP?` <span class="mkw">${w} %</span>`:""}</b>${sub?`<small>${sub}</small>`:""}</span>${m}<span class="mka" aria-hidden="true">${tab?"›":""}</span></${tab?"button":"div"}></li>`};
+  // in points until every part has a mark (lsPts): each part's points of the LS's 10, and no single mark yet
+  const P=lsPts(ls,M),PP=P&&!P.all&&!M.only?P:null,ptOf=k=>PP&&PP.parts.find(x=>x.k===k);
   // everyday work of THIS LS (as in progressBox): the tabs due so far, how many done, how many late
   const dw=D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).filter(([a])=>a.ls===ls.id):[],due=dw.reduce((n,[a,,o])=>n+elTabsTotal(a,o),0),done=due-tabsMiss(dw);
   const lateHere=tabsMiss(W.miss.filter(([a])=>a.ls===ls.id));
@@ -901,8 +910,9 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
   const bar=M?`<div class="mksplit" aria-hidden="true">${parts.filter(x=>x[3]).map(x=>`<span style="flex:${x[3]}" class="mk-${x[0]}"><i style="width:${x[5]==null?0:Math.max(0,Math.min(100,x[5]*10))}%"></i></span>`).join("")}</div>`:"";
   const lsn=window.elLsNum?elLsNum(ls):"LS",closed=(D.ls[ls.id]||{}).status==="closed";
   const hero=`<section class="box mkc mkhero"><div class="mkhd"><div><h2>${closed?t(`La meva nota de ${lsn}`,`My ${lsn} mark`):t(`La meva nota de ${lsn} fins ara`,`My ${lsn} mark so far`)}</h2><p class="mksub">${closed?t("Aquesta LS ja s'ha acabat. Clica una part per veure'n el detall.","This LS is over. Click a part to see the details."):t("Canvia cada dia amb la teva feina. Clica una part per veure'n el detall.","It changes every day with your work. Click a part to see the details.")}</p></div>`
-      +`<div class="mkbig">${M&&M.total!=null?dgMark(M.total,true):`<span class="mkm no">${t("encara no","not yet")}</span>`}</div></div>${bar}`
-    +`<ul class="mkparts">${parts.map(x=>row(x[0],x[1],x[2],x[3],x[4],mk(x[5]),x[6])).join("")}`
+      +`<div class="mkbig">${PP?`<span class="mkpt"><b>${pt1(PP.got)}<i> / ${pt1(PP.of)}</i></b><small> ${t("punts fins ara","points so far")}</small><em>${t(`${pt1(PP.left)} punts per fer`,`${pt1(PP.left)} points to do`)}</em></span>`:M&&M.total!=null?dgMark(M.total,true):`<span class="mkm no">${t("encara no","not yet")}</span>`}</div></div>${bar}`
+      +(PP?`<p class="mkptx">${t("La nota de la LS es fa amb aquestes parts. Cada part et dona els seus punts quan està feta: el que encara és per fer, encara no ho tens.","Your LS mark is made of these parts. Each part gives you its points once it is done: what is still to do, you don't have yet.")}</p>`:"")
+    +`<ul class="mkparts">${parts.map(x=>{const q=ptOf(x[0]==="ex"?"exam":x[0]);return row(x[0],x[1],x[2],x[3],x[4],q?`<span class="mkm">${ptOne(ls,q)}</span>`:mk(x[5]),x[6])}).join("")}`
     +(cpList(ls).length?row("cp","🎯",t("Els meus checkpoints","My checkpoints"),0,cpSub(ls),cm?`<span class="mkm sm">${cm.s}/${cm.m}</span>`:"<span></span>","cp"):"")+`</ul></section>`;
   // ⏰ what to do now: the late activities (they count 0 until done), or 🎉 all up to date
   let todo="";
@@ -1145,7 +1155,7 @@ async function goLive(){
   // 📌 a learning path pulled up by the teacher shows at once: only the LS docs of the group's open LSs (one read each when the board opens)
   const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};setInterval(pdraw,30e3);   // gone when the class it was made in ends (until)
   EL_LS.filter(l=>{const i=D.ls[l.id];return i&&i.status==="open"&&elLsForGroup(l,i,g)}).forEach(l=>F.onSnapshot(F.doc(db,"ls",l.id),x=>{const d=x.exists()?x.data():{},i=D.ls[l.id];
-    i.push=d.push||{};if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
+    i.push=d.push||{};if(window.elSqSync&&elSqAct(l.id))elSqSync(l.id,d.sq||{});if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
   const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsLine()};
   F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw()},e=>console.warn("points",e));
@@ -1386,6 +1396,18 @@ function lsMarks(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||!g.blocks)ret
   const cw=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"),cs=cw.filter(b=>v[b.id]!=null),cont=cs.length?cs.reduce((n,b)=>n+v[b.id]*b.w,0)/cs.reduce((n,b)=>n+b.w,0):null;
   const has=g.blocks.filter(b=>v[b.id]!=null),total=has.length?has.reduce((n,b)=>n+v[b.id]*b.w,0)/has.reduce((n,b)=>n+b.w,0):null;
   return {exam,fp:v.fp,daily:cont,total,v,w:{daily:elFormativeShare(ls.id),exam:W("exam"),fp:W("fp")}}}
+// The LS mark in points, part by part (Roger, 21 Nov 2026: "Potser podriem posar la nota de la LS en 3 parts: 2,5/4; 0/3,5 (per fer) 0/2,5
+// (per fer)", "perque ara com ho veuen es pensen que van millor del que van"): until every part has a mark, no single LS mark is shown (an 8.5
+// in the everyday work alone looked like an 8.5 LS mark); each part shows the points it gives of the LS's 10, a part without a mark is
+// "0 / 3.5 · to do" (🔒 soon while the exam results are held). elLsPts in el-points.js; the dashboard shows the same (⛵ Class voyage).
+const lsPts=(ls,M)=>M&&window.elLsPts?elLsPts(ls.id,{daily:M.daily,exam:M.exam,fp:M.fp}):null,pt1=x=>f1(Math.round(x*10)/10);
+const PT_NM={daily:["📚","Feina de cada dia","Everyday work"],exam:["📝","Examen","Exam"],fp:["🎬","Producte final","Final product"]};
+const ptHeld=ls=>{const X=D.rs[ls.id+"/assessment"]||{};return !!(X.held||(X.showFrom&&Date.now()<Date.parse(X.showFrom)))};
+// one part: "3,4 / 4" or "0 / 3,5 per fer"
+const ptOne=(ls,p)=>p.v!=null?`<span class="ptv"><b>${pt1(p.pts)}</b><small> / ${pt1(p.max)}</small></span>`
+  :`<span class="ptv no"><b>0</b><small> / ${pt1(p.max)}</small><em>${p.k==="exam"&&ptHeld(ls)?"🔒 "+t("aviat","soon"):t("per fer","to do")}</em></span>`;
+// the parts in one line (📚 3,4/4 · 📝 0/3,5 per fer · 🎬 0/2,5 per fer)
+const ptLine=(ls,P)=>`<span class="ptl">${P.parts.map(p=>`<span class="ptc${p.v==null?" no":""}" title="${esc(t(PT_NM[p.k][1],PT_NM[p.k][2]))}">${PT_NM[p.k][0]} ${ptOne(ls,p)}</span>`).join("")}</span>`;
 // The activities that count 0 in "My LS mark so far" right now, next to the mark, and how far it can go up (Roger, 14 Nov 2026, after a
 // 4 ESO A student wrote worried about his low mark: "com tens aquesta nota però tens pendents aquestes tasques; per tant..."). The same rule
 // as the dashboard's mark (teacher.html missZ, canDoZ, dueStep): a step of the LS's grading lists (EL_GRADING gv parts, auto) counts 0 when
@@ -1414,6 +1436,12 @@ function zeroLine(ls,M,g,P){const zs=zeroSteps(ls,g);if(!zs.length)return "";
   // "LP2 · Reading" (the path's number in the group's time plan, as in My marks; its title on hover), the title when it has no number
   const pl=(window.EL_PLAN||{})[ls.id],nm=window.elLpNumMap&&pl&&D.me.group?elLpNumMap(ls.id,pl,ELWeek.col(pl,D.me.group)):{},num=a=>{const n=Object.keys(nm).find(x=>nm[x]===a);return n?"LP"+n:a.title};
   const chip=({a,k,n})=>`<a href="${a.path.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(window.elTabOf?elTabOf(a.id,k):k)}" title="${esc(a.title)}">${esc(num(a))} · ${esc(n)}</a>`;
+  // in points while the LS has parts without a mark (lsPts): the everyday work's points now, and how far they go up
+  const PZ=lsPts(ls,M),pd=PZ&&!PZ.all&&PZ.parts.find(x=>x.k==="daily"),kw=PZ?PZ.parts.filter(x=>x.v!=null).reduce((n,x)=>n+x.w,0):0,upP=pd&&up!=null&&kw?up*kw/100-(PZ.got-pd.pts):null;
+  if(pd&&pd.v!=null)return `<span class="zbox"><br><b>${t(`Ara la feina de cada dia et dona ${pt1(pd.pts)} punts de ${pt1(pd.max)}, però `,`Your everyday work gives you ${pt1(pd.pts)} of its ${pt1(pd.max)} points now, but `)}${t(N===1?"tens 1 activitat pendent que compta 0:":`tens ${N} activitats pendents que compten 0:`,N===1?"you have 1 activity still to do that counts 0:":`you have ${N} activities still to do that count 0:`)}</b></span>`
+    +`<span class="zl">${tabs.map(chip).join("")}</span>`
+    +(upP!=null&&upP>pd.pts+0.05?`<span class="zup">📈 ${t(`Si les fas ara, compten del tot i pujaràs almenys fins a <b>${pt1(Math.min(pd.max,upP))} punts de ${pt1(pd.max)}</b>.`,`If you do them now, they count in full and you go up to at least <b>${pt1(Math.min(pd.max,upP))} of ${pt1(pd.max)} points</b>.`)}</span>`
+      :`<span class="zup">📈 ${t("Fes-les i els teus punts pujaran.","Do them and your points go up.")}</span>`);
   return `<span class="zbox"><br><b>${M.total==null?"":t(`Ara la teva nota és ${f1(M.total)}, però `,`Your mark is ${f1(M.total)} now, but `)}${t(N===1?"tens 1 activitat pendent que compta 0:":`tens ${N} activitats pendents que compten 0:`,N===1?"you have 1 activity still to do that counts 0:":`you have ${N} activities still to do that count 0:`)}</b></span>`
     +`<span class="zl">${tabs.map(chip).join("")}</span>`
     +(up!=null?`<span class="zup">📈 ${t(`Si les fas ara, compten del tot i la teva nota pujarà almenys fins a <b>${f1(up)}</b>.`,`If you do them now, they count in full and your mark goes up to at least <b>${f1(up)}</b>.`)}</span>`
@@ -1454,22 +1482,24 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
     g.gv.parts.forEach(x=>{const k=x.sn||x.id;if(!by.has(k))by.set(k,{w:0,mw:0,ms:0,x});const y=by.get(k),m=(P.gv||{})[x.id];y.w+=x.w;if(m!=null){y.mw+=x.w;y.ms+=m*x.w}});
     return [...by.entries()].map(([k,y])=>{const n=SN[k]||[esc(y.x.name),""];return sub(n[0],W("gv")*y.w/sw,y.mw?y.ms/y.mw:null,n[1])}).join("")};
   // the LS mark so far also big in the heading (Roger, 5 Nov 2026: "podria sortir aquí tb"), where the old "My average mark" stood
-  return `<div class="box fv prog"><div class="lphead">${fvHead("📊",t("La meva nota de la LS fins ara","My LS mark so far"),lsName(ls))}${total==null?"":dgMark(total,true)}</div>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
+  const PQ=lsPts(ls,M),PP=PQ&&!PQ.all?PQ:null,ptOf=k=>PP&&PP.parts.find(x=>x.k===k);   // in points until every part has a mark (lsPts)
+  return `<div class="box fv prog"><div class="lphead">${fvHead("📊",t("La meva nota de la LS fins ara","My LS mark so far"),lsName(ls))}${PP?ptLine(ls,PP):total==null?"":dgMark(total,true)}</div>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
     +`<p class="fvlead">${t("Com es fa la nota d'aquesta LS i com vas. Canvia cada dia amb la teva feina.","How the mark of this LS is made and how you are doing. It changes every day with your work.")}</p>`
     // the three parts as one bar, the daily work first and highlighted (Roger, 2 Nov 2026: "make clear … their daily work from the learning paths is very important")
     // the three parts as cards that add up to the LS mark, the daily work first and biggest (Roger, 2 Nov 2026: "make clear … their daily
     // work from the learning paths is very important"; 7 Nov 2026: cards in the style of ⓘ About this LS)
     +(share?`<div class="fv-parts">`
-      +fvPart("fk-g main","📚",t("Feina diària","Daily work"),t("els learning paths","the learning paths"),share,cont,share>W("exam")?t("la part més gran","the biggest part"):"")
-      +fvPart("fk-i","📝",t("Examen","Exam"),v.exam==null&&exDay?when(exDay):t("al final de la LS","at the end of the LS"),W("exam"),v.exam,"")
-      +fvPart("fk-a","🎬",t("Producte final","Final product"),hasFp(ls)?fpSub(ls):t("al final de la LS","at the end of the LS"),W("fp"),v.fp,"")+`</div>`:"")
+      +fvPart("fk-g main","📚",t("Feina diària","Daily work"),t("els learning paths","the learning paths"),share,cont,share>W("exam")?t("la part més gran","the biggest part"):"",ptOf("daily")&&ptOne(ls,ptOf("daily")))
+      +fvPart("fk-i","📝",t("Examen","Exam"),v.exam==null&&exDay?when(exDay):t("al final de la LS","at the end of the LS"),W("exam"),v.exam,"",ptOf("exam")&&ptOne(ls,ptOf("exam")))
+      +fvPart("fk-a","🎬",t("Producte final","Final product"),hasFp(ls)?fpSub(ls):t("al final de la LS","at the end of the LS"),W("fp"),v.fp,"",ptOf("fp")&&ptOne(ls,ptOf("fp")))+`</div>`:"")
     +`<div class="fv-warn">⚠️ <b>${t("Si no treballes cada dia, la teva nota baixa.","If you don't work every day, your mark goes down.")}</b> ${t("Cada activitat que no has fet quan tocava compta un 0 a l'avaluació contínua fins que la facis. Si la fas tard, compta igual que si l'haguessis fet a temps.","Every activity you haven't done by its day counts 0 in your continuous assessment until you do it. If you do it late, it counts the same as on time.")}${zeroLine(ls,M,g,p)}</div>`
     +`<div class="wrap"><table class="xt prt"><thead><tr><th>${t("Part","Part")}</th><th>${t("Pes","Weight")}</th><th>${t("Nota fins ara","Mark so far")}</th><th></th></tr></thead><tbody>`
     +(share?row("📚 "+t("La meva feina diària als learning paths","My daily work in the learning paths")+` <small class="muted">(${t("avaluació contínua","continuous assessment")})</small>`,share,cont,t(`Les activitats dels learning paths${due.length?` · fetes ${done} de ${due.length} aquest trimestre`:""}`,`Your learning-path activities${due.length?` · ${done} of ${due.length} done this term`:""}`),"pb daily")
       +cw.map(b=>row(b.id==="gv"?t("Vocabulari, gramàtica i destreses","Vocabulary, grammar and skills"):b.id==="other"?t("Altres competències","Other competences"):esc(b.name),b.w,v[b.id],b.id==="gv"?(TX?t("El vocabulari i la gramàtica que recordes i practiques, i les pestanyes d'escoltar, llegir, parlar i escriure dels learning paths que has fet","The vocabulary and grammar you remember and practise, and the listening, reading, speaking and writing tabs of the learning paths you have done"):t("Està fet d'aquestes parts:","It is made of these parts:")):b.id==="other"&&other.length?t("Les competències que treballes a més d'escoltar, llegir, parlar i escriure:","The skills you work on besides listening, reading, speaking and writing:")+`<ul class="oc">${other.map(c=>`<li>${pill(c)} ${esc(easy(c))}${srcOf(c)}</li>`).join("")}</ul>`:"","in")+det(b.id)).join(""):"")
     +row(t("Examen final","Final exam"),W("exam"),v.exam,v.exam==null&&exDay?t(`Examen: ${when(exDay)}`,`Exam: ${when(exDay)}`):"","pb")+det("exam")
     +row(t("Producte final","Final product"),W("fp"),v.fp,v.fp==null?t("Al final de la LS","At the end of the LS"):"","pb")+det("fp")
-    +`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b></td><td><b>100 %</b></td><td>${mark(total)}</td><td class="l">${bar(total)}</td></tr></tbody></table></div>`
+    +(PP?`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b><br><small class="muted">${t("Encara no hi ha nota de la LS: cada part dona els seus punts quan està feta.","No LS mark yet: each part gives its points once it is done.")}</small></td><td><b>100 %</b></td><td colspan="2" class="l">${ptLine(ls,PP)}</td></tr></tbody></table></div>`
+      :`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b></td><td><b>100 %</b></td><td>${mark(total)}</td><td class="l">${bar(total)}</td></tr></tbody></table></div>`)
     +`<p class="muted" style="margin:6px 0 0">${t("Les activitats que encara no toquen i les parts que encara no estan corregides no compten fins llavors.","Activities whose day has not come yet and parts not marked yet do not count until then.")}${p.at?" "+t(`Actualitzat: ${when(p.at)}`,`Updated: ${when(p.at)}`):""}</p></div>`}
 // 🧩 My competences in 🎓 My progress (Roger, 9 Nov 2026: "show them the grades of their assessment criteria - competences (that are related
 // to the work done). So that they understand what they have learnt and what they need to work on"). The same pieces as the dashboard's
@@ -1684,10 +1714,10 @@ function progressPlace(lss,ls){
   const stTag={done:`<span class="pgs done">✅ ${t("Acabada","Finished")}</span>`,now:`<span class="pgs now">▶ ${t("Ara","Now")} · ${t("nota fins ara","mark so far")}</span>`,coming:`<span class="pgs soon">🔜 ${t("Aviat","Coming soon")}</span>`};
   const row=r=>{const L=`<td class="l"><span class="pgn">LS${r.n}</span><span class="pgnm"><b>${esc(r.name||t("Learning Situation","Learning Situation"))}</b>${stTag[r.st]}</span></td>`;
     if(r.st==="coming")return `<tr class="soon">${L}<td colspan="5" class="l pgsoon">${t("El professor encara l'està preparant. Quan la comencis, aquí hi veuràs les teves notes.","Your teacher is still preparing it. When you start it, your marks will be here.")}</td><td></td></tr>`;
-    const M=r.M||{w:{}},tot=M.total,TD=lsDone(r.l),dn=TD&&TD.pct,dp=TD&&TD.parts.find(x=>x.k==="daily");
+    const M=r.M||{w:{}},TD=lsDone(r.l),dn=TD&&TD.pct,dp=TD&&TD.parts.find(x=>x.k==="daily"),P=r.M&&lsPts(r.l,M),PP=P&&!P.all&&P.got?P:null,tot=PP?null:M.total;
     const H=(k,ca,en)=>` data-h="${k} ${t(ca,en)}"`;
     return `<tr class="${r.st}">${L}<td${H("📚","Feina diària","Daily work")}>${mk(M.daily,M.w.daily,M.only?t("no compta en aquesta LS","not in this LS"):"")}</td><td${H("📝","Examen","Exam")}>${mk(M.exam,M.w.exam)}</td><td${H("🎬","Producte final","Final product")}>${mk(M.fp,M.w.fp)}</td>`
-      +`<td class="pgtot"${H("🎓","Nota de la LS","LS mark")}>${tot==null?`<span class="pgna">${t("encara no","not yet")}</span>`:dgMark(tot)}<span class="xbar"><span style="width:${tot==null?0:Math.max(0,Math.min(100,tot*10))}%;background:${tot==null?"#e2e8f0":col(tot*10)}"></span></span></td>`
+      +`<td class="pgtot"${H("🎓","Nota de la LS","LS mark")}>${PP?`<span class="pgpt"><b>${pt1(PP.got)}</b> / ${pt1(PP.of)} ${t("punts fins ara","points so far")}<small>${t(`${pt1(PP.left)} per fer`,`${pt1(PP.left)} to do`)}</small></span>`:tot==null?`<span class="pgna">${t("encara no","not yet")}</span>`:dgMark(tot)}<span class="xbar"><span style="width:${tot==null?0:Math.max(0,Math.min(100,tot*10))}%;background:${tot==null?"#e2e8f0":col(tot*10)}"></span></span></td>`
       +`<td class="pgdn"${H("✅","Tasques fetes","Tasks done")}>${dn==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(dn)}">${Math.round(dn)} %</b><span class="xbar"><span style="width:${Math.max(0,Math.min(100,dn))}%;background:${col(dn)}"></span></span>${dp?`<small>${dp.n} ${t("de","of")} ${dp.of} SLP</small>`:""}`}</td>`
       +`<td><button type="button" class="g pgo" data-do="pgo" data-ls="${r.l.id}" data-h="${M.only?"exam":"formative"}">${t("Detalls","Details")} →</button></td></tr>`};
   const nd=these.filter(r=>r.st!=="coming"),nc=these.length-nd.length;
@@ -1762,10 +1792,10 @@ function skRadarBox(lss,ls){if(!window.ELCharts)return "";ELCharts.wire();
 // a card with a mark out of 10 as its big number
 const fvCard=(k,i,name,sub,m)=>`<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small>${/\bmain\b/.test(k)&&m!=null?`<span class="fv-big">${dgMark(m,true)}</span>`:`<b class="fv-big">${fvMk(m)}</b>`}<span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`;
 // one part of the LS mark as a card: icon, name, when, its weight and the mark so far with a bar (progressBox)
-function fvPart(k,i,name,sub,w,m,tag){
+function fvPart(k,i,name,sub,w,m,tag,pts){
   return `<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small>`
     +`<b class="fv-big">${w} <small>%</small></b>${tag?`<span class="fv-tag">⭐ ${tag}</span>`:""}`
-    +`<span class="fv-pm">${t("Nota fins ara:","Mark so far:")} ${m==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b>${f1(m)}</b> / 10`}</span>`
+    +`<span class="fv-pm">${pts?t("Punts:","Points:")+" "+pts:`${t("Nota fins ara:","Mark so far:")} ${m==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b>${f1(m)}</b> / 10`}`}</span>`
     +`<span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`}
 // My final product (Roger, 2 Nov 2026: "final product missing" on the board's cards): from LS2 on, a fourth card with the final product
 // of the LS (EL_GRADING[ls].fp): its mark and share of the LS mark, the day it is due, every step with what was handed in (the page
@@ -2055,7 +2085,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
-if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
+if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits);if(i&&i.sq&&window.elSqSync&&elSqAct(id))elSqSync(id,i.sq,true)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
   // signed out: the welcome page, where everyone signs in (Roger, 7 Nov 2026); el_who is already gone, so it does not send them back here
   if(!u){location.replace("index.html");return}
