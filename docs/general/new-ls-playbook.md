@@ -19,10 +19,10 @@ Every rule a new LS keeps from LS2 (routes, readings, listenings, each learning 
 Each step ends with Roger's OK before the next one starts.
 
 1. **Programme.** 👤 Roger confirms that the LS section of the programme is final: objectives, criteria, competences, vocabulary, grammar and final product. 👤 Roger says anything that should be different from LS2.
-2. **Plan.** 🤖 Claude proposes the organisation: learning paths, checkpoints, when groups are formed, final product steps and a rough calendar, with how much each learning path and the whole LS work listening, speaking, reading and writing (about 25 % each). 👤 Roger approves it.
+2. **Plan.** 🤖 Claude proposes an overview guide for the whole LS: learning paths, checkpoints, when groups are formed, final product steps and a rough calendar, with how much each learning path and the whole LS work listening, speaking, reading and writing (about 25 % each). 👤 Roger approves it.
 3. **Content.** 🤖 Claude writes all the content for the three routes in one document: texts, questions and scripts. 👤 Roger approves it. Nothing goes on the site before this.
 4. **Criteria check.** 🤖 Claude shows which activity gives evidence for each criterion, with the indicators for each level. 👤 Roger approves it.
-5. **Site.** 🤖 Claude builds the LS pages and the class presentations for the new vocabulary and grammar. 👤 Roger tries them with the tester account.
+5. **Site, one week at a time** (Roger, 21 Nov 2026). 🤖 Claude drafts what happens in each class of the coming week (two main activities per class, REQUIREMENTS.md › 5). 👤 Roger checks it and says what to build. 🤖 Claude builds only that week's pages, games and class presentations. 👤 Roger tries them with the tester account. Then the next week.
 6. **Audio and videos.** 🤖 Claude sends the tagged scripts, the cost and the voice previews. 👤 Roger picks the voices and says OK for each recording. 🤖 Claude makes the slow copies for free.
 7. **Final product.** 🤖 Claude prepares the final product page: a model final product for each route, the task, the steps, the groups, the rubric per route (Word) and the two marking rounds. 👤 Roger approves the models, the rubric and its weights.
 8. **Grading.** 🤖 Claude prepares the LS mark and the few moments when Roger clicks a level on the dashboard. 👤 Roger approves it. Changes to the dashboard are made by the English Lab project, so Roger may need to paste a message there.
