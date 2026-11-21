@@ -16,7 +16,7 @@ The Drive copy is the one outside Google Cloud: if the whole Firebase project we
 with it. Recordings and final product videos are not in Firestore: they are already files in 04_Students.
 
 The copies hold students' personal data: never put one in this repo, the project's public files or an Action log. They stay in
-04_Students (private). How long they are kept is part of the yearly cycle in `roadmap.md` (deleted with the year's data).
+04_Students (private). How long they are kept is part of the yearly cycle in [REQUIREMENTS.md › 2](../REQUIREMENTS.md#2-privacy-data-and-drive) (deleted with the year's data).
 
 ## Restore
 

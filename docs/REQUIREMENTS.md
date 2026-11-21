@@ -6,7 +6,7 @@ It unifies:
 
 - the Drive guides in Teacher Studio › 01_General › **01_How we work** (*How we make exams*, *How we make rubrics*, *Drive rules*, *Prompts*) and **08_Reference docs** (*Procediment LS per curs*, *Competences per term*, *How to make a class game*, *LS playbook*, *Research audit*);
 - the project instructions and the project memory's standing rules;
-- the root [AGENTS.md](../AGENTS.md), the LS `AGENTS.md` files and the guides in [docs/general/](general/).
+- the root [AGENTS.md](../AGENTS.md), the LS `AGENTS.md` files and the notes in [docs/general/](general/) (21 Nov 2026: every rule moved here; the notes keep only how each feature works).
 
 Duplicates are merged into one line. Each rule says where it comes from and when Roger set it. Where two sources disagree, Claude follows the **newer** rule until Roger decides, and the clash is listed in [section 13](#13-to-revise-what-is-outdated-and-what-contradicts).
 
@@ -14,7 +14,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **Where it lives** (Roger, 20 Nov 2026: "I need you to be efficient… organize the info there where I can also review it").
 
-- **This file is the one rulebook.** Every rule lives here and nowhere else: project memory and the routine files only point here. The repo's `CLAUDE.md` loads this file into every Claude session that works in the repo, so no thread can miss it.
+- **This file is the one rulebook.** Every rule lives here and nowhere else: project memory, the routine files and the feature notes in `docs/general/` only point here. The notes stay because a thread reads the note of the feature it changes before touching it; outdated notes are in `docs/archive/` (21 Nov 2026). The repo's `CLAUDE.md` loads this file into every Claude session that works in the repo, so no thread can miss it.
 - **Roger reviews it on GitHub**: [docs/REQUIREMENTS.md](https://github.com/rogerbeltranps-lab/English-lab/blob/main/docs/REQUIREMENTS.md). He writes his changes or answers in a thread (or as a comment on the PR), and Claude edits this file in a PR.
 - **A new standing rule goes here in the same PR as the work.** Change or remove the old line instead of adding a second one. Never write a rule only in project memory, a routine file or Drive.
 - **In Drive** (Roger, 20 Nov 2026), Teacher Studio › 01_General › 01_How we work and 08_Reference docs each hold only a link doc that opens this file. The old guides, and a snapshot of this file as of 20 Nov, are in each folder's `Archive`. Nothing was deleted.
@@ -54,7 +54,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 | Roger says | It means |
 | --- | --- |
 | **"merge"** | Approval to merge the PR. |
-| **"apply"** | Approval for a live write (Firestore data, uploading exam or checkpoint keys, importing marks, deleting an account). "merge" alone never covers it. |
+| **"apply"** | Approval for a live write (Firestore data, uploading exam or checkpoint keys, importing marks, deleting an account, deploying a new school script version). "merge" alone never covers it. |
 | **"send"** | Approval to send an email or message that was shown to him. |
 | "merge without asking" / "send without asking" | Approval for that one ask, not a standing rule. |
 
@@ -72,11 +72,11 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **His computers and accounts**
 
-- **Never act in Roger's browser or accounts without asking** (8 Nov 2026). Give him the link instead.
+- **Never act in Roger's browser or accounts without asking** (8 Nov 2026). Give him the link instead. **One exception** (Roger, 21 Nov 2026): Claude pastes and deploys new versions of the school Apps Script relay itself, in the browser built into the Claude app, once Roger says **"apply"** for that change. Every other browser or account action stays forbidden.
 - Setup on his computer: **one step at a time, one paste-ready command**, full paths filled in. Never ask him to paste a secret in the chat; for a key, give one Terminal line that copies `NAME=value` to the clipboard.
 - School Wi-Fi blocks github.com: on school days he needs his phone hotspot for anything that talks to GitHub.
 - Devices: Mac (`/Users/roger/Developer/English-lab-site`) and PC (`C:\Developer\English-lab`). Both fall behind `main`; pull when a device session starts.
-- New versions of the school Apps Script (mail relay, Gemini, Classroom): Claude writes the file in `/mnt/project-files/school-script/`; **Roger pastes and deploys it himself**. Scripts Roger runs himself must need no API to switch on and no Google Cloud setup (Prompts, 22 Oct 2026).
+- New versions of the school Apps Script (mail relay, Gemini, Classroom): Claude writes the file in `/mnt/project-files/school-script/`, shows what changes, and after Roger's **"apply"** pastes and deploys it in the Claude app's built-in browser (21 Nov 2026; Roger no longer pastes scripts by hand). Scripts Roger runs himself must need no API to switch on and no Google Cloud setup (Prompts, 22 Oct 2026).
 
 **Costs and scheduled tasks**
 
@@ -96,6 +96,11 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - In demos, previews and screenshots use the invented students of the demo files (Alex Sample, Pau Exemple), never real ones.
 - **Keep Firestore reads low** (the free plan's 50,000 reads a day ran out on 1 Nov 2026). No new reads without a reason; cloud scripts must check for quota errors (a silent 429 returns empty data).
 - The service-account key `bf3c16b4…` was partly exposed in a screenshot and should be replaced (open item).
+
+**Backups and the yearly cycle**
+
+- **Backups** (20 Nov 2026, [backups.md](general/backups.md)): Firestore backs itself up every day (kept 7 days) and every Sunday (kept 14 weeks), and every Friday a copy goes to Drive › 04_Students (private) › English Lab database copies. The copies hold students' personal data: never in the repo, the project's public files or an Action log. A restore happens only on Roger's "apply".
+- **Yearly cycle** (roadmap, Oct 2026): at the end of each school year, export every student's progress (CSV) and keep the backups in the school's Drive, then delete the year's student data from Firebase. How long backups are kept, who opens them and when they are deleted belongs to the data-protection approval and the privacy notice for families (students are minors); keep backups without names where names are not needed. **Ask Roger** before the first yearly deletion (June 2027).
 
 **Drive: where things go** (Drive rules, 26 Oct 2026; AGENTS)
 
@@ -225,6 +230,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - **Content first** (AGENTS): only content Roger approved goes on the site. Never invent or change pedagogical content during implementation; flag gaps and contradictions first.
 - Confirm the programme section is final. Check grammar and vocabulary against the programme and the Drive grammar and lexicon maps (section 4).
 - Each step of the playbook ends with Roger's OK before the next.
+- Lessons from LS2 (playbook): confirm the programme is final before building (rebuilt in PR #54); write readings per route from the start (#36, #38); record with `eleven_v3` and tags from the start (#51, #52); agree the exam format before writing it (#70, #72); plan the final product's marking rounds before its page (#71).
 
 **Routes and levels**
 
@@ -251,6 +257,14 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - ✓ Check per question; the mark is the first try; students can correct wrong answers in the notebook without changing the mark.
 - Students can't copy the theory into their notes; notes are optional, their own examples (19 Nov 2026).
 - Randomise answer options, never the questions.
+- The recall warm-up is done with no notes; practice is done at 80 %; the learning path's piece of writing or speaking is saved for the final product (Playbook).
+- Part of the vocabulary practice is **heard** (*Listen and complete*: the computer says the sentence, the student types the missing words) and the mixed practice is **said** (*Say it* into the mic), so the four skills stay balanced (30 Oct 2026).
+- **Listening cycle**: "Before you listen" (predict 2–3 words), a first listen for the gist, a second for the questions, then the micro-dictation of its 2–3 chunks. Prediction and gist boxes come automatically; the LS only supplies the chunks. **Never marked.** Real videos are mixed with recorded ones.
+- **Shadowing step** in every learning path after Getting started (30 Oct 2026): a 25–45 s part of a recording the LS already has (never changed), with script and start and end times for the normal and slower copy, done in four rounds, counted by completion. The same clips run on the class shadowing page in the first five minutes of class.
+- **My goal / How did it go?** opens and closes each learning path: about a minute, never marked, not a step; the teacher reads both on the dashboard.
+- **Class presentations** introduce new vocabulary and grammar and **ask before they explain**: the class guesses each word, then sees it, hears it and gets its Catalan meaning. Teams win points (a bonus of up to +0.5 on the term grade), with a buzzer and a class quiz on the Chromebooks.
+- **Recall checkpoints** every two weeks: on the LS page each sits right after the learning path it reviews and asks only about paths done before it; students must finish it to open what comes after (section 8).
+- **Criteria**: every assessment criterion has at least one activity that gives evidence for it, and four levels (NA · AS · AN · AE) with indicators.
 
 **Research audit content rules** (approved 26 Oct 2026; status in section 13)
 
@@ -264,17 +278,35 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 
 - **One vocabulary game + one grammar game per LS** (16 Nov 2026), built from a vocabulary + grammar pair of decks per learning path; never a mixed deck. The board may play them together (📚🧩 Vocabulary + Grammar, 19 Nov 2026).
 - Questions only in the game: no theory slides (16 Nov 2026). Cumulative: Roger ticks which points go in.
-- Games are at Core level for everyone and use the LS's less common words.
+- Games are at **Core level** for everyone, not easy (the first demo was too easy), and use plenty of the learning path's **less common words**: passively (in the questions) and actively (questions on a word's meaning, use, collocation or preposition). A vocabulary game asks only words; a grammar game only grammar and 💬 Expressions. Lean: about 15–20 questions.
+- In class: students see only the question and four coloured tiles (or type the words in a ✏️ written question); they never see the answer before the board shows it. No timer, only right or wrong. After a written question the board shows the wrong answers without names. Music only on the projector.
+- **Points**: +1 term point per right answer; the best student in the group gets +0.5 on the term grade, the others proportionally down to 0; the tester never counts as the best. Results count only questions whose answer was shown; a student who joined but didn't answer gets it wrong.
 - Our own names and art, never a copy of another game.
 
 **Each LS has** (Memory; Playbook Part 1b)
 
 - The icon side menu, the ⓘ About banner, the "This LS in 4 minutes" video, the 🧩📚 Games and theory card, a shadowing video (~6 min, the approved format), a self-assessment Reflect page, secure recall checkpoints, a sample exam (optional, always open), vocabulary games, a study summary PDF per route, paper worksheets, its voyage road skin (themed per LS; art via ChatGPT/Gemini prompts Roger runs).
-- Tick the site look checklist (Playbook Part 1b) before Roger tries a new LS.
+- The LS page's Final Product tab is only a short card with "Open the final product →"; the final product page opens with a model final product for the student's route, then what the route must do and what counts, the steps and the rubric.
+- A study summary PDF per route (students download it from their board) and a Word copy for Roger.
+- Calendar: dated sessions per group, the exam day and a due date per activity, on the dashboard and the student board.
+
+**Site look checklist** (Roger, 7 Nov 2026; Claude ticks every line before Roger tries a new LS; the 20 Nov simple LS home may have changed some, check against LS2)
+
+- Name with its number ("LS3 · Title") in the page title, heading, back link and menus.
+- No 📚 Study place and no "List in the LS" link; the grammar and vocabulary lists stay hidden in the page for the board's 🔤 Grammar and vocabulary place, with the summary PDF.
+- 🧩📚 Games and theory card beside the LS title: grammar and vocabulary circles, Open and 📝 Your notes.
+- Tiles: 📈 My formative assessment, 🗣 Shadowing video, ⓘ About this LS, 🖨 Paper worksheets (teacher only). No 🎮 Vocabulary games tile.
+- ⓘ About is visual (objective cards with a verb icon, the "How will we work" diagram, competence tiles, criteria as cards that open), opens at the top at once, and going back returns to where the student was. No routes or Catalan help paragraph.
+- Students see only the learning paths the teacher has opened.
+- On the board: the Games and theory card with this LS's results only, 🎯 My level beside the greeting ("Core · A2"), My marks, Final product and Exams in the same card style.
+- Flashcards speak with the Kokoro Heart voice; listenings, Talk and dictation stay ElevenLabs.
+- Students' left menu is the shared one (My dashboard · Practise · My course and its LSs · Books · Grammar and vocabulary · Games · Help · Study on your phone); Practise and Games show only the student's own course.
+- The teacher's student view shows the page in the student's language from the first moment, with the red frame.
 
 **Final product**
 
 - A spoken video: students upload it on the site; it goes to Roger's Drive. **No spoken video = 0.**
+- Only the video is marked as a group; everything else per student. Marked in two rounds, midway and at the end, with a marking PDF per round; a rubric per route in Word (Playbook). Group make-up: see contradiction 29.
 - Procediment (21 Oct 2026): a video made with Google Slides, the student's face visible in picture-in-picture; audio alone only for practice (still the format? see section 13).
 
 **Audio and video**
@@ -442,6 +474,13 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - **Final product**: Roger marks it with **✨ Correct in my Roig** (his own Gemini app, the agreed prompt and rubric, nothing paid; 20 Nov 2026). For the next LS, automatic drafts must be **off**. The prompt is kind but honest ("I don't want to give grades they don't deserve"); prompt changes only with Roger's agreement. Feedback in the part-line format (`Name (30%) · 7.5/10` + ✔ / ➜ lines). LS1 FP reflection: students who said in a problem report they couldn't see the instructions get the reflection row 10/10; nobody else (14 Nov 2026).
 - **Speaking analysis** (20 Nov 2026): teacher only; nothing runs by itself; 🔍 Analyse shows the count and cost first.
 
+**Recall checkpoints** (Roger, 31 Oct 2026: "make sure they don't cheat"; [secure-checkpoints.md](general/secure-checkpoints.md))
+
+- On the site, not as an exam: rules first ("I have read the rules" tick), one question at a time, about 45 s each, no going back, only once; no copying or pasting; leaving the page sends it automatically (back within 2 s is only a 👀 glance).
+- No mark and no answers until Roger releases them (📣 Release feedback); then the page shows the mark, every answer, the right one and the hint (Catalan for Starter and Base).
+- Answers and hints never in the repo: keys in project files and Drive, uploaded to `cpKeys` only on Roger's "apply", before the checkpoint opens.
+- The dashboard warns (⚠️) when a checkpoint is 35 points or more above the student's usual level: worth a look, not proof.
+
 **Daily work** (the 40 %)
 
 - Recall checkpoints 10 · warm-ups 2.5 · practice/grammar/mixed done 5 · class games 2.5 · skills tabs done 15 (= 35, "Grammar, vocabulary and skills") + other competences 5. Transversal criteria never count.
@@ -496,7 +535,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - PRs: the attribution block, assignee and reviewer `rogerbeltranps-lab`, screenshots for visual changes. Merge only on "merge" (or the problem-report standing approval for technical bugs).
 - Checks before a PR: `node --check` on changed JS, `git diff --check`, the repo checks that apply (`tools/vocab-cards/check.mjs`, `tools/answers-stay/…`), a Playwright look at 1366×768 (and 390×844 for student pages). Say honestly when a check was only programmatic.
 - Bump `?v=` cache keys when a shared file or media changes; tell Roger (and students) to hard reload.
-- `firestore.rules` publish by themselves on merge (GitHub Action). New school script versions: Roger pastes and deploys.
+- `firestore.rules` publish by themselves on merge (GitHub Action). New school script versions: Claude pastes and deploys them in the Claude app's browser after Roger's "apply" (section 1).
 - Preview without Firebase: `EL_DEMO_*` demo data and the invented students; never real data in previews.
 - Firestore: no new reads without need; the dashboard works from its browser copy and updates per group.
 - `teacher.html` belongs to this project; the separate LS (content) project must ask here for dashboard changes.
@@ -528,7 +567,8 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 | Class games (Roger's readable guide) | [docs/general/class-games-guide.md](general/class-games-guide.md) |
 | Secure recall checkpoints | [docs/general/secure-checkpoints.md](general/secure-checkpoints.md) |
 | Problem reports routine | [docs/general/problem-reports-auto.md](general/problem-reports-auto.md) |
-| Research audit decisions | [docs/general/research-audit-brief.md](general/research-audit-brief.md) |
+| Backups and restore | [docs/general/backups.md](general/backups.md) |
+| Old notes (roadmap, task list, research audit brief) | [docs/archive/general/](archive/general/) |
 | One LS's rules and decision log | `docs/<course>/ls<n>-<name>/AGENTS.md` |
 | One LS's grading, indicators, FP rubric | `docs/<course>/ls<n>-<name>/grading.md`, `indicators.md`, `final-product-assessment.md` |
 | Programmes (Catalan) | `docs/2eso/programme.md`, `docs/4eso/programme.md` |
@@ -590,3 +630,8 @@ Until Roger answers, Claude follows the **newer** rule (in bold).
 | 24 | FP format | Procediment: a video with Google Slides, face in picture-in-picture. | **A spoken video uploaded on the site** (no format rule since). | Confirm the Slides + face rule. |
 | 25 | Rubric marking prompt | Rubrics doc: every rubric has a ready-to-paste ChatGPT prompt. | **Claude marks writings; Roger marks FPs in his Gemini app with the agreed prompt** (20 Nov 2026). | Keep "a ready-to-paste prompt" without naming ChatGPT? |
 | 26 | Research audit status | Research audit Doc: changes 3–9 "to do". | Several are built (core words, micro-dictation chunks, Catalan-to-English flashcards, the voyage road). | Roger to confirm which are still wanted. |
+| 27 | Class game theory | Class games guide (5 Nov): theory and explanation slides between the questions. | **Questions only, no theory slides** (16 Nov 2026). | Done: the guide now points here. |
+| 28 | Storing recordings | Roadmap (Oct 2026): never store audio recordings (the most sensitive data). | **Speaking recordings and FP videos are stored** in Drive › 04_Students (private) (Nov 2026). | Confirm, and check it is in the data-protection approval. |
+| 29 | Final product groups | Playbook: groups from the same route. | **Research audit (26 Oct 2026): mixed routes**, at least one Core or Plus student per group. | Ask Roger which from LS3. |
+| 30 | Sample exam timing | Playbook: taken the session before the exam. | **Research audit: open a week before the exam** (and it is always open, 9 Nov 2026). | Wording only. |
+| 31 | Flashcards typing | Playbook Part 1 (26 Oct): the student types or says the English before turning the card. | **No typing on the cards** (20 Nov 2026). | Done: playbook points here. |

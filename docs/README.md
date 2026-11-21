@@ -57,7 +57,6 @@ Grammar and vocabulary decks for the projector are in the English Lab menu: [lab
 Roger's reference documents, the ones every new LS follows. Word copies are in the LS project's files, folder `reference/`.
 
 - [How we build a Learning Situation](general/new-ls-playbook.md): the checklist for a new LS, with 4ESO LS2 as the model.
-- [Research audit brief](general/research-audit-brief.md): the changes Roger approved after the research audit (26 Oct 2026): what the site builds and what the LS project designs.
 - [Worked example: from competence to LS criterion](https://claude.ai/artifact/RLZP7UdTgREkiT7MJgCFAR): how a competence becomes an LS criterion with its indicators, plus the 4ESO LS2 assessment example.
 
 ## Docs map (for building the site)
@@ -67,10 +66,14 @@ Start with the [root AGENTS.md](../AGENTS.md): it holds the rules for every cour
 ```
 docs/
   README.md                      this index; add each new LS's row when its docs folder is created
-  general/                       not tied to a course or LS
-    roadmap.md                   planned clean-up of the code structure
-    tasks.md                     living list of pending site tasks
+  REQUIREMENTS.md                the one rulebook (every rule lives here)
+  general/                       feature notes, not tied to a course or LS (how each feature works; rules are in REQUIREMENTS.md)
+    backups.md                   database backups and how to restore
+    class-games-guide.md         how the class games work (Roger's readable guide)
+    problem-reports-auto.md      the problem reports routine
+    secure-checkpoints.md        how the recall checkpoints are built
     new-ls-playbook.md           how we build a new LS: checklist for Roger + technical notes (model: 4ESO LS2)
+  archive/general/               outdated notes kept for history (roadmap, task list, research audit brief; 21 Nov 2026)
   4eso/
     programme.md                 Roger's 4ESO teaching programme (all 6 LS, grammar and vocabulary per LS, Beginners chapter)
     ls1-my-real-routine/

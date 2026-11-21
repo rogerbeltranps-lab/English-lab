@@ -25,14 +25,7 @@ Kahoot-style games for class (Roger, 26 Oct 2026). The board runs on the project
 
 ## The rules for every game
 
-- **Safe level.** Not easy: the first demo was too easy.
-- **Plenty of learning-path vocabulary**, mainly the words that are not common at the students' level (the Safe and Daring words of the learning path, not the basic ones):
-  - **passive:** the words appear in the question and theory texts;
-  - **active:** some questions ask for a word directly (meaning, use, collocation or preposition).
-- **Theory slides between the questions**: short, a few lines, with examples. The questions after each theory slide practise it.
-- **Two games per learning path (5 Nov 2026):** a **vocabulary game** (only words: meaning, use, collocations, prepositions) and a **grammar game** (only the grammar of the path). Both are linked from the learning path page with teacher-only buttons (📚 Vocabulary game, 🧩 Grammar game). Done for LS2 LP1, LP2 and LP3 in 2 ESO and 4 ESO (LP3 on 6 Nov 2026, replacing its older mixed game).
-- **The grammar game explains before it asks:** each grammar point starts with explanation slides (how it is made, when we use it, examples and the typical mistake, often in a table), then 4–6 questions on it. Press Space to show the explanation one part at a time, and **CA** (or the C key) to show a short Catalan help under the slide.
-- Keep it lean: about 15–20 questions and 3 theory slides in a vocabulary game, about 16 questions and 3–4 explanation slides in a grammar game.
+The rules (level, words, length, points, no theory slides) are in [How we work - Work requirements › 5, Class games](../REQUIREMENTS.md#5-designing-a-learning-situation), the one rulebook (21 Nov 2026). This guide says how the games work.
 
 ## Results
 
