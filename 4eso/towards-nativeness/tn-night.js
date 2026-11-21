@@ -50,25 +50,35 @@
     apply();
   }
 
+  /* Where the button goes: the phone's top bar (header.elplh, before ⓘ) when it shows; beside the title on the course home;
+     otherwise a round button at the top right (a learning path on a computer, where the phone bar is hidden). */
+  function place(){
+    var head = document.querySelector("header.elplh");
+    if(head && getComputedStyle(head).display !== "none") return { kind: "ib", parent: head, before: head.querySelector(".inf") };
+    var home = document.querySelector(".lshead .lsht");
+    if(home) return { kind: "tn-inline", parent: home, before: home.firstChild };
+    if(document.body && root.classList.contains("elready")) return { kind: "tn-float", parent: document.body, before: null };
+    return null;
+  }
   function addButton(){
-    if(document.querySelector(".tn-night-btn")) return true;
-    var head = document.querySelector("header.elplh"), home = document.querySelector(".lshead .lsht"), b = document.createElement("button");
-    b.type = "button"; b.className = "tn-night-btn"; b.onclick = toggle;
-    if(head){
-      b.className += " ib";
-      head.insertBefore(b, head.querySelector(".inf") || null);
-    }else if(home){                                  /* the course home: beside the title, covering nothing */
-      b.className += " tn-inline";
-      home.insertBefore(b, home.firstChild);
-    }else if(document.body && document.documentElement.classList.contains("elready")){
-      b.className += " tn-float";
-      document.body.appendChild(b);
-    }else return false;
+    var w = place(), b = document.querySelector(".tn-night-btn");
+    if(!w) return false;
+    if(b && b.parentNode === w.parent && b.classList.contains(w.kind)) return true;
+    if(b) b.remove();
+    b = document.createElement("button");
+    b.type = "button"; b.className = "tn-night-btn " + w.kind; b.onclick = toggle;
+    w.parent.insertBefore(b, w.before && w.before.parentNode === w.parent ? w.before : null);
     apply();
     return true;
   }
-  /* el-app.js draws the top bar after load: wait for it (at most ~10 s) */
-  var tries = 0, t = setInterval(function(){ if(addButton() || ++tries > 50) clearInterval(t); }, 200);
+  /* el-app.js draws the top bar after load, sometimes late on a phone (sign-in), and can draw it again: whenever the page
+     changes and the button is missing, put it back (Roger, 21 Nov 2026, iPhone: "Don't see it yet"). */
+  var queued = false;
+  function ensure(){ queued = false; addButton(); }
+  try{ new MutationObserver(function(){ if(!queued){ queued = true; setTimeout(ensure, 50); } })
+    .observe(root, { childList: true, subtree: true }); }catch(e){}
+  setInterval(ensure, 2000);
+  addEventListener("resize", function(){ setTimeout(ensure, 100); });
 
   setInterval(apply, 60000);                       /* 21:00 and 7:00 switch by themselves */
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) apply(); });
