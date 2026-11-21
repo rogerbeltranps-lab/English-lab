@@ -107,7 +107,7 @@ const [allProbs,allIdeas]=await Promise.all([since("problems",weekAgo),since("su
 // the ones already fixed, closed or answered need nothing (Roger, 21 Nov 2026, on this email listing reports he had already answered:
 // "he rebut aquest mail amb problemes que ja he solucionat"). Answered = an answer sent and not taken back (msgs[].back), as on the dashboard.
 const answered=x=>(x.msgs||[]).some(m=>!m.back);
-const [probs,ideas]=[allProbs.filter(x=>!x.fixed&&!answered(x)),allIdeas.filter(x=>!answered(x))],nFixed=allProbs.length-probs.length,nIdeasDone=allIdeas.length-ideas.length;
+const [probs,ideas]=[allProbs.filter(x=>!x.fixed&&!answered(x)),allIdeas.filter(x=>!answered(x)&&!x.done)],nFixed=allProbs.length-probs.length,nIdeasDone=allIdeas.length-ideas.length;
 // ---- 3. website problems found by the weekly site check (Roger, 1 Nov 2026: "send me a mail if theres any prob"). The check runs on Saturday
 // at 5:45 Madrid time, before this email, and opens a GitHub issue labelled site-check for each problem it finds; Roger closes it when it is fixed.
 let siteIssues=[];
@@ -123,7 +123,7 @@ const out=["Good morning! Here is your English Lab week.",""];
 if(nBehind)out.push("⚠ SESSIONS NOT TICKED ("+nBehind+")","Tick the ones you did. For the others, 🏠 Set as homework so students do them at home, or leave them: they move to next week's list.","",
   ...behind.flatMap(([x,ps])=>[x.name+":",...ps.map(y=>"   ☐ "+y.line),""]),"Open the Time plan: "+SITE+"teacher.html","");
 if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already fixed or answered.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
-if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),(nIdeasDone?"("+n(nIdeasDone,"more idea","more ideas")+" this week already answered.)\n":"")+"Open them: "+SITE+"teacher.html","");
+if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),(nIdeasDone?"("+n(nIdeasDone,"more idea","more ideas")+" this week already answered or archived.)\n":"")+"Open them: "+SITE+"teacher.html","");
 if(siteIssues.length)out.push("🛠️ WEBSITE PROBLEMS FOUND BY THE WEEKLY CHECK ("+siteIssues.length+")","",...siteIssues.map(x=>"• "+x.title+"\n   "+x.html_url+"\n"),"Close each one on GitHub when it is fixed.","");
 out.push("—","English Lab sends this every Saturday morning, only when there is something. Students do not see it.");
 const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):"",siteIssues.length?n(siteIssues.length,"website problem","website problems"):""].filter(Boolean);
