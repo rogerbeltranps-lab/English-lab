@@ -1,6 +1,7 @@
 /* Games for students who finish the web exam early (Roger, 17 Nov 2026: "if they finish before I want them to have games to play, it can be
    hangman, etc… if they answer well the questions they have kind of points and they can build a scaffold that reaches the top of a building").
-   ELExamGames.mount(el, {words: [[word, Catalan clue]], quiz: [{q, o, a}], ca, store}) after the exam is turned in (shared/js/el-web-exam.js).
+   ELExamGames.mount(el, {words: [[word, Catalan clue]], quiz: [{q, o, a}], ca, store, title}) after the exam is turned in (shared/js/el-web-exam.js),
+   and on the Games page (lab/index.html 🏗 Exam games, from <ls>/data/exam-games.js; title: its own heading instead of "While you wait").
    🔤 Hangman (a solved word = 2 points) and ❓ Quick quiz (a right answer = 1 point); every point adds one level of scaffolding up the
    building, and at the top a taller building starts. Practice only: nothing goes to the cloud; the points stay in this browser (store key). */
 (function () {
@@ -43,7 +44,7 @@
     // which building and how high: the points run through the buildings one after another
     const where = () => { let p = st.pts, i = 0; while (p >= FLOORS[Math.min(i, FLOORS.length - 1)]) { p -= FLOORS[Math.min(i, FLOORS.length - 1)]; i++; } return { b: i, n: FLOORS[Math.min(i, FLOORS.length - 1)], h: p }; };
     let topMsg = '';
-    el.innerHTML = '<div class="eg"><h2>🎮 ' + t('Mentre esperes', 'While you wait') + '</h2><p class="lead">' +
+    el.innerHTML = '<div class="eg"><h2>' + (o.title ? esc(o.title) : '🎮 ' + t('Mentre esperes', 'While you wait')) + '</h2><p class="lead">' +
       t('Juga i guanya punts: cada punt puja un pis de la bastida. Arribaràs dalt de l’edifici?', 'Play and win points: every point builds one more level of scaffolding. Can you reach the top of the building?') + '</p>' +
       '<div class="eg-grid"><div class="eg-site" id="egSite"></div><div><div class="eg-tabs">' +
       '<button class="eg-tab" data-eg="hang">🔤 ' + t('Penjat', 'Hangman') + ' <small>+2</small></button><button class="eg-tab" data-eg="quiz">❓ ' + t('Preguntes ràpides', 'Quick quiz') + ' <small>+1</small></button></div>' +

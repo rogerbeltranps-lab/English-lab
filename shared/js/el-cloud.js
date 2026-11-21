@@ -1449,23 +1449,32 @@ const onPage=u=>{try{return new URL(u,ROOT).pathname===location.pathname}catch(e
 const tabP=(u,p)=>window.elTabOf?elTabOf(String(u||""),p||""):p||"";
 function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:tabP(g.u,g.p),n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
   (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{const xp=x&&tabP(x.u,x.p);if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===xp))out.push({u:x.u,p:xp,n:x.n||x.p||""})});
-  const f=ffRead(g);if(f)f.ps.forEach(p=>{if(!out.some(y=>y.u===f.u&&y.p===p))out.push({u:f.u,p,n:ffName(p,lockCa()),ff:true})});return out}
+  const f=ffRead(g);if(f)f.gs.forEach(x=>{if(!x||!x.u)return;const xp=tabP(x.u,x.p);if(!out.some(y=>y.u===x.u&&y.p===xp))out.push({u:x.u,p:xp,n:x.n||"",ff:true,hide:!!x.hide})});return out}
 const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
 // the tab the student is on: the active tab, or the panel shown when the page opened on a #tab link without marking a tab (the bar then
 // said "Go there" to a student already on the teacher's tab)
 const curPanel=()=>{const t=document.querySelector(".tab.active[data-panel]");if(t)return t.dataset.panel;const p=document.querySelector(".panel.active[id]");return p?p.id:null};
-// ⚡ I've finished (Roger, 12 Nov 2026: "I want to allow doing further activities planned on the agenda for fast finishers", then "yes add
-// I've finished but that brings them to the book section"): in class mode the student's 🎓 bar has ⚡ I've finished. Once every step open
-// for the class (cmEn: the teacher's step and the 👥 ones) is done on this student's progress, it takes them to the 📖 Book learning path
-// of the LS, at the first chapter they have not done, opened for them alone while this class mode lasts (sessionStorage el_cm_ff =
-// {s, until, u, ps: [chapters]}; page-only, like the Time plan's 🏫 tabs: the class tab opens the Book path for the group at the rules
-// level and names it on live/{group}.go.ff, el-cm-agenda.js). Not finished: a note says what is left. The chapter counts as one more open
-// step for them (a chip on the bar, not moved by the teacher's next move), and ⚡ again after it gives the next chapter. After the class
-// those chapters are as the Time plan says again (🏫 read-only until their day, answers kept).
+// ⚡ I've finished: fast finishers in class (Roger, 12 Nov 2026: "I want to allow doing further activities planned on the agenda for fast
+// finishers", "yes add I've finished but that brings them to the book section"; 21 Nov 2026: "In class I want fast finisher to read the
+// book, if they are done, they can do pending tasks (button to go to pending task), only if they have no pending task, I want them to go
+// to games (include the ones of the exam)"). In class mode the student's 🎓 bar has ⚡ I've finished. It opens the ⚡ Finished early? card
+// (ffCard) with the order worked out for this student:
+//   0. today's class steps first (cmEn without the ones given here): a step not done on their progress → "First finish …" and a Go button;
+//   1. 📖 the LS's Book (the class tab opens it for the group and names it on live/{group}.go.ff, el-cm-agenda.js), until the whole book is
+//      read: every chapter's questions answered (the reader's own "done"); it opens where they stopped (no row when today has no Book);
+//   2. ✅ their pending tasks: the ✅ To do list (el-todo.js elTodoReady → elTodoPending: late work, homework, class work not finished),
+//      a button for each one;
+//   3. 🎲 only with no pending task: the Games page (lab/), the LS vocabulary games and the exam's 🏗 games (Hangman, Quick quiz).
+// What the card opens is given to this student alone while this class mode lasts (sessionStorage el_cm_ff = {s, until, k, gs: [{u, p, n,
+// hide}]}; page-only, like the Time plan's 🏫 tabs): a chip on the bar (hide: a page the games link to, no chip of its own), not moved
+// by the teacher's next move, freed with elSecFree / EL_CM_FREE on load. Each stage replaces the one before. Nothing new is made: it only
+// points to work that exists and is open (the week-by-week rule). After the class those steps are as the Time plan says again.
 const FF_K="el_cm_ff";
-function ffRead(g){if(!g||!g.cm)return null;try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.s===g.s&&o.u&&Array.isArray(o.ps)?o:null}catch(e){return null}}
-// the chapters granted on this page while that class mode lasts (known before live/{group} is read: the page's first locks)
-function ffPage(){try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.u&&Array.isArray(o.ps)&&Date.now()<+o.until&&onPage(o.u)?o.ps:[]}catch(e){return []}}
+function ffGet(){try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");if(o&&o.u&&Array.isArray(o.ps)&&!o.gs)o.gs=o.ps.map(p=>({u:o.u,p,n:ffName(p,lockCa())}));   // the older {u, ps} (the Book only)
+  return o&&Array.isArray(o.gs)?o:null}catch(e){return null}}
+function ffRead(g){if(!g||!g.cm)return null;const o=ffGet();return o&&o.s===g.s?o:null}
+// the steps given on this page while that class mode lasts (known before live/{group} is read: the page's first locks)
+function ffPage(){const o=ffGet();return o&&Date.now()<+o.until?o.gs.filter(x=>x&&onPage(x.u)).map(x=>x.p||""):[]}
 const ffName=(p,ca)=>"📖 "+(ca?"El llibre":"The book");
 const samePath=(a,b)=>{try{return new URL(a,ROOT).pathname===new URL(b,ROOT).pathname}catch(e){return false}};
 const ffAct=u=>(window.EL_CATALOG||[]).find(y=>y.path&&samePath(y.path,u));
@@ -1475,18 +1484,66 @@ function ffDone(x){const a=ffAct(x.u);if(!a)return true;const sk=a.skip||[],ks=(
   if(!ks.length)return true;const d=ffDoneSet(a);return ks.every(k=>d.has(k))}
 // the Book path the class tab offers (go.ff = [path]): the one of this page's LS, else the first
 function ffBook(g){const ps=g&&g.cm&&Array.isArray(g.ff)?g.ff:[];if(!ps.length)return null;const as=ps.map(ffAct).filter(Boolean);return as.find(a=>a.ls===lsId)||as[0]||null}
-function ffGo(){const g=LOCK;if(!g||!g.cm)return;const ca=lockCa(),bk=ffBook(g);if(!bk)return;
-  const left=cmEn(g).filter(x=>!ffDone(x));
-  if(left.length){lockToast((ca?"✋ Primer acaba: ":"✋ First finish: ")+left.map(x=>x.n||x.p).join(", "));return}
-  const d=ffDoneSet(bk),left2=((window.EL_ACTIONS||{})[bk.id]||[]).find(k=>!d.has(k)),nx="book";   // one tab: the book opens where they stopped
-  if(!left2){lockToast(ca?"🎉 Ja has llegit tot el llibre! Ajuda un company o repassa la feina d'avui.":"🎉 You've read the whole book! Help a classmate or look back at today's work.");return}
-  const f=ffRead(g)&&samePath(ffRead(g).u,bk.path)?ffRead(g):{s:g.s,u:bk.path,ps:[]};f.until=g.until||Date.now()+60*60e3;if(!f.ps.includes(nx))f.ps.push(nx);
-  try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}
-  if(onPage(bk.path)){window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(nx);if(window.elSecFree)elSecFree([nx])}
-  b0();cmJump({u:bk.path,p:nx})}
+// the pending tasks of the ✅ To do list (el-todo.js; it starts once the student is known, so a short wait the first time)
+async function ffPending(){for(let i=0;i<30&&!window.elTodoReady;i++)await new Promise(r=>setTimeout(r,100));
+  if(!window.elTodoReady)return [];const f=await Promise.race([window.elTodoReady,new Promise(r=>setTimeout(()=>r(null),4000))]);
+  try{return f?f():[]}catch(e){console.warn("todo",e);return []}}
+// 🎲 the Games page and the pages its cards open (the LS vocabulary games): one chip, the others only let the student through
+const ffGames=ca=>[{u:"lab/",p:"",n:"🎲 "+(ca?"Jocs":"Games")},{u:"lab/index.html",p:"",n:"",hide:true}]
+  .concat((window.EL_LS||[]).filter(l=>!l.personal).map(l=>({u:l.id.replace("-","/")+"/vocabulary-games.html",p:"",n:"",hide:true})));
+async function ffState(g){const left=cmEn(g).filter(x=>!x.ff&&!ffDone(x)),bk=ffBook(g),chs=bk?((window.EL_ACTIONS||{})[bk.id]||[]):[];
+  const d=bk?ffDoneSet(bk):null,read=chs.filter(k=>d.has(k)).length,book=bk&&chs.length?{a:bk,read,n:chs.length,done:read>=chs.length}:null;
+  const todo=(await ffPending()).filter(x=>!(bk&&samePath(x.u,bk.path)));
+  return {left,book,todo,stage:left.length?0:book&&!book.done?1:todo.length?2:3}}
+// give this student a stage's steps (replacing the last ones) and take them to the first
+function ffGrant(g,k,gs){const f={s:g.s,until:g.until||Date.now()+60*60e3,k,gs};try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}
+  const here=gs.filter(x=>x.p&&onPage(x.u)).map(x=>tabP(x.u,x.p));
+  if(here.length){window.EL_CM_FREE=window.EL_CM_FREE||new Set();here.forEach(p=>window.EL_CM_FREE.add(p));if(window.elSecFree)elSecFree(here)}
+  ffClose();b0();lockBar();cmJump(gs[0])}
 const b0=()=>{const b=document.getElementById("el-lock");if(b)b.dataset.h=""};   // the bar is drawn again (a new chip)
+const ffClose=()=>{const c=document.getElementById("el-ff");if(c)c.remove()};
+const ffEsc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const FF_CSS=`#el-ff{position:fixed;left:50%;top:calc(var(--el-lock-h,52px) + 10px);transform:translateX(-50%);z-index:2147482500;width:min(460px,calc(100vw - 24px));max-height:calc(100vh - var(--el-lock-h,52px) - 30px);overflow:auto;background:#fff;color:#0f172a;border:2px solid #facc15;border-radius:18px;box-shadow:0 14px 40px rgba(15,23,42,.28);font:15px/1.4 system-ui,sans-serif;text-align:left}
+#el-ff .hd{display:flex;align-items:center;gap:8px;background:#fef9c3;padding:12px 16px;border-bottom:1px solid #fde68a}#el-ff .hd b{flex:1;font-size:18px;color:#422006}
+#el-ff .hd button{border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:#713f12;padding:2px 6px}
+#el-ff .bd{padding:12px 16px 16px}#el-ff .ld{margin:0 0 8px;color:#475569;font-size:14px}
+#el-ff .first{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-weight:700}
+#el-ff ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#el-ff li{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #e2e8f0;border-radius:14px;padding:10px 12px;background:#f8fafc;color:#64748b}
+#el-ff li .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:#e2e8f0;color:#475569}
+#el-ff li .tx{flex:1;min-width:0}#el-ff li .tx b{display:block;color:#334155;font-size:15.5px}#el-ff li .tx small{display:block;font-size:13px}
+#el-ff li.ok{background:#f0fdf4;border-color:#bbf7d0}#el-ff li.ok .n{background:#16a34a;color:#fff}#el-ff li.ok .tx b{color:#166534}
+#el-ff li.on{background:#fffbeb;border-color:#f59e0b;color:#713f12;box-shadow:0 0 0 3px #fde68a}#el-ff li.on .n{background:#f59e0b;color:#fff}#el-ff li.on .tx b{color:#422006}
+#el-ff .tasks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#el-ff button.go{border:0;border-radius:999px;background:#0f766e;color:#fff;font:800 14.5px system-ui,sans-serif;padding:9px 16px;cursor:pointer;margin-top:8px}
+#el-ff .tasks button.go{margin:0;padding:7px 13px;font-size:13.5px;text-align:left}#el-ff .more{font-size:13px;color:#713f12;margin-top:6px}
+#el-ff .wait{padding:18px 4px;color:#475569}
+@media (max-width:640px){#el-ff{top:calc(var(--el-lock-h,52px) + 6px);border-radius:14px}#el-ff .hd b{font-size:16.5px}}`;
+// ⚡ Finished early? card: the order, the stage the student is on (yellow), the ones done (green) and the button(s) for the next step
+async function ffGo(){const g=LOCK;if(!g||!g.cm)return;if(document.getElementById("el-ff"))return ffClose();const ca=lockCa(),t=(c,e)=>ca?c:e;
+  if(!document.getElementById("el-ff-css")){const st=document.createElement("style");st.id="el-ff-css";st.textContent=FF_CSS;document.head.append(st)}
+  const c=document.createElement("div");c.id="el-ff";c.setAttribute("role","dialog");c.setAttribute("aria-label",t("Has acabat abans d'hora?","Finished early?"));
+  c.innerHTML=`<div class="hd"><b>⚡ ${t("Has acabat abans d'hora?","Finished early?")}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd"><p class="wait">${t("Un moment…","One moment…")}</p></div>`;
+  document.body.append(c);c.addEventListener("click",e=>{if(e.target.closest("[data-x]"))ffClose()});
+  const S=await ffState(g);if(!c.isConnected||LOCK!==g&&!(LOCK&&LOCK.s===g.s))return;
+  const rows=[],lvl=i=>S.stage>i?"ok":S.stage===i?"on":"",go=(k,i,txt)=>`<button type="button" class="go" data-ffk="${k}" data-ffi="${i}">${ffEsc(txt)} →</button>`;
+  if(S.book){const b=S.book,nx=Math.min(b.read+1,b.n);rows.push({k:"book",i:1,b:"📖 "+t("Llegeix el llibre","Read the book"),
+    s:b.done?"✓ "+t("Llegit sencer","You've read it all"):t(`Capítol ${nx} de ${b.n}`,`Chapter ${nx} of ${b.n}`)+(b.read?t(` · ${b.read} llegits`,` · ${b.read} read`):""),
+    x:S.stage===1?go("book",0,"📖 "+t("Continua el llibre","Go on with the book")):""})}
+  const td=S.todo,show=td.slice(0,6);
+  rows.push({k:"todo",i:2,b:"✅ "+t("Fes les tasques pendents","Do your pending tasks"),s:td.length?t(td.length===1?"1 tasca pendent":`${td.length} tasques pendents`,td.length===1?"1 task to do":`${td.length} tasks to do`):"✓ "+t("No en tens cap","You have none"),
+    x:S.stage===2?`<div class="tasks">${show.map((x,i)=>go("todo",i,x.n||x.p||"")).join("")}</div>`+(td.length>show.length?`<div class="more">${t(`I ${td.length-show.length} més a ✅ Per fer`,`And ${td.length-show.length} more in ✅ To do`)}</div>`:""):""});
+  rows.push({k:"games",i:3,b:"🎲 "+t("Juga","Play games"),s:t("Jocs de vocabulari i els jocs de l'examen","Vocabulary games and the exam games"),x:S.stage===3?go("games",0,"🎲 "+t("Ves als jocs","Go to the games")):""});
+  const first=S.stage===0?`<div class="first">✋ ${t("Primer acaba la feina d'avui:","First finish today's work:")}<div class="tasks" style="margin-top:8px">${S.left.map((x,i)=>go("left",i,x.n||x.p||"")).join("")}</div></div>`:"";
+  c.querySelector(".bd").innerHTML=first+`<p class="ld">${t("Quan acabis la feina de classe, fes-ho en aquest ordre:","When you finish the class work, do this in order:")}</p><ol>`
+    +rows.map((r,j)=>`<li class="${lvl(r.i)}"><span class="n">${S.stage>r.i?"✓":j+1}</span><span class="tx"><b>${r.b}</b><small>${ffEsc(r.s)}</small>${r.x}</span></li>`).join("")+`</ol>`;
+  c.onclick=e=>{if(e.target.closest("[data-x]"))return ffClose();const x=e.target.closest("button[data-ffk]");if(!x)return;const k=x.dataset.ffk,i=+x.dataset.ffi;
+    if(k==="left"){const y=S.left[i];ffClose();if(y)cmJump(y);return}
+    if(k==="book")return ffGrant(g,"book",[{u:S.book.a.path,p:"book",n:ffName("book",ca)}]);
+    if(k==="todo"){const y=S.todo[i];if(y)ffGrant(g,"todo",[{u:y.u,p:y.p||"",n:"✅ "+(y.n||y.p||"")}]);return}
+    if(k==="games")return ffGrant(g,"games",ffGames(ca))}}
 function ffBtn(b,ca){const x=document.createElement("button");x.dataset.ff="1";x.textContent=ca?"⚡ He acabat":"⚡ I've finished";
-  x.title=ca?"Has fet tot el d'avui? Continua amb el llibre":"Done with everything for now? Go on with the book";
+  x.title=ca?"Has acabat abans d'hora? Mira què toca ara":"Finished early? See what to do next";
   x.style.cssText="border:0;border-radius:999px;padding:6px 16px;background:#facc15;color:#422006;font:800 14px system-ui,sans-serif;cursor:pointer";b.append(x)}
 // may the student open this tab now (a step the teacher opened on this page, or the one they were already on)
 const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lockFrom};
@@ -1533,20 +1590,21 @@ function lockBar0(){let b=document.getElementById("el-lock");
     b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.ff)return ffGo();if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
   const en=cmEn(g);
   if(en.length>1){   // several steps open: a chip for each, the one the student is on marked
-    const ff=!!ffBook(g),at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur)),h2="m|"+ca+"|"+ff+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
+    const ff=!!g.cm;let at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur));if(at2>=0&&en[at2].hide)at2=en.findIndex(x=>x.ff&&!x.hide);   // ⚡ always in class mode; a games page: the 🎲 chip
+    const h2="m|"+ca+"|"+ff+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
     b.textContent="🎓 "+(ca?"Mode classe · pots treballar a:":"Class mode · you can work on:")+" ";
-    en.forEach((x,i)=>{const c=document.createElement("button");c.dataset.k=String(i);c.textContent=(i===at2?"● ":"")+(x.n||x.p);
+    en.forEach((x,i)=>{if(x.hide)return;const c=document.createElement("button");c.dataset.k=String(i);c.textContent=(i===at2?"● ":"")+(x.n||x.p);
       c.style.cssText="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;"+(i===at2?"background:#fff;color:#0f766e":"background:#0f766e;color:#fff");b.append(c)});if(ff)ffBtn(b,ca);return}
   const off=g.p&&cur!==g.p,h=(g.cm?"🎓 "+(ca?"Mode classe: segueixes el professor":"Class mode: you follow your teacher"):"🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here"))+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
     +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
-  const ff=!!ffBook(g);
+  const ff=!!g.cm;
   if(b.dataset.h!==h+ff){b.dataset.h=h+ff;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
     x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}if(ff)ffBtn(b,ca)}}
 // clicks on the kept page: links that leave it, and other tabs when the teacher chose one
 document.addEventListener("click",e=>{if(!lockHere())return;
   const t=e.target.closest&&e.target.closest(".tab[data-panel]");
   if(t&&(LOCK.cm?!cmTabOk(t.dataset.panel):LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom)){e.preventDefault();e.stopImmediatePropagation();
-    const en=cmEn(LOCK);lockToast(en.length>1?(lockCa()?"🔒 Ara pots treballar a: ":"🔒 Now you can work on: ")+en.map(x=>x.n||x.p).join(", "):(lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
+    const en=cmEn(LOCK);lockToast(en.length>1?(lockCa()?"🔒 Ara pots treballar a: ":"🔒 Now you can work on: ")+en.filter(x=>!x.hide).map(x=>x.n||x.p).join(", "):(lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
   const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;let u;try{u=new URL(a.href,location.href)}catch(x){return}
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
   // 📓 in class mode: the notebook is another page, so it opens as a ✍ quick note over this one and is saved into the notebook

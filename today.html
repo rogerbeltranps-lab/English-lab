@@ -651,8 +651,34 @@ function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyCl
   O.innerHTML=`<div class="card"><div style="font-size:46px;line-height:1.1">${ic} 🏁</div><h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
     +`<p>${t("Acaba totes les activitats pendents! Cada activitat que acabes et fa avançar.","Finish all your pending activities! Every activity you finish moves you forward.")}</p>`
     +`<p class="ce">${t(`Et falten ${nAct(n)}.`,`You have ${nAct(n)} left to do.`)}</p>`
-    +`<button type="button" data-r="todo">✅ ${t("Mira-les","See them")}</button> <button type="button" data-r="ok" style="background:#fff;color:#4a2f0e;box-shadow:0 4px 0 #d9c294">${t("D'acord","OK")}</button></div>`;
-  O.classList.add("on");O.onclick=e=>{const b=e.target.closest("button[data-r]");if(!b)return;O.classList.remove("on");O.onclick=null;try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}if(b.dataset.r==="todo")location.hash="#todo"}}
+    +`<button type="button" data-r="ok">👍 ${t("D'acord","OK")}</button></div>`;
+  O.classList.add("on");O.onclick=e=>{const b=e.target.closest("button[data-r]");if(!b)return;O.classList.remove("on");O.onclick=null;try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}
+    vyPend(lss,true)}}
+// One button, OK, and then the column on the right shows the pending activities (Roger, 21 Nov 2026: "vull que vegin les activitats
+// pendents a la columna de la dreta, no que obrin aquella pestanya"; "quan apretes d'acord (únic botó) un missatge destaca la columna de la
+// dreta i diu mira aquí les activitats pendents"): 🧭 Your steps lights up with "👉 Look here: your pending activities", only the stops
+// still on ✅ To do (the same tabs as its count, lsBeds' "thirsty" ones) marked, the rest folded away, and "Show all my steps" to go back.
+// Kept while the board draws again (S.vyPend). Where the column is not shown (narrow screens, phones) OK only closes the card.
+function vyPend(lss,on){const A=document.querySelector("#main .vy-steps");if(on!=null)S.vyPend=!!on;
+  if(!A||getComputedStyle(A).display==="none"){S.vyPend=false;return false}
+  if(!document.getElementById("vy-pend-css")){const st=document.createElement("style");st.id="vy-pend-css";st.textContent=`
+.vy-steps.vypend{border-color:#f59e0b;box-shadow:0 0 0 4px #fbbf2466;animation:vyglow 1.2s ease-in-out 3}@keyframes vyglow{50%{box-shadow:0 0 0 10px #fbbf2444}}
+.vy-steps .vy-pbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;margin:0 8px 6px;padding:7px 10px;border-radius:12px;background:#fff1e6;border:2px solid #f59e0b;color:#7c2d12;font:700 13px system-ui,sans-serif}
+.vy-steps .vy-pbar button{border:0;background:none;color:#4a2f0e;font:600 12px system-ui,sans-serif;text-decoration:underline;cursor:pointer;white-space:nowrap;padding:0}
+.vy-steps.vypend li.s:not(.pd),.vy-steps.vypend li.pt:not(.pd){display:none}
+.vy-steps.vypend li.s.pd a{background:#fff;box-shadow:0 0 0 2px #f59e0b inset;margin:3px 0}.vy-steps.vypend li.s.pd .tk{border-color:#f59e0b;background:#fef3c7;color:#b45309;font-size:11px}
+.vy-steps.vypend li.s.pd{animation:vypd 1.2s ease-out 2}@keyframes vypd{50%{transform:translateX(-4px)}}
+@media (prefers-reduced-motion:reduce){.vy-steps.vypend,.vy-steps.vypend li.s.pd{animation:none}}`;document.head.append(st)}
+  const old=A.querySelector(".vy-pbar");if(old)old.remove();A.classList.remove("vypend");A.querySelectorAll(".pd").forEach(x=>x.classList.remove("pd"));
+  if(!S.vyPend)return true;
+  const ks=new Set(),all=new Set();todoItems(lss).forEach(x=>{if(!x.tabs.length)all.add(x.a.id);x.tabs.forEach(([id])=>ks.add(x.a.id+"#"+id))});
+  const lis=[...A.querySelectorAll("li.s[data-k]")],pd=lis.filter(li=>{const k=li.dataset.k;return !li.classList.contains("ok")&&(ks.has(k)||all.has(k.split("#")[0]))});
+  if(!pd.length){S.vyPend=false;return false}
+  pd.forEach(li=>{li.classList.add("pd");li.querySelector(".tk").textContent="!";let p=li.previousElementSibling;while(p&&!p.classList.contains("pt"))p=p.previousElementSibling;if(p)p.classList.add("pd")});
+  A.classList.add("vypend");const bar=document.createElement("div");bar.className="vy-pbar";
+  bar.innerHTML=`<span>👉 ${t(`Mira aquí les activitats pendents (${pd.length})`,`Look here: your pending activities (${pd.length})`)}</span><button type="button">${t("Mostra tots els passos","Show all my steps")}</button>`;
+  bar.querySelector("button").onclick=()=>{pd.forEach(li=>li.querySelector(".tk").textContent=li.classList.contains("now")?"▶":"✓");vyPend(lss,false)};
+  const ol=A.querySelector("ol");A.insertBefore(bar,ol);if(ol)ol.scrollTop=0;return true}
 // the road document: read once per LS, then my own line written when my steps done change (never in the teacher's or a tester's view)
 function voyageRoad(ls,V){
   if(DEMO||!F||!D.me.group)return;const db=ELCloud.db,ref=F.doc(db,"road",ls.id,"groups",D.me.group);
@@ -981,7 +1007,7 @@ function render(){
   const n=S.pend.length;
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
-    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy){elVoyage.wire($("#main"),S.vy);vyRace(lss)}}
+    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy){elVoyage.wire($("#main"),S.vy);vyRace(lss);if(S.vyPend)vyPend(lss)}}
   else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
