@@ -2164,6 +2164,9 @@ function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.
     me:null,mates:rows.map(r=>({n:first(r.s),s:r.done})),cont:null,store:null,save:false,
     // music on, except in the group's class time (the 🎵 button can still turn it on)
     quiet:()=>!!(window.elSlotNow&&window.elTT&&elSlotNow(elTT(gid))),view:"grp:"+gid+":"+ls,...vyPct(ls,gid,info,rows,beds)};
+  // ⛵ Show the class map in class mode (el-cm-agenda.js mapOpen) draws this copy on the projector: no names list there, no reads
+  try{localStorage.setItem("el_vymap_"+gid,JSON.stringify({at:Date.now(),gname:grp.name,V:{ls:VYV.ls,skin:ls,en:true,beds:beds.map(b=>({id:b.id,kind:b.kind,plants:b.plants.map(({ks,...q})=>q)})),
+    fp:VYV.fp,mates:VYV.mates,pct:VYV.pct,pctPort:VYV.pctPort,later:[...VYV.later]}}))}catch(e){}
   // wired once the box is on the page; the view starts at the middle of the class (no "You" here: el-voyage.js wire)
   setTimeout(()=>{const r=document.querySelector(".vyrank .vymap");if(r&&VYV)elVoyage.wire(r,VYV)},0);
   return elVoyage.html(VYV)}
