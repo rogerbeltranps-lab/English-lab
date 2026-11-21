@@ -1,5 +1,7 @@
 # Roadmap: clean code for English Lab
 
+> **Archived 21 Nov 2026** (Roger: outdated). Kept for history only; its rules, where still true, are in [docs/REQUIREMENTS.md](../../REQUIREMENTS.md).
+
 ## Goal
 Keep the code clean as the site grows. A new Learning Situation (LS) should only need new **content** (and maybe new activities). The style, navigation, progress and phone behaviour come from shared code.
 

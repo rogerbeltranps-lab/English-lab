@@ -1,5 +1,7 @@
 # Research audit: changes for the LS project
 
+> **Archived 21 Nov 2026** (Roger: outdated). Kept for history only; its rules, where still true, are in [docs/REQUIREMENTS.md](../../REQUIREMENTS.md).
+
 **Approved by Roger on 26 Oct 2026** ("the rest I agree with all", then "go"). Full audit with sources: [How your Learning Situations measure up against the research](https://claude.ai/artifact/FhBnrKpdnaYA5C4bjDoBbT). This file lists what the **LS project** designs (content); the English Lab project builds the site changes and ticks them here.
 
 ## Site changes (English Lab project)

@@ -1,5 +1,7 @@
 # English Lab — Pending Tasks
 
+> **Archived 21 Nov 2026** (Roger: outdated). Kept for history only; its rules, where still true, are in [docs/REQUIREMENTS.md](../../REQUIREMENTS.md).
+
 This is the repository's living task list. Update it whenever a task is added, completed, or dropped.
 
 **Last updated:** October 16, 2026
