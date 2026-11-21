@@ -10,6 +10,8 @@
 // The board passes what it already has: elVoyage.html(V) draws the frame, elVoyage.wire(root, V) lays the map out at the width it gets.
 // V = {ls, skin (the LS id: SKINS, the whole world of the map), beds:[{id, kind: lp|cp|fp|bonus, plants:[{key, id, name, href, st}]}], fp:{title, sub, href, done}, now, me:{n, s},
 //      mates:[{n, s}], cont:{href, label}, store, save, en, quiet()}
+// The teacher's class map (teacher.html vyMap) passes no me and adds view (the map's name, to keep its scroll), pct, pctPort and later:
+// then the column on the right is 🧭 Class steps, the share of the group who did each step (classCol).
 (function(){
   const BASE=(()=>{try{return new URL("../",document.currentScript.src).href}catch(e){return "shared/"}})();
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -229,6 +231,10 @@
 .vy-steps .ok .tk,.vy-steps .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.vy-steps li.ok .n{color:#6b7280}
 .vy-steps li.now a{background:#fff;box-shadow:0 0 0 2px #b45309 inset}.vy-steps li.now .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}
 .vy-steps li.fp a{margin-top:8px;background:#fdf2d6;font-weight:700}.vy-steps li.fp .tk{border:0;font-size:17px;color:inherit}
+.vy-steps .sub{margin:-2px 14px 4px;font:600 11px system-ui,sans-serif;color:#8a5a1f}
+.vy-steps .pc{flex:none;min-width:44px;padding:3px 0;border-radius:999px;text-align:center;font:800 12px system-ui,sans-serif;color:#fff}.vy-steps .pc.lt{background:#e5e7eb;color:#6b7280}
+.vy-steps li.cl a:hover{background:none}.vy-steps li.cl.lt .n{color:#6b7280}.vy-steps li.cl em{display:block;font:600 11px system-ui,sans-serif;color:#9ca3af;font-style:normal}
+.vy-steps .pt .ppc{margin-left:auto;font:800 12px system-ui,sans-serif;color:#8a5a1f}
 .vy-steps li.s.pop .tk{animation:vytk .5s cubic-bezier(.2,1.8,.4,1)}@keyframes vytk{0%{transform:scale(.3)}100%{transform:scale(1)}}
 .vy-go{display:flex;margin-top:10px}.vy-go a{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;background:#3fa34d;color:#fff;text-decoration:none;font-weight:800;font-size:19px;border-radius:16px;padding:12px;box-shadow:0 4px 0 #2b7a36;min-width:0}
 .vy-go a small{font-weight:600;font-size:15px;opacity:.95;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vy-go a.fin{background:#b45309;box-shadow:0 4px 0 #7c3a06}.vy-go a.all{background:#fff;color:#174d3d;box-shadow:0 4px 0 #cbd5e1}
@@ -239,15 +245,32 @@
   // ---- the frame (the map itself is laid out by wire, at the width it gets) ----
   const cssVars=S=>{const u=f=>`url(${S.I}${f}.webp)`;return `--vy-bg:${u(S.bg.tile)};--vy-bgs:${S.bg.size}px;--vy-bgc:${S.bg.color};--vy-wash:${S.bg.wash||"transparent"};`
     +`--vy-st:${u(S.stop.step)};--vy-std:${u(S.stop.done)};--vy-stn:${u(S.stop.now)};--vy-veh:${u(S.veh.img)};--vy-band:${S.veh.band||"none"}`};
+  // 🧭 Class steps, the teacher's column beside the class map (Roger, 21 Nov 2026: "a column with the percentage of students that have done
+  // it", looking like the students' 🧭 Your steps): the same places and steps, each with the share of the group who finished it, in the
+  // site's colours (elPctCol); a place shows who finished all its steps. V.pct = {step key: %}, V.pctPort = {place index: %}, V.later = Set of
+  // the step keys not done in class yet (planned for today or a later class): their share is shown grey. Numbers only, never a name.
+  function classCol(V,M,en){const t=(ca,e)=>en?e:ca,fp=V.fp||{},pc=k=>V.pct[k],L=V.later||new Set(),cl=window.elPctCol||(()=>"#64748b");
+    const ds=M.stops.filter(s=>!L.has(s.key)&&pc(s.key)!=null),avg=ds.length?Math.round(ds.reduce((a,s)=>a+pc(s.key),0)/ds.length):null;
+    const pill=(p,grey)=>`<span class="pc${grey?" lt":""}" style="${grey?"":`background:${cl(p)}`}">${p==null?"–":p+"%"}</span>`;
+    let c=`<h2>🧭 ${t("Passos de la classe","Class steps")} <small>${avg==null?"":t(`mitjana ${avg}%`,`${avg}% average`)}</small></h2><div class="bar"><i style="width:${avg||0}%;background:${cl(avg)}"></i></div>`
+      +`<p class="sub">${t("% d'alumnes que l'han fet","% of students who have done it")}</p><ol>`;
+    M.items.forEach(it=>{
+      if(it.port){const p=(V.pctPort||{})[it.pi];c+=`<li class="pt"><span>${it.port.f}</span>${esc(it.port.c)}<span class="ppc" title="${esc(t("Han fet tots els passos","Did every step"))}">${p==null?"":p+"%"}</span></li>`;return}
+      const k=SK[it.sk]||SK.Step,lt=L.has(it.key);
+      c+=`<li class="s cl${lt?" lt":""}" data-k="${esc(it.key)}"><a>${pill(pc(it.key),lt)}<span class="n"><small style="color:${k[1]}">${esc(skName(it.sk,en))}</small>${esc(it.t)}${lt?`<em>${t("📅 encara no fet a classe","📅 not done in class yet")}</em>`:""}</span></a></li>`});
+    if(fp.title)c+=`<li class="s fp"><a><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final","Final product")}</small>${esc(fp.title)}</span></a></li>`;
+    return c+"</ol>"}
   function html(V){css();const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),n=M.stops.length,fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en);
     const now=M.stops.find(s=>s.key===V.now);
-    let col=`<h2>🧭 ${t("Els teus passos","Your steps")} <small>${t(`${M.done} de ${n} fets`,`${M.done} of ${n} done`)}</small></h2><div class="bar"><i style="width:${n?Math.round(M.done/n*100):0}%"></i></div><ol>`;
+    let col;
+    if(V.pct)col=classCol(V,M,en);   // the teacher's class map: the share of the group who did each step (no ticks, no names)
+    else{col=`<h2>🧭 ${t("Els teus passos","Your steps")} <small>${t(`${M.done} de ${n} fets`,`${M.done} of ${n} done`)}</small></h2><div class="bar"><i style="width:${n?Math.round(M.done/n*100):0}%"></i></div><ol>`;
     M.items.forEach(it=>{
       if(it.port){col+=`<li class="pt"><span>${it.port.f}</span>${esc(it.port.c)}<span class="tk${it.done?" ok":""}">✓</span></li>`;return}
       const k=SK[it.sk]||SK.Step,nw=now&&it.key===now.key;
       col+=`<li class="s${it.done?" ok":""}${nw?" now":""}" data-k="${esc(it.key)}"><a href="${esc(it.href)}"><span class="tk">${nw?"▶":"✓"}</span><span class="n"><small style="color:${k[1]}">${esc(skName(it.sk,en))}</small>${esc(it.t)}</span></a></li>`});
     if(fp.title)col+=`<li class="s fp${fp.done?" ok":""}${!now&&!fp.done?" now":""}"><a href="${esc(fp.href||"#")}"><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final","Final product")}</small>${esc(fp.title)}</span></a></li>`;
-    col+="</ol>";
+    col+="</ol>"}
     const go=V.cont?`<a href="${esc(V.cont.href)}">▶ ${t("Continua","Continue")} <small>· ${esc(V.cont.label||(now?now.t:""))}</small></a>`
       :fp.title&&!fp.done?`<a class="fin" href="${esc(fp.href||"#")}">🏆 ${t("Producte final","Final product")} <small>· ${esc(fp.title)}</small></a>`
       :`<a class="all" href="lab/practice.html">✓ ${t("Ho tens tot fet! Practica pel teu compte","You're all done! Practise on your own")} →</a>`;
@@ -276,7 +299,9 @@
     const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),RH=wide?80:66,YW=wide?100:72;sea.classList.toggle("narrow",!wide);
     const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
     Object.values(at).forEach(L=>L.sort((a,b)=>String(a.n).localeCompare(b.n)));
-    const meI=spot(V.me&&V.me.s!=null?V.me.s:M.done);
+    // no "You" (the teacher's class map): the view starts at the middle of the class
+    const mid=()=>{const L=(V.mates||[]).map(m=>m.s|0).sort((a,b)=>a-b);return L.length?L[L.length>>1]:M.done};
+    const meI=spot(V.me&&V.me.s!=null?V.me.s:V.me?M.done:mid());
     const bw=m=>wide?Math.max(52,String(m.n).length*7.5+16)+4:Math.max(46,String(m.n).length*6.3+14)+4;
     const pack=(L,room0,room)=>{const rows=[[]];let used=0,cap=room0;
       L.forEach(m=>{const w=bw(m),r=rows[rows.length-1];if(r.length?used+w>cap:w>cap&&cap<room){rows.push([]);used=0;cap=room}rows[rows.length-1].push(m);used+=w});
@@ -330,8 +355,9 @@
     map.innerHTML=h;
     // where the view starts: where it was, else my boat
     const toMe=b=>sc.scrollTo({top:Math.max(0,meXY[1]-sc.clientHeight*.55),behavior:b?"smooth":"auto"});
-    if(LAST[V.store]!=null&&LAST.w===W)sc.scrollTop=LAST[V.store];else toMe();LAST.w=W;
-    sc.addEventListener("scroll",()=>{LAST[V.store]=sc.scrollTop},{passive:true});
+    const LK=V.store||V.view||"-";   // the scroll kept per map (the teacher's map: per group)
+    if(LAST[LK]!=null&&LAST.w===W)sc.scrollTop=LAST[LK];else toMe();LAST.w=W;
+    sc.addEventListener("scroll",()=>{LAST[LK]=sc.scrollTop},{passive:true});
     // buttons
     // the button says what is happening: playing → "Music on"; on but the browser is still waiting for a first tap (browsers never
     // play sound before one) → "▶ Tap for music"; off → "Music off"

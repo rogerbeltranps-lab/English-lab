@@ -5,7 +5,7 @@
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}a[data-do]{color:#0f766e;cursor:pointer;text-decoration:underline dotted}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.chip.dim:not(.on){color:#64748b;border-style:dashed}.lsbar{margin:2px 0 10px}#stans td{white-space:normal}td.ac.st{cursor:pointer}td.ac.st:hover{outline:2px solid #0f766e;outline-offset:-2px}td.pt{white-space:nowrap}td.gcol{white-space:nowrap}a.ptm{cursor:pointer;text-decoration:underline dotted}td.gcol .grings{margin-left:0}td.exm{background:#f8fafc;white-space:nowrap}td.exm a.exrep{color:inherit;text-decoration:underline dotted}td.exm a.exrep:hover{color:#0f766e}td.exm .exsec{border:0;background:none;padding:0 0 0 4px;font-size:12px;cursor:pointer;opacity:.7}td.exm .exsec:hover{opacity:1}a.vygo{background:#1f6b52;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 2px 0 #174d3d}a.vygo:hover{filter:brightness(1.1)}
-.vymap{margin:8px 0 12px}.vymap .vy-steps,.vymap .vy-go,.vymap .vy-down{display:none}.vymap .vy{margin:0}
+.vymap{margin:8px 0 12px}.vymap .vy-go,.vymap .vy-down{display:none}.vymap .vy{margin:0}
 .vysea{position:relative;height:190px;margin:8px 0 12px;border-radius:16px;border:3px solid #b08a52;background:linear-gradient(#ffffff38,#ffffff38),url(shared/img/voyage/sea.webp) 0 0/240px repeat,#7fc0e3;overflow:hidden}
 .vysea .vyport{position:absolute;top:8px;background:#fbf3df;border:1px solid #b08a52;border-radius:10px;padding:2px 10px;font:700 13px Georgia,serif;color:#4a2f0e}.vysea .vyport.l{left:10px}.vysea .vyport.r{right:10px;max-width:45%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vysea .vyb{position:absolute;display:flex;align-items:center;gap:2px;width:40px}.vysea .vyb img{width:34px;height:34px}.vysea .vyb b{font-size:10.5px;color:#fff;border-radius:999px;padding:0 6px;border:1.5px solid #fff;white-space:nowrap;background:#16a34a}.vysea .vyb.amber b{background:#ea580c}.vysea .vyb.red b{background:#dc2626}
@@ -2155,19 +2155,31 @@ function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.
   const beds=acts(ls).filter(a=>!a.manual&&!(a.optional&&!a.checkpoint)&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,gid)).map(a=>{
     const ks=(EL_ACTIONS[a.id]||[]).filter(k=>!(a.skip||[]).includes(k)),off=elSecLocked(a,info,gid)||[],lk=k=>off.includes(k)||(k==="cards"||k==="practice")&&off.includes("vocab");
     const secs=(window.EL_SECTIONS||{})[a.id]||[],seen=new Set(),plants=[];
-    elTabGroups(a,ks).forEach(g=>{const id=vyTab(a,g[0]);if(seen.has(id)||on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+id)||g.every(lk))return;seen.add(id);
-      plants.push({id,key:a.id+"#"+id,name:((secs.find(x=>x[0]===id)||[])[1])||id,href:a.path?a.path+"#"+id:"#",st:"sprout"})});
+    elTabGroups(a,ks).forEach(g=>{const id=vyTab(a,g[0]);if(on&&!on.has(a.id+"#")&&!on.has(a.id+"#"+id)||g.every(lk))return;
+      if(seen.has(id)){const q=plants.find(x=>x.id===id);if(q)q.ks.push(...g);return}seen.add(id);   // ks: the steps of the stop (vyPct)
+      plants.push({id,key:a.id+"#"+id,ks:[...g],name:((secs.find(x=>x[0]===id)||[])[1])||id,href:a.path?a.path+"#"+id:"#",st:"sprout"})});
     return {id:a.id,kind:a.checkpoint?"cp":"lp",plants}}).filter(b=>b.plants.length);
   if(!beds.length)return "";
   VYV={ls:window.elLsNum&&L?elLsNum(L):"",skin:ls,en:true,beds,now:null,fp:{title:fa?fa.title.replace(/\s*\([^)]*\)\s*$/,"").replace(/^final product:\s*/i,""):"",href:fa&&fa.path||"#",done:false},
     me:null,mates:rows.map(r=>({n:first(r.s),s:r.done})),cont:null,store:null,save:false,
     // music on, except in the group's class time (the 🎵 button can still turn it on)
-    quiet:()=>!!(window.elSlotNow&&window.elTT&&elSlotNow(elTT(gid)))};
-  // wired once the box is on the page; the view starts at the middle of the class (no "You" here)
-  setTimeout(()=>{const r=document.querySelector(".vyrank .vymap");if(!r||!VYV)return;elVoyage.wire(r,VYV);
-    const sc=r.querySelector(".vy-sc"),ms=[...r.querySelectorAll(".vy-mates")].sort((x,y)=>x.offsetTop-y.offsetTop),m=ms[ms.length>>1];
-    if(sc&&m)sc.scrollTop=Math.max(0,m.offsetTop-sc.clientHeight*.5)},0);
+    quiet:()=>!!(window.elSlotNow&&window.elTT&&elSlotNow(elTT(gid))),view:"grp:"+gid+":"+ls,...vyPct(ls,gid,info,rows,beds)};
+  // wired once the box is on the page; the view starts at the middle of the class (no "You" here: el-voyage.js wire)
+  setTimeout(()=>{const r=document.querySelector(".vyrank .vymap");if(r&&VYV)elVoyage.wire(r,VYV)},0);
   return elVoyage.html(VYV)}
+// 🧭 Class steps beside the class map (Roger, 21 Nov 2026: "on the right, I also want to see this with the percentage of students who've
+// done them … a column with the percentage of students that have done it"): for every stop of the map, the share of the group's students
+// who did all its steps; for every place, the share who did all its stops. A stop not done in class yet (planned for today or a later
+// class, and not homework: elDueBefore, the same test as ✅ To do) shows its share in grey and stays out of the average. No reads, no names.
+function vyPct(ls,gid,info,rows,beds){const N=rows.length,pct={},pctPort={},later=new Set();if(!N)return {pct,pctPort,later};
+  const db=window.elDueBefore?elDueBefore(info,gid):null,who={};
+  beds.forEach(b=>{const a=byId(b.id);if(!a)return;const ds=rows.map(r=>doneSet(r.s.uid,a));
+    b.plants.forEach(p=>{const g=p.ks||[],ok=new Set();
+      rows.forEach((r,i)=>{if(g.length&&g.every(k=>ds[i].has(k)))ok.add(r.s.uid)});who[p.key]=ok;pct[p.key]=Math.round(ok.size/N*100);
+      if(db&&!db.acts.has(a.id)&&![...(db.tabs[a.id]||[])].some(x=>vyTab(a,x)===p.id))later.add(p.key)})});
+  const M=elVoyage.model({skin:ls,en:true,beds});
+  M.ports.forEach(x=>{if(x.keys.length)pctPort[x.pi]=Math.round(rows.filter(r=>x.keys.every(k=>who[k]&&who[k].has(r.s.uid))).length/N*100)});
+  return {pct,pctPort,later}}
 const fpAct=(ls,list)=>{const g=(window.EL_GRADING||{})[ls]||{};return (g.fp&&byId(g.fp.a))||(list||acts(ls)).find(a=>a.manual&&a.graded)||(list||acts(ls)).find(a=>a.manual)||null};
 const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};if(x.max)return true;
   return !!(g.fp&&g.fp.a===a.id&&!g.fp.mark&&g.fp.rows.length&&g.fp.rows.every(r=>lvOf(u,a.id,r.step,r.c)))};
