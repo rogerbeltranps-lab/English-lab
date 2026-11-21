@@ -557,6 +557,145 @@ window.TN_SHADOW = {
    ]
   ]
  },
+ "mistakes_n21": {
+  "title": "Your sentences from 18–21 Nov 2026, the native way",
+  "src": "audio/shadow-mistakes-n21.mp3",
+  "slow": "audio/shadow-mistakes-n21-slow.mp3",
+  "t": [
+   0,
+   27.9
+  ],
+  "ts": [
+   0,
+   34.87
+  ],
+  "lines": [
+   [
+    "Is it because it’s Saturday?"
+   ],
+   [
+    "The table full screen is missing here."
+   ],
+   [
+    "A microphone is covered."
+   ],
+   [
+    "I can hear two songs."
+   ],
+   [
+    "Can I switch between these sections?"
+   ],
+   [
+    "Is that what you did?"
+   ],
+   [
+    "I want a full-screen view with the menu at the top."
+   ],
+   [
+    "I can’t read some of the letters properly here."
+   ],
+   [
+    "I want everything to be ready before class."
+   ],
+   [
+    "Why is English Lab so pricey?"
+   ]
+  ],
+  "marks": [
+   [
+    "Is it because it’s Saturday? ↗"
+   ],
+   [
+    "The table full screen is missing here. ↘"
+   ],
+   [
+    "A microphone is covered. ↘"
+   ],
+   [
+    "I can hear two songs. ↘"
+   ],
+   [
+    "Can I switch between these sections? ↗"
+   ],
+   [
+    "Is that what you did? ↗"
+   ],
+   [
+    "I want a full-screen view with the menu at the top. ↘"
+   ],
+   [
+    "I can’t read some of the letters properly here. ↘"
+   ],
+   [
+    "I want everything to be ready before class. ↘"
+   ],
+   [
+    "Why is English Lab so pricey? ↘"
+   ]
+  ],
+  "cues": [
+   [
+    0.4,
+    1.91,
+    0.5,
+    2.39
+   ],
+   [
+    2.81,
+    4.8,
+    3.51,
+    6.0
+   ],
+   [
+    5.7,
+    7.15,
+    7.12,
+    8.94
+   ],
+   [
+    8.05,
+    9.44,
+    10.06,
+    11.8
+   ],
+   [
+    10.34,
+    12.23,
+    12.92,
+    15.29
+   ],
+   [
+    13.13,
+    14.31,
+    16.41,
+    17.89
+   ],
+   [
+    15.21,
+    17.77,
+    19.01,
+    22.21
+   ],
+   [
+    18.67,
+    20.91,
+    23.34,
+    26.14
+   ],
+   [
+    21.81,
+    24.26,
+    27.26,
+    30.32
+   ],
+   [
+    25.16,
+    27.0,
+    31.45,
+    33.75
+   ]
+  ]
+ },
  "mistakes_n16": {
   "title": "Your sentences from 11–16 Nov 2026, the native way",
   "src": "audio/shadow-mistakes-n16.mp3",

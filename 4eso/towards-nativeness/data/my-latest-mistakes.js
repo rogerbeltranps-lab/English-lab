@@ -12,6 +12,54 @@
    (when items have ca), ✨ Make it idiomatic, 🗣 Spoken English and 🗣 Shadowing (when data/shadow.js has a clip for the batch: run
    tools/towards-nativeness/shadow.py after adding a batch). Older batches (from the fourth on) come back together in 🔁 Review, mixed. */
 window.TN_MISTAKES = [
+  { id: 'n21', date: '18–21 Nov 2026', from: 'your two newest lists', items: [
+    { s: 'I want the students see their exam results on the dashboard.', bad: 'the students see', fix: ['the students to see'], why: 'want + someone + <strong>to</strong>.', ca: 'Vull que els alumnes facin el vídeo abans de divendres.', en: ['I want the students to make the video before Friday', 'I want students to make the video before Friday', 'I want the students to make the video by Friday', 'I want students to make the video by Friday'] },
+    { s: 'I want that everything is clear for the students.', bad: 'that everything is', fix: ['everything to be'], why: 'Never <em>want that</em>: want + something + <strong>to be</strong>.' },
+    { s: 'The students view still shows the old marks.', bad: 'students view', fix: ['student view'], why: 'A noun used as an adjective stays singular: <strong>student</strong> view.' },
+    { s: 'Where can I see the exams results?', bad: 'exams results', fix: ['exam results'], why: 'Singular in front: <strong>exam</strong> results.' },
+    { s: 'Open the samples exam first.', bad: 'samples exam', fix: ['sample exam'], why: 'Singular in front: <strong>sample</strong> exam.' },
+    { s: 'My 2nd of ESO group played the game in class mode.', bad: '2nd of ESO', fix: ['2nd ESO', '2 ESO'], why: 'No <em>of</em> in course names: <strong>2nd ESO</strong>.', ca: 'Segons les notes, el grup de 4t d’ESO va millor.', en: ['Based on the marks, the 4th ESO group is doing better', 'Based on the marks, the 4 ESO group is doing better', 'Judging by the marks, the 4th ESO group is doing better', 'Going by the marks, the 4th ESO group is doing better', 'According to the marks, the 4th ESO group is doing better'] },
+    { s: 'We started the LS2 on Monday.', bad: 'the LS2', fix: ['LS2'], why: 'No <em>the</em> before a name with a number: <strong>LS2</strong>, Room 4.' },
+    { s: 'Can you do a copy of the 4th ESO path?', bad: 'do a copy', fix: ['make a copy'], why: '<strong>make</strong> = create something new: make a copy, make a video.' },
+    { s: 'They need to do the video before Friday.', bad: 'do the video', fix: ['make the video'], why: 'You <strong>make</strong> a video.' },
+    { s: 'The games are done at the end of the class.', bad: 'are done', fix: ['are played'], why: 'You <strong>play</strong> a game.' },
+    { s: 'I checked it twice and is wrong again.', bad: 'and is wrong', fix: ['and it’s wrong', 'and it is wrong'], why: 'Every verb needs its subject: <strong>it’s</strong> wrong.' },
+    { s: 'This time will be different.', bad: 'This time will be', fix: ['This time it will be', 'This time it’ll be'], why: 'Every verb needs its subject: this time <strong>it will</strong> be.' },
+    { s: 'When I open the page, shows an error.', bad: 'shows', fix: ['it shows'], why: 'Every verb needs its subject: <strong>it</strong> shows.' },
+    { s: 'Is very slow on my phone today.', bad: 'Is very slow', fix: ['It’s very slow', 'It is very slow'], why: 'English never drops <strong>it</strong>.', ca: 'Hauria d’estar sempre activat.', en: ['It should always be on', 'It should always be switched on', 'It should always be turned on', 'It should always be enabled', 'It should always be active'] },
+    { s: 'Is it closed because is Saturday?', bad: 'because is', fix: ['because it’s', 'because it is'], why: 'Never drop the subject <strong>it</strong>.' },
+    { s: 'The menu missing on this page.', bad: 'menu missing', fix: ['menu is missing'], why: 'A sentence needs its verb: the menu <strong>is</strong> missing.' },
+    { s: 'Why English Lab is so slow today?', bad: 'Why English Lab is', fix: ['Why is English Lab'], why: 'Questions invert: why <strong>is English Lab</strong>…?', ca: 'Per què l’English Lab és tan car?', en: ['Why is English Lab so expensive', 'Why is English Lab so pricey', 'Why is English Lab that expensive', 'Why is English Lab that pricey'] },
+    { s: 'That’s what you did with the exam results?', bad: 'That’s what you did', fix: ['Is that what you did'], why: 'Questions invert: <strong>Is that</strong> what you did?' },
+    { s: 'There are three activities pending in the student view.', bad: 'three activities pending', fix: ['three pending activities'], why: 'Adjective before the noun: <strong>pending activities</strong>.', ca: 'Hi ha tres redaccions pendents.', en: ['There are three pending writings', 'There are 3 pending writings', 'There are three pending essays', 'There are three pending writing tasks'] },
+    { s: 'They gave us an exam easy.', bad: 'an exam easy', fix: ['an easy exam'], why: 'Adjective before the noun: an <strong>easy exam</strong>.' },
+    { s: 'I’ll send you a mail with the sample exam.', bad: 'a mail', fix: ['an email'], why: '<em>mail</em> is uncountable: send <strong>an email</strong>.', ca: 'Envia’m un correu amb els resultats dels exàmens.', en: ['Send me an email with the exam results', 'Email me the exam results', 'Send me an email with the results of the exams'] },
+    { s: 'We only can enter marks on Fridays.', bad: 'only can', fix: ['can only'], why: '<em>only</em> after the modal: can <strong>only</strong> enter.' },
+    { s: 'I need first to plan the sessions for LS2.', bad: 'I need first to plan', fix: ['First I need to plan', 'First, I need to plan'], why: '<strong>First</strong> goes at the start (or <em>…plan them first</em>).', ca: 'Primer he de planificar la SA2.', en: ['First I need to plan LS2', 'First I have to plan LS2', 'I need to plan LS2 first', 'I have to plan LS2 first'] },
+    { s: 'The button should be always on.', bad: 'be always', fix: ['always be'], why: '<em>always</em> after the modal: should <strong>always be</strong>.' },
+    { s: 'Students write their texts on the web.', bad: 'the web', fix: ['the website', 'the site'], why: '<em>la web</em> → the <strong>website</strong>; <em>the web</em> is the whole internet.' },
+    { s: 'Can I introduce marks on the dashboard?', bad: 'introduce marks', fix: ['enter marks'], why: '<em>introduir notes</em> → <strong>enter</strong> marks.', ca: 'Has d’introduir les notes a la web.', en: ['You have to enter the marks on the website', 'You need to enter the marks on the website', 'You must enter the marks on the website', 'You have to enter the marks on the site', 'You have to enter the marks into the website'] },
+    { s: 'Is this the last version of the website?', bad: 'last version', fix: ['latest version'], why: '<strong>latest</strong> = the newest; <em>last</em> = the final one.', ca: 'És l’última versió?', en: ['Is it the latest version', 'Is this the latest version', 'Is that the latest version'] },
+    { s: 'Could you explain me how the export works?', bad: 'explain me how', fix: ['explain to me how', 'explain how'], why: 'explain <strong>to</strong> someone, never <em>explain me</em>.', ca: 'M’ho pots explicar?', en: ['Can you explain it to me', 'Could you explain it to me'] },
+    { s: 'I’m hearing two songs.', bad: 'I’m hearing', fix: ['I can hear'], why: 'Sense verbs: <strong>I can hear</strong>, I can see.' },
+    { s: 'Can you change among these sections?', bad: 'change among', fix: ['switch between'], why: '<strong>switch between</strong> two or more things.' }
+  ],
+  // ✨ Make it idiomatic: whole sentences to rewrite (spoken or written). a = natural versions; the first one is read aloud and shadowed.
+  idiom: [
+    { s: 'I want a full screen with the above menu.', a: ['I want a full-screen view with the menu at the top.', 'I want a full-screen view with the menu on top.'], why: 'a <strong>full-screen view</strong>; <em>the above menu</em> sounds like a document: the <strong>menu at the top</strong>.' },
+    { s: 'I can’t read all the letters well here.', a: ['I can’t read some of the letters properly here.', 'Some of the letters are hard to read here.'], why: '<em>not all</em> = <strong>some of</strong>; read something <strong>properly</strong>.' },
+    { s: 'I want that everything is ready before the class.', a: ['I want everything to be ready before class.', 'I want everything ready before class.'], why: 'want + something + <strong>to be</strong>; <strong>before class</strong>, no <em>the</em>.' },
+    { s: 'Why English Lab is that pricy?', a: ['Why is English Lab so pricey?', 'Why is English Lab that pricey?', 'Why is English Lab so expensive?'], why: 'Questions invert: <strong>Why is English Lab</strong>…?' }
+  ],
+  // 🗣 Spoken English: short things you say all the time (spoken = said aloud in Make it idiomatic and shadowed).
+  spoken: [
+    { s: 'Is it because is Saturday?', a: ['Is it because it’s Saturday?'], why: 'Say the <strong>it’s</strong>.' },
+    { s: 'Table full screen missing here.', a: ['The table full screen is missing here.', 'The full-screen table is missing here.'], why: 'Article and verb: <strong>The</strong> table… <strong>is</strong> missing.' },
+    { s: 'There’s a microphone covered.', a: ['A microphone is covered.', 'One of the microphones is covered.'], why: 'Describe its state with <strong>is</strong>.' },
+    { s: 'I’m hearing two songs.', a: ['I can hear two songs.'], why: '<strong>I can hear</strong>.' },
+    { s: 'Can I change among these sections?', a: ['Can I switch between these sections?'], why: '<strong>switch between</strong>.' },
+    { s: 'That’s what you did?', a: ['Is that what you did?'], why: 'Questions invert.' }
+  ] },
   { id: 'n16', date: '11–16 Nov 2026', from: 'the project chat and about 80 threads', items: [
     { s: 'Change “Marks” for “Assessment details”.', bad: 'for', fix: ['to'], why: 'change X <strong>to</strong> Y.', ca: 'Canvia «Notes» per «Qualificacions».', en: ['Change Notes to Grades', 'Change Notes to Marks'] },
     { s: 'Where did you take the dictionary from?', bad: 'take', fix: ['get'], why: '<strong>get</strong> something from somewhere.', ca: 'D’on has tret aquestes imatges?', en: ['Where did you get these images from', 'Where did you get these pictures from', 'Where did you get those images from', 'Where did you get those pictures from'] },
@@ -135,6 +183,10 @@ window.TN_MISTAKES = [
 /* 📍 in / on / at (Roger, 17 Nov 2026: "in/on prepositions like in/on the list are difficult for me"): its own strand, always the second
    step. All your own preposition slips, from every list so far. Add new ones at the TOP when a new list has them (q with ___, a, en). */
 window.TN_PREPS = [
+  { q: 'Open the activity ___ class mode.', a: ['in'], en: 'in a mode: in class mode, in full screen.' },
+  { q: 'The link is ___ the list ___ the top of the page.', a: ['on at', 'on / at'], en: 'on a list; at the top.' },
+  { q: 'It looks fine ___ my phone but not ___ the laptop.', a: ['on on', 'on / on'], en: 'on a device.' },
+  { q: 'My students are ___ 4th ESO.', a: ['in'], en: 'in a year / course / group.' },
   { q: 'It’s already ___ the list.', a: ['on'], en: 'on a list / the agenda / a page: things you read from.' },
   { q: 'Can you add it ___ the list?', a: ['to'], en: 'add something to something.' },
   { q: 'And it takes a while to see the mark ___ the table.', a: ['in'], en: 'in a table: the mark is inside a cell.' },
