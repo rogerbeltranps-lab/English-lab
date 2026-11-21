@@ -4218,7 +4218,7 @@ const tkOf=x=>(S.D.tk[x.gid]||{}).ticks||{};
 const itKey=(d,it)=>"@"+d+"#"+it;
 const nrm=s=>String(s).toLowerCase().replace(/[·:()\-–,.!?]/g," ").replace(/\s+/g," ").trim();
 const shortTi=a=>a.title.split(/[:(]/)[0].trim();
-const isLpA=a=>!a.optional&&!/checkpoint|sample exam|first exam|final product|reflect/i.test(a.title);   // the optional practice exam ("First exam" since 19 Nov 2026) is never a learning path: no LP number
+const isLpA=a=>!a.optional&&!/checkpoint|sample exam|first exam|final product|reflect/i.test(a.title);   // the optional practice exam ("Sample exam"; it was "First exam" 19–21 Nov 2026) is never a learning path: no LP number
 // "LP3 Now or usually?" (its number in the plan, else its place among the LS's learning paths), "Final product", else the short title
 function agLab(x,a){if(/final product/i.test(a.title))return "Final product";
   if(a.agendaDue)return "📖 "+a.title;   // the Book (Roger, 12 Nov 2026): no LP number, and it never shifts the others' numbers

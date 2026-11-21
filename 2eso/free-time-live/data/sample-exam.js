@@ -1,4 +1,4 @@
-/* 2 ESO · LS2 · First exam (practice, not graded; the page is still sample-exam.html, key ls2SampleExam2ESO). Roger, 19 Nov 2026: "Adapt
+/* 2 ESO · LS2 · Sample exam (practice, called First exam 19–21 Nov 2026, not graded; the page is still sample-exam.html, key ls2SampleExam2ESO). Roger, 19 Nov 2026: "Adapt
    the sample exam (let's label it first exam) with only everything we've done … only up to the step of the group that has done less", and
    "tailor … so that students have an exam easy … more related to what they know best". So:
    - content = LP1 Getting started + LP2 What are they doing? only (what both 2 ESO groups have done; 2 ESO A does the LP2 grammar the same
@@ -39,7 +39,7 @@ const L51 = ['Unfinished or not understandable; no clear parts, even with the fr
 const AUDIO = { audio: 'audio/sample-exam-two-vlogs.mp3', title: 'Two vlogs: Ellie and Jack', script: SCRIPT };
 
 window.LP = {
-  key: 'ls2SampleExam2ESO', n: 'E', title: 'First exam',
+  key: 'ls2SampleExam2ESO', n: 'E', title: 'Sample exam',
   panels: [
     // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
     { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
