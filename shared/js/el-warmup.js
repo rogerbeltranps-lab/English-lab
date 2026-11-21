@@ -138,7 +138,8 @@ function guess(c){const s=S.st;if(!s||s.shown||s.got.has(c)||s.miss.includes(c)|
   if(letters(s.it.w).includes(c))s.got.add(c);else s.miss.push(c);if(hangWon()||s.miss.length>=LIVES)s.shown=true;draw()}
 
 function click(e){const b=e.target.closest("button");if(!b||!S&&!b.dataset.x)return;
-  if(b.dataset.x)return S&&S.view!=="rem"&&S.o.onRemind&&!remDone(S.o.s)?toRem():close();
+  if(b.dataset.x)return S&&S.view!=="rem"&&(S.o.onRace||S.o.onRemind)&&!remDone(S.o.s)?toRem():close();
+  if(b.dataset.race){const f=S&&S.o.onRace;close();if(f)f({fin:true});return}
   if(b.dataset.say){S.sayOpen=!S.sayOpen;return draw()}
   if(b.dataset.tosay){S.view="say";return draw()}
   if(b.dataset.togame)return toGame();
@@ -158,7 +159,7 @@ function inWrong(i){const ws=S.st.it.ws;let on=false;for(let k=0;k<=i;k++){if(/\
 function draw(){if(!box||!S)return;if(S.view==="say")return drawSay();if(S.view==="rem")return drawRem();const g=GAMES.find(x=>x.id===S.game),n=S.items.length,end=S.round>=n;
   const tabs=GAMES.filter(x=>itemsFor(x.id,S.pool).length).map(x=>`<button class="wu-t ${x.id===S.game?"on":""}" data-g="${x.id}" title="Play ${E(x.name)} instead">${x.em} ${E(x.name)}</button>`).join("");
   let body="";
-  if(end)body=`<div class="wu-end"><div class="wu-big">🎉</div><h2>Warm-up done!</h2><p>${E(S.o.title||"")}</p><div class="wu-row"><button class="wu-b" data-again="1">↻ Play again</button><button class="wu-b go" data-x="1">▶ Start the class</button></div></div>`;
+  if(end)body=`<div class="wu-end"><div class="wu-big">🎉</div><h2>Warm-up done!</h2><p>${E(S.o.title||"")}</p><div class="wu-row"><button class="wu-b" data-again="1">↻ Play again</button><button class="wu-b go" data-x="1">${S.o.onRace&&!remDone(S.o.s)?"⛵ Who's winning the race? →":"▶ Start the class"}</button></div></div>`;
   else if(S.game==="hang")body=drawHang();else if(S.game==="vow")body=drawVow();else if(S.game==="order")body=drawOrder();else body=drawSpot();
   const done=!end&&S.st&&S.st.shown;
   box.innerHTML=`<div class="wu-top"><b>🔥 Warm-up · ${E(S.o.gname||S.o.g)}</b>${S.say?`<button class="wu-t" data-tosay="1" title="Show the saying of the day again">💬 Saying</button>`:""}<span class="wu-tabs">${tabs}</span><button class="wu-b ghost" data-x="1" title="Close the warm-up (Esc)">▶ Start the class</button></div>
@@ -217,9 +218,14 @@ function drawSpot(){const s=S.st,ws=s.it.ws;
 // and o.onRemind() then shows every student their own list on their screen (el-cm-agenda.js remind → el-cloud.js cmRemind → el-todo.js
 // remind). The numbers are the dashboard's copy in this browser (teacher.html remSave, localStorage el_rem_<group>): what the group did in
 // class before today or has as homework; the share of students per step; never a name. No copy (or one over 12 hours old): the message only.
+// Courses with the race map never get this slide: toRem opens the map instead (below).
 const REM_K="el_wu_rem";
 const remDone=s=>{try{return !!s&&sessionStorage.getItem(REM_K)===String(s)}catch(e){return false}};
-function toRem(){S.view="rem";if(!remDone(S.o.s)){try{sessionStorage.setItem(REM_K,String(S.o.s))}catch(e){}try{const r=S.o.onRemind&&S.o.onRemind();if(r&&r.catch)r.catch(e=>console.warn("finish reminder",e))}catch(e){console.warn("finish reminder",e)}}draw()}
+// ⛵ In the courses with the race map (o.onRace) the games lead straight to it (Roger, 21 Nov 2026: "we are repeating the info"; he chose
+// the students' own ✅ card on the website, and in class once the map closes): no slide here, the map says "Finish all your activities!"
+// on top, students see 👀 Look at the screen, then their own card when the map closes (el-cm-agenda.js mapClose). Once per class mode.
+function toRem(){if(S.o.onRace){try{sessionStorage.setItem(REM_K,String(S.o.s))}catch(e){}const f=S.o.onRace;close();f({fin:true});return}
+  S.view="rem";if(!remDone(S.o.s)){try{sessionStorage.setItem(REM_K,String(S.o.s))}catch(e){}try{const r=S.o.onRemind&&S.o.onRemind();if(r&&r.catch)r.catch(e=>console.warn("finish reminder",e))}catch(e){console.warn("finish reminder",e)}}draw()}
 function remData(g){try{const d=JSON.parse(localStorage.getItem("el_rem_"+g)||"null");return d&&d.g===g&&Date.now()-d.at<12*36e5?d:null}catch(e){return null}}
 const pcCol=p=>window.elPctCol?elPctCol(p):p==null?"#cbd5e1":p<50?"#dc2626":p<60?"#ea580c":p<80?"#16a34a":p<90?"#2563eb":"#8b5cf6";
 function drawRem(){const d=remData(S.o.g),hm=t=>new Date(t).toTimeString().slice(0,5);

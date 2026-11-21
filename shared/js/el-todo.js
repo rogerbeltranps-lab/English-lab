@@ -96,10 +96,12 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   document.body.append(box,btn);
   const draw=()=>{const n=counts();btn.innerHTML=`✅ ${t("Per fer","To do")}${n?`<span class="n">${n}</span>`:""}`;if(!box.hidden)box.innerHTML=panel()};
   const show=o=>{box.hidden=!o;store.set("el_todo_open",o?"1":"0");draw()};
-  btn.onclick=()=>show(box.hidden);
+  // ✅ To do opens the same card as in class, with links (Roger, 21 Nov 2026: "maybe it's clearer than the current To do … when they press
+  // the button to do"); the old panel stays only as a fallback
+  btn.onclick=()=>{if(document.getElementById("el-rem"))return;if(REM){remind({links:true});return}show(box.hidden)};
   box.addEventListener("click",e=>{if(e.target.closest("[data-x]"))show(false)});
-  // Closed unless the student left it open (no more "once a week": there is no week plan for students, Roger 6 Nov 2026).
-  box.hidden=store.get("el_todo_open")!=="1";
+  // Closed: the button opens the card (remind) now.
+  box.hidden=true;
   draw();
   // ✅ Finish your activities (Roger, 21 Nov 2026): what remind() below shows in class, from the same pieces as the list above
   REM=()=>{const db=window.EL_RAW_OPEN?null:window.elDueBefore(info,group),dr=((p._dropped||{})[gi])||[],secOf=a=>(window.EL_SECTIONS||{})[a.id]||[];
@@ -113,7 +115,7 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
     // checkpoints and anything else on the list that has no bar of its own
     td.filter(x=>!lps.some(z=>z.a===x.a)).forEach(x=>lps.push({a:x.a,lab:num(x.a)+x.a.title.split(/[:(]/)[0].trim(),n:0,of:0,pc:null,x}));
     const ex=W.exam(p,gi),dn=ex?W.days(today,ex):null;
-    return {ca,lps,hw:hws().filter(h=>!h.done),exam:ex&&dn>=0?{d:W.date(ex,lang),n:dn}:null}};
+    return {ca,lps,hw:hws().filter(h=>!h.done),exam:ex&&dn>=0?{d:W.date(ex,lang),n:dn}:null,href}};
   remReady();
   // progress made on this page shows when the student comes back to the tab or reopens the list
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)draw()});
@@ -134,13 +136,15 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
 // group has worked on (what was done in class before today or set as homework, elDueBefore: the share of those steps done; a tab for a later
 // class is never shown or counted here), the tabs still to do under it (the ✅ To do list, elTodoList), homework not done and the exam day.
 // No links: in class mode the class follows the teacher; ✅ To do on every page has them. Catalan for Starter/Base. No reads of its own.
-export async function remind(){const r=await Promise.race([remP,new Promise(z=>setTimeout(z,20000))]);if(!REM||document.getElementById("el-rem"))return false;
+// o.race (the board, once a day: today.html vyRace): the same card when they open the website, with the race line; o.done() runs when it closes.
+export async function remind(o){o=o||{};const r=await Promise.race([remP,new Promise(z=>setTimeout(z,20000))]);if(!REM||document.getElementById("el-rem"))return false;
   const D=REM(),t=(c,e)=>D.ca?c:e,col=p=>window.elPctCol?elPctCol(p):"#16a34a";
   const todo=D.lps.filter(z=>z.x).length+D.hw.length;
   const rows=D.lps.map(z=>{const x=z.x,ok=!x;
-    const tabs=x?(x.cp?`<span class="tb">⏱ ${t(`Primer el ${esc(x.cp.title)}`,`First ${esc(x.cp.title)}`)}</span>`:x.tabs.length?x.tabs.map(([,nm])=>`<span class="tb">${esc(nm)}</span>`).join(""):`<span class="tb">${z.a.checkpoint?t("Fes-lo","Do it"):t("Tot","All of it")}</span>`):"";
+    const L=(h,txt)=>o.links&&D.href?`<a class="tb" href="${h}">${txt} →</a>`:`<span class="tb">${txt}</span>`;   // o.links: each one opens the activity
+    const tabs=x?(x.cp?L(o.links&&D.href?D.href(x.cp):"",`⏱ ${t(`Primer el ${esc(x.cp.title)}`,`First ${esc(x.cp.title)}`)}`):x.tabs.length?x.tabs.map(([id,nm])=>L(o.links&&D.href?D.href(z.a,id):"",esc(nm))).join(""):L(o.links&&D.href?D.href(z.a):"",z.a.checkpoint?t("Fes-lo","Do it"):t("Tot","All of it"))):"";
     return `<li class="${ok?"ok":""}"><div class="r"><span class="n">${esc(z.lab)}</span>${z.pc==null?"<span></span><b></b>":`<span class="bar"><i style="width:${z.pc}%;background:${col(z.pc)}"></i></span><b>${z.pc} %</b>`}<small>${ok?"✔ "+t("Fet","Done"):x.late?"⏰ "+t("Endarrerida","Late"):""}</small></div>${tabs?`<div class="tbs"><span class="lb">${t("Et falta:","Still to do:")}</span>${tabs}</div>`:""}</li>`}).join("");
-  const hw=D.hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b>${D.hw.map(h=>`<div>${esc(ELWeek.taskText(h.x,D.ca?"ca":"en"))}</div>`).join("")}</div>`:"";
+  const hw=D.hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b>${D.hw.map(h=>`<div>${esc(ELWeek.taskText(h.x,D.ca?"ca":"en"))}${o.links&&h.href?` <a class="tb" href="${h.href}">${t("Obre","Open")} →</a>`:""}</div>`).join("")}</div>`:"";
   const exam=D.exam?`<div class="ex">📝 ${t("Examen","Exam")}: ${D.exam.d}${D.exam.n>1?t(` · d'aquí a ${D.exam.n} dies`,` · in ${D.exam.n} days`):D.exam.n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
   const st=document.createElement("style");st.id="el-rem-css";st.textContent=`
 #el-rem{position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;font:16px/1.35 system-ui,sans-serif;color:#0f172a}
@@ -152,6 +156,7 @@ export async function remind(){const r=await Promise.race([remP,new Promise(z=>s
 #el-rem .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#el-rem .bar{height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden}#el-rem .bar i{display:block;height:100%;border-radius:999px;min-width:6px}
 #el-rem .r b{text-align:right;font-size:18px}#el-rem .r small{color:#64748b;font-size:13px;white-space:nowrap}#el-rem li:not(.ok) .r small{color:#b91c1c;font-weight:600}#el-rem li.ok .r small{color:#16a34a;font-weight:600}
 #el-rem .tbs{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}#el-rem .lb{font-size:13px;color:#b91c1c;font-weight:700;margin-right:2px}
+#el-rem a.tb{text-decoration:none}#el-rem a.tb:hover{border-color:#ea580c;background:#ffedd5}
 #el-rem .tb{font-size:13px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:2px 10px}
 #el-rem .hw{background:#ecfeff;color:#155e75;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:15px}#el-rem .ex{background:#fef3c7;border-radius:10px;padding:8px 12px;margin:10px 0 4px;font-size:15px}
 #el-rem .all{background:#f0fdf4;color:#166534;border-radius:10px;padding:10px 12px;font-weight:700;margin:4px 0 8px}
@@ -160,11 +165,11 @@ export async function remind(){const r=await Promise.race([remP,new Promise(z=>s
 @media (max-width:640px){#el-rem{padding:8px}#el-rem .hd,#el-rem .bd,#el-rem .ft{padding-left:14px;padding-right:14px}#el-rem .r{grid-template-columns:minmax(0,1fr) 52px;gap:4px 10px}#el-rem .bar{grid-column:1/-1;grid-row:2}#el-rem .r small{grid-column:1/-1}#el-rem .ft{flex-direction:column;align-items:stretch}}
 @media print{#el-rem{display:none}}`;
   if(!document.getElementById("el-rem-css"))document.head.append(st);
-  const o=document.createElement("div");o.id="el-rem";o.className="notranslate";o.translate=false;
-  o.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-rem-h"><div class="hd"><h2 id="el-rem-h">✅ ${todo?t("Acaba totes les activitats!","Finish all your activities!"):t("Ho tens tot fet!","You're up to date!")}</h2>
-    <p>${todo?t("Totes les activitats compten. Aquí tens el que vam fer a classe i el que encara et falta.","Every activity counts. Here is what we have done in class and what you still have to do."):t("Has fet totes les activitats que hem fet a classe. Molt bé!","You have done every activity we did in class. Well done!")}</p></div>
+  const el=document.createElement("div");el.id="el-rem";el.className="notranslate";el.translate=false;
+  el.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-rem-h"><div class="hd"><h2 id="el-rem-h">✅ ${todo?t("Acaba totes les activitats!","Finish all your activities!"):t("Ho tens tot fet!","You're up to date!")}</h2>
+    <p>${todo?(o.race?t("Per guanyar la cursa, acaba-les totes: cada activitat que acabes et fa avançar. ","To win the race, finish them all: every activity you finish moves you forward. "):"")+t("Totes les activitats compten. Aquí tens el que vam fer a classe i el que encara et falta.","Every activity counts. Here is what we have done in class and what you still have to do."):t("Has fet totes les activitats que hem fet a classe. Molt bé!","You have done every activity we did in class. Well done!")}</p></div>
     <div class="bd">${D.lps.length?`<h3>${t("La meva feina a cada learning path","My work in each learning path")}</h3><ul>${rows}</ul>`:""}${hw}${exam}</div>
-    <div class="ft"><p>${todo?t("Acaba-les a casa o a classe quan acabis abans.","Finish them at home, or in class when you finish early."):t("Continua així!","Keep it up!")}</p><button type="button" data-x>👍 ${t("D'acord","OK")}</button></div></div>`;
-  const shut=()=>{o.remove();clearTimeout(tm)},tm=setTimeout(shut,5*60e3);   // gone after 5 minutes if nobody presses OK
-  o.addEventListener("click",e=>{if(e.target.closest("[data-x]")||e.target===o)shut()});
-  document.body.append(o);o.querySelector("[data-x]").focus();return true}
+    <div class="ft"><p>${todo?(o.links?t("Clica una activitat per anar-hi. ","Click an activity to go there. "):"")+t("Acaba-les a casa o a classe quan acabis abans.","Finish them at home, or in class when you finish early."):t("Continua així!","Keep it up!")}</p><button type="button" data-x>👍 ${t("D'acord","OK")}</button></div></div>`;
+  const shut=()=>{if(!el.isConnected)return;el.remove();clearTimeout(tm);if(o.done)try{o.done()}catch(e){}},tm=setTimeout(shut,5*60e3);   // gone after 5 minutes if nobody presses OK
+  el.addEventListener("click",e=>{if(e.target.closest("[data-x]")||e.target===el)shut()});
+  document.body.append(el);el.querySelector("[data-x]").focus();return true}

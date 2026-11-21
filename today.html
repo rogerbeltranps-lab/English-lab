@@ -170,7 +170,7 @@ a.hal.games.nbk .gnote{background:#fffef8;border-color:#1f4fb5;color:#1f4fb5}a.h
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:14px;padding:14px 20px}a.tile .tb.hw{background:#0e7490}
 .todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
 .todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
-.todo .chips{display:flex;flex-wrap:wrap;gap:6px}.todo .stp{display:inline-block;font-size:14px;font-weight:600;border-radius:999px;padding:6px 13px;border:1px solid #99f6e4;background:#f0fdfa;color:#0f766e;text-decoration:none;white-space:nowrap}.todo a.stp:hover{outline:2px solid currentColor}.todo li.late .stp{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.miss{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.ok{border-color:#86efac;background:#dcfce7;color:#166534}.todo .stp.hwt{background:#ecfeff;border-color:#67e8f9;color:#155e75}.tdls{font-size:15px;margin:12px 0 8px;color:#475569}
+.todo .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.todo .tdlb{font-size:14px;font-weight:700;color:#b91c1c}.todo .tdbar{flex:1 1 140px;max-width:260px;height:10px;border-radius:9px;background:#e2e8f0;overflow:hidden;align-self:center;margin-left:auto}.todo .tdbar i{display:block;height:100%;border-radius:9px}.todo .tdpc{font-size:16px;min-width:3.2em;text-align:right}.todo .stp{display:inline-block;font-size:14px;font-weight:600;border-radius:999px;padding:6px 13px;border:1px solid #99f6e4;background:#f0fdfa;color:#0f766e;text-decoration:none;white-space:nowrap}.todo a.stp:hover{outline:2px solid currentColor}.todo li.late .stp{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.miss{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.ok{border-color:#86efac;background:#dcfce7;color:#166534}.todo .stp.hwt{background:#ecfeff;border-color:#67e8f9;color:#155e75}.tdls{font-size:15px;margin:12px 0 8px;color:#475569}
 .tdtag{font-size:13px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}.tdtag.late{background:#fee2e2;color:#991b1b}.tdtag.hw{background:#cffafe;color:#155e75}.tdtag.cls{background:#e0e7ff;color:#3730a3}
 .hwlist li{border:1px solid #a5f3fc;background:#f0fdff;border-radius:14px;padding:12px 14px;margin:0 0 10px}.hwlist li.dn{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
 .hwl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.hwl .hwi{font-size:20px}.hwl .hwt{flex:1 1 260px;font-weight:600}.hwl .ok{color:#16a34a;font-weight:700}.hwl .td{color:#b45309;font-weight:700}.hwlist .hwmsg{margin-top:6px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;color:#0f172a;text-decoration:none;min-height:120px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
@@ -643,10 +643,18 @@ function vySq(ls,out){const A=window.elSqAct&&elSqAct(ls.id),i=A?out.findIndex(b
     out.forEach((b,j)=>{if(b.kind!=="fp"&&ids.has(b.id))at=j});out.splice(at<0?out.length:at+1,0,Object.assign({},sb,{kind:"bonus",plants:[pl]}))})}
 // 🏁 To win the race (Roger, 21 Nov 2026: "A message could pop up saying that to win the race they need to do all the activities pending"):
 // once a day, on the board's map, a card over the map when ✅ To do has something (the same count as the To do tile); ✅ See them opens it.
-// Not in class time or class mode (the class gets its own ✅ Finish all your activities card after the warm-up, el-todo.js remind).
+// Not in class time or class mode (in class the warm-up's games lead to the race map on the projector).
 function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyClass())return;const n=todoItems(lss).reduce((k,x)=>k+todoTabs(x),0);if(!n)return;
   const k="el_race_"+(AS||(U&&U.uid)||"demo"),d=new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
   try{if(localStorage.getItem(k)===d)return}catch(e){}   // seen once it is closed (the board draws again when the road arrives)
+  const seen=()=>{try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}};
+  // their own ✅ Finish all your activities card (Roger, 21 Nov 2026: "I thought that was what they saw when they open the website"; in class
+  // he chose the website, not class): el-todo.js remind with the race line and links; closing it lights up the pending steps. The teacher's student view has no el-todo
+  // on the board: the short card below.
+  if(!AS&&!vyRace.busy){vyRace.busy=1;import(new URL("shared/js/el-todo.js",location.href).href).then(m=>m.remind({race:true,links:true,done:()=>vyPend(lss,true)}))
+    .then(ok=>{vyRace.busy=0;if(ok)seen();else vyRace0(lss,k,d,n)}).catch(()=>{vyRace.busy=0;vyRace0(lss,k,d,n)});return}
+  if(AS)vyRace0(lss,k,d,n)}
+function vyRace0(lss,k,d,n){const O=document.querySelector("#main .vy-ovl");if(!O||document.getElementById("el-rem"))return;
   const ic=elVoyage.skin(S.vy).veh.icon;
   O.innerHTML=`<div class="card"><div style="font-size:46px;line-height:1.1">${ic} 🏁</div><h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
     +`<p>${t("Acaba totes les activitats pendents! Cada activitat que acabes et fa avançar.","Finish all your pending activities! Every activity you finish moves you forward.")}</p>`
@@ -1932,12 +1940,13 @@ function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter
   const li=x=>{const a=x.a,ds=doneSet(a),ks=tabGroups(a,visSteps(a,D.ls[x.l.id]||{})),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
     // each path says when it is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): ⏰ late, 📝 homework by its day, else 🏫 in class
     const tags=(x.late?` <span class="tdtag late">⏰ ${t("endarrerida","late")}</span>`:"")+(h?` <span class="tdtag hw">📝 ${t("deures per al","homework by")} ${when(h.x.date)}</span>`:"");   // no "from class" (Roger, 9 Nov 2026: "just in red what's missing and in green what's done")
-    const miss=new Set(x.tabs.map(([id])=>id)),okTabs=((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>!miss.has(id)&&tabDone(a,id,ds));
-    const chips=x.cp?`<a class="stp go2" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
-      :x.tabs.length?((window.EL_SECTIONS||{})[a.id]||[]).map(([id,tn])=>miss.has(id)?`<a class="stp go2 miss ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝":"✗"} ${esc(tn)} →</a>`
-          :okTabs.some(([y])=>y===id)?(elStepsOptional(stateOf(a),elSecSteps(a,id))?`<a class="stp go2 op" href="${tabHref(a,id)}" title="${t("No cal que la tornis a fer: compta com a feta","You don't need to do it again: it counts as done")}">○ ${esc(tn)} <small>· ${t("opcional","optional")}</small></a>`:`<span class="stp ok">✔ ${esc(tn)}</span>`):"").join("")
-      :`<a class="stp go2 miss" href="${tabHref(a)}">✗ ${/checkpoint/.test(a.id)?"Checkpoint":t("Obre-la","Open it")} →</a>`;
-    return `<li><div class="tdh"><b><a href="${tabHref(a)}">${esc(nm)}</a></b>${ks.length>1?` <small class="muted">· ${n} / ${ks.length} ${t("passos fets","steps done")}</small>`:""}${tags}</div><div class="chips">${chips}</div></li>`};
+    // like the ✅ Finish all your activities card (Roger, 21 Nov 2026: "maybe it's clearer than the current To do"): a bar with the share of
+    // steps done, then only what is still to do ("Et falta"), each one a link; no green ✔ chips
+    const miss=new Set(x.tabs.map(([id])=>id)),pc=ks.length>1?Math.round(n/ks.length*100):null;
+    const chips=x.cp?`<a class="stp go2 miss" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
+      :x.tabs.length?((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>miss.has(id)).map(([id,tn])=>`<a class="stp go2 miss ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
+      :`<a class="stp go2 miss" href="${tabHref(a)}">${/checkpoint/.test(a.id)?t("Fes-lo","Do it"):t("Obre-la","Open it")} →</a>`;
+    return `<li class="${x.late?"late":""}"><div class="tdh"><b><a href="${tabHref(a)}">${esc(nm)}</a></b>${pc!=null?`<span class="tdbar"><i style="width:${pc}%;background:${elPctCol(pc)}"></i></span><b class="tdpc">${pc} %</b>`:""}${tags}</div><div class="chips"><span class="tdlb">${t("Et falta:","Still to do:")}</span>${chips}</div></li>`};
   return `<div class="box todo">${head}${many?lss.filter(l=>xs.some(x=>x.l.id===l.id)).map(l=>`<h3 class="tdls">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</h3><ul class="tdl">${xs.filter(x=>x.l.id===l.id).map(li).join("")}</ul>`).join(""):`<ul class="tdl">${xs.map(li).join("")}</ul>`}${testCard(lss)}</div>`}
 // 📝 Homework (Roger, 6 Nov 2026: "They are only homework if I say so"): only what the teacher set as homework (a learning path or some of
 // its tabs, 🏠 Set as homework on the dashboard; never the plan's "Homework by …" lines: ELWeek.studentHw), with the day it is for, ✔ when I have done it, a
