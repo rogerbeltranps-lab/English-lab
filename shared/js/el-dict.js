@@ -154,6 +154,7 @@
     + '.eldict-tipbox.up::after{bottom:auto;top:-9px;right:10px;border-top:0;border-bottom:9px solid #20312b}'
     + '@media (max-width:640px){.eldict-tipbox{right:10px;bottom:146px}.eldict-tipbox::after{right:28px}}'
     + '@media (max-width:640px){.eldict-fab{right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
+    + '@media (max-width:640px){body.eldict-kb .eldict-fab,body.eldict-kb .eldict-tipbox,body.eldict-kb #el-todo-btn,body.eldict-kb #el-cloud-bar,body.eldict-kb .elslpbar,body.eldict-kb .elptabs,body.eldict-kb .panel.active>.section-next{visibility:hidden!important}}'
     + '@media print{.eldict-fab,.eldict,.eldict-tipbox{display:none!important}}';
   var fab, box, inp, out, last = '', dragging = false, dragged = false;
   function recent() { try { return JSON.parse(localStorage.getItem('el_dict_recent') || '[]') || []; } catch (e) { return []; } }
@@ -195,6 +196,7 @@
       var w = wordAt(e.clientX, e.clientY); if (w) open(w);
     });
     label(); setInterval(vis, 800); vis();
+    if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); } else addEventListener('resize', fit);
   }
   /* Until a student uses it, it wiggles now and then and says "Dictionary"; from the first time they open it (button or double-click),
      it is only the 🔍 (Roger, 12 Nov 2026: "pots fer que es mogui? i que es faci petit com la lupa el primer cop que el toques o el facis
@@ -256,7 +258,28 @@
       if (below) { tip.style.top = Math.round(r.bottom + 12) + 'px'; tip.style.bottom = 'auto'; } else { tip.style.top = 'auto'; tip.style.bottom = Math.round(innerHeight - r.top + 12) + 'px'; }
     }
   }
+  /* On a phone the window sits at the top of the part of the screen the student can see, and never grows past it (Roger, 21 Nov 2026:
+     "On my phone the dictionary moves all around the page and sometimes I don't even see what I'm typing"). iPhone Safari doesn't
+     shrink the page when the keyboard opens: it slides the page up instead, so a window fixed to the bottom was pushed off the top
+     and the box you type in went out of sight. visualViewport says what is really visible; the window follows it, the typing box
+     stays at its top, and the results scroll inside it. While the student types, the bars fixed at the bottom (Next step, ✅ To do,
+     the 🔍 button, the tab bar) are hidden, so they don't float in the middle of the page above the keyboard. Computers: unchanged. */
+  var vv = window.visualViewport, phoneQ = window.matchMedia ? matchMedia('(max-width:640px)') : null;
+  function onPhone() { return !!(phoneQ && phoneQ.matches); }
+  function fit() {
+    if (!box || box.hidden || !onPhone()) return;
+    var top = vv ? vv.offsetTop : 0, h = vv ? vv.height : innerHeight, kb = d.body.classList.contains('eldict-kb');
+    // with the keyboard closed, leave room for the bars at the top and bottom; with it open, use all the space above it
+    var gapTop = kb ? 8 : 64, gapBottom = kb ? 8 : 150;
+    if (h - gapTop - gapBottom < 220) { gapTop = 8; gapBottom = 8; }
+    box.style.left = '8px'; box.style.right = '8px'; box.style.bottom = 'auto';
+    box.style.top = Math.round(top + gapTop) + 'px';
+    box.style.maxHeight = Math.max(160, Math.round(h - gapTop - gapBottom)) + 'px';
+  }
   function place() {
+    placeFab(); fit();
+  }
+  function placeFab() {
     if (fab.hidden || dragging) return;
     var pos = getPos();
     fab.classList.toggle('moved', !!pos);
@@ -323,14 +346,16 @@
       box.innerHTML = head(); box.dataset.ca = String(ca());
       inp = box.querySelector('input'); out = box.querySelector('.eldict-b');
       box.querySelector('.eldict-x').onclick = close;
-      box.querySelector('form').onsubmit = function (e) { e.preventDefault(); look(inp.value); };
+      box.querySelector('form').onsubmit = function (e) { e.preventDefault(); look(inp.value); if (onPhone()) inp.blur(); };   // on a phone, Look up closes the keyboard so the results have room
+      inp.addEventListener('focus', function () { if (onPhone()) { d.body.classList.add('eldict-kb'); fit(); } });
+      inp.addEventListener('blur', function () { d.body.classList.remove('eldict-kb'); fit(); });
     }
     box.hidden = false; if (!seen()) seenNow();
     if (!used()) { try { localStorage.setItem(usedKey(), String(Date.now())); } catch (e) {} label(); }
     place();
-    if (q) { inp.value = q; look(q); } else { if (!last) showRecent(); setTimeout(function () { inp.focus(); inp.select && inp.select(); }, 30); }
+    if (q) { inp.value = q; look(q); } else { if (!last) showRecent(); setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); } inp.select && inp.select(); }, 30); }
   }
-  function close() { if (box) box.hidden = true; }
+  function close() { if (box) { box.hidden = true; if (inp && d.activeElement === inp) inp.blur(); } d.body.classList.remove('eldict-kb'); }
   function showRecent() {
     var r = recent(); out.innerHTML = r.length ? '<div class="eldict-rec"><span>' + t('Darreres paraules', 'Recent words') + '</span>' + r.map(function (x) { return '<button type="button">' + esc(x) + '</button>'; }).join('') + '</div>' : '';
     [].forEach.call(out.querySelectorAll('.eldict-rec button'), function (b) { b.onclick = function () { inp.value = b.textContent; look(b.textContent); }; });
