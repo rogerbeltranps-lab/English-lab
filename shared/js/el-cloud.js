@@ -1815,7 +1815,7 @@ function cmLook(g){const l=g&&g.cm&&g.look;if(!l||l.s!==g.s||!(Date.now()-l.at<L
   x.innerHTML=`<div><span>👀</span><b>${ca?"Mira la pantalla!":"Look at the screen!"}</b><small>${ca?"Look at the screen!":"Mira la pantalla!"}</small></div>`
     +`<style>#el-look{position:fixed;inset:0;z-index:2147482400;background:rgba(15,23,42,.82);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#fff;text-align:center}`
     +`#el-look div{display:flex;flex-direction:column;align-items:center;gap:6px}#el-look span{font-size:clamp(70px,14vw,150px);line-height:1;animation:ellk 1.6s ease-in-out infinite}`
-    +`#el-look b{font-size:clamp(30px,5vw,56px)}#el-look small{font-size:clamp(16px,2vw,22px);opacity:.8}@keyframes ellk{50%{transform:scale(1.12)}}@media (prefers-reduced-motion:reduce){#el-look span{animation:none}}</style>`;
+    +`#el-look b{font-size:clamp(30px,5vw,56px);color:#fff}#el-look small{font-size:clamp(16px,2vw,22px);color:#e2e8f0}@keyframes ellk{50%{transform:scale(1.12)}}@media (prefers-reduced-motion:reduce){#el-look span{animation:none}}</style>`;
   document.body.append(x)}
 const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}

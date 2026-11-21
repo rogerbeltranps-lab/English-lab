@@ -146,10 +146,13 @@ export async function remind(o){o=o||{};const r=await Promise.race([remP,new Pro
     return `<li class="${ok?"ok":""}"><div class="r"><span class="n">${esc(z.lab)}</span>${z.pc==null?"<span></span><b></b>":`<span class="bar"><i style="width:${z.pc}%;background:${col(z.pc)}"></i></span><b>${z.pc} %</b>`}<small>${ok?"✔ "+t("Fet","Done"):x.late?"⏰ "+t("Endarrerida","Late"):""}</small></div>${tabs?`<div class="tbs"><span class="lb">${t("Et falta:","Still to do:")}</span>${tabs}</div>`:""}</li>`}).join("");
   const hw=D.hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b>${D.hw.map(h=>`<div>${esc(ELWeek.taskText(h.x,D.ca?"ca":"en"))}${o.links&&h.href?` <a class="tb" href="${h.href}">${t("Obre","Open")} →</a>`:""}</div>`).join("")}</div>`:"";
   const exam=D.exam?`<div class="ex">📝 ${t("Examen","Exam")}: ${D.exam.d}${D.exam.n>1?t(` · d'aquí a ${D.exam.n} dies`,` · in ${D.exam.n} days`):D.exam.n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
+  // every text sets its own colour: the page's own h2/p colours (green, navy…) must never reach the purple header (Roger, 21 Nov 2026:
+  // "I can't read all the letters well here": the title came out green on purple)
   const st=document.createElement("style");st.id="el-rem-css";st.textContent=`
 #el-rem{position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;font:16px/1.35 system-ui,sans-serif;color:#0f172a}
 #el-rem .bx{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.35);width:min(720px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;text-align:left}
-#el-rem .hd{background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;padding:16px 22px}#el-rem h2{margin:0;font:800 clamp(22px,2.6vw,30px)/1.2 system-ui,sans-serif}#el-rem .hd p{margin:6px 0 0;font-size:15px;opacity:.95}
+#el-rem .hd{background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;padding:16px 22px}#el-rem h2{margin:0;font:800 clamp(22px,2.6vw,30px)/1.2 system-ui,sans-serif;color:#fff}#el-rem .hd p{margin:6px 0 0;font-size:15px;color:#fff}
+#el-rem .n,#el-rem .r b{color:#0f172a}
 #el-rem .bd{padding:12px 22px 6px;overflow:auto}#el-rem h3{margin:4px 0 6px;font:800 13px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
 #el-rem ul{list-style:none;margin:0;padding:0}#el-rem li{padding:8px 10px;border-radius:10px}#el-rem li:nth-child(odd){background:#f8fafc}
 #el-rem .r{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,200px) 58px 118px;align-items:center;gap:12px}

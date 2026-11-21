@@ -120,7 +120,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag.dock .tools button{font-size:12px;padding:5px 6px}#el-cmag.dock .hint,#el-cmag.dock .ok{font-size:12px}#el-cmag.dock .chip{font-size:12px;padding:4px 8px}
 #el-cmwrap{position:fixed;inset:0;z-index:2147483100;background:rgba(15,23,42,.55);display:grid;place-items:center;padding:16px;font:600 15px system-ui,sans-serif;color:#1e1b4b}
 #el-cmwrap .bx{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(15,23,42,.4);width:min(720px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
-#el-cmwrap .hd{padding:16px 20px 10px;border-bottom:1.5px solid #e0e7ff}#el-cmwrap h2{margin:0 0 4px;font-size:21px}#el-cmwrap .hd p{margin:0;color:#475569;font-weight:500;font-size:14px}
+#el-cmwrap .hd{padding:16px 20px 10px;border-bottom:1.5px solid #e0e7ff}#el-cmwrap h2{margin:0 0 4px;font-size:21px;color:#1e1b4b}#el-cmwrap .hd p{margin:0;color:#475569;font-weight:500;font-size:14px}
 #el-cmwrap .ls{overflow:auto;padding:8px 20px 12px}#el-cmwrap .lp{margin:12px 0 4px;font-weight:800;color:#3730a3;font-size:15px}
 #el-cmwrap .r{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9}#el-cmwrap .r .n{flex:1;min-width:0}
 #el-cmwrap .seg{display:flex;flex:none;border:1.5px solid #c7d2fe;border-radius:999px;overflow:hidden}

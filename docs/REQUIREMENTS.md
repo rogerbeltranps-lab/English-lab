@@ -157,6 +157,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - **Quality over quantity** (19 Nov 2026): too many activities. Students see only the SLPs Roger adds; the final product is always last. Keep screens short: little on the menu, details inside each place.
 - Students use **Chromebooks (~1366×768)**: design for that first, then check 390×844 (phone). Phone rules live only in `el-phone.css` inside `@media (max-width:640px)`; computers must stay pixel-identical.
 - Course palettes: **2 ESO green, 4 ESO blue**. Competence colours: CE1 teal, CE2 blue, CE3 orange, CE4 green, CE5 purple, CE6 amber, CD indigo, CC pink.
+- **Every text is easy to read on its background** (Roger, 21 Nov 2026: "I can't read all the letters well here", on the green ✅ Finish all your activities! title over a purple header): white text on dark or coloured headers and buttons, dark text on light cards, never coloured text on a coloured band. A pop-up or bar drawn over a page sets the colour of each of its texts itself, so a page's own heading colours never leak into it.
 - **One colour rule for every percentage** (20 Nov 2026): under 50 red · 50–59 orange · 60–79 green · 80–89 blue · 90+ purple (`elPctCol`).
 - Marks: the degree (Assoliment notable…) in a coloured box first, the number small beside it (10 Nov 2026).
 - Student pages: no translating, no copying of page text, no spell-check in answer boxes (9 and 13 Nov 2026).
