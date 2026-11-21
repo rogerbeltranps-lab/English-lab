@@ -1999,16 +1999,18 @@ const spkGet=(gid,ls,u,fid)=>((SPK.d[spkDoc(ls,gid)]||{})[u]||{})[fid]||null;
 // Classroom or by a link (fpgVideo, as 🎬 Final product); group videos are left out (Roig can't tell which voice is the student) and so
 // are YouTube links (no file).
 function spkRecs(studs,lss){const out=[];studs.forEach(s=>lss.forEach(ls=>acts(ls).forEach(a=>{const st=pstate(s.uid,a).steps||{};
-  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""})})})));
+  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
   lss.forEach(ls=>{const a=fpAct(ls);if(a)studs.forEach(s=>{const r=spkFpRec(s,a);if(r)out.push(r)})});
   return out.sort((p,q)=>tms(q.at)-tms(p.at))}
 const spkLevels=an=>SPK_LV.map(([k])=>an&&an[k]&&an[k].level!=null?+an[k].level:null);
 const spkScore=an=>prAvg(spkLevels(an));   // 0-4, the average of the four levels
 const spkFpRec=(s,a)=>{let v=null;try{v=fpgVideo(s.uid,a)}catch(e){}return v&&v.id&&!v.by?{u:s.uid,s,a,k:"fp",ls:a.ls,fid:v.id,ids:v.ids||[],secs:null,at:v.at||null,title:"",fp:true}:null};
-const spkTask=(a,k,title)=>k==="fp"?(a.title||"Final product")+" (the final product: a spoken presentation)":(a.title||a.id)+" · "+(title||tabName(a,k)||cpName(a.id,k));
+// 🎲 a Surprise questions recording (sq): the four questions it answered go with the task, so the analysis judges the answers to them
+const spkQs=x=>{const f=((x&&x.f)||[]).find(y=>y.l==="Questions asked");return x&&x.sq&&f?String(f.v||"").replace(/\s*\n\s*/g," / "):""};
+const spkTask=(a,k,title,qs)=>k==="fp"?(a.title||"Final product")+" (the final product: a spoken presentation)":(a.title||a.id)+" · "+(title||tabName(a,k)||cpName(a.id,k))+(qs?" · four surprise questions answered without preparation, easy to harder: "+qs:"");
 const spkCost=list=>list.reduce((n,r)=>n+(r.fp?SPK_EUR_FP:SPK_EUR),0);
 const spkCefr=ls=>/my-real-routine/.test(ls)&&ls.startsWith("2eso")?"A1":"A2+";
-async function spkOne(r,gid){const j=await fpgCall({action:"speak_an",fileId:r.fid,fp:!!r.fp,fileIds:r.ids||[],task:spkTask(r.a,r.k,r.title),level:level(r.u,r.ls),course:r.ls.startsWith("2eso")?"2 ESO":"4 ESO",cefr:spkCefr(r.ls)});
+async function spkOne(r,gid){const j=await fpgCall({action:"speak_an",fileId:r.fid,fp:!!r.fp,fileIds:r.ids||[],task:spkTask(r.a,r.k,r.title,r.qs),level:level(r.u,r.ls),course:r.ls.startsWith("2eso")?"2 ESO":"4 ESO",cefr:spkCefr(r.ls)});
   const rec={a:r.a.id,k:r.k,at:r.at||null,an:j.an,model:j.model||"",eur:j.eur==null?null:j.eur,done:new Date().toISOString()},id=spkDoc(r.ls,gid),d=SPK.d[id]=SPK.d[id]||{};
   (d[r.u]=d[r.u]||{})[r.fid]=rec;SPK.v++;FPG.cost=null;await put(["settings",id],{[r.u]:{[r.fid]:rec}});return rec}
 // analyse a list of recordings, three at a time; the line at the top of the page shows how far it is; ⏸ Stop finishes the ones running
@@ -2037,7 +2039,7 @@ function spkCard(rec,r){const an=(rec||{}).an;if(!an)return "";const V=an.voc||{
 // under the 🔊 player in the recording window (wrOpen): the analysis, or a button to make it
 function spkBox(u,aid,step){const a=byId(aid),x=((pstate(u,a)||{}).steps||{})[step],s=S.P[u];if(!a||!s||!x||!x.audio||!x.audio.id)return "";
   const gid=s.group;if(!SPK.d[spkDoc(a.ls,gid)]){spkLoad(a.ls,gid).then(()=>{if(redraw&&$("#dlg").open)redraw()});return `<p class="muted">🗣 Loading the speaking analysis…</p>`}
-  const r={u,s,a,k:step,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""},rec=spkGet(gid,a.ls,u,x.audio.id);
+  const r={u,s,a,k:step,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)},rec=spkGet(gid,a.ls,u,x.audio.id);
   if(rec)return spkCard(rec,r);
   return `<p class="muted">🗣 <b>No speaking analysis yet</b> (words said well and wrong, vocabulary, grammar, structure: only for you). <button class="g mini" data-do="spkagain" data-u="${esc(u)}" data-a="${esc(aid)}" data-s="${esc(step)}">🔍 Analyse it</button> <small>about €${SPK_EUR.toFixed(3)}</small></p>`}
 // the collection: what many recordings have in common, most common first. one = a single student (their own lists, no student counts)

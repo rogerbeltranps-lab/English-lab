@@ -1,0 +1,78 @@
+/* 🎲 Surprise questions bank · 2 ESO LS2 · Free Time, Live! (Roger, 21 Nov 2026: approved as the sample bank of the new step).
+   Four steps, easy → complex (tiers), four questions per step and level, so classmates side by side get different ones. lp = the learning
+   path a question needs (LP1 Getting started · LP2 What are they doing? · LP3 Now or usually? · LP4 Likes and screen tips): a step with
+   upTo: n draws only lp ≤ n. Starter (beginners): Catalan + a sentence starter (h); Base (insecure): Catalan + help words; Core (safe):
+   💡 help words on a tap; Plus (daring): no help. Only what LS2 taught: play / go / do, clothes, kit and weather, Present Simple vs
+   Continuous, like / love / hate + -ing, screen tips (imperatives). Drawn by shared/js/el-surprise.js. */
+window.EL_SURPRISE = window.EL_SURPRISE || {};
+window.EL_SURPRISE['2eso-free-time-live'] = {
+tiers: [{en:'About you',ca:'Sobre tu'},{en:'Describe it',ca:'Descriu-ho'},{en:'Now or usually?',ca:'Ara o normalment?'},{en:'Your opinion',ca:'La teva opinió'}],
+beginners:[
+ [{q:'What sport do you play?',ca:'Quin esport practiques?',h:'I play… / I don’t play sport, but I…',lp:1},
+  {q:'What is your favourite hobby?',ca:'Quina és la teva afició preferida?',h:'My favourite hobby is…',lp:1},
+  {q:'Where do you go on Saturdays?',ca:'On vas els dissabtes?',h:'On Saturdays I go to…',lp:1},
+  {q:'Who do you go out with?',ca:'Amb qui surts?',h:'I go out with…',lp:1}],
+ [{q:'What are you wearing today?',ca:'Què portes posat avui?',h:'Today I’m wearing…',lp:2},
+  {q:'What’s the weather like today?',ca:'Quin temps fa avui?',h:'Today it’s… (sunny, cold, raining…)',lp:2},
+  {q:'What do you do after school?',ca:'Què fas després de l’escola?',h:'After school I… Then I…',lp:1},
+  {q:'What do you need for your favourite sport?',ca:'Què necessites per al teu esport preferit?',h:'I need… (a ball, trainers, a helmet…)',lp:2}],
+ [{q:'What are you doing right now?',ca:'Què estàs fent ara mateix?',h:'Right now I’m …-ing.',lp:2},
+  {q:'What is your teacher doing now?',ca:'Què està fent el professor ara?',h:'My teacher is …-ing.',lp:2},
+  {q:'Look at two classmates. What are they doing?',ca:'Mira dos companys. Què estan fent?',h:'They’re …-ing.',lp:2},
+  {q:'What do you usually do at the weekend? What are you doing this weekend?',ca:'Què fas normalment el cap de setmana? Què fas aquest cap de setmana?',h:'I usually… This weekend I’m…',lp:3}],
+ [{q:'What do you love doing? What do you hate doing?',ca:'Què t’encanta fer? Què odies fer?',h:'I love …-ing. I hate …-ing.',lp:4},
+  {q:'Do you like watching TV? What do you like watching?',ca:'T’agrada mirar la tele? Què t’agrada mirar?',h:'Yes, I like watching… / No, I don’t like…',lp:4},
+  {q:'Give a tip for using your phone.',ca:'Dona un consell per fer servir el mòbil.',h:'Don’t use your phone in bed. / Take a break.',lp:4},
+  {q:'Tell me about your favourite free-time activity: where, when and who with.',ca:'Explica la teva activitat preferida: on, quan i amb qui.',h:'I… at… on… with…',lp:1}]],
+insecure:[
+ [{q:'What do you do in your free time?',ca:'Què fas en el teu temps lliure?',h:['play','go','do'],lp:1},
+  {q:'How often do you do sport?',ca:'Cada quan fas esport?',h:['every day','twice a week','never'],lp:1},
+  {q:'Who do you usually go out with, and where do you go?',ca:'Amb qui surts normalment, i on aneu?',h:['my friends','the park','the square'],lp:1},
+  {q:'What’s your favourite sport or game? When do you play it?',ca:'Quin és el teu esport o joc preferit? Quan hi jugues?',h:['on Saturdays','after school'],lp:1}],
+ [{q:'Describe what you are wearing today.',ca:'Descriu què portes posat avui.',h:['a hoodie','jeans','trainers'],lp:2},
+  {q:'What’s the weather like today? What do you do on a day like this?',ca:'Quin temps fa avui? Què fas un dia així?',h:['cloudy','windy','stay at home'],lp:2},
+  {q:'What do you need for your favourite activity?',ca:'Què necessites per a la teva activitat preferida?',h:['a helmet','a ball','a racket'],lp:2},
+  {q:'Describe your perfect Saturday.',ca:'Descriu el teu dissabte perfecte.',h:['in the morning','in the afternoon','then'],lp:1}],
+ [{q:'What are you doing right now? What are your classmates doing?',ca:'Què estàs fent ara? I els teus companys?',h:['I’m','they’re','-ing'],lp:2},
+  {q:'Imagine you’re at the sports centre. Tell me what people are doing.',ca:'Imagina que ets al poliesportiu. Explica què fa la gent.',h:['playing','running','watching'],lp:2},
+  {q:'What do you usually do on Saturdays? What are you doing this Saturday?',ca:'Què fas normalment els dissabtes? Què fas aquest dissabte?',h:['usually','this Saturday'],lp:3},
+  {q:'What do you usually wear for sport? What are you wearing now?',ca:'Què et poses normalment per fer esport? Què portes ara?',h:['I usually wear','now I’m wearing'],lp:3}],
+ [{q:'What do you love doing and what do you hate doing at the weekend?',ca:'Què t’encanta fer i què odies fer el cap de setmana?',h:['I love','I hate','-ing'],lp:4},
+  {q:'Do you spend a lot of time on screens? Give two tips.',ca:'Passes molt temps davant de pantalles? Dona dos consells.',h:['Take a break','Don’t…'],lp:4},
+  {q:'Tell me about a hobby: what it is, how often you do it and who with.',ca:'Parla d’una afició: què és, cada quan la fas i amb qui.',h:['every…','with'],lp:1},
+  {q:'Imagine you’re recording a live vlog. Where are you and what is happening?',ca:'Imagina que graves un vlog en directe. On ets i què passa?',h:['Hi! I’m at…','right now'],lp:3}]],
+safe:[
+ [{q:'What do you usually do after school?',h:['usually','then'],lp:1},
+  {q:'How often do you see your friends outside school?',h:['once a week','almost every day'],lp:1},
+  {q:'What sport or hobby do you do, and where do you do it?',h:['go + -ing','at the…'],lp:1},
+  {q:'What’s your favourite day of the week? Why?',h:['because','free time'],lp:1}],
+ [{q:'Describe the weather today and what people usually do on a day like this.',h:['foggy','stay in','go out'],lp:2},
+  {q:'Describe what you are wearing today and what you wear for sport.',h:['I’m wearing','kit'],lp:2},
+  {q:'Tell me about a sports event you like watching: where it is and who plays.',h:['match','tournament'],lp:2},
+  {q:'Describe your favourite place to spend your free time. What can you do there?',h:['there is','you can'],lp:1}],
+ [{q:'Tell me what you usually do on Saturdays and what’s different this weekend.',h:['usually','but this weekend'],lp:3},
+  {q:'Look around you. What are three people doing right now?',h:['is …-ing','are …-ing'],lp:2},
+  {q:'What are you doing these days that you don’t usually do?',h:['This month I’m…','at the moment'],lp:3},
+  {q:'Imagine you’re reporting live from a football match. What’s happening?',h:['is winning','the fans are'],lp:2}],
+ [{q:'What do you love doing and what do you hate doing? Explain why.',h:['love + -ing','because'],lp:4},
+  {q:'How much time do you spend on screens? Is it too much? Give one tip.',h:['hours a day','Don’t…'],lp:4},
+  {q:'Which is better: free time outdoors or at home? Why?',h:['I prefer','because'],lp:4},
+  {q:'A friend is always on their phone in bed. What advice do you give them?',h:['Turn off…','Don’t…'],lp:4}]],
+daring:[
+ [{q:'Tell me about your free time: what you do, how often and who with.',lp:1},
+  {q:'What hobby do you really enjoy, and what do you need to do it?',lp:2},
+  {q:'Describe a normal Saturday for you, from morning to night.',lp:1},
+  {q:'What do you and your friends usually do when you meet?',lp:1}],
+ [{q:'Describe a place near your home where people do sport: what it’s like and what people do there.',lp:2},
+  {q:'Describe the clothes and kit you need for two different sports.',lp:2},
+  {q:'Describe a sports event you want to watch: where it is, who plays and why you want to go.',lp:2},
+  {q:'Is today a good day for your favourite hobby? Why or why not?',lp:2}],
+ [{q:'Contrast your usual weekend with this weekend. Why is it different?',lp:3},
+  {q:'Imagine you’re live at a bike park. Describe what’s happening and what people usually do there.',lp:3},
+  {q:'What are you doing this month that is different from usual? Why?',lp:3},
+  {q:'Think of someone in your family. What do they usually do on Sundays, and what do you think they’re doing now?',lp:3}],
+ [{q:'Some people say teenagers spend too much time on screens. Do you agree? Give reasons and one tip.',lp:4},
+  {q:'What do you prefer: playing sport or watching it? Explain with examples.',lp:4},
+  {q:'Which free-time activity do you recommend to a classmate, and why? Give two tips to start.',lp:4},
+  {q:'Give three ideas of things to do instead of looking at screens, and say why they’re good.',lp:4}]]
+};
