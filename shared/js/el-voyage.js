@@ -316,15 +316,29 @@
     const finRows=at[n]?pack(at[n],W-8-(meI===n&&V.me?YW:0),W-8):[],fR=Math.max(finRows.length,meI===n&&V.me?1:0);
     const fogTop=destB+110+Math.max(0,fR-1)*RH,need=fp.done?finY+Math.max(0,fR-1)*RH+150:fogTop+FOGH+70;
     let total,pts,topY;
+    // no vehicle on a place's picture (Roger, 21 Nov 2026: "I said no vehicles on the pictures"): each picture (beside its port, from
+    // the line of its port up) is kept as a box, and a stop next to one fits its rows in the room up to the picture's edge (more rows
+    // if needed). Where not even one vehicle fits (a narrow map pushes the pictures in), that picture is drawn smaller. The pictures
+    // move with the layout, so it is laid out again with the boxes of the last pass until nothing changes.
+    const PIC=W>560,SZ=Math.min(280,W*.27),PMIN=Math.min(SZ,130),NEED=wide?92:70,picX=(j,sz)=>j%2===0?Math.max(-20,cx-lane*2-sz-150):Math.min(W-sz+20,cx+lane*2+150);
+    let obs=[];M.ports.forEach(it=>it.psz=SZ);
+    const boxes=()=>PIC?M.ports.map((it,j)=>{const z=it.psz,x=picX(j,z);return {it,j,x0:x-6,x1:x+z+6,y0:it.y-z*.95-6,y1:it.y+z*.08}}):[];
+    const fit=(it,room)=>{if(it.y==null)return room;const a=it.y-(it.ex||0)/2-14,b=it.y+(it.ex||0)/2+RH+14,L=it.x-40-room,R=it.x+40+room;
+      obs.forEach(o=>{if(o.y1<a||o.y0>b)return;let r=room;
+        if(it.right){if(o.x1>L&&o.x0<it.x-40)r=it.x-40-o.x1-6}else if(o.x0<R&&o.x1>it.x+40)r=o.x0-it.x-40-6;
+        if(r>=room)return;room=r;
+        if(r<NEED){const P=o.it,z=o.j%2===0?it.x-40-NEED-12+20:W+20-(it.x+40+NEED+12);P.psz=Math.max(PMIN,Math.min(P.psz,z))}});
+      return Math.max(NEED,room)};
     const lay=T=>{let yy=0,li=0;pts=[];total=T;
       // first the rows of each stop (they depend on where the stop stands), then the heights
       M.items.forEach(it=>{if(it.port)return;it.x=cx+lanes[li%lanes.length]*lane;it.right=it.x<=cx;li++;
-        const i=M.stops.indexOf(it),room=(it.right?it.x-40:W-it.x-40)-4,mine=i===meI&&V.me;
+        const i=M.stops.indexOf(it),room=fit(it,(it.right?it.x-40:W-it.x-40)-4),mine=i===meI&&V.me;
         it.rows=at[i]?pack(at[i],room-(mine?YW:0),room):[];it.ex=Math.max(0,Math.max(it.rows.length,mine?1:0)-1)*RH});
       M.items.forEach(it=>total+=it.port?GAP+2*it.ph:STEP+it.ex);total+=90;yy=total-70;
       M.items.forEach(it=>{if(it.port){yy-=GAP/2+it.ph;it.y=yy;yy-=GAP/2+it.ph;return}yy-=it.ex/2;it.y=yy;pts.push([it.x,it.y]);yy-=STEP+it.ex/2});
       topY=pts.length?Math.min(...pts.map(p=>p[1])):total-120};
-    lay(TOP);if(topY<need)lay(TOP+need-topY);
+    const sig=()=>M.items.map(it=>it.port?it.psz:it.rows?it.rows.length:0).join(),layAll=T=>{obs=[];lay(T);for(let k=0;k<6&&PIC;k++){const g=sig();obs=boxes();lay(T);if(sig()===g)break}};
+    layAll(TOP);if(topY<need)layAll(TOP+need-topY);
     map.style.height=total+"px";
     let h="";
     // the route
@@ -338,7 +352,7 @@
     // ports: the label on the route, the picture at the side
     M.ports.forEach((it,j)=>{const P=it.port,img=P.img;
       h+=portCard(it);
-      if(W>560){const left=j%2===0,sz=Math.min(280,W*.27),px=left?Math.max(-20,cx-lane*2-sz-150):Math.min(W-sz+20,cx+lane*2+150);
+      if(PIC){const sz=it.psz||SZ,px=picX(j,sz);
         h+=`<div class="vy-pimg" style="left:${px}px;top:${it.y-sz*.95}px;width:${sz}px"><img src="${I}${img}.webp" alt="">${hasFw(S,it.pi)?fwHtml():""}<span class="ln">${P.f} ${esc(P.c)}</span></div>`}});
     // the stops
     const now=M.stops.find(s=>s.key===V.now);
