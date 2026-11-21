@@ -175,8 +175,8 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 
 **The teacher's dashboard** (20 Nov 2026)
 
-- Home: one card per group with the exam rings per part and a second line per skill with the **class work** (first tries + vocabulary and grammar games); the old First tries section is gone. 📝 Exams sorts 🏆 Best mark first.
-- 🌱 Progress tile per group: LS mark so far, steps done, work marked, activities average, 📈 skill mastery over time (the whole year, week by week), 🕸 skills radar, average per criterion. No new Firestore reads.
+- Home: one card per group with **🙌 Class work** rings (first tries per skill; grammar and vocabulary with the games) where First tries used to be (no checkpoints), and below them the exam rings per part, so the two rows compare at a glance. 📝 Exams sorts 🏆 Best mark first.
+- 🌱 Progress tile per group: LS mark so far, steps done, work marked, activities average, 📈 skill mastery over time (the whole year, week by week, with each LS's exam ★ and final product ■ as points: LS1's pages kept no scores, so LS1 shows through them; 21 Nov 2026), 🕸 skills radar, average per criterion. No new Firestore reads.
 - 👁 The student view shows exactly what students see.
 - 🧭 Learning situations › an LS and each group's 🔓 Learning paths show what every learning path covers: **Vocabulary · Grammar · What we do**, from the path's own step titles. The Learning situations table also shows every tab (SLP) of each path per group: ✔ open, 🔒 locked, 🏫 kept for a later class (21 Nov 2026).
 
