@@ -8,10 +8,49 @@
      ca:  optional, a Catalan sentence that tests the same point (Catalan → English), with en: [accepted English versions]
    A batch can also have idiom: [{s, a: [natural versions], why}] (whole sentences to make idiomatic) and spoken: [the same shape, for
    short spoken chunks]; both use the ✨ panel (R.idiom: type it or 🎙 say it, then compare).
-   The page makes, for each of the 3 newest batches: 🔍 Spot it (choose the wrong part), ✏️ Fix it (type the right words), Catalan → English
+   The page makes, for each of the 3 newest batches: 🔍 Spot it (write the whole sentence correctly), ✏️ Fix it (type the right words), Catalan → English
    (when items have ca), ✨ Make it idiomatic, 🗣 Spoken English and 🗣 Shadowing (when data/shadow.js has a clip for the batch: run
    tools/towards-nativeness/shadow.py after adding a batch). Older batches (from the fourth on) come back together in 🔁 Review, mixed. */
 window.TN_MISTAKES = [
+  { id: 'n21b', date: '17–21 Nov 2026 · list 2', from: 'your newest messages', items: [
+    { s: 'Did you include the mistakes I did these days?', bad: 'the mistakes I did these days', fix: ['the mistakes I’ve made recently', 'the mistakes I made recently', 'the mistakes I’ve made lately', 'the mistakes I’ve made over the last few days'], why: 'You <strong>make</strong> a mistake; <em>these days</em> = nowadays, so say <strong>recently</strong>.' },
+    { s: 'I want to write the good sentence, not choose it.', bad: 'the good sentence', fix: ['the correct sentence', 'the right sentence'], why: 'For answers: <strong>correct / right</strong>. <em>Good</em> is about quality.' },
+    { s: 'I want fast finisher to read the book.', bad: 'fast finisher', fix: ['fast finishers'], why: 'A group in general is plural: <strong>fast finishers</strong>.' },
+    { s: 'Include the ones of the exam.', bad: 'the ones of the exam', fix: ['the exam ones', 'the ones from the exam'], why: 'A noun in front (<strong>the exam ones</strong>), or <strong>from</strong> for where things come from.' },
+    { s: 'I want it to have them ready by Monday.', bad: 'I want it to have', fix: ['I want to have'], why: 'No extra <em>it</em>: I want <strong>to have</strong> them ready.' },
+    { s: 'We will mark them like the rest of the speaking.', bad: 'the rest of the speaking', fix: ['the other speaking activities', 'the rest of the speaking activities', 'the other speaking tasks'], why: '<em>speaking</em> as an adjective needs its noun: speaking <strong>activities</strong>.' },
+    { s: 'It can be done in that moment or set as homework.', bad: 'in that moment', fix: ['at that moment', 'right then', 'then'], why: 'A point in time: <strong>at</strong> that moment (<em>en aquell moment</em>).' },
+    { s: 'When I tap the %, I want to see who’s done and who hasn’t.', bad: 'who’s done and', fix: ['who’s done it and', 'who has done it and'], why: '<em>do</em> needs its object here: who’s done <strong>it</strong>.' },
+    { s: 'I thought that was they saw when they opened the website.', bad: 'that was they saw', fix: ['that was what they saw'], why: 'The clause needs <strong>what</strong>: that was what they saw.' },
+    { s: 'It opens when they press the button to do.', bad: 'the button to do', fix: ['the To do button'], why: 'Name the button first: <strong>the To do button</strong>.' },
+    { s: 'Correct the writings missing.', bad: 'writings missing', fix: ['missing writings'], why: 'Adjective before the noun: the <strong>missing writings</strong>.' },
+    { s: 'I don’t understand the colours not the labels.', bad: 'not the labels', fix: ['or the labels'], why: 'After a negative verb, join with <strong>or</strong>: I don’t understand X or Y.' },
+    { s: 'I won’t make it because I have a doctor appointment.', bad: 'doctor appointment', fix: ['doctor’s appointment'], why: 'Fixed phrase with <strong>’s</strong>: a doctor’s appointment.' },
+    { s: 'We need to label it with Sample exam 1.', bad: 'label it with', fix: ['label it', 'call it'], why: '<strong>label</strong> something + its name, no <em>with</em>.' },
+    { s: 'Go ahead with the plan and next week activities.', bad: 'next week activities', fix: ['next week’s activities'], why: 'Time + noun: next week<strong>’s</strong> activities.' },
+    { s: 'Put the summary like columns.', bad: 'like columns', fix: ['as columns', 'in columns'], why: 'The form something takes: <strong>as</strong> columns / <strong>in</strong> columns.' },
+    { s: 'This web is to teach, not for self-study.', bad: 'This web is to teach', fix: ['This website is for teaching', 'This site is for teaching'], why: '<em>the web</em> is the whole internet: <strong>this website</strong>. Purpose: <strong>for + -ing</strong>.' },
+    { s: 'We don’t have much time as we should.', bad: 'much time as', fix: ['as much time as'], why: 'Amounts: <strong>as much</strong> … as.' },
+    { s: 'The same happens in 2 ESO.', bad: 'The same happens', fix: ['The same thing happens'], why: 'The set phrase is <strong>the same thing happens</strong>.' },
+    { s: 'I’ve seen that you have a lot of docs here.', bad: 'I’ve seen that you have', fix: ['I see you have', 'I see that you have', 'I notice you have', 'I’ve noticed you have'], why: 'Something you notice right now: <strong>I see</strong> / I notice.' },
+    { s: 'What happens with the writing?', bad: 'What happens with', fix: ['What’s happening with', 'What about'], why: 'A situation now: <strong>What’s happening with</strong>…? or <strong>What about</strong>…?' },
+    { s: 'Change the green colour per the blue one.', bad: 'per the blue one', fix: ['to the blue one', 'to blue'], why: '<em>canviar X per Y</em> → change X <strong>to</strong> Y (or replace X <strong>with</strong> Y).' },
+    { s: 'A 60 should be green already.', bad: 'A 60 should be green already', fix: ['60 should already be green'], why: 'No article before a mark used as a value; <strong>already</strong> goes before the adjective.' },
+    { s: 'Make a backup for the data.', bad: 'backup for', fix: ['backup of'], why: 'A backup or a copy <strong>of</strong> something.' },
+    { s: 'Where is the data I have of my students?', bad: 'of my students', fix: ['on my students', 'about my students'], why: 'Data or information <strong>on</strong> someone.' },
+    { s: 'Is this already done?', bad: 'Is this already done', fix: ['Has this already been done', 'Has this been done yet'], why: 'A finished action with <em>already</em>: <strong>has … been done</strong>.' },
+    { s: 'Suggest replies accordingly to the website.', bad: 'accordingly to', fix: ['according to', 'based on'], why: '<strong>according to</strong> + noun; <em>accordingly</em> stands alone.' },
+    { s: 'Write an email remembering them that speaking is compulsory.', bad: 'remembering them', fix: ['reminding them'], why: '<strong>remind</strong> someone = make them remember.' },
+    { s: 'It’s a document that help you work better.', bad: 'that help you', fix: ['that helps you'], why: 'A document = it: <strong>helps</strong>.' },
+    { s: 'Where better for you to have them?', bad: 'Where better', fix: ['Where is it better'], why: 'A question needs its verb: Where <strong>is it</strong> better…?' },
+    { s: 'Show the answer after 2 hours since they receive the message.', bad: 'after 2 hours since', fix: ['2 hours after', 'at least 2 hours after'], why: '<strong>after</strong> or <em>since</em>, not both: 2 hours after they receive it.' },
+    { s: 'What’s the point on that?', bad: 'point on', fix: ['point of'], why: 'the point <strong>of</strong> something.' }
+  ],
+  idiom: [
+    { s: 'Now I’ve done what I’ve done.', a: ['What’s done is done.'], why: 'The fixed idiom for <em>el que està fet, fet està</em>: <strong>What’s done is done.</strong>' },
+    { s: 'They must be like a game.', a: ['They should work like a game.', 'They should be like a game.'], why: '<strong>should</strong> for how you want something to work; <em>must</em> sounds like an order.' },
+    { s: 'It had to look more or less like this one.', a: ['It should look more or less like this one.', 'It should look roughly like this one.'], why: '<strong>should</strong> for what you expect; <em>had to</em> = an obligation.' }
+  ] },
   { id: 'n21', date: '18–21 Nov 2026', from: 'your two newest lists', items: [
     { s: 'I want the students see their exam results on the dashboard.', bad: 'the students see', fix: ['the students to see'], why: 'want + someone + <strong>to</strong>.', ca: 'Vull que els alumnes facin el vídeo abans de divendres.', en: ['I want the students to make the video before Friday', 'I want students to make the video before Friday', 'I want the students to make the video by Friday', 'I want students to make the video by Friday'] },
     { s: 'I want that everything is clear for the students.', bad: 'that everything is', fix: ['everything to be'], why: 'Never <em>want that</em>: want + something + <strong>to be</strong>.' },
@@ -224,20 +263,17 @@ window.TN_PREPS = [
 ];
 
 (function () {
-  const B = window.TN_MISTAKES, words = s => String(s).replace(/[.,!?…“”]/g, '').split(/\s+/).filter(Boolean);
+  const B = window.TN_MISTAKES;
   const gap = (s, bad) => s.replace(bad, '___');
-  // two other parts of the sentence as wrong choices for 🔍 Spot it: chunks of 1–3 words that don't overlap the mistake
-  const others = (s, bad) => { const rest = words(s.replace(bad, ' | ')).join(' ').split('|').map(x => x.trim()).filter(Boolean), out = [];
-    rest.forEach(r => { const w = r.split(' '); if (w.length) out.push(w.slice(0, Math.min(3, w.length)).join(' ')); if (w.length > 3) out.push(w.slice(-2).join(' ')); });
-    const u = [...new Set(out)].filter(x => x && x !== bad); return u.length >= 2 ? u.slice(0, 2) : u.concat(['(no mistake)']).slice(0, 2); };
   const fixArr = m => Array.isArray(m.fix) ? m.fix : [m.fix];
   const panels = [];
   const recent = B.slice(0, 3), older = B.slice(3);
   recent.forEach((b, k) => {
     const tag = k === 0 ? 'Newest · ' : '';
-    panels.push({ id: 'spot_' + b.id, type: 'mc', tab: '🔍 ' + tag + b.date, title: 'Spot it · ' + b.date + ' · ' + b.from, pill: b.items.length + ' sentences',
-      intro: 'Your own sentences from ' + b.date + '. Each one has one mistake (grammar or idiom only). Choose the part that is wrong, then read why.',
-      items: b.items.map(m => ({ q: '“' + m.s + '”', o: [m.bad].concat(others(m.s, m.bad)), ex: m.why + ' → <strong>' + gap(m.s, m.bad).replace('___', fixArr(m)[0]) + '</strong>' })) });
+    // ✍️ written, not chosen (Roger, 21 Nov 2026: "I want to write the correct sentence, not choose"): a new id, so the old choose-the-part tries stay apart
+    panels.push({ id: 'spotw_' + b.id, type: 'rewrite', tab: '🔍 ' + tag + b.date, title: 'Spot it · ' + b.date + ' · ' + b.from, pill: b.items.length + ' sentences',
+      intro: 'Your own sentences from ' + b.date + '. Each one has one mistake (grammar or idiom only). Write the whole sentence correctly, then read why.',
+      items: b.items.map(m => ({ s: m.s, a: fixArr(m).map(f => m.s.replace(m.bad, f)), ex: m.why })) });
     panels.push({ id: 'fix_' + b.id, type: 'typed', tab: '✏️ Fix it · ' + b.date, title: 'Fix it · ' + b.date, pill: 'Type it',
       intro: 'The wrong part is gone. Type what a native speaker would write in the gap. After two wrong tries you’ll see the answer.',
       items: b.items.map(m => ({ q: gap(m.s, m.bad) + ' <span class="tiny">(you wrote: <s>' + m.bad + '</s>)</span>', a: fixArr(m), en: m.why.replace(/<[^>]+>/g, '') })) });

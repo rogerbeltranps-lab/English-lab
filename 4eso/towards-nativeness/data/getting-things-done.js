@@ -4,19 +4,19 @@
 window.LP = {
   key: 'tnDone', n: 2, title: 'Getting things done',
   panels: [
-    { id: 'spot', type: 'mc', tab: '🔍 Spot the mistake', title: 'Spot the mistake: your own instructions', pill: 'Warm-up',
-      intro: 'Your real messages, typing slips already fixed. One mistake each. Choose the part that is wrong.',
+    { id: 'spotw', type: 'rewrite', tab: '🔍 Spot the mistake', title: 'Spot the mistake: your own instructions', pill: 'Warm-up',
+      intro: 'Your real messages, typing slips already fixed. One mistake each. Write the whole sentence correctly, then read why.',
       items: [
-        { q: '“You didn’t do the changes I asked for.”', o: ['do the changes', 'You didn’t', 'I asked for'], ex: '<strong>make</strong> changes, a decision, a mistake, an exam, a rubric. <strong>do</strong> a test, an exercise, a good job.' },
-        { q: '“I want students receive a notification.”', o: ['want students receive', 'a notification', 'I'], ex: '<strong>want + someone + to</strong>: I want students to receive a notification.' },
-        { q: '“I attach the grid with the criteria.”', o: ['I attach', 'the grid', 'with the criteria'], ex: 'For what you are doing as you write: <strong>I’m attaching / I’ve attached</strong>. <em>I attach</em> sounds like a habit.' },
-        { q: '“Maybe is better to leave it.”', o: ['Maybe is better', 'to leave it', 'Maybe'], ex: 'Every verb needs a subject: <strong>Maybe it’s better to leave it.</strong>' },
-        { q: '“In general the audio it’s not working well.”', o: ['the audio it’s', 'In general', 'well'], ex: 'One subject only: <strong>the audio isn’t working</strong>.' },
-        { q: '“Here it happens the same.”', o: ['Here it happens the same', 'Here', 'the same'], ex: 'No dummy <em>it</em> before the verb: <strong>The same thing happens here.</strong>' },
-        { q: '“Did you fixed that?”', o: ['Did you fixed', 'that', 'Did'], ex: 'After did, the base form: <strong>Did you fix that?</strong>' },
-        { q: '“Don’t allow students press answers super fast.”', o: ['allow students press', 'Don’t', 'super fast'], ex: '<strong>allow someone to</strong> / <strong>let someone + verb</strong>: Don’t let students press… / Don’t allow students to press…' },
-        { q: '“I don’t want the spellchecker underline their mistakes.”', o: ['want the spellchecker underline', 'their mistakes', 'I don’t'], ex: '<strong>want + object + to</strong>: I don’t want the spellchecker to underline their mistakes.' },
-        { q: '“Make possible to select the PDF.”', o: ['Make possible to', 'select', 'the PDF'], ex: '<strong>make it possible to</strong>: Make it possible to select the PDF.' }
+        { s: 'You didn’t do the changes I asked for.', a: ['You didn’t make the changes I asked for.'], ex: '<strong>make</strong> changes, a decision, a mistake, an exam, a rubric. <strong>do</strong> a test, an exercise, a good job.' },
+        { s: 'I want students receive a notification.', a: ['I want students to receive a notification.', 'I want the students to receive a notification.'], ex: '<strong>want + someone + to</strong>: I want students to receive a notification.' },
+        { s: 'I attach the grid with the criteria.', a: ['I’m attaching the grid with the criteria.', 'I’ve attached the grid with the criteria.', 'I attached the grid with the criteria.', 'Please find attached the grid with the criteria.'], ex: 'For what you are doing as you write: <strong>I’m attaching / I’ve attached</strong>. <em>I attach</em> sounds like a habit.' },
+        { s: 'Maybe is better to leave it.', a: ['Maybe it’s better to leave it.', 'Maybe it would be better to leave it.'], ex: 'Every verb needs a subject: <strong>Maybe it’s better to leave it.</strong>' },
+        { s: 'In general the audio it’s not working well.', a: ['In general the audio isn’t working well.', 'In general, the audio isn’t working well.', 'In general the audio is not working well.'], ex: 'One subject only: <strong>the audio isn’t working</strong>.' },
+        { s: 'Here it happens the same.', a: ['The same thing happens here.', 'The same happens here.', 'It’s the same here.'], ex: 'No dummy <em>it</em> before the verb: <strong>The same thing happens here.</strong>' },
+        { s: 'Did you fixed that?', a: ['Did you fix that?'], ex: 'After did, the base form: <strong>Did you fix that?</strong>' },
+        { s: 'Don’t allow students press answers super fast.', a: ['Don’t allow students to press answers super fast.', 'Don’t let students press answers super fast.'], ex: '<strong>allow someone to</strong> / <strong>let someone + verb</strong>: Don’t let students press… / Don’t allow students to press…' },
+        { s: 'I don’t want the spellchecker underline their mistakes.', a: ['I don’t want the spellchecker to underline their mistakes.'], ex: '<strong>want + object + to</strong>: I don’t want the spellchecker to underline their mistakes.' },
+        { s: 'Make possible to select the PDF.', a: ['Make it possible to select the PDF.'], ex: '<strong>make it possible to</strong>: Make it possible to select the PDF.' }
       ] },
 
     { id: 'vocab', type: 'vocab', tab: 'Vocabulary', title: 'Getting things done: collocations and polite requests',

@@ -151,6 +151,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - "Not late yet" counts are never shown to students (19 Nov 2026).
 - The public home page shows no screenshots or pictures of the app and never mentions the full screen mode (7 Nov 2026).
 - **Students never see Towards Nativeness** (20 Nov 2026). It is Roger's own C1 to C2 course (a personal LS in 4 ESO). It never appears anywhere for students: menu, My marks tabs, board, progress, notebook, LS lists. The teacher's 👁 student view must show exactly what students see, so it is hidden there too. Only the dashboard, Roger's own view and the tester see it. Checked on every PR by `tools/students-never-see/check.mjs` (PR #784).
+- **In Towards Nativeness, 🔍 Spot the mistake is written, not chosen** (Roger, 21 Nov 2026: "I want to write the correct sentence, not choose"): every Spot the mistake step (the four learning paths and each 🔍 Spot it list in My latest mistakes) shows his own sentence and he types the whole sentence correctly. Capitals, punctuation, contractions, missing apostrophes (dont) and one typing slip in a longer word never count; his original sentence typed again never passes. Once it is right (or after two wrong tries) the natural version and the rule show. Every new corrections list is added to My latest mistakes, up to the latest messages.
 
 **Look and devices**
 

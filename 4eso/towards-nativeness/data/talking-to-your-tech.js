@@ -4,19 +4,19 @@
 window.LP = {
   key: 'tnTech', n: 1, title: 'Talking to your tech',
   panels: [
-    { id: 'spot', type: 'mc', tab: '🔍 Spot the mistake', title: 'Spot the mistake: your own sentences', pill: 'Warm-up',
-      intro: 'Every sentence is one you really wrote to Claude. Each has one mistake (grammar or idiom only, typing slips are already fixed). Choose the part that is wrong, then read why.',
+    { id: 'spotw', type: 'rewrite', tab: '🔍 Spot the mistake', title: 'Spot the mistake: your own sentences', pill: 'Warm-up',
+      intro: 'Every sentence is one you really wrote to Claude. Each has one mistake (grammar or idiom only, typing slips are already fixed). Write the whole sentence correctly, then read why.',
       items: [
-        { q: '“I don’t see the changes in my cellphone.”', o: ['in my cellphone', 'I don’t see', 'the changes'], ex: 'Devices, screens and platforms take <strong>on</strong>: on my phone, on my iPhone, on Windows, on GitHub, on the website.' },
-        { q: '“How long I’ll have to wait?”', o: ['I’ll have', 'How long', 'to wait'], ex: 'In a question the auxiliary goes before the subject: <strong>How long will I have to wait?</strong>' },
-        { q: '“Home doesn’t work yet.” (after a fix that didn’t work)', o: ['yet', 'Home', 'doesn’t work'], ex: '<strong>still</strong> = it goes on (It still doesn’t work). <strong>yet</strong> = it hasn’t started (I haven’t tried it yet).' },
-        { q: '“The English Lab button doesn’t bring me here.”', o: ['bring me', 'The English Lab button', 'here'], ex: 'A link or button <strong>takes</strong> you somewhere. <em>Bring</em> is movement towards the speaker: bring your laptop to class.' },
-        { q: '“What did you exactly do?”', o: ['did you exactly do', 'What', 'do'], ex: 'Adverbs like exactly, already, always go before the main verb: <strong>What exactly did you do?</strong>' },
-        { q: '“Why 2 ESO doesn’t have a time plan?”', o: ['Why 2 ESO doesn’t have', 'a time plan', 'Why'], ex: 'Question order: <strong>Why doesn’t 2 ESO have a time plan?</strong>' },
-        { q: '“The button is on the top of the table.”', o: ['on the top of', 'The button', 'the table'], ex: 'Positions on a page: <strong>at the top / at the bottom / at the top right</strong>.' },
-        { q: '“Is ChatGPT better in this?”', o: ['better in', 'Is ChatGPT', 'this'], ex: 'good / better / bad <strong>at</strong> something: Is ChatGPT better at this?' },
-        { q: '“Why is Claude failing in connecting with my project?”', o: ['failing in connecting', 'Why is Claude', 'my project'], ex: '<strong>fail to do</strong>: Why is Claude failing to connect to my project?' },
-        { q: '“I asked this to ChatGPT.”', o: ['asked this to ChatGPT', 'I', 'this'], ex: '<strong>ask someone something</strong>, no <em>to</em>: I asked ChatGPT this. (But explain something <strong>to</strong> someone.)' }
+        { s: 'I don’t see the changes in my cellphone.', a: ['I don’t see the changes on my phone.', 'I don’t see the changes on my cellphone.', 'I can’t see the changes on my phone.', 'I don’t see the changes on my mobile.'], ex: 'Devices, screens and platforms take <strong>on</strong>: on my phone, on my iPhone, on Windows, on GitHub, on the website.' },
+        { s: 'How long I’ll have to wait?', a: ['How long will I have to wait?'], ex: 'In a question the auxiliary goes before the subject: <strong>How long will I have to wait?</strong>' },
+        { s: 'Home doesn’t work yet.', a: ['Home still doesn’t work.', 'Home still isn’t working.', 'Home is still not working.', 'Home still does not work.'], ex: '<strong>still</strong> = it goes on (It still doesn’t work). <strong>yet</strong> = it hasn’t started (I haven’t tried it yet).', note: 'after a fix that didn’t work' },
+        { s: 'The English Lab button doesn’t bring me here.', a: ['The English Lab button doesn’t take me here.'], ex: 'A link or button <strong>takes</strong> you somewhere. <em>Bring</em> is movement towards the speaker: bring your laptop to class.' },
+        { s: 'What did you exactly do?', a: ['What exactly did you do?'], ex: 'Adverbs like exactly, already, always go before the main verb: <strong>What exactly did you do?</strong>' },
+        { s: 'Why 2 ESO doesn’t have a time plan?', a: ['Why doesn’t 2 ESO have a time plan?', 'Why does 2 ESO not have a time plan?', 'Why hasn’t 2 ESO got a time plan?'], ex: 'Question order: <strong>Why doesn’t 2 ESO have a time plan?</strong>' },
+        { s: 'The button is on the top of the table.', a: ['The button is at the top of the table.'], ex: 'Positions on a page: <strong>at the top / at the bottom / at the top right</strong>.' },
+        { s: 'Is ChatGPT better in this?', a: ['Is ChatGPT better at this?'], ex: 'good / better / bad <strong>at</strong> something: Is ChatGPT better at this?' },
+        { s: 'Why is Claude failing in connecting with my project?', a: ['Why is Claude failing to connect with my project?', 'Why is Claude failing to connect to my project?'], ex: '<strong>fail to do</strong>: Why is Claude failing to connect to my project?' },
+        { s: 'I asked this to ChatGPT.', a: ['I asked ChatGPT this.', 'I asked ChatGPT about this.'], ex: '<strong>ask someone something</strong>, no <em>to</em>: I asked ChatGPT this. (But explain something <strong>to</strong> someone.)' }
       ] },
 
     { id: 'vocab', type: 'vocab', tab: 'Vocabulary', title: 'Words and chunks for talking to your tech',
