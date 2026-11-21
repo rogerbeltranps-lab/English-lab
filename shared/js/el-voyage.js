@@ -11,7 +11,8 @@
 // V = {ls, skin (the LS id: SKINS, the whole world of the map), beds:[{id, kind: lp|cp|fp|bonus, plants:[{key, id, name, href, st}]}], fp:{title, sub, href, done}, now, me:{n, s},
 //      mates:[{n, s}], cont:{href, label}, store, save, en, quiet()}
 // The teacher's class map (teacher.html vyMap) passes no me and adds view (the map's name, to keep its scroll), pct, pctPort and later:
-// then the column on the right is 🧭 Class steps, the share of the group who did each step (classCol).
+// then the column on the right is 🧭 Class steps, the share of the group who did each step (classCol); who(key) gives the names
+// for a tap on a step or a place (teacher only).
 (function(){
   const BASE=(()=>{try{return new URL("../",document.currentScript.src).href}catch(e){return "shared/"}})();
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -234,6 +235,9 @@
 .vy-steps .sub{margin:-2px 14px 4px;font:600 11px system-ui,sans-serif;color:#8a5a1f}
 .vy-steps .pc{flex:none;min-width:44px;padding:3px 0;border-radius:999px;text-align:center;font:800 12px system-ui,sans-serif;color:#fff}.vy-steps .pc.lt{background:#e5e7eb;color:#6b7280}
 .vy-steps li.cl a:hover{background:none}.vy-steps li.cl.lt .n{color:#6b7280}.vy-steps li.cl em{display:block;font:600 11px system-ui,sans-serif;color:#9ca3af;font-style:normal}
+.vy-steps li.wh{cursor:pointer}.vy-steps li.cl.wh a:hover,.vy-steps li.pt.wh:hover{background:#f3e7cc}.vy-steps li.on>a,.vy-steps li.pt.on{background:#f3e7cc}
+.vy-steps .vy-who{margin:2px 6px 8px;padding:8px 10px;background:#fff;border:1px solid #e3cf9f;border-radius:10px;font:500 12px/1.35 system-ui,sans-serif;color:#1f2937;cursor:default}
+.vy-steps .vy-who b{display:block;font-size:11px;font-weight:800;margin:4px 0 2px}.vy-steps .vy-who b.y{color:#15803d}.vy-steps .vy-who b.n{color:#b91c1c}.vy-steps .vy-who p{margin:0}
 .vy-steps .pt .ppc{margin-left:auto;font:800 12px system-ui,sans-serif;color:#8a5a1f}
 .vy-steps li.s.pop .tk{animation:vytk .5s cubic-bezier(.2,1.8,.4,1)}@keyframes vytk{0%{transform:scale(.3)}100%{transform:scale(1)}}
 .vy-go{display:flex;margin-top:10px}.vy-go a{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;background:#3fa34d;color:#fff;text-decoration:none;font-weight:800;font-size:19px;border-radius:16px;padding:12px;box-shadow:0 4px 0 #2b7a36;min-width:0}
@@ -255,9 +259,9 @@
     let c=`<h2>🧭 ${t("Passos de la classe","Class steps")} <small>${avg==null?"":t(`mitjana ${avg}%`,`${avg}% average`)}</small></h2><div class="bar"><i style="width:${avg||0}%;background:${cl(avg)}"></i></div>`
       +`<p class="sub">${t("% d'alumnes que l'han fet","% of students who have done it")}</p><ol>`;
     M.items.forEach(it=>{
-      if(it.port){const p=(V.pctPort||{})[it.pi];c+=`<li class="pt"><span>${it.port.f}</span>${esc(it.port.c)}<span class="ppc" title="${esc(t("Han fet tots els passos","Did every step"))}">${p==null?"":p+"%"}</span></li>`;return}
+      if(it.port){const p=(V.pctPort||{})[it.pi];c+=`<li class="pt${V.who&&p!=null?" wh":""}" data-k="port:${it.pi}"><span>${it.port.f}</span>${esc(it.port.c)}<span class="ppc" title="${esc(t("Han fet tots els passos","Did every step"))}">${p==null?"":p+"%"}</span></li>`;return}
       const k=SK[it.sk]||SK.Step,lt=L.has(it.key);
-      c+=`<li class="s cl${lt?" lt":""}" data-k="${esc(it.key)}"><a>${pill(pc(it.key),lt)}<span class="n"><small style="color:${k[1]}">${esc(skName(it.sk,en))}</small>${esc(it.t)}${lt?`<em>${t("📅 encara no fet a classe","📅 not done in class yet")}</em>`:""}</span></a></li>`});
+      c+=`<li class="s cl${lt?" lt":""}${V.who?" wh":""}" data-k="${esc(it.key)}"><a title="${V.who?esc(t("Toca per veure qui","Tap to see who")):""}">${pill(pc(it.key),lt)}<span class="n"><small style="color:${k[1]}">${esc(skName(it.sk,en))}</small>${esc(it.t)}${lt?`<em>${t("📅 encara no fet a classe","📅 not done in class yet")}</em>`:""}</span></a></li>`});
     if(fp.title)c+=`<li class="s fp"><a><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final","Final product")}</small>${esc(fp.title)}</span></a></li>`;
     return c+"</ol>"}
   function html(V){css();const en=V.en,t=(ca,e)=>en?e:ca,M=model(V),n=M.stops.length,fp=V.fp||{},S=skinOf(V),wd=k=>S.wd(k,en);
@@ -376,6 +380,14 @@
     sea.querySelector('[data-vy="me"]').onclick=()=>{toMe(1);SND.play("click",.6)};
     map.addEventListener("click",e=>{if(e.target.closest(".vy-st,.vy-lab,.vy-dest"))SND.play("click",.6)});
     root.querySelectorAll(".vy-steps li.s a").forEach(a=>a.addEventListener("click",()=>SND.play("click",.6)));
+    // the teacher's 🧭 Class steps: a tap on a step or a place opens who has done it and who hasn't (V.who(key) = {yes:[names], no:[names]});
+    // another tap closes it (Roger, 21 Nov 2026: "when I press on the % I see who's done and who hasn't")
+    // (one handler on the column, set as a property: wire runs again when the width changes)
+    const asd=root.querySelector(".vy-steps");if(V.who&&asd)asd.onclick=e=>{const li=e.target.closest("li.wh");if(!li||e.target.closest(".vy-who"))return;
+      const nx=li.nextElementSibling,open=nx&&nx.classList.contains("vy-who");root.querySelectorAll(".vy-steps .vy-who").forEach(x=>x.remove());
+      root.querySelectorAll(".vy-steps li.on").forEach(x=>x.classList.remove("on"));if(open)return;
+      const w=V.who(li.dataset.k);if(!w)return;const L=(c,lab,a)=>`<b class="${c}">${lab} (${a.length})</b><p>${a.length?a.map(esc).join(", "):"–"}</p>`;
+      li.classList.add("on");li.insertAdjacentHTML("afterend",`<li class="vy-who">${L("y",t("✅ Fet","✅ Done"),w.yes)}${L("n",t("⏳ Encara no","⏳ Not yet"),w.no)}</li>`)};
     const nowLi=root.querySelector(".vy-steps li.now");if(nowLi){const ol=nowLi.parentElement;ol.scrollTop=Math.max(0,nowLi.offsetTop-ol.clientHeight*.45)}
     // relayout when the width changes (window resized, phone turned)
     if(!wire.ro&&window.ResizeObserver){wire.ro=new ResizeObserver(()=>{const r=wire.last;if(!r)return;const s=r.root.querySelector(".vy-sc");if(s&&s.clientWidth&&Math.abs(s.clientWidth-(LAST.w||0))>20)wire(r.root,r.V)})}
