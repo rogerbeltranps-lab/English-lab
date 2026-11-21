@@ -1,4 +1,4 @@
-/* 4 ESO · LS2 · First exam (practice, not graded; the page is still sample-exam.html, key ls2SampleExam4ESO). Roger, 19 Nov 2026: a sample
+/* 4 ESO · LS2 · Sample exam 1 (practice, called First exam 19–21 Nov 2026, not graded; the page is still sample-exam.html, key ls2SampleExam4ESO). Roger, 19 Nov 2026: a sample
    exam "with what we've done so far" (only up to the step of the group that has done less) and "tailored … so that they get good marks". So:
    - content = LP1 Getting started (autumn words, feelings; the LP1 game: get + comparative, adjective + preposition + -ing), LP2 Celebrations
      around the world (celebrations, Present Simple for customs, on / in / at, It is celebrated / It takes place) and LP3 vocabulary + Past
@@ -39,7 +39,7 @@ const L51 = ['Unfinished or not understandable; no clear parts (what, when, cust
 const AUDIO = { audio: 'audio/sample-exam-new-year.mp3', title: 'Two New Years: Callum and Yuki', script: SCRIPT };
 
 window.LP = {
-  key: 'ls2SampleExam4ESO', n: 'E', title: 'First exam',
+  key: 'ls2SampleExam4ESO', n: 'E', title: 'Sample exam 1',
   panels: [
     // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
     { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },

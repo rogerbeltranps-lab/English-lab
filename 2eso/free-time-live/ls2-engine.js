@@ -18,7 +18,7 @@ var LS2 = (function () {
     ['recall-checkpoint-3.html', 'Recall checkpoint 3'],
     ['write-your-vlog-script.html', '6 · Write your vlog script'],
     ['recall-checkpoint-4.html', 'Recall checkpoint 4'],
-    ['sample-exam.html', 'First exam'],
+    ['sample-exam.html', 'Sample exam 1'],
     ['free-time-vlog.html', '7 · Final product'],
     ['reflect.html', 'Reflect']
   ];
