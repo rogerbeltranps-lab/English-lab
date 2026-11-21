@@ -558,7 +558,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - Bump `?v=` cache keys when a shared file or media changes; tell Roger (and students) to hard reload.
 - `firestore.rules` publish by themselves on merge (GitHub Action). New school script versions: Claude pastes and deploys them in the Claude app's browser after Roger's "apply" (section 1).
 - Preview without Firebase: `EL_DEMO_*` demo data and the invented students; never real data in previews.
-- Firestore: no new reads without need; the dashboard works from its browser copy and updates per group.
+- Firestore: no new reads without need; the dashboard **opens at once from its browser copy** and checks the light part (messages, settings, ticks) in the background, never waiting for Firestore before showing the page (Roger, 21 Nov 2026: "It took ages to open"), and updates per group.
 - `teacher.html` belongs to this project; the separate LS (content) project must ask here for dashboard changes.
 
 ---
