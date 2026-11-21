@@ -1634,7 +1634,7 @@ const avgP=v=>v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;
 function withLsG(ls,gid,fn){const o=[S.ls,S.g,S.zero,COURSE];S.ls=ls;S.g=gid;S.zero=false;COURSE=ls.split("-")[0];try{return fn()}finally{[S.ls,S.g,S.zero,COURSE]=o}}
 function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.ls,info=(S.D.ls[ls]||{}),x=n&&n.p&&Object.assign({gid:g.id},n);
   const studs=Object.values(S.P).filter(s=>s.group===g.id&&!s.tester&&!s.away&&s.uid),as=ls?acts(ls).filter(a=>elLpOpen(a,info,g.id)):[];
-  const lps=as.filter(a=>!a.checkpoint&&!/sample exam/i.test(a.title)).map(a=>{const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
+  const lps=as.filter(a=>!a.checkpoint&&!a.optional&&!/sample exam|first exam/i.test(a.title)).map(a=>{const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
     const share=studs.map(s=>{if(!req.length)return isDone(s.uid,a)?100:0;const d=doneSet(s.uid,a);return req.filter(k=>d.has(k)).length/req.length*100});
     return {a,lab:x&&x.p?agLab(x,a):shortTi(a),pc:avgP(share),fin:studs.filter(s=>isDone(s.uid,a)).length}});
   const cps=as.filter(a=>a.checkpoint),cpV=studs.flatMap(s=>cps.map(a=>firstOf(s.uid,a.id,"check")).filter(f=>f&&f.max).map(f=>f.score/f.max*100));
@@ -1662,7 +1662,7 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
   // students; Grammar and Vocabulary also take the class games of that LS (half and half when both exist); the whole: every first try, with the
   // games as one more half.
   const FT={},all=[],LV=/_(beginners|insecure|safe|daring|native)$/;
-  if(window.ELCharts)as.filter(a=>!a.checkpoint&&!/sample exam/i.test(a.title)).forEach(a=>studs.forEach(s=>Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
+  if(window.ELCharts)as.filter(a=>!a.checkpoint&&!a.optional&&!/sample exam|first exam/i.test(a.title)).forEach(a=>studs.forEach(s=>Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
     if(!t||!+t.max)return;const sk=ELCharts.skillOf(a,k.replace(LV,""));if(!sk)return;const v=Math.max(0,Math.min(100,t.score/t.max*100));(FT[sk]=FT[sk]||[]).push(v);all.push(v)})));
   const mix=(a,g)=>a!=null&&g!=null?Math.round((a+g)/2):a!=null?a:g!=null?g:null,gm=[gs.grammar,gs.vocab].filter(v=>v!=null);
   const cw={all:mix(avgP(all),gm.length?avgP(gm):null),n:{all:all.length}};
@@ -4256,7 +4256,7 @@ const tkOf=x=>(S.D.tk[x.gid]||{}).ticks||{};
 const itKey=(d,it)=>"@"+d+"#"+it;
 const nrm=s=>String(s).toLowerCase().replace(/[·:()\-–,.!?]/g," ").replace(/\s+/g," ").trim();
 const shortTi=a=>a.title.split(/[:(]/)[0].trim();
-const isLpA=a=>!/checkpoint|sample exam|final product|reflect/i.test(a.title);
+const isLpA=a=>!a.optional&&!/checkpoint|sample exam|first exam|final product|reflect/i.test(a.title);   // the optional practice exam ("Sample exam 1" since 21 Nov 2026; it was "First exam" 19–21 Nov) is never a learning path: no LP number
 // "LP3 Now or usually?" (its number in the plan, else its place among the LS's learning paths), "Final product", else the short title
 function agLab(x,a){if(/final product/i.test(a.title))return "Final product";
   if(a.agendaDue)return "📖 "+a.title;   // the Book (Roger, 12 Nov 2026): no LP number, and it never shifts the others' numbers
