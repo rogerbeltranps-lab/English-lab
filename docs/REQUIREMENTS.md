@@ -336,7 +336,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 - Each section carries its criteria; vocabulary and grammar count for **4.1 and 5.1** alike (Use of English is reading and writing, 30 Oct 2026).
 - Scale: NA 2.5 · AS 5 · AN 7.5 · AE 10. Mark to degree: under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.
 - A percentage alone never sets the degree of 4.1 or 2.2: their indicators describe a task (reading log, listening chart); the exam scores are supporting evidence.
-- **LS1's harder (Daring) exam counts ×1.2**, capped at 10 (17 Nov 2026). Levels are still set from the raw points. **Ask Roger** whether the harder paper of later exams gets a bonus too.
+- **LS1's harder (Daring) exam counts ×1.2**, capped at 10 (17 Nov 2026). Levels are still set from the raw points. From LS2 on, the Core paper gets **no bonus** (none was set for LS2; Roger, 21 Nov 2026: "this is solved").
 - The exam is not the whole LS: the number of activities done never raises an exam mark, but it counts in the LS mark (Rubrics doc).
 
 ### 6.2 Before writing it
@@ -345,7 +345,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 2. **Exam day per group** is in `EL_PLAN[ls].exam`; check it with Roger.
 3. **Remind Roger** to decide the versions per level and who takes each. Marks are not converted between levels (6.1).
 4. **Agree the format with Roger before writing** (lesson from LS2: the exam was rebuilt twice).
-5. Look at what students do best and worst in the activities and class games. For LS2 Roger wanted the exam **achievable** ("so that they get good marks", 19 Nov 2026): lean on strengths (choosing is easier than typing), avoid what most failed. **Ask Roger** if the next exam should be tailored the same way.
+5. Look at what students do best and worst in the activities and class games. For LS2 Roger wanted the exam **achievable** ("so that they get good marks", 19 Nov 2026): lean on strengths (choosing is easier than typing), avoid what most failed. Later exams are tailored the same way, the newest decision (Roger, 21 Nov 2026: "this is solved").
 6. **From LS3 on, 10–15 % of the exam is on the core language of earlier LSs** (Research audit, 26 Oct 2026).
 
 ### 6.3 Structure
@@ -643,5 +643,4 @@ Roger, 21 Nov 2026: "when it comes to contradictions, my last decisions are the 
 
 ### 13.3 Still open: nothing newer was decided
 
-- **A bonus for the harder paper after LS1** (6.1) and **an exam tailored to strengths again** (6.2): ask when the next exam is planned.
 - **Research audit changes 3–9** (old row 26): several are built (core words, micro-dictation chunks, Catalan-to-English flashcards, the voyage road); Roger to say which of the rest are still wanted.
