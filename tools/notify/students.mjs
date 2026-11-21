@@ -23,7 +23,7 @@ const W=site(["el-catalog.js","el-plan.js","el-week.js"]),WK=W.ELWeek,TODAY=WK.t
 if(!TEST&&!DRY&&TODAY<"2026-11-08"){console.log("Students' emails start on Sunday 8 Nov 2026.");process.exit(0)}
 const wd=new Date(TODAY+"T12:00").getDay(),MON=WK.add(TODAY,wd===0?1:wd===6?2:(8-wd)%7||7);   // the next Monday
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]);
-const CA_ROUTES=["beginners","insecure"];
+const CA_ROUTES=["beginners"];   // Base reads English since 21 Nov 2026
 const db=await firestore(),weekAgo=new Date(Date.now()-7*864e5).toISOString(),recent=d=>d&&new Date(d)>=new Date(weekAgo)&&new Date(d)<=new Date();   // not yet: an answer held until later
 
 const roster=Object.fromEntries(await db.list("roster"));

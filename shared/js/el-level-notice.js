@@ -14,7 +14,7 @@ export async function levelNotice({lv,seen,save,course}){
     if(!last||ms(d.changed)>ms(last.d.changed))last={l,d}}
   if(!last||ms(last.d.changed)<=((was||{})[course]||0))return;
   const at=ms(last.d.changed),N=id=>((window.EL_LEVELS||[]).find(x=>x.id===id)||{}).name||id;
-  const lvl=last.d.level,before=last.d.was&&last.d.was!==lvl?last.d.was:null,en=!(window.elCa?elCa(lvl):lvl==="beginners"||lvl==="insecure");
+  const lvl=last.d.level,before=last.d.was&&last.d.was!==lvl?last.d.was:null,en=!(window.elCa?elCa(lvl):lvl==="beginners");
   const n="LS"+(L.indexOf(last.l)+1),ls=n+" · "+last.l.title.replace(/^\S+ · /,"");
   // the title names course, route and CEFR level, e.g. "2ESO Starter (A1)" (Roger, 31 Oct 2026; elLevelLabel in el-catalog.js)
   const full=window.elLevelLabel?elLevelLabel(course,lvl):N(lvl);

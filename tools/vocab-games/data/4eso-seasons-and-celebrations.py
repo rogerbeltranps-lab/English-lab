@@ -199,7 +199,7 @@ PICTURES = [
 
 ROUTE_DETAIL = {
  'beginners': "Les paraules bàsiques de la LS (estacions, menjar de tardor, festes i dates), amb una pista en català i sempre amb opcions per triar. Frases en blocs.",
- 'insecure': "Totes les paraules bàsiques de les celebracions, dates i correus. Al Rosco escrius la resposta (pots demanar pista de lletres); a la resta tries entre 3 o 4 opcions i ordenes paraules soltes.",
+ 'insecure': "All the basic words for celebrations, dates and emails. In the Alphabet Challenge you type the answer (you can ask for a letter hint); in the other games you choose from 3 or 4 options and put single words in order.",
  'safe': 'English definitions and context gaps: traditions, comparing cultures, planning an event, the passive and formal emails.',
  'daring': 'Infer meaning from situations, fix collocation mistakes and use the language of heritage, identity and change.',
 }

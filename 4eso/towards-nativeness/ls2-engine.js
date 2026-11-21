@@ -18,7 +18,9 @@ var LS2 = (function () {
   const PRODUCTS = 'tnProducts';
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   let LP, level, state;
-  const ca = () => level === 'insecure' || level === 'beginners';
+  // Catalan only for Starter (Roger, 21 Nov 2026: "base is also in English, no Catalan help"). Base keeps its extra support
+  // (questions shown, slower voice), now in English: sup().
+  const ca = () => level === 'beginners', sup = () => level === 'beginners' || level === 'insecure';
   window.elMicCa = ca;   // the microphone helper (shared/js/el-mic.js) speaks the route's language
   /* Starter works differently, not only with fewer questions (Roger, 31 Oct 2026, thread "Explain Starter vs Base learning paths").
      Only in Learning Paths whose data says starter: true (paths students had not started that day; started ones stay as they were):
@@ -909,7 +911,7 @@ var LS2 = (function () {
           if (ok) score++;
           // the explanation is our own data and may hold <strong> (Roger, 17 Nov 2026: "take <strong>on</strong>" showed as text)
           if (q.ex && c) fb.innerHTML = (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex);
-          else fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
+          else fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : sup() ? q.he : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
         if (count) firsts(p.id, p.id, p.items, items, all, marked(items, p.id, only), g, i => !items[i].guess);
@@ -1600,8 +1602,8 @@ var LS2 = (function () {
           const q0 = $('#' + id + 'Qs'); if (q0) q0.after(b); }
         $('#' + id + 'Task').innerHTML = byLevel(p.task); $('#' + id + 'Model').innerHTML = byLevel(p.model);
         $('#' + id + 'Qs').innerHTML = qs.map((q, i) => '<li><button class="btn secondary" type="button" data-tq="' + id + i + '" aria-label="Listen">▶</button> ' +
-          (ca() ? q.q + (q.ca ? ' <span class="tiny">(' + q.ca + ')</span>' : '') : '<details style="display:inline-block;vertical-align:middle"><summary>' + 'Show the question' + '</summary>' + q.q + '</details>') + '</li>').join('');
-        qs.forEach((q, i) => { $('[data-tq="' + id + i + '"]').onclick = () => sayLine(q.q, ca() ? 0.85 : 0.95); });
+          (sup() ? q.q + (ca() && q.ca ? ' <span class="tiny">(' + q.ca + ')</span>' : '') : '<details style="display:inline-block;vertical-align:middle"><summary>' + 'Show the question' + '</summary>' + q.q + '</details>') + '</li>').join('');
+        qs.forEach((q, i) => { $('[data-tq="' + id + i + '"]').onclick = () => sayLine(q.q, sup() ? 0.85 : 0.95); });
         const msg = $('#' + id + 'Msg'), min = (p.min || { beginners: 15, insecure: 25, safe: 50, daring: 70, native: 40 })[level] || 30;
         const showInstant = () => { let box = $('#' + id + 'Instant'); if (!box) { box = document.createElement('div'); box.id = id + 'Instant'; const host = $('#' + id); if (host) host.append(box); } box.innerHTML = instantCard(sp); };
         showInstant();
@@ -1641,7 +1643,7 @@ var LS2 = (function () {
               if (me !== run) return;
               if (i >= qs.length) { stop(); return; }
               const k = i++; st.textContent = (ca() ? 'Pregunta ' : 'Question ') + (k + 1) + ' / ' + qs.length + ' 🔊';
-              sayLine(qs[k].q, ca() ? 0.85 : 0.95, () => { if (me !== run) return; answerTime(me, k, next); });
+              sayLine(qs[k].q, sup() ? 0.85 : 0.95, () => { if (me !== run) return; answerTime(me, k, next); });
             };
             next();
           };
@@ -1863,7 +1865,7 @@ var LS2 = (function () {
       bind() {
         const key = id + '_' + level, m = $('#' + id + 'Media'), msg = $('#' + id + 'Msg');
         state.shadow = state.shadow || {}; const sh = state.shadow[key] = state.shadow[key] || { plays: 0 };
-        let slow = ca(), endAt = 0, onEnd = null;
+        let slow = sup(), endAt = 0, onEnd = null;
         const count = () => { $('#' + id + 'Count').textContent = (ca() ? 'Vegades: ' : 'Plays: ') + (sh.plays || 0); };
         const mark = () => $$('[data-sh="' + id + '"]').forEach(b => { const on = (b.dataset.slow === '1') === slow; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); });
         const rate = () => $$('[data-rate="' + id + '"]').forEach(b => { const on = String(sh.rate) === b.dataset.v; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); });

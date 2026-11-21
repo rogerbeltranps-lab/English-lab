@@ -163,7 +163,7 @@
 
   // ---------- the student ----------
   async function student(level, group) {
-    ca = paperOf(level) === 'base';
+    ca = level === 'beginners';   // Catalan for Starter only (Roger, 21 Nov 2026: Base reads English)
     let d = null, l = null;
     try { [d, l] = await Promise.all([readDoc(), readLs()]); } catch (e) { console.warn('exam read', e); }
     lsDoc = l; const loc = local.get();
@@ -195,7 +195,7 @@
   }
   let tPaper = null;   // 🧪 the paper the tester chose
   function intro() {
-    if (tPaper) { S.level = tPaper.startsWith('core') ? 'safe' : 'insecure'; ca = tPaper.startsWith('base'); }
+    if (tPaper) { S.level = tPaper.startsWith('core') ? 'safe' : 'insecure'; ca = false; }
     const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pick(pl, 'A')].sections[s].length, 0);
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · ' + (X.lsShort || 'LS2') + ' · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
       '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
@@ -556,7 +556,7 @@
       const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { paper, level: paper.startsWith('core') ? 'safe' : 'insecure', order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [] };
-      ca = paper.startsWith('base'); run(); });
+      ca = false; run(); });
     $('#wxTryLock').onclick = () => { S = S || { exits: [], answers: {} }; S.exits = [{ at: now(), why: 'fullscreen' }]; S.status = 'out'; ca = false;
       locked(); const L = $('.wx-lock .box'); const x = D.createElement('p'); x.innerHTML = '<button class="wx-btn sec" id="wxLockOut">Close this test</button>'; L.appendChild(x);
       $('#wxLockOut').onclick = () => { $('.wx-lock').remove(); teacherPick(); };
@@ -564,7 +564,7 @@
   }
   function viewOnly(d) {
     if (!d) { root.innerHTML = '<div class="wx-card"><p>👁 ' + t('Aquest alumne encara no ha començat l’examen.', 'This student has not started the exam.') + '</p></div>'; return; }
-    S = Object.assign({ exits: [], glances: [], changes: [], snaps: [], answers: {} }, d); S.sec = 'review'; ca = S.paper.startsWith('base');
+    S = Object.assign({ exits: [], glances: [], changes: [], snaps: [], answers: {} }, d); S.sec = 'review'; ca = S.level === 'beginners';
     root.innerHTML = '<div class="wx-card"><p>👁 Student view · ' + esc(S.paper) + ' · ' + esc(S.status) + '</p></div>'; run();
   }
   const isTester = () => !!(!PV && C() && C().user && C().isTester(C().user));

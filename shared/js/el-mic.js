@@ -18,7 +18,7 @@
   const KEY = 'elMicId';
   const saved = { get() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }, set(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} } };
   const ca = () => {
-    try { if (typeof window.elMicCa === 'function') return !!window.elMicCa(); return typeof level !== 'undefined' && (level === 'insecure' || level === 'beginners'); }   // eslint-disable-line no-undef
+    try { if (typeof window.elMicCa === 'function') return !!window.elMicCa(); return typeof level !== 'undefined' && level === 'beginners'; }   // eslint-disable-line no-undef
     catch (e) { return false; }
   };
   const T = (c, e) => ca() ? c : e;

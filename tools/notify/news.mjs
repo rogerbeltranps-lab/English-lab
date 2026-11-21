@@ -18,7 +18,7 @@ import os from "node:os";
 import path from "node:path";
 import {E,ARGS,DRY,SITE,SCHOOL,TEACHER_TO,ROOT,sendMail,site,firestore} from "./lib.mjs";
 
-const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat",CA_ROUTES=["beginners","insecure"];
+const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat",CA_ROUTES=["beginners"];
 if(!SCHOOL.ok&&!DRY){console.log("No SCHOOL_MAIL_URL: students' emails are off, nothing to do.");process.exit(0)}
 const STATE=E.NEWS_STATE||path.join(os.tmpdir(),"news-state.json"),now=new Date(Date.now()-60000).toISOString();
 // What each student was last told about, as small signatures (the dashboard rewrites results docs often, so "updated" alone is not news):

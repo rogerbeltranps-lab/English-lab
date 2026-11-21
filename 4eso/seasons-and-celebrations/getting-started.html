@@ -232,7 +232,7 @@ function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#prog
 // on a phone the open step stays in view in the strip of steps
 function markTabs(){let next=false;STEPS.forEach(k=>{const t=document.querySelector('.tab[data-panel="'+k+'"]');if(!t)return;const d=!!state.done[k];t.classList.toggle("done",d);t.classList.toggle("next",!d&&!next);t.dataset.next=ca()?"SEGÜENT":"NEXT";if(!d)next=true});
   const a=$(".lp-body>.tabs .tab.active");if(a&&innerWidth<1000&&markTabs.on!==a.dataset.panel){markTabs.on=a.dataset.panel;a.parentNode.scrollLeft=a.offsetLeft-a.parentNode.offsetLeft-16}}
-const ca=()=>level==="insecure"||level==="beginners";
+const ca=()=>level==="beginners";
 const need=n=>Math.ceil(n*0.8);
 // a step is done once every question is answered and checked, whatever the score (Roger, 6 Nov 2026); the score still shows
 const allIn=(prefix,n)=>{for(let i=0;i<n;i++){const r=document.querySelector('input[name="'+prefix+i+'"]');if(r){if(!document.querySelector('input[name="'+prefix+i+'"]:checked'))return false}else{const t=document.getElementById(prefix+i);if(t&&!String(t.value).trim())return false}}return true};
@@ -321,7 +321,7 @@ function renderRead(){
   delete movedFrom.readingQs;const v=kept("read",readItems,"readingQs",readingQs),t=v?null:typing("read",readItems,"readingQs",readingQs);if(v){fillRadio(readItems,"rd",v);doRead(false);if(movedFrom.readingQs)movedNote("#readResult","read",movedFrom.readingQs===2)}else if(t)fillRadio(readItems,"rd",t);
 }
 $("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
-function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
+function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:level==="insecure"?q.he:null,false);f.className="feedback "+(ok?"ok":"no")});
   const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("rd",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(allIn("rd",n)){if(count)complete("read");else doneFrom("read")}}
 $("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"),readItems)};
 $("#againRead").onclick=()=>again("read",renderRead);
@@ -334,7 +334,7 @@ function renderListen(){
   delete movedFrom.listening;const v=kept("listen",listenItems,"listening",listening),t=v?null:typing("listen",listenItems,"listening",listening);if(v){fillRadio(listenItems,"l",v);doListen(false);if(movedFrom.listening)movedNote("#listenResult","listen",movedFrom.listening===2)}else if(t)fillRadio(listenItems,"l",t);
 }
 $("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
-function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
+function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:level==="insecure"?q.he:null,true);f.className="feedback "+(ok?"ok":"no")});
   const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("l",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(allIn("l",n)){if(count)complete("listen");else doneFrom("listen")}}
 $("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"),listenItems)};
 $("#againListen").onclick=()=>again("listen",renderListen);

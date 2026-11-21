@@ -5,6 +5,8 @@
    met the 🔒 message and they reported "it doesn't let me mark it as done" (2ESOB, 17 Nov 2026). Roger, 17 Nov 2026, chose
    "Next section →", hidden while 🎓 class mode / the teacher's 🔒 does not let the student go there.
    LS1 keeps its old wording (leave LS1 alone): its learning paths are the pages that load ls1-lp.js. */
+// Catalan only for Starter since 21 Nov 2026 (Roger: "base is also in English"); LS1 keeps Base in Catalan (its pages are finished).
+var snCa = l => l === 'beginners' || (l === 'insecure' && !!document.querySelector('script[src*="ls1-lp.js"]'));
 var sectionNext = {
   ls1: () => !!document.querySelector('script[src*="ls1-lp.js"]'),
   // el-cloud.js tells whether the teacher's 🎓 class mode / 🔒 keeps the student off that tab or page (and sends "el-lock" when that changes)
@@ -29,7 +31,7 @@ var sectionNext = {
       panel.appendChild(card);
       const button = card.querySelector('button'), message = card.querySelector('.feedback');
       const nextTab = tabs[order.indexOf(next)];
-      const ca = () => /^(insecure|beginners)$/.test(config.level());
+      const ca = () => snCa(config.level());
       button.addEventListener('click', () => {
         if (cfg.done()) {
           message.textContent = '';
@@ -71,7 +73,7 @@ var sectionNext = {
     undo.className = 'btn secondary';
     config.button.insertAdjacentElement('afterend', undo);
     const sync = () => {
-      undo.textContent = /^(insecure|beginners)$/.test(config.level()) ? 'Desfés ↺' : 'Undo ↺';
+      undo.textContent = snCa(config.level()) ? 'Desfés ↺' : 'Undo ↺';
       undo.hidden = !config.isDone();
     };
     undo.addEventListener('click', () => { config.undo(); setTimeout(sync, 0); });
@@ -92,7 +94,7 @@ var sectionNext = {
       const seen = chips.filter(c => c.classList.contains('seen')).length;
       const all = chips.length > 0 && seen === chips.length;
       button.disabled = !all;
-      note.textContent = all ? '' : (/^(insecure|beginners)$/.test(config.level())
+      note.textContent = all ? '' : (snCa(config.level())
         ? 'Passa el ratolí per sobre de cada expressió (o toca-la al mòbil) per veure’n el significat: ' + seen + '/' + chips.length
         : 'Hover over (or tap) every expression to see its meaning: ' + seen + '/' + chips.length);
     };
@@ -117,7 +119,7 @@ var sectionNext = {
     const select = document.getElementById('sessionJump');
     // read at the moment it is used: el-cloud.js trims the menu to the learning paths open for the student once it knows them
     const nextOpt = () => { const options = select ? [...select.options].filter(o => o.value) : [], here = options.findIndex(o => o.value === location.pathname.split('/').pop()); return options[here + 1] || null; };
-    const ca = () => /^(insecure|beginners)$/.test(config.level());
+    const ca = () => snCa(config.level());
     const card = document.createElement('div');
     card.className = 'section-card section-next';
     card.innerHTML = '<div class="actions"><button class="btn main" type="button"></button></div><p class="feedback no" aria-live="polite"></p>' +

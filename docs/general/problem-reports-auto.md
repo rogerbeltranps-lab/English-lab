@@ -55,7 +55,7 @@ hourly task "English Lab: problem reports" is switched off.
    reviewer `rogerbeltranps-lab`), wait for its checks, **squash-merge it without asking** (Roger's standing approval for technical fixes
    from problem reports). Never put student names or emails in the PR, commits or code: say "problem report, 2ESOA, 8 Nov".
 4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --msg2 "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank
-   you…" in the report's language (Catalan for Beginners, Insecure and no route, English for Safe and Daring; the tool says which). `--msg`
+   you…" in the report's language (Catalan for Starter and no route, English for Base, Core, Plus and Pro since 21 Nov 2026; the tool says which). `--msg`
    adds one or two plain sentences in that language, in Roger's voice: what was wrong and what they see now ("Tenies raó: …", "You were
    right: …"). Never mention AI, Claude, PRs or code. If they must reload, say so ("Recarrega la pàgina").
 5. Roger's email: `auto.mjs fixed` saves `problems/{id}.auto.at`; the GitHub Action **"English Lab emails"** (`tools/notify/notify.mjs
@@ -124,7 +124,7 @@ line, after the reports (or alone, when there is no open report):
 
 1. `node tools/marking/marks.mjs comments --new`. "No new comments." → nothing else to do for comments.
 2. Otherwise answer the sheet exactly as the Friday task does (`/mnt/project-files/claude-answers-preview/daily-answers-task-prompt.md`):
-   read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter, Base and no route,
+   read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter and no route (Base reads English since 21 Nov 2026),
    English for Core, Plus and Pro, FORYOU for anything that needs Roger. Write the EL-ANSWERS v1 file in the scratchpad and run
    `node tools/marking/marks.mjs answer <file> --new --apply` (it saves `settings/marking.cmtRun`, so the next run skips them).
 3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
@@ -153,7 +153,7 @@ Practise" on the board, Games, the learning paths) and how to use it. Only when 
 about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
 information you don't have: a short honest draft he can complete, and the note says what is missing. `--note` = one line for Roger (what
 you checked). The dashboard puts the draft in the 💬 Answer box (ideas: both boxes, the language Roger writes in first; private messages:
-Catalan for Starter, Base and no route, English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.
+Catalan for Starter and no route (Base reads English since 21 Nov 2026), English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.
 
 ## Costs and limits
 

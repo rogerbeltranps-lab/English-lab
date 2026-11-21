@@ -77,7 +77,7 @@ if (cmd === "export") {
     const st = await api("GET", DOCS + "students/" + uid, null, true), s = st ? dec({ mapValue: { fields: st.fields } }) : {};
     const it = X && X.key === key ? (X.papers[d.paper]?.sections.writing || []).find(x => x.id === id) : null, sn = (d.snaps || [])[0];
     const text = String((d.answers || {})[id] || "").trim(), first = sn ? String((sn.answers || {})[id] || "").trim() : null;
-    out[uid] = { name: s.name || "", email: s.email || "", group: d.group, paper: d.paper, lang: d.paper.startsWith("base") ? "ca" : "en", status: d.status,
+    out[uid] = { name: s.name || "", email: s.email || "", group: d.group, paper: d.paper, lang: d.level === "beginners" ? "ca" : "en", status: d.status,
       task: it ? it.q : "", min: it ? it.min : null, words: words(text), text, firstText: first != null && first !== text ? first : undefined };
   }
   fs.writeFileSync(a3, JSON.stringify(out, null, 1));
