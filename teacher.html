@@ -1859,6 +1859,19 @@ function prStu(u){if(PRC.d!==S.D||PRC.v!==SPK.v)PRC={d:S.D,v:SPK.v,m:new Map()};
   // only: the students' own charts (today.html) cannot read it.
   EL_LS.forEach(l=>Object.values(((SPK.d[spkDoc(l.id,(S.P[u]||{}).group)]||{})[u])||{}).forEach(r=>{const sc=r&&spkScore(r.an);if(sc==null)return;
     const A=o.act[l.id]=o.act[l.id]||{},z=A.Speaking||(A.Speaking={s:0,n:0}),t=tms(r.at)||tms(r.done);z.s+=sc/4;z.n++;if(t)o.ev.push({t,sk:"Speaking",v:sc/4,ls:l.id})}));
+  // 📝 the exam and 🎬 the final product of each LS as big points (Roger, 21 Nov 2026: "it looks like LS1 is missing here … use their exams and
+  // final product results": LS1's pages saved no dated tries, only what was done): o.mil = [{k: exam|fp, ls, t, v (0-100), parts {skill: %}}].
+  // The exam on its Time plan day (else the LS's last check), its parts by skill; the final product on its due day: its mark, and its spoken
+  // part for Speaking (LS1: the whole final product; from LS2 on: the rubric rows of the oral production criteria, 3.x). The teacher sees held exams.
+  o.mil=[];const gid=(S.P[u]||{}).group,day=d=>d?Date.parse(d+"T12:00:00")||0:0;
+  EL_LS.forEach(l=>{const g=(window.EL_GRADING||{})[l.id];if(!g)return;const px=planX(l.id,gid),ts=o.ev.filter(e=>e.ls===l.id).map(e=>e.t),last=ts.length?Math.max(...ts):0,ex0=px.p&&px.gi>=0?day(ELWeek.exam(px.p,px.gi)):0;
+    if(g.exam){const em=examMark(u,l.id);if(em){const pe=prExam(u,l.id),parts={};Object.entries(pe.ex).forEach(([k,z])=>{if(z.m)parts[k]=z.s/z.m*100});
+      const t=ex0||last;if(t)o.mil.push({k:"exam",ls:l.id,t:Math.min(t,Date.now()),v:em.mark*10,parts})}}
+    if(g.fp&&g.fp.a){const R=res(u,g.fp.a),pr=res(u,asId(l.id)).progress||{},m=R.max?(+R.score||0)/R.max*10:pr.fp!=null?+pr.fp:null;if(m==null)return;
+      const rows=(g.fp.rows||[]).filter(r=>/^3\./.test(r.c)),PF=(pr.parts||{}).fp||{},got=rows.filter(r=>PF[r.step+"|"+r.c]!=null),w=got.reduce((n,r)=>n+r.w,0);
+      const spk=g.only||!g.fp.rows?m*10:w?got.reduce((n,r)=>n+(+PF[r.step+"|"+r.c])*r.w,0)/w*10:null;
+      const due=px.p&&px.gi>=0&&ELWeek.due?day(ELWeek.due(px.p,g.fp.a,px.gi)):0,t=due||ex0||last;
+      if(t)o.mil.push({k:"fp",ls:l.id,t:Math.min(t,Date.now()),v:m*10,parts:spk==null?{}:{Speaking:spk}})}});
   PRC.m.set(u,o);return o}
 // the exam of an LS by skill: the points of its parts (results/{ls}__assessment sections); held = the date students see it, or true
 function prExam(u,ls){const X=res(u,asId(ls)),E=((window.EL_GRADING||{})[ls]||{}).exam,ex={};
@@ -1883,9 +1896,9 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     +card("🎓","LS mark so far",mk==null?"–":f1(mk)+"<i>/10</i>",`${rows.filter(r=>r.m!=null).length} of ${studs.length} students with a mark`)
     +card("👣","Steps done",stt?Math.round(sd/stt*100)+"<i> %</i>":"–",stt?`${sd} of ${stt} open steps, whole group`:"no open steps yet")
     +card("✏️","Work marked",cd+cw?cd+"<i> of "+(cd+cw)+"</i>":"–",cw?`${cw} waiting for Beltran`:"nothing waiting",cw?"warn":"")
-    +card("📊","Activities average",prPc(actAvg),"all tries, every skill (as the LS page)")+`</div>`;
+    +card("📊","Activities average",prPc(actAvg),actAvg==null&&((window.EL_GRADING||{})[ls]||{}).only?"this LS's pages kept no scores: see its exam and final product below":"all tries, every skill (as the LS page)")+`</div>`;
   // ---- 📈 skill mastery over time: week by week, the whole school year
-  const evs=X.flatMap(({x})=>x.ev.filter(e=>inC.has(e.ls)));let line="",table="";
+  const evs=X.flatMap(({x})=>x.ev.concat(x.mil||[]).filter(e=>inC.has(e.ls)));let line="",table="";
   if(evs.length){const w0=prMon(Math.min(...evs.map(e=>e.t))),W=[];for(let d=new Date(w0);d.getTime()<=prMon(Date.now());d.setDate(d.getDate()+7))W.push(d.getTime());
     const wi=t=>{const m=prMon(t);let i=W.indexOf(m);if(i<0)i=W.findIndex(w=>Math.abs(w-m)<2*86400e3);return i};
     // per student: wk[sk][w] = [sum, n] of that week's checks
@@ -1897,6 +1910,14 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     ks.forEach(sk=>{const [ic,col,sh,da]=PR_SK[sk],g=pm?null:grpV(sk),v=pm?stuV(pm,sk):g.v,n=pm?stuN(pm,sk):g.n;
       ser.push({label:sk,icon:ic,color:col,shape:sh,dash:da,v});v.forEach((x,i)=>{if(x!=null)tipRows[i].push(`${ic} ${esc(sk)}: <b>${Math.round(x)} %</b> <small>(${pm?plural(n[i],"check"):plural(n[i],"student")})</small>`)})});
     if(pm&&sel!=="all"){const g=grpV(sel);ser.push({label:"Group",color:"#64748b",shape:"circle",dash:"3 4",v:g.v});g.v.forEach((x,i)=>{if(x!=null)tipRows[i].push(`👥 Group: <b>${Math.round(x)} %</b>`)})}
+    // 📝 exam (★) and 🎬 final product (■): the student's, or the group's average, in the week they happened, joined from LS to LS; one skill:
+    // that part of the exam, and for Speaking the spoken part of the final product
+    [["fp","🎬","Final product","#be185d","square"],["exam","📝","Exam","#0f172a","star"]].forEach(([k,ic,name,col,sh])=>{
+      const val=m=>sel==="all"?m.v:m.parts[sel],src=(pm?[X.find(z=>z.s.uid===me.uid)]:X).map(({x})=>(x.mil||[]).filter(m=>m.k===k&&inC.has(m.ls)&&val(m)!=null));
+      const acc=W.map(()=>[0,0]);src.forEach(ms=>ms.forEach(m=>{const i=wi(m.t);if(i<0)return;acc[i][0]+=val(m);acc[i][1]++}));
+      const v=acc.map(a=>a[1]?a[0]/a[1]:null);if(!v.some(x=>x!=null))return;
+      ser.push({label:sel==="all"?name:name+" · "+sel,icon:ic,color:col,shape:sh,big:true,v});
+      v.forEach((x,i)=>{if(x!=null)tipRows[i].push(`${ic} ${esc(name)}${sel==="all"?"":" · "+esc(sel)}: <b>${sel==="all"?f1(x/10)+" / 10":Math.round(x)+" %"}</b>${pm?"":` <small>(${plural(acc[i][1],"student")})</small>`}`)})});
     const lab=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
     const marks=lss.map(l=>{const ts=evs.filter(e=>e.ls===l.id).map(e=>e.t);return ts.length?{i:wi(Math.min(...ts)),label:lsS(l)}:null}).filter(Boolean).sort((a,b)=>a.i-b.i).filter((m,j,a)=>!j||m.i>a[j-1].i);
     line=ELCharts?ELCharts.line({x:W.map(lab),tips:tipRows.map((r,i)=>r.length?`<b>Week of ${esc(lab(W[i]))}</b><br>`+r.join("<br>"):""),series:ser,marks,h:sel==="all"?320:290,
@@ -1908,7 +1929,7 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
   const chips=`<div class="bar prsk"><button class="chip ${sel==="all"?"on":""}" data-do="prsk" data-s="all">All skills</button>`+PR_K.map(k=>`<button class="chip ${sel===k?"on":""}" data-do="prsk" data-s="${k}"><i class="sw" style="background:${PR_SK[k][1]}"></i>${PR_SK[k][0]} ${k}</button>`).join("")+`</div>`;
   const how=me?(sel==="all"?`Each point is the average of ${esc(shortName(me).mid)}'s checks in that skill that week (first tries and latest checks, and the levels you gave).`:`${esc(shortName(me).mid)} in ${sel}, week by week, with the group's average (dotted).`)
     :sel==="all"?"Each point is the group's average in that skill that week: each student's checks that week (first tries and latest checks, and the levels you gave), then the average of the students.":`The group's average in ${sel} week by week; each faint line is one student. Pick a student above to follow them.`;
-  const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass. Speaking comes from Roig's analysis of the recordings (🗣 Speaking).</p>${chips}`
+  const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass. Speaking comes from Roig's analysis of the recordings (🗣 Speaking). ★ the exam and ■ the final product of each LS, with their marks (one skill: that part).</p>${chips}`
     +(line||`<p class="muted">No checked activities yet${me?" for "+esc(shortName(me).mid):""}.</p>`)+table+`</div>`;
   // ---- 🕸 skills in this LS: activities (all tries) and exam
   const exs=studs.map(s=>prExam(s.uid,ls)),held=exs.find(e=>e.held),pctA=(x,sk)=>{const z=(x.act[ls]||{})[sk];return z&&z.n?z.s/z.n*100:null},pctE=(e,sk)=>{const z=e.ex[sk];return z&&z.m?z.s/z.m*100:null};
