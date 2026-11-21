@@ -138,14 +138,17 @@
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
   // The music is on by default (Roger, 20 Nov: "always on except for when it's class time for the students"). quiet(): no sound to
   // start with, the 🎵 button turns it on for this page (force); lock(): no sound at all, not even with 🎵 (a student in class time)
-  const SND={on:saved!=="0",MV:.3,music:null,sea:null,quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
+  const SND={on:saved!=="0",MV:.3,music:null,sea:null,el:{},quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
     hush(){return this.lock()||this.quiet()&&!this.force},
     play(k,vol){const f=this.sk.snd[k];if(!f||!this.on||this.hush())return;try{const a=new Audio(this.sk.A+f);a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
     duck(){const m=this.music;if(!m)return;clearTimeout(this.dt);m.volume=this.MV*.35;this.dt=setTimeout(()=>{if(this.music)this.music.volume=this.MV},1800)},
     startBg(){if(this.music||!this.on||this.hush()||!document.querySelector(".vy-sea")||document.hidden)return;
       const S=this.sk;if(!S.snd.music)return;
-      try{const m=this.music=new Audio(S.A+S.snd.music);m.loop=true;m.volume=this.MV;let w=null;
-        if(S.snd.amb){w=this.sea=new Audio(S.A+S.snd.amb);w.loop=true;w.volume=S.snd.ambVol;w.play().catch(()=>{})}
+      // the same audio element is reused when the music comes back (another tab, another place of the board): Safari lets an element
+      // that already played play again without a new tap, and the song goes on where it stopped
+      const get=(k,src)=>{let a=this.el[k];if(!a||a._src!==src){a=this.el[k]=new Audio(src);a._src=src;a.loop=true}return a};
+      try{const m=this.music=get("m",S.A+S.snd.music);m.volume=this.MV;let w=null;
+        if(S.snd.amb){w=this.sea=get("a",S.A+S.snd.amb);w.volume=S.snd.ambVol;w.play().catch(()=>{})}
         // refused (no tap yet): forget both, the next tap tries again
         m.play().then(()=>{this.ui&&this.ui()},()=>{if(this.music===m){try{w&&w.pause()}catch(e){}this.music=this.sea=null}this.ui&&this.ui()})}catch(e){}},
     stopBg(){[this.music,this.sea].forEach(a=>{try{a&&a.pause()}catch(e){}});this.music=this.sea=null;this.ui&&this.ui()}};
@@ -154,7 +157,9 @@
   // (pointerdown, click, keydown and touchend: Safari and touch screens count only some of them as a tap; the 🎵 button handles itself)
   ["pointerdown","click","keydown","touchend"].forEach(ev=>addEventListener(ev,e=>{if(!(e.target&&e.target.closest&&e.target.closest('[data-vy="snd"]')))SND.startBg()},{capture:true}));
   setInterval(()=>{if(SND.music&&(!document.querySelector(".vy-sea")||SND.hush()||!SND.on))SND.stopBg()},1500);
-  document.addEventListener("visibilitychange",()=>{if(document.hidden)SND.stopBg()});
+  // back to the tab: the music starts again by itself (Roger, 21 Nov: "when you come back it should start again")
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)SND.stopBg();else SND.startBg()});
+  addEventListener("pageshow",e=>{if(e.persisted)SND.startBg()});
 
   // ---- styles ----
   function css(){if(document.getElementById("vy-css"))return;const s=document.createElement("style");s.id="vy-css";s.textContent=`
