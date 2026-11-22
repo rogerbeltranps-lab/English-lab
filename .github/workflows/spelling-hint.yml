@@ -1,0 +1,18 @@
+# A spelling slip gets a spelling hint, not the grammar rule (Roger, 22 Nov 2026). tools/spelling-hint/check.mjs checks that the
+# spelling block is the same in every ls2-engine.js and lab/practice.html, and runs its cases. Free, read-only, no secrets, no browser.
+name: Spelling hint
+on:
+  pull_request:
+    paths: ['2eso/**', '4eso/**', 'lab/practice.html', 'tools/spelling-hint/**', '.github/workflows/spelling-hint.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: node tools/spelling-hint/check.mjs

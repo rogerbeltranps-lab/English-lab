@@ -104,17 +104,21 @@ window.LP = {
 
     { id: 'translate', type: 'typed', tab: 'Catalan → English', title: 'Say it like a native: Catalan → English', pill: 'Write it',
       intro: 'Translate each sentence the way a native speaker would write it to a colleague. Contractions are fine. After two wrong tries you’ll see a model.',
+      /* Every natural way counts (Roger, 22 Nov 2026: "This is correct too!" for "It works, right?"); the first answer is the model shown.
+         Not "yet" for encara no + present (Home doesn’t work yet is a mistake in 🔍 Spot the mistake), not "bring me", not "exactly" before the verb. */
       items: [
         { q: 'Encara no funciona.', a: ['It’s still not working', 'It still doesn’t work', 'It still isn’t working'], en: 'still + negative: It’s still not working.' },
-        { q: 'Encara no ho he provat al mòbil.', a: ['I haven’t tried it on my phone yet', 'I haven’t tested it on my phone yet', 'I have not tried it on my phone yet'], en: 'yet at the end, present perfect, on my phone.' },
-        { q: 'Quant de temps hauré d’esperar?', a: ['How long will I have to wait', 'How long am I going to have to wait'], en: 'Auxiliary before the subject.' },
-        { q: 'Aquest botó no em porta a la pàgina correcta.', a: ['This button doesn’t take me to the right page', 'This button doesn’t take me to the correct page'], en: 'take me to.' },
-        { q: 'Què has fet exactament?', a: ['What exactly did you do', 'What exactly have you done'], en: 'In a question, exactly goes right after the question word: What exactly…?' },
-        { q: 'El menú és a dalt a la dreta.', a: ['The menu is at the top right', 'The menu’s at the top right'], en: 'at the top right.' },
-        { q: 'Triga moltíssim a carregar.', a: ['It’s taking ages to load', 'It takes ages to load', 'It’s taking a long time to load', 'It takes a long time to load'], en: 'take ages / a long time to + verb.' },
-        { q: 'Resulta que el fitxer tenia un altre nom.', a: ['It turns out the file had a different name', 'It turns out that the file had a different name', 'It turned out the file had a different name', 'It turned out that the file had a different name'], en: 'It turns out (that)…' },
-        { q: 'Funciona, oi?', a: ['It works, doesn’t it', 'It’s working, isn’t it'], en: 'Tag questions repeat the auxiliary.' },
-        { q: 'Per què no té pla de temps 2n d’ESO?', a: ['Why doesn’t 2 ESO have a time plan', 'Why doesn’t 2nd ESO have a time plan'], en: 'Questions need do/does: Why doesn’t … have …?' }
+        { q: 'Encara no ho he provat al mòbil.', a: ['I haven’t tried it on my phone yet', 'I haven’t tested it on my phone yet', 'I haven’t tried it out on my phone yet', 'I haven’t checked it on my phone yet'], en: 'yet at the end, present perfect, on my phone.' },
+        { q: 'Quant de temps hauré d’esperar?', a: ['How long will I have to wait', 'How long am I going to have to wait', 'How long do I have to wait', 'How long will I need to wait', 'How long do I need to wait', 'How long will I have to wait for', 'How long do I have to wait for'], en: 'Auxiliary before the subject.' },
+        { q: 'Aquest botó no em porta a la pàgina correcta.', a: ['This button doesn’t take me to the right page', 'This button doesn’t take me to the correct page', 'This button isn’t taking me to the right page', 'This button isn’t taking me to the correct page', 'This button doesn’t send me to the right page', 'This button doesn’t send me to the correct page'], en: 'take me to.' },
+        { q: 'Què has fet exactament?', a: ['What exactly did you do', 'What exactly have you done', 'What did you do exactly', 'What have you done exactly'], en: 'In a question, exactly goes right after the question word: What exactly…?' },
+        { q: 'El menú és a dalt a la dreta.', a: ['The menu is at the top right', 'The menu’s at the top right', 'The menu is in the top right', 'The menu is at the top right corner', 'The menu is in the top right corner', 'The menu is in the top right-hand corner', 'The menu is at the top right-hand corner', 'The menu is top right'], en: 'at the top right.' },
+        { q: 'Triga moltíssim a carregar.', a: ['It’s taking ages to load', 'It takes ages to load', 'It’s taking a long time to load', 'It takes a long time to load', 'It’s taking forever to load', 'It takes forever to load', 'It’s taking so long to load', 'It takes so long to load', 'It’s taking such a long time to load', 'It takes such a long time to load'], en: 'take ages / a long time to + verb.' },
+        // casual "Turns out…", doc / document and "another name" count too (Roger, 22 Nov 2026: "Turns out the doc had an other name.")
+        { q: 'Resulta que el fitxer tenia un altre nom.', a: ['It turns out', 'It turned out', 'Turns out', 'Turned out'].flatMap(s => ['', ' that'].flatMap(t => ['file', 'doc', 'document'].flatMap(f => ['a different', 'another'].map(n => s + t + ' the ' + f + ' had ' + n + ' name')))), en: 'It turns out (that)…' },
+        { q: 'Funciona, oi?', a: ['It works, doesn’t it', 'It’s working, isn’t it', 'It works, right', 'It’s working, right', 'It does work, doesn’t it', 'It works, yeah', 'It’s working, yeah'], en: 'Tag questions repeat the auxiliary.' },
+        // "pla de temps" isn't Catalan (Roger, 22 Nov 2026); time plan, timeline, schedule… all count, and 2ESO / 2 ESO / 2nd ESO
+        { q: 'Per què 2n d’ESO no té planificació?', a: ['time plan', 'timeline', 'time line', 'schedule', 'timetable', 'plan'].flatMap(n => ['2 ESO', '2nd ESO', '2ESO'].flatMap(g => ['Why doesn’t ' + g + ' have a ' + n, 'Why does ' + g + ' not have a ' + n, 'Why hasn’t ' + g + ' got a ' + n, 'Why isn’t there a ' + n + ' for ' + g, 'Why is there no ' + n + ' for ' + g])), en: 'Questions need do/does: Why doesn’t … have …?' },
       ] },
 
     { id: 'grammar', type: 'typed', tab: 'Grammar', title: 'Questions, indirect questions and adverb position', pill: 'Answer all',

@@ -305,7 +305,7 @@ var LS2 = (function () {
   const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
   function fits(q, answers, typed) {
     const v = norm(typed); if (!v) return false;
-    if (answers.some(a => norm(a) === v)) return true;
+    if (answers.some(a => norm(a) === v || bare(a) === bare(v))) return true;   // contractions either way (it's = it is)
     const t = bare(typed).split(' '); if (t.length < 2) return false;
     const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
     if (g < 1) return false;
@@ -320,6 +320,80 @@ var LS2 = (function () {
       return false;
     });
   }
+  /* ✏️ SPELLING SLIPS (same block in every ls2-engine.js and lab/practice.html; tools/spelling-hint/check.mjs keeps them identical).
+     Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake" ("It takes ages to laod." got the grammar rule).
+     When a wrong answer matches an accepted one except for spelling, the feedback names the word instead of the grammar rule:
+     "Almost! Check the spelling of ‘laod’." A slip is two letters swapped (laod, od for do), or one wrong, missing or extra letter in a word of 4+ letters
+     (two in a word of 8+), or a word split or joined (an other = another, alot = a lot); a missing apostrophe gets "Check the apostrophes".
+     It is still not right (a spelling slip is wrong, as in the exams, 18 Nov 2026), but it doesn't count as one of the two tries before the
+     answer shows. Never a slip: a real word for another (in / on, then / than, were / where, take / took), or a grammar ending (take / takes,
+     work / worked, go / going), so grammar mistakes keep their grammar rule. */
+  const SP_KNOWN = new Set(('a an the this that these those there their theyre then than them they he she it its we you your youre our out hour ' +
+    'i me my mine his her him us who whom whose what when where were wear which witch why how here hear too to two of off on in at by for from form ' +
+    'with into onto about above below under over after before since ago during while until till still yet already just even ever never always often ' +
+    'also very really quite quiet quit every each both either neither other another others else own same some any much many more most less least few ' +
+    'little lot lots no not nor now know knew known new or and but so if as be been being is are was am will would could should shall can may might ' +
+    'must have has had having do does did done doing make made take took taken give gave given get got go went gone come came say said tell told see ' +
+    'saw seen think thought though through tough buy bought bring brought lose loose loss lost live life lives leave left right write wrote written ' +
+    'rise raise lie lay laid lain affect effect accept except advice advise practice practise piece peace brake break weather whether like likes ' +
+    'liked well good better best bad worse worst far further farther one ones won once only way ways weigh week weak').split(' '));
+  const spEdit = (a, b) => {   // letters to change, add, drop or swap to turn a into b
+    const m = a.length, n = b.length; if (Math.abs(m - n) > 2) return 3;
+    const d = []; for (let i = 0; i <= m; i++) d.push([i]); for (let j = 1; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+    return d[m][n]; };
+  const spSwap = (t, a, K) => t.length === a.length && (a.length >= 3 || !K.has(t)) && t !== a && spEdit(t, a) === 1 && [...t].sort().join('') === [...a].sort().join('');
+  const spGram = (t, a) => ['s', 'es', 'd', 'ed', 'ing', 'n', 'en', 'r', 'er', 'est', 'ly'].some(e => t === a + e || a === t + e);
+  const spSlip = (t, a, K) => t !== a && !/\d/.test(t + a) && (spSwap(t, a, K) ||
+    (a.length >= 4 && !K.has(t) && !spGram(t, a) && spEdit(t, a) <= (a.length >= 8 ? 2 : 1)));
+  // the typed words T against the words A from index i: the same, a slip, or a word split or joined. [[typed, right, 0 slip / 1 split / 2 joined]], or null
+  function spAlign(A, T, i, j, end, K, out) {
+    if (j === T.length) return end(i) ? out : null;
+    if (i === A.length) return null;
+    if (A[i] === T[j]) return spAlign(A, T, i + 1, j + 1, end, K, out);
+    let r = null;
+    if (j + 1 < T.length && T[j] + T[j + 1] === A[i]) r = spAlign(A, T, i + 1, j + 2, end, K, out.concat([[T[j] + ' ' + T[j + 1], A[i], 1]]));
+    if (!r && i + 1 < A.length && A[i] + A[i + 1] === T[j]) r = spAlign(A, T, i + 2, j + 1, end, K, out.concat([[T[j], A[i] + ' ' + A[i + 1], 2]]));
+    if (!r && spSlip(T[j], A[i], K)) r = spAlign(A, T, i + 1, j + 1, end, K, out.concat([[T[j], A[i], 0]]));
+    return r; }
+  const spBare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const spFlat = s => norm(s).replace(/'/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  // what the slips are (an empty list = only the apostrophes), or null when the answer is wrong for another reason
+  function spellSlips(q, answers, typed, more) {
+    answers = (answers || []).filter(a => typeof a === 'string' && a.trim()); if (!answers.length || !norm(typed)) return null;
+    const K = new Set(SP_KNOWN); answers.concat(more || []).forEach(a => spFlat(a).split(' ').forEach(x => K.add(x)));
+    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    for (const W of [spBare, spFlat]) {
+      const T = W(typed).split(' ').filter(Boolean), most = Math.max(1, Math.ceil(T.length / 3)), fine = r => r && r.length <= most;
+      if (!T.length) continue;
+      for (const a of answers) {   // the answer on its own (a gap, or a whole sentence)
+        const A = W(a).split(' ').filter(Boolean), r = spAlign(A, T, 0, 0, i => i === A.length, K, []);
+        if (fine(r) && (r.length || W === spFlat)) return r;
+      }
+      if (g < 1 || T.length < 2) continue;
+      for (const a of answers) {   // more than the gap: a run of the sentence with the gap filled that holds the whole answer
+        const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+        if (!fills) continue;
+        const A = [], gap = [], put = (x, f) => W(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(A.length); A.push(y); });
+        put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+        if (!gap.length) continue;
+        for (let k = 0; k <= gap[0]; k++) { const r = spAlign(A, T, k, 0, i => i > gap[gap.length - 1], K, []); if (fine(r) && (r.length || W === spFlat)) return r; }
+      }
+    }
+    return null; }
+  // "Almost! Check the spelling of ‘laod’." / "‘an other’ is one word." (cat: the Catalan of Starter)
+  function spellHint(sl, cat) {
+    const qt = s => '<strong>‘' + esc(s) + '’</strong>', list = xs => xs.length > 1 ? xs.slice(0, -1).map(qt).join(', ') + (cat ? ' i ' : ' and ') + qt(xs[xs.length - 1]) : qt(xs[0]);
+    const sp = sl.filter(x => !x[2]).map(x => x[0]), one = sl.filter(x => x[2] === 1).map(x => x[0]), two = sl.filter(x => x[2] === 2).map(x => x[0]), out = [];
+    if (sp.length) out.push(cat ? 'Revisa com s’escriu ' + list(sp) : 'Check the spelling of ' + list(sp));
+    if (one.length) out.push(list(one) + (cat ? ' s’escriu tot junt' : one.length > 1 ? ' are one word each' : ' is one word'));
+    if (two.length) out.push(list(two) + (cat ? ' són dues paraules' : two.length > 1 ? ' are two words each' : ' is two words'));
+    if (!out.length) out.push(cat ? 'Revisa els apòstrofs (’)' : 'Check the apostrophes (’)');
+    return (cat ? 'Gairebé! ' : 'Almost! ') + out.join('. ') + '.'; }
+  /* END SPELLING SLIPS */
   // the accepted answer the student said (in any recognition alternative), or null
   const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
   function bindModes(items, prefix, mode, parts) {
@@ -359,13 +433,16 @@ var LS2 = (function () {
       got.push([ok, typedAs($('#' + prefix + i))]);
       if (only && !only.includes(i)) return;
       const key = prefix + i;
-      if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
+      // a spelling slip (laod for load): the word is named instead of the grammar rule, and it isn't one of the two tries before the answer
+      const sl = !ok && v && !it.own && !it.whole && !picking(it) ? spellSlips(it.q, it.a, $('#' + prefix + i).value, items.flatMap(x => Array.isArray(x.a) ? x.a : [])) : null;
+      if (ok) score++; else if (v && count !== false && !sl) tries[key] = (tries[key] || 0) + 1;
       if (picking(it) && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
       if (!v && EXTRA.has(it)) { f.innerHTML = ''; f.className = 'feedback'; return; }
       f.innerHTML = ok ? (it.own ? (ca() ? 'Molt bé! El professor pot llegir la teva frase.' : 'Well done! Your teacher can read your sentence.') : (ca() ? 'Correcte!' : 'Correct!'))
         : !v ? (picking(it) ? (ca() ? 'Tria una resposta.' : 'Choose an answer.') : ca() ? 'Escriu una resposta.' : 'Type an answer.')
+        : sl ? spellHint(sl, ca()) + ' ' + (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.show || it.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'))
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
           (show ? (it.own ? (ca() ? 'Un exemple: ' : 'An example: ') : (ca() ? 'Resposta: ' : 'Answer: ')) + '<strong>' + esc(it.show || (it.a || [])[0] || '') + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -1733,9 +1810,10 @@ var LS2 = (function () {
             fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], null, !!(p.media && p.media.audio));
           } else {
             const v = norm($('#' + p.id + i).value), key = p.id + i; ok = fits(q.q, q.a, $('#' + p.id + i).value); g.push([ok, typedAs($('#' + p.id + i))]);
-            if (!ok && v && count) tries[key] = (tries[key] || 0) + 1;
+            const sl = !ok && v ? spellSlips(q.q, q.a, $('#' + p.id + i).value, items.flatMap(x => Array.isArray(x.a) ? x.a : [])) : null;
+            if (!ok && v && count && !sl) tries[key] = (tries[key] || 0) + 1;
             fb.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
-              : (ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
+              : (sl ? spellHint(sl, ca()) + ' ' : ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
           }
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
           if (ok) { right++; pts += ptsOf(p, q); }
