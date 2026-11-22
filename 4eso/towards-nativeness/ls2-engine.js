@@ -307,8 +307,14 @@ var LS2 = (function () {
         let p = 0; while (p < w.length && p < ow.length && w[p] === ow[p]) p++;
         let q = 0; while (q < w.length - p && q < ow.length - p && w[w.length - 1 - q] === ow[ow.length - 1 - q]) q++;
         let lo = p, hi = w.length - q; if (hi <= lo) { lo = Math.max(0, p - 1); hi = Math.min(w.length, p + 1); }
-        for (let k = 0; k <= lo && k + tw.length <= w.length; k++)
-          if (k + tw.length >= hi && tw.every((y, j) => same(w[k + j], y))) return true;
+        const inOrig = ow.some((_, k) => k + tw.length <= ow.length && tw.every((y, j) => y === ow[k + j]));
+        for (let k = 0; k + tw.length <= w.length; k++) {
+          if (!tw.every((y, j) => same(w[k + j], y))) continue;
+          if (k <= lo && k + tw.length >= hi) return true;   // the whole changed part
+          // a word that moved (Roger, 22 Nov 2026: "What exactly" for "What did you exactly do?"): two or more words of the changed part,
+          // in an order the original sentence never has
+          if (tw.length >= 2 && k < hi && k + tw.length > lo && !inOrig) return true;
+        }
         return false; });
     });
   }
@@ -1123,7 +1129,20 @@ var LS2 = (function () {
 
   // 🔍 Spot the mistake, written (Roger, 21 Nov 2026): items { s: the sentence as Roger wrote it, a: [accepted correct sentences], ex: the rule }.
   // A typed panel where each answer is the whole corrected sentence (wholeOk); the model and the rule show once it is right, or after two tries.
-  R.rewrite = p => R.typed(Object.assign({}, p, { type: 'typed', items: p.items.map(it => ({ q: '“' + it.s + '”' + (it.note ? ' <span class="tiny">(' + it.note + ')</span>' : ''), a: it.a, whole: it.s, show: it.a[0], en: it.ex })) }));
+  R.rewrite = p => {
+    const q = Object.assign({}, p, { type: 'typed', items: p.items.map(it => ({ q: '“' + it.s + '”' + (it.note ? ' <span class="tiny">(' + it.note + ')</span>' : ''), a: it.a, whole: it.s, show: it.a[0], en: it.ex })) });
+    const r = R.typed(q), bind = r.bind;
+    // a first try marked wrong by an older, stricter check, that the check now accepts, gets its credit (Roger, 22 Nov 2026: "Sth wrong here")
+    r.bind = function () {
+      let up = 0; const IT = state.items || {};
+      Object.keys(IT).filter(k => k.indexOf(p.id + '_') === 0).forEach(k => { const F = IT[k]; if (!F || !Array.isArray(F.q)) return;
+        F.q.forEach((qi, j) => { const it = q.items[qi]; if (it && !F.ok[j] && wholeOk(it, (F.a || [])[j] || '')) { F.ok[j] = 1; up++; } });
+        const T = (state.tries || {})[p.id]; if (up && T && T.per && T.level === F.level) T.score = F.q.filter((_, j) => F.ok[j]).length; });
+      if (up) save();
+      return bind.apply(this, arguments);
+    };
+    return r;
+  };
 
   // a grammar step in parts: only the compulsory questions count (arrange); each block shows "3 / 7 compulsory" as the student answers
   function partsBind(p) {

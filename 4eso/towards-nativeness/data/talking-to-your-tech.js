@@ -11,7 +11,7 @@ window.LP = {
         { s: 'How long I’ll have to wait?', a: ['How long will I have to wait?'], ex: 'In a question the auxiliary goes before the subject: <strong>How long will I have to wait?</strong>' },
         { s: 'Home doesn’t work yet.', a: ['Home still doesn’t work.', 'Home still isn’t working.', 'Home is still not working.', 'Home still does not work.'], ex: '<strong>still</strong> = it goes on (It still doesn’t work). <strong>yet</strong> = it hasn’t started (I haven’t tried it yet).', note: 'after a fix that didn’t work' },
         { s: 'The English Lab button doesn’t bring me here.', a: ['The English Lab button doesn’t take me here.'], ex: 'A link or button <strong>takes</strong> you somewhere. <em>Bring</em> is movement towards the speaker: bring your laptop to class.' },
-        { s: 'What did you exactly do?', a: ['What exactly did you do?'], ex: 'Adverbs like exactly, already, always go before the main verb: <strong>What exactly did you do?</strong>' },
+        { s: 'What did you exactly do?', a: ['What exactly did you do?'], ex: 'In a question, <strong>exactly</strong> goes right after the question word: <strong>What exactly did you do?</strong> (Adverbs like already and always go before the main verb: I’ve already done it.)' },
         { s: 'Why 2 ESO doesn’t have a time plan?', a: ['Why doesn’t 2 ESO have a time plan?', 'Why does 2 ESO not have a time plan?', 'Why hasn’t 2 ESO got a time plan?'], ex: 'Question order: <strong>Why doesn’t 2 ESO have a time plan?</strong>' },
         { s: 'The button is on the top of the table.', a: ['The button is at the top of the table.'], ex: 'Positions on a page: <strong>at the top / at the bottom / at the top right</strong>.' },
         { s: 'Is ChatGPT better in this?', a: ['Is ChatGPT better at this?'], ex: 'good / better / bad <strong>at</strong> something: Is ChatGPT better at this?' },
@@ -109,7 +109,7 @@ window.LP = {
         { q: 'Encara no ho he provat al mòbil.', a: ['I haven’t tried it on my phone yet', 'I haven’t tested it on my phone yet', 'I have not tried it on my phone yet'], en: 'yet at the end, present perfect, on my phone.' },
         { q: 'Quant de temps hauré d’esperar?', a: ['How long will I have to wait', 'How long am I going to have to wait'], en: 'Auxiliary before the subject.' },
         { q: 'Aquest botó no em porta a la pàgina correcta.', a: ['This button doesn’t take me to the right page', 'This button doesn’t take me to the correct page'], en: 'take me to.' },
-        { q: 'Què has fet exactament?', a: ['What exactly did you do', 'What exactly have you done'], en: 'exactly before the main verb.' },
+        { q: 'Què has fet exactament?', a: ['What exactly did you do', 'What exactly have you done'], en: 'In a question, exactly goes right after the question word: What exactly…?' },
         { q: 'El menú és a dalt a la dreta.', a: ['The menu is at the top right', 'The menu’s at the top right'], en: 'at the top right.' },
         { q: 'Triga moltíssim a carregar.', a: ['It’s taking ages to load', 'It takes ages to load', 'It’s taking a long time to load', 'It takes a long time to load'], en: 'take ages / a long time to + verb.' },
         { q: 'Resulta que el fitxer tenia un altre nom.', a: ['It turns out the file had a different name', 'It turns out that the file had a different name', 'It turned out the file had a different name', 'It turned out that the file had a different name'], en: 'It turns out (that)…' },
@@ -121,7 +121,7 @@ window.LP = {
       explain: [
         '<strong>Direct questions</strong>: auxiliary + subject + verb. <em>How long will I have to wait? Why doesn’t it load? Does this project have too much info?</em>',
         '<strong>Indirect questions</strong> keep statement order and lose do/does: <em>I need to know what the best option is. Do you know why it doesn’t load?</em> (not <s>why doesn’t it load</s>)',
-        '<strong>Adverbs</strong> (already, always, only, exactly, just, still) go before the main verb but after <em>be</em>: <em>You already have their emails. Students should always see it. It’s still slow.</em>',
+        '<strong>Adverbs</strong> (already, always, only, just, still) go before the main verb but after <em>be</em>: <em>You already have their emails. Students should always see it. It’s still slow.</em> In a question, <strong>exactly</strong> goes right after the question word: <em>What exactly did you do?</em>',
         '<strong>Tags</strong> repeat the auxiliary with the opposite polarity: <em>We can’t export it, can we? It works, doesn’t it?</em>'
       ],
       items: [
