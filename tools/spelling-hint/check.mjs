@@ -32,6 +32,7 @@ const CASES = [   // [question, answers, typed, the hint (null = no spelling hin
   ['She ___ (watch) TV now.', ['is watching'], 'is wacthing', 'Almost! Check the spelling of ‘wacthing’.'],
   ['She ___ (watch) TV now.', ['is watching'], 'She is watchin TV now', 'Almost! Check the spelling of ‘watchin’.'],
   ['', ['beautiful'], 'beautifull', 'Almost! Check the spelling of ‘beautifull’.'],
+  ['', ['It works, doesn’t it', 'It works, right'], 'It works, rigth?', 'Almost! Check the spelling of ‘rigth’.'],
   ['', ['What exactly did you do'], 'What exactly did you od', 'Almost! Check the spelling of ‘od’.'],
   // grammar and word mistakes keep their rule
   ['', AGES, 'It take ages to load.', null],
