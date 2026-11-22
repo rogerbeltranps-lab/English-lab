@@ -1090,7 +1090,7 @@ function rtCorrect(c,box){
   const qh=`<p class="q">${rcEsc(qt.textContent.replace(/^\s*\d+\.\s*/,"").trim())}</p>`;
   if(!c.s){card.className="wait";B.innerHTML=qh+`<p class="w">${ca?"Pensa la resposta i escolta…":"Think of your answer and listen…"}</p>`;return}
   // what they answered: the option they picked (0 = the right one in the data) or what they typed (the page's own ✓ when they checked)
-  const r=hit.querySelector("input[type=radio]:checked"),t=hit.querySelector("input.typed,input[type=text]"),fb=hit.querySelector(".feedback");
+  const r=hit.querySelector("input[type=radio]:checked"),t=hit.querySelector("input.typed,textarea.typed,input[type=text]"),fb=hit.querySelector(".feedback");
   const said=r?(r.closest("label")||{}).textContent||"":t?t.value.trim():"";
   const ok=r?+r.value===0:t?(fb&&fb.classList.contains("ok"))||[].concat(q.a||[],q.alt||[]).some(a=>rtNorm(a)===rtNorm(said)):false;
   // where their text says it: their level's (the one whose marked sentence is in the text on their screen; their route first)
