@@ -4,7 +4,8 @@
 // double-clicks a word on the page.
 //  1. This LS's word list first (every vocabulary panel of every learning path of the LS, from its data/*.js: English, Catalan, example).
 //  2. Then, if the word isn't there (or "More meanings"), free online sources, no key, nothing paid, no Claude: Google Translate's free
-//     endpoint (the same one the announcements use) for the translation, and dictionaryapi.dev for a short English meaning.
+//     endpoint (the same one the announcements use) for the translation, MyMemory when Google doesn't answer, and dictionaryapi.dev
+//     then Wiktionary for a short English meaning (22 Nov 2026). A word no source knows says "Not found", never "I can't reach…".
 // It never gives answers away: words, phrasal verbs or short expressions only (max 4 words online; up to 6 when the expression is on the
 // LS's list; 60 characters); hidden on Recall steps ("No notes"); a Catalan
 // word whose English is an answer of an activity on this page shows "Try it yourself first" instead. Chrome page translate and
@@ -91,13 +92,40 @@
       return ELD.answers.some(function (a) { return a === b || (a.length > 2 && SMALL.indexOf(a) < 0 && w.indexOf(' ' + a + ' ') >= 0); });
     });
   };
-  var GT = 'https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dt=bd&dj=1&hl=en';
-  function gt(q, sl, tl) { return fetch(GT + '&sl=' + sl + '&tl=' + tl + '&q=' + encodeURIComponent(q)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }); }
+  // Online sources, all free, no key (Roger, 22 Nov 2026: "calque" showed "I can't reach the online dictionary"): Google's gtx endpoint
+  // answers 429 "automated queries" to some networks (a whole school behind one address, iCloud Private Relay…), and then every look-up failed.
+  // Now: Google first; if it fails, it rests for 10 minutes on this tab and MyMemory translates instead. English meanings: dictionaryapi.dev,
+  // then Wiktionary. A word no source knows says "Not found"; "I can't reach…" only when no source answered at all.
+  var GT = 'https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dt=bd&dj=1&hl=en', GT_REST = 'el_dict_gt_rest';
+  function gtResting() { try { return Date.now() - (+sessionStorage.getItem(GT_REST) || 0) < 6e5; } catch (e) { return false; } }
+  function gt(q, sl, tl) {
+    if (gtResting()) return Promise.reject('rest');
+    return fetch(GT + '&sl=' + sl + '&tl=' + tl + '&q=' + encodeURIComponent(q)).then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+      .catch(function (e) { try { sessionStorage.setItem(GT_REST, String(Date.now())); } catch (x) {} throw e; });
+  }
+  // a JSON answer: the data, null when the source answered "not found" (404), a rejection when it couldn't be reached
+  function getJSON(url) { return fetch(url).then(function (r) { if (r.status === 404) return null; if (!r.ok) throw r.status; return r.json(); }); }
+  var plain = function (h) { try { return (new DOMParser().parseFromString(String(h || ''), 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim(); } catch (e) { return String(h || '').replace(/<[^>]*>/g, ''); } };
+  function mm(q, sl, tl) {   // MyMemory: the back-up translator (needs the two languages; a word it doesn't know comes back unchanged)
+    return getJSON('https://api.mymemory.translated.net/get?langpair=' + sl + '|' + tl + '&q=' + encodeURIComponent(q)).then(function (j) {
+      var txt = plain(j && j.responseData && j.responseData.translatedText);
+      if (!j || +j.responseStatus !== 200 || /MYMEMORY WARNING|QUERY LENGTH|INVALID/i.test(txt)) throw 'mm';
+      if (!txt || norm(txt) === norm(q)) return null;
+      var more = [];
+      (j.matches || []).forEach(function (m) { var x = plain(m.translation); if (norm(m.segment) === norm(q) && +m.quality >= 70 && x && norm(x) !== norm(txt) && norm(x) !== norm(q) && more.indexOf(x) < 0) more.push(x); });
+      return { main: txt.replace(/[.!]$/, ''), more: more.slice(0, 4) };
+    });
+  }
   function online(q) {
+    var mean = q.split(' ').length <= 3 ? meaning(q).then(function (m) { return { m: m, ok: true }; }, function () { return { m: null, ok: false }; }) : Promise.resolve({ m: null, ok: false });
     return gt(q, 'auto', 'ca').then(function (j) {
       if (j.src === 'en') return { dir: 'en', j: j };
-      if (MODE === 'en-ca') return { dir: 'ca', blockedDir: true };
-      return gt(q, j.src && j.src !== 'auto' ? j.src : 'ca', 'en').then(function (k) { return { dir: 'ca', j: k }; });
+      return mean.then(function (M) {
+        // "calque", "menu"… read as French or Spanish: an English word the English dictionary knows stays English
+        if (j.src !== 'ca' && M.m) return gt(q, 'en', 'ca').then(function (k) { return { dir: 'en', j: k }; });
+        if (MODE === 'en-ca') return { dir: 'ca', blockedDir: true };
+        return gt(q, j.src && j.src !== 'auto' ? j.src : 'ca', 'en').then(function (k) { return { dir: 'ca', j: k }; });
+      });
     }).then(function (r) {
       if (!r.j) return r;
       var j = r.j, main = (j.sentences || []).map(function (s) { return s.trans || ''; }).join('').trim(), more = [];
@@ -105,15 +133,46 @@
       r.main = main; r.more = more.slice(0, 5); r.pos = ((j.dict || [])[0] || {}).pos || '';
       r.same = norm(main) === norm(q);
       return r;
-    });
+    }, function () {   // Google didn't answer: the English dictionary decides the direction, MyMemory translates
+      return mean.then(function (M) {
+        // an English word: its meaning and Catalan; a Catalan word that is English too (mar, sol, gat…) also gets its Catalan → English card
+        var soft = function (sl, tl) { return mm(q, sl, tl).catch(function () { return null; }); };
+        if (M.m) return Promise.all([soft('en', 'ca'), MODE === 'en-ca' ? null : soft('ca', 'en')]).then(function (x) { return { dir: 'en', main: x[0] ? x[0].main : '', more: x[0] ? x[0].more : [], pos: '', m: M.m, alt: x[1] && norm(x[1].main) !== norm(x[0] ? x[0].main : '') ? x[1] : null }; });
+        if (MODE === 'en-ca') { if (M.ok) return { none: true }; throw 'unreachable'; }
+        return mm(q, 'ca', 'en').then(function (x) { return x ? { dir: 'ca', main: x.main, more: x.more, pos: '' } : { none: true }; },
+          function () { if (M.ok) return { none: true }; throw 'unreachable'; });
+      });
+    }).then(function (r) { r.mean = mean; return r; });
   }
-  function meaning(word) {   // a short English meaning (and the IPA) for an English word
-    return fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word)).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (a) {
-      var e = a && a[0]; if (!e) return null;
+  function dictApi(word) {   // dictionaryapi.dev: a short English meaning and the IPA
+    return getJSON('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(word)).then(function (a) {
+      var e = Array.isArray(a) && a[0]; if (!e) return null;
       var ph = e.phonetic || ((e.phonetics || []).filter(function (p) { return p.text; })[0] || {}).text || '';
       var defs = []; (e.meanings || []).forEach(function (m) { (m.definitions || []).slice(0, 1).forEach(function (x) { if (defs.length < 2) defs.push({ pos: m.partOfSpeech, d: x.definition, ex: x.example || '' }); }); });
-      return { ph: ph, defs: defs };
-    }).catch(function () { return null; });
+      return defs.length ? { ph: ph, defs: defs } : null;
+    });
+  }
+  function wikt(word) {   // Wiktionary: many more words (calque, …), no IPA here
+    return getJSON('https://en.wiktionary.org/api/rest_v1/page/definition/' + encodeURIComponent(word.replace(/ /g, '_'))).then(function (j) {
+      var defs = [];
+      ((j && j.en) || []).forEach(function (g) {
+        (g.definitions || []).some(function (x) {
+          var dd = plain(x.definition); if (!dd) return false;
+          var ex = plain(((x.parsedExamples || [])[0] || {}).example || (x.examples || [])[0] || '');
+          if (defs.length < 2) defs.push({ pos: String(g.partOfSpeech || '').toLowerCase(), d: dd, ex: ex });
+          return true;
+        });
+      });
+      return defs.length ? { ph: '', defs: defs } : null;
+    });
+  }
+  // the English meaning: resolves the meaning, or null when the sources answered but don't know the word; rejects when none could be reached
+  function meaning(word) {
+    var w = String(word || '').trim(), lw = w.toLowerCase();
+    return dictApi(lw).then(function (m) { return m; }, function () { return undefined; }).then(function (m) {
+      if (m) return m;
+      return wikt(lw).then(function (x) { return x || (lw !== w ? wikt(w).catch(function () { return null; }) : null); }, function () { if (m === null) return null; throw 'unreachable'; });
+    });
   }
   function say(text) {
     try {
@@ -400,21 +459,29 @@
       if (my !== seq) return;
       if (r.blockedDir) { slot.innerHTML = msg(t('Aquí només pots buscar paraules en anglès.', 'Here you can only look up English words.')); return; }
       var none = function () { slot.innerHTML = msg(t('No l’he trobada. Revisa com s’escriu.', 'Not found. Check the spelling.'), true); };
-      if (!r.main) { none(); return; }
+      if (r.none || (!r.main && !r.m)) { none(); return; }
       if (r.dir === 'ca' && (isAnswer(r.main) || r.more.some(isAnswer))) { slot.innerHTML = tryIt(); return; }
       var en = r.dir === 'en' ? q : r.main, tr = r.dir === 'en' ? r.main : q;
       var card = function (m) {
         return '<div class="eldict-r"><div class="eldict-src">' + t('Diccionari en línia', 'Online dictionary') + '</div>'
           + '<div class="eldict-w"><b>' + esc(en) + '</b>' + (m && m.ph ? '<span class="eldict-ph">' + esc(m.ph) + '</span>' : '') + sayBtn(en) + '</div>'
-          + '<div class="eldict-tr">' + esc(tr) + (r.pos ? ' <em>(' + esc(r.pos) + ')</em>' : '') + '</div>'
+          + (tr ? '<div class="eldict-tr">' + esc(tr) + (r.pos ? ' <em>(' + esc(r.pos) + ')</em>' : '') + '</div>' : '')
           + (r.more.length ? '<div class="eldict-tr"><em>' + (r.dir === 'en' ? t('També: ', 'Also: ') : t('També: ', 'Also: ')) + esc(r.more.join(', ')) + '</em></div>' : '')
           + (m && m.defs.length ? m.defs.map(function (x) { return '<div class="eldict-def"><i>' + esc(x.pos) + '</i> · ' + esc(x.d) + (x.ex ? '<div class="eldict-ex">' + esc(x.ex) + '</div>' : '') + '</div>'; }).join('') : '')
           + '</div>';
       };
+      // the English meaning: already asked for when the word typed is English; nothing when it can't be reached
+      var mean = function () { return (r.dir === 'en' && r.mean ? r.mean.then(function (M) { return M.m; }) : meaning(en)).catch(function () { return null; }); };
+      if (r.m) {   // Google didn't answer: the meaning came first
+        var alt = r.alt && !isAnswer(r.alt.main) && !r.alt.more.some(isAnswer) ? '<div class="eldict-r"><div class="eldict-src">' + t('Diccionari en línia · del català', 'Online dictionary · from Catalan') + '</div>'
+          + '<div class="eldict-w"><b>' + esc(r.alt.main) + '</b>' + sayBtn(r.alt.main) + '</div><div class="eldict-tr">' + esc(q) + '</div>'
+          + (r.alt.more.length ? '<div class="eldict-tr"><em>' + t('També: ', 'Also: ') + esc(r.alt.more.join(', ')) + '</em></div>' : '') + '</div>' : '';
+        slot.innerHTML = card(r.m) + alt; wire(); return;
+      }
       // the same word back (festival, hotel, piano… or a typo): show it only if the English dictionary knows it
-      if (r.same && !r.more.length) { meaning(en).then(function (m) { if (my !== seq) return; if (m && r.dir === 'en') { slot.innerHTML = card(m); wire(); } else none(); }); return; }
+      if (r.same && !r.more.length) { mean().then(function (m) { if (my !== seq) return; if (m && r.dir === 'en') { slot.innerHTML = card(m); wire(); } else none(); }); return; }
       slot.innerHTML = card(null); wire();
-      if (en.split(' ').length <= 3) meaning(en).then(function (m) { if (my === seq && m) { slot.innerHTML = card(m); wire(); } });
+      if (en.split(' ').length <= 3) mean().then(function (m) { if (my === seq && m) { slot.innerHTML = card(m); wire(); } });
     }).catch(function () {
       if (my === seq) slot.innerHTML = msg(t('Ara no puc connectar amb el diccionari en línia. Torna-ho a provar d’aquí a una estona.', 'I can’t reach the online dictionary right now. Try again in a moment.'), true);
     });
