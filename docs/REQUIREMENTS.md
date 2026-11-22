@@ -157,6 +157,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 **Look and devices**
 
 - **Quality over quantity** (19 Nov 2026): too many activities. Students see only the SLPs Roger adds; the final product is always last. Keep screens short: little on the menu, details inside each place.
+- **On a phone, the 🔍 Dictionary stays still** (Roger, 21 Nov 2026: "the dictionary moves all around the page and sometimes I don't even see what I'm typing"): its window sits at the top of what is visible, the box you type in always shows above the keyboard, and the bars at the bottom hide while you type. Computers unchanged.
 - Students use **Chromebooks (~1366×768)**: design for that first, then check 390×844 (phone). Phone rules live only in `el-phone.css` inside `@media (max-width:640px)`; computers must stay pixel-identical.
 - Course palettes: **2 ESO green, 4 ESO blue**. Competence colours: CE1 teal, CE2 blue, CE3 orange, CE4 green, CE5 purple, CE6 amber, CD indigo, CC pink.
 - **Every text is easy to read on its background** (Roger, 21 Nov 2026: "I can't read all the letters well here", on the green ✅ Finish all your activities! title over a purple header): white text on dark or coloured headers and buttons, dark text on light cards, never coloured text on a coloured band. A pop-up or bar drawn over a page sets the colour of each of its texts itself, so a page's own heading colours never leak into it.
