@@ -428,6 +428,80 @@ const starterLv = () => base(S.level) === 'beginners';
 // brackets, words of the same set, then other answers), in a fixed order per question
 const nWords = x => (String(x).trim().match(/\S+/g) || []).length;
 const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  /* ✏️ SPELLING SLIPS (same block in every ls2-engine.js and lab/practice.html; tools/spelling-hint/check.mjs keeps them identical).
+     Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake" ("It takes ages to laod." got the grammar rule).
+     When a wrong answer matches an accepted one except for spelling, the feedback names the word instead of the grammar rule:
+     "Almost! Check the spelling of ‘laod’." A slip is two letters swapped (laod, od for do), or one wrong, missing or extra letter in a word of 4+ letters
+     (two in a word of 8+), or a word split or joined (an other = another, alot = a lot); a missing apostrophe gets "Check the apostrophes".
+     It is still not right (a spelling slip is wrong, as in the exams, 18 Nov 2026), but it doesn't count as one of the two tries before the
+     answer shows. Never a slip: a real word for another (in / on, then / than, were / where, take / took), or a grammar ending (take / takes,
+     work / worked, go / going), so grammar mistakes keep their grammar rule. */
+  const SP_KNOWN = new Set(('a an the this that these those there their theyre then than them they he she it its we you your youre our out hour ' +
+    'i me my mine his her him us who whom whose what when where were wear which witch why how here hear too to two of off on in at by for from form ' +
+    'with into onto about above below under over after before since ago during while until till still yet already just even ever never always often ' +
+    'also very really quite quiet quit every each both either neither other another others else own same some any much many more most less least few ' +
+    'little lot lots no not nor now know knew known new or and but so if as be been being is are was am will would could should shall can may might ' +
+    'must have has had having do does did done doing make made take took taken give gave given get got go went gone come came say said tell told see ' +
+    'saw seen think thought though through tough buy bought bring brought lose loose loss lost live life lives leave left right write wrote written ' +
+    'rise raise lie lay laid lain affect effect accept except advice advise practice practise piece peace brake break weather whether like likes ' +
+    'liked well good better best bad worse worst far further farther one ones won once only way ways weigh week weak').split(' '));
+  const spEdit = (a, b) => {   // letters to change, add, drop or swap to turn a into b
+    const m = a.length, n = b.length; if (Math.abs(m - n) > 2) return 3;
+    const d = []; for (let i = 0; i <= m; i++) d.push([i]); for (let j = 1; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+    return d[m][n]; };
+  const spSwap = (t, a, K) => t.length === a.length && (a.length >= 3 || !K.has(t)) && t !== a && spEdit(t, a) === 1 && [...t].sort().join('') === [...a].sort().join('');
+  const spGram = (t, a) => ['s', 'es', 'd', 'ed', 'ing', 'n', 'en', 'r', 'er', 'est', 'ly'].some(e => t === a + e || a === t + e);
+  const spSlip = (t, a, K) => t !== a && !/\d/.test(t + a) && (spSwap(t, a, K) ||
+    (a.length >= 4 && !K.has(t) && !spGram(t, a) && spEdit(t, a) <= (a.length >= 8 ? 2 : 1)));
+  // the typed words T against the words A from index i: the same, a slip, or a word split or joined. [[typed, right, 0 slip / 1 split / 2 joined]], or null
+  function spAlign(A, T, i, j, end, K, out) {
+    if (j === T.length) return end(i) ? out : null;
+    if (i === A.length) return null;
+    if (A[i] === T[j]) return spAlign(A, T, i + 1, j + 1, end, K, out);
+    let r = null;
+    if (j + 1 < T.length && T[j] + T[j + 1] === A[i]) r = spAlign(A, T, i + 1, j + 2, end, K, out.concat([[T[j] + ' ' + T[j + 1], A[i], 1]]));
+    if (!r && i + 1 < A.length && A[i] + A[i + 1] === T[j]) r = spAlign(A, T, i + 2, j + 1, end, K, out.concat([[T[j], A[i] + ' ' + A[i + 1], 2]]));
+    if (!r && spSlip(T[j], A[i], K)) r = spAlign(A, T, i + 1, j + 1, end, K, out.concat([[T[j], A[i], 0]]));
+    return r; }
+  const spBare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const spFlat = s => norm(s).replace(/'/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  // what the slips are (an empty list = only the apostrophes), or null when the answer is wrong for another reason
+  function spellSlips(q, answers, typed, more) {
+    answers = (answers || []).filter(a => typeof a === 'string' && a.trim()); if (!answers.length || !norm(typed)) return null;
+    const K = new Set(SP_KNOWN); answers.concat(more || []).forEach(a => spFlat(a).split(' ').forEach(x => K.add(x)));
+    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    for (const W of [spBare, spFlat]) {
+      const T = W(typed).split(' ').filter(Boolean), most = Math.max(1, Math.ceil(T.length / 3)), fine = r => r && r.length <= most;
+      if (!T.length) continue;
+      for (const a of answers) {   // the answer on its own (a gap, or a whole sentence)
+        const A = W(a).split(' ').filter(Boolean), r = spAlign(A, T, 0, 0, i => i === A.length, K, []);
+        if (fine(r) && (r.length || W === spFlat)) return r;
+      }
+      if (g < 1 || T.length < 2) continue;
+      for (const a of answers) {   // more than the gap: a run of the sentence with the gap filled that holds the whole answer
+        const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+        if (!fills) continue;
+        const A = [], gap = [], put = (x, f) => W(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(A.length); A.push(y); });
+        put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+        if (!gap.length) continue;
+        for (let k = 0; k <= gap[0]; k++) { const r = spAlign(A, T, k, 0, i => i > gap[gap.length - 1], K, []); if (fine(r) && (r.length || W === spFlat)) return r; }
+      }
+    }
+    return null; }
+  // "Almost! Check the spelling of ‘laod’." / "‘an other’ is one word." (cat: the Catalan of Starter)
+  function spellHint(sl, cat) {
+    const qt = s => '<strong>‘' + esc(s) + '’</strong>', list = xs => xs.length > 1 ? xs.slice(0, -1).map(qt).join(', ') + (cat ? ' i ' : ' and ') + qt(xs[xs.length - 1]) : qt(xs[0]);
+    const sp = sl.filter(x => !x[2]).map(x => x[0]), one = sl.filter(x => x[2] === 1).map(x => x[0]), two = sl.filter(x => x[2] === 2).map(x => x[0]), out = [];
+    if (sp.length) out.push(cat ? 'Revisa com s’escriu ' + list(sp) : 'Check the spelling of ' + list(sp));
+    if (one.length) out.push(list(one) + (cat ? ' s’escriu tot junt' : one.length > 1 ? ' are one word each' : ' is one word'));
+    if (two.length) out.push(list(two) + (cat ? ' són dues paraules' : two.length > 1 ? ' are two words each' : ' is two words'));
+    if (!out.length) out.push(cat ? 'Revisa els apòstrofs (’)' : 'Check the apostrophes (’)');
+    return (cat ? 'Gairebé! ' : 'Almost! ') + out.join('. ') + '.'; }
+  /* END SPELLING SLIPS */
 const s3 = v => ({ go: 'goes', do: 'does', have: 'has', be: 'is' })[v] || (/[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : /(s|sh|ch|x|z|o)$/.test(v) ? v + 'es' : v + 's');
 const ing = v => /ie$/.test(v) ? v.slice(0, -2) + 'ying' : (/[^e]e$/.test(v) ? v.slice(0, -1) + 'ing' : /^[^aeiou]*[aeiou][bdgmnprt]$/.test(v) ? v + v.slice(-1) + 'ing' : v + 'ing');
 const hash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
@@ -483,12 +557,14 @@ function gcheck(count) {
   let ok = 0; const v = [];
   g.items.forEach((it, i) => {
     const box = $('#gq' + i), val = box.value, n = norm(val), right = !!n && it.a.some(a => expand(a) === expand(val)), f = $('#gf' + i), k = g.key + i;
-    v.push(val.trim().slice(0, 60)); if (right) ok++; else if (n && count) gtries[k] = (gtries[k] || 0) + 1;
+    const sl = !right && n && !starterLv() ? spellSlips(it.q, it.a, val, g.items.flatMap(x => x.a || [])) : null;   // a spelling slip: the word, not the rule, and not a try
+    v.push(val.trim().slice(0, 60)); if (right) ok++; else if (n && count && !sl) gtries[k] = (gtries[k] || 0) + 1;
     if (starterLv() && n && !right && count) $$(`[data-do="gpick"][data-i="${i}"]`).forEach(x => { if (norm(x.dataset.v) === n) x.disabled = true; });
     const why = EN ? (it.en || it.ca || '') : (it.ca || it.en || ''), show = gtries[k] >= 2;
     box.className = 'typed' + (n ? right ? ' right' : ' wrong' : '');
     f.className = 'fb ' + (right ? 'ok' : 'no');
     f.innerHTML = right ? '✓' : !n ? (starterLv() ? 'Tria una resposta.' : t('Escriu una resposta.', 'Type an answer.'))
+      : sl ? '✗ ' + spellHint(sl, !EN) + ' ' + (show ? t('Resposta', 'Answer') + ': <b>' + esc(it.a[0]) + '</b>' : t('Torna-ho a provar.', 'Try again.'))
       : '✗ ' + (why ? `<span class="hint">💡 ${esc(why)}</span> ` : '') + (show ? t('Resposta', 'Answer') + ': <b>' + esc(it.a[0]) + '</b>' : t('Torna-ho a provar.', 'Try again.'));
   });
   const k = gKey(), prev = store.gram[k] || {}, sc = ok + '/' + g.items.length;

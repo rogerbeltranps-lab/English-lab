@@ -277,6 +277,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - **Grammar that comes back**: only Starter and Base drill the old form; Core and Plus start from the new use, never more old-form items than new ones.
 - Words with a structure (in/on/at, play/go/do, verb + preposition) are **💬 Expressions**, their own step after Vocabulary, not grammar (16 Nov 2026).
 - ✓ Check per question; the mark is the first try; students can correct wrong answers in the notebook without changing the mark.
+- **A spelling slip gets a spelling hint, never the grammar rule** (Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake"; "This should be the same for the students"): in every typed answer (learning paths, Towards Nativeness, 🎯 Practise, the sample exam), an answer that is right except for spelling shows **"Almost! Check the spelling of ‘laod’. Try again."** (or "‘an other’ is one word", "Check the apostrophes"; Catalan for Starter). A real word in place of another (in / on, then / than) or a wrong ending (take / takes) keeps its grammar rule. A slip is still not right (as in the exams), but it is not one of the two tries before the answer shows. Contractions count either way (It's = It is).
 - Students can't copy the theory into their notes; notes are optional, their own examples (19 Nov 2026).
 - Randomise answer options, never the questions.
 - The recall warm-up is done with no notes; practice is done at 80 %; the learning path's piece of writing or speaking is saved for the final product (Playbook).
