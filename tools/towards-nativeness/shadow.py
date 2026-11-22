@@ -1,4 +1,4 @@
-"""Towards Nativeness: records the 🗣 Shadowing clips with Kokoro, voice af_heart (Roger, 17 Nov 2026: "kokoro now (heart)"), one sentence
+"""(Replaced by shadow-eleven.mjs, ElevenLabs Chris, since 22 Nov 2026; kept as the free Kokoro fallback.) Towards Nativeness: records the 🗣 Shadowing clips with Kokoro, voice af_heart (Roger, 17 Nov 2026: "kokoro now (heart)"), one sentence
 at a time with a pause between them, and writes 4eso/towards-nativeness/audio/<file>.mp3 + -slow.mp3 (atempo 0.8) and data/shadow.js:
 window.TN_SHADOW = {key: clip} with lines (one per sentence), marks and cues
 [[from, to, slowFrom, slowTo], ...] taken straight from the recording, so 🔁 Listen and repeat works without any alignment step.
