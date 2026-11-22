@@ -3,7 +3,9 @@
    the other option shadowing all as you listen").
    Used by the class shadowing page (shared/shadow/), the LS2 Learning Path Shadowing step (ls2-engine.js R.shadow) and Practise (lab/).
    clip.marks = per script line, its sentences in the shadowing video's format (tools/shadowing-video): **stressed** underlined,
-   ‿ linked words, ↗ before a comma or a pause and at the end of yes/no questions, ↘ at the end of statements and wh- questions.
+   ‿ linked words, {{words|ipa}} assimilation (the words with a dotted line and only the changed sounds in IPA after them, e.g.
+   {{can’t‿you|tʃ}} → can’t‿you /tʃ/; Roger, 22 Nov 2026: "Indicate assimilation and the ipa transcription of only the assimilation";
+   its key line shows only on a page that has one), ↗ before a comma or a pause and at the end of yes/no questions, ↘ at the end of statements and wh- questions.
    clip.cues = [[from, to, slowFrom, slowTo], …] per sentence (tools/shadowing-marks/apply.py, pocketsphinx alignment). Every
    sentence and clip starts through lead() (a quiet run-up, see below) so its first word is heard.
    Marks on/off and the mode are remembered on the device (localStorage), never saved anywhere else. Clips without marks show the
@@ -19,6 +21,8 @@
 
   const css = document.createElement('style');
   css.textContent = '.shm-s{text-decoration:underline;text-decoration-thickness:.12em;text-underline-offset:.2em;text-decoration-color:var(--accent,#1f5f8b);font-weight:700}'
+    + '.shm-a{text-decoration:underline dotted #0f766e;text-decoration-thickness:.1em;text-underline-offset:.32em}.shm-ipa{font:600 .72em/1 "Charis SIL","Doulos SIL","Gentium Plus","Lucida Sans Unicode","Segoe UI",Arial,sans-serif;color:#0f766e;margin-left:.2em;white-space:nowrap;font-style:normal}'
+    + '.shm-key .shm-ka{display:none}:root:has(.shm-a) .shm-key .shm-ka{display:inline}.shm-off .shm-ipa{display:none}.shm-off .shm-a{text-decoration:none}'
     + '.shm-l{color:var(--accent,#1f5f8b);font-weight:800}'
     + '.shm-t{font-weight:800;margin-left:.08em;font-size:.95em}.shm-t.up{color:#c2410c}.shm-t.dn{color:#1d4ed8}'
     + '.shm-off .shm-s{text-decoration:none;font-weight:inherit}.shm-off .shm-l>span,.shm-off .shm-t{display:none}.shm-off .shm-l::before{content:"\\0020"}'
@@ -39,7 +43,7 @@
 
   // one marked sentence → HTML (the arrow sits right after the word, before the comma or full stop, as in the video)
   function sent(m) {
-    return esc(m).replace(/-/g, '\u2011').replace(/\*\*(.+?)\*\*/g, '<span class="shm-s">$1</span>').replace(/==(.+?)==/g, '$1')
+    return esc(m).replace(/-/g, '\u2011').replace(/\{\{(.+?)\|(.+?)\}\}/g, '<span class="shm-a">$1</span><span class="shm-ipa">/$2/</span>').replace(/\*\*(.+?)\*\*/g, '<span class="shm-s">$1</span>').replace(/==(.+?)==/g, '$1')
       .replace(/‿/g, '<span class="shm-l"><span>‿</span></span>')
       .replace(/([,.?!:;…])\s*([↗↘])/g, '$2$1')
       .replace(/\s*↗/g, '<span class="shm-t up" aria-hidden="true">↗</span>').replace(/\s*↘/g, '<span class="shm-t dn" aria-hidden="true">↘</span>');
@@ -56,8 +60,8 @@
   }
   function key(ca) {
     return ca
-      ? '<div class="shm-key"><span><span class="shm-s">subratllat</span> = síl·laba forta: més fort i més llarg</span><span><b class="shm-l">‿</b> = uneix les paraules</span><span><b class="shm-t up">↗</b> la veu puja (abans d’una coma i a les preguntes de sí o no)</span><span><b class="shm-t dn">↘</b> la veu baixa (al final i a les preguntes amb who, what, where…)</span></div>'
-      : '<div class="shm-key"><span><span class="shm-s">underlined</span> = stressed: say it louder and longer</span><span><b class="shm-l">‿</b> = join the words</span><span><b class="shm-t up">↗</b> voice goes up (before a comma, yes/no questions)</span><span><b class="shm-t dn">↘</b> voice goes down (at the end, who/what/where questions)</span></div>';
+      ? '<div class="shm-key"><span><span class="shm-s">subratllat</span> = síl·laba forta: més fort i més llarg</span><span><b class="shm-l">‿</b> = uneix les paraules</span><span class="shm-ka"><span class="shm-a">puntejat</span> <span class="shm-ipa">/tʃ/</span> = els sons canvien: digues-ho així</span><span><b class="shm-t up">↗</b> la veu puja (abans d’una coma i a les preguntes de sí o no)</span><span><b class="shm-t dn">↘</b> la veu baixa (al final i a les preguntes amb who, what, where…)</span></div>'
+      : '<div class="shm-key"><span><span class="shm-s">underlined</span> = stressed: say it louder and longer</span><span><b class="shm-l">‿</b> = join the words</span><span class="shm-ka"><span class="shm-a">dotted</span> <span class="shm-ipa">/tʃ/</span> = the sounds change: say it like this</span><span><b class="shm-t up">↗</b> voice goes up (before a comma, yes/no questions)</span><span><b class="shm-t dn">↘</b> voice goes down (at the end, who/what/where questions)</span></div>';
   }
   const label = (ca, on) => on ? (ca ? '🎵 Amaga les marques' : '🎵 Hide the marks') : (ca ? '🎵 Mostra les marques' : '🎵 Show the marks');
   const marksOn = () => !html.classList.contains('shm-off');

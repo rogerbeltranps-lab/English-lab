@@ -50,7 +50,7 @@ window.TN_SHADOW = {
     "The **fav**icon‿isn’t **show**ing‿on my **phone’s** **home** screen. ↘"
    ],
    [
-    "**Check** whether there’s‿a **prob**lem‿on **Git**Hub. ↘"
+    "**Check** whether there’s‿a **prob**lem‿{{on **Git**Hub|ŋ ɡ}}. ↘"
    ],
    [
     "Is ChatGP**T** **bet**ter‿at **this**? ↗"
@@ -62,7 +62,7 @@ window.TN_SHADOW = {
     "So‿is **O**pus **bet**ter for my **web**site? ↗"
    ],
    [
-    "But **can’t**‿you **do**‿it your**self**? ↘"
+    "But {{**can’t**‿you|tʃ}} **do**‿it your**self**? ↘"
    ],
    [
     "It’s **tak**ing‿**a**ges. ↘"
@@ -74,7 +74,7 @@ window.TN_SHADOW = {
     "Some **sec**tions **scroll** **side**ways‿and the **lay**out **looks** **weird**. ↘"
    ],
    [
-    "What‿ex**act**ly did‿you **do**? ↘"
+    "What‿ex**act**ly {{did‿you|dʒ}} **do**? ↘"
    ]
   ],
   "cues": [
@@ -192,7 +192,7 @@ window.TN_SHADOW = {
     "**Here’s** the **doc**ument‿I’m **send**ing you. ↘"
    ],
    [
-    "I **need**‿you to **make**‿an HTM**L** page. ↘"
+    "I {{**need**‿you|dʒ}} to **make**‿an HTM**L** page. ↘"
    ],
    [
     "Go‿a**head** then‿and‿ap**ply** the **chang**es to the re**pos**itory. ↘"
@@ -328,7 +328,7 @@ window.TN_SHADOW = {
     "You can **start** from **scratch**. ↘"
    ],
    [
-    "I **fig**ured‿it‿**out**‿after‿an‿**hour**. ↘"
+    "I **fig**ured‿it‿**out** after‿an‿**hour**. ↘"
    ],
    [
     "When‿I **had** the i**dea** ↗, I’d **nev**er **built**‿an‿**app**. ↘"
@@ -340,7 +340,7 @@ window.TN_SHADOW = {
     "**Stu**dents **could**n’t **leave** the **game** once they’d **fin**ished‿it. ↘"
    ],
    [
-    "When**ev**er they **moved** from **one** **page** to an**oth**er ↗, they **dropped**‿out‿of full **screen**. ↘"
+    "When**ev**er they **moved** from {{**one** **page**|m p}} to an**oth**er ↗, they **dropped**‿out‿of full **screen**. ↘"
    ],
    [
     "**Stu**dents **say** it’s **hard** to **or**ganise their **thoughts**‿on the **web**site. ↘"
@@ -349,7 +349,7 @@ window.TN_SHADOW = {
     "De**sign**ing L**Ss** that‿are‿a **bit** **com**plex **takes** me **a**ges. ↘"
    ],
    [
-    "I was **see**ing the **right** **game** ↗, but the **stu**dents were **play**ing‿a **hack**er game. ↘"
+    "I was **see**ing the {{**right** **game**|k ɡ}} ↗, but the **stu**dents were **play**ing‿a **hack**er game. ↘"
    ],
    [
     "**Did**n’t we a**gree** there **would**n’t be any **tran**scripts‿in the **speak**ing‿ac**tiv**ities? ↗"
@@ -464,7 +464,7 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "**Now** I **want**‿you to **do** the **same** with the 2 E**SO** L**Ss**. ↘"
+    "**Now** I {{**want**‿you|tʃ}} to **do** the **same** with the 2 E**SO** L**Ss**. ↘"
    ],
    [
     "A**dapt** the 4 E**SO** L**Ss** to **what** we’ve‿a**greed**. ↘"
@@ -473,7 +473,7 @@ window.TN_SHADOW = {
     "Cre**ate**‿a **mas**ter **doc**ument with‿**all** the com**pe**tences. ↘"
    ],
    [
-    "From‿a **giv**en com**pe**tence ↗, I de**sign**‿an‿ob**jec**tive. ↘"
+    "From‿a {{**giv**en com**pe**tence|ŋ k}} ↗, I de**sign**‿an‿ob**jec**tive. ↘"
    ],
    [
     "**These**‿are the **docs** that‿ex**plain** how to **write** the ob**jec**tives. ↘"
@@ -488,10 +488,10 @@ window.TN_SHADOW = {
     "**Send** **Na**el‿an‿**e**mail **tell**ing‿him his **vid**eo has **no** **sound**. ↘"
    ],
    [
-    "**Not** **hand**ed‿**in** or **no** **link** should be a **0** by de**fault**. ↘"
+    "**Not** **hand**ed‿**in** or **no** **link** {{should be|b b}} a **0** by de**fault**. ↘"
    ],
    [
-    "The **fi**nal **task** was **post**ed‿on **Class**room‿on **23** **Oct**. ↘"
+    "The **fi**nal **task** was **post**ed‿{{on **Class**room|ŋ k}}‿on **23** **Oct**. ↘"
    ]
   ],
   "cues": [
@@ -618,7 +618,7 @@ window.TN_SHADOW = {
     "Can‿I **switch** be**tween** **these** **sec**tions? ↗"
    ],
    [
-    "Is **that** what‿you **did**? ↗"
+    "Is **that** {{what‿you|tʃ}} **did**? ↗"
    ],
    [
     "I **want**‿a **full**-screen **view** with the **men**u‿at the **top**. ↘"
@@ -799,7 +799,7 @@ window.TN_SHADOW = {
     "**So** ↗, is‿it **merged**? ↗"
    ],
    [
-    "What does “**Send**‿and con**firm**” **mean**? ↘"
+    "What does “**Send**‿{{and con**firm**|ŋ k}}” **mean**? ↘"
    ],
    [
     "But **where**? ↘ In the **script** called‿English **Lab**? ↗"
@@ -817,7 +817,7 @@ window.TN_SHADOW = {
     "It **takes**‿a **while** to **see** the **mark**‿in the **ta**ble. ↘"
    ],
    [
-    "On my **i**Pad ↗, the **page** **does**n’t **scroll**‿all the **way** to the **top**. ↘"
+    "{{On my|m m}} **i**Pad ↗, the **page** **does**n’t **scroll**‿all the **way** to the **top**. ↘"
    ],
    [
     "O**K** ↗, **merge**. ↘ Now that‿I **know** ↗, I **won’t**‿ask the **stu**dents to **do**‿it‿a**gain**. ↘"

@@ -7,7 +7,7 @@ Usage (repo root): node tools/towards-nativeness/shadow-lines.js > /tmp/tn-shado
 Clips whose mp3 exists are not recorded again unless --force; data/shadow.js is always rewritten from the sentences and saved times
 (audio/<file>.json).
 Marks (Roger, 22 Nov 2026: "I want marks to be more complete with stress words, linking etc."): each sentence's **stressed** syllables,
-‿ linking and ↗ ↘ melody, written by hand in shadow-marks.json (sentence → marked sentence). A new sentence missing there gets only the
+‿ linking, {{assimilation|ipa}} and ↗ ↘ melody, written by hand in shadow-marks.json (sentence → marked sentence). A new sentence missing there gets only the
 arrows and is listed when the tool runs: add its marks to shadow-marks.json and run the tool again."""
 import json, os, re, subprocess, sys, tempfile
 import numpy as np, soundfile as sf
