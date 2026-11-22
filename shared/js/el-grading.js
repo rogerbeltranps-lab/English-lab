@@ -90,7 +90,7 @@ window.EL_GRADING={
       // (they ask about earlier Learning Paths). Practice, grammar and mixed practice count only as done by the session deadline (EL_PLAN[ls].due).
       // gv part weights are their % of the LS mark (they add up to the block weight, 35); sn = the plain-words row students see (today.html SN; parts with the same sn are one row)
       gv:{parts:[
-        {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"cp",name:"Recall checkpoints",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
         {id:"warm",name:"Recall warm-ups done",sn:"remember",w:2.5,time:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
         {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"vocabEx"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammarPrep"],[LP3,"grammar"],[LP3,"grammarRel"],[LP3,"grammarComp"],[LP3,"grammarFeel"],[LP3,"mixed"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]},
@@ -184,7 +184,7 @@ window.EL_GRADING={
           2:{name:"Round 2 · Vlog, script, editing and tip",note:"Steps 3–5 with the full script, the editing log and the tip, plus the process; the video is watched on Classroom",answers:[[FP,"script",{rate:true}],[FP,"edit",{rate:true}],[FP,"tips"]],process:true}}},
       // gv part weights are their % of the LS mark (they add up to the block weight, 35); sn = the plain-words row students see (today.html SN; parts with the same sn are one row)
       gv:{parts:[
-        {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"cp",name:"Recall checkpoints",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
         {id:"warm",name:"Recall warm-ups done",sn:"remember",w:2.5,time:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
         {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"practice"],[LP1,"vocabEx"],[LP2,"practice"],[LP2,"vocabEx"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"vocabEx"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]},
