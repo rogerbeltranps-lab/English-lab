@@ -253,7 +253,7 @@ var LS2 = (function () {
       '.gnote{padding:10px 14px;border-radius:12px;background:#f3f7fc;border:1px solid #c5d8ef;line-height:1.55;margin-bottom:6px}' +
       '.gkind{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:800;background:#eef2f7;color:#334155}' +
       '.gk-pick{background:#e0f2fe;color:#075985}.gk-join{background:#ede9fe;color:#5b21b6}.gk-change{background:#fef3c7;color:#92400e}.gk-fix{background:#fee2e2;color:#991b1b}.gk-own{background:#dcfce7;color:#166534}.gk-listen{background:#f1f5f9;color:#334155}' +
-      '.question input.typed.own{width:100%;max-width:none}' +
+      '.question .typed.own{width:100%;max-width:none}' +
       '.gcount{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;font-size:.62em;font-weight:800;vertical-align:middle;background:#eef2f7;color:#334155}.gcount.ok{background:#dcfce7;color:#166534}' +
       '.gbd{margin:14px 0 0;padding:10px 14px;border-radius:12px;background:#dcfce7;border:1px solid #86efac;color:#14532d;font-weight:700}' +
       '#el-gready{font:700 15px system-ui,-apple-system,Segoe UI,sans-serif;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147481000;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#14532d;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}' +
@@ -261,11 +261,41 @@ var LS2 = (function () {
       '.gextra{margin:22px 0 4px;padding:10px 14px;border-radius:12px;background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}';
     document.head.appendChild(st);
   }
+  /* 📱 cellphone, cell phone, mobile phone, smartphone, my mobile = phone (Roger, 21 Nov 2026: "on my cellphone" should be right; 22 Nov
+     "I haven't tried it on my cellphone yet" in Catalan → English). Only the phone word: "yet", tenses and word order still count. */
+  const phone = s => s.replace(/\b(?:cell ?phone|mobile phone|smart ?phone)\b/g, 'phone').replace(/\b(my|your|his|her|our|their|the|a) mobile\b/g, '$1 phone');
+  /* ✍ The answer box shows the whole sentence (Roger, 22 Nov 2026, iPhone: "I can't see my sentence": a one-line box beside ✓ Check cut a
+     long answer off). A typed answer is a <textarea rows=1 class="typed el-grow">: it wraps and grows a line at a time as the student types,
+     Enter never adds a line (it checks, as before) and a pasted line break becomes a space. Setting .value from code (restoring answers,
+     🎤 Say it) grows it too, and a box drawn in a hidden tab grows when the tab opens (ResizeObserver). Pick boxes stay <input>. */
+  const growIt = el => { if (!el.offsetWidth) return; el.style.height = 'auto'; const h = el.scrollHeight + (el.offsetHeight - el.clientHeight); if (h > 0) el.style.height = h + 'px'; };
+  const TAV = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+  function growWire(el) {
+    if (el.dataset.grow) return; el.dataset.grow = '1';
+    Object.defineProperty(el, 'value', { configurable: true, get() { return TAV.get.call(this); }, set(v) { TAV.set.call(this, v); growIt(this); } });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); });
+    el.addEventListener('input', () => { const v = TAV.get.call(el); if (/[\r\n]/.test(v)) TAV.set.call(el, v.replace(/[\r\n]+/g, ' ')); growIt(el); });
+    let w = 0; if (window.ResizeObserver) new ResizeObserver(() => { if (el.offsetWidth !== w) { w = el.offsetWidth; growIt(el); } }).observe(el);
+    growIt(el);
+  }
+  function growCss() {
+    if (document.getElementById('el-grow-css')) return;
+    const st = document.createElement('style'); st.id = 'el-grow-css';
+    st.textContent = 'textarea.typed.el-grow{display:block;resize:none;overflow:hidden;min-height:0;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere;box-sizing:border-box;font:inherit}' +
+      // the notebook look: one pen line that grows, not the ruled writing box of a long text
+      'html.el-lpnb .lp-panels .panel textarea.typed.el-grow{background:transparent!important;border:0!important;border-bottom:2px solid #9fb6d8!important;padding:0 6px!important;min-height:36px!important}' +
+      'html.el-lpnb .lp-panels .panel textarea.typed.el-grow:focus{border-bottom-color:var(--nb-ink)!important;background-color:transparent!important}';
+    document.head.appendChild(st);
+    const scan = r => r.querySelectorAll && r.querySelectorAll('textarea.el-grow:not([data-grow])').forEach(growWire);
+    new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) { if (n.matches('textarea.el-grow')) growWire(n); scan(n); } }))).observe(document.documentElement, { childList: true, subtree: true });
+    scan(document);
+  }
   // one: every question gets its own ✓ Check (not the recall warm-up, which is one try for the whole set)
   function typedHtml(items, prefix, mode, parts, one) {
     if (starter() || items.some(it => it.opts)) bindPicks();
     if (parts) partsCss();
     if (one) oneCss();
+    growCss();
     let sec = null, np = 0, inX = false;   // blocks are numbered in the order this route sees them
     const head = it => {
       if (!parts) return '';
@@ -277,7 +307,7 @@ var LS2 = (function () {
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      (one ? '<div class="el-onerow">' : '') + '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.whole ? ' placeholder="Write the correct sentence"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (one ? oneBtn(prefix, i) + '</div>' : '') +
+      (one ? '<div class="el-onerow">' : '') + (pk ? '<input type="text" class="typed' : '<textarea rows="1" enterkeyhint="done" class="typed el-grow') + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.whole ? ' placeholder="Write the correct sentence"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (pk ? '' : '</textarea>') + (one ? oneBtn(prefix, i) + '</div>' : '') +
       (pk ? picksHtml(it, items, prefix, i, m) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
@@ -320,7 +350,7 @@ var LS2 = (function () {
   }
   function fits(q, answers, typed) {
     const v = norm(typed); if (!v) return false;
-    if (answers.some(a => norm(a) === v)) return true;
+    if (answers.some(a => phone(norm(a)) === phone(v))) return true;
     const t = bare(typed).split(' '); if (t.length < 2) return false;
     const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
     if (g < 1) return false;
@@ -447,8 +477,10 @@ var LS2 = (function () {
   function oneCss() {
     if (document.getElementById('el-one-css')) return;
     const st = document.createElement('style'); st.id = 'el-one-css';
-    st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
-      '.question.whole .el-onerow{flex-wrap:wrap}.question.whole .el-onerow>input.typed{flex:1 1 100%;max-width:none;font-size:16px}' +
+    st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>.typed{flex:1 1 auto;min-width:0}' +
+      '.question.whole .el-onerow{flex-wrap:wrap}.question.whole .el-onerow>.typed{flex:1 1 100%;max-width:none;font-size:16px}' +
+      // on a phone the box takes the whole line and ✓ Check goes under it (Roger, 22 Nov 2026: "I can't see my sentence")
+      '@media (max-width:640px){.el-onerow{flex-wrap:wrap}.el-onerow>.typed{flex:1 1 100%;max-width:none}}' +
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
       '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}' +
       '.el-nbink .question.el-nbopen .el-one{display:inline-block!important}.el-nbfix{display:inline-block;margin-top:6px;padding:6px 14px!important;font-size:.9em!important;min-height:0!important}' +
@@ -566,7 +598,7 @@ var LS2 = (function () {
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
-  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
+  function clearStep(id, listId) { $$('#' + listId + ' input,#' + listId + ' textarea.typed').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count, only): the step's own check (only: the questions to check and show; null = all); stays(id, prefix, listId, items, check)
   // wires Check, Do it again and the restore. src: the panel's whole list (p.items / p.practice), to place answers saved at another route.
   // one: the counted questions (positions) when every question has its own ✓ Check; without it (the recall warm-up) one Check for the set.
@@ -586,7 +618,7 @@ var LS2 = (function () {
       };
       const L = $('#' + listId);
       L.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-one]'); if (b && b.dataset.one === prefix) go(+b.dataset.i); });
-      L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('input.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
+      L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
     }
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
     $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); forget(id, prefix); if (nbk && window.elLpNb) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
@@ -1865,6 +1897,7 @@ var LS2 = (function () {
      (state.movie[id].c); done when every line has been checked once. After two wrong tries the line is shown. */
   const mmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
   R.movie = p => {
+    growCss();
     const all = [];
     (p.clips || []).forEach((c, ci) => (c.items || []).forEach((it, k) => all.push(Object.assign({ ci, k }, it))));
     const yt = (c, t) => 'https://www.youtube-nocookie.com/embed/' + c.youtube + '?start=' + Math.floor(t[0]) + '&end=' + Math.ceil(t[1]) + '&rel=0';
@@ -1875,7 +1908,7 @@ var LS2 = (function () {
         c.items.map((it, k) => { const i = all.findIndex(x => x.ci === ci && x.k === k);
           return '<div class="question"><div class="actions" style="justify-content:flex-start;align-items:center;gap:8px"><strong>' + (k + 1) + '.</strong><button class="btn secondary" type="button" data-mv="' + ci + ':' + k + '">▶ Play this part (' + mmss(it.t[0]) + '–' + mmss(it.t[1]) + ')</button></div>' +
             '<p class="q-title">' + esc(it.q).replace(/_{2,}/g, '<span style="display:inline-block;min-width:4em;border-bottom:2px solid currentColor">&nbsp;</span>') + '</p>' +
-            '<input class="typed" id="' + p.id + i + '" autocomplete="off" spellcheck="false" placeholder="Type the missing words" enterkeyhint="done"><div class="actions" style="justify-content:flex-start"><button class="btn secondary el-one" type="button" data-mvc="' + i + '" title="Check only this line">✓ Check</button></div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>'; }).join('') +
+            '<textarea rows="1" class="typed el-grow" id="' + p.id + i + '" autocomplete="off" spellcheck="false" placeholder="Type the missing words" enterkeyhint="done"></textarea><div class="actions" style="justify-content:flex-start"><button class="btn secondary el-one" type="button" data-mvc="' + i + '" title="Check only this line">✓ Check</button></div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>'; }).join('') +
         (c.credit ? '<p class="tiny">' + c.credit + '</p>' : '') + '</div>').join('') +
         '<div class="section-card"><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">Check all</button></div><div class="result" id="' + p.id + 'Result"></div></div>',
       bind() {
