@@ -127,7 +127,7 @@ var LS2 = (function () {
      data/tts.js lists the recorded keys. Listen-and-complete recordings already have the beep in the gap. A line with no recording still
      uses the browser voice. */
   const ttsKey = s => { let h = 0x811c9dc5; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); };
-  (function () { if (window.LS2_TTS || document.querySelector('script[data-tts]')) return; const t = document.createElement('script'); t.src = 'data/tts.js'; t.dataset.tts = '1'; document.head.appendChild(t); })();
+  (function () { if (window.LS2_TTS || document.querySelector('script[data-tts]')) return; const t = document.createElement('script'); t.src = 'data/tts.js?v=2'; t.dataset.tts = '1'; document.head.appendChild(t); })();
   let recAudio = null;
   function stopSay() { sayTok++; if (recAudio) { recAudio.pause(); recAudio = null; } if (window.speechSynthesis) speechSynthesis.cancel(); }
   // plays the recording of text (slow when rate < 0.8) and returns true, or returns false when there is none
@@ -143,7 +143,7 @@ var LS2 = (function () {
   function sayLine(q, rate, onend) {
     if (playRec(q, rate, onend)) return;
     if (recAudio) { recAudio.pause(); recAudio = null; }
-    const s = window.speechSynthesis; if (!s) { if (onend) onend(); return; } s.cancel(); const tok = ++sayTok;
+    const s = window.speechSynthesis; if (!s) { if (onend) onend(); return; } if (s.speaking || s.pending) s.cancel(); const tok = ++sayTok;   // cancel only when something is playing: on the iPhone a speak() straight after cancel() can stay silent
     const seq = String(q).replace(/<[^>]+>/g, '').split(/_{2,}(?:[\s/]*_{2,})*/).flatMap((t, i) => i ? [null, t] : [t]).filter(t => t === null || /[A-Za-z0-9]/.test(spoken(t)));
     let i = 0; utt = [];
     const next = () => { if (tok !== sayTok) return; if (i >= seq.length) { if (onend) onend(); return; } const t = seq[i++]; if (t === null) return beep(next);
@@ -922,7 +922,7 @@ var LS2 = (function () {
   }
   function bindDict(p) {
     if (!p.chunks || !p.chunks.length) return;
-    const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
+    const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; if (s.speaking || s.pending) s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
     state.dict = state.dict || {}; const kept = state.dict[p.id] || [];
     // typed but not checked yet stays too (state.dictT[panel]; Roger, 6 Nov 2026: "they must see them with their responses")
     state.dictT = state.dictT || {}; const typedD = kept.some(v => v) ? [] : state.dictT[p.id] || [];   // Practise again keeps state.dict until the new check
