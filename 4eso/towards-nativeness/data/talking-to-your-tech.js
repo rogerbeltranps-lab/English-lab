@@ -117,7 +117,8 @@ window.LP = {
         // casual "Turns out…", doc / document and "another name" count too (Roger, 22 Nov 2026: "Turns out the doc had an other name.")
         { q: 'Resulta que el fitxer tenia un altre nom.', a: ['It turns out', 'It turned out', 'Turns out', 'Turned out'].flatMap(s => ['', ' that'].flatMap(t => ['file', 'doc', 'document'].flatMap(f => ['a different', 'another'].map(n => s + t + ' the ' + f + ' had ' + n + ' name')))), en: 'It turns out (that)…' },
         { q: 'Funciona, oi?', a: ['It works, doesn’t it', 'It’s working, isn’t it', 'It works, right', 'It’s working, right', 'It does work, doesn’t it', 'It works, yeah', 'It’s working, yeah'], en: 'Tag questions repeat the auxiliary.' },
-        { q: 'Per què no té pla de temps 2n d’ESO?', a: ['Why doesn’t 2 ESO have a time plan', 'Why doesn’t 2nd ESO have a time plan', 'Why does 2 ESO not have a time plan', 'Why hasn’t 2 ESO got a time plan', 'Why hasn’t 2nd ESO got a time plan', 'Why isn’t there a time plan for 2 ESO', 'Why is there no time plan for 2 ESO', 'Why isn’t there a time plan for 2nd ESO', 'Why is there no time plan for 2nd ESO'], en: 'Questions need do/does: Why doesn’t … have …?' }
+        // "pla de temps" isn't Catalan (Roger, 22 Nov 2026); time plan, timeline, schedule… all count, and 2ESO / 2 ESO / 2nd ESO
+        { q: 'Per què 2n d’ESO no té planificació?', a: ['time plan', 'timeline', 'time line', 'schedule', 'timetable', 'plan'].flatMap(n => ['2 ESO', '2nd ESO', '2ESO'].flatMap(g => ['Why doesn’t ' + g + ' have a ' + n, 'Why does ' + g + ' not have a ' + n, 'Why hasn’t ' + g + ' got a ' + n, 'Why isn’t there a ' + n + ' for ' + g, 'Why is there no ' + n + ' for ' + g])), en: 'Questions need do/does: Why doesn’t … have …?' },
       ] },
 
     { id: 'grammar', type: 'typed', tab: 'Grammar', title: 'Questions, indirect questions and adverb position', pill: 'Answer all',
