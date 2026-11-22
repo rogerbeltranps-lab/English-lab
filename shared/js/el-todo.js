@@ -99,7 +99,7 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   // ✅ To do opens the same card as in class, with links (Roger, 21 Nov 2026: "maybe it's clearer than the current To do … when they press
   // the button to do"); the old panel stays only as a fallback
   btn.onclick=()=>{if(document.getElementById("el-rem"))return;if(REM){remind({links:true});return}show(box.hidden)};
-  box.addEventListener("click",e=>{if(e.target.closest("[data-x]"))show(false)});
+  box.addEventListener("click",e=>{if(e.target.closest("[data-x]")){show(false);return}const a=e.target.closest("a[href]");if(a&&samePage(a,e))show(false)});
   // Closed: the button opens the card (remind) now.
   box.hidden=true;
   draw();
@@ -128,6 +128,14 @@ async function start0({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
     return out};
   return {draw,pending};
 }
+
+// A link on the to-do card to the page that is open: the browser loads nothing (and with the same #tab not even a hashchange), so the
+// card stayed and the tab never opened. Open the tab here instead (the tabs of el-cloud.js openHashTab). true = handled.
+function samePage(a,e){let u;try{u=new URL(a.href,location.href)}catch(x){return false}
+  if(u.origin!==location.origin||u.pathname!==location.pathname||u.search!==location.search)return false;
+  e.preventDefault();const id=decodeURIComponent(u.hash.slice(1));
+  if(u.hash&&u.hash!==location.hash)history.replaceState(history.state,"",u.hash);
+  const t=id&&[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click();scrollTo(0,0);return true}
 
 // ✅ Finish your activities (Roger, 21 Nov 2026: "At the beginning of the class, after the games, I want the students to see something like
 // this [the dashboard's Work done in each learning path bars]. I want to remind them that they need to do all the activities. I also want
@@ -174,5 +182,8 @@ export async function remind(o){o=o||{};const r=await Promise.race([remP,new Pro
     <div class="bd">${D.lps.length?`<h3>${t("La meva feina a cada learning path","My work in each learning path")}</h3><ul>${rows}</ul>`:""}${hw}${exam}</div>
     <div class="ft"><p>${todo?(o.links?t("Clica una activitat per anar-hi. ","Click an activity to go there. "):"")+t("Acaba-les a casa o a classe quan acabis abans.","Finish them at home, or in class when you finish early."):t("Continua així!","Keep it up!")}</p><button type="button" data-x>👍 ${t("D'acord","OK")}</button></div></div>`;
   const shut=()=>{if(!el.isConnected)return;el.remove();clearTimeout(tm);if(o.done)try{o.done()}catch(e){}},tm=setTimeout(shut,5*60e3);   // gone after 5 minutes if nobody presses OK
-  el.addEventListener("click",e=>{if(e.target.closest("[data-x]")||e.target===el)shut()});
+  el.addEventListener("click",e=>{if(e.target.closest("[data-x]")||e.target===el){shut();return}
+    // a link to the page that is already open (✅ To do on that learning path) loads nothing: close the card and open the tab
+    // (problem report, 4ESOA, 22 Nov 2026: "Shadowing →" did nothing on the Shadowing page itself)
+    const a=e.target.closest("a[href]");if(a&&samePage(a,e)){shut()}});
   document.body.append(el);el.querySelector("[data-x]").focus();return true}
