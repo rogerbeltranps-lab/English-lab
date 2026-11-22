@@ -993,7 +993,7 @@ window.ELNotebook = (function () {
   const pick = e => { if (CH.length < 2) return; const p = e.target && e.target.closest && e.target.closest('.nb-spread .nb-page'); if (p && p.dataset.ci != null) use(+p.dataset.ci); };
   ['pointerdown', 'mousedown', 'touchstart', 'click', 'change', 'input', 'submit', 'keydown', 'focusin'].forEach(ev => document.addEventListener(ev, pick, true));
   // 🔍 the dictionary floats over the notebook too (Roger, 13 Nov 2026: "only the magnifier, always floating")
-  function dict() { if (window.ELDict || document.getElementById('el-dict-js') || !me) return; const sc = document.createElement('script'); sc.id = 'el-dict-js'; sc.src = new URL('./el-dict.js?v=2', me).href; document.head.append(sc); }
+  function dict() { if (window.ELDict || document.getElementById('el-dict-js') || !me) return; const sc = document.createElement('script'); sc.id = 'el-dict-js'; sc.src = new URL('./el-dict.js?v=3', me).href; document.head.append(sc); }
   // 📓 opened from a learning path (el-cloud.js el_nb_at, set by the click): that LP's step in the notebook, else that LP, else its LS
   // chapter. Kept (PEND) until a layout finds that LS: the first draws can come before the other LSs' chapters are loaded.
   let PEND;
