@@ -297,6 +297,7 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 window.TN_LS=(window.EL_LS||[]).filter(l=>l.personal);window.TN_CAT=(window.EL_CATALOG||[]).filter(a=>TN_LS.some(l=>l.id===a.ls));
 window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window.EL_CATALOG||[]).filter(a=>!TN_CAT.includes(a));</script>
 <script src="shared/js/el-route-names.js" defer></script>
+<script src="shared/js/el-sound.js" defer></script>
 <script src="shared/js/el-garden.js" defer></script>
 <script src="4eso/towards-nativeness/tn-garden.js" defer></script>
 <script src="shared/js/el-sections.js"></script>
@@ -2932,7 +2933,9 @@ function tnPage(){tnLoad();
     +`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 16px">${tile(DN+"/"+TOT,"steps done",plural(rows.filter(r=>r.dn).length,"learning path")+" started")+tile(FT==null?"–":FT+" %","right first time","in the exercises with a score")
       +tile(fixes.length,"slips corrected",`${sp} speaking · ${wr} writing`)+tile(learn.length,"sentences to learn","from ✨ Make it idiomatic")+tile(day(last),"last time","you worked on it")}</div>`
     // 🌱 your garden (Roger, 17 Nov 2026: "I want to have a garden too"): the same one as on the course home, from the account above
-    +(window.TNGarden?TNGarden.html(TND.lp,k=>(rows.find(r=>r.k===k)||{}).o||{},"4eso/towards-nativeness/",null):"")
+    // flowers already seen are shared with the course home on this device (el_garden_tn), so a new one rings once (Roger, 22 Nov 2026:
+    // "When I open the garden again and there's a new flower I should hear a nice sound")
+    +(window.TNGarden?TNGarden.html(TND.lp,k=>(rows.find(r=>r.k===k)||{}).o||{},"4eso/towards-nativeness/","el_garden_tn"):"")
     +lpTable+kindBox+lastBox+learnBox+fluBox+stBox;
 }
 /* ---- 📊 Class results (Roger, 13 Nov 2026: "I need to see the statistic right away but also somewhere else to assess my performance"):
