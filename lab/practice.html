@@ -185,7 +185,7 @@ const sentences = (text, lv) => plain(text).split(/(?<=[.!?])\s+(?=[A-Z“"‘'�
   .filter(s => { const n = s.split(/\s+/).length; return n >= MINW[lv] && n <= MAXW[lv] && /[.!?]$/.test(s) && !/___|…|\[|\]|\s\/\s|\.\.\./.test(s); });
 
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
-function extract(pg, lv) {
+function extract(pg, lv, off) {
   const out = { words: [], grammar: [], build: [], listen: [], shadow: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
@@ -197,7 +197,7 @@ function extract(pg, lv) {
     return out;
   }
   const texts = [];
-  panelsOf(pg, lv).forEach(p => {
+  panelsOf(pg, lv).filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
     if (p.type === 'vocab') {
       const core = new Set(forLevel(p.core, lv));
       (p.groups || []).filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => {
@@ -274,7 +274,12 @@ async function content() {
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
   const out = { words: [], grammar: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
-  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
+  // Only the tabs the learning path itself shows (Roger, 22 Nov 2026: "Why some 4ESO students could do the future forms if they are scheduled
+  // for next Wednesday?"): a tab the teacher locked, or one the Time plan keeps for a later class (or none yet), stays out of Practise
+  // until the path page opens it (elSecLockedFor in el-catalog.js, the same test as the LP page; REQUIREMENTS §3 "No class work shown
+  // in advance"). The teacher and testers still see everything.
+  const offOf = a => all() || !window.elSecLockedFor ? null : new Set(elSecLockedFor(a, D.ls[a.ls] || {}, D.group, new Set()));
+  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv, offOf(acts[i].a)); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
   const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   return out;
 }
