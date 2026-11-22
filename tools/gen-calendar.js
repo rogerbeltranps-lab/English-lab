@@ -11,7 +11,7 @@
 // moved and learning paths dropped on the dashboard are in the feed. .github/workflows/calendar-sync.yml runs it every hour in the day.
 const fs=require("fs"),path=require("path"),vm=require("vm");
 const root=path.resolve(process.argv[2]||"."),SITE="https://rogerbeltranps-lab.github.io/English-lab/";
-const ctx={window:{},console};ctx.window.window=ctx.window;vm.createContext(ctx);
+const ctx={console};ctx.window=ctx;vm.createContext(ctx);   // window = the global, as in a browser (el-catalog.js calls elIsGrammar bare)
 for(const f of ["shared/js/el-catalog.js","shared/js/el-plan.js","shared/js/el-week.js"])vm.runInContext(fs.readFileSync(path.join(root,f),"utf8"),ctx,{filename:f});
 const W=ctx.window.ELWeek,GROUPS=ctx.window.EL_GROUPS,LS=ctx.window.EL_LS||[];
 const D=s=>s.replace(/-/g,""),esc=s=>String(s).replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
