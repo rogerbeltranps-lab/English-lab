@@ -1875,7 +1875,7 @@ var LS2 = (function () {
         c.items.map((it, k) => { const i = all.findIndex(x => x.ci === ci && x.k === k);
           return '<div class="question"><div class="actions" style="justify-content:flex-start;align-items:center;gap:8px"><strong>' + (k + 1) + '.</strong><button class="btn secondary" type="button" data-mv="' + ci + ':' + k + '">▶ Play this part (' + mmss(it.t[0]) + '–' + mmss(it.t[1]) + ')</button></div>' +
             '<p class="q-title">' + esc(it.q).replace(/_{2,}/g, '<span style="display:inline-block;min-width:4em;border-bottom:2px solid currentColor">&nbsp;</span>') + '</p>' +
-            '<input class="typed" id="' + p.id + i + '" autocomplete="off" spellcheck="false" placeholder="Type the missing words"><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>'; }).join('') +
+            '<input class="typed" id="' + p.id + i + '" autocomplete="off" spellcheck="false" placeholder="Type the missing words" enterkeyhint="done"><div class="actions" style="justify-content:flex-start"><button class="btn secondary el-one" type="button" data-mvc="' + i + '" title="Check only this line">✓ Check</button></div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>'; }).join('') +
         (c.credit ? '<p class="tiny">' + c.credit + '</p>' : '') + '</div>').join('') +
         '<div class="section-card"><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">Check all</button></div><div class="result" id="' + p.id + 'Result"></div></div>',
       bind() {
@@ -1890,11 +1890,18 @@ var LS2 = (function () {
           f.className = 'feedback ' + (ok ? 'ok' : 'no');
           f.innerHTML = ok ? 'Correct! <em>' + line(it) + '</em>' : 'Not yet. Play the part again.' + ((sv.n[i] || 0) >= 2 ? ' The line: <em>' + line(it) + '</em>' : '');
           return ok; };
-        const check = count => { let r = 0; all.forEach((_, i) => { if (show(i, count)) r++; });
+        const check = (count, only) => { let r = 0; all.forEach((_, i) => { const inn = !only || only.includes(i); if ((inn || sv.c[i] != null) && show(i, count && inn)) r++; });
           save(); const firstOk = Object.values(sv.c).filter(x => x === 1).length, done = all.every((_, i) => sv.c[i] != null);
           $('#' + p.id + 'Result').innerHTML = '<p>' + r + ' / ' + all.length + ' right now · ' + firstOk + ' right at the first try' + (done ? ' ✓' : ' · check every line') + '</p>';
           if (done && count) complete(p.id); };
         $('#' + p.id + 'Check').onclick = () => check(true);
+        /* ✓ Check one line at a time (Roger, 22 Nov 2026: "I want to check it step by step"): each line has its own ✓ Check (or Enter on
+           the phone keyboard); it counts only that line. Once every line has an answer, lines typed but not checked yet are checked too. */
+        const one = i => { const v = all.map((_, j) => $('#' + p.id + j).value.trim()), f = $('#' + p.id + 'f' + i);
+          if (!v[i]) { f.className = 'feedback no'; f.textContent = 'Type the missing words first.'; return; }
+          check(true, [i].concat(v.every(Boolean) ? all.map((_, j) => j).filter(j => j !== i && sv.c[j] == null) : [])); };
+        $$('#' + p.id + ' [data-mvc]').forEach(b => b.onclick = () => one(+b.dataset.mvc));
+        all.forEach((_, i) => $('#' + p.id + i).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); one(i); } }));
         if (Object.keys(sv.c).length) check(false);
       }
     };
