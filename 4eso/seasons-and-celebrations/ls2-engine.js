@@ -549,7 +549,7 @@ var LS2 = (function () {
   /* 🆕 The latest answer shows (Roger, 22 Nov 2026: "Es millor que els alumnes i jo tinguin les últimes versions a la llibreta i a la
      pàgina, així si ja ho han arreglat ho veuen bé"): a step opened again shows, question by question, the newest answer the student gave
      (a new ✓ Check on the page, ↺ Practise again, or ✏️ Correct it in the notebook), checked again with today's check, in the laptop look
-     and in the notebook look; 📓 My notebook (el-exam.js) shows it too. The first try stays what counts for the mark (state.items,
+     and in the notebook look; 📓 My notebook (el-exam.js) shows it too. The first try is kept as information only (Roger, 22 Nov 2026: first tries never count for the mark) (state.items,
      state.tries and state.nb[id].v never change) and is written small under a changed answer. state.ans[id] is the newest answers:
      .t[i] when question i's answer was checked, .ok[i] 1 / 0 as the page showed it (written back each time the step opens, so 📓 My
      notebook follows today's check). Answers saved before this have no t: one that differs from the first try counts from the step's
@@ -792,13 +792,13 @@ var LS2 = (function () {
       let at = f;
       if (was || open) {
         const w = document.createElement('div'); w.className = 'el-nbwas';
-        w.innerHTML = (ca() ? 'El teu primer intent (és el que compta per a la nota): ' : 'Your first try (this is what counts for your mark): ') + (fok === true ? nbAns(it, S.first[i]) : '<s>' + nbAns(it, S.first[i]) + '</s>');
+        w.innerHTML = (ca() ? 'El teu primer intent: ' : 'Your first try: ') + (fok === true ? nbAns(it, S.first[i]) : '<s>' + nbAns(it, S.first[i]) + '</s>');
         f.after(w); at = w;
       }
       if (wrong && !open) {
         const b = document.createElement('button'); b.type = 'button'; b.className = 'btn secondary el-nbfix';
         b.textContent = '✏️ ' + (ca() ? 'Corregeix-la' : 'Correct it');
-        b.title = ca() ? 'Torna a fer només aquesta pregunta. La nota no canvia.' : 'Do only this question again. Your mark does not change.';
+        b.title = ca() ? 'Torna a fer només aquesta pregunta.' : 'Do only this question again.';
         b.onclick = () => nbOpen(id, i);
         at.after(b);
       }
@@ -806,8 +806,8 @@ var LS2 = (function () {
     if (fixed && r && r.classList.contains('show')) {
       const T = (state.tries || {})[id === 'vocab' ? 'practice' : id], n = T && T.max != null ? ' ' + T.score + ' / ' + T.max : '';
       const s = document.createElement('span'); s.className = 'el-nbmark';
-      s.textContent = '✏️ ' + (ca() ? 'Has corregit ' + fixed + (fixed > 1 ? ' respostes' : ' resposta') + '. La teva nota continua sent el primer intent' + (n ? ':' + n : '') + '.'
-        : 'You’ve corrected ' + fixed + (fixed > 1 ? ' answers' : ' answer') + '. Your mark is still your first try' + (n ? ':' + n : '') + '.');
+      s.textContent = '✏️ ' + (ca() ? 'Has corregit ' + fixed + (fixed > 1 ? ' respostes' : ' resposta') + '. Primer intent' + (n ? ':' + n : '') + '.'
+        : 'You’ve corrected ' + fixed + (fixed > 1 ? ' answers' : ' answer') + '. First try' + (n ? ':' + n : '') + '.');
       r.appendChild(s);
     }
   }

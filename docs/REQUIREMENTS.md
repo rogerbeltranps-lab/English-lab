@@ -277,7 +277,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - **Compulsory per grammar block = 4** (3 questions + the own example), the rest ➕ extra practice; 💬 Expressions = 6 compulsory + 4 extra per level.
 - **Grammar that comes back**: only Starter and Base drill the old form; Core and Plus start from the new use, never more old-form items than new ones.
 - Words with a structure (in/on/at, play/go/do, verb + preposition) are **💬 Expressions**, their own step after Vocabulary, not grammar (16 Nov 2026).
-- ✓ Check per question; the mark is the first try; students can correct wrong answers on the page or in the notebook without changing the mark, and the corrected answer is the one they see from then on (22 Nov 2026).
+- ✓ Check per question. **First tries never count for the mark** (Roger, 22 Nov 2026: "The first mark shouldn't count for the mark, I want to have the information to see how first tries change over time, but they shouldn't count for the mark since we need to value the work and the learning process. This is a rule"): they are kept only as information for Roger (how first tries change over time). Students can correct wrong answers on the page or in the notebook, and the corrected answer is the one they see from then on (22 Nov 2026). Pages never tell students that a first try counts.
 - **Typed answers: every natural answer counts, and the feedback names the real mistake** (Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake"; "This is correct too!"; "This should be the same for the students"). For every typed answer (learning paths, Towards Nativeness, 🎯 Practise, the sample exam):
   - **Accept every natural, correct answer**, casual ones included ("It works, right?", "Turns out the doc had another name", "What did you do exactly?", "in the top right corner", 2ESO / 2 ESO). When writing a question, list all of them; the first answer is the model shown. Contractions count either way (It's = It is).
   - **A spelling slip gets a spelling hint, never the grammar rule**: "Almost! Check the spelling of ‘laod’. Try again." (or "‘an other’ is one word", "Check the apostrophes"; Catalan for Starter). It is **still not right** (Roger chose "fix it and try again", 22 Nov 2026, as in the exams), but it is not one of the two tries before the answer shows.
@@ -516,7 +516,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 **Daily work** (the 40 %)
 
-- Recall checkpoints 10 · warm-ups 2.5 · practice/grammar/mixed done 5 · class games 2.5 · skills tabs done 15 (= 35, "Grammar, vocabulary and skills") + other competences 5. Transversal criteria never count.
+- Recall checkpoints 10 · warm-ups done 2.5 (no longer their first-try score, 22 Nov 2026) · practice/grammar/mixed done 5 · class games 2.5 · skills tabs done 15 (= 35, "Grammar, vocabulary and skills") + other competences 5. Transversal criteria never count.
 - **Missing work = 0 only if the tab was done in class (ticked on the Time plan) and its day has passed.**
 - **Done late counts the same as on time this term** (14 Nov 2026). Roger wants it **stricter next term**: remind him when term 2 starts (23 Nov 2026).
 - Term 1 ended 20 Nov 2026: Roger closes each group with 🔒 Close term.

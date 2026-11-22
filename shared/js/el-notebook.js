@@ -140,7 +140,7 @@ window.ELNotebook = (function () {
       // 💬 the feedback of that question (the step's explanation, our own data) in the teacher's green pen under it
       const ex = (x.ex ? `<span class="nb-ex">${x.ex}</span>` : '')
         // 🆕 a newer answer is the one written above (Roger, 22 Nov 2026); the first try, which counts for the mark, small under it
-        + (x.first ? `<span class="nb-was">${t('Primer intent (compta per a la nota)', 'First try (counts for your mark)')}: ${x.first.ok ? pen(x.first.given) || '—' : `<s>${pen(x.first.given) || '—'}</s>`}</span>` : '');
+        + (x.first ? `<span class="nb-was">${t('Primer intent', 'First try')}: ${x.first.ok ? pen(x.first.given) || '—' : `<s>${pen(x.first.given) || '—'}</s>`}</span>` : '');
       if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}${ex}</li>`;
       return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}${ex}</li>`;
     };

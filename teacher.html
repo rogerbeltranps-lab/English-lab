@@ -741,7 +741,7 @@ const cpStale=(d,K)=>{if(!d||d.redo)return false;const m=cpMark(d,K);return !d.f
 // recall warm-ups of the same LS (first try). ⚠️ when it is CP_GAP points or more above it (worth a look), ↓ when that much below.
 const CP_GAP=35;
 function cpUsual(u,a){const c=a.ls.slice(0,4),ex=EL_LS.filter(l=>l.course===c&&(EL_GRADING[l.id]||{}).exam).map(l=>examMark(u,l.id)).filter(Boolean).map(x=>x.mark*10);
-  const w=(((EL_GRADING[a.ls]||{}).gv||{}).parts||[]).filter(p=>p.id==="warm").flatMap(p=>p.first).map(([id,k])=>firstOf(u,id,k)).filter(f=>f&&f.max).map(f=>f.score/f.max*100);
+  const w=(((EL_GRADING[a.ls]||{}).gv||{}).parts||[]).filter(p=>p.id==="warm").flatMap(p=>p.first||p.time||[]).map(([id,k])=>firstOf(u,id,k)).filter(f=>f&&f.max).map(f=>f.score/f.max*100);
   const av=l=>l.length?l.reduce((x,y)=>x+y,0)/l.length:null,e=av(ex),wu=av(w),both=[e,wu].filter(x=>x!=null);
   return both.length?{v:av(both),exam:e,warm:wu}:null}
 function cpGap(u,a,d,K){if(!d||d.redo||!K)return null;const m=cpMark(d,K);if(!m.max)return null;const us=cpUsual(u,a);if(!us)return null;

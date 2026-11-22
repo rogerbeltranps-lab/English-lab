@@ -91,7 +91,7 @@ window.EL_GRADING={
       // gv part weights are their % of the LS mark (they add up to the block weight, 35); sn = the plain-words row students see (today.html SN; parts with the same sn are one row)
       gv:{parts:[
         {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
-        {id:"warm",name:"Recall warm-ups (first try)",sn:"remember",w:2.5,first:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"warm",name:"Recall warm-ups done",sn:"remember",w:2.5,time:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
         {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"vocabEx"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammarPrep"],[LP3,"grammar"],[LP3,"grammarRel"],[LP3,"grammarComp"],[LP3,"grammarFeel"],[LP3,"mixed"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]},
         // Class games (Roger, 9 Nov 2026: "the performance in those games should be counted on performance of the students when it comes to
@@ -105,10 +105,10 @@ window.EL_GRADING={
       // Other competences: per criterion, half automatic (linked steps done; first:true = counts its first-try score) and half teacher levels (average).
       auto:{
         "1.1":[[LP2,"speak"]],
-        "1.2":[[LP3,"write"],[LP3,"speak"],[LP4,"respect",1]],
-        "6.1":[[LP4,"notes",1],[LP4,"credit",1],[LP4,"card"]],
+        "1.2":[[LP3,"write"],[LP3,"speak"],[LP4,"respect"]],
+        "6.1":[[LP4,"notes"],[LP4,"credit"],[LP4,"card"]],
         "CC1 1.3":[[LP5,"write"],[LP6,"write"]],
-        "CC3 3.2":[[LP4,"respect",1]]
+        "CC3 3.2":[[LP4,"respect"]]
       },
       // Teacher half: levels on learning-path pieces only (Roger, 2 Nov 2026: "the final product must be in the final product … the other
       // competences come from the learning paths"). 1.1 and 1.2 have no learning-path level, so they are the steps alone. The final product
@@ -185,7 +185,7 @@ window.EL_GRADING={
       // gv part weights are their % of the LS mark (they add up to the block weight, 35); sn = the plain-words row students see (today.html SN; parts with the same sn are one row)
       gv:{parts:[
         {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
-        {id:"warm",name:"Recall warm-ups (first try)",sn:"remember",w:2.5,first:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"warm",name:"Recall warm-ups done",sn:"remember",w:2.5,time:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
         {id:"time",name:"Practice done",sn:"practice",w:5,time:[[LP1,"practice"],[LP1,"vocabEx"],[LP2,"practice"],[LP2,"vocabEx"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"vocabEx"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]},
         // Class games (Roger, 9 Nov 2026: "the performance in those games should be counted on performance of the students when it comes to
@@ -197,7 +197,7 @@ window.EL_GRADING={
           [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
           [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"parts"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"],[BK,"ch1"],[BK,"ch2"],[BK,"ch3"],[BK,"ch4"],[BK,"ch5"],[BK,"ch6"]]}]},
       auto:{
-        "6.2":[[LP4,"credit",1],[LP4,"factfile"]],
+        "6.2":[[LP4,"credit"],[LP4,"factfile"]],
         "CD2 2.2":[[FP,"slides"],[FP,"edit"]],
         "CD4 4.5":[[LP5,"write"],[LP5,"speak"],[FP,"tips"]]
       },
