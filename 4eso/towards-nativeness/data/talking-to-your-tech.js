@@ -98,7 +98,7 @@ window.LP = {
           items: [
             { t: [14, 27], q: 'Did you know there are more people with genius IQs living in China than there are people ___ living in the United States?', a: ['of any kind'] },
             { t: [60, 72], q: 'Maybe it’s just sometimes you say ___ at once…', a: ['two things'] },
-            { t: [294, 312], q: 'It’ll be because ___.', a: ['you’re an asshole', 'you are an asshole'] }
+            { t: [294, 306], q: 'But you’re going to go through life thinking that girls don’t like you because ___.', a: ['you’re a nerd', 'you are a nerd'] }
           ] }
       ] },
 
