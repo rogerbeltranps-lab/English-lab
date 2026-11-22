@@ -5,13 +5,13 @@ window.LP = {
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Getting started', en: 'Recall: Getting started' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res. Intentar recordar és el que t’ajuda a aprendre.', en: 'Type the answers without looking. Trying to remember is what helps you learn.' },
       items: [
-        { q: 'In winter the days get ___.', a: ['shorter'], ca: 'Contrari de longer.', en: 'The opposite of longer.' },
+        { q: 'In winter the days get ___.', a: ['shorter', 'colder', 'darker'], ca: 'Contrari de longer.', en: 'The opposite of longer.' },
         { q: 'The Catalan sweets with almonds and pine nuts: ___', a: ['panellets'] },
         { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
         { r: 'insecure', q: 'The US word for autumn: ___', a: ['fall'] },
         { r: 'insecure', q: 'In autumn, leaves ___ colour.', a: ['change'] },
         { q: 'How do you feel before a party you love? I feel ___.', a: ['excited', 'happy'] },
-        { r: 'safe', q: 'The clocks go ___ in October.', a: ['back'] },
+        { r: 'safe', q: 'The clocks go ___ in October.', a: ['back', 'back an hour', 'back one hour'] },
         { r: 'safe', q: 'It’s ___ today. Wear a jumper.', a: ['chilly', 'cold', 'cool'] }
       ] },
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari de celebracions', en: 'Celebration vocabulary' },
@@ -30,15 +30,15 @@ window.LP = {
         { r: 'safe', g: 'Getting started', items: [['the clocks go back', 'es retarda el rellotge', 'The clocks go back in October.'], ['cosy', 'acollidor', 'Our living room is cosy.']] }
       ],
       practice: [
-        { q: 'At Diwali people ___ small oil lamps.', a: ['light'] },
+        { q: 'At Diwali people ___ small oil lamps.', a: ['light', 'light up'] },
         { q: 'Children ___ up as witches and ghosts.', a: ['dress'] },
-        { q: 'There are ___ in the sky at midnight.', a: ['fireworks'] },
-        { q: 'On Sunday we ___ our relatives in Girona.', a: ['visit'] },
-        { q: 'People walk through the streets in a big ___.', a: ['parade'] },
-        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange'] },
+        { q: 'On New Year’s Eve there are ___ in the sky at midnight.', a: ['fireworks'] },
+        { q: 'On Sunday we ___ our relatives in Girona.', a: ['visit', 'see', 'meet'] },
+        { q: 'People walk through the streets in a big ___.', a: ['parade', 'procession'] },
+        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange', 'give', 'swap'] },
         { r: 'safe', q: 'I always look ___ to the holidays.', a: ['forward'] },
-        { r: 'safe', q: 'Christmas is a ___ holiday for some families and a secular one for others.', a: ['religious'] },
-        { r: 'daring', q: 'Many families ___ their ancestors on All Saints’ Day.', a: ['honour', 'honor'] },
+        { r: 'safe', q: 'Christmas is a ___ holiday for some families and a secular one for others.', a: ['religious', 'sacred'] },
+        { r: 'daring', q: 'Many families ___ their ancestors on All Saints’ Day.', a: ['honour', 'honor', 'remember', 'commemorate'] },
         { r: 'daring', q: 'Celebrations give people a sense of ___ to a community.', a: ['belonging'] }
       ] },
     /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
@@ -106,7 +106,7 @@ window.LP = {
         { p: 'ex', r: 'safe', q: 'Families get ___ for a big meal at New Year.', a: ['together'], en: 'get together = meet as a group.' },
         { p: 'ex', r: 'safe', q: 'Every summer we have a big family ___ at my grandparents’ house. (get / together)', a: ['get-together', 'get together'], en: 'a get-together (noun) = a meeting of family or friends.' },
         { p: 'ex', r: 'safe', k: 'fix', q: '“We visit to our relatives.” → We ___ our relatives.', a: ['visit'], en: 'visit: no to.' },
-        { p: 'ex', r: 'safe', q: 'This recipe is passed ___ from grandparents to grandchildren.', a: ['down'], en: 'pass down = give to the next generation.' },
+        { p: 'ex', r: 'safe', q: 'This recipe is passed ___ from grandparents to grandchildren.', a: ['down', 'on'], en: 'pass down = give to the next generation.' },
         // ➕ for every level (📘 Expressions together takes its 4 questions from these)
         { p: 'ex', opts: ['dress', 'wear', 'put'], q: 'Children ___ up as witches at Halloween.', a: ['dress'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
         { p: 'ex', opts: ['have', 'make', 'do'], q: 'On Sunday we ___ a get-together with our cousins.', a: ['have'], ca: 'fer una trobada = have a get-together.', en: 'have a get-together.' },

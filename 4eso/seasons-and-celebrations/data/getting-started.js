@@ -24,21 +24,21 @@ const vocab=[
  {r:"safe",g:"Seasons & nature (Safe)",items:[["seasonal","de temporada","Chestnuts are seasonal food."],["crop","collita, conreu","Rice is an important crop."],["pick fruit","collir fruita","We pick fruit in September."],["frost","gebre, glaçada","There's frost on the car."],["chilly","fresquet, fred","It's chilly: wear a jumper."],["cosy","acollidor","Our living room is cosy."],["it gets dark early","es fa fosc aviat","In winter it gets dark early."],["the clocks go back","es retarda el rellotge","The clocks go back in October."]]}
 ];
 const practice=[
- {r:"beginners",q:"In autumn the days get ___.",a:["shorter"]},
+ {r:"beginners",q:"In autumn the days get ___.",a:["shorter","colder","cooler","darker"]},
  {r:"insecure",q:"Leaves ___ from the trees in November.",a:["fall"]},
- {r:"beginners",q:"It's ___ today. Take an umbrella.",a:["rainy","raining"]},
+ {r:"beginners",q:"It's ___ today. Take an umbrella.",a:["rainy","raining","wet"]},
  {r:"beginners",q:"At the Castanyada we roast ___.",a:["chestnuts","sweet potatoes"]},
  {r:"beginners",q:"At Halloween people carve ___.",a:["pumpkins"]},
  {r:"insecure",q:"It isn't hot or cold. It's ___.",a:["mild"]},
- {r:"insecure",q:"I can't see the road. It's very ___.",a:["foggy"]},
+ {r:"insecure",q:"I can't see the road. It's very ___.",a:["foggy","misty"]},
  {r:"insecure",q:"Farmers collect the crops at ___ time.",a:["harvest"]},
  {r:"insecure",q:"I feel ___ the night before a big party.",a:["excited","happy","nervous"]},
  {r:"beginners",q:"___ (UK) / fall (US) is my favourite season.",a:["autumn"]},
- {r:"safe",q:"The clocks go ___ in late October.",a:["back"]},
- {r:"safe",q:"In winter it gets dark ___.",a:["early","earlier"]},
+ {r:"safe",q:"The clocks go ___ in late October.",a:["back","back an hour","back one hour"]},
+ {r:"safe",q:"In winter it gets dark ___.",a:["early","earlier","sooner"]},
  {r:"safe",q:"It's ___ outside. Wear a jumper.",a:["chilly","cold","cool"]},
  {r:"safe",q:"On a cold night, our living room feels warm and ___.",a:["cosy","cozy"]},
- {r:"safe",q:"We go to the farm to ___ fruit.",a:["pick"]}
+ {r:"safe",q:"We go to the farm to ___ fruit.",a:["pick","harvest"]}
 ];
 // Reading (one chat per route, AGENTS.md). Options: first one is correct; order is shuffled on screen.
 const readingChat={

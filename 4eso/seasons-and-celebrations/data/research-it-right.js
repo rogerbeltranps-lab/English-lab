@@ -7,12 +7,12 @@ window.LP = {
       items: [
         { r: 'insecure', q: '25 December = the twenty-___ of December', a: ['fifth'] },
         { q: 'I like it ___ we eat together.', a: ['because'] },
-        { q: '___, we clean the house. Then we decorate it.', a: ['first'] },
+        { q: '___, we clean the house. Then we decorate it.', a: ['first', 'firstly'] },
         { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'] },
         { q: 'We visit relatives ___ Christmas.', a: ['at'] },
         { r: 'insecure', q: 'Children get red ___ with money at Lunar New Year.', a: ['envelopes'] },
         { r: 'safe', q: 'People in Ireland ___ ___ carve turnips.', a: ['used to'] },
-        { r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about family.', a: ['whereas', 'while'] },
+        { r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about family.', a: ['whereas', 'while', 'but'] },
         { r: 'daring', q: 'Diwali, ___ is celebrated in autumn, is the festival of lights.', a: ['which'] },
         { r: 'daring', q: '___ it started in Europe, Halloween is popular in the USA.', a: ['although', 'even though'] }
       ] },

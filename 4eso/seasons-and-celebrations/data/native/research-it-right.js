@@ -4,7 +4,7 @@ window.LP.native = {
     intro: 'Type the answers without looking.',
     items: [
       { q: 'Halloween is thought to ___ originated in Ireland. (1 word)', a: ['have'], en: 'Perfect infinitive: to have originated.' },
-      { q: 'Pumpkins soon ___ turnips. (took the place of)', a: ['supplanted'] },
+      { q: 'Pumpkins soon ___ turnips. (took the place of)', a: ['supplanted', 'replaced', 'superseded'] },
       { q: 'The custom fell into ___ after the war.', a: ['disuse'] },
       { q: 'A custom presented as ancient but actually recent: an ___ tradition.', a: ['invented'] },
       { q: 'It was ___ in 1863 that Thanksgiving became official. (1 word)', a: ['only', 'not until'], en: 'It was only in… that…' },
