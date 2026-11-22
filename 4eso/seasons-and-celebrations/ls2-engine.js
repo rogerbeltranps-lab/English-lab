@@ -299,15 +299,30 @@ var LS2 = (function () {
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
-  /* More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
+  /* ✅ ANSWER CHECK (the same block in 2eso/free-time-live/ls2-engine.js, 4eso/seasons-and-celebrations/ls2-engine.js and
+     4eso/seasons-and-celebrations/getting-started.html; tools/answer-check/check.mjs keeps the copies identical and runs its cases).
+     More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
      whole sentence for "I ___ (watch) a basketball match right now." counts when it is a run of words of the sentence with the gap filled
-     that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails. */
-  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+     that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails.
+     Roger, 22 Nov 2026 ("I'm detecting a lot of mistakes, do students have the same problem?"): American spellings count as the British ones
+     (gray = grey, color = colour, favorite = favourite…), and a gap that shows its first letters (l_____, to c___) takes the whole word or only
+     the letters still missing. */
+  const UK_US = { gray: 'grey', color: 'colour', colors: 'colours', colorful: 'colourful', favorite: 'favourite', favorites: 'favourites',
+    neighbor: 'neighbour', neighbors: 'neighbours', center: 'centre', theater: 'theatre', honor: 'honour', honors: 'honours', honored: 'honoured',
+    behavior: 'behaviour', flavor: 'flavour', humor: 'humour', organize: 'organise', organized: 'organised', organizing: 'organising',
+    organization: 'organisation', realize: 'realise', realized: 'realised', recognize: 'recognise', apologize: 'apologise', symbolize: 'symbolise',
+    criticize: 'criticise', commercialized: 'commercialised', commercialization: 'commercialisation', traveling: 'travelling', traveled: 'travelled',
+    traveler: 'traveller', canceled: 'cancelled', cozy: 'cosy', pajamas: 'pyjamas', program: 'programme', programs: 'programmes', mom: 'mum',
+    practice: 'practise', practiced: 'practised', practicing: 'practising', jewelry: 'jewellery', catalog: 'catalogue', dialog: 'dialogue',
+    skeptical: 'sceptical', defense: 'defence', liter: 'litre', fiber: 'fibre' };
+  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/[a-z]+/g, w => UK_US[w] || w);
   function fits(q, answers, typed) {
     const v = norm(typed); if (!v) return false;
-    if (answers.some(a => norm(a) === v || bare(a) === bare(v))) return true;   // contractions either way (it's = it is)
+    if (answers.some(a => norm(a) === v || bare(a) === bare(v))) return true;   // contractions either way (it's = it is), US spellings
+    const Q = String(q || '').replace(/<[^>]+>/g, ''), cue = ((Q.match(/(?:^|[^a-z'’-])([a-z]{1,3})_{2,}/i) || [])[1] || '').toLowerCase();
+    if (cue && answers.some(a => { const x = bare(a); return x.startsWith(cue) && x.slice(cue.length) === bare(typed); })) return true;   // l_____ → isten
     const t = bare(typed).split(' '); if (t.length < 2) return false;
-    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    const parts = Q.replace(/(^|[^a-z'’-])[a-z]{1,3}(?=_{2,})/gi, '$1').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
     if (g < 1) return false;
     return answers.some(a => {
       const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
@@ -320,6 +335,7 @@ var LS2 = (function () {
       return false;
     });
   }
+  /* END ANSWER CHECK */
   /* ✏️ SPELLING SLIPS (same block in every ls2-engine.js and lab/practice.html; tools/spelling-hint/check.mjs keeps them identical).
      Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake" ("It takes ages to laod." got the grammar rule).
      When a wrong answer matches an accepted one except for spelling, the feedback names the word instead of the grammar rule:

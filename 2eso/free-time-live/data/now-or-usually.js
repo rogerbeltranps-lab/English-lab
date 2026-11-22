@@ -14,7 +14,7 @@ window.LP = {
         { r: 'insecure', q: 'She ___ karate on Tuesdays. (fer)', a: ['does'] },
         { r: 'insecure', q: '___ you watching the match? — Yes, I am.', a: ['are'] },
         { r: 'safe', q: 'Our team is playing in a basketball ___ with 12 teams.', a: ['tournament'] },
-        { r: 'safe', q: 'It’s ___: I can’t see the end of the street.', a: ['foggy'] },
+        { r: 'safe', q: 'It’s ___: I can’t see the end of the street.', a: ['foggy', 'misty'] },
         { r: 'daring', q: 'The ___ is cheering: 500 people!', a: ['crowd'] },
         { r: 'daring', q: 'Correct: “She’s studing.” → She’s ___.', a: ['studying'] }
       ] },

@@ -207,6 +207,45 @@ const ROUTES=["beginners","insecure","safe","daring","native"];
 const N=()=>level==="native"&&!!window.GS_NATIVE,nat=(k,base)=>N()?GS_NATIVE[k]:base;
 const forLevel=(items,lvl)=>items.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(lvl));
 const norm=s=>String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+// the same checker as the LS2 pages (contractions either way, the whole sentence, US spellings, first-letter gaps; Roger, 22 Nov 2026)
+const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  /* ✅ ANSWER CHECK (the same block in 2eso/free-time-live/ls2-engine.js, 4eso/seasons-and-celebrations/ls2-engine.js and
+     4eso/seasons-and-celebrations/getting-started.html; tools/answer-check/check.mjs keeps the copies identical and runs its cases).
+     More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
+     whole sentence for "I ___ (watch) a basketball match right now." counts when it is a run of words of the sentence with the gap filled
+     that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails.
+     Roger, 22 Nov 2026 ("I'm detecting a lot of mistakes, do students have the same problem?"): American spellings count as the British ones
+     (gray = grey, color = colour, favorite = favourite…), and a gap that shows its first letters (l_____, to c___) takes the whole word or only
+     the letters still missing. */
+  const UK_US = { gray: 'grey', color: 'colour', colors: 'colours', colorful: 'colourful', favorite: 'favourite', favorites: 'favourites',
+    neighbor: 'neighbour', neighbors: 'neighbours', center: 'centre', theater: 'theatre', honor: 'honour', honors: 'honours', honored: 'honoured',
+    behavior: 'behaviour', flavor: 'flavour', humor: 'humour', organize: 'organise', organized: 'organised', organizing: 'organising',
+    organization: 'organisation', realize: 'realise', realized: 'realised', recognize: 'recognise', apologize: 'apologise', symbolize: 'symbolise',
+    criticize: 'criticise', commercialized: 'commercialised', commercialization: 'commercialisation', traveling: 'travelling', traveled: 'travelled',
+    traveler: 'traveller', canceled: 'cancelled', cozy: 'cosy', pajamas: 'pyjamas', program: 'programme', programs: 'programmes', mom: 'mum',
+    practice: 'practise', practiced: 'practised', practicing: 'practising', jewelry: 'jewellery', catalog: 'catalogue', dialog: 'dialogue',
+    skeptical: 'sceptical', defense: 'defence', liter: 'litre', fiber: 'fibre' };
+  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/[a-z]+/g, w => UK_US[w] || w);
+  function fits(q, answers, typed) {
+    const v = norm(typed); if (!v) return false;
+    if (answers.some(a => norm(a) === v || bare(a) === bare(v))) return true;   // contractions either way (it's = it is), US spellings
+    const Q = String(q || '').replace(/<[^>]+>/g, ''), cue = ((Q.match(/(?:^|[^a-z'’-])([a-z]{1,3})_{2,}/i) || [])[1] || '').toLowerCase();
+    if (cue && answers.some(a => { const x = bare(a); return x.startsWith(cue) && x.slice(cue.length) === bare(typed); })) return true;   // l_____ → isten
+    const t = bare(typed).split(' '); if (t.length < 2) return false;
+    const parts = Q.replace(/(^|[^a-z'’-])[a-z]{1,3}(?=_{2,})/gi, '$1').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    if (g < 1) return false;
+    return answers.some(a => {
+      const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+      if (!fills) return false;
+      const words = [], gap = [], put = (x, f) => bare(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(words.length); words.push(y); });
+      put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+      if (!gap.length) return false;
+      for (let k = 0; k + t.length <= words.length; k++)
+        if (k <= gap[0] && k + t.length > gap[gap.length - 1] && t.every((x, j) => x === words[k + j])) return true;
+      return false;
+    });
+  }
+  /* END ANSWER CHECK */
 // The questions (recall, vocab, practice, readingChat, readingQs, listening) and the speaking task and model (speakTask, speakModel) are in data/getting-started.js.
 const celebrations=["Castanyada","Halloween","Diwali","Thanksgiving","Hanukkah","Christmas","Lunar New Year","A local festa major","Other"];
 
@@ -225,7 +264,7 @@ function attempt(k,score,max){const t={score,max,level,date:new Date().toISOStri
 // ls2-engine.js: q = place in the list in data/getting-started.js, ok 1/0, a = what was typed or the option chosen, 0 = right)
 function firstItems(k,src,items,got){state.items=state.items||{};const key=k+"_"+level;if(state.items[key])return;
   state.items[key]={level,date:new Date().toISOString(),q:items.map(it=>src.indexOf(it)),ok:got.map(g=>g[0]?1:0),a:got.map(g=>g[1])};save()}
-const gotTyped=(items,prefix)=>items.map((it,i)=>{const v=$("#"+prefix+i).value;return [it.a.some(a=>norm(a)===norm(v)),String(v||"").trim().slice(0,40)]});
+const gotTyped=(items,prefix)=>items.map((it,i)=>{const v=$("#"+prefix+i).value;return [fits(it.q,it.a,v),String(v||"").trim().slice(0,40)]});
 const gotRadio=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return [!!c&&+c.value===0,c?+c.value:null]});
 function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%";markTabs()}
 // the list of steps as on the LS2 engine pages (ls2-engine.js markTabs): a tick on each step done, the first one not done marked NEXT;
@@ -278,7 +317,7 @@ function renderTyped(list,items,prefix){
 }
 function checkTyped(items,prefix,result,key,explain){
   let score=0;
-  items.forEach((it,i)=>{const v=norm($("#"+prefix+i).value),ok=it.a.some(a=>norm(a)===v);if(ok)score++;
+  items.forEach((it,i)=>{const v=norm($("#"+prefix+i).value),ok=fits(it.q,it.a,$("#"+prefix+i).value);if(ok)score++;
     const f=$("#"+prefix+"f"+i);
     f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(v===""?(ca()?"Escriu una resposta.":"Type an answer."):(ca()?"Encara no. ":"Not yet. ")+(explain?(ca()?"Resposta: <strong>"+it.a[0]+"</strong>. "+(it.ca||it.en||""):"Answer: <strong>"+it.a[0]+"</strong>. "+(it.en||it.ca||"")):(ca()?"Revisa la paraula al vocabulari de dalt i torna-ho a provar.":"Check the word list above and try again.")));
     f.className="feedback "+(ok?"ok":"no")});

@@ -41,13 +41,13 @@ window.LP.native = {
     ],
     core: ['stem from', 'be rooted in', 'give rise to', 'folklore', 'an invented tradition', 'evolve into', 'morph into', 'supplant', 'fall into disuse', 'revive', 'dwindle', 'sanitise', 'nostalgic', 'sceptical', 'contested', 'irreverent'],
     practice: [
-      { q: 'The Halloween lantern ___ from an Irish custom of carving turnips.', a: ['stems'] },
-      { q: 'In America, pumpkins soon ___ turnips because they were easier to carve.', a: ['supplanted'] },
+      { q: 'The Halloween lantern ___ from an Irish custom of carving turnips.', a: ['stems', 'comes', 'derives', 'originates'] },
+      { q: 'In America, pumpkins soon ___ turnips because they were easier to carve.', a: ['supplanted', 'replaced', 'superseded'] },
       { q: 'The old dance fell into ___ but was revived in the 1980s.', a: ['disuse'] },
       { q: 'Irish emigration gave ___ to the Halloween we know today.', a: ['rise'] },
-      { q: 'The number of families who observe the full ritual has ___ to a handful. (became smaller)', a: ['dwindled'] },
+      { q: 'The number of families who observe the full ritual has ___ to a handful. (became smaller)', a: ['dwindled', 'fallen', 'dropped', 'shrunk'] },
       { q: 'Many school plays ___ the story of the first Thanksgiving. (make it less unpleasant)', a: ['sanitise', 'sanitize'] },
-      { q: 'The meaning of the holiday is ___: not everyone agrees on it.', a: ['contested'] },
+      { q: 'The meaning of the holiday is ___: not everyone agrees on it.', a: ['contested', 'disputed', 'debated'] },
       { q: 'Historians are ___ (SCEPTIC) about the popular version of the story.', a: ['sceptical', 'skeptical'] },
       { q: 'A custom that looks ancient but is actually recent is an ___ tradition.', a: ['invented'] },
       { q: 'Halloween is rooted ___ the Celtic festival of Samhain.', a: ['in'] }

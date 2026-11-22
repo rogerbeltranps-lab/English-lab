@@ -4,12 +4,12 @@ window.LP.native = {
     intro: 'Type the answers without looking.',
     items: [
       { q: 'A tradition that is centuries old: time-___', a: ['honoured', 'honored'] },
-      { q: 'The custom is ___ to date back to the 1300s. (reported)', a: ['said', 'thought', 'believed'] },
+      { q: 'The custom is ___ to date back to the 1300s. (reported)', a: ['said', 'thought', 'believed', 'reported', 'claimed'] },
       { q: 'Sources citing each other so a claim looks stronger: ___ reporting', a: ['circular'] },
       { q: 'Writing that keeps a source’s structure but swaps a few words: p___', a: ['patchwriting'] },
       { q: 'Under no circumstances ___ you light fireworks indoors. (1 word)', a: ['should', 'must'] },
       { q: 'The festival ___ (EVOLVE) from a harvest ritual into a street party. (past)', a: ['evolved'] },
-      { q: 'Two things looking alike does not ___ that one came from the other.', a: ['mean', 'prove'] },
+      { q: 'Two things looking alike does not ___ that one came from the other.', a: ['mean', 'prove', 'imply'] },
       { q: 'The lamps ___ (SYMBOL) the triumph of light over darkness.', a: ['symbolise', 'symbolize'] }
     ] },
 
@@ -82,7 +82,7 @@ window.LP.native = {
       { q: 'We are about to confirm the band. POINT → We are ___ the band.', a: ['on the point of confirming'], en: 'on the point of + -ing.' },
       { q: 'I’m sure there will be problems with the sound. BOUND → There ___ problems with the sound.', a: ['are bound to be'], en: 'be bound to = certain to.' },
       { q: 'If we had known about the exam, we would have chosen another date. HAD → ___ about the exam, we would have chosen another date.', a: ['had we known'], en: 'Had + subject + past participle.' },
-      { q: 'It is very likely that families will come. CHANCE → There ___ families will come.', a: ['is every chance that', 'is a good chance that'], en: 'There is every chance that…' },
+      { q: 'It is very likely that families will come. CHANCE → There ___ families will come.', a: ['is every chance that', 'is a good chance that', 'is every chance', 'is a good chance', 'is a strong chance that'], en: 'There is every chance that…' },
       { q: 'At eleven the band will be in the middle of its set. PLAYING → At eleven the band ___.', a: ['will be playing'], en: 'Future continuous.' },
       { q: 'Please contact Laia if you need anything. SHOULD → ___ anything, please contact Laia.', a: ['should you need'], en: 'Formal: Should you need…' }
     ] },

@@ -115,7 +115,7 @@ window.LP.native = {
       { q: 'I have never seen such a spectacular parade. NEVER → ___ such a spectacular parade.', a: ['never have i seen', 'never before have i seen'], en: 'Never + have + subject + past participle.' },
       { q: 'The festival is beautiful and it is also free. ONLY → Not ___, but it is also free.', a: ['only is the festival beautiful', 'only is it beautiful'], en: 'Not only + auxiliary + subject…, but…' },
       { q: 'We realised how late it was only when the fireworks started. DID → Only when the fireworks started ___ how late it was.', a: ['did we realise', 'did we realize'], en: 'Only when… + inverted auxiliary.' },
-      { q: 'As soon as the clock struck twelve, everyone started singing. SOONER → No ___ twelve than everyone started singing.', a: ['sooner had the clock struck'], en: 'No sooner had + subject + past participle + than.' },
+      { q: 'As soon as the clock struck twelve, everyone started singing. SOONER → No ___ twelve than everyone started singing.', a: ['sooner had the clock struck', 'sooner did the clock strike'], en: 'No sooner had + subject + past participle + than.' },
       { q: 'They had no idea that the party was for them. LITTLE → ___ that the party was for them.', a: ['little did they know', 'little did they realise', 'little did they realize'], en: 'Little did + subject + verb.' },
       { q: 'I love the atmosphere of Sant Joan most. WHAT → ___ the atmosphere.', a: ['what i love most about sant joan is', 'what i love about sant joan most is'], en: 'What + clause + is…' },
       { q: 'Lincoln made Thanksgiving a national holiday in 1863. IT → ___ Lincoln made Thanksgiving a national holiday.', a: ['it was in 1863 that'], en: 'It was + focus + that…' },

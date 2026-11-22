@@ -226,9 +226,9 @@ window.LP = (function () {
         { q: 'Small oil lamps at Diwali: ___', a: ['diyas'] },
         { q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data → on.', en: 'Date → on.' },
         { q: 'Children ___ (dress) up at Halloween.', a: ['dress'] },
-        { r: 'insecure', q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get'] },
+        { r: 'insecure', q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get', 'gather', 'come'] },
         { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
-        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange'] },
+        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange', 'give', 'swap'] },
         { r: 'safe', q: 'The opposite of religious: ___', a: ['secular'] },
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
@@ -262,15 +262,15 @@ window.LP = (function () {
         { q: 'People used to light ___ and wear masks.', a: ['bonfires', 'bonfire'] },
         { q: 'Before pumpkins, people in Ireland used to carve ___.', a: ['turnips', 'turnip'] },
         { q: 'At the Castanyada we eat roasted ___ and panellets.', a: ['chestnuts'] },
-        { q: 'In 1621 the Pilgrims had a big harvest ___ that lasted three days.', a: ['feast'] },
-        { r: 'insecure', q: 'People believed that the ___ of the dead came back on that night.', a: ['spirits'] },
-        { r: 'insecure', q: 'On All Saints’ Day, many people visit the ___.', a: ['cemetery'] },
-        { r: 'insecure', q: 'At Thanksgiving, many people say what they are ___ for.', a: ['grateful'] },
+        { q: 'In 1621 the Pilgrims had a big harvest ___ that lasted three days.', a: ['feast', 'festival', 'celebration'] },
+        { r: 'insecure', q: 'People believed that the ___ of the dead came back on that night.', a: ['spirits', 'souls', 'ghosts'] },
+        { r: 'insecure', q: 'On All Saints’ Day, many people visit the ___.', a: ['cemetery', 'graveyard', 'cemeteries', 'graves'] },
+        { r: 'insecure', q: 'At Thanksgiving, many people say what they are ___ for.', a: ['grateful', 'thankful'] },
         { r: 'safe', q: 'Thanksgiving became a national ___ in 1863.', a: ['holiday'] },
-        { r: 'safe', q: 'Samhain is an ___ Celtic festival, more than 2,000 years old.', a: ['ancient'] },
-        { r: 'safe', q: 'At Christmas the ___ streets are full of people.', a: ['crowded'] },
-        { r: 'daring', q: 'Halloween ___ back to an old Celtic festival.', a: ['dates'] },
-        { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized'] }
+        { r: 'safe', q: 'Samhain is an ___ Celtic festival, more than 2,000 years old.', a: ['ancient', 'old'] },
+        { r: 'safe', q: 'At Christmas the ___ streets are full of people.', a: ['crowded', 'busy', 'packed'] },
+        { r: 'daring', q: 'Halloween ___ back to an old Celtic festival.', a: ['dates', 'goes'] },
+        { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized', 'commercial', 'materialistic'] }
       ] },
     /* 🔗 Prepositions + vocab (Roger, 14 Nov 2026: "we could add a Prepositions + vocab and add it to the LP" + "and add activities to work
        on them"): dates with in / on / at and words that go with a preposition, out of the Vocabulary. Like the grammar steps: 7 compulsory
@@ -497,7 +497,7 @@ window.LP = (function () {
       items: [
         /* Core and Plus: 6 compulsory (Plus: without unlike, with although) */
         { p: 'comp', r: 'safe', q: '___ Halloween ___ the Castanyada take place on 31 October.', a: ['both and'], show: 'Both … and', en: 'The same: Both… and…' },
-        { p: 'comp', r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about food and family.', a: ['whereas', 'while'], en: 'Contrast between two things.' },
+        { p: 'comp', r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about food and family.', a: ['whereas', 'while', 'but'], en: 'Contrast between two things.' },
         { p: 'comp', r: 'safe', only: ['safe'], opts: ['Unlike', 'Whereas', 'Both'], q: '___ Halloween, the Castanyada is a family celebration at home.', a: ['unlike'], en: 'Unlike + noun.' },
         { p: 'comp', r: 'safe', opts: ['different from', 'similar to', 'different of'], q: 'Thanksgiving is ___ Halloween: it’s a family meal, not a costume party.', a: ['different from'], en: 'Different: different from (not of).' },
         { p: 'comp', r: 'safe', opts: ['similar to', 'similar than', 'different from'], q: 'The Castanyada is ___ Thanksgiving: both are about family and food.', a: ['similar to'], en: 'The same: similar to (not than).' },
@@ -525,7 +525,7 @@ window.LP = (function () {
         { p: 'comp', r: 'daring', a: [], own: { must: [',\\s*(which|who)\\b', '\\b(although|even though)\\b'], min: 12 }, q: 'Write about a celebration: give extra information with <b>, which … ,</b> or <b>, who … ,</b> and use <b>although</b> or <b>even though</b>.', show: 'Although it is a Celtic tradition, Halloween, which takes place on 31 October, is now very commercial.', en: 'Use , which / , who … and although / even though.' },
         /* ➕ extra: Starter and Base */
         { p: 'comp', only: ['beginners', 'insecure'], opts: ['First', 'Finally', 'Because'], q: '___, we clean the house. Then we decorate it.', a: ['first'], ca: 'Primer pas.', en: 'First step.' },
-        { p: 'comp', only: ['beginners', 'insecure'], q: '___, we all eat together.', a: ['finally'], ca: 'Últim pas.', en: 'Last step.' },
+        { p: 'comp', only: ['beginners', 'insecure'], q: '___, we all eat together.', a: ['finally', 'lastly'], ca: 'Últim pas.', en: 'Last step.' },
         { p: 'comp', only: ['beginners', 'insecure'], k: 'fix', q: '“We eat also panellets.” → We ___ ___ panellets.', a: ['also eat'], ca: '<em>also</em> va davant del verb.', en: '<em>also</em> goes before the verb.' },
         { p: 'comp', only: ['beginners', 'insecure'], q: 'Thanksgiving ___ ___ in November. (té lloc)', a: ['takes place'], ca: 'Costum: It takes place in + mes.', en: 'Custom: It takes place in + month.' },
         { p: 'comp', only: ['beginners', 'insecure'], opts: ["don't work", "doesn't work", 'not work'], q: 'In Catalonia, we ___ (not / work) on 25 December.', a: ["don't work", 'do not work'], ca: 'Costum en negatiu: don’t + verb.', en: 'Negative custom: don’t + verb.' },
@@ -565,8 +565,8 @@ window.LP = (function () {
         { q: 'She ___ (love) the parade.', a: ['loves'] },
         { q: 'My brother ___ (like) the fireworks.', a: ['likes'] },
         { q: 'I love Christmas ___ we eat together.', a: ['because'] },
-        { q: 'First, we clean the house. ___, we decorate it.', a: ['then', 'after that'] },
-        { r: 'insecure', only: ['insecure'], q: 'The Castanyada ___ ___ on 31 October. (es fa)', a: ['is held'], ca: 'Costum: It is held on + data.', en: 'Custom: It is held on + date.' },
+        { q: 'First, we clean the house. ___, we decorate it.', a: ['then', 'after that', 'next'] },
+        { r: 'insecure', only: ['insecure'], q: 'The Castanyada ___ ___ on 31 October. (es fa)', a: ['is held', 'takes place'], ca: 'Costum: It is held on + data.', en: 'Custom: It is held on + date.' },
         { r: 'insecure', only: ['insecure'], q: 'My cousins ___ (not / celebrate) Halloween.', a: ["don't celebrate", 'do not celebrate'], ca: 'Negatiu: don’t + verb.', en: 'Negative: don’t + verb.' },
         { r: 'safe', q: 'In 1863, Lincoln ___ Thanksgiving official. (used to make / made)', a: ['made'], en: 'One finished event in 1863.' },
         { r: 'safe', q: 'My grandparents ___ ___ roast chestnuts in the street. (used to / use to)', a: ['used to'], en: 'Affirmative: used to.' },
