@@ -39,8 +39,8 @@
   //            imgs: [{img, me, band}] several shapes: each student gets one by their first name, the same on every screen}
   //   fog      the picture over what is not open yet;  decos: 9 pictures for the sides of the map: the 1st in the bottom corner, the
   //            others from the top down (null = none, [name, width px] = a bigger one)
-  //   road     {halo, hw, line, lw, dash} the colours and widths of the route;  snd: {dir (under shared/), music, amb (the loop under the
-  //            music, null = none), ambVol, click, step, port, fog, voyage} sound files (null = silent)
+  //   road     {halo, hw, line, lw, dash} the colours and widths of the route;  snd: {dir (under shared/), music, click, step, port, fog,
+  //            voyage} sound files (null = silent). Never a background loop under the music (Roger, 22 Nov 2026: "leave only the music")
   //   w        wording {key: [Catalan, English]}: title, back (to my vehicle), map (back to the map), tip (the fog), reached (a place),
   //            dest, done, reach, end
   const SEA={dir:"img/voyage/",places:PORTS,dest:DEST,img:[],fest:false,
@@ -48,7 +48,8 @@
     veh:{img:"boat",me:"boat-me",band:"inset(69% 0 15% 0)",icon:"⛵"},fog:"fog",
     decos:["compass","whale","dolphin","turtle","seagull","seagull","dolphin","whale","turtle"],
     road:{halo:"#ffffff55",hw:22,line:"#fff",lw:3,dash:"10 10"},
-    snd:{dir:"audio/voyage/",music:"music.mp3",amb:"sea-loop.wav",ambVol:.15,click:"click.mp3",step:"step.mp3",port:"port.mp3",fog:"fog.mp3",voyage:"voyage.mp3"},
+    // no sea loop under the song (Roger, 22 Nov 2026: "there's like a sea-ish sound that is a noise. Leave only the music")
+    snd:{dir:"audio/voyage/",music:"music.mp3",click:"click.mp3",step:"step.mp3",port:"port.mp3",fog:"fog.mp3",voyage:"voyage.mp3"},
     w:{title:["El teu viatge","Your voyage"],back:["Torna al meu vaixell","Back to my boat"],map:["Torna al mapa","Back to the map"],
       tip:["Apareixeran més ports quan el professor els afegeixi","More ports appear when your teacher adds them"],reached:["Has arribat a port","Port reached"],
       dest:["Destinació final","Final destination"],done:["Viatge completat!","Voyage complete!"],reach:["Has arribat a","You reached"],end:["el final del viatge.","the end of the voyage."]}};
@@ -82,7 +83,7 @@
       road:{halo:"#6b7280",hw:30,line:"#fff",lw:3,dash:"14 12"},
       // sounds: a clean sports-TV theme (no noise drums), camera snap, cheer, fanfare, beep-beep horn. No background loop: the crowd
       // loop sounded like noise, and iPhones ignore the volume we set, so it played as loud as the song (Roger, 20 Nov)
-      snd:{dir:"audio/road-2eso/",music:"music.mp3",amb:null,click:"click.mp3",step:"step.mp3",port:"port.mp3",fog:"fog.mp3",voyage:"voyage.mp3",horn:"horn.mp3"},
+      snd:{dir:"audio/road-2eso/",music:"music.mp3",click:"click.mp3",step:"step.mp3",port:"port.mp3",fog:"fog.mp3",voyage:"voyage.mp3",horn:"horn.mp3"},
       w:{title:["La teva gira de reporter","Your reporter tour"],back:["Torna al meu bus","Back to my bus"],tip:["Apareixeran més parades quan el professor les afegeixi","More stops appear when your teacher adds them"],
          reached:["Parada assolida","Stop reached"],dest:["Destinació final","Final destination"],done:["Gira completada!","Trip complete!"],
          reach:["Has arribat a","You made it to"],end:["el final de la gira.","the end of the tour."]}
@@ -143,7 +144,7 @@
   let saved=null;try{saved=localStorage.getItem("el_voyage_snd")}catch(e){}
   // The music is on by default (Roger, 20 Nov: "always on except for when it's class time for the students"). quiet(): no sound to
   // start with, the 🎵 button turns it on for this page (force); lock(): no sound at all, not even with 🎵 (a student in class time)
-  const SND={on:saved!=="0",MV:.3,music:null,sea:null,el:{},quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
+  const SND={on:saved!=="0",MV:.3,music:null,el:{},quiet:()=>false,lock:()=>false,force:false,dt:0,sk:skinOf(null),
     hush(){return this.lock()||this.quiet()&&!this.force},
     play(k,vol){const f=this.sk.snd[k];if(!f||!this.on||this.hush())return;try{const a=new Audio(this.sk.A+f);a.volume=vol||.8;a.play().catch(()=>{});this.duck()}catch(e){}},
     duck(){const m=this.music;if(!m)return;clearTimeout(this.dt);m.volume=this.MV*.35;this.dt=setTimeout(()=>{if(this.music)this.music.volume=this.MV},1800)},
@@ -152,11 +153,10 @@
       // the same audio element is reused when the music comes back (another tab, another place of the board): Safari lets an element
       // that already played play again without a new tap, and the song goes on where it stopped
       const get=(k,src)=>{let a=this.el[k];if(!a||a._src!==src){a=this.el[k]=new Audio(src);a._src=src;a.loop=true}return a};
-      try{const m=this.music=get("m",S.A+S.snd.music);m.volume=this.MV;let w=null;
-        if(S.snd.amb){w=this.sea=get("a",S.A+S.snd.amb);w.volume=S.snd.ambVol;w.play().catch(()=>{})}
-        // refused (no tap yet): forget both, the next tap tries again
-        m.play().then(()=>{this.ui&&this.ui()},()=>{if(this.music===m){try{w&&w.pause()}catch(e){}this.music=this.sea=null}this.ui&&this.ui()})}catch(e){}},
-    stopBg(){[this.music,this.sea].forEach(a=>{try{a&&a.pause()}catch(e){}});this.music=this.sea=null;this.ui&&this.ui()}};
+      try{const m=this.music=get("m",S.A+S.snd.music);m.volume=this.MV;
+        // refused (no tap yet): forget it, the next tap tries again
+        m.play().then(()=>{this.ui&&this.ui()},()=>{if(this.music===m)this.music=null;this.ui&&this.ui()})}catch(e){}},
+    stopBg(){try{this.music&&this.music.pause()}catch(e){}this.music=null;this.ui&&this.ui()}};
   // the song starts with the first tap on the board (browsers allow sound only after one), and stops when the map is gone (another
   // place of the board), the tab is hidden or class mode starts
   // (pointerdown, click, keydown and touchend: Safari and touch screens count only some of them as a tap; the 🎵 button handles itself)
