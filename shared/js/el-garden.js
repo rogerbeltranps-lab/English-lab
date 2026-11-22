@@ -155,6 +155,8 @@ a.gd-help{position:absolute;right:18px;bottom:2px;width:96px;height:84px;z-index
 .gdn-key span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}.gdn-key svg{width:13px;height:22px}.gdn-key .gd-tree{width:16px;height:22px}.gdn-key b{font-weight:800;margin-right:2px}
 @keyframes gdbob{50%{transform:translateY(2px)}}@keyframes gdspin{to{transform:rotate(360deg)}}
 @keyframes gdgrow{0%{transform:scale(.1)}100%{transform:scale(1)}}@keyframes gdglow{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(2.2)}}
+.gd-ring{animation:gdring .9s ease-in-out both}.gd-ring::after{content:"";position:absolute;left:50%;top:0;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:radial-gradient(#fde047aa,transparent 70%);animation:gdglow 1.8s ease-out both;pointer-events:none}
+@keyframes gdring{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg) scale(1.12)}45%{transform:rotate(8deg) scale(1.12)}70%{transform:rotate(-4deg)}}
 @keyframes gdpop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
 /* the butterflies fly around the garden and land on a flower now and then (Roger, 17 Nov 2026: "can you make the butterflies fly?") */
 @keyframes gdfa{0%,100%{transform:translate(0,0) rotate(0)}12%{transform:translate(-60px,-34px) rotate(-22deg)}25%{transform:translate(-130px,6px) rotate(-8deg)}31%{transform:translate(-130px,8px) rotate(0)}40%{transform:translate(-70px,-48px) rotate(18deg)}55%{transform:translate(70px,-26px) rotate(22deg)}68%{transform:translate(150px,6px) rotate(8deg)}74%{transform:translate(150px,8px) rotate(0)}86%{transform:translate(70px,-42px) rotate(-16deg)}}
@@ -165,7 +167,14 @@ a.gd-help{position:absolute;right:18px;bottom:2px;width:96px;height:84px;z-index
 @media (prefers-reduced-motion:reduce){.gdn *{animation:none!important;transition:none!important}}
 @media (max-width:600px){.gdn-h{padding:10px 12px 8px;gap:8px 10px}.gdn-h .gd-sun{width:32px;height:32px}.gdn-t{flex:1 1 200px}.gdn-t b{font-size:16px}.gdn-st{margin-left:0}.gdn-lawn{padding:6px 8px 10px}.gdn-beds{gap:10px 8px}}`;
   function css(){if(document.getElementById("gdn-css"))return;const s=document.createElement("style");s.id="gdn-css";s.textContent=CSS;document.head.appendChild(s)}
-  const FRESH={};
+  // FRESH: the flowers growing in right now (6 s) · NEWP: every flower new on this page (+N new flowers) · BASE: a first visit on this
+  // computer, still learning the garden (no "new" flowers, no chime)
+  const FRESH={},NEWP={},BASE={};
+  // 🔔 a soft chime when new flowers bloomed since the last visit (Roger, 22 Nov 2026), once per drawing that finds new ones, and the new
+  // flowers shine again as it rings. ELSound in el-sound.js (Web Audio, no file, muted with the sound setting): if the browser has not
+  // allowed sound yet (an iPhone after opening a page), it rings at the first tap or key.
+  const chime=()=>{if(!window.ELSound||!ELSound.soon)return;setTimeout(()=>ELSound.soon("bloom",()=>document.querySelectorAll(".gdn .gd-nw").forEach(el=>{
+    el.classList.remove("gd-ring");void el.offsetWidth;el.classList.add("gd-ring")})),450)};
   // 🐦 the birds whistle when they fly in, once per page (Roger, 17 Nov 2026: "when birds appear I want them to whistle"; ELSound in
   // el-sound.js, Web Audio, no sound file; muted when the student muted sounds). Browsers only allow sound after a tap or a key on the
   // page, so it waits for the first one. Clicking a bird makes it chirp again.
@@ -176,12 +185,19 @@ a.gd-help{position:absolute;right:18px;bottom:2px;width:96px;height:84px;z-index
   window.elGarden=function(G,o){css();const en=!!(o&&o.en),t=(ca,e)=>en?e:ca;
     const all=G.beds.flatMap(b=>b.plants.map(p=>Object.assign({bed:b},p)));
     const n={bloom:0,bud:0,sprout:0,thirsty:0};all.forEach(p=>n[p.st]++);
-    // the flowers seen last time on this computer: the new ones grow in front of the student (once per page load)
-    if(G.store&&!FRESH[G.store]){let was=null;try{was=JSON.parse(localStorage.getItem(G.store)||"null")}catch(e){}
-      const now=all.filter(p=>p.st==="bloom").map(p=>p.key);FRESH[G.store]=new Set(Array.isArray(was)?now.filter(k=>!was.includes(k)):[]);
-      if(G.save!==false)try{localStorage.setItem(G.store,JSON.stringify(now))}catch(e){}
-      setTimeout(()=>{FRESH[G.store].clear()},6000)}
-    const fresh=FRESH[G.store]||new Set();
+    // the flowers already seen on this computer: the new ones grow in front of the student with "+N new flowers" and a chime (Roger,
+    // 22 Nov 2026: "When I open the garden again and there's a new flower I should hear a nice sound"). Checked at every drawing, not
+    // only the first one of the page, so a garden drawn again (the dashboard's ✦ page, a page brought back by the browser's Back) also
+    // notices the flowers that bloomed meanwhile. The list only grows (a flower seen once is never new again), so a first drawing made
+    // from incomplete data never makes old flowers look new; and the very first visit on a computer only learns the garden, silently.
+    if(G.store){let was=null;try{was=JSON.parse(localStorage.getItem(G.store)||"null")}catch(e){}
+      if(!Array.isArray(was)){was=[];if(!(G.store in BASE))BASE[G.store]=1}
+      const now=all.filter(p=>p.st==="bloom").map(p=>p.key),add=now.filter(k=>!was.includes(k));
+      if(add.length){const f=FRESH[G.store]||(FRESH[G.store]=new Set()),nw=NEWP[G.store]||(NEWP[G.store]=new Set());
+        if(!BASE[G.store]&&G.save!==false){add.forEach(k=>{f.add(k);nw.add(k)});clearTimeout(f.t);f.t=setTimeout(()=>f.clear(),6000);chime()}
+        if(G.save!==false)try{localStorage.setItem(G.store,JSON.stringify(was.concat(add)))}catch(e){}}
+      if(!(G.store in BASE))BASE[G.store]=0}
+    const fresh=FRESH[G.store]||new Set(),nw=NEWP[G.store]||new Set();
     const rot=n.bloom===0&&n.bud===0&&n.thirsty>0,firstTh=all.find(p=>p.st==="thirsty");
     // 🍂 a wilting garden (Roger, 18 Nov 2026: "if there [are] less than 20% I want the garden a bit yellowish and some flies"): not rotten
     // yet, but under 20% of what we already did in class is finished (flowers among flowers + thirsty plants; the optional sample exam
@@ -198,13 +214,13 @@ a.gd-help{position:absolute;right:18px;bottom:2px;width:96px;height:84px;z-index
     let bi=0;const nBf=(b,done)=>{const f=b.plants.filter(p=>p.st==="bloom").length;return Math.min(2,Math.max(done&&b.plants.length>1?1:0,Math.floor(f/5)))};
     const beds=G.beds.map(b=>{const done=b.plants.every(p=>p.st==="bloom"),head=`${b.label?b.label+" · ":""}${b.title}`;
       if(b.kind==="cp"){const p=b.plants[0],st=b.plants.every(x=>x.st==="bloom")?"bloom":b.plants.some(x=>x.st==="thirsty")?"thirsty":b.plants.some(x=>x.st!=="sprout")?"bud":"sprout";
-        return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${rot&&st!=="bloom"?svg(40,56,DEADTREE,"gd-tree"):treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
+        return `<div class="gdt"><a href="${esc(p.href)}" class="${b.plants.some(x=>fresh.has(x.key))?"gd-fresh":""}${b.plants.some(x=>nw.has(x.key))?" gd-nw":""}" title="${esc(head+" · "+ST[st])}" aria-label="${esc(head+" · "+ST[st])}">${rot&&st!=="bloom"?svg(40,56,DEADTREE,"gd-tree"):treeSvg(st)}</a>${b.label?`<span class="gds">${esc(b.label)}</span>`:""}</div>`}
       const plants=b.plants.map(p=>{const k=kindOf(p.id,b.kind),lab=`${p.name}${KN[k]&&!new RegExp(KN[k],"i").test(p.name)?" ("+KN[k]+")":""} · ${ST[p.st]}`;
-        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${rot&&p.st!=="bloom"?" gd-rot":p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${rot&&p.st!=="bloom"?svg(24,40,ROTTEN(),"gd-svg"):plantSvg(k,p.st)}</a>`}).join("");
+        return `<a href="${esc(p.href)}" class="${fresh.has(p.key)?"gd-fresh":""}${nw.has(p.key)?" gd-nw":""}${rot&&p.st!=="bloom"?" gd-rot":p.st==="thirsty"?" gd-th":""}" title="${esc(head+" › "+lab)}" aria-label="${esc(head+" › "+lab)}">${rot&&p.st!=="bloom"?svg(24,40,ROTTEN(),"gd-svg"):plantSvg(k,p.st)}</a>`}).join("");
       return `<div class="gdb ${b.kind}${done?" done":""}" title="${esc(head)}">${b.label?`<span class="gds">${esc(b.label)}</span>`:""}${plants}${rot?[FLY(bi++,"30%",-12),FLY(bi++,"68%",-6),b.plants.length>3?WORM(bi++,"12%",-3):"",b.plants.length>7?WORM(bi++,"55%",-4):""].join(""):Array.from({length:nBf(b,done)},()=>BFLY(BCOL[bi%BCOL.length],bi++)).join("")}</div>`}).join("");
     // 🐦 everything done = every activity the student can do now is done (Roger, 17 Nov 2026: "make sure birds show up when everything is
     // done"): the optional sample exam and tabs kept for a later class (🏫 read-only, p.later) never hold the birds back
-    const must=all.filter(p=>p.bed.kind!=="bonus"),full=must.length>0&&must.every(p=>p.st==="bloom"),allDone=must.length>0&&must.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty"),nf=fresh.size;
+    const must=all.filter(p=>p.bed.kind!=="bonus"),full=must.length>0&&must.every(p=>p.st==="bloom"),allDone=must.length>0&&must.every(p=>p.st==="bloom"||p.later&&p.st!=="thirsty"),nf=nw.size;
     const head=rot?t("El teu jardí s'està podrint! 🪰 Fes les activitats que vam fer a classe per salvar-lo","Your garden is rotting! 🪰 Do the activities we did in class to save it")
       :wilt?t("El teu jardí s'està marcint 🍂 Has acabat menys del 20% del que vam fer a classe: rega'l!","Your garden is wilting 🍂 You've finished less than 20% of what we did in class: water it!"):full?t("El teu jardí està ple de flors! 🌈","Your garden is in full bloom! 🌈")
       :allDone?t("Ho has fet tot, de moment! 🐦 La resta creixerà quan ho fem a classe","You've done everything for now! 🐦 The rest will grow when we do it in class")
