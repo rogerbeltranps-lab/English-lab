@@ -393,9 +393,17 @@ var LS2 = (function () {
     });
     return score;
   }
+  // left (set by doneNow): which questions are missing, so the student knows what to do (Roger, 22 Nov 2026: 9 / 10 with all ten typed)
+  function leftNote(left) {
+    const nums = left.map(i => i + 1), list = nums.length > 1 ? nums.slice(0, -1).join(', ') + (ca() ? ' i ' : ' and ') + nums[nums.length - 1] : String(nums[0]);
+    return ca() ? ' · Per completar el pas, respon i comprova ' + (nums.length > 1 ? 'les preguntes ' : 'la pregunta ') + list + ' (✓ Comprova).'
+                : ' · To complete the step, answer and check question' + (nums.length > 1 ? 's ' : ' ') + list + ' (✓ Check).';
+  }
   function result(el, score, n, done, extra) {
+    const left = LEFT; LEFT = null;
     el.textContent = score + ' / ' + n + (ca() ? ' correctes' : ' correct') +
       (done ? (ca() ? ' · Pas completat ✓' : ' · Step complete ✓')
+            : left && left.length ? leftNote(left)
             : (ca() ? ' · Respon totes les preguntes per completar el pas.' : ' · Answer every question to complete the step.')) + (extra || '');
     el.classList.add('show');
   }
@@ -431,8 +439,11 @@ var LS2 = (function () {
     save();
   }
   // done: every counted question answered and checked in this attempt, or each one checked once (its first check) on this route
+  // LEFT: the questions still to answer or check, for result() just after (the message names them instead of "Answer every question")
+  let LEFT = null;
   const doneNow = (id, k, items, prefix, need) => { const v = vals(items, prefix), C = chk(id), T = (state.tries || {})[k];
-    return need.every(i => C.has(i) && filledV(v[i])) || !!(T && T.per && T.full && T.level === level); };
+    LEFT = need.filter(i => !(C.has(i) && filledV(v[i])));
+    return !LEFT.length || !!(T && T.per && T.full && T.level === level); };
   function oneCss() {
     if (document.getElementById('el-one-css')) return;
     const st = document.createElement('style'); st.id = 'el-one-css';
@@ -517,7 +528,7 @@ var LS2 = (function () {
   function movedNote(id, fresh, added) {
     const el = $('#' + id + 'Result'); if (!el) return;
     const done = state.done[id === 'vocab' ? 'practice' : id];
-    if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.|Answer every question to complete the step\.|Respon totes les preguntes per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
+    if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.|Answer every question to complete the step\.|Respon totes les preguntes per completar el pas\.|To complete the step, answer and check [^.]*\.|Per completar el pas, respon i comprova [^.]*\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
     if (done && !/✓/.test(el.textContent)) el.textContent += ca() ? ' · Pas completat ✓' : ' · Step complete ✓';
     const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
     p.textContent = added ? (ca()
@@ -567,7 +578,11 @@ var LS2 = (function () {
         if (nbFrozen(id) && one.includes(i)) return nbRedo(id, i);   // ➕ extra practice stays open in the notebook look; a wrong answer opened with ✏️ is checked by nbRedo
         const v = vals(items, prefix);
         if (!filledV(v[i])) return check(false, [i]);   // "Type an answer": nothing is marked or saved
-        chk(id).add(i); check(true, [i]); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true);
+        chk(id).add(i);
+        /* every counted question has an answer: the ones typed but not checked yet are checked too, so the step ends with its ✓ (Roger,
+           22 Nov 2026: "It should have a tick saying done"; question 9 was typed but its ✓ Check never pressed, and the step said 9 / 10) */
+        const now = [i].concat(one.every(j => filledV(v[j])) ? one.filter(j => j !== i && !chk(id).has(j)) : []);
+        now.forEach(j => chk(id).add(j)); check(true, now); keep(id, prefix, vals(items, prefix), items); if (nbFrozen(id)) nbLock(id, listId, true); nbSaved(id, true);
       };
       const L = $('#' + listId);
       L.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-one]'); if (b && b.dataset.one === prefix) go(+b.dataset.i); });
