@@ -6,6 +6,8 @@
 // hand-written marks of shadow-marks.json. Needs ffmpeg + ffprobe.
 // Usage (repo root): node tools/towards-nativeness/shadow-lines.js > tn-shadow.json
 //                    ELEVENLABS_API_KEY=... node tools/towards-nativeness/shadow-eleven.mjs tn-shadow.json [--dry]
+//   --record-only: only records the sentences into eleven-cache/ (no ffmpeg needed, e.g. on the PC); then run again without it
+//   where ffmpeg is installed (the cloud) to build the clips from the cache for free.
 //   EL_VOICE_ID (default: the voice named "Chris" in the account), EL_MODEL (default eleven_v3)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -50,6 +52,7 @@ if (todo.length) {
     console.log('recorded:', s);
   }
 }
+if (process.argv.includes('--record-only')) { console.log('recorded; build the clips where ffmpeg is installed'); process.exit(0); }
 const tmp = fs.mkdtempSync(path.join(DIR, '.tmp-'));
 const sil = (n, t) => { const f = path.join(tmp, n + '.wav'); execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono', '-t', String(t), f]); return f; };
 const lead = sil('lead', LEAD), gap = sil('gap', GAP);
