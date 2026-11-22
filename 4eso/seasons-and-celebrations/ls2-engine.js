@@ -524,8 +524,6 @@ var LS2 = (function () {
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
       '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}' +
       '.el-nbink .question.el-nbopen .el-one{display:inline-block!important}.el-nbfix{display:inline-block;margin-top:6px;padding:6px 14px!important;font-size:.9em!important;min-height:0!important}' +
-      '.el-nbwas{margin-top:4px;font-size:.92em;color:#5f6874}.el-nbwas s{text-decoration-color:#d32f2f;text-decoration-thickness:2px}.el-nbmark{display:block;margin-top:6px;font-weight:400}' +
-      'html.el-lpnb .lp-panels .panel .el-nbwas{font:400 19px/1.3 var(--nb-hand,cursive)}html.el-lpnb .lp-panels .panel .el-nbwas s{color:var(--nb-ink,#1f4fb5)}' +
       'html.el-lpnb .lp-panels .panel .question.el-nbopen{outline:2px dashed var(--nb-ink,#1f4fb5);outline-offset:6px;border-radius:6px}';
     document.head.appendChild(st);
   }
@@ -562,12 +560,81 @@ var LS2 = (function () {
     return out;
   }
   const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
+  /* 🆕 The latest answer shows (Roger, 22 Nov 2026: "Es millor que els alumnes i jo tinguin les últimes versions a la llibreta i a la
+     pàgina, així si ja ho han arreglat ho veuen bé"): a step opened again shows, question by question, the newest answer the student gave
+     (a new ✓ Check on the page, ↺ Practise again, or ✏️ Correct it in the notebook), checked again with today's check, in the laptop look
+     and in the notebook look; 📓 My notebook (el-exam.js) shows it too. The first try is kept as information only (Roger, 22 Nov 2026: first tries never count for the mark) (state.items,
+     state.tries and state.nb[id].v never change) and is written small under a changed answer. state.ans[id] is the newest answers:
+     .t[i] when question i's answer was checked, .ok[i] 1 / 0 as the page showed it (written back each time the step opens, so 📓 My
+     notebook follows today's check). Answers saved before this have no t: one that differs from the first try counts from the step's
+     last check (state.last), the first try from state.tries, and a ✏️ correction (state.nb[id].re) from its own time. */
+  const tkOf = id => id === 'vocab' ? 'practice' : id;
+  const firstAt = id => String(((state.tries || {})[tkOf(id)] || {}).date || '');
+  function ansAt(id, A, j) {
+    if (A.t && A.t[j]) return String(A.t[j]);
+    const N = state.nb && state.nb[id], n = N && N !== A && Array.isArray(N.q) ? N.q.indexOf(A.q[j]) : -1;
+    return n >= 0 && String(N.v[n]) === String(A.v[j]) ? firstAt(id) : String(((state.last || {})[tkOf(id)] || {}).date || firstAt(id));
+  }
+  // rec (state.ans[id], or the notebook's first try state.nb[id]) with each answered question's newest answer, and its tries
+  function newest(id, rec, prefix) {
+    if (!rec || !Array.isArray(rec.v) || !Array.isArray(rec.q) || !rec.q.length) return rec;
+    const A = state.ans && state.ans[id], N = state.nb && state.nb[id], re = N && N.re && typeof N.re === 'object' ? N.re : {};
+    const useA = !!A && A !== rec && Array.isArray(A.q) && Array.isArray(A.v) && !A.from;
+    const out = Object.assign({}, rec, { v: rec.v.slice(), tries: Object.assign({}, rec.tries || {}) });
+    rec.q.forEach((q, i) => {
+      if (!filledV(rec.v[i])) return;   // a question not answered in this try (a new try after ↺ Practise again) stays empty
+      let at = rec === A ? ansAt(id, A, i) : firstAt(id), best = null;
+      const j = useA ? A.q.indexOf(q) : -1;
+      if (j >= 0 && filledV(A.v[j])) { const t = ansAt(id, A, j); if (t > at) { at = t; best = { v: A.v[j], t: (A.tries || {})[prefix + j] }; } }
+      const r = re[q]; if (r && filledV(r.v) && String(r.at || '') > at) best = { v: r.v, t: r.t };
+      if (!best || String(best.v) === String(rec.v[i])) return;
+      out.v[i] = best.v;
+      Object.keys(out.tries).forEach(k => { if (new RegExp('^' + prefix + i + '(\\D|$)').test(k)) delete out.tries[k]; });
+      if (best.t) out.tries[prefix + i] = best.t;
+    });
+    return out;
+  }
+  const okIn = f => !f ? null : f.classList.contains('ok') ? 1 : f.classList.contains('no') ? 0 : null;
+  // question it's answer v goes into the newest answers (state.ans[id]): when it was checked (at) and whether it was right (ok)
+  function setAns(id, it, v, ok, at) {
+    const A = state.ans && state.ans[id]; if (!A || !Array.isArray(A.q) || !Array.isArray(A.v) || A.from) return false;
+    const j = A.q.indexOf(qid(it)); if (j < 0) return false;
+    if (state.nb && state.nb[id] === A) state.nb[id] = JSON.parse(JSON.stringify(A));   // the notebook's first try never changes with it
+    let ch = false;
+    if (String(A.v[j]) !== String(v)) { A.v[j] = v; A.t = A.t || []; A.t[j] = at || new Date().toISOString(); ch = true; }
+    if (ok != null) { A.ok = A.ok || []; if (A.ok[j] !== ok) { A.ok[j] = ok; ch = true; } }
+    if (Array.isArray(A.c) && !A.c.includes(j)) { A.c.push(j); A.c.sort((a, b) => a - b); ch = true; }
+    return ch;
+  }
+  // a step opened again: what the page shows (the newest answers, checked with today's check) goes back into state.ans[id]
+  function latestBack(id, prefix, items) {
+    if (fresh[id] || !state.ans || !state.ans[id]) return;
+    const v = vals(items, prefix), N = state.nb && state.nb[id], re = N && N.re && typeof N.re === 'object' ? N.re : {}; let ch = false;
+    items.forEach((it, i) => { const ok = okIn($('#' + prefix + 'f' + i)); if (ok == null || !filledV(v[i])) return;
+      const r = re[qid(it)]; if (setAns(id, it, v[i], ok, r && String(r.v) === String(v[i]) ? r.at : null)) ch = true; });
+    try { if (NBS[id] && NBS[id].one && lastFromPage(id, prefix, NBS[id].one, v)) ch = true; } catch (e) {}   // NBS is set up further down
+    if (ch) save();
+  }
+  /* 📊 The latest score on the teacher's dashboard (state.last: "First try 6/10 → latest 9/10"; Roger, 22 Nov 2026: "On the teacher's
+     dashboard I want to see the first tries and last tries"): the counted questions as they stand now, after a ✏️ correction or today's
+     check. Only when every answered counted question shows ✓ or ✗ (an empty one is not right) and they are the same questions as the saved
+     score. The first try never changes. */
+  function lastFromPage(id, prefix, one, v) {
+    const tk = tkOf(id), L = (state.last || {})[tk] || (state.tries || {})[tk]; if (!L || !one || !one.length || one.length !== L.max) return false;
+    const oks = one.map(i => { const o = okIn($('#' + prefix + 'f' + i)); return o == null && !filledV((v || [])[i]) ? 0 : o; }); if (oks.some(x => x == null)) return false;
+    const sc = oks.filter(Boolean).length; if (sc === L.score) return false;
+    lastTry(tk, sc, one.length); return true;
+  }
   // c: the questions checked in this attempt (✓ Check one at a time, 16 Nov 2026). The notebook gets each question's answer at its first
   // check (nb.c); a notebook kept before (no c) or on another route stays as it is.
   function keep(id, prefix, v, items) {
-    delete fresh[id]; if (state.again) delete state.again[id]; state.ans = state.ans || {};
+    delete fresh[id]; if (state.again) delete state.again[id]; state.ans = state.ans || {}; const was = state.ans[id], now = new Date().toISOString();
     const tr = Object.fromEntries(Object.entries(tries).filter(([k]) => mine(k, prefix))), one = !!(NBS[id] && NBS[id].one), C = [...chk(id)].sort((a, b) => a - b);
     state.ans[id] = { v, tries: tr, l: level, q: (items || []).map(qid) }; if (one) state.ans[id].c = C;
+    // the newest answers: when each one was checked (an answer that didn't change keeps its time) and whether it was right (see newest)
+    const A = state.ans[id], wq = was && Array.isArray(was.q) && Array.isArray(was.v) ? was.q : [];
+    A.t = A.q.map((q, i) => { const j = wq.indexOf(q); return !filledV(v[i]) ? null : j >= 0 && String(was.v[j]) === String(v[i]) ? ansAt(id, was, j) : now; });
+    A.ok = A.q.map((q, i) => okIn($('#' + prefix + 'f' + i)));
     if (state.typing) delete state.typing[id + '_' + level];
     state.nb = state.nb || {}; const nb = state.nb[id];
     const F = C.filter(i => filledV(v[i]));   // the notebook keeps answers only (an empty question checked with "Check all" is not in it)
@@ -576,8 +643,9 @@ var LS2 = (function () {
     save();
   }
   // the answers to show on this route ({v, moved}), with their tries, or null
-  function kept(id, prefix, items, src, rec) {
-    const a = rec || (!fresh[id] && state.ans && state.ans[id]); if (!a || !Array.isArray(a.v)) return null;
+  // raw: the record as it is (the notebook's first try); otherwise each question's newest answer (newest)
+  function kept(id, prefix, items, src, rec, raw) {
+    const a0 = rec || (!fresh[id] && state.ans && state.ans[id]), a = raw ? a0 : newest(id, a0, prefix); if (!a || !Array.isArray(a.v)) return null;
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     const cOf = v => Array.isArray(a.c) ? v.map((x, i) => x ? i : -1).filter(i => i >= 0) : null;   // null: checked as a whole set (before 16 Nov 2026)
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false, c: cOf(a.v.map((_, i) => Array.isArray(a.c) && a.c.includes(i))) }; }
@@ -672,14 +740,14 @@ var LS2 = (function () {
     if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
     if (k) { fill(items, prefix, k.v); check(false, k.c); if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } else if (t) fill(items, prefix, t);
-    nbSaved(id, !!k);
+    nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
      they are pulled up to the laptop version to do it there and the new results are only shown there, not in the notebook").
      state.nb[id]: the answers of the activity's first check (like state.ans). With the notebook look on (html.el-lpnb, el-app.js) a
      checked activity shows those answers with their corrections, written in pen: nothing can be changed (inert) and Check is hidden.
      ↺ Practise again stays: it takes the page back to the laptop look (window.elLpNb(false)) and clears the activity there; the new
-     answers and results show only in the laptop look. el-app.js calls window.elNbRefresh() when the look changes. Marks never change. */
+     answers show in the laptop look (and, since 22 Nov 2026, in the notebook look too: newest). el-app.js calls window.elNbRefresh() when the look changes. Marks never change. */
   const NBS = {};
   // a notebook filled question by question (nb.c) is frozen only once every counted question is in it; until then the activity stays open
   /* a notebook record that holds none of this step's questions is not this step's first try (problem report, 4ESOA, 18 Nov 2026: "no em
@@ -703,26 +771,27 @@ var LS2 = (function () {
     if (!$('#' + listId)) return;
     Object.keys(tries).forEach(k => { if (mine(k, prefix)) delete tries[k]; });
     clearStep(id, listId);
+    // k0: the first try (written small under an answer that changed), k: the newest answers, shown and checked again
+    const T0 = Object.assign({}, tries), k0 = on ? kept(id, prefix, items, src, state.nb[id], true) : null;
+    Object.keys(tries).forEach(x => { delete tries[x]; }); Object.assign(tries, T0);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
-    nbMerge(S, on && k);
+    nbMerge(S, on && k0, on && k);
     if (k) { fill(items, prefix, k.v); check(false, k.c); if (!on) { if (k.moved) movedNote(id, k.fresh, k.added); else splitNote(id); } } else if (t) fill(items, prefix, t);
-    nbLock(id, listId, on && !!k); nbSaved(id, !!k);
+    nbLock(id, listId, on && !!k); nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* ✏️ Correct a wrong answer in the notebook, one question at a time (Roger, 19 Nov 2026: "I want them to be able to redo the questions
      one by one"). In the frozen notebook look every counted question answered wrong has its own "✏️ Correct it": it opens only that
      question, the student answers it again and presses its ✓ Check, as often as they need (a typed answer shows after the second wrong
-     try, as in the laptop look). The correction stays in the notebook (state.nb[id].re, by question id: {v, t: tries, ok, at}) with the
-     first try crossed out under it. Nothing else changes: the mark is still the first check (state.items, state.tries), and 📓 My notebook
-     (first try) and the laptop look (state.ans, ↺ Practise again) never see the corrections. */
-  const nbRe = id => { const nb = state.nb && state.nb[id]; return nb && nb.re && typeof nb.re === 'object' ? nb.re : null; };
-  // k: the frozen notebook's answers (kept), or null. S.first keeps the first try; each saved correction is drawn on top of it.
-  function nbMerge(S, k) {
-    S.open = new Set(); S.first = k ? k.v.slice() : null;
-    const re = k && S.one && nbRe(S.id); if (!re) return;
-    S.items.forEach((it, i) => { const r = re[qid(it)]; if (!r || !S.one.includes(i) || !filledV(k.v[i])) return; k.v[i] = r.v; tries[S.prefix + i] = r.t || 0; });
+     try, as in the laptop look). The correction stays in the notebook (state.nb[id].re, by question id: {v, t: tries, ok, at}). The first
+     try (state.items, state.tries, state.nb[id]) is only the dashboard's statistic, never shown to students and never the mark. Since 22 Nov
+     2026 the correction is also the newest answer (state.ans, setAns), so the laptop look and 📓 My notebook show it too (see newest). */
+  // k0: the frozen notebook's first try (kept raw), k: its newest answers (🆕 22 Nov 2026: a correction on the page or with ✏️ Correct it)
+  function nbMerge(S, k0, k) {
+    S.open = new Set(); S.first = k0 ? k0.v.slice() : null; S.cur = k0 && k ? k.v.slice() : null;
   }
-  const nbAns = (it, v) => it && it.o ? String(it.o[v] == null ? '' : it.o[v]) : esc(String(v == null ? '' : v));
-  // on: the notebook look is frozen; draws ✏️ Correct it under each wrong answer, the crossed-out first try and the mark note
+  // on: the notebook look is frozen; draws ✏️ Correct it under each wrong answer. Students see only their newest answer: the first try is
+  // never shown to them (Roger, 22 Nov 2026: "No need to say your first, students must be their last version"; "First tries will be a
+  // statistic for me"): it stays in state.items / state.tries / state.nb for the dashboard only
   function nbFix(id, on) {
     const S = NBS[id], l = S && $('#' + S.listId); if (!l) return;
     l.querySelectorAll('.el-nbfix,.el-nbwas').forEach(x => x.remove());
@@ -731,35 +800,21 @@ var LS2 = (function () {
     if (!on || !S.one) return;
     if (!S.open) S.open = new Set();
     if (!S.first) S.first = vals(S.items, S.prefix);   // frozen just now, with the last ✓ Check: what is on the page is the first try
-    const re = nbRe(id) || {}; let fixed = 0;
     S.one.forEach(i => {
-      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q || !filledV(S.first[i])) return;
-      const was = re[qid(it)], open = S.open.has(i), wrong = f.classList.contains('no');
-      if (was) fixed++;
-      if (!wrong && !was && !open) return;   // right at the first try: it stays in pen
+      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q || !filledV((S.cur || S.first)[i])) return;
+      const open = S.open.has(i), wrong = f.classList.contains('no');
+      if (!wrong && !open) { if (!q.inert) [...q.children].forEach(c => { c.inert = true; }); return; }   // right (corrected too): it stays in pen
       q.inert = false;
       if (open) q.classList.add('el-nbopen'); else [...q.children].forEach(c => { c.inert = true; });
-      let at = f;
-      if (was || open) {
-        const w = document.createElement('div'); w.className = 'el-nbwas';
-        w.innerHTML = (ca() ? 'El teu primer intent (és el que compta per a la nota): ' : 'Your first try (this is what counts for your mark): ') + '<s>' + nbAns(it, S.first[i]) + '</s>';
-        f.after(w); at = w;
-      }
+      const at = f;
       if (wrong && !open) {
         const b = document.createElement('button'); b.type = 'button'; b.className = 'btn secondary el-nbfix';
         b.textContent = '✏️ ' + (ca() ? 'Corregeix-la' : 'Correct it');
-        b.title = ca() ? 'Torna a fer només aquesta pregunta. La nota no canvia.' : 'Do only this question again. Your mark does not change.';
+        b.title = ca() ? 'Torna a fer només aquesta pregunta.' : 'Do only this question again.';
         b.onclick = () => nbOpen(id, i);
         at.after(b);
       }
     });
-    if (fixed && r && r.classList.contains('show')) {
-      const T = (state.tries || {})[id === 'vocab' ? 'practice' : id], n = T && T.max != null ? ' ' + T.score + ' / ' + T.max : '';
-      const s = document.createElement('span'); s.className = 'el-nbmark';
-      s.textContent = '✏️ ' + (ca() ? 'Has corregit ' + fixed + (fixed > 1 ? ' respostes' : ' resposta') + ' a la llibreta. La teva nota continua sent el primer intent' + (n ? ':' + n : '') + '.'
-        : 'You’ve corrected ' + fixed + (fixed > 1 ? ' answers' : ' answer') + ' in your notebook. Your mark is still your first try' + (n ? ':' + n : '') + '.');
-      r.appendChild(s);
-    }
   }
   // ✏️ Correct it: only that question opens, empty, with its own ✓ Check
   function nbOpen(id, i) {
@@ -782,8 +837,10 @@ var LS2 = (function () {
     const ok = !!(f && f.classList.contains('ok'));
     if (!ok) { tries[key] = (tries[key] || 0) + 1; S.check(false, [i]); }
     const nb = state.nb[id]; nb.re = nb.re || {};
-    nb.re[qid(S.items[i])] = { v, t: tries[key] || 0, ok: ok ? 1 : 0, at: new Date().toISOString() };
+    const at = new Date().toISOString(); nb.re[qid(S.items[i])] = { v, t: tries[key] || 0, ok: ok ? 1 : 0, at };
+    setAns(id, S.items[i], v, ok ? 1 : 0, at); if (!S.cur) S.cur = S.first.slice(); S.cur[i] = v;   // the newest answer, on the page too
     if (ok) S.open.delete(i);
+    lastFromPage(id, S.prefix, S.one, vals(S.items, S.prefix));   // 📊 the dashboard's latest score follows the correction
     save(); nbFix(id, true);
   }
   /* "📓 Saved in your notebook ✓" under a checked activity (Roger, 14 Nov 2026: "so somehow they have the feeling that they are writing
@@ -1837,7 +1894,7 @@ var LS2 = (function () {
         const tk = p.id + '_' + level;
         if (count) { firstTry(tk, pts, maxOf(p)); firstItems(p.id, p.items, items, g); }
         const done = answered(items, p.id);
-        result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)) + (ca() ? ' (primer intent: ' : ' (first try: ') + ((state.tries || {})[tk] || {}).score + ')');
+        result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)));   // the first try is the dashboard's statistic, never shown (22 Nov 2026)
         if (done) { if (count) complete(p.id); else doneFrom(p.id, p.id + '_' + level); };
         if (LP.onScore) LP.onScore();
       }, p.items);

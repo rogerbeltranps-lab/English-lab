@@ -20,6 +20,9 @@ window.ELExam = (function () {
     ? items.filter(x => x && ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level)))
     : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
   const files = {}, ME = document.currentScript && document.currentScript.src;
+  // 📓 the notebook cover counts the latest answers too (Roger, 22 Nov 2026: "students must be their last version even on the cover"):
+  // LATEST[activity][step] = {r: right now, of: questions}, filled by build for every step it draws (el-notebook.js lsSum reads it)
+  const LATEST = {};
   // the section tabs of every activity (el-sections.js), loaded here when the page doesn't have them (an LS1 home, building LS2's chapter)
   let secP = null;
   const sections = () => window.EL_SECTIONS || !ME ? Promise.resolve() : secP || (secP = new Promise(ok => {
@@ -52,6 +55,7 @@ window.ELExam = (function () {
   // done: {"activity#panel": day} · level: a route id · ca: Catalan for Starter/Base · games: {lpNumber: true} played
   async function build({ LS, gid, done, level, ca, played, base, rs }) {
     level = ROUTES.includes(level) ? level : 'insecure';
+    PH = !!((window.EL_LS || []).find(l => l.id === LS) || {}).personal;   // 📱 phone words count as phone only in a personal LS (as its engine)
     const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
     if (base) await sections();
     const pl = plan(LS, gid), out = [], dropped = [], doc = base ? await home(base) : document;
@@ -77,7 +81,7 @@ window.ELExam = (function () {
       const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [Object.assign({ title: nolv(tx(p.title)), boxes: ex }, p.type === 'vocab' || p.id === 'vocabEx' ? { ex: true } : {})] : []; };
       mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
       // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
-      // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
+      // answers to the activities, their latest answers (22 Nov 2026), as the teacher would correct them (Roger, 13 Nov 2026)
       // 💬 the teacher's feedback on each step (Roger, 18 Nov 2026: "apart from the corrections, students should see their feedback"):
       // results/{activity}.replies[step] (the writing, speaking and talk corrections, the answers to a hand-in) and answers[step].t (the
       // answer to the student's comment), as el-corrections.js shows them at the top of the step's tab; levels never. A writing comes
@@ -88,6 +92,7 @@ window.ELExam = (function () {
           orig: pn && pn.type === 'writing' && h && h.f && h.f[0] ? String(h.f[0].v || '') : '' }; };
       panels.forEach(p => {
         const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx), fb = fbOf(p.id);
+        if (work && work.of) (LATEST[a.id] || (LATEST[a.id] = {}))[p.type === 'vocab' ? 'vocab' : p.id] = { r: work.right, of: work.of };
         if (!tab && !work && !fb) return;
         // (Roger, 13 Nov 2026: "even if the students don't do the activities, they must appear in the notebook, not done, with a note
         // (to do / per fer, depending on the level), and the theory of the SLPs too"): a tab done in class that the student hasn't done
@@ -112,7 +117,79 @@ window.ELExam = (function () {
   }
   /* A panel's first check (ls2-engine.js firstItems: state.items[panel_route] = {level, date, q: the question's place in the list, ok, a:
      what was typed, or the option chosen with 0 = the right one}): the questions with the student's answers, the right ones, ✓ / ✗.
-     The vocabulary practice is kept under "vocab". Only the first try, whatever the route it was done at. */
+     The vocabulary practice is kept under "vocab". Each question shows the student's newest answer (🆕 Roger, 22 Nov 2026: "Es millor que
+     els alumnes i jo tinguin les últimes versions a la llibreta i a la pàgina"), and the score counts those: students never see their first
+     try (Roger, 22 Nov 2026: "No need to say your first, students must be their last version even on the cover"; "First tries will be a
+     statistic for me"). The first check only says which questions the step asked; it stays the dashboard's statistic. */
+  /* ✓ today's check of a typed answer, so the notebook can show the latest answers already, before the step is opened again (Roger, 22 Nov
+     2026: "So if you have their last versions I want them see them already"). A copy of ls2-engine.js norm / expand / bare / fits /
+     wholeOk (Towards Nativeness' copy, the newest; 📱 phone words only in a personal LS, as there): true right, false wrong, null can't tell
+     (an own sentence). Keep it in step with the engines when their check changes. */
+  let PH = false;
+  const nrm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+  const phone = s => !PH ? s : s.replace(/\b(?:cell ?phone|mobile phone|smart ?phone)\b/g, 'phone').replace(/\b(my|your|his|her|our|their|the|a) mobile\b/g, '$1 phone');
+  const expand = s => (' ' + nrm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function fits(q, answers, typed) {
+    const v = nrm(typed); if (!v) return false;
+    if (answers.some(a => phone(nrm(a)) === phone(v) || bare(phone(nrm(a))) === bare(phone(v)))) return true;
+    const t = bare(typed).split(' '); if (t.length < 2) return false;
+    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    if (g < 1) return false;
+    return answers.some(a => {
+      const w = nrm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+      if (!fills) return false;
+      const words = [], gap = [], put = (x, f) => bare(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(words.length); words.push(y); });
+      put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+      if (!gap.length) return false;
+      for (let k = 0; k + t.length <= words.length; k++)
+        if (k <= gap[0] && k + t.length > gap[gap.length - 1] && t.every((x, j) => x === words[k + j])) return true;
+      return false;
+    });
+  }
+  const lev1 = (a, b) => { if (a === b) return true; const la = a.length, lb = b.length; if (Math.abs(la - lb) > 1) return false;
+    let i = 0; while (i < la && i < lb && a[i] === b[i]) i++;
+    if (la === lb) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+    return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1); };
+  const flat = x => nrm(x).replace(/'/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function wholeOk(it, typed) {
+    return [bare, flat].some(c => {
+      const t = c(typed); if (!t || t === c(it.whole)) return false;
+      const tw = t.split(' '), orig = new Set(c(it.whole).split(' '));
+      const same = (x, y) => x === y || (x.length >= 5 && !orig.has(y) && lev1(x, y)), ow = c(it.whole).split(' ');
+      return (it.a || []).some(a => { const w = c(a).split(' ');
+        if (w.length === tw.length && w.every((x, j) => same(x, tw[j]))) return true;
+        let p = 0; while (p < w.length && p < ow.length && w[p] === ow[p]) p++;
+        let q = 0; while (q < w.length - p && q < ow.length - p && w[w.length - 1 - q] === ow[ow.length - 1 - q]) q++;
+        let lo = p, hi = w.length - q; if (hi <= lo) { lo = Math.max(0, p - 1); hi = Math.min(w.length, p + 1); }
+        const inOrig = ow.some((_, k) => k + tw.length <= ow.length && tw.every((y, j) => y === ow[k + j]));
+        for (let k = 0; k + tw.length <= w.length; k++) {
+          if (!tw.every((y, j) => same(w[k + j], y))) continue;
+          if (k <= lo && k + tw.length >= hi) return true;
+          if (tw.length >= 2 && k < hi && k + tw.length > lo && !inOrig) return true;
+        }
+        return false; });
+    });
+  }
+  function checkNow(it, v) {
+    if (v == null || String(v).trim() === '') return null;
+    if (Array.isArray(it.o)) return +v === 0;
+    if (it.own) return null;
+    try { const A = Array.isArray(it.a) ? it.a : [it.a]; return it.whole ? wholeOk(it, String(v)) : fits(it.q, A.filter(x => x != null).map(String), String(v)); } catch (e) { return null; }
+  }
+  // the newest answer to question it (ls2-engine.js newest / latestBack): state.ans[id] (.ok as the page last checked it) or a ✏️
+  // correction made in the notebook look (state.nb[id].re), whichever is newer; null when there is none or it can't be marked
+  function latestOf(p, st, it) {
+    const id = p.type === 'vocab' ? 'vocab' : p.id, A = st && st.ans && st.ans[id], N = st && st.nb && st.nb[id], q = String(it.id || it.q || '');
+    const has = x => x != null && String(x).trim() !== '';
+    let best = null;
+    // a step not opened since 22 Nov 2026 has no .ok yet: today's check (checkNow); an own sentence waits until the step is opened again
+    const guess = v => checkNow(it, v);
+    if (A && Array.isArray(A.q) && Array.isArray(A.v) && !A.from) { const j = A.q.indexOf(q), ok = j < 0 ? null : Array.isArray(A.ok) && A.ok[j] != null ? !!A.ok[j] : guess(A.v[j]); if (j >= 0 && has(A.v[j]) && ok != null) best = { v: A.v[j], ok, at: String((A.t || [])[j] || '') }; }
+    const r = N && N.re && typeof N.re === 'object' ? N.re[q] : null;
+    if (r && has(r.v) && (!best || (String(r.at || '') > best.at && String(r.v) !== String(best.v)))) best = { v: r.v, ok: !!r.ok, at: String(r.at || '') };
+    return best;
+  }
   function firstTry(p, st, tx) {
     const IT = (st && st.items) || {}, id = p.type === 'vocab' ? 'vocab' : p.id, src = p.type === 'vocab' ? p.practice : p.items;
     if (!src) return null;
@@ -124,11 +201,16 @@ window.ELExam = (function () {
       const it = list[qi]; if (!it || typeof it !== 'object') return null;
       const mc = Array.isArray(it.o), a = (rec.a || [])[j];
       // 🔍 Spot the mistake, written (Towards Nativeness, type rewrite): the sentence as Roger wrote it is the question (Roger, 21 Nov 2026: "The heading of the questions are missing")
-      return { q: it.q ? tx(it.q) : it.s ? '“' + tx(it.s) + '”' : '', mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, !!(rec.ok || [])[j], a, tx) };
+      const say = x => mc ? (x == null ? '' : tx(it.o[+x])) : String(x == null ? '' : x), fok = !!(rec.ok || [])[j], L = latestOf(p, st, it);
+      // the newest answer (state.ans / ✏️ Correct it, in full); without one, the first check's answer (kept cut at 40 characters, 160 for a whole sentence)
+      // no newer answer: the first check's answer, with today's check (an answer an older check marked wrong gets its tick once it is accepted)
+      const now = L, v = now ? now.v : a, ok = now ? now.ok : fok || (!it.guess && checkNow(it, a) === true);
+      return { q: it.q ? tx(it.q) : it.s ? '“' + tx(it.s) + '”' : '', mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a),
+        given: say(v), ok, at: now ? String(now.at || '') : '', guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, ok, v, tx) };
     }).filter(Boolean);
     if (!qs.length) return null;
-    const scored = qs.filter(x => !x.guess);
-    return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+    const scored = qs.filter(x => !x.guess), day = qs.reduce((d, x) => x.at > d ? x.at : d, String(rec.date || ''));
+    return { day: day.slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
   }
   /* 💬 the feedback line the step showed under that question after ✓ Check (Roger, 18 Nov 2026: "All the activities done in class should
      have the feedback that appears in the normal menu in the notebook"), as ls2-engine.js writes it: a typed question "Correct!" or
@@ -157,5 +239,5 @@ window.ELExam = (function () {
     const qs = list.filter(it => it && typeof it === 'object' && it.q).map(it => ({ q: tx(it.q), o: Array.isArray(it.o) ? it.o.map(tx).filter(Boolean).sort((a, b) => a.localeCompare(b)) : null }));
     return { task: tx(p.task) || tx(p.intro) || '', qs };
   }
-  return { build, lps, plan, ROUTES };
+  return { build, lps, plan, ROUTES, latest: (aid, id) => (LATEST[aid] || {})[id] || null };
 })();

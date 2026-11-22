@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261120a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261122a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const NBERR = window.elNbLayoutErrors = [];   // the sections that could not be laid out (layout), for the console and a ⚠️ report
@@ -124,9 +124,10 @@ window.ELNotebook = (function () {
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
   const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬', fb: '💬' };
-  // ✏️ the student's answers to an activity, their first try, corrected as a teacher would on paper (Roger, 13 Nov 2026: "with the
-  // corrections made as if a corrector had marked them on top, only the first attempt"): their answer in blue pen in the sentence, a red
-  // ✓ when it is right; when it is not, their answer crossed out in red with the right one written above it
+  // ✏️ the student's answers to an activity, corrected as a teacher would on paper (Roger, 13 Nov 2026: "with the corrections made as if a
+  // corrector had marked them on top"): their answer in blue pen in the sentence, a red ✓ when it is right; when it is not, their answer
+  // crossed out in red with the right one written above it. Since 22 Nov 2026 it is their latest answer, never the first try (Roger: "No
+  // need to say your first, students must be their last version even on the cover"; first tries are only his statistic)
   const blank = /_{2,}|…{1,}(?=\s*\()|\.{3,}/;
   function work(w) {
     const pen = x => esc(x).replace(/&amp;(#?\w+;)/g, '&$1');
@@ -143,7 +144,7 @@ window.ELNotebook = (function () {
       return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}${ex}</li>`;
     };
     const pc = w.of ? w.right / w.of : 1;
-    return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
+    return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} ${w.day ? `<small>· ${esc(H.exDay(w.day))}</small>` : ''}${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
   }
   // 💬 the teacher's feedback on a step (el-exam.js fb: {text, corr, orig} or {many: […]}), in the notebook's hand (Roger, 18 Nov 2026):
   // a writing correction (el-marking.js fbText: the comment, "✗ their words → right — why" lines, "✅ " + the corrected text with the
@@ -335,7 +336,7 @@ window.ELNotebook = (function () {
   // activitats ben fetes en general (n/m) per cada communicative competence … El nom de l'alumne curs i English Lab, Roger Beltran i el curs
   // 2026/2027 amb el fav icon"; "La portada tb surt al obrir la llibreta"; "Per defecte la portada surt sempre"). Page 1 of every chapter and
   // of every print. One summary per LS of the course with something in it: from the learning paths' answers on this device (each step's
-  // criteria in EL_STEP_CRITERIA; first try), the class games (myGames) and the results (the teacher's final level for a criterion wins).
+  // criteria in EL_STEP_CRITERIA; the latest answers, el-exam.js latest), the class games (myGames) and the results (the teacher's final level for a criterion wins).
   // the final product feedback as the teacher writes it: "Part (w %) · m / 10" lines, then ✔ what went well and ➜ what to keep in mind
   function fpParts(txt) {
     const HL = /^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/, parts = [], com = []; let cur = null;
@@ -356,7 +357,7 @@ window.ELNotebook = (function () {
     });
     return out;
   }
-  // which skill an activity practises, by its tab: the first tries of the cover's rings (recall and checkpoints mix them: left out)
+  // which skill an activity practises, by its tab: the cover's rings (recall and checkpoints mix them: left out)
   const SKILL = id => /^(grammar([A-Z]\w*)?|mixed)$/.test(id) ? 'grammar' : /^(vocab|words|cards)$/.test(id) ? 'vocab' : /^(read|log|sources|ch\d+)$/.test(id) ? 'read' : /^(listen|again|chart)$/.test(id) ? 'listen' : null;
   const lsSum = L => {
     const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {}, skill = {}, act = { n: 0, ok: 0 };
@@ -364,8 +365,12 @@ window.ELNotebook = (function () {
       let st = null; try { st = JSON.parse(localStorage.getItem(a.keys[0]) || 'null'); } catch (e) {}
       const items = (st && st.items) || {}, first = {};
       Object.entries(items).forEach(([k, r]) => { const id = k.replace(/_[^_]+$/, ''); if (!r || !Array.isArray(r.ok) || !r.ok.length) return; if (!first[id] || String(r.date || '') < String(first[id].date || '')) first[id] = r; });
+      // 🆕 the latest answers (Roger, 22 Nov 2026: "students must be their last version even on the cover"; "So if you have their last
+      // versions I want them see them already"): el-exam.js counts each step's newest answers when it draws it; a step it didn't draw
+      // (no panel any more) keeps its first check
       Object.entries(first).forEach(([id, r]) => {
-        const right = r.ok.filter(Boolean).length, of = r.ok.length, sk = SKILL(id);
+        const lt = window.ELExam && ELExam.latest ? ELExam.latest(a.id, id) : null, right = lt ? lt.r : r.ok.filter(Boolean).length, of = lt ? lt.of : r.ok.length, sk = SKILL(id);
+        if (!of) return;
         if (sk) { const z = skill[sk] || (skill[sk] = { r: 0, of: 0 }); z.r += right; z.of += of; }
         act.n++; if (right / of >= .5) act.ok++;
         const cs = ((SC[a.id] || {})[id] || []).filter(c => /^\d+\.\d+$/.test(c)); if (!cs.length) return;
@@ -416,7 +421,7 @@ window.ELNotebook = (function () {
     const ids = new Set(sums.map(y => y.L.id)), gl = Object.values(H.mg || {}).filter(y => y && ids.has(y.ls)), gm = { grammar: { r: 0, of: 0, n: 0 }, vocab: { r: 0, of: 0, n: 0 } };
     (window.elLatestGames ? elLatestGames(gl) : gl).forEach(y => { const z = gm[y.kind === 'vocab' ? 'vocab' : y.kind === 'grammar' ? 'grammar' : '']; if (z && y.of) { z.r += +y.r || 0; z.of += +y.of; z.n++; } });
     const act = sums.reduce((a, y) => { a.n += y.act.n; a.ok += y.act.ok; return a; }, { n: 0, ok: 0 }), here = sums.length > 1 ? `${window.elLsNum ? elLsNum(me0) : 'LS'}` : '';
-    const tiles = [['✏️', act.n, t('activitats fetes', 'activities done'), act.n ? t(`${act.ok} bé al primer intent`, `${act.ok} right on the first try`) : ''],
+    const tiles = [['✏️', act.n, t('activitats fetes', 'activities done'), act.n ? t(`${act.ok} ben fetes`, `${act.ok} done well`) : ''],
       ['🎮', gm.grammar.n + gm.vocab.n, t('jocs de classe', 'class games played'), ''],
       ['🧭', st.lps || 0, t('learning paths començats', 'learning paths started'), here],
       ['🔤', st.words || 0, t('paraules a la llibreta', 'words in my notebook'), here],
@@ -429,7 +434,7 @@ window.ELNotebook = (function () {
         return `<div class="nb-fr-row d-${r.deg || 'x'}"><div class="nb-fr-rt"><span class="nb-fr-sk">${SKI[k] || '⭐'} <b>${esc(CEN[k] || String(r.comp).replace(/^\S+ · /, ''))}</b></span><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}">${esc(r.deg || '–')}</span><span class="nb-fr-dw">${esc(DG[r.deg] || t('encara sense nota', 'not assessed yet'))}</span></div>`
           + `${r.ind ? `<div class="nb-fr-t">${esc(r.ind)}</div>` : ''}</div>`; }).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
       + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}</div>`
-      + `${Object.keys(y.comp).length ? `<div class="nb-fr-ab"><div class="nb-fr-abh">✅ ${t('Activitats ben fetes', 'Activities done well')} <small>${t('(la meitat o més bé al primer intent)', '(half or more right on the first try)')}</small></div><div class="nb-fr-abl">${Object.keys(y.comp).sort((a, b) => a - b).map(k => { const z = y.comp[k], n = Math.min(z.of, 12);
+      + `${Object.keys(y.comp).length ? `<div class="nb-fr-ab"><div class="nb-fr-abh">✅ ${t('Activitats ben fetes', 'Activities done well')} <small>${t('(la meitat o més bé)', '(half or more right)')}</small></div><div class="nb-fr-abl">${Object.keys(y.comp).sort((a, b) => a - b).map(k => { const z = y.comp[k], n = Math.min(z.of, 12);
         return `<div class="nb-fr-abc"><b>${SKI[k] || '⭐'} ${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))}</b><span class="nb-fr-sqs" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i < Math.round(z.ok / z.of * n) ? 'ok' : ''}"></i>`).join('')}</span><small>${t(`${z.ok} de ${z.of} ben fetes`, `${z.ok} of ${z.of} done well`)}</small></div>`; }).join('')}</div></div>` : ''}</div>`;
     // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
     return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40" decoding="sync"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
@@ -437,9 +442,9 @@ window.ELNotebook = (function () {
       + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
       + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
       // (Roger, 13 Nov 2026: "On the cover only this and add sth like this bit about grammar, vocabulary, reading, listening activities.
-      // Then the following pages my results but in a cover style", then "This should be notebook like not like a cover"): the first tries
-      // of each skill as rings, the results on the next pages, on notebook paper
-      + `<div class="nb-fr-rings"><div class="nb-fr-rh">${t('Primers intents', 'First tries')}</div>${[['grammar', '🧩', t('Gramàtica', 'Grammar')], ['vocab', '📚', t('Vocabulari', 'Vocabulary')], ['read', '📖', 'Reading'], ['listen', '🎧', 'Listening']].map(([k, ic, nm]) => {
+      // Then the following pages my results but in a cover style", then "This should be notebook like not like a cover"): the answers
+      // of each skill as rings (the latest ones, 22 Nov 2026), the results on the next pages, on notebook paper
+      + `<div class="nb-fr-rings"><div class="nb-fr-rh">${t('Les meves activitats', 'My activities')}</div>${[['grammar', '🧩', t('Gramàtica', 'Grammar')], ['vocab', '📚', t('Vocabulari', 'Vocabulary')], ['read', '📖', 'Reading'], ['listen', '🎧', 'Listening']].map(([k, ic, nm]) => {
         const z = sums.reduce((a, y) => { const v = y.skill[k]; if (v) { a.r += v.r; a.of += v.of; } return a; }, { r: 0, of: 0 });
         return ring(z, ic, nm); }).join('')}`
       // 🎮 the class games and 📊 the numbers of the notebook (Roger, 13 Nov 2026: "Add more statistics here", the empty part of the cover)
@@ -1143,7 +1148,7 @@ window.ELNotebook = (function () {
       { el: '.nb-bar .nb-tab', all: '.nb-bar .nb-tab', ic: '🗂', h: t('Les pestanyes', 'The tabs'), p: t('Toca Index o un LP per anar-hi de seguida. A l\'índex hi ha totes les parts amb el número de pàgina.', 'Tap Index or an LP to go straight there. The index lists every part with its page number.') },
       { el: '.nb-nav', ic: '👉', h: t('Passa la pàgina', 'Turn the page'), p: t('Amb ◀ ▶, amb les fletxes del teclat, o arrossegant la cantonada de la pàgina com en un llibre de veritat. Aquí no es fa scroll.', 'With ◀ ▶, the arrow keys, or by dragging the corner of the page like a real book. No scrolling here.') },
       { el: '.nb-side .nb-stab', all: '.nb-side', at: '.nb-work', wide: 1, ic: '🏷', h: t('Els post-its de les seccions', 'The section post-its'), p: t('Cada LP està dividit en seccions: Vocabulary, Reading, Grammar… Toca un post-it del costat per saltar-hi.', 'Each LP is split into sections: Vocabulary, Reading, Grammar… Tap a post-it on the edge to jump there.') },
-      { el: '.nb-work', at: '.nb-work', ic: '✏️', h: t('Les teves respostes, corregides', 'Your answers, corrected'), p: t('Després de cada activitat hi veuràs el teu primer intent, corregit en vermell: el que està malament ratllat i la resposta bona a sobre. Estudia sobretot això!', 'After each activity you\'ll see your first try, corrected in red: the wrong word crossed out and the right answer above it. Study those most!'), pad: 4 },
+      { el: '.nb-work', at: '.nb-work', ic: '✏️', h: t('Les teves respostes, corregides', 'Your answers, corrected'), p: t('Després de cada activitat hi veuràs les teves últimes respostes, corregides en vermell: el que està malament ratllat i la resposta bona a sobre. Estudia sobretot això!', 'After each activity you\'ll see your latest answers, corrected in red: the wrong word crossed out and the right answer above it. Study those most!'), pad: 4 },
       { el: '.nb-spread', at: '.nb-work', ic: '🖍', h: t('Subratlla i encercla', 'Highlight and circle'), p: t('Tria unes paraules amb el ratolí o el dit i apareixeran els subratlladors: groc, verd, rosa, subratllar, ondulat, encerclar. 🧽 ho treu.', 'Select some words with the mouse or your finger and the highlighters appear: yellow, green, pink, underline, wavy, circle. 🧽 takes it off.'), pad: -30 },
       { el: '.nb-bt', at: '.nb-bt', ic: '✍', h: t('Escriu a la llibreta', 'Write in your notebook'), p: t('Toca on vulguis d\'una pàgina i escriu-hi: el que hi ha a sota baixa una línia. Toca una nota teva per canviar-la. Al marge, 🟨 hi enganxa un post-it. Si t\'equivoques, ↶ Desfés.', 'Tap anywhere on a page and write there: what is below moves down a line. Tap a note of yours to change it. In the margin, 🟨 sticks a post-it. Made a mistake? ↶ Undo.') },
       { el: '.eldict-fab', opt: 1, ic: '🔍', h: t('El diccionari', 'The dictionary'), p: t('La lupa sempre és aquí. Busca qualsevol paraula en anglès o en català.', 'The magnifier is always here. Look up any word in English or Catalan.') },

@@ -70,20 +70,21 @@ await pick(0); await tap(`button[data-one="listen"][data-i="${W}"]`); await page
 ok(await page.evaluate((W) => document.querySelector('#listenf' + W).classList.contains('ok'), W), 'right: Correct!');
 ok(await page.locator('#listenForm .el-nbfix').count() === 0, 'no ✏️ left');
 ok(await page.evaluate((W) => document.querySelectorAll('#listenForm>.question')[W].querySelector('.options').inert, W), 'the correction is in pen too');
-ok(/first try/i.test(await page.textContent('#listenResult')) || LANG === 'ca', 'the result says the mark is still the first try');
+ok(!/first try|primer intent/i.test(await page.textContent('#listenResult')), 'the result never mentions the first try (22 Nov 2026)');
 await shot('3-corrected', `#listenForm>.question:nth-child(${W + 1})`);
 s = await st();
 ok(JSON.stringify(s.items['listen_' + LV]) === first && JSON.stringify(s.tries.listen) === firstTries, 'the mark and the first try did not change');
-ok(s.nb.listen.v[W] === 1 && s.ans.listen.v[W] === 1, 'notebook first try and laptop answers keep "as a forward"');
+ok(s.nb.listen.v[W] === 1 && s.ans.listen.v[W] === 0, 'the first try (statistic) keeps "as a forward", the latest answer is the correction');
 ok(s.nb.listen.re && Object.values(s.nb.listen.re)[0].v === 0, 'the correction is saved in the notebook');
+ok(s.last && s.last.listen && s.last.listen.score === qs.length && s.tries.listen.score === qs.length - 1, 'dashboard: first try ' + (s.tries.listen || {}).score + ' → latest ' + ((s.last || {}).listen || {}).score + ' / ' + qs.length);
 // back later: the correction is still there
 await page.reload(); await page.waitForTimeout(1500); await tap('.tab[data-panel="listen"]'); await page.waitForTimeout(400);
 ok(await page.evaluate((W) => { const c = document.querySelector('input[name="listen' + W + '"]:checked'); return c && c.value === '0'; }, W), 'after a reload the corrected answer is there');
-ok(await page.evaluate((W) => /as a forward/.test(document.querySelectorAll('#listenForm>.question')[W].querySelector('.el-nbwas').textContent), W), 'with the first try crossed out');
+ok(await page.evaluate(() => !document.querySelector('#listenForm .el-nbwas, #listenResult .el-nbmark') && !/first try|primer intent/i.test(document.querySelector('#listen').textContent)), 'only the latest answer, no first try line');
 await shot('4-after-reload', `#listenResult`);
-// the laptop look still shows the first try
+// the laptop look shows the latest answer too (22 Nov 2026)
 await page.evaluate(() => window.elLpNb(false)); await page.waitForTimeout(400);
-ok(await page.evaluate((W) => { const c = document.querySelector('input[name="listen' + W + '"]:checked'); return c && c.value === '1'; }, W), 'the laptop look still shows the first try');
+ok(await page.evaluate((W) => { const c = document.querySelector('input[name="listen' + W + '"]:checked'); return c && c.value === '0'; }, W), 'the laptop look shows the corrected answer');
 ok(await page.locator('#listenForm .el-nbfix, #listenForm .el-nbwas').count() === 0, 'no ✏️ in the laptop look');
 await page.evaluate(() => window.elLpNb(true)); await page.waitForTimeout(400);
 await browser.close();
