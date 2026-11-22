@@ -20,7 +20,7 @@ window.ELNotebook = (function () {
   const me = document.currentScript && document.currentScript.src;
   function css() {
     if (document.getElementById('el-nb-css') || !me) return;
-    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261120a', me).href; document.head.append(l);
+    const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261122a', me).href; document.head.append(l);
   }
   const PLAIN = 'el-nb-plain';
   const NBERR = window.elNbLayoutErrors = [];   // the sections that could not be laid out (layout), for the console and a ⚠️ report
@@ -138,12 +138,14 @@ window.ELNotebook = (function () {
     const li = x => {
       const q = String(x.q || ''), mark = x.guess ? '' : x.ok ? '<i class="nb-tick">✓</i>' : '<i class="nb-cross">✗</i>';
       // 💬 the feedback of that question (the step's explanation, our own data) in the teacher's green pen under it
-      const ex = x.ex ? `<span class="nb-ex">${x.ex}</span>` : '';
+      const ex = (x.ex ? `<span class="nb-ex">${x.ex}</span>` : '')
+        // 🆕 a newer answer is the one written above (Roger, 22 Nov 2026); the first try, which counts for the mark, small under it
+        + (x.first ? `<span class="nb-was">${t('Primer intent (compta per a la nota)', 'First try (counts for your mark)')}: ${x.first.ok ? pen(x.first.given) || '—' : `<s>${pen(x.first.given) || '—'}</s>`}</span>` : '');
       if (!x.mc && blank.test(q)) return `<li>${q.replace(blank, () => fix(x))} ${mark}${ex}</li>`;
       return `<li>${q} <span class="nb-arrow">→</span> ${fix(x)} ${mark}${ex}</li>`;
     };
     const pc = w.of ? w.right / w.of : 1;
-    return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
+    return `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves respostes', 'My answers')} <small>· ${w.fixed ? t('les últimes respostes', 'your latest answers') : t('primer intent', 'first try')}${w.day ? ' · ' + esc(H.exDay(w.day)) : ''}</small>${w.of ? `<span class="nb-stamp${pc >= .8 ? ' ok' : ''}" title="${t('Primer intent', 'First try')}">${w.right}/${w.of}</span>` : ''}</div><ol class="nb-ans">${w.qs.map(li).join('')}</ol></div>`;
   }
   // 💬 the teacher's feedback on a step (el-exam.js fb: {text, corr, orig} or {many: […]}), in the notebook's hand (Roger, 18 Nov 2026):
   // a writing correction (el-marking.js fbText: the comment, "✗ their words → right — why" lines, "✅ " + the corrected text with the

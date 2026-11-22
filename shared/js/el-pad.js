@@ -20,7 +20,7 @@ const penOf = (el, ed) => { const pe = el && el.closest && el.closest('[class*="
 
 export function css() {
   if (document.getElementById('el-nb-css')) return;
-  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261120a', import.meta.url).href; document.head.append(l);
+  const l = document.createElement('link'); l.id = 'el-nb-css'; l.rel = 'stylesheet'; l.href = new URL('../css/el-notebook.css?v=20261122a', import.meta.url).href; document.head.append(l);
 }
 export function clean(h) {
   let n = 0;

@@ -112,7 +112,24 @@ window.ELExam = (function () {
   }
   /* A panel's first check (ls2-engine.js firstItems: state.items[panel_route] = {level, date, q: the question's place in the list, ok, a:
      what was typed, or the option chosen with 0 = the right one}): the questions with the student's answers, the right ones, ✓ / ✗.
-     The vocabulary practice is kept under "vocab". Only the first try, whatever the route it was done at. */
+     The vocabulary practice is kept under "vocab". The first try, whatever the route it was done at, gives the score; each question shows
+     the student's newest answer when it changed (🆕 Roger, 22 Nov 2026: "Es millor que els alumnes i jo tinguin les últimes versions a la
+     llibreta i a la pàgina"), with the first try written small under it (first). */
+  // the newest answer to question it (ls2-engine.js newest / latestBack): state.ans[id] (.ok as the page last checked it) or a ✏️
+  // correction made in the notebook look (state.nb[id].re), whichever is newer; null when there is none or it can't be marked
+  function latestOf(p, st, it) {
+    const id = p.type === 'vocab' ? 'vocab' : p.id, A = st && st.ans && st.ans[id], N = st && st.nb && st.nb[id], q = String(it.id || it.q || '');
+    const has = x => x != null && String(x).trim() !== '';
+    let best = null;
+    // a step not opened since 22 Nov 2026 has no .ok yet: a choice is right when it is option 0, a typed answer when it is one of the
+    // accepted answers (letters only); anything else waits until the step is opened again (the first try shows meanwhile)
+    const flat = x => String(x == null ? '' : x).toLowerCase().replace(/[’'`]/g, '').replace(/[^a-z0-9à-ü ]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const guess = v => Array.isArray(it.o) ? +v === 0 : it.own ? null : (Array.isArray(it.a) ? it.a : [it.a]).some(x => x != null && flat(x) === flat(v)) ? true : null;
+    if (A && Array.isArray(A.q) && Array.isArray(A.v) && !A.from) { const j = A.q.indexOf(q), ok = j < 0 ? null : Array.isArray(A.ok) && A.ok[j] != null ? !!A.ok[j] : guess(A.v[j]); if (j >= 0 && has(A.v[j]) && ok != null) best = { v: A.v[j], ok, at: String((A.t || [])[j] || '') }; }
+    const r = N && N.re && typeof N.re === 'object' ? N.re[q] : null;
+    if (r && has(r.v) && (!best || (String(r.at || '') > best.at && String(r.v) !== String(best.v)))) best = { v: r.v, ok: !!r.ok, at: String(r.at || '') };
+    return best;
+  }
   function firstTry(p, st, tx) {
     const IT = (st && st.items) || {}, id = p.type === 'vocab' ? 'vocab' : p.id, src = p.type === 'vocab' ? p.practice : p.items;
     if (!src) return null;
@@ -124,11 +141,15 @@ window.ELExam = (function () {
       const it = list[qi]; if (!it || typeof it !== 'object') return null;
       const mc = Array.isArray(it.o), a = (rec.a || [])[j];
       // 🔍 Spot the mistake, written (Towards Nativeness, type rewrite): the sentence as Roger wrote it is the question (Roger, 21 Nov 2026: "The heading of the questions are missing")
-      return { q: it.q ? tx(it.q) : it.s ? '“' + tx(it.s) + '”' : '', mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, !!(rec.ok || [])[j], a, tx) };
+      const say = x => mc ? (x == null ? '' : tx(it.o[+x])) : String(x == null ? '' : x), fok = !!(rec.ok || [])[j], L = latestOf(p, st, it);
+      // the first try is kept cut at 40 characters (160 for a whole sentence): the same answer, longer, is not a new one
+      const a0 = String(a == null ? '' : a).trim(), now = L && String(L.v).trim() !== a0 && !(a0.length >= 40 && String(L.v).trim().startsWith(a0)) ? L : null;
+      return { q: it.q ? tx(it.q) : it.s ? '“' + tx(it.s) + '”' : '', mc, right: mc ? tx(it.o[0]) : it.own ? tx(it.show) : tx(Array.isArray(it.a) ? it.a[0] : it.a),
+        given: say(now ? now.v : a), ok: now ? now.ok : fok, fok, first: now ? { given: say(a), ok: fok } : null, guess: !!it.guess, ex: it.guess ? '' : pageFb(p, it, mc, now ? now.ok : fok, now ? now.v : a, tx) };
     }).filter(Boolean);
     if (!qs.length) return null;
     const scored = qs.filter(x => !x.guess);
-    return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
+    return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.fok).length, of: scored.length, fixed: qs.filter(x => x.first).length };
   }
   /* 💬 the feedback line the step showed under that question after ✓ Check (Roger, 18 Nov 2026: "All the activities done in class should
      have the feedback that appears in the normal menu in the notebook"), as ls2-engine.js writes it: a typed question "Correct!" or

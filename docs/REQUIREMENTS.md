@@ -167,7 +167,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - Marks: the degree (Assoliment notable…) in a coloured box first, the number small beside it (10 Nov 2026).
 - Student pages: no translating, no copying of page text, no spell-check in answer boxes (9 and 13 Nov 2026).
 - Everything students can download or print carries "© (year) Roger Beltran · English Lab · All rights reserved".
-- Students' answers always come back (on reload, another device, after a level change) unless they redo that activity (6 Nov 2026).
+- Students' answers always come back (on reload, another device, after a level change) unless they redo that activity (6 Nov 2026). **The latest version shows** (Roger, 22 Nov 2026: "Es millor que els alumnes i jo tinguin les últimes versions a la llibreta i a la pàgina, així si ja ho han arreglat ho veuen bé"): a step opened again shows each question's newest answer (corrected on the page or with ✏️ Correct it), checked with today's check, on the page, in the notebook look and in 📓 My notebook; the first try, which is still the mark, is written small under an answer that changed. Students and Towards Nativeness alike.
 - Never draw a guessed page that changes after sign-in (7 Nov 2026).
 - **LS1 stays as it is** unless Roger asks: its content and pages are finished.
 
@@ -277,7 +277,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - **Compulsory per grammar block = 4** (3 questions + the own example), the rest ➕ extra practice; 💬 Expressions = 6 compulsory + 4 extra per level.
 - **Grammar that comes back**: only Starter and Base drill the old form; Core and Plus start from the new use, never more old-form items than new ones.
 - Words with a structure (in/on/at, play/go/do, verb + preposition) are **💬 Expressions**, their own step after Vocabulary, not grammar (16 Nov 2026).
-- ✓ Check per question; the mark is the first try; students can correct wrong answers in the notebook without changing the mark.
+- ✓ Check per question; the mark is the first try; students can correct wrong answers on the page or in the notebook without changing the mark, and the corrected answer is the one they see from then on (22 Nov 2026).
 - **Typed answers: every natural answer counts, and the feedback names the real mistake** (Roger, 22 Nov 2026: "the feedback is wrong then because I didn't make a grammar mistake"; "This is correct too!"; "This should be the same for the students"). For every typed answer (learning paths, Towards Nativeness, 🎯 Practise, the sample exam):
   - **Accept every natural, correct answer**, casual ones included ("It works, right?", "Turns out the doc had another name", "What did you do exactly?", "in the top right corner", 2ESO / 2 ESO). When writing a question, list all of them; the first answer is the model shown. Contractions count either way (It's = It is).
   - **A spelling slip gets a spelling hint, never the grammar rule**: "Almost! Check the spelling of ‘laod’. Try again." (or "‘an other’ is one word", "Check the apostrophes"; Catalan for Starter). It is **still not right** (Roger chose "fix it and try again", 22 Nov 2026, as in the exams), but it is not one of the two tries before the answer shows.
