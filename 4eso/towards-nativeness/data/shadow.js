@@ -47,34 +47,34 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "The favicon isn’t showing on my phone’s home screen. ↘"
+    "The **fav**icon‿isn’t **show**ing‿on my **phone’s** **home** screen. ↘"
    ],
    [
-    "Check whether there’s a problem on GitHub. ↘"
+    "**Check** whether there’s‿a **prob**lem‿on **Git**Hub. ↘"
    ],
    [
-    "Is ChatGPT better at this? ↗"
+    "Is ChatGP**T** **bet**ter‿at **this**? ↗"
    ],
    [
-    "How long will I have to wait? ↘"
+    "How **long** will‿I have to **wait**? ↘"
    ],
    [
-    "So is Opus better for my website? ↘"
+    "So‿is **O**pus **bet**ter for my **web**site? ↗"
    ],
    [
-    "But can’t you do it yourself? ↘"
+    "But **can’t**‿you **do**‿it your**self**? ↘"
    ],
    [
-    "It’s taking ages. ↘"
+    "It’s **tak**ing‿**a**ges. ↘"
    ],
    [
-    "I’ve already used almost 40% of my weekly limit. ↘"
+    "I’ve‿al**rea**dy **used**‿al**most** **40%**‿of my **week**ly **lim**it. ↘"
    ],
    [
-    "Some sections scroll sideways and the layout looks weird. ↘"
+    "Some **sec**tions **scroll** **side**ways‿and the **lay**out **looks** **weird**. ↘"
    ],
    [
-    "What exactly did you do? ↘"
+    "What‿ex**act**ly did‿you **do**? ↘"
    ]
   ],
   "cues": [
@@ -186,34 +186,34 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "I’m attaching the grid with the criteria. ↘"
+    "I’m‿at**tach**ing the **grid** with the cri**te**ria. ↘"
    ],
    [
-    "Here’s the document I’m sending you. ↘"
+    "**Here’s** the **doc**ument‿I’m **send**ing you. ↘"
    ],
    [
-    "I need you to make an HTML page. ↘"
+    "I **need**‿you to **make**‿an HTM**L** page. ↘"
    ],
    [
-    "Go ahead then and apply the changes to the repository. ↘"
+    "Go‿a**head** then‿and‿ap**ply** the **chang**es to the re**pos**itory. ↘"
    ],
    [
-    "Don’t change any content ↗, just list the errors you find and how to fix them. ↘"
+    "Don’t **change**‿any **con**tent ↗, just **list** the **er**rors you **find**‿and **how** to **fix** them. ↘"
    ],
    [
-    "I want to let fast finishers do further activities. ↘"
+    "I **want** to **let** **fast** **fin**ishers do **fur**ther‿ac**tiv**ities. ↘"
    ],
    [
-    "Yes ↗, add “I’ve finished” ↗, but make it take them to the book section. ↘"
+    "**Yes** ↗, **add** “I’ve **fin**ished” ↗, but **make**‿it **take** them to the **book** section. ↘"
    ],
    [
-    "Once I finish ↗, I’d like to use one of the two LSs as a model for the next ones. ↘"
+    "Once‿I **fin**ish ↗, I’d **like** to **use** **one**‿of the **two** L**Ss**‿as‿a **mod**el for the **next** ones. ↘"
    ],
    [
-    "I want the option to say “send it anyway” ↗, so always ask me. ↘"
+    "I **want** the **op**tion to say “**send**‿it‿**an**yway” ↗, so **al**ways‿**ask** me. ↘"
    ],
    [
-    "Maybe it’s better to leave it. ↘"
+    "**May**be it’s **bet**ter to **leave**‿it. ↘"
    ]
   ],
   "cues": [
@@ -261,9 +261,9 @@ window.TN_SHADOW = {
    ],
    [
     27.27,
-    32.0,
+    32,
     34.09,
-    40.0
+    40
    ],
    [
     32.9,
@@ -325,34 +325,34 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "You can start from scratch. ↘"
+    "You can **start** from **scratch**. ↘"
    ],
    [
-    "I figured it out after an hour. ↘"
+    "I **fig**ured‿it‿**out**‿after‿an‿**hour**. ↘"
    ],
    [
-    "When I had the idea ↗, I’d never built an app. ↘"
+    "When‿I **had** the i**dea** ↗, I’d **nev**er **built**‿an‿**app**. ↘"
    ],
    [
-    "The idea is that they can read on from the last chapter they read. ↘"
+    "The i**dea**‿is that they can **read**‿**on** from the **last** **chap**ter they **read**. ↘"
    ],
    [
-    "Students couldn’t leave the game once they’d finished it. ↘"
+    "**Stu**dents **could**n’t **leave** the **game** once they’d **fin**ished‿it. ↘"
    ],
    [
-    "Whenever they moved from one page to another ↗, they dropped out of full screen. ↘"
+    "When**ev**er they **moved** from **one** **page** to an**oth**er ↗, they **dropped**‿out‿of full **screen**. ↘"
    ],
    [
-    "Students say it’s hard to organise their thoughts on the website. ↘"
+    "**Stu**dents **say** it’s **hard** to **or**ganise their **thoughts**‿on the **web**site. ↘"
    ],
    [
-    "Designing LSs that are a bit complex takes me ages. ↘"
+    "De**sign**ing L**Ss** that‿are‿a **bit** **com**plex **takes** me **a**ges. ↘"
    ],
    [
-    "I was seeing the right game ↗, but the students were playing a hacker game. ↘"
+    "I was **see**ing the **right** **game** ↗, but the **stu**dents were **play**ing‿a **hack**er game. ↘"
    ],
    [
-    "Didn’t we agree there wouldn’t be any transcripts in the speaking activities? ↗"
+    "**Did**n’t we a**gree** there **would**n’t be any **tran**scripts‿in the **speak**ing‿ac**tiv**ities? ↗"
    ]
   ],
   "cues": [
@@ -464,34 +464,34 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "Now I want you to do the same with the 2 ESO LSs. ↘"
+    "**Now** I **want**‿you to **do** the **same** with the 2 E**SO** L**Ss**. ↘"
    ],
    [
-    "Adapt the 4 ESO LSs to what we’ve agreed. ↘"
+    "A**dapt** the 4 E**SO** L**Ss** to **what** we’ve‿a**greed**. ↘"
    ],
    [
-    "Create a master document with all the competences. ↘"
+    "Cre**ate**‿a **mas**ter **doc**ument with‿**all** the com**pe**tences. ↘"
    ],
    [
-    "From a given competence ↗, I design an objective. ↘"
+    "From‿a **giv**en com**pe**tence ↗, I de**sign**‿an‿ob**jec**tive. ↘"
    ],
    [
-    "These are the docs that explain how to write the objectives. ↘"
+    "**These**‿are the **docs** that‿ex**plain** how to **write** the ob**jec**tives. ↘"
    ],
    [
-    "Please check whether any students who hadn’t done the LS1 exam have finally done it. ↘"
+    "**Please** **check** whether‿any **stu**dents who **had**n’t **done** the LS**1**‿exam have **fi**nally **done**‿it. ↘"
    ],
    [
-    "The doc you created is missing the verb to be. ↘"
+    "The **doc** you cre**at**ed‿is **miss**ing the **verb** to **be**. ↘"
    ],
    [
-    "Send Nael an email telling him his video has no sound. ↘"
+    "**Send** **Na**el‿an‿**e**mail **tell**ing‿him his **vid**eo has **no** **sound**. ↘"
    ],
    [
-    "Not handed in or no link should be a 0 by default. ↘"
+    "**Not** **hand**ed‿**in** or **no** **link** should be a **0** by de**fault**. ↘"
    ],
    [
-    "The final task was posted on Classroom on 23 Oct. ↘"
+    "The **fi**nal **task** was **post**ed‿on **Class**room‿on **23** **Oct**. ↘"
    ]
   ],
   "cues": [
@@ -603,34 +603,34 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "Is it because it’s Saturday? ↗"
+    "Is‿it be**cause**‿it’s **Sat**urday? ↗"
    ],
    [
-    "The table full screen is missing here. ↘"
+    "The **ta**ble full screen‿is **miss**ing **here**. ↘"
    ],
    [
-    "A microphone is covered. ↘"
+    "A **mi**crophone‿is **cov**ered. ↘"
    ],
    [
-    "I can hear two songs. ↘"
+    "I can **hear** **two** **songs**. ↘"
    ],
    [
-    "Can I switch between these sections? ↗"
+    "Can‿I **switch** be**tween** **these** **sec**tions? ↗"
    ],
    [
-    "Is that what you did? ↗"
+    "Is **that** what‿you **did**? ↗"
    ],
    [
-    "I want a full-screen view with the menu at the top. ↘"
+    "I **want**‿a **full**-screen **view** with the **men**u‿at the **top**. ↘"
    ],
    [
-    "I can’t read some of the letters properly here. ↘"
+    "I **can’t** **read** some‿of the **let**ters **prop**erly **here**. ↘"
    ],
    [
-    "I want everything to be ready before class. ↘"
+    "I **want**‿**ev**erything to be **read**y be**fore** **class**. ↘"
    ],
    [
-    "Why is English Lab so pricey? ↘"
+    "**Why** is English **Lab** so **pric**ey? ↘"
    ]
   ],
   "cues": [
@@ -644,7 +644,7 @@ window.TN_SHADOW = {
     2.81,
     4.8,
     3.51,
-    6.0
+    6
    ],
    [
     5.7,
@@ -690,7 +690,7 @@ window.TN_SHADOW = {
    ],
    [
     25.16,
-    27.0,
+    27,
     31.45,
     33.75
    ]
@@ -784,76 +784,76 @@ window.TN_SHADOW = {
   ],
   "marks": [
    [
-    "Ah ↗, yes ↗, that’s the idea. ↘"
+    "**Ah** ↗, **yes** ↗, **that’s** the i**dea**. ↘"
    ],
    [
-    "Nope ↗, I meant like this one. ↘"
+    "**Nope** ↗, I **meant** like **this** one. ↘"
    ],
    [
-    "By the way ↗, can they look up phrasal verbs? ↘"
+    "By the **way** ↗, can they **look**‿**up** **phras**al **verbs**? ↗"
    ],
    [
-    "But the readings aren’t always the same ↗, are they? ↘"
+    "But the **read**ings **aren’t** **al**ways the **same** ↗, **are** they? ↘"
    ],
    [
-    "So ↗, is it merged? ↘"
+    "**So** ↗, is‿it **merged**? ↗"
    ],
    [
-    "What does “Send and confirm” mean? ↘"
+    "What does “**Send**‿and con**firm**” **mean**? ↘"
    ],
    [
-    "But where? In the script called English Lab? ↘"
+    "But **where**? ↘ In the **script** called‿English **Lab**? ↗"
    ],
    [
-    "When you correct me ↗, you need to change that. ↘"
+    "When you cor**rect** me ↗, you **need** to **change** **that**. ↘"
    ],
    [
-    "We can make the last version of the answers the one that counts. ↘"
+    "We can **make** the **last** **ver**sion‿of the **an**swers the **one** that **counts**. ↘"
    ],
    [
-    "Yes ↗, go ahead. I need to smooth things over with the families. ↘"
+    "**Yes** ↗, go‿a**head**. ↘ I **need** to **smooth** things‿**o**ver with the **fam**ilies. ↘"
    ],
    [
-    "It takes a while to see the mark in the table. ↘"
+    "It **takes**‿a **while** to **see** the **mark**‿in the **ta**ble. ↘"
    ],
    [
-    "On my iPad ↗, the page doesn’t scroll all the way to the top. ↘"
+    "On my **i**Pad ↗, the **page** **does**n’t **scroll**‿all the **way** to the **top**. ↘"
    ],
    [
-    "OK ↗, merge. Now that I know ↗, I won’t ask the students to do it again. ↘"
+    "O**K** ↗, **merge**. ↘ Now that‿I **know** ↗, I **won’t**‿ask the **stu**dents to **do**‿it‿a**gain**. ↘"
    ],
    [
-    "I want to know the percentage the class got last time. ↘"
+    "I **want** to **know** the per**cent**age the **class** got **last** **time**. ↘"
    ],
    [
-    "The difficulty builds as we go. ↘"
+    "The **dif**ficulty **builds**‿as we **go**. ↘"
    ],
    [
-    "If I haven’t had time to teach something ↗, there are no questions on it. ↘"
+    "If‿I **have**n’t had **time** to **teach** something ↗, there‿are **no** **ques**tions‿on‿it. ↘"
    ],
    [
-    "It’s not about quantity but quality. ↘"
+    "It’s **not**‿about **quan**tity but **qual**ity. ↘"
    ],
    [
-    "If I close it ↗, I want to be able to come back to it. ↘"
+    "If‿I **close**‿it ↗, I **want** to be able to **come** **back** to it. ↘"
    ],
    [
-    "Do students see this? I end up here when I press the notebook. ↘"
+    "Do **stu**dents **see** **this**? ↗ I **end**‿**up** **here** when‿I **press** the **note**book. ↘"
    ],
    [
-    "Can we make it feel like you’re writing in the notebook? ↗"
+    "Can we **make**‿it **feel** like you’re **writ**ing‿in the **note**book? ↗"
    ],
    [
-    "Make the content bigger so I can see it well on the panel. ↘"
+    "Make the **con**tent **big**ger so I can **see**‿it **well**‿on the **pan**el. ↘"
    ],
    [
-    "I mean: little tweaks get merged ↗, big changes start a thread. ↘"
+    "I **mean**: **lit**tle **tweaks** get **merged** ↗, **big** **chang**es **start**‿a **thread**. ↘"
    ],
    [
-    "They should have a button to go back to exactly where they were. ↘"
+    "They should **have**‿a **but**ton to go **back** to ex**act**ly where they **were**. ↘"
    ],
    [
-    "Call it Roig everywhere on the website instead of Gemini ↗, so nobody knows what it is. ↘"
+    "**Call**‿it **Roig** **ev**erywhere‿on the **web**site in**stead**‿of **Gem**ini ↗, so **no**body **knows** what‿it **is**. ↘"
    ]
   ],
   "cues": [
@@ -882,9 +882,9 @@ window.TN_SHADOW = {
     13.87
    ],
    [
-    12.0,
+    12,
     13.17,
-    15.0,
+    15,
     16.46
    ],
    [
@@ -906,7 +906,7 @@ window.TN_SHADOW = {
     27.62
    ],
    [
-    23.0,
+    23,
     26.18,
     28.75,
     32.72

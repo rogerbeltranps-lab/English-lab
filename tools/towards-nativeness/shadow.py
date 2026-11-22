@@ -1,11 +1,14 @@
 """Towards Nativeness: records the 🗣 Shadowing clips with Kokoro, voice af_heart (Roger, 17 Nov 2026: "kokoro now (heart)"), one sentence
 at a time with a pause between them, and writes 4eso/towards-nativeness/audio/<file>.mp3 + -slow.mp3 (atempo 0.8) and data/shadow.js:
-window.TN_SHADOW = {key: clip} with lines (one per sentence), marks (only the ↗ ↘ melody arrows: no stress guesses) and cues
+window.TN_SHADOW = {key: clip} with lines (one per sentence), marks and cues
 [[from, to, slowFrom, slowTo], ...] taken straight from the recording, so 🔁 Listen and repeat works without any alignment step.
 Usage (repo root): node tools/towards-nativeness/shadow-lines.js > /tmp/tn-shadow.json
                    venv/bin/python tools/towards-nativeness/shadow.py /tmp/tn-shadow.json kokoro-v1.0.onnx voices-v1.0.bin [--force]
 Clips whose mp3 exists are not recorded again unless --force; data/shadow.js is always rewritten from the sentences and saved times
-(audio/<file>.json)."""
+(audio/<file>.json).
+Marks (Roger, 22 Nov 2026: "I want marks to be more complete with stress words, linking etc."): each sentence's **stressed** syllables,
+‿ linking and ↗ ↘ melody, written by hand in shadow-marks.json (sentence → marked sentence). A new sentence missing there gets only the
+arrows and is listed when the tool runs: add its marks to shadow-marks.json and run the tool again."""
 import json, os, re, subprocess, sys, tempfile
 import numpy as np, soundfile as sf
 from kokoro_onnx import Kokoro
@@ -15,8 +18,12 @@ LS = os.path.join(ROOT, '4eso', 'towards-nativeness')
 AUX = r'^(is|are|am|was|were|do|does|did|can|could|will|would|should|shall|have|has|had|may|might|must)n?\b'
 SLOW = 0.8
 
+HAND = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'shadow-marks.json')))
+
 def marks(s):
-    """The melody arrows only: ↗ before a comma and at the end of yes/no questions, ↘ at the end of statements and wh- questions."""
+    """The hand-written marks; without them, the melody arrows only: ↗ before a comma and at the end of yes/no questions, ↘ at the end of statements and wh- questions."""
+    if s in HAND: return HAND[s]
+    print('no marks in shadow-marks.json, arrows only:', s, flush=True)
     s = re.sub(r',', ' ↗,', s)
     end = '↗' if s.rstrip().endswith('?') and re.match(AUX, s.strip(), re.I) else '↘'
     return s.rstrip() + ' ' + end
