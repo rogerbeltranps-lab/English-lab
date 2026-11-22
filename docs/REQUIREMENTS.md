@@ -320,6 +320,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 - Students see only the learning paths the teacher has opened.
 - On the board: the Games and theory card with this LS's results only, 🎯 My level beside the greeting ("Core · A2"), My marks, Final product and Exams in the same card style.
 - Flashcards speak with the Kokoro Heart voice; listenings, Talk and dictation stay ElevenLabs.
+- **Every reading text of a learning path can be heard** (Roger, 21 Nov 2026: "is it possible to make kokoro read the readings? Heart voice?"; "And can you add it to students' readings too? Not in the exams"): 🔊 Listen to the text, read by the free Kokoro Heart voice, with 🐢 Slower and the paragraph being read lit up. Towards Nativeness and the students' LS2 learning paths, every level; a new LS's readings are recorded when it is built. **Never in exams, sample exams or recall checkpoints.** LS1 stays as it is.
 - Students' left menu is the shared one (My dashboard · Practise · My course and its LSs · Books · Grammar and vocabulary · Games · Help · Study on your phone); Practise and Games show only the student's own course.
 - The teacher's student view shows the page in the student's language from the first moment, with the red frame.
 
@@ -331,7 +332,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
 
 **Audio and video**
 
-- ElevenLabs: `eleven_v3` with audio tags, voices chosen by Roger from previews, one OK per generation. Slow copies always made locally for free (ffmpeg). Flashcards use the free Kokoro Heart voice.
+- ElevenLabs: `eleven_v3` with audio tags, voices chosen by Roger from previews, one OK per generation. Slow copies always made locally for free (ffmpeg). Flashcards and reading texts use the free Kokoro Heart voice.
 - Never re-record a listening students already used.
 
 ---
