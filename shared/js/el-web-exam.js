@@ -122,6 +122,15 @@
   .wx-esc{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:11px;padding:9px 14px;font-weight:700;max-width:90vw}
   .wx-teacher{background:#eef6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin:0 0 12px}
   .wx-teacher audio{width:100%;max-width:520px;margin-top:6px}
+  #wxPrint{display:none}
+  @media print{body>*:not(#wxPrint){display:none!important}#wxPrint{display:block!important}html,body{background:#fff!important;color:#000}}
+  #wxPrint{font:11pt/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#000}
+  #wxPrint h1{font-size:15pt;margin:0 0 4px}#wxPrint .pv-who{margin:0 0 4px}#wxPrint .pv-note{border:1px solid #999;border-radius:6px;padding:6px 9px;margin:8px 0 12px;font-size:10pt}
+  #wxPrint h2{font-size:12.5pt;margin:14px 0 4px;border-bottom:1px solid #999;padding-bottom:2px;break-after:avoid}
+  #wxPrint table{width:100%;border-collapse:collapse}#wxPrint td{border-bottom:1px solid #ddd;padding:4px 6px;vertical-align:top;break-inside:avoid}
+  #wxPrint td.n{width:2em;font-weight:700}#wxPrint td.a{width:38%;font-weight:700}#wxPrint .blank{color:#b45309;font-style:italic;font-weight:400}
+  #wxPrint .pv-text{white-space:pre-wrap;border:1px solid #bbb;border-radius:6px;padding:8px 10px;margin:4px 0}
+  #wxPrint .pv-foot{margin-top:16px;font-size:9pt;color:#444;text-align:center}
   .wx-au{background:#fff7ed;border-color:#fdba74}.wx-au .wx-btn{margin-top:8px}.wx-aubar{display:inline-block;vertical-align:middle;width:200px;max-width:40vw;height:10px;border-radius:6px;background:#fed7aa;overflow:hidden;margin:8px 8px 0}.wx-aubar i{display:block;height:100%;width:0;background:#ea580c}
   `;
   D.head.appendChild(css);
@@ -297,14 +306,14 @@
     // flicker 1.5-3 s after it starts, and without this a student let back in would be locked again straight away.
     let away = 0, veil = null, wait = null; const settle = Date.now() + 5000;
     const out = why => { clearTimeout(wait); wait = null; exitNow(why); };
-    const leave = full => { if (S.status !== 'in') return;
+    const leave = full => { if (S.status !== 'in' || Date.now() < printUntil) return;   // 🖨 the print window is not leaving the exam
       if (!full && Date.now() > settle) return out('left');
       if (away) { if (full) { clearTimeout(wait); wait = setTimeout(() => out('fullscreen'), FS_GRACE); } return; }
       away = Date.now(); veil = D.createElement('div'); veil.className = 'wx-veil'; veil.textContent = t('Torna a l’examen!', 'Come back to the exam!'); D.body.appendChild(veil);
       wait = setTimeout(() => { if (!full && D.hasFocus() && !D.hidden) return back(); out(full ? 'fullscreen' : 'left'); }, full ? FS_GRACE : GRACE); };
     const back = () => { if (!away || S.status !== 'in') return; if (D.hidden || (fsOk() && !isFull())) return; clearTimeout(wait); S.glances.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); away = 0; if (veil) veil.remove(); veil = null; touch(); };
     on(window, 'blur', () => leave(false)); on(D, 'visibilitychange', () => D.hidden ? leave(false) : back()); on(window, 'focus', back);
-    const fsc = () => { if (isFull()) back(); else if (fsOk()) leave(true); };
+    const fsc = () => { if (isFull()) back(); else if (Date.now() < printUntil) return; else if (fsOk()) leave(true); };
     on(D, 'fullscreenchange', fsc); on(D, 'webkitfullscreenchange', fsc);
     on(window, 'pagehide', () => { if (S.status === 'in') { S.pendingExit = now(); keep(); } });
     off.push(() => { clearTimeout(wait); if (veil) veil.remove(); });
@@ -426,8 +435,9 @@
           (s === 'listening' && S.listenDone && mode !== 'teacher' ? '' : ' <button class="go" data-go="' + s + '|' + id + '">' + t('canvia', 'change') + '</button>') + '</td></tr>'; }).join('')).join('');
     b.innerHTML = '<div class="wx-sec wx-rev"><h2>✅ ' + NAME.review[ca ? 0 : 1] + '</h2><p class="wx-lead">' + t('Revisa totes les respostes. Prem <b>canvia</b> per anar a una pregunta.', 'Check all your answers. Press <b>change</b> to go to a question.') + '</p><div class="wx-sum">' + sum + '</div>' +
       '<table><tbody>' + rows + '</tbody></table>' +
-      (mode === 'view' ? '' : '<div class="wx-nav"><button class="wx-btn red" id="wxEnd">🏁 ' + t('Entrega l’examen', 'Turn in the exam') + '</button></div><div id="wxSure"></div>') + '</div>';
+      '<div class="wx-nav">' + (mode === 'view' ? '' : '<button class="wx-btn red" id="wxEnd">🏁 ' + t('Entrega l’examen', 'Turn in the exam') + '</button>') + prBtn() + '</div>' + (mode === 'view' ? '' : '<div id="wxSure"></div>') + '</div>';
     b.querySelectorAll('[data-go]').forEach(x => x.onclick = () => { const [s, id] = x.dataset.go.split('|'); S.sec = s; keep(); draw(id); });
+    bindPr(b);
     const end = $('#wxEnd'); if (end) end.onclick = () => {
       end.hidden = true; const sure = $('#wxSure');
       sure.innerHTML = '<div class="wx-sure"><p><b>⚠️ ' + t('Vols entregar l’examen?', 'Turn in your exam?') + '</b><br>' + (blanks ? t('Tens <b>' + blanks + '</b> pregunt' + (blanks === 1 ? 'a' : 'es') + ' en blanc. ', 'You have <b>' + blanks + '</b> blank question' + (blanks === 1 ? '' : 's') + '. ') : t('Has contestat totes les preguntes. ', 'You have answered every question. ')) + t('Quan l’entreguis, ja no el podràs canviar.', 'Once you turn it in, you can’t change it.') + '</p><button class="wx-btn sec" id="wxNo">← ' + t('No, continua', 'No, go on') + '</button> <button class="wx-btn red" id="wxYes" disabled>' + t('Sí, entrega-ho', 'Yes, turn it in') + '</button></div>';
@@ -437,12 +447,57 @@
       $('#wxNo').focus();
     };
   }
+  // ---------- 🖨 Print / Save as PDF: a paper copy of the answers (Roger, 23 Nov 2026: "maybe we can add print the exam so that if
+  // sth happens students can print it as pdf", when a student could not turn in his exam) ----------
+  // On ✅ Review (and the teacher's 👁 view) a button prints the student's own answers: who, paper, every question of their paper in
+  // their order with their answer (blank in orange), the whole writing. No reading texts and no options: only what the Review page
+  // shows, so the PDF is not a copy of the exam. While the print window is open the lock waits (it is not leaving the exam); if the
+  // browser left full screen for it, a button takes the student back before the exam goes on. Nothing new is saved in the cloud.
+  let printUntil = 0;
+  const prBtn = () => '<button class="wx-btn sec" id="wxPrintBtn" type="button">🖨 ' + t('Imprimeix / Desa en PDF', 'Print / Save as PDF') + '</button>';
+  function bindPr(b) { const p = b.querySelector('#wxPrintBtn'); if (p) p.onclick = printNow; }
+  function failNote() { const b = $('#wxBody'); if (!b) return; const n = D.createElement('div'); n.className = 'wx-warn';
+    n.innerHTML = '⚠️ <b>' + t('No s’ha pogut entregar.', 'It couldn’t be turned in.') + '</b> ' + t('Les respostes estan desades en aquest ordinador. Torna-ho a provar amb 🏁 Entrega. Si continua fallant, prem <b>🖨 Imprimeix / Desa en PDF</b>, desa el PDF i avisa el professor.', 'Your answers are kept on this computer. Try 🏁 Turn in again. If it still fails, press <b>🖨 Print / Save as PDF</b>, save the PDF and tell your teacher.');
+    b.prepend(n); }
+  function printHtml() {
+    const u = mode === 'view' ? (C() && C().viewing) || {} : (me || {}), name = (PV && PV.name) || u.displayName || u.name || '', mail = (PV && PV.email) || u.email || '';
+    const when = new Date(), hhmm = when.toTimeString().slice(0, 5), day = when.toLocaleDateString('en-GB');
+    const st = S.status === 'done' ? t('Entregat', 'Turned in') + (S.done ? ' ' + new Date(S.done).toTimeString().slice(0, 5) : '') : t('No entregat encara', 'Not turned in yet');
+    const sec = s => { const its = (S.order[s] || []).map(id => items(s).find(x => x.id === id)).filter(Boolean); if (!its.length) return '';
+      return '<h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + ' · ' + answered(s) + '/' + its.length + '</h2>' + (s === 'writing'
+        ? its.map(it => { const v = String(S.answers[it.id] || '').trim(); return '<p><b>' + esc(it.q) + '</b></p>' + (v ? '<div class="pv-text">' + esc(v) + '</div><p>' + words(v) + ' ' + t('paraules', 'words') + '</p>' : '<p class="blank">' + t('en blanc', 'blank') + '</p>'); }).join('')
+        : '<table><tbody>' + its.map((it, i) => { const v = String(S.answers[it.id] || '').trim();
+          return '<tr><td class="n">' + (i + 1) + '.</td><td>' + esc(it.q) + '</td><td class="a">' + (v ? esc(v) : '<span class="blank">' + t('en blanc', 'blank') + '</span>') + '</td></tr>'; }).join('') + '</tbody></table>'); };
+    return '<h1>📝 ' + t('Examen', 'Exam') + ' ' + esc(X.lsShort || 'LS2') + ' · ' + (S.paper.startsWith('core') ? 'Core' : 'Base') + ' ' + esc(S.paper.split('-')[1] || '') + '</h1>' +
+      '<p class="pv-who"><b>' + esc(name || mail || '—') + '</b>' + (name && mail ? ' · ' + esc(mail) : '') + (S.group ? ' · ' + esc(S.group) : '') + '</p>' +
+      '<p class="pv-who">' + t('Imprès el ', 'Printed on ') + day + ' ' + hhmm + ' · ' + st + '</p>' +
+      '<div class="pv-note">' + t('Còpia de les teves respostes. Si l’examen no s’ha pogut entregar, desa-la en PDF i dona-la al professor.', 'A copy of your answers. If your exam could not be turned in, save it as a PDF and give it to your teacher.') + '</div>' +
+      SECS.map(sec).join('') + '<p class="pv-foot">© ' + when.getFullYear() + ' Roger Beltran · English Lab · All rights reserved</p>';
+  }
+  function printNow() {
+    if (mode === 'student' && dirty) save();   // the newest answers go to the cloud too, if it can
+    let p = $('#wxPrint'); if (!p) { p = D.createElement('div'); p.id = 'wxPrint'; D.body.appendChild(p); }
+    p.innerHTML = printHtml();
+    printUntil = Infinity;
+    let fin = false; const done = () => { if (fin) return; fin = true; window.removeEventListener('afterprint', done);
+      setTimeout(() => { printUntil = Date.now() + 1500;   // a last blur/focus as the window closes is still not leaving
+        if (S.status === 'in' && mode === 'student' && fsOk() && !isFull()) backToFull(); }, 300); };
+    window.addEventListener('afterprint', done);
+    try { window.print(); } catch (e) { console.warn('print', e); }
+    setTimeout(done, 1000);   // Chrome returns from print() when its window closes; iPad/iPhone may not send afterprint
+  }
+  function backToFull() {   // the browser left full screen for the print window: back to it before the exam goes on
+    let v = $('#wxPrBack'); if (v) return; v = D.createElement('div'); v.className = 'wx-veil'; v.id = 'wxPrBack';
+    v.innerHTML = '<div><p>🖨 ' + t('Ja està. Torna a la pantalla completa per continuar.', 'Done. Go back to full screen to go on.') + '</p><button class="wx-btn" type="button">⛶ ' + t('Continua a pantalla completa', 'Continue in full screen') + '</button></div>';
+    D.body.appendChild(v);   // leaving the tab or app now still locks the exam, as always
+    v.querySelector('button').onclick = async () => { await goFull(); v.remove(); };
+  }
   async function turnIn() {
     if (mode === 'teacher') { unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); return teacherPick(t('Prova acabada: no s’ha desat res.', 'Preview finished: nothing was saved.')); }
     S.status = 'done'; S.done = now(); keep(); unbind();
     const yes = $('#wxYes'); if (yes) { yes.disabled = true; yes.textContent = t('Enviant…', 'Sending…'); }
     const ok = await save();
-    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); return; }
+    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); failNote(); return; }
     if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
   }
   function handedIn() {
