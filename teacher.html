@@ -1262,6 +1262,7 @@ const fsGroup=()=>GR.some(x=>x.id===S.g)?S.g:FSW.g||((window.ELWeek&&ELWeek.clas
 // 👁 Student view (Roger, 6 Nov 2026: "I want to have a button to see the web as student on the top bar"): next to 🔓 Release all,
 // it opens a list of a group's students (the group in class or open, other groups one tap away); a name opens that student's board
 // in a new tab in the read-only student view (today.html?student=…, el-cloud.js el_as): every page then shows the site as they see it.
+// 📄 Term report (Roger, 23 Nov 2026): with that chip on, a name opens the student's draft term report (today.html?student=…#report).
 // It never passes the LS picked on the dashboard (a 4 ESO B tab left on LS1 opened their board on LS1): today.html picks the current LS by the time plan.
 const SV={open:false,g:null};
 const svSame=()=>{try{return matchMedia("(max-width:640px)").matches||matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
@@ -1273,7 +1274,8 @@ function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(
   return `<div class="svpop"><div class="svh"><b>👁 See the site as a student</b><button type="button" class="svx" data-do="sview" title="Close">✕</button></div>
     <div class="svg">${GR.map(x=>`<button type="button" class="${x.id===g.id?"on":""}" data-do="svgroup" data-g="${x.id}">${esc(x.name)}</button>`).join("")}</div>
     <p class="svnote">Tap a name: their board opens ${svSame()?"here (Back or ✕ Exit brings you to the dashboard)":"in a new tab"} and every page shows what they see, with their answers. Read-only: nothing is changed.</p>
-    <div class="svlist">${studs.map(s=>`<a href="today.html?student=${encodeURIComponent(s.uid)}${q}" target="_blank" rel="noopener" data-sv="1"><span>${name(s)}</span>${route(level(s.uid,l?l.id:S.ls))}</a>`).join("")||'<p class="muted">Nobody in this group has signed in yet.</p>'}</div>
+    <div class="svg"><button type="button" class="${SV.rep?"on":""}" data-do="svrep" title="Open each student's 📄 Term 1 report (draft) instead of their board. Students see theirs only when you press 📄 Show draft reports in class mode.">📄 Term report</button></div>
+    <div class="svlist">${studs.map(s=>`<a href="today.html?student=${encodeURIComponent(s.uid)}${q}${SV.rep?"#report":""}" target="_blank" rel="noopener" data-sv="1"><span>${name(s)}</span>${route(level(s.uid,l?l.id:S.ls))}</a>`).join("")||'<p class="muted">Nobody in this group has signed in yet.</p>'}</div>
     ${out>0?`<p class="svnote">${out} not signed in yet (no student view for them).</p>`:""}</div>`}
 // the same list as a sheet on a phone (More → See the site as a student): a name opens the board in this tab (svSame)
 function svSheet(gid){const g=GR.find(x=>x.id===gid)||GR[0];if(!g)return "";
@@ -6529,6 +6531,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     fshide:()=>{e.preventDefault();FSWL.hide=!FSWL.hide;try{localStorage.setItem("el_t_fshide",FSWL.hide?"1":"0")}catch(x){}fsDraw()},
     sview:()=>{e.preventDefault();SV.open=!SV.open;SV.top=0;if(SV.open)SV.g=null;fsDraw()},
     svgroup:()=>{e.preventDefault();SV.g=k.g;SV.top=0;fsDraw()},
+    svrep:()=>{e.preventDefault();SV.rep=!SV.rep;fsDraw()},   // 📄 the names open the term report (today.html#report)
     attre:()=>{e.preventDefault();attLoad(S.g,true);render()},
     attcell:()=>{e.preventDefault();attCell(k.id,k.e)},
     // during a class (by the timetable) it is on by itself: switching it off = {on:false, off:true, until: the end of the class}, for this class only
