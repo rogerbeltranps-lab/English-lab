@@ -314,6 +314,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-coverage.js"></script>
 <script src="shared/js/el-points.js?v=20261121b"></script>
 <script src="shared/js/el-items.js"></script>
+<script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
 <script src="shared/print/lp-list.js"></script>
 <script src="shared/js/el-step-titles.js" defer></script><script src="shared/js/el-voyage.js" defer></script><script src="shared/js/el-charts.js" defer></script><!-- 🌱 Progress: the skill of each step (as the LS page) and the charts -->
@@ -3434,7 +3435,7 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
       :W.mode&&!W.go?`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">📝 Exam mode${only.length?" · only "+who:" · "+esc(grp.name)}: students are coming to the exam and wait in full screen</span><button data-wx="go" style="background:#166534;color:#fff;border-color:#166534">▶ Start the exam</button><button class="g" data-wx="close">⏹ End exam mode</button>`
       :`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">🟢 ${W.go?"Started at "+new Date(W.go).toTimeString().slice(0,5)+" · ":""}${only.length?"only "+who:"open for "+esc(grp.name)}</span><button class="g" data-wx="close">🔒 Close the exam</button>`)
     +`<a class="g" href="${esc(link)}" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 12px;border:1px solid #cbd5e1;border-radius:10px">👁 Preview and 🔊 audio</a>`
-    +`<button class="g" data-wx="copy" data-v="${esc(link)}">🔗 Copy the link</button><button class="g" data-wx="refresh">🔄 Refresh</button>`
+    +`<button class="g" data-wx="copy" data-v="${esc(link)}">🔗 Copy the link</button><button class="g" data-wx="refresh">🔄 Refresh</button><button class="g" data-wx="mail" title="A student whose exam could not be turned in emailed you a sealed code: paste it here to read it and turn it in">📥 Open an emailed exam</button>`
     +(n("done")+n("out")+n("stopped")?`<button data-wx="save">📥 Save marks (${n("done")+n("out")+n("stopped")})</button>`:"")+`</div>`;
   // 👤 a make-up exam for some students (Roger, 17 Nov 2026: "I must be able to go one student and make him do an exam, or some students"):
   // ticked by default = those with no exam mark and no web exam yet
@@ -3457,6 +3458,31 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
   return `<div class="box">${fold("wxbox",`🖥 Web exam · ${esc(grp.name)} · ${n("done")} turned in${n("in")?` · ${n("in")} working`:""}${n("out")?` · <span style="color:#b91c1c">${n("out")} stopped</span>`:""}${np?` · 📄 ${np} on paper`:""}`,head+pick+note
     +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Paper</th><th>State</th>${WXSEC.map(([k,nm,ic])=>`<th>${ic} ${nm}<br><small class="muted">/${secMax(exOf(ls),k)}</small></th>`).join("")}${wxW("",ls)?`<th>✍️ Writing<br><small class="muted">/${secMax(exOf(ls),"writing")}</small></th>`:""}<th>Exam<br><small class="muted">/10</small></th><th>Exits</th><th>After coming back</th></tr></thead><tbody>${studs.concat(Object.values(S.P||{}).filter(s=>s.tester&&s.uid&&wxDoc(s.uid)&&!studs.includes(s))).map(row).join("")}</tbody></table></div>`
     +`<p class="muted">🚪 exits (left full screen, another tab or app, closed the page) · ⏱ total time out of the exam (until you let them back in) · 🔓 let back in with the password · 👀 a flicker under 0.4 s just after full screen started (not an exit) · 🔑✗ wrong passwords typed. <b>After coming back</b> compares the answers saved when they first left with the final ones: ⚠️ +n = answers that became right after coming back. <b>✍️ Writing:</b> click a student to read the text and give it a 5.1 level (the points go in by themselves); <b>*</b> = the mark without the writing, until you mark it.</p>`,"",true)}</div>`}
+// 📥 Open an emailed exam (Roger, 23 Nov 2026: "can we send the mail with the text encripted?" … "students can't give the answers to other
+// classes either"): when turning in fails, the student's Gmail sends a sealed code (el-web-exam.js stuckBox, shared/js/el-exam-seal.js).
+// Paste it here: it opens only if not a letter was changed; it shows the answers and the mark, compares them with the copy the website
+// saved last, and 🏁 Turn it in writes them into students/{uid}/exams/{key} as turned in (status done, emailed:{sealed, at}).
+function wxMailDlg(ls,o,err){const c=wxCfg(ls),K=wxKey(ls),lt=x=>x?new Date(x).toTimeString().slice(0,5):"?";
+  const box=`<h3>📥 Open an emailed exam</h3><p class="muted">Copy everything from <b>-----BEGIN ENGLISH LAB EXAM-----</b> to <b>-----END…-----</b> in the student's email and paste it here. Students can't read the code, and if a single letter was changed it won't open.</p>
+    <textarea id="wxMailIn" rows="${o?3:7}" style="width:100%;font-family:monospace;font-size:12px" placeholder="-----BEGIN ENGLISH LAB EXAM-----">${o?"":esc(WX.mailTxt||"")}</textarea><div class="row"><button data-wx="mopen">🔓 Open</button></div>`
+    +(err?`<p style="color:#b91c1c;font-weight:700">✗ ${esc(err)}</p>`:"");
+  if(!o)return dlg(box,true);
+  const s=Object.values(S.P||{}).find(x=>x.uid&&x.uid===o.uid)||Object.values(S.P||{}).find(x=>x.email&&String(x.email).toLowerCase()===String(o.email||"").toLowerCase()),u=s&&s.uid,d=u?wxDoc(u):null;
+  const other=o.key!==c.key,dd={uid:u,order:o.order||{},answers:o.answers||{}},m=K&&!other?wxMark(dd,K,ls):null;
+  const diff=d?Object.keys(Object.assign({},d.answers||{},o.answers||{})).filter(id=>String((d.answers||{})[id]||"").trim()!==String((o.answers||{})[id]||"").trim()).length:null;
+  const rows=other?"":WXSEC.concat([["writing","Writing","✍️"]]).map(([k,nm,ic])=>{const ids=(o.order||{})[k]||[];if(!ids.length)return "";
+    return `<tr><th colspan="3" style="text-align:left">${ic} ${nm}${m&&m.sec[k]?` · ${m.sec[k].right}/${m.sec[k].n}`:""}</th></tr>`+ids.map((id,i)=>{const v=String((o.answers||{})[id]||""),ok=K&&k!=="writing"&&wxOk(K,id,v);
+      return k==="writing"?`<tr><td colspan="3" style="text-align:left;white-space:pre-wrap">${esc(v)||'<span class="muted">(blank)</span>'}<br><small class="muted">${wxWords(v)} words</small></td></tr>`
+        :`<tr><td>${i+1}</td><td style="text-align:left">${esc((K&&K[id]||{}).q||id)}</td><td><b>${esc(v)||'<span class="muted">(blank)</span>'}</b> ${K?ok?"✓":"✗":""}</td></tr>`}).join("")}).join("");
+  const state=other?`<p style="color:#b91c1c;font-weight:700">✗ This code is for another exam (${esc(o.key)}). Open it from that LS's 📝 Exams page.</p>`
+    :!u?`<p style="color:#b91c1c;font-weight:700">✗ No student with this email in your classes (${esc(o.email||"?")}).</p>`
+    :d&&d.status==="done"?`<p>✅ Already turned in on the website${d.done?" at "+lt(d.done):""}. Nothing to do.${diff?` <b>${diff}</b> answer(s) differ from the email.`:""}</p>`
+    :`<p>${d?`The website kept a copy saved at ${d.updated&&d.updated.toDate?d.updated.toDate().toTimeString().slice(0,5):"?"}: <b>${diff}</b> answer(s) in the email are newer or different.`:"The website has no copy of this exam."}</p>
+      <div class="row"><button data-wx="mturn" style="background:#166534;color:#fff;border-color:#166534">🏁 Turn it in for ${esc(name(s))}</button></div>`;
+  WX.mail={o,u};
+  dlg(box+`<h4>🖥 ${s?name(s):esc(o.name||o.email||"?")} · ${esc(o.group||"")} · ${esc(String(o.paper||"").replace("base","Base").replace("core","Core"))}</h4>
+    <p class="muted">Started ${lt(o.started)} · answers frozen ${lt(o.done)} · code made ${lt(o.sealed)}${o.exits?` · 🚪 ${o.exits} exit(s)`:""}${m?` · <b>${f1(m.mark)}/10</b>${m.partial?" *":""}`:""}</p>`
+    +state+(rows?`<h4>Answers</h4><table>${rows}</table>`:""),true)}
 function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=K?wxMark(d,K,ls):null,as=K?wxAssess(d,K,ls):null;
   const ex=(d.exits||[]).map((x,i)=>`<li>${hm(x.at)} · ${esc({fullscreen:"left full screen",left:"another tab, window or app",reload:"closed or reloaded the page"}[x.why]||x.why)}${x.ret?` · back on the page at ${hm(x.ret)} (away ${wxDur(Date.parse(x.ret)-Date.parse(x.at))})`:""}${x.back?` · let back in at ${hm(x.back)} · <b>⏱ ${wxDur(wxOut(x,d))} out</b>`:wxOut(x,d)!=null?` · <b>still locked: ⏱ ${wxDur(wxOut(x,d))} so far</b>`:" · <b>never came back</b>"}</li>`).join("");
   const chg=as&&as.ch.length?`<table><tr><th>Question</th><th>At the exit</th><th>Final</th></tr>${as.ch.map(c=>c.w?`<tr><td style="text-align:left">✍️ Writing</td><td>${wxWords(c.before)} words</td><td>${wxWords(c.after)} words ⚠️<br><small class="muted">the text changed after coming back: compare it below</small></td></tr>`:`<tr><td style="text-align:left">${esc((K[c.id]||{}).q||c.id)}</td><td>${esc(c.before)||'<span class="muted">blank</span>'} ${c.okB?"✓":"✗"}</td><td>${esc(c.after)||'<span class="muted">blank</span>'} ${c.okA?"✓":"✗"}${c.okA&&!c.okB?" ⚠️":""}</td></tr>`).join("")}</table>
@@ -3517,6 +3543,15 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
     copy:async()=>{try{await navigator.clipboard.writeText(k.v);b.textContent="✓ Copied"}catch(x){prompt("Copy the link:",k.v)}},
     save:()=>wxSave(ls,grp,studs),
     dlg:()=>wxDlg(k.u,ls),
+    mail:()=>{WX.mailTxt="";wxMailDlg(ls)},
+    mopen:async()=>{const t=($("#wxMailIn")||{}).value||WX.mailTxt||"";WX.mailTxt=t;if(!window.ELExamSeal)return wxMailDlg(ls,null,"The page is still loading: try again in a second.");
+      try{wxMailDlg(ls,await ELExamSeal.open(t))}catch(x){wxMailDlg(ls,null,{nocode:"No exam code found in what you pasted.",broken:"This code doesn't open: something in it was changed or it was not copied whole.",browser:"This browser can't open the code: use Chrome."}[x.message]||"It doesn't open: "+x.message)}},
+    mturn:()=>{const M=WX.mail;if(!M||!M.u)return;const o=M.o,s=S.P[M.u],d=wxDoc(M.u);
+      if(!confirm(`Turn in ${name(s).replace(/<[^>]+>/g,"")}'s exam with the answers from the email?\n\nIt counts as turned in at ${new Date(o.done).toTimeString().slice(0,5)}. The copy the website had is replaced by the email's answers; exits and the log stay.`))return;
+      const x={ls:o.ls,key:o.key,paper:o.paper,level:o.level||null,group:o.group||s.group||null,order:o.order,answers:o.answers,started:o.started,listenDone:o.listenDone||null,status:"done",done:o.done,emailed:{sealed:o.sealed,at:new Date().toISOString()}};
+      if(!d)Object.assign(x,{exits:[],glances:[],changes:[],snaps:[],tries:0,plays:o.plays||0});
+      Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"students",M.u,"exams",c.key),Object.assign({},x,{updated:F.serverTimestamp()}),{merge:true}))
+        .then(()=>{WX.docs[M.u]=Object.assign({},d||{},x,{uid:M.u});WX.mail=null;$("#dlg").close();render()},er=>alert("Could not save: "+er.message))},
     wlv:()=>{const d=wxDoc(k.u),w=wxW(k.u,ls,d);if(!w)return;const sc=Math.round(WXLV[k.l]*w.max*10)/10;
       quick(patch(k.u,asId(ls),{sections:{writing:{score:sc,max:w.max}},levels:{writing:{"5.1":k.l}}}));render();wxDlg(k.u,ls)},
     acc:()=>{const K=wxKey(ls),it=K&&K[k.i];if(!it)return;it.extra=[...new Set((it.extra||[]).concat(k.v))];
