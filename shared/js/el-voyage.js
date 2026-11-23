@@ -302,7 +302,10 @@
     // stops. The fog never covers a vehicle or a label (Roger, 20 Nov): the road starts low enough to leave it its own band
     // every student's vehicle is shown (Roger, 20 Nov: "I want to see them all"): at a stop they stand in rows on the side without
     // the label (yours first, next to the stop), as many rows as needed, and the road leaves the stop the room for its rows
-    const n=M.stops.length,spot=x=>Math.max(0,Math.min(n,x|0)),RH=wide?80:66,YW=wide?100:72;sea.classList.toggle("narrow",!wide);
+    // a vehicle stands by the LAST stop its student did (Roger, 23 Nov 2026: "boats should always be by the last activity they did"; one
+    // standing at the next stop looked as if that activity were done): s steps done = by stop s (the s-th, index s-1); none done = by the
+    // first stop; every stop done = at the destination (as before)
+    const n=M.stops.length,spot=x=>{x=Math.max(0,x|0);return x>=n?n:Math.max(0,x-1)},RH=wide?80:66,YW=wide?100:72;sea.classList.toggle("narrow",!wide);
     const at={};(V.mates||[]).forEach(m=>{const i=spot(m.s);(at[i]=at[i]||[]).push(m)});
     Object.values(at).forEach(L=>L.sort((a,b)=>String(a.n).localeCompare(b.n)));
     // no "You" (the teacher's class map): the view starts at the middle of the class
@@ -362,7 +365,7 @@
     // boats: every student by the steps done (one past the last stop = at the destination)
     // the rows of a stop are centred on it; yours is the first row; at the destination the rows start at the left edge
     const y0=s=>s.y-s.ex/2,YO=wide?78:74;
-    const XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),y0(s)+48])(M.stops[i]):[8+YW/2,finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;
+    const XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),y0(s)+48])(M.stops[i]):[8+YW/2,finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;M.spot=spot;
     const row=r=>r.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
     M.stops.forEach((s,i)=>(s.rows||[]).forEach((r,k)=>{if(!r.length)return;const off=k===0&&i===meI&&V.me?YW:0,wB=r.reduce((a,m)=>a+bw(m),0);
       h+=`<div class="vy-mates" style="left:${s.right?s.x-40-wB-off:s.x+40+off}px;top:${y0(s)+k*RH}px">${row(r)}</div>`}));
@@ -436,7 +439,7 @@
     const el=k=>[...document.querySelectorAll(".vy-sea .vy-st")].find(e=>e.dataset.k===k),li=k=>[...document.querySelectorAll(".vy-steps li.s")].find(e=>e.dataset.k===k);
     let delay=300;
     // veh.drive: my vehicle drives along the road from where it was (the steps done last time) to where it is now, then the step pops
-    const fromI=M.stops.filter(s=>od.has(s.key)).length,still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fromI=(M.spot||(x=>x))(M.stops.filter(s=>od.has(s.key)).length),still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(S.veh.drive&&newDone.length&&M.xy&&M.meI>fromI&&!still){const to=M.xy(M.meI),pts=[];for(let i=fromI;i<=M.meI;i++)pts.push(M.xy(i));
       setTimeout(()=>{const y=document.querySelector(".vy-sea .vy-you");if(!y||!y.animate)return;
         const sc=document.querySelector(".vy-sea .vy-sc");if(sc)sc.scrollTo({top:Math.max(0,pts[0][1]-sc.clientHeight*.55)});
