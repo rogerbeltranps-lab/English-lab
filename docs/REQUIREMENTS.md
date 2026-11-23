@@ -144,7 +144,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 **What students must not see**
 
 - **Never show locked or future work** (7 Nov 2026): no 🔒, "not open", "checkpoint first", or totals that include closed steps. Only learning paths and sections Roger has opened.
-- **No class work shown in advance** (20 Nov 2026): a tab planned for a later class is hidden, like a locked tab, until its class opens it (5 minutes before class, or class mode); never shown in blue. Its steps still count in the path's progress.
+- **No class work shown in advance** (20 Nov 2026): a tab planned for a later class is hidden, like a locked tab, until its class opens it (5 minutes before class, or class mode); never shown in blue. Its steps still count in the path's progress. **🎯 Practise follows the same rule** (Roger, 22 Nov 2026): it holds only the tabs the learning path page shows, never a locked tab or one planned for a later class.
 - **Students are never told which activities are assessed**: no "this counts", "first try" or "checkpoint" labels (26 Oct 2026). Only the general note that all work is part of continuous assessment (40 % of the LS mark from LS2).
 - **No gaps in learning path numbers** (Roger, 21 Nov 2026: "students mustnt see any gap"): when a learning path is dropped, the paths students will do are renumbered in order (LP1, LP2, LP3, LP4…) and the dropped one moves to the end, hidden.
 - Students never see **send times** of messages (14 Nov 2026), never classmates' marks, never where Practise content comes from.
