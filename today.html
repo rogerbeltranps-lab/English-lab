@@ -45,7 +45,7 @@ button.mkr:hover{background:#f8fafc}.mki{width:34px;height:34px;border-radius:10
 .mktodo{border-top:5px solid #dc2626}.mktodo h2{color:#b91c1c}.mktodo.ok{border-top-color:#16a34a}.mktodo.ok h2{color:#15803d}
 .mklead{color:#475569;font-size:14px;margin:6px 0 10px}.ptv{white-space:nowrap}.ptv b{font-weight:800}.ptv small{color:#64748b;font-weight:600}.ptv.no b,.ptv.no small{color:#94a3b8}.ptv em{font-style:normal;font-size:12px;font-weight:700;color:#94a3b8;margin-left:6px}.ptl{display:inline-flex;flex-wrap:wrap;gap:6px 8px;align-items:center}.ptc{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:3px 9px;font-size:14px;white-space:nowrap}.ptc.no{background:#fff}.mkpt{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.15}.mkpt b{font-size:30px;font-weight:800;color:#0f172a}.mkpt b i{font-style:normal;font-size:18px;font-weight:700;color:#64748b}.mkpt small{font-size:13px;color:#475569;font-weight:600}.mkpt em{font-style:normal;font-size:12.5px;color:#94a3b8;font-weight:700;margin-top:2px}.mkptx{color:#475569;font-size:13.5px;margin:8px 0 0}.pgpt{display:block;font-size:13px}.pgpt b{font-size:16px}.pgpt small{display:block;color:#94a3b8}@media (max-width:640px){.mkpt{align-items:flex-start}}.mkok{background:#ecfdf3;border-radius:12px;padding:12px 14px;margin:10px 0 0;font-size:14.5px}.mkok b{display:block}
 .mklate{list-style:none;margin:0;padding:0;display:grid;gap:8px}.mklate li{background:#fef2f2;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center}
-.mklate b{font-size:14.5px}.mklate small{color:#7f1d1d;font-size:13px;grid-column:1}.mklate a.mkdo{grid-row:1/3;grid-column:2;background:#b91c1c;color:#fff;text-decoration:none;font-weight:700;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap}
+.mklate b{font-size:14.5px}.mklate small{color:#7f1d1d;font-size:13px;grid-column:1}.mklate small a{color:inherit;text-decoration:underline;font-weight:600}.mklate a.mkdo{grid-row:1/3;grid-column:2;background:#b91c1c;color:#fff;text-decoration:none;font-weight:700;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap}
 .mkopen{font-size:14px;color:#475569;margin:10px 0 0}.mkopen a{font-weight:700}
 .mkpts{margin-top:16px!important;display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding:12px 20px}.mkp b{font-size:24px;color:#b45309}.mkp{font-weight:700}.mkb b{font-size:17px;color:#6d28d9}
 .mklock{font-size:14px;color:#991b1b;background:#fef2f2;border-radius:999px;padding:4px 12px}.mkunl{font-size:14px;color:#166534;background:#dcfce7;border-radius:999px;padding:4px 12px}
@@ -922,7 +922,7 @@ function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],
       const shown=W.miss.slice(0,5),more=tabsMiss(W.miss.slice(5));
       todo=`<section class="box mkc mktodo"><h2>⏰ ${W.nm>1?t(`Tens ${W.nm} activitats endarrerides`,`You have ${W.nm} late activities`):t("Tens 1 activitat endarrerida","You have 1 late activity")}</h2>`
         +`<p class="mklead">${t(W.nm>1?"Compten 0 fins que les facis.":"Compta 0 fins que la facis.",W.nm>1?"They count 0 until you do them.":"It counts 0 until you do it.")} ${up!=null?t(`Fes-les i la teva nota pujarà almenys fins a <b>${f1(up)}</b>.`,`Do them and your mark goes up to at least <b>${f1(up)}</b>.`):t("Fes-les ara i la teva nota puja.","Do them now and your mark goes up.")}</p>`
-        +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftNames(a,o);return `<li><b>${esc(a.title)}</b><small>${ln.length?ln.map(esc).join(" · ")+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${a.path}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
+        +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftLinks(a,o);return `<li><b>${esc(a.title)}</b><small>${ln?ln+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${lateHref(a,o)}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
         +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+`</section>`}}
   return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div>${mkSkills(ls)}<div id="ptbox">${pointsLine()}</div>`}
 // The LS mark's parts as one bar: each part as wide as its share of the mark, filled by its mark so far, and its name under it (Roger, 21 Nov
@@ -1887,6 +1887,10 @@ const isDone=a=>elAllDone(a,doneSet(a),D.rs[a.id]);   // every step done, not th
 // el-catalog.js): the tabs not done of a path, how many of a list of [[activity, day]], and their names (as on the learning path)
 const tabsLeft=(a,o)=>elTabsLeft(a,doneSet(a),D.rs[a.id],o),tabsMiss=list=>list.reduce((n,[a,,o])=>n+tabsLeft(a,o).length,0);   // o = only the tabs taught (elDueWork)
 const leftNames=(a,o)=>tabsLeft(a,o).filter(g=>g.length).map(g=>tabName(a.id,g[0]));
+// ⏰ late work links to the tab still to do, never to the path's first tab (Roger, 22 Nov 2026: a student's "Do it" opened Recall, done ✓,
+// so the three late tabs looked done): [[tab name, link to that tab]], and the first one for the "Do it" button
+const leftTabs=(a,o)=>tabsLeft(a,o).filter(g=>g.length).map(g=>[tabName(a.id,g[0]),tabHref(a,g[0])]),lateHref=(a,o)=>(leftTabs(a,o)[0]||[,tabHref(a)])[1];
+const leftLinks=(a,o)=>leftTabs(a,o).map(([n,h])=>`<a href="${h}">${esc(n)}</a>`).join(" · ");
 const nAct=n=>n===1?t("1 activitat","1 activity"):t(`${n} activitats`,`${n} activities`);
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
 // "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
@@ -1899,7 +1903,7 @@ function lateList(lss){const today=ELWeek.today(),late=[];
   return late.sort((x,y)=>x[1]<y[1]?-1:1)}
 function lateBox(lss){const late=lateList(lss);if(!late.length)return "";
   return `<div class="pend late"><b>⏰ ${late.length>1?t(`Tens ${late.length} activitats endarrerides:`,`You have ${late.length} late activities:`):t("Tens 1 activitat endarrerida:","You have 1 late activity:")}</b><ul>`
-    +late.map(([a,d])=>`<li>${esc(a.title)} · <span class="muted">${t("calia fer-la el","it was due on")} ${when(d)}</span> <a class="go" href="${a.path}">${t("Fes-la ara","Do it now")}</a></li>`).join("")+`</ul></div>`}
+    +late.map(([a,d,o])=>`<li>${esc(a.title)} · <span class="muted">${t("calia fer-la el","it was due on")} ${when(d)}</span> <a class="go" href="${lateHref(a,o)}">${t("Fes-la ara","Do it now")}</a></li>`).join("")+`</ul></div>`}
 function dueList(p,gi,i,info){const today=ELWeek.today(),ds=ELWeek.dueIn(p,gi,i).map(([id,d])=>[EL_CATALOG.find(x=>x.id===id),d]).filter(([a])=>a);
   if(!ds.length)return "";
   return `<ul class="due">${ds.map(([a,d])=>{const can=canDo(a,info),done=!a.manual&&isDone(a);
