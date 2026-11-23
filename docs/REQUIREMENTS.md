@@ -444,7 +444,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 - Everything but the writing is marked automatically against the keys. Record the version each student took.
 - **Writing**: Claude marks it with the C1–C4 rubric (section 7), the corrected text, a mistakes table and feedback in Roger's voice (Catalan for Starter, English for everyone else, Base included, since 21 Nov 2026). A blank writing is 0. Writing rows are always named C1–C4.
-- **Preview first** (marks per student, average, how many passed), then save only on Roger's "apply".
+- **Preview first** (marks per student, average, how many passed), then save only on Roger's "apply". **The preview's marks also go on the dashboard as drafts** (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their provisional marks here"): the web exam table shows "≈ 6.5 draft" in the Writing column and a provisional exam mark (≈); students never see a draft, and "apply" turns it into the real mark (`tools/web-exam/writing.mjs --draft`).
 - **Paper exams**: marked by hand from Roger's photos, doubtful items flagged; Roger enters them (Save marks skips paper rows).
 - **A part not done is left out, not 0** (14 Nov 2026): the mark is the other parts rescaled to 10.
 - A student who lost connection: use what was saved, only on Roger's word (20 Nov 2026).

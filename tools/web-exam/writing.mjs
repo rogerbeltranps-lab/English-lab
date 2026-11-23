@@ -10,7 +10,9 @@
 //       level of that mark: NA < 5 · AS < 7 · AN < 9 · AE) and report.writing {original, corrected (changed words in *…*), rubric, feedback,
 //       errors}, which the student's board shows as "Your writing" (today.html examWriting). Nothing else in the record changes, and the
 //       dashboard's 📥 Save marks keeps a corrected writing. Students see it from showFrom (4 days after the exam, 8:00; el-cloud.js held).
-//       Without --apply it only prints what would change.
+//       Without --apply it only prints what would change. --draft (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their
+//       provisional marks here") writes only results/{ls}__assessment.wdraft {score, max, level, at}: the dashboard's web exam table shows it
+//       as "≈ 6.5 draft" and a provisional exam mark; students never see it. The real import (--apply) removes the draft.
 // Both files hold personal data: keep them outside the repo (project files alumnes/ or the exam's folder).
 // Sign-in: FIREBASE_SERVICE_ACCOUNT (the cloud environment's secret), else the Firebase CLI login on Roger's computer (as tools/exam-marks).
 import fs from "node:fs";
@@ -21,7 +23,7 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const PROJECT = "english-lab-ietm", ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const args = process.argv.slice(2), apply = args.includes("--apply"), [cmd, key, a3, a4] = args.filter(a => !a.startsWith("--"));
+const args = process.argv.slice(2), draft = args.includes("--draft"), apply = args.includes("--apply") || draft, [cmd, key, a3, a4] = args.filter(a => !a.startsWith("--"));
 if (!["export", "import"].includes(cmd) || !key || !a3 || (cmd === "import" && !a4)) {
   console.error("Usage: node writing.mjs export <exam key> <out.json>\n       node writing.mjs import <exam key> <ls id> <marked.json> [--apply]"); process.exit(1); }
 
@@ -102,13 +104,15 @@ if (cmd === "export") {
     const score = orig ? (of ? Math.round(got / of * MAX * 10) / 10 : 0) : 0, lv = deg(score / MAX * 10);
     const writing = Object.assign({ original: orig || "(blank)", rubric: rub.map(([name, s, m]) => ({ name, score: +s || 0, max: +m })) },
       w.corrected && orig ? { corrected: mark(orig, String(w.corrected).trim()) } : {}, w.feedback ? { feedback: w.feedback } : {}, { errors: w.errors || [] }, w.copied ? { copied: w.copied } : {});
-    console.log((apply ? "✓ " : "→ ") + (w.name || uid) + ": " + got + "/" + of + " → " + score + "/" + MAX + " " + lv + " · " + (w.errors || []).length + " mistakes");
+    console.log((draft ? "≈ " : apply ? "✓ " : "→ ") + (w.name || uid) + ": " + got + "/" + of + " → " + score + "/" + MAX + " " + lv + " · " + (w.errors || []).length + " mistakes");
     if (!apply) continue; n++;
+    const rid = DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment");
+    if (draft) { await api("PATCH", rid + "?updateMask.fieldPaths=wdraft", { fields: { wdraft: enc({ score, max: MAX, level: lv, at: new Date().toISOString() }) } }); continue; }
     // students see it 4 days after the exam at 8:00 Madrid (7:00 UTC in winter), as the dashboard's 📥 Save marks (showFrom; kept if already set)
     const cur = await api("GET", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment"), null, true), sf = cur && cur.fields && cur.fields.showFrom && dec(cur.fields.showFrom);
     const day = new Date(d.done || d.started || Date.now()); day.setUTCDate(day.getUTCDate() + 4); day.setUTCHours(7, 0, 0, 0);
-    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
+    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom", "wdraft"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
       { fields: { ls: enc(ls), activity: enc(ls + "/assessment"), sections: enc({ writing: { score, max: MAX } }), levels: enc({ writing: { "5.1": lv } }), report: enc({ writing }), showFrom: enc(sf || day.toISOString()) } });
   }
-  console.log(apply ? "\nWritten: " + n : "\nNothing written: run again with --apply.");
+  console.log(apply ? "\nWritten" + (draft ? " as drafts" : "") + ": " + n : "\nNothing written: run again with --draft (provisional, dashboard only) or --apply.");
 }
