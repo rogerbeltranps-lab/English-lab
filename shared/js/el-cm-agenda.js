@@ -387,6 +387,8 @@ export function remind(){if(!C||!C.s)return Promise.resolve();return C.setDoc(C.
 let mapBox=null;
 const mapCopy=()=>{try{const x=JSON.parse(localStorage.getItem("el_vymap_"+C.g)||"null");return x&&x.V&&x.V.beds?x:null}catch(e){return null}};
 const lookSet=on=>C&&C.s?C.setDoc(C.doc(C.db,"live",C.g),{go:{look:on?{s:C.s,at:Date.now()}:null}},{merge:true}).catch(e=>console.warn("look at the screen",e)):null;
+// The map box fills the screen under the header and the map and 🧭 Class steps each scroll inside it (Roger, 23 Nov 2026: "aqui no puc fer
+// scroll down": .vymap was not part of the flex column, so both grew to their full height past the bottom of the screen).
 // o.fin (from the warm-up games, Roger 21 Nov 2026): the header also says "Finish all your activities!" and the button starts the class.
 export async function mapOpen(o){o=o||{};if(!C||mapBox)return;const x=mapCopy();
   if(!x){const t=`Open ${E(C.gname)}'s page on the dashboard once first: the map comes from there.`,m=box&&box.querySelector(".shmap");
@@ -398,7 +400,7 @@ export async function mapOpen(o){o=o||{};if(!C||mapBox)return;const x=mapCopy();
 #el-cmmap{position:fixed;inset:0;z-index:2147482600;background:#fbf6ea;display:flex;flex-direction:column;padding:10px 14px 12px;font:16px system-ui,sans-serif}
 #el-cmmap .hd{display:flex;align-items:center;gap:12px;margin:0 0 8px}#el-cmmap .hd b{font:700 22px Georgia,serif;color:#4a2f0e}#el-cmmap .hd .fin{font:800 20px system-ui,sans-serif;color:#166534;background:#dcfce7;border-radius:999px;padding:4px 14px}#el-cmmap .hd small{color:#8a5a1f;font-weight:600}
 #el-cmmap .hd button{margin-left:auto;padding:7px 16px;border:0;border-radius:999px;background:#4338ca;color:#fff;font:800 15px system-ui,sans-serif;cursor:pointer}
-#el-cmmap .vy{margin:0;flex:1;min-height:0;display:flex;flex-direction:column}#el-cmmap .vy-row{height:auto;flex:1;min-height:0}#el-cmmap .vy-go,#el-cmmap .vy-down{display:none}
+#el-cmmap .vymap{flex:1;min-height:0;display:flex;flex-direction:column}#el-cmmap .vy{margin:0;flex:1;min-height:0;display:flex;flex-direction:column}#el-cmmap .vy-row{height:auto;flex:1;min-height:0}#el-cmmap .vy-go,#el-cmmap .vy-down{display:none}
 #el-cmmap .vy-steps{width:min(400px,30vw)}#el-cmmap .vy-steps li.s a{font-size:15px}#el-cmmap .vy-steps .pc{font-size:14px;min-width:52px}#el-cmmap .vy-steps .pt{font-size:15px}`;document.head.append(st)}
   const V=Object.assign({},x.V,{later:new Set(x.V.later||[]),view:"cm:"+C.g,quiet:()=>false});
   const at=new Date(x.at||Date.now()),hm=at.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),day=at.toDateString()===new Date().toDateString()?hm:dLab(at.toLocaleDateString("en-CA"))+" "+hm;
