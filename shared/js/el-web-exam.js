@@ -462,7 +462,7 @@
   function printHtml() {
     const u = mode === 'view' ? (C() && C().viewing) || {} : (me || {}), name = (PV && PV.name) || u.displayName || u.name || '', mail = (PV && PV.email) || u.email || '';
     const when = new Date(), hhmm = when.toTimeString().slice(0, 5), day = when.toLocaleDateString('en-GB');
-    const st = S.status === 'done' ? t('Entregat', 'Turned in') + (S.done ? ' ' + new Date(S.done).toTimeString().slice(0, 5) : '') : t('No entregat encara', 'Not turned in yet');
+    const st = S.status === 'done' ? '🏁 ' + t('Entrega premuda', 'Turn in pressed') + (S.done ? ' ' + new Date(S.done).toTimeString().slice(0, 5) : '') : t('No entregat encara', 'Not turned in yet');
     const sec = s => { const its = (S.order[s] || []).map(id => items(s).find(x => x.id === id)).filter(Boolean); if (!its.length) return '';
       return '<h2>' + ICON[s] + ' ' + NAME[s][ca ? 0 : 1] + ' · ' + answered(s) + '/' + its.length + '</h2>' + (s === 'writing'
         ? its.map(it => { const v = String(S.answers[it.id] || '').trim(); return '<p><b>' + esc(it.q) + '</b></p>' + (v ? '<div class="pv-text">' + esc(v) + '</div><p>' + words(v) + ' ' + t('paraules', 'words') + '</p>' : '<p class="blank">' + t('en blanc', 'blank') + '</p>'); }).join('')
@@ -492,12 +492,33 @@
     D.body.appendChild(v);   // leaving the tab or app now still locks the exam, as always
     v.querySelector('button').onclick = async () => { await goFull(); v.remove(); };
   }
+  // 📧 A copy for the teacher on every 🏁 Turn in (Roger, 23 Nov 2026: "when turning in is to do two things at the same time, turn in and
+  // send a pdf"; he chose "Sent to you automatically"): at the same moment as the save, the page posts the printHtml() copy to the school
+  // Apps Script (action "exam_copy", v36), which checks the student's sign-in and emails it to the teacher's school address with a PDF
+  // attached. Students see nothing and press nothing; it travels apart from Firestore, so a turn in that fails still reaches the teacher.
+  // A failed turn in also saves the same copy as a file on the computer (saveFile). Never in the teacher's preview or 👁 view.
+  const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
+  const copyDoc = () => '<!doctype html><html><head><meta charset="utf-8"><title>Exam ' + esc(X.lsShort || '') + '</title><style>body{font:11pt/1.45 system-ui,Arial,sans-serif;color:#000;max-width:900px;margin:20px auto;padding:0 16px}h1{font-size:15pt;margin:0 0 4px}.pv-who{margin:0 0 4px}.pv-note{border:1px solid #999;border-radius:6px;padding:6px 9px;margin:8px 0 12px;font-size:10pt}h2{font-size:12.5pt;margin:14px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #ddd;padding:4px 6px;vertical-align:top}td.n{width:2em;font-weight:700}td.a{width:38%;font-weight:700}.blank{color:#b45309;font-style:italic;font-weight:400}.pv-text{white-space:pre-wrap;border:1px solid #bbb;border-radius:6px;padding:8px 10px;margin:4px 0}.pv-foot{margin-top:16px;font-size:9pt;color:#444;text-align:center}</style></head><body>' + printHtml() + '</body></html>';
+  async function sendCopy() {
+    if (mode !== 'student' || PV) return;
+    try { const c = C(), u = c && c.auth && c.auth.currentUser; if (!u) return;
+      const body = { idToken: await u.getIdToken(), action: 'exam_copy', key: X.key, ls: X.lsShort || X.ls, paper: S.paper, group: S.group || '', status: S.status, tester: isTester(), html: copyDoc() };
+      await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body), keepalive: body.html.length < 60000 });
+    } catch (e) { console.warn('exam copy', e); }
+  }
+  function saveFile() {
+    if (mode !== 'student') return;
+    try { printUntil = Date.now() + 3000;   // the download bar is not leaving the exam
+      const a = D.createElement('a'); a.href = URL.createObjectURL(new Blob([copyDoc()], { type: 'text/html' }));
+      a.download = 'exam-' + String(X.ls || X.key).replace(/[^\w-]+/g, '') + '-' + ((me && me.email) || 'answers').split('@')[0] + '.html'; D.body.appendChild(a); a.click(); a.remove();
+    } catch (e) { console.warn('exam file', e); }
+  }
   async function turnIn() {
     if (mode === 'teacher') { unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); return teacherPick(t('Prova acabada: no s’ha desat res.', 'Preview finished: nothing was saved.')); }
     S.status = 'done'; S.done = now(); keep(); unbind();
     const yes = $('#wxYes'); if (yes) { yes.disabled = true; yes.textContent = t('Enviant…', 'Sending…'); }
-    const ok = await save();
-    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); failNote(); return; }
+    const ok = await Promise.all([save(), sendCopy()]).then(r => r[0]);
+    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); failNote(); saveFile(); return; }
     if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
   }
   function handedIn() {
