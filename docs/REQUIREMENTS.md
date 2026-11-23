@@ -402,7 +402,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 ### 6.6 Listening
 
-- **First section, one shared audio** for all versions and levels, with different questions per version and level; played in class, all together. "Listening finished" opens the rest. A make-up student may play it at most twice, no pause or rewind.
+- **First section, one shared audio** for all versions and levels, with different questions per version and level; played in class, all together. "Listening finished" opens the rest. A make-up student may play it at most twice, no pause or rewind. **Every make-up (👤 Only some students…) works like that** (Roger, 23 Nov 2026: "they will need headphones… play the audio in their exam twice like the last time with Elunei"): the student brings headphones and plays the audio on their own exam page (2 plays), and gets **another version of their level** than the one their account gets in class, so a student who redoes the exam never sees the same questions ("different from the ones [he] did, but the same as others prepared").
 - **Short: about 1.5 minutes**; plan fewer audio facts (Exams doc).
 - Claude delivers the full script and a plain dialogue `.txt` (`SPEAKER: line`). The audio: as in LS2, reuse a recording the LS already has (LS2 used a learning-path video's audio, Nov 2026); a new recording only with Roger's OK for that generation (section 1).
 
