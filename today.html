@@ -307,6 +307,26 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
     document.documentElement.classList.add("embed");const b=document.createElement("base");b.target="_blank";document.head.appendChild(b);
     addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.querySelector("dialog[open]")&&parent.xrEsc)parent.xrEsc()})}catch(e){console.warn("exam embed",e)}})();</script>
 <style>html.embed .side,html.embed .mtabs,html.embed .bnav,html.embed #crumb,html.embed .phead,html.embed #note{display:none!important}html.embed .app{display:block}html.embed .page{max-width:none;padding:8px 10px}html.embed body{background:#fff}html.embed .t-exam{border:0;padding:0 2px}</style>
+<style>/* 📄 Term report (reportPlace): the course colour tints the band (2 ESO green, 4 ESO blue) */
+.trep{--rk:#2563eb}.trep[data-c="2eso"]{--rk:#15803d}
+.rph{background:var(--rk);color:#fff;border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin:12px 0 8px}
+.rph h2{color:#fff;margin:2px 0 0;font-size:1.35rem}.rph small{color:#fff;opacity:.92;font-size:13px}.rph .route{background:#fff;color:#0f172a}
+.rpdraft{background:#fffbeb;border:1px dashed #f59e0b;border-radius:10px;padding:8px 12px;margin:0 0 4px;color:#78350f;font-size:14px}
+.rpls{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rpl{border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px}
+.rpl h3{margin:2px 0 6px;font-size:16px;color:#0f172a}.rpl ul{margin:0;padding-left:18px}.rpl li{margin:0 0 10px;color:#0f172a}.rphow{margin-top:12px;background:#f8fafc}.rphow li{margin-bottom:4px}
+.rpt{display:block}.rpf{display:block;font-size:13.5px;color:#475569;margin-top:3px}
+.rpp{display:inline-block;color:#fff;border-radius:6px;padding:0 7px;font-weight:700;font-size:12.5px;margin-right:2px;font-variant-numeric:tabular-nums}.rpp.none{background:#94a3b8}
+.rpms{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.rpm{border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.rpm.main{background:#eff6ff}.trep[data-c="2eso"] .rpm.main{background:#f0fdf4}.rpm h3{margin:0;font-size:15px;color:#0f172a}.rpm p{margin:0;font-size:13px}.rpm .dgbx small{color:inherit;opacity:.9}
+.rpgv{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.rpgv h3{margin:0 0 6px;font-size:15px;color:#0f172a}
+.rptags{display:flex;flex-wrap:wrap;gap:6px}.rptag{border:1.5px solid #e2e8f0;border-radius:999px;padding:3px 10px;font-size:13.5px;color:#0f172a;background:#fff}.rptag.good{border-color:#16a34a}.rptag.work{border-color:#ea580c}
+.rpw{overflow-x:auto}.rpw svg{min-width:460px;display:block}.rpw text{fill:#64748b;font:12px system-ui,sans-serif}.rpw text.lb{fill:#0f172a;font-weight:700}
+.rpkv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}.rpkv div{background:#f1f5f9;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column}
+.rpkv b{font-size:20px;color:#0f172a;font-variant-numeric:tabular-nums}.rpkv span{font-size:13px;color:#475569}
+.rpv{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:14.5px;color:#0f172a}.rpv.ok{background:#dcfce7}.rpv.late{background:#ffedd5}.rpv.next{background:#fff7ed;border:1.5px solid #ea580c}
+.rpc{border-left:3px solid var(--rk);padding:4px 0 4px 12px;margin:4px 0;font-size:15px;color:#0f172a;line-height:1.55}.rpfoot{font-size:12px;text-align:center}
+@media print{.trep .rpw svg{min-width:0}}
+</style>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
@@ -315,6 +335,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
+<script src="shared/js/el-term-report.js?v=20261123"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261121b"></script>
@@ -486,9 +507,9 @@ const helpGuide=()=>{
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
+const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang",report:"report"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({examprep:t("Practica per l'examen","Exam practice"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
+const placeTitle=p=>({examprep:t("Practica per l'examen","Exam practice"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary"),report:"📄 "+t("Informe del 1r trimestre","Term 1 report")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
@@ -855,6 +876,7 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="me")return meBox(lss,ls);
   if(place==="examprep")return examPrep(lss);
   if(place==="progress")return progressPlace(lss,ls);
+  if(place==="report"){S.inRep=true;try{return reportPlace(lss,ls)}finally{S.inRep=false}}
   // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
   // only on 📈 My formative assessment (Roger, 14 Nov 2026: "in my final product and exams, students only need to see that, not my activities,
   // since it's shown in My formative assessment"): 🎯 checkpoints, 🎬 final product and 📝 exams show only their own content
@@ -1021,6 +1043,7 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
+  if(placeNow()==="report"&&!repOk())try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}   // 📄 only while the teacher shows it (reportPlace)
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
@@ -1569,13 +1592,15 @@ function compOfPieces(ps){const o={};ps.forEach(y=>{const k=String(y.c).split(".
     K.w+=y.w;C.w+=y.w;if(!C.src.has(y.src[0]))C.src.set(y.src[0],new Set());if(y.src[1])C.src.get(y.src[0]).add(y.src[1]);if(y.m!=null){K.sw+=y.w;K.sm+=y.m*y.w;C.sw+=y.w;C.sm+=y.m*y.w}});
   Object.values(o).forEach(K=>{K.m=K.sw?K.sm/K.sw:null;Object.values(K.crit).forEach(C=>C.m=C.sw?C.sm/C.sw:null)});return o}
 // the four official degrees (DOIGC: NA / AS / AN / AE), in words students understand
-const degOf=m=>(m=m==null?null:Math.round(m*10)/10,m==null?null:m>=9?["ae",t("Excel·lent","Excellent")]:m>=7?["an",t("Notable","Very good")]:m>=5?["as",t("Satisfactori","Satisfactory")]:["na",t("No satisfactori","Not satisfactory")]);
+const degOf=m=>(m=m==null?null:Math.round(m*10)/10,m==null?null:m>=9?["ae",repCa(t("Excel·lent","Excellent"),3)]:m>=7?["an",repCa(t("Notable","Very good"),2)]:m>=5?["as",repCa(t("Satisfactori","Satisfactory"),1)]:["na",repCa(t("No satisfactori","Not satisfactory"),0)]);
+// 📄 in the term report, the English level names carry the official Catalan in brackets (Roger, 23 Nov 2026: "students must see the translation though")
+const repCa=(s,i)=>S.inRep&&EN?s+" ("+REP_DEG[i][0]+")":s;
 // Degree + indicator under each criterion (Roger, 10 Nov 2026: "sota cada competència-criteri posar Assoliment + la frase de l'indicador"):
 // the official degree of the criterion's mark and the sentence of that level from the LS's indicators (EL_GRADING[ls].ind, in Catalan
 // for Starter and Base from .indCa). The mark out of 10 is the share of full achievement: NA 2.5 · AS 5 · AN 7.5 · AE 10.
 const DGK=["na","as","an","ae"],dgIdx=m=>{const d=degOf(m);return d?DGK.indexOf(d[0]):-1};
 // Level names (Roger, 10 Nov 2026: "eren satisfactori, no satisfactori, notable, excel·lent"), in Catalan for Starter/Base, English for Core/Plus.
-const dgName=i=>[t("No satisfactori","Not satisfactory"),t("Satisfactori","Satisfactory"),t("Notable","Very good"),t("Excel·lent","Excellent")][i];
+const dgName=i=>repCa([t("No satisfactori","Not satisfactory"),t("Satisfactori","Satisfactory"),t("Notable","Very good"),t("Excel·lent","Excellent")][i],i);
 const indOf=(l,c)=>{const g=(window.EL_GRADING||{})[l&&l.id]||{},I=(!EN&&g.indCa&&g.indCa[c])||(g.ind||{})[c];return Array.isArray(I)&&I.length===4?I:null};
 const indLss=(c,lss)=>[...lss].filter(l=>indOf(l,c));
 // The degree as the main thing and the mark out of 10 small on its right (Roger, 10 Nov 2026: "que surti Assoliment notable in a box i el
@@ -1708,6 +1733,70 @@ function fxDo(d){const F=S.fx;if(!F)return;
   else if(d.do==="fxnext"){F.typed="";F.tries=0;F.pick=null;if(F.i+1<F.items.length){F.i++;F.state="ask"}else F.state="end";drawFix()}
   else if(d.do==="fxagain"){F.items=F.P.miss.slice();F.i=0;F.tries=0;F.right=0;F.typed="";F.state="ask";drawFix()}
   else if(d.do==="fxclose"){$("#dlg").close()}}
+// 📄 Term report (Roger, 23 Nov 2026: "create a personal report of the 1st term. It must include criteria, grammar and vocabulary, a progress
+// of their results over time and their daily work (if they did the activities at the end of the term or just before the exam, they need to
+// know)"; "make sure they dont see them… I will show them the draft in class, I will need a button saying show draft… not before"):
+// today.html#report. Students reach it only while the teacher's class tab shows the drafts (📄 Show draft reports: live/{group}.go.report,
+// el-cloud.js cmReport sets window.EL_REP_ON and brings them here); the Firestore rules let them read their termReports/{email} only then.
+// The teacher sees any student's from the 👁 student view (today.html?student=uid#report). What we worked on comes from el-term-report.js
+// (Roger's own words), each point with the student's % and one line written by tools/term-report/draft.mjs; the marks, criteria and the
+// skills chart are worked out here, live, as on 📊 My marks and 🎓 My progress; when the work was done and the comment come from the draft.
+const repOk=()=>!!(DEMO||AS||all()||window.EL_REP_ON);
+const repTxt=s=>esc(s).replace(/&lt;(\/?)i&gt;/g,"<$1i>");   // the draft's lines: plain text with <i> only
+// the level names: English with the official Catalan in brackets (Roger, 23 Nov 2026: "students must see the translation though")
+const REP_DEG=[["No assoliment","Not satisfactory"],["Assoliment satisfactori","Satisfactory"],["Assoliment notable","Very good"],["Assoliment excel·lent","Excellent"]];
+const repDeg=(m,big)=>{const i=dgIdx(m);if(i<0)return `<span class="pgna">${t("encara no","not yet")}</span>`;const [ca,en]=REP_DEG[i];
+  return `<span class="dgm${big?" big":""}"><span class="dgbx dg-${DGK[i]}">${EN?`${en} <small>(${ca})</small>`:ca}</span><span class="dgn">${f1(m)}<small>&nbsp;/&nbsp;10</small></span></span>`};
+function repLoad(){
+  if(DEMO){S.rep=(DEMO.trep||{}).t1||{};return}
+  const mail=String((AS?D.me.email:U&&U.email)||"").toLowerCase();if(!mail){S.rep={};return}
+  F.getDoc(F.doc(ELCloud.db,"termReports",mail)).then(x=>{S.rep=(x.exists()&&x.data().t1)||{}}).catch(e=>{console.warn("term report",e);S.rep={}}).then(()=>{if(placeNow()==="report")render()})}
+// the bars of the weeks: how many activities were finished each week (▲ = the exam's week), the last week orange when it holds far more than the rest
+function repWeeks(T){const w=(T&&T.weeks)||[];if(!w.length)return "";const n=w.length,Wd=640,H=170,L=30,R=10,Tp=18,B=30,max=Math.max(10,...w.map(x=>+x[1]||0)),bw=(Wd-L-R)/n,ys=v=>Tp+(max-v)*(H-Tp-B)/max;
+  const avg=w.reduce((s,x)=>s+(+x[1]||0),0)/n,ex=T.exam?(()=>{const d=new Date(T.exam+"T12:00:00Z"),k=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-k);return d.toISOString().slice(0,10)})():"";
+  let g=[0,Math.round(max/2),max].map(v=>`<line x1="${L}" x2="${Wd-R}" y1="${ys(v)}" y2="${ys(v)}" stroke="#e2e8f0"/><text x="${L-6}" y="${ys(v)+4}" text-anchor="end">${v}</text>`).join("");
+  w.forEach(([d,v],i)=>{v=+v||0;const x=L+i*bw+bw*.18,ww=bw*.64,hot=v>2*avg&&v>=5;g+=`<rect x="${x}" y="${ys(v)}" width="${ww}" height="${ys(0)-ys(v)}" rx="3" fill="${hot?"#ea580c":"var(--rk,#2563eb)"}"/>`
+    +(v?`<text class="lb" x="${x+ww/2}" y="${ys(v)-4}" text-anchor="middle">${v}</text>`:"")
+    +`<text x="${x+ww/2}" y="${H-10}" text-anchor="middle">${d===ex?"▲ ":""}${new Date(d+"T12:00:00").toLocaleDateString(EN?"en-GB":"ca",{day:"numeric",month:"short"})}</text>`});
+  return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
+const repName=()=>{const n=String(D.me.name||"").trim();return n.includes(",")?n.split(",")[1].trim()+" "+n.split(",")[0].trim():n};
+function reportPlace(lss,ls){
+  const course=all()?ls.course:((EL_GROUPS.find(x=>x.id===D.me.group)||{}).course||ls.course),C=((window.EL_TREP||{}).t1||{})[course];
+  if(!C)return `<div class="box"><p class="muted">${t("Encara no hi ha cap informe.","There is no report yet.")}</p></div>`;
+  if(S.rep===undefined){S.rep=null;repLoad()}
+  if(!S.rep)return `<div class="box"><p class="muted">${t("Carregant…","Loading…")}</p></div>`;
+  const R=S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
+  const lv=(elRouteOf(D.lv,(mine[mine.length-1]||{}).id)||{}).level;
+  const P=[];C.lss.forEach(x=>x.pts.forEach(p=>P.push(p)));
+  const pill=v=>v==null?`<span class="rpp none">–</span>`:`<span class="rpp" style="background:${col(v)}">${v} %</span>`;
+  const short=h=>String(h).replace(/<[^>]+>/g,"").split(/[:(]/)[0].trim().replace(/\.$/,"");
+  let k=0;const worked=`<div class="rpls">${C.lss.map(x=>`<div class="rpl"><h3>${esc(x.name)}</h3><ul>${x.pts.map(p=>{const r=pts[k++]||{};
+    return `<li><span class="rpt">${EN?p.en:p.ca}</span>${r.line||r.pct!=null?`<span class="rpf">${pill(r.pct)} ${repTxt(r.line||"")}</span>`:""}</li>`}).join("")}</ul></div>`).join("")}</div>`
+    +`<div class="rpl rphow"><h3>${t("Com hem treballat i avaluat","How we worked and how you were assessed")}</h3><ul>${(C.how[EN?"en":"ca"]||[]).map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`;
+  // the marks: the term (as 🎓 My progress), each LS (LS1 whole; LS2 part by part while its final product counts in term 2)
+  const TM=termMark(mine.flatMap(compPieces).filter(y=>y.term===1));
+  const lsTile=l=>{const M=lsMarks(l);if(!M)return "";const Pt=lsPts(l,M),part=Pt&&!Pt.all;
+    return `<div class="rpm"><h3>${esc(window.elLsNum?elLsNum(l):"")} · ${esc(String(l.title).replace(/^\S+ · /,""))}</h3>${part?ptLine(l,Pt):repDeg(M.total)}</div>`};
+  const glance=`<div class="rpms"><div class="rpm main"><h3>${t("Nota del 1r trimestre","Term 1 mark")}</h3>${repDeg(TM,true)}<p class="muted">${t("Amb tots els criteris de les dues LS del trimestre.","From every criterion of the term's two LSs.")}</p></div>${mine.map(lsTile).join("")}</div>`;
+  const tags=(ix,c)=>(ix||[]).map(i=>P[i]?`<span class="rptag ${c}">${esc(short(EN?P[i].en:P[i].ca))}</span>`:"").join("");
+  const T=R.time||{},prof=T.profile,VD={steady:["ok",t("🟢 Feina constant.","🟢 Steady work."),t("Has fet la majoria d'activitats la mateixa setmana de la classe.","You did most activities in the same week as the class.")],
+    behind:["late",t("🟡 Vas endarrerit.","🟡 Falling behind."),t(`Només ${T.inWeek||0} % de les activitats les vas fer la setmana de la classe; la resta, més tard o encara no.`,`You did only ${T.inWeek||0}% of the activities in the week of the class; the rest later, or not yet.`)],
+    last:["late",t("🟠 Ho has deixat per al final.","🟠 Left until the end."),t(`${T.lastMin||0} % de les activitats que vas fer, les vas fer l'última setmana del trimestre o just abans de l'examen.`,`${T.lastMin||0}% of the activities you did were done in the last week of term or just before the exam.`)],
+    none:["late",t("🔴 Encara no has fet les activitats.","🔴 No activities done yet."),t("Les activitats dels learning paths són la base de la teva nota.","The learning path activities are the basis of your mark.")]}[prof];
+  const daily=T.due!=null?repWeeks(T)+`<div class="rpkv"><div><b>${T.done||0} / ${T.due}</b><span>${t("activitats fetes de les que hem fet a classe","activities done of the ones we did in class")}</span></div><div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("fetes la mateixa setmana de la classe","done in the week of the class")}</span></div></div>`
+    +(VD?`<div class="rpv ${VD[0]}"><b>${VD[1]}</b> ${VD[2]}</div>`:""):`<p class="muted">${t("Encara no hi ha dades.","No data yet.")}</p>`;
+  const next=`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
+  const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
+  return `<div class="trep" data-c="${esc(course)}"><div class="rph"><div><small>${esc(g?g.name:"")} · English</small><h2>${esc(repName())}</h2></div>${lv?levelTag(course,lv):""}</div>`
+    +`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Pot canviar: les activitats que acabis abans de divendres encara compten.","<b>Draft.</b> It can still change: the activities you finish before Friday still count.")}</p>`
+    +box("🧭",t("Aquest primer trimestre hem treballat","What we worked on this term"),t("i com t'ha anat cada punt","and how each point went for you"),worked)
+    +box("🎓",t("Les teves notes","Your marks"),"",glance)
+    +compBox(mine,1)
+    +((R.strong||[]).length||(R.work||[]).length?box("🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),"",`<div class="rpgv"><div><h3>💪 ${t("El que domines","What you know well")}</h3><div class="rptags">${tags(R.strong,"good")||`<span class="muted">–</span>`}</div></div><div><h3>🎯 ${t("El que has de treballar","What to work on")}</h3><div class="rptags">${tags(R.work,"work")||`<span class="muted">–</span>`}</div></div></div>`):"")
+    +skGrowBox(course)
+    +box("📅",t("La teva feina de cada dia i quan la vas fer","Your daily work and when you did it"),t("cada barra és una setmana","each bar is a week"),daily+next)
+    +(R.comment?box("💬",t("Comentari del professor","Your teacher's comment"),"",`<p class="rpc">${repTxt(R.comment)}</p>`):"")
+    +`<p class="muted rpfoot">© ${new Date().getFullYear()} Roger Beltran · English Lab · ${t("Tots els drets reservats","All rights reserved")}</p></div>`}
 // 🎓 My progress (Roger, 9 Nov 2026: "students need to have a table with their results on the dashboard so that they can understand better
 // their progress. There they can choose term (and they see their 2 LS that they will have, not yet prepared)"; "name it progress"):
 // today.html#progress. Term chips (the current one first chosen) and one row per LS of that term: daily work, exam, final product and the
@@ -2100,6 +2189,7 @@ async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit:
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
   ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},pgsk:()=>{S.pgsk=k.k;render()},pgrls:()=>{S.pgrls=k.ls;render()},xls:()=>{S.xls=k.ls||null;render();scrollTo(0,0)},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({home:"marks",daily:"work",fp:"final",cp:"checkpoints"}[k.t]||k.t))}catch(e){}render();scrollTo(0,0)},    crit:()=>critPanel(k.c,k),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
+addEventListener("el-report",()=>{if(D){S.rep=undefined;render()}});   // 📄 the teacher showed or hid the draft reports (el-cloud.js cmReport)
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
 if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits&&window.ELWeek)ELWeek.applyEdits(id,i.planEdits);if(i&&i.sq&&window.elSqSync&&elSqAct(id))elSqSync(id,i.sq,true)});render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board

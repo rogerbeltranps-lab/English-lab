@@ -1716,6 +1716,7 @@ function goTo(g,first){
   cmLook(g);   // 👀 Look at the screen, while the teacher shows the class map
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
+  if(cmReport(g))return;   // 📄 the teacher is showing the term report drafts: the student stays on their own
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
   if(g&&g.cm)return cmGo(g);
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
@@ -1774,6 +1775,7 @@ addEventListener("hashchange",()=>{if(LOCK&&LOCK.cm&&elCmOn(LOCK)&&!nbHere())cmG
 // and are sent back). While it lasts they are kept there like a pull-up (lock: links that leave the page and the other tabs are blocked).
 // Not out of a recall checkpoint, the sample exam or a followed presentation. It ends with ⏹ Stop or the end of the class (until).
 function cmGo(g){
+  if(REP_ON)return void cmReport(g);   // 📄 on their term report while the teacher shows the drafts
   if(nbHere()){cmNbBar(g);return}   // 📓 in their notebook: they stay, the ↩ button takes them back
   cmNbBar(null);
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
@@ -1817,6 +1819,19 @@ function cmLook(g){const l=g&&g.cm&&g.look;if(!l||l.s!==g.s||!(Date.now()-l.at<L
     +`#el-look div{display:flex;flex-direction:column;align-items:center;gap:6px}#el-look span{font-size:clamp(70px,14vw,150px);line-height:1;animation:ellk 1.6s ease-in-out infinite}`
     +`#el-look b{font-size:clamp(30px,5vw,56px);color:#fff}#el-look small{font-size:clamp(16px,2vw,22px);color:#e2e8f0}@keyframes ellk{50%{transform:scale(1.12)}}@media (prefers-reduced-motion:reduce){#el-look span{animation:none}}</style>`;
   document.body.append(x)}
+// 📄 Term report drafts in class (Roger, 23 Nov 2026: "make sure they dont see them… I will show them the draft in class, I will need a button
+// saying show draft"; "not before"): while the teacher's class tab has 📄 Show draft reports on (el-cm-agenda.js repSet writes
+// live/{group}.go.report = {s, at}; ✕ Hide or ⏹ Stop clears it), every student in that class mode is taken to their own report
+// (today.html#report, reportPlace) and kept there; window.EL_REP_ON tells the board, and the Firestore rules let them read their
+// termReports/{email} only while go.report is under 90 minutes old. When it goes, class mode takes them back to the class as usual.
+const REP_MS=90*60e3;let REP_ON=false;
+function cmReport(g){const r=g&&g.cm&&g.report,on=!!(r&&r.s===g.s&&Date.now()-r.at<REP_MS&&!onDash&&user&&isStudent(user)&&!AS&&!window.EL_EXAM_LOCK);
+  const was=REP_ON;REP_ON=on;window.EL_REP_ON=on;if(was!==on)dispatchEvent(new Event("el-report"));
+  if(!on)return false;
+  const board=/\/today\.html$/.test(location.pathname);
+  if(board){if(location.hash!=="#report")location.hash="report"}
+  else goMove(new URL("today.html#report",ROOT),lockCa()?"📄 El teu informe del trimestre":"📄 Your term report",false,3,"📄");
+  return true}
 const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
 // the 🌟 line sits under the 🎓 class mode bar: lockPad moves the page down by both (one place for it, #550 + #551)
