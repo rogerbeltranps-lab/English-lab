@@ -107,12 +107,14 @@ if (cmd === "export") {
     console.log((draft ? "≈ " : apply ? "✓ " : "→ ") + (w.name || uid) + ": " + got + "/" + of + " → " + score + "/" + MAX + " " + lv + " · " + (w.errors || []).length + " mistakes");
     if (!apply) continue; n++;
     const rid = DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment");
-    if (draft) { await api("PATCH", rid + "?updateMask.fieldPaths=wdraft", { fields: { wdraft: enc({ score, max: MAX, level: lv, at: new Date().toISOString() }) } }); continue; }
+    // `updated` too: the dashboard only fetches results whose `updated` is newer than its copy (Roger, 23 Nov 2026: the saved marks didn't show)
+    const upd = { timestampValue: new Date().toISOString() };
+    if (draft) { await api("PATCH", rid + "?updateMask.fieldPaths=wdraft&updateMask.fieldPaths=updated", { fields: { wdraft: enc({ score, max: MAX, level: lv, at: new Date().toISOString() }), updated: upd } }); continue; }
     // students see it 4 days after the exam at 8:00 Madrid (7:00 UTC in winter), as the dashboard's 📥 Save marks (showFrom; kept if already set)
     const cur = await api("GET", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment"), null, true), sf = cur && cur.fields && cur.fields.showFrom && dec(cur.fields.showFrom);
     const day = new Date(d.done || d.started || Date.now()); day.setUTCDate(day.getUTCDate() + 4); day.setUTCHours(7, 0, 0, 0);
-    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom", "wdraft"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
-      { fields: { ls: enc(ls), activity: enc(ls + "/assessment"), sections: enc({ writing: { score, max: MAX } }), levels: enc({ writing: { "5.1": lv } }), report: enc({ writing }), showFrom: enc(sf || day.toISOString()) } });
+    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom", "wdraft", "updated"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
+      { fields: { ls: enc(ls), activity: enc(ls + "/assessment"), sections: enc({ writing: { score, max: MAX } }), levels: enc({ writing: { "5.1": lv } }), report: enc({ writing }), showFrom: enc(sf || day.toISOString()), updated: upd } });
   }
   console.log(apply ? "\nWritten" + (draft ? " as drafts" : "") + ": " + n : "\nNothing written: run again with --draft (provisional, dashboard only) or --apply.");
 }
