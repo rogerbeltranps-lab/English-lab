@@ -123,6 +123,10 @@
   .wx-teacher{background:#eef6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 14px;margin:0 0 12px}
   .wx-teacher audio{width:100%;max-width:520px;margin-top:6px}
   #wxPrint{display:none}
+  .wx-stuck{position:fixed;inset:0;z-index:2147483550;background:rgba(15,23,42,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+  .wx-stuck .box{background:#fff;color:#20312b;border-radius:18px;max-width:560px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3);line-height:1.5}
+  .wx-stuck h2{margin:0 0 8px;color:#174d3d}.wx-stuck a.wx-btn{display:inline-block;text-decoration:none;font-size:1.08rem}.wx-small{font-size:.9rem;color:#4b5d56}
+  @media print{.wx-stuck{display:none!important}}
   @media print{body>*:not(#wxPrint){display:none!important}#wxPrint{display:block!important}html,body{background:#fff!important;color:#000}}
   #wxPrint{font:11pt/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#000}
   #wxPrint h1{font-size:15pt;margin:0 0 4px}#wxPrint .pv-who{margin:0 0 4px}#wxPrint .pv-note{border:1px solid #999;border-radius:6px;padding:6px 9px;margin:8px 0 12px;font-size:10pt}
@@ -159,11 +163,11 @@
     snaps: S.snaps.slice(0, 30), tries: S.tries || 0, plays: S.plays || 0, done: S.done || null, updated: F.serverTimestamp() });
   function keep() { S.at = Date.now(); local.set(S); }
   function touch() { keep(); dirty = true; clearTimeout(saveT); saveT = setTimeout(save, SAVE_MS); mark(t('Desant…', 'Saving…')); }
-  async function save() {
+  async function save(force) {   // force: a turn-in retry goes even while an earlier write still waits (Firestore queues both)
     clearTimeout(saveT); saveT = null; if (mode !== 'student') { dirty = false; return mark(''); }
-    if (busy) { saveT = setTimeout(save, 1000); return; }
-    busy = true; const was = dirty; dirty = false;
-    try { const F = await fsLib(); await F.setDoc(ref(F), payload(F)); S.cloudAt = now(); keep(); mark('✓ ' + t('Desat', 'Saved') + ' ' + new Date().toTimeString().slice(0, 5)); busy = false; return true; }
+    if (busy && !force) { saveT = setTimeout(save, 1000); return; }
+    busy = true; const was = dirty; dirty = false; const sentDone = S.status === 'done';
+    try { const F = await fsLib(); await F.setDoc(ref(F), payload(F)); S.cloudAt = now(); if (sentDone && S.stuck) { busy = false; stuckDone(); return true; } keep(); mark('✓ ' + t('Desat', 'Saved') + ' ' + new Date().toTimeString().slice(0, 5)); busy = false; return true; }
     catch (e) { busy = false; dirty = dirty || was; console.warn('exam save', e);
       if (e && /permission/i.test(String(e.code || e.message))) { try { const l = await readLs(); if (!isOpen(l, S.group) && S.status !== 'done') return closedNow(); } catch (x) {} }
       mark('⚠️ ' + t('No s’ha pogut desar: es tornarà a provar', 'Not saved yet: trying again'), true); saveT = setTimeout(save, 8000); return false; }
@@ -186,6 +190,8 @@
       S.plays = Math.max(+(loc && loc.started === S.started && loc.plays) || 0, +(d && d.plays) || 0);   // listening plays used: never fewer than either copy
       // the exam was running when the page closed or reloaded: that is leaving it, so it locks (a reload in the first seconds with
       // nothing answered, as when the site reloads itself once after signing in, only asks to go back to full screen)
+      if (S.status === 'in' && S.stuck && base === loc) { ca = level === 'beginners'; return stuckBox(); }   // turning in had failed: the send window again, not the lock
+      delete S.stuck;
       if (S.status === 'in') {
         const fresh = !Object.keys(S.answers).length && !S.exits.length && Date.now() - Date.parse(S.started) < 20000;
         if (fresh) return resume();
@@ -415,7 +421,7 @@
     auBox();
   }
   function set(id, v) {
-    if (S.status !== 'in' || mode === 'view') return;
+    if (S.status !== 'in' || mode === 'view' || S.stuck) return;
     const was = S.answers[id] || '';
     if (v === was) return;
     if (S.exits.length) {   // changed after coming back: logged for the teacher (one line per question and visit, the latest value)
@@ -456,9 +462,6 @@
   let printUntil = 0;
   const prBtn = () => '<button class="wx-btn sec" id="wxPrintBtn" type="button">🖨 ' + t('Imprimeix / Desa en PDF', 'Print / Save as PDF') + '</button>';
   function bindPr(b) { const p = b.querySelector('#wxPrintBtn'); if (p) p.onclick = printNow; }
-  function failNote() { const b = $('#wxBody'); if (!b) return; const n = D.createElement('div'); n.className = 'wx-warn';
-    n.innerHTML = '⚠️ <b>' + t('No s’ha pogut entregar.', 'It couldn’t be turned in.') + '</b> ' + t('Les respostes estan desades en aquest ordinador. Torna-ho a provar amb 🏁 Entrega. Si continua fallant, prem <b>🖨 Imprimeix / Desa en PDF</b>, desa el PDF i avisa el professor.', 'Your answers are kept on this computer. Try 🏁 Turn in again. If it still fails, press <b>🖨 Print / Save as PDF</b>, save the PDF and tell your teacher.');
-    b.prepend(n); }
   function printHtml() {
     const u = mode === 'view' ? (C() && C().viewing) || {} : (me || {}), name = (PV && PV.name) || u.displayName || u.name || '', mail = (PV && PV.email) || u.email || '';
     const when = new Date(), hhmm = when.toTimeString().slice(0, 5), day = when.toLocaleDateString('en-GB');
@@ -481,7 +484,7 @@
     printUntil = Infinity;
     let fin = false; const done = () => { if (fin) return; fin = true; window.removeEventListener('afterprint', done);
       setTimeout(() => { printUntil = Date.now() + 1500;   // a last blur/focus as the window closes is still not leaving
-        if (S.status === 'in' && mode === 'student' && fsOk() && !isFull()) backToFull(); }, 300); };
+        if (S.status === 'in' && !S.stuck && mode === 'student' && fsOk() && !isFull()) backToFull(); }, 300); };
     window.addEventListener('afterprint', done);
     try { window.print(); } catch (e) { console.warn('print', e); }
     setTimeout(done, 1000);   // Chrome returns from print() when its window closes; iPad/iPhone may not send afterprint
@@ -492,33 +495,58 @@
     D.body.appendChild(v);   // leaving the tab or app now still locks the exam, as always
     v.querySelector('button').onclick = async () => { await goFull(); v.remove(); };
   }
-  // 📧 A copy for the teacher on every 🏁 Turn in (Roger, 23 Nov 2026: "when turning in is to do two things at the same time, turn in and
-  // send a pdf"; he chose "Sent to you automatically"): at the same moment as the save, the page posts the printHtml() copy to the school
-  // Apps Script (action "exam_copy", v36), which checks the student's sign-in and emails it to the teacher's school address with a PDF
-  // attached. Students see nothing and press nothing; it travels apart from Firestore, so a turn in that fails still reaches the teacher.
-  // A failed turn in also saves the same copy as a file on the computer (saveFile). Never in the teacher's preview or 👁 view.
-  const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
-  const copyDoc = () => '<!doctype html><html><head><meta charset="utf-8"><title>Exam ' + esc(X.lsShort || '') + '</title><style>body{font:11pt/1.45 system-ui,Arial,sans-serif;color:#000;max-width:900px;margin:20px auto;padding:0 16px}h1{font-size:15pt;margin:0 0 4px}.pv-who{margin:0 0 4px}.pv-note{border:1px solid #999;border-radius:6px;padding:6px 9px;margin:8px 0 12px;font-size:10pt}h2{font-size:12.5pt;margin:14px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #ddd;padding:4px 6px;vertical-align:top}td.n{width:2em;font-weight:700}td.a{width:38%;font-weight:700}.blank{color:#b45309;font-style:italic;font-weight:400}.pv-text{white-space:pre-wrap;border:1px solid #bbb;border-radius:6px;padding:8px 10px;margin:4px 0}.pv-foot{margin-top:16px;font-size:9pt;color:#444;text-align:center}</style></head><body>' + printHtml() + '</body></html>';
-  async function sendCopy() {
-    if (mode !== 'student' || PV) return;
-    try { const c = C(), u = c && c.auth && c.auth.currentUser; if (!u) return;
-      const body = { idToken: await u.getIdToken(), action: 'exam_copy', key: X.key, ls: X.lsShort || X.ls, paper: S.paper, group: S.group || '', status: S.status, tester: isTester(), html: copyDoc() };
-      await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body), keepalive: body.html.length < 60000 });
-    } catch (e) { console.warn('exam copy', e); }
+  // 📧 Turning in failed → "Send your exam to your teacher" (Roger, 23 Nov 2026: "If it's not possible to turn in, a window pops up and
+  // say, send your exam to your teacher … with their mail (not mine) … they only have to press send"). The exam is finished for the student:
+  // answers freeze (set() ignores changes), the lock stops, and a window offers 📧 Send it to my teacher (their own Gmail opens a new email
+  // to the teacher with every answer written in it: a web page can't attach a file to an email, so the answers go in the text), 🖨 Save
+  // as PDF and 🔄 Try again. The page also tries to turn it in again by itself every 15 s and when the connection comes back.
+  const TEACHER_MAIL = 'roger.beltran@ietramuntana.cat';
+  function mailText() {
+    const u = me || {}, name = (PV && PV.name) || u.displayName || '', mail = (PV && PV.email) || u.email || '';
+    const L = ['English Lab · ' + t('Examen', 'Exam') + ' ' + (X.lsShort || 'LS2') + ' · ' + (S.paper.startsWith('core') ? 'Core' : 'Base') + ' ' + (S.paper.split('-')[1] || ''),
+      (name || mail) + (name && mail ? ' · ' + mail : '') + ' · ' + (S.group || ''), t('No s’ha pogut entregar a la web. Aquestes són les meves respostes.', 'It couldn’t be turned in on the website. These are my answers.'), ''];
+    SECS.forEach(s => { const ids = S.order[s] || []; if (!ids.length) return; L.push('== ' + NAME[s][1] + ' ==');
+      ids.forEach((id, i) => { const it = items(s).find(x => x.id === id); if (!it) return; const v = String(S.answers[id] || '').trim();
+        if (s === 'writing') L.push(v || '(blank)'); else L.push((i + 1) + '. ' + (v || '(blank)')); });
+      L.push(''); });
+    return L.join('\n');
   }
-  function saveFile() {
-    if (mode !== 'student') return;
-    try { printUntil = Date.now() + 3000;   // the download bar is not leaving the exam
-      const a = D.createElement('a'); a.href = URL.createObjectURL(new Blob([copyDoc()], { type: 'text/html' }));
-      a.download = 'exam-' + String(X.ls || X.key).replace(/[^\w-]+/g, '') + '-' + ((me && me.email) || 'answers').split('@')[0] + '.html'; D.body.appendChild(a); a.click(); a.remove();
-    } catch (e) { console.warn('exam file', e); }
+  const gmailUrl = () => 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(TEACHER_MAIL) +
+    '&su=' + encodeURIComponent('English Lab · Exam ' + (X.lsShort || 'LS2') + ' · ' + (S.group || '') + ' · ' + (((me || {}).displayName) || (PV && PV.name) || '')) + '&body=' + encodeURIComponent(mailText());
+  let retryT = null;
+  function stuckBox() {
+    S.stuck = true; keep(); unbind();   // no lock any more: the student has finished; answers frozen
+    if (!wrap) run(); S.sec = 'review'; draw(); unbind();
+    let v = $('#wxStuck'); if (v) v.remove(); v = D.createElement('div'); v.id = 'wxStuck'; v.className = 'wx-stuck';
+    v.innerHTML = '<div class="box"><h2>📧 ' + t('Envia l’examen al professor', 'Send your exam to your teacher') + '</h2>' +
+      '<p>' + t('L’examen no s’ha pogut entregar. Les respostes estan guardades en aquest ordinador i ja no es poden canviar.', 'Your exam couldn’t be turned in. Your answers are kept on this computer and can’t be changed any more.') + '</p>' +
+      '<p><b>' + t('Prem el botó: s’obrirà un correu al teu Gmail amb totes les respostes. Només has de prémer Envia.', 'Press the button: an email opens in your Gmail with all your answers. You only have to press Send.') + '</b></p>' +
+      '<p><a class="wx-btn" id="wxMail" target="_blank" rel="noopener" href="' + esc(gmailUrl()) + '">📧 ' + t('Envia-ho al professor', 'Send it to my teacher') + '</a></p>' +
+      '<p class="wx-small">' + t('Si no hi ha internet, el correu no s’obrirà: espera que torni i prem-lo de nou. Mentrestant, aquesta pàgina continua intentant entregar l’examen sola.', 'If there is no internet, the email won’t open: wait until it’s back and press it again. Meanwhile, this page keeps trying to turn in your exam by itself.') + '</p>' +
+      '<p>' + prBtn() + ' <button class="wx-btn sec" id="wxAgainTi" type="button">🔄 ' + t('Torna a provar d’entregar', 'Try to turn it in again') + '</button></p><p class="wx-small" id="wxStuckMsg"></p></div>';
+    D.body.appendChild(v); bindPr(v);
+    v.querySelector('#wxAgainTi').onclick = () => retry(true);
+    clearInterval(retryT); retryT = setInterval(() => retry(false), 15000); window.addEventListener('online', onl);
+  }
+  const onl = () => retry(false);
+  function stuckDone() {   // it reached the cloud after all: turned in
+    clearInterval(retryT); window.removeEventListener('online', onl); delete S.stuck; S.status = 'done'; keep();
+    const v = $('#wxStuck'); if (v) v.remove(); if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn(); }
+  let retrying = false;
+  async function retry(loud) {
+    if (retrying || !S.stuck) return; retrying = true; const m = $('#wxStuckMsg'); if (loud && m) m.textContent = t('Provant…', 'Trying…');
+    S.status = 'done'; S.done = S.done || now(); const ok = await Promise.race([save(true), new Promise(r => setTimeout(() => r(false), 12000))]); retrying = false;
+    if (ok || !S.stuck) return;
+    S.status = 'in'; keep(); if (m) m.textContent = loud ? '⚠️ ' + t('Encara no es pot. Envia-ho per correu.', 'Not yet. Send it by email.') : '';
   }
   async function turnIn() {
     if (mode === 'teacher') { unbind(); if (wrap) wrap.remove(); wrap = null; exitFull(); return teacherPick(t('Prova acabada: no s’ha desat res.', 'Preview finished: nothing was saved.')); }
     S.status = 'done'; S.done = now(); keep(); unbind();
     const yes = $('#wxYes'); if (yes) { yes.disabled = true; yes.textContent = t('Enviant…', 'Sending…'); }
-    const ok = await Promise.all([save(), sendCopy()]).then(r => r[0]);
-    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); failNote(); saveFile(); return; }
+    // no connection: Firestore keeps the write waiting and never answers, so after 12 s it counts as failed (the write still goes through
+    // by itself if the connection comes back while the page is open: stuckDone then closes the send window)
+    const ok = await Promise.race([save(), new Promise(r => setTimeout(() => r(false), 12000))]);
+    if (!ok) { S.status = 'in'; keep(); run(); S.sec = 'review'; draw(); mark('⚠️ ' + t('No s’ha pogut entregar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be turned in. Check the connection and try again.'), true); stuckBox(); return; }
     if (wrap) wrap.remove(); wrap = null; exitFull(); handedIn();
   }
   function handedIn() {
