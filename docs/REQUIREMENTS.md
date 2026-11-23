@@ -402,7 +402,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 ### 6.6 Listening
 
-- **First section, one shared audio** for all versions and levels, with different questions per version and level; played in class, all together. "Listening finished" opens the rest. A make-up student may play it at most twice, no pause or rewind.
+- **First section, one shared audio** for all versions and levels, with different questions per version and level; played in class, all together. "Listening finished" opens the rest. A make-up student may play it at most twice, no pause or rewind. **Every make-up (👤 Only some students…) works like that** (Roger, 23 Nov 2026: "they will need headphones… play the audio in their exam twice like the last time with Elunei"): the student brings headphones and plays the audio on their own exam page (2 plays), and gets **another version of their level** than the one their account gets in class, so a student who redoes the exam never sees the same questions ("different from the ones [he] did, but the same as others prepared").
 - **Short: about 1.5 minutes**; plan fewer audio facts (Exams doc).
 - Claude delivers the full script and a plain dialogue `.txt` (`SPEAKER: line`). The audio: as in LS2, reuse a recording the LS already has (LS2 used a learning-path video's audio, Nov 2026); a new recording only with Roger's OK for that generation (section 1).
 
@@ -445,7 +445,7 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 - Everything but the writing is marked automatically against the keys. Record the version each student took.
 - **Writing**: Claude marks it with the C1–C4 rubric (section 7), the corrected text, a mistakes table and feedback in Roger's voice (Catalan for Starter, English for everyone else, Base included, since 21 Nov 2026). A blank writing is 0. Writing rows are always named C1–C4.
-- **Preview first** (marks per student, average, how many passed), then save only on Roger's "apply".
+- **Preview first** (marks per student, average, how many passed), then save only on Roger's "apply". **The preview's marks also go on the dashboard as drafts** (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their provisional marks here"): the web exam table shows "≈ 6.5 draft" in the Writing column and a provisional exam mark (≈); students never see a draft, and "apply" turns it into the real mark (`tools/web-exam/writing.mjs --draft`).
 - **Paper exams**: marked by hand from Roger's photos, doubtful items flagged; Roger enters them (Save marks skips paper rows).
 - **A part not done is left out, not 0** (14 Nov 2026): the mark is the other parts rescaled to 10.
 - A student who lost connection: use what was saved, only on Roger's word (20 Nov 2026).
@@ -484,6 +484,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 - **C1 Task achievement 8**: four aspects × 0–2 (0 no evidence, 1 partial, 2 developed), adapted to each paper and version.
 - **C2 Grammar 4 · C3 Vocabulary 4 · C4 Organisation and cohesion 4** (organisation 0–1, connectors 0–2, mechanics 0–1).
+- **Made-up facts never count** (Roger, 23 Nov 2026: "if someone makes up facts, it's okay no big deal, I only care about their English"): C1 checks that each point of the task is there, not that it is true, and the feedback never corrects facts.
 - **No word-count penalty**: word ranges guide; brevity only costs points when ideas the task asks for are missing (in C1).
 - **No quotas as thresholds**: "5 expressions" or "2 connectors" describe an excellent text, they never block a mark. No minimum number of structures.
 - **One error, one penalty**: each error counts in one criterion only ("She get up": credit *get up* in vocabulary, penalise the -s in grammar).

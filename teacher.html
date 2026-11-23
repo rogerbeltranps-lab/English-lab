@@ -3384,12 +3384,15 @@ const WXLV={NA:8/30,AS:15/30,AN:23/30,AE:1};
 const wxWid=d=>((d.order||{}).writing||[])[0]||null;
 const wxWords=v=>(String(v||"").trim().match(/[A-Za-zÀ-ÿ’'0-9-]+/g)||[]).length;
 const wxW=(u,ls,d)=>{const e=exOf(ls);if(!e||!e.sections.some(x=>x[0]==="writing"))return null;const x=res(u,asId(ls)),sc=(x.sections||{}).writing,id=d&&wxWid(d),txt=id?String((d.answers||{})[id]||""):"";
-  return {max:secMax(e,"writing"),score:sc&&sc.score!=null?+sc.score:null,level:((x.levels||{}).writing||{})["5.1"]||null,id,txt,words:wxWords(txt)}};
+  // a writing draft (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their provisional marks here"): results .wdraft
+  // {score, max, level}, written by tools/web-exam/writing.mjs --draft and removed when the marks are saved for real; never shown to students
+  const dr=!(sc&&sc.score!=null)&&x.wdraft&&x.wdraft.score!=null?x.wdraft:null;
+  return {max:secMax(e,"writing"),score:sc&&sc.score!=null?+sc.score:null,level:((x.levels||{}).writing||{})["5.1"]||null,draft:dr?+dr.score:null,dlevel:dr&&dr.level||null,id,txt,words:wxWords(txt)}};
 // marks of one exam (any answers map: the final one or a copy taken at an exit): per section right/n and points of the section's maximum
 function wxMark(d,K,ls,answers){const e=exOf(ls),A=answers||d.answers||{},out={sec:{},score:0,max:0,known:true};
   WXSEC.forEach(([k])=>{const ids=(d.order||{})[k]||[],mx=secMax(e,k),right=ids.filter(id=>{if(!wxAcc(K,id))out.known=false;return wxOk(K,id,A[id])}).length;
     const sc=ids.length?Math.round(right/ids.length*mx*100)/100:0;out.sec[k]={right,n:ids.length,score:sc,max:mx};out.score+=sc;out.max+=mx});
-  const w=d.uid?wxW(d.uid,ls,d):null;if(w){out.w=w;if(w.score!=null||!w.words){out.score+=w.score||0;out.max+=w.max}else out.partial=true}   // a blank writing counts 0   // not marked yet: the mark is without the writing (*)
+  const w=d.uid?wxW(d.uid,ls,d):null;if(w){out.w=w;if(w.score!=null||!w.words){out.score+=w.score||0;out.max+=w.max}else if(w.draft!=null){out.score+=w.draft;out.max+=w.max;out.draft=true}else out.partial=true}   // a blank writing counts 0   // not marked yet: the mark is without the writing (*)
   if(!w&&exOf(ls).sections.some(x=>!WXSEC.some(y=>y[0]===x[0])))out.partial=true;   // LS1: the writing (wtask…) is marked apart (tools/exam-marks)
   out.mark=out.max?out.score/out.max*10:null;return out}
 // what going out changed: the answers at the first exit against the final ones (each question: before, after, right before / after)
@@ -3451,8 +3454,8 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
     const d=wxDoc(s.uid);if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="10">${st(null)}</td></tr>`;
     const m=K?wxMark(d,K,ls):null,w=wxW(s.uid,ls,d),as=K?wxAssess(d,K,ls):null,ex=(d.exits||[]).length,back=(d.exits||[]).filter(x=>x.back).length,saved=(res(s.uid,asId(ls)).sections||{}).listening;
     return `<tr data-wx="dlg" data-u="${s.uid}" style="cursor:pointer" title="Click: every answer, and what changed after an exit"><td class="n">${s.tester?"🧪 ":""}${name(s)}</td><td style="white-space:nowrap">${esc((d.paper||"").replace("base","Base").replace("core","Core"))}</td><td>${st(d)}${saved?' <small class="muted" title="Saved in 📊 Assessment details">💾</small>':""}</td>`
-      +WXSEC.map(([k])=>`<td>${m?m.sec[k].right+"/"+m.sec[k].n:"–"}</td>`).join("")+(w?`<td>${w.score!=null?`<b>${f1(w.score)}</b>${w.level?` <small class="muted">${w.level}</small>`:""}`:w.words?`<span style="color:#b45309;white-space:nowrap" title="Click the row to mark it">✍️ ${w.words} w.</span>`:'<span class="muted">blank</span>'}</td>`:"")
-      +`<td><b>${m?f1(m.mark):"–"}</b>${m&&m.partial?'<small class="muted" title="Without the writing: not marked yet">*</small>':""}</td>`
+      +WXSEC.map(([k])=>`<td>${m?m.sec[k].right+"/"+m.sec[k].n:"–"}</td>`).join("")+(w?`<td>${w.score!=null?`<b>${f1(w.score)}</b>${w.level?` <small class="muted">${w.level}</small>`:""}`:w.draft!=null?`<span style="color:#b45309;white-space:nowrap" title="Draft mark: not saved yet, students don't see it">≈ <b>${f1(w.draft)}</b> <small>draft</small></span>`:w.words?`<span style="color:#b45309;white-space:nowrap" title="Click the row to mark it">✍️ ${w.words} w.</span>`:'<span class="muted">blank</span>'}</td>`:"")
+      +`<td>${m&&m.draft?'<small style="color:#b45309" title="With the writing draft: provisional, not saved yet">≈ </small>':""}<b>${m?f1(m.mark):"–"}</b>${m&&m.partial?'<small class="muted" title="Without the writing: not marked yet">*</small>':""}</td>`
       +`<td>${ex?`🚪 ${ex}${(()=>{const t=(d.exits||[]).map(x=>wxOut(x,d)).filter(v=>v!=null).reduce((a,b)=>a+b,0);return t?` · ⏱ <b>${wxDur(t)}</b> out`:""})()}${back?` · 🔓 ${back}`:""}${(d.glances||[]).length?` · 👀 ${d.glances.length}`:""}${d.tries?` · 🔑✗${d.tries}`:""}`:(d.glances||[]).length?`👀 ${d.glances.length}`:'<span class="muted">–</span>'}</td>`
       +`<td>${as?(as.ch.length?`${as.gained?`<b style="color:#b45309">⚠️ +${as.gained} right</b>`:""} ${as.ch.length} changed`:"no change"):'<span class="muted">–</span>'}</td></tr>`};
   return `<div class="box">${fold("wxbox",`🖥 Web exam · ${esc(grp.name)} · ${n("done")} turned in${n("in")?` · ${n("in")} working`:""}${n("out")?` · <span style="color:#b91c1c">${n("out")} stopped</span>`:""}${np?` · 📄 ${np} on paper`:""}`,head+pick+note
@@ -3504,7 +3507,7 @@ function wxWBox(u,ls,d){const w=wxW(u,ls,d);if(!w||!w.id)return "";const X=windo
     it=X&&X.papers[d.paper]&&(X.papers[d.paper].sections.writing||[]).find(x=>x.id===w.id),sn=(d.snaps||[])[0],before=sn?String((sn.answers||{})[w.id]||""):null;
   if(!X)wxData(wxCfg(ls)).then(x=>{if(x&&$("#dlg")&&$("#dlg").open&&!$("#dlg [data-wtask]"))wxDlg(u,ls)});
   const ind=((G()||{}).ind||{})["5.1"]||[];
-  return `<h4>✍️ Writing · ${w.words} words${w.score!=null?` · <b>${f1(w.score)}/${w.max}</b>`:""}</h4>`
+  return `<h4>✍️ Writing · ${w.words} words${w.score!=null?` · <b>${f1(w.score)}/${w.max}</b>`:w.draft!=null?` · <span style="color:#b45309">≈ <b>${f1(w.draft)}/${w.max}</b> draft</span>`:""}</h4>`
     +(it?`<p class="muted" data-wtask style="white-space:pre-wrap">${esc(it.q)}${it.frame?"\nFrame: "+esc(it.frame):""} (at least ${it.min} words)</p>`:"")
     +`<div style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(w.txt.trim())||'<span class="muted">(blank)</span>'}</div>`
     +(before!=null&&before.trim()!==w.txt.trim()?`<details style="margin-top:6px"><summary>⚠️ The text when they first left (${wxWords(before)} words)</summary><div style="white-space:pre-wrap;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(before.trim())||'<span class="muted">(blank)</span>'}</div></details>`:"")
