@@ -122,7 +122,8 @@ window.EL_GRADING={
         "2.2":{e:[[LP3,"chart"],{exam:"listening"}],levelOnly:true},
         "4.2":{e:[[LP4,"card"],[FP,"source"]]},
         "6.1":{e:[[LP4,"card"],[FP,"research"]]},
-        "3.2":{e:[[FP,"part"]]},
+        // the learning-path speakings first (their 3.2 level comes with Beltran's correction; Roger, 24 Nov 2026), then the final product
+        "3.2":{e:[[LP2,"speak"],[LP3,"speak"],[LP3,"talk"],[LP4,"talk"],[LP5,"speak"],[LP5,"talk"],[LP6,"speak"],[LP6,"talk"],[FP,"part"]]},
         // the learning-path writings first (their 5.1 level comes with Beltran's correction; Roger, 21 Nov 2026), then the exam and the final product
         "5.1":{e:[[LP2,"write"],[LP3,"write"],[LP5,"write"],[LP6,"write"],["exam","writing"],[FP,"email"]]},
         "1.1":{e:[[FP,"group"]]},
@@ -209,7 +210,8 @@ window.EL_GRADING={
         "2.2":{e:[[LP3,"chart"],{exam:"listening"}],levelOnly:true},
         "4.2":{e:[[LP4,"factfile"],[FP,"source"]]},
         "6.2":{e:[[LP4,"factfile"],[FP,"factfile"]]},
-        "3.2":{e:[[FP,"edit"]]},
+        // the learning-path speakings first (their 3.2 level comes with Beltran's correction; Roger, 24 Nov 2026), then the final product
+        "3.2":{e:[[LP2,"speak"],[LP2,"talk"],[LP3,"speak"],[LP3,"talk"],[LP4,"talk"],[LP5,"speak"],[LP5,"talk"],[LP6,"speak"],[LP6,"talk"],[FP,"edit"]]},
         // the learning-path writings first (their 5.1 level comes with Beltran's correction; Roger, 21 Nov 2026), then the exam and the final product
         "5.1":{e:[[LP2,"write"],[LP3,"write"],[LP5,"write"],[LP6,"write"],["exam","writing"],[FP,"script"]]},
         "CD2 2.2":{e:[[FP,"edit"]]},
