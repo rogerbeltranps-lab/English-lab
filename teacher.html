@@ -306,6 +306,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-marking.js"></script>
+<script src="shared/js/el-fix.js?v=1"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-comp-map.js"></script>
@@ -1038,13 +1039,35 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
     <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp&&step!=="shadow"?spkBox(u,aid,step):""}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
-    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+fbHold(u,aid,step,x)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
+    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":(x.fbWho||{})[step]==="teacher"?"✏️ Your correction, sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+fbHold(u,aid,step,x)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
       :`<p><b>Handed in</b> <small class="muted">(no correction yet: Beltran corrects it in the next afternoon run, weekdays)</small></p>${more(f)}`}
     ${(h=>h&&(ELMark.q(h)||cmtCa(x,h,step))?`<div class="hand" style="border-left:4px solid #2563eb">${cmtBox(u,a,step,h,true)}</div>`:"")(((pstate(u,a)||{}).steps||{})[step])}
     ${canBack?backBox(u,aid,step,orig):""}
+    ${f.length&&!mo?`<div id="fxhost"></div><div class="row" id="fxrow" style="justify-content:flex-start"><button data-do="fixopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Underline the mistakes, change the corrections, the feedback and the level">✏️ Correct it${t?" (change the correction)":""}</button></div>`:""}
     <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
   if(t)writing($("#wrfix"),t,EN,old||!rich?"":orig)}
+// ✏️ Correct it (Roger, 24 Nov 2026: "I underline the sentences that are wrong, and the system suggests a correction and why. I change
+// whatever I want"): shared/js/el-fix.js opens the hand-in's text (a recording: Roig's transcript) with the correction already saved
+// (Beltran's, or the teacher's own) as underlines; the teacher underlines, changes the correction, the why, the feedback template (✔ / ➜)
+// and the 5.1 level of a writing, the double check runs, and Save writes the same fields as marks.mjs fb-apply, so Beltran's next run
+// skips it (fbSig = this version) and a new version handed in later is corrected again. fbWho[step] = "teacher" labels it as yours.
+// It shows to students at once (or at 7:30 with the 🌙 hold), unless Beltran's version was still waiting for 17:00: then it waits too.
+function fixOpen(u,aid,step){const a=byId(aid),s=S.P[u],h=$("#fxhost");if(!a||!s||!h)return;const x=res(u,aid),st=pstate(u,a);
+  const it=ELMark.fbItems(st,new Set(),/reflect$/.test(aid)?"reflect":null)[step]||{fields:[]},f=it.fields||[];
+  const rec=/speak|talk|shadow|^sq/.test(step)||it.mode==="surprise"||it.mode==="shadow",isTr=y=>y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació";
+  const src=rec?(f.find(isTr)||f.find(y=>y.l==="Text")||f.find(y=>!/^Notes from the recording|^Model sentences/.test(y.l))||{}):(f[0]||{});
+  const route=elRouteOf(S.D.lv[u],a.ls).level,ca=!route||route==="beginners",g=(window.EL_GRADING||{})[a.ls]||{};
+  const lvHas=!rec&&it.mode==="writing"&&!g.only&&!!(g.ind&&g.ind["5.1"]),cur=(((x.levels||{})[step])||{})["5.1"]||null;
+  const names=[...new Set(Object.values(S.P).filter(p=>p.group===s.group).flatMap(p=>String(fullName(p)||"").split(/\s+/)).filter(w=>w.length>2))];
+  const go=tms((x.fbGo||{})[step]),hold=go>Date.now()?`🕗 Beltran's correction is waiting until ${goWhen(go)}: yours waits until then too.`:"Yours shows to the student as soon as you save it (between 21:00 and 7:30 you choose: now, or hold it until 7:30).";
+  $("#fxrow")&&($("#fxrow").style.display="none");
+  ELFix.open(h,{orig:String(src.v||""),reply:(x.replies||{})[step]||"",rec,ca,lv:{has:lvHas,cur},names,hold,
+    onCancel:()=>wrOpen(u,aid,step),
+    onSave:o=>new Promise(ok=>lateAsk(()=>{const now=new Date().toISOString(),at=go>Date.now()?new Date(go).toISOString():S.hold?new Date(S.hold).toISOString():now;
+      const w=patch(u,aid,Object.assign({replies:{[step]:o.text},fbSig:{[step]:sigOf(JSON.stringify(f))},fbBy:{[step]:null},fbWho:{[step]:"teacher"},fbAt:{[step]:now},fbGo:{[step]:at}},
+        lvHas&&o.lv!==cur?{levels:{[step]:{"5.1":o.lv}},marked:{[step]:now}}:{}));
+      ok(Promise.resolve(w).then(()=>{render();wrOpen(u,aid,step)}))}))})}
 // ↩ Send it back (Roger, 4 Nov 2026, on a text filled with "c c c" to reach the minimum: "I want to be able to tell him that they need to
 // write the characters missing"): a message in the student's language (Catalan for Starter/Base, English for Core/Plus; ready-made for
 // the usual cases, editable) goes on top of the correction, the writing opens again on their page (flags[step] = {done: "redo", back,
@@ -5022,7 +5045,7 @@ function cmtBox(u,a,id,x,lite){const xr=res(u,a.id),rp=xr.replies||{},wait=waits
     +(ca?`<p><b>🤖 Beltran's answer</b> <small class="muted">(the student sees it as your answer${ca.at?" · "+esc(ymd(tms(ca.at))):""}${ca.edited?"; edited by you":""})</small></p>${tms(ca.at)>Date.now()?`<p class="pbhold">🕗 Not shown yet: the student sees it at ${goWhen(tms(ca.at))} (weekdays from 17:00, at least 2 hours after the comment). You can still change or remove it.<button class="g" data-do="canow" data-u="${u}" data-a="${a.id}" data-s="${id}">📨 Show it now</button></p>`:""}<textarea id="ca-${id}" style="min-height:60px">${esc(ca.t)}</textarea><div class="row" style="margin-top:4px"><button class="g" data-do="casave" data-u="${u}" data-a="${a.id}" data-s="${id}">Update Beltran's answer</button> <button class="g" data-do="cadel" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take Beltran's answer away: the student no longer sees it, and Beltran will not answer this comment again">🗑 Remove</button></div>`
       :cmtGone(xr,x,id)?`<p class="muted">🗑 You removed Beltran's answer${cmtGone(xr,x,id).removed?" on "+esc(ymd(tms(cmtGone(xr,x,id).removed))):""}: the student sees no answer.</p>`:"")
     // lite (the correction dialog, wrOpen): what was sent for the step is already above it, so the box to answer shows only when nothing was sent
-    +(lite&&rp[id]?(wait?`<div class="row" style="margin-top:4px"><button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button></div>`:""):`<p><b>${fb?"🤖 Correction of the work (sent by Beltran)":ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div>`)}
+    +(lite&&rp[id]?(wait?`<div class="row" style="margin-top:4px"><button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button></div>`:""):`<p><b>${fb?((xr.fbWho||{})[id]==="teacher"?"✏️ Your correction of the work":"🤖 Correction of the work (sent by Beltran)"):ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div>`)}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{},cas=xr.answers||{};
@@ -6688,6 +6711,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     cadel:()=>act(api.caDel(u,a,k.s)).then(()=>(redraw||(()=>cellPanel(u,a.id)))()),
     canow:()=>act(api.caNow(u,a,k.s)).then(()=>(redraw||(()=>cellPanel(u,a.id)))()),
     fbnow:()=>act(api.fbNow(u,a,k.s)).then(()=>(redraw||(()=>wrOpen(u,a.id,k.s)))()),
+    fixopen:()=>fixOpen(u,a.id,k.s),
     casave:()=>{const v=$("#ca-"+k.s).value.trim();if(!v)return;act(api.claudeAns(u,a,k.s,v)).then(()=>(redraw||(()=>cellPanel(u,a.id)))())},
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>(redraw||(()=>cellPanel(u,a.id)))())},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
