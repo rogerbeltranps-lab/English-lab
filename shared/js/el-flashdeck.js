@@ -52,6 +52,15 @@
   const CSS = `
 .elfd{color:#172033}
 .elfd-how{background:#f8fafc;border-radius:14px;padding:10px 14px;margin:0 0 12px;line-height:1.5}
+.elfd-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 12px}.elfd-head h3{margin:0 0 2px;font-size:1.25rem}.elfd-head p{margin:0;color:#667085}
+.elfd-lss{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:0 0 12px}
+.elfd-ls{display:flex;flex-direction:column;align-items:flex-start;gap:3px;border:2px solid #ddd6fe;border-radius:20px;padding:16px 18px;background:linear-gradient(180deg,#f5f3ff,#fff);text-align:left;cursor:pointer;font:inherit;color:#172033}
+.elfd-ls:hover{border-color:#7c3aed;box-shadow:0 12px 30px rgba(109,40,217,.12)}.elfd-ls .t{font-weight:800;font-size:1.12rem;margin-bottom:6px}
+.elfd-ls .big{font-size:2.4rem;font-weight:800;line-height:1;color:#6d28d9}.elfd-ls .big.ok{color:#15803d}.elfd-ls small{color:#667085;font-weight:600}.elfd-ls .ln{font-weight:700}
+.elfd-ls .elfd-bar{width:100%;margin:8px 0 2px}.elfd-ls .go{align-self:flex-end;margin-top:6px;background:#6d28d9;color:#fff;border-radius:999px;padding:6px 16px;font-weight:800}
+.elfd .b.elfd-mix{width:100%;padding:12px 18px;font-size:1.02rem;background:#172033}
+.elfd-main{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;border:0;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,#6d28d9,#3157d5);color:#fff;text-align:left;cursor:pointer;font:inherit}
+.elfd-main b{font-size:1.3rem}.elfd-main small{font-weight:600;opacity:.95}.elfd-main small span{color:#fff!important}.elfd-main:disabled{background:#e2e8f0;color:#334155;cursor:default}
 .elfd-deck{border:1px solid #e5e7eb;border-radius:18px;padding:14px 16px;margin:10px 0;background:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .elfd-deck.all{background:linear-gradient(180deg,#f5f3ff,#fff);border-color:#ddd6fe}
 .elfd-deck h3{margin:0;font-size:1.08rem;flex:1 1 220px}.elfd-deck h3 small{display:block;color:#667085;font-weight:600;font-size:.85rem;margin-top:2px}
@@ -168,16 +177,24 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
 
     // ---------- screens ----------
     const num = (v, cl, en, cat) => `<span class="${cl}">${v}<small>${t(cat, en)}</small></span>`;
+    // Flashcards opens on the LSs to choose from (Roger, 24 Nov 2026: "it's not clear what they are selecting. I want the user to go to
+    // flashcards and there select LS or see statistics"): one big card per LS, 📊 My statistics, and ▶ all my LSs mixed. An LS opens its own
+    // page: ▶ Study everything mixed, or one part.
+    const todayOf = d => { const n = d.id === '*' ? decks().map(x => counts(x, Date.now())).reduce((a, b) => ({ newToday: a.newToday + b.newToday, lrn: a.lrn + b.lrn, due: a.due + b.due, total: a.total + b.total }), { newToday: 0, lrn: 0, due: 0, total: 0 }) : counts(d, Date.now());
+      return { nw: n.newToday, lrn: n.lrn, due: n.due, total: n.total, all: n.newToday + n.lrn + n.due }; };
+    const todayLine = n => [n.nw ? `<span class="new">${n.nw} ${t(n.nw === 1 ? 'nova' : 'noves', 'new')}</span>` : '', n.lrn ? `<span class="lrn">${n.lrn} ${t('aprenent', 'learning')}</span>` : '', n.due ? `<span class="due">${n.due} ${t('per repassar', 'to review')}</span>` : ''].filter(Boolean).join(' · ');
     function list() {
-      const ds = decks(), now = Date.now();
+      const ds = decks();
       if (!ds.length) return `<div class="elfd-how">${t('Encara no hi ha targetes: apareixeran quan feu el vocabulari i la gramàtica a classe.', 'No cards yet: they will appear when you do the vocabulary and grammar in class.')}</div>`;
-      const row = (d, all) => { const n = all ? ds.map(x => counts(x, now)).reduce((a, b) => ({ new: a.new + b.newToday, lrn: a.lrn + b.lrn, due: a.due + b.due, total: a.total + b.total }), { new: 0, lrn: 0, due: 0, total: 0 }) : (x => Object.assign({}, x, { new: x.newToday }))(counts(d, now));
-        return `<div class="elfd-deck${all ? ' all' : ''}"><h3>${all ? '🔀 ' : '🧠 '}${esc(d.name)}<small>${n.total} ${t('targetes', 'cards')}${all ? ' · ' + t('totes barrejades', 'all mixed') : ''}</small></h3>
-          <div class="elfd-n">${num(n.new, 'new', 'New', 'Noves')}${num(n.lrn, 'lrn', 'Learning', 'Aprenent')}${num(n.due, 'due', 'To review', 'Per repassar')}</div>
-          <div class="elfd-acts"><button class="b" data-fd="study" data-v="${esc(d.id)}" ${n.new + n.lrn + n.due ? '' : 'disabled'}>▶ ${t('Estudia', 'Study')}</button>${all ? '' : `<button class="b g" data-fd="parts" data-v="${esc(d.id)}">🎯 ${t('Una part', 'One part')}</button>`}<button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Stats')}</button></div></div>`; };
-      return `<div class="elfd-how">${t('Cada LS té el seu paquet amb tot el vocabulari i la gramàtica que heu fet. Gira la targeta i digues com t’ha anat: les que saps tornen més tard, les difícils tornen aviat. Una mica cada dia!',
-        'Each LS has its own deck with all the vocabulary and grammar you have done. Turn the card and say how it went: cards you know come back later, hard ones come back soon. A little every day!')}</div>`
-        + (ds.length > 1 ? row(allDeck(ds), true) : '') + ds.map(d => row(d)).join('');
+      const card = d => { const n = todayOf(d), s = strength(d, d.cards);
+        return `<button class="elfd-ls" data-fd="ls" data-v="${esc(d.id)}"><span class="t">🧠 ${esc(d.name)}</span>
+          ${n.all ? `<span class="big">${n.all}</span><small>${t('targetes per estudiar avui', 'cards to study today')}</small><small class="ln">${todayLine(n)}</small>` : `<span class="big ok">✓</span><small>${t('Fet per avui', 'Done for today')}</small><small class="ln">&nbsp;</small>`}
+          ${bar(s)}<small>${d.cards.length} ${t('targetes', 'cards')} · ${Math.round((s.mat + s.young) / s.n * 100)}% ${t('apreses', 'learnt')}</small><span class="go">${t('Obre', 'Open')} ›</span></button>`; };
+      const all = ds.length > 1 ? todayOf({ id: '*' }) : null;
+      return `<div class="elfd-head"><div><h3>${t('Tria una LS', 'Choose an LS')}</h3><p>${t('Cada LS té les seves targetes amb el vocabulari i la gramàtica que heu fet a classe.', 'Each LS has its own cards with the vocabulary and grammar you have done in class.')}</p></div>
+        <button class="b g" data-fd="stats" data-v="*">📊 ${t('Les meves estadístiques', 'My statistics')}</button></div>
+        <div class="elfd-lss">${ds.map(card).join('')}</div>
+        ${all ? `<button class="b elfd-mix" data-fd="study" data-v="*" ${all.all ? '' : 'disabled'}>🔀 ${t('Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}${all.all ? ` · ${all.all}` : ''}</button>` : ''}`;
     }
     function partsOf(d) {
       const m = new Map(); d.cards.forEach(c => { if (!m.has(c.part)) m.set(c.part, { part: c.part, kind: c.kind, cards: [] }); m.get(c.part).cards.push(c); });
@@ -186,10 +203,13 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const strength = (d, cards) => { let mat = 0, young = 0, lrn = 0; cards.forEach(c => { const s = D(deckOfCard(d, c)).c[c.id]; if (!s) return; if (s[0] === S_REV) s[2] >= MATURE ? mat++ : young++; else lrn++; }); return { mat, young, lrn, nw: cards.length - mat - young - lrn, n: cards.length }; };
     const bar = s => `<div class="elfd-bar">${[['mat', COL.mature], ['young', COL.young], ['lrn', COL.lrn], ['nw', '#dbeafe']].map(([k, c]) => s[k] ? `<i style="width:${s[k] / s.n * 100}%;background:${c}"></i>` : '').join('')}</div>`;
     const icon = k => k === 'g' ? '📘' : k === 'e' ? '💬' : '🃏';
-    function parts(d) {
-      const ps = partsOf(d), now = Date.now(), end = dayStart(now) + DAY;
-      return `<div class="elfd-acts" style="margin-bottom:10px"><button class="b g sm" data-fd="back">← ${t('Tots els paquets', 'All decks')}</button></div><h3 style="margin:4px 0 6px">🎯 ${esc(d.name)}</h3>
-        <div class="elfd-how">${t('Tria una part per estudiar només aquelles targetes.', 'Choose a part to study only those cards.')}</div>
+    function lsPage(d) {
+      const ps = partsOf(d), now = Date.now(), end = dayStart(now) + DAY, n = todayOf(d);
+      return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${t('Totes les LS', 'All LSs')}</button><button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Statistics')}</button></div>
+        <h3 style="margin:6px 0 10px">🧠 ${esc(d.name)}</h3>
+        <button class="elfd-main" data-fd="study" data-v="${esc(d.id)}" ${n.all ? '' : 'disabled'}><b>▶ ${t('Estudia-ho tot barrejat', 'Study everything mixed')}</b>
+          <small>${n.all ? `${n.all} ${t('targetes avui', 'cards today')}: ${todayLine(n)}` : t('Fet per avui ✓ Torna demà, o estudia una part aquí sota.', 'Done for today ✓ Come back tomorrow, or study one part below.')}</small></button>
+        <h4>🎯 ${t('O estudia només una part', 'Or study only one part')}</h4>
         <div class="elfd-parts">${ps.map(p => { const s = strength(d, p.cards), due = p.cards.filter(c => { const x = D(d.id).c[c.id]; return x && x[1] < end; }).length;
           return `<button class="elfd-part" data-fd="part" data-v="${esc(d.id)}" data-p="${esc(p.part)}"><b>${icon(p.kind)} ${esc(p.part)}</b><small>${p.cards.length} ${t('targetes', 'cards')} · ${Math.round((s.mat + s.young) / s.n * 100)}% ${t('apreses', 'learnt')}${due ? ` · <span class="due">${due} ${t('per repassar', 'to review')}</span>` : ''}</small>${bar(s)}</button>`; }).join('')}</div>
         <div class="elfd-key">${[[COL.mature, t('Madures (21+ dies)', 'Mature (21+ days)')], [COL.young, t('Joves', 'Young')], [COL.lrn, t('Aprenent', 'Learning')], ['#dbeafe', t('Noves', 'New')]].map(([c, l]) => `<span style="--c:${c}">${l}</span>`).join('')}</div>`;
@@ -209,7 +229,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
         cells.push(`<span class="${n ? 'l' + (n < 10 ? 1 : n < 30 ? 2 : n < 60 ? 3 : 4) : ''}${tt === today0 ? ' td' : ''}" title="${new Date(tt).toLocaleDateString()} · ${n}"></span>`); }
       const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '–';
       const ps = d.id === '*' ? [] : partsOf(d);
-      return `<div class="elfd-acts" style="margin-bottom:10px"><button class="b g sm" data-fd="back">← ${t('Tots els paquets', 'All decks')}</button></div><h3 style="margin:4px 0 6px">📊 ${esc(d.name)}</h3>
+      return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${d.id === '*' ? t('Totes les LS', 'All LSs') : esc(d.name)}</button></div><h3 style="margin:6px 0 6px">📊 ${d.id === '*' ? t('Les meves estadístiques · totes les LS', 'My statistics · all my LSs') : esc(d.name)}</h3>
         <h4>${t('Avui', 'Today')}</h4><div class="elfd-stat"><div><b>${td[0]}</b><small>${t('targetes estudiades', 'cards studied')}</small></div><div><b>${Math.round(td[2] / 60)} min</b><small>${t('de temps', 'of study')}</small></div>
           <div><b>${pct(td[1], td[0])}</b><small>${t('encertades', 'right')} (${td[0] - td[1]} ${t('cops “De nou”', '× Again')})</small></div><div><b>${td[3]}</b><small>${t('targetes noves', 'new cards')}</small></div></div>
         <div class="elfd-stat"><div><b>🔥 ${streak}</b><small>${t(streak === 1 ? 'dia seguit' : 'dies seguits', streak === 1 ? 'day in a row' : 'days in a row')}</small></div><div><b>${pct(rok, rv)}</b><small>${t('record (repassos, 30 dies)', 'remembered (reviews, 30 days)')}</small></div></div>
@@ -243,19 +263,19 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     }
 
     function open() { document.documentElement.classList.add('elfd-on'); if (!layer) { layer = document.createElement('div'); layer.className = 'elfd elfd-full'; layer.setAttribute('role', 'dialog'); layer.setAttribute('aria-modal', 'true'); layer.addEventListener('click', click); } if (!layer.isConnected) document.body.appendChild(layer); }
-    function close() { if (layer && layer.isConnected) layer.remove(); document.documentElement.classList.remove('elfd-on'); if (ses) saveSoon(true); ses = null; if (view.k === 'study') view = { k: 'list' }; render(); }
+    function close() { if (layer && layer.isConnected) layer.remove(); document.documentElement.classList.remove('elfd-on'); if (ses) saveSoon(true); const id = ses && ses.d.id; ses = null; if (view.k === 'study') view = id && id !== '*' ? { k: 'ls', id } : { k: 'list' }; render(); }
     function render() {
       host.classList.add('elfd');
       if (view.k === 'study' && ses) { open(); layer.innerHTML = studyHtml(); return; }
       const ds = decks(), d = view.id === '*' ? allDeck(ds) : ds.find(x => x.id === view.id);
-      host.innerHTML = view.k === 'parts' && d ? parts(d) : view.k === 'stats' && d ? stats(d) : list();
+      host.innerHTML = view.k === 'ls' && d ? lsPage(d) : view.k === 'stats' && d ? stats(d) : list();
     }
     function click(e) {
       const el = e.target.closest('[data-fd]'); if (!el) return; const k = el.dataset.fd, v = el.dataset.v, ds = decks(), d = v === '*' ? allDeck(ds) : ds.find(x => x.id === v);
       if (k === 'study' && d) start(d);
       else if (k === 'part' && d) start(d, el.dataset.p);
-      else if (k === 'parts' || k === 'stats') { view = { k, id: v }; render(); host.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
-      else if (k === 'back') { view = { k: 'list' }; render(); }
+      else if (k === 'ls' || k === 'stats') { view = { k, id: v }; render(); host.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      else if (k === 'back') { view = view.k === 'stats' && view.id !== '*' ? { k: 'ls', id: view.id } : { k: 'list' }; render(); }
       else if (k === 'close') close();
       else if (k === 'statsnow') { const id = ses.d.id; close(); view = { k: 'stats', id }; render(); }
       else if (k === 'show') { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }
