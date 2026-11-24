@@ -20,7 +20,8 @@
 //        --todo says what, in one short line). --reply = the suggested answer to the student (≤1000 characters, Roger's voice, the report's
 //        language, never AI): the dashboard shows it with a one-click send button. Run it again on the same report to change it.
 // Never straight away (Roger, 17 Nov 2026: "always answer from 8-18 and after 2 hours since u receive the message o report, don't use their
-// names or surnames since sometimes it feels like AI"): `fixed` saves the card with at = tools/problems/reply-time.mjs replyAt(report time)
+// names or surnames since sometimes it feels like AI"; 24 Nov 2026: "These answers must be in the afternoon from 17h": weekdays 17:00-21:00
+// now, not 8-18): `fixed` saves the card with at = tools/problems/reply-time.mjs replyAt(report time)
 // (problemReplies.at, the msgs entry's go and auto.go: el-cloud.js shows the card only from then, the dashboard says when); --now sends at
 // once, only when Roger asks for it. --msg and --reply are refused if they use the student's name or surnames.
 // Both languages (Roger, 20 Nov 2026: "It should also have the catalan version"): --msg and --reply come with --msg2 / --reply2, the same

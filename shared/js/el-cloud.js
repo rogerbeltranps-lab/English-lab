@@ -69,8 +69,17 @@ function myResults(uid,fresh){
 // showFrom (an ISO time, written by the dashboard's 📥 Save marks and tools/web-exam/writing.mjs) shows no exam marks, report or writing
 // level before that time; the board says when they come out (held). The continuous-assessment progress stays. On read, so the copy in
 // this browser opens by itself when the day comes.
+// Beltran's answers and corrections held too (Roger, 24 Nov 2026: "These answers must be in the afternoon from 17h and the same for all
+// the corrections during weekdays at 17h"): an answer to a comment (answers[step].at) or a correction (replies[step] with fbGo[step],
+// tools/marking/marks.mjs, tools/problems/reply-time.mjs) still to come is taken out here, so no page (the step's tab, the cards, the
+// notebook, the board, My marks) shows it before then. A writing sent back to redo keeps its flag hidden too, so it opens at the same time.
+const later=(m,now)=>{const t=typeof m==="number"?m:Date.parse(m||"");return t>now};
+function soon(r,now){const go=r.fbGo||{},an=r.answers||{},hg=Object.keys(go).filter(k=>later(go[k],now)),ha=Object.keys(an).filter(k=>an[k]&&later(an[k].at,now));
+  if(!hg.length&&!ha.length)return r;
+  const c=Object.assign({},r),cut=(f,ks)=>{if(c[f]){c[f]=Object.assign({},c[f]);ks.forEach(k=>delete c[f][k])}};
+  cut("answers",ha);cut("replies",hg);cut("fbSig",hg);cut("flags",hg);return c}
 function held(d){const now=Date.now(),o={};
-  for(const [k,r] of Object.entries(d||{})){if(!(r&&r.showFrom&&now<Date.parse(r.showFrom))){o[k]=r;continue}
+  for(const [k,r0] of Object.entries(d||{})){const r=r0&&typeof r0==="object"?soon(r0,now):r0;if(!(r&&r.showFrom&&now<Date.parse(r.showFrom))){o[k]=r;continue}
     const c=Object.assign({},r);delete c.sections;delete c.report;delete c.version;delete c.webPaper;
     if(c.levels){c.levels=Object.assign({},c.levels);delete c.levels.writing}
     // the exam mark the dashboard keeps in .progress (progSync) is held too (Roger, 20 Nov 2026: "students can see their results! they
