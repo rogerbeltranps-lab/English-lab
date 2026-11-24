@@ -160,6 +160,12 @@ D.fpg = {};
   }
 }
 
+// 📐 Levels NA–AE (EL_DEMO_LV=1; Roger, 24 Nov 2026): term 1 of the demo counts levels from 1 Nov, so the Learning paths table shows the chips
+if (process.env.EL_DEMO_LV) Object.values(D.tm).forEach((t) => { t.formative = { t1: 'levels', from: '2026-11-01' }; });
+// …and every tab of 4 ESO LS2's first three paths was done in class on 5 Nov in 4 ESO A (Time plan ticks), so their two weeks are over
+if (process.env.EL_DEMO_LV) { const ls = '4eso-seasons-and-celebrations', its = [];
+  CAT.filter((a) => a.ls === ls && /getting-started|celebrations-around|where-traditions/.test(a.id)).forEach((a) => ((global.EL_SECTIONS || {})[a.id] || []).forEach(([t]) => its.push(a.id + '#' + t)));
+  D.ls[ls].planEdits = Object.assign({}, D.ls[ls].planEdits, { '4ESOA': { agenda: JSON.stringify({ days: { '2026-11-05': its } }) } }); }
 // 🗣 Speaking analyses (EL_DEMO_SPEAK=1): Roig's analysis of the 2 ESO A Getting started recordings (all but the last two), teacher only
 if (process.env.EL_DEMO_SPEAK) {
   const c = '2eso', ls = LS2[c], gs = CAT.find((a) => a.id === c + '/ls2-getting-started'), doc = D.spk = {}, d = doc['spk_' + ls + '_2ESOA'] = {};

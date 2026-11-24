@@ -43,6 +43,15 @@ export function writing(el,text,T,orig){const ls=String(text).split("\n"),rows=l
     +(fixed?'<b style="display:block;margin-bottom:4px">'+T("✅ El teu text corregit","✅ Your text, corrected")+'</b><p style="margin:0;padding:10px 12px;background:#fff;border-radius:10px;white-space:pre-wrap">'
       +esc(fixed.slice(2)).replace(/\*([^*\n]+)\*/g,'<b style="color:#15803d;text-decoration:underline">$1</b>')+'</p>':"")}
 
+// 📐 Term 2 (Roger, 24 Nov 2026: "feedback will have NA to AE"): a correction given on or after EL_LV_FROM (el-points.js) shows its degree
+// first, in a coloured box: the English criteria's levels of that step (results.levels[step]), averaged; transversal criteria left out.
+// English names carry the Catalan in brackets; Catalan only for Starter. Corrections before that day keep no level, as before.
+const LVM={NA:2.5,AS:5,AN:7.5,AE:10},LVN={NA:["No assoliment","Not satisfactory"],AS:["Assoliment satisfactori","Satisfactory"],AN:["Assoliment notable","Very good"],AE:["Assoliment excel·lent","Excellent"]},
+  LVC={NA:"#fee2e2;color:#991b1b",AS:"#dcfce7;color:#166534",AN:"#dbeafe;color:#1e40af",AE:"#ede9fe;color:#5b21b6"};
+function lvOf(r,step){const from=window.EL_LV_FROM||"2026-11-30",at=String(((r.marked||{})[step])||((r.fbAt||{})[step])||"").slice(0,10);if(!at||at<from)return null;
+  const ls=Object.entries((r.levels||{})[step]||{}).filter(([c,l])=>!/^(CC|CD|CPSAA|CE)\s?\d/.test(c)&&LVM[l]).map(([,l])=>LVM[l]);if(!ls.length)return null;
+  const m=ls.reduce((a,b)=>a+b,0)/ls.length;return m<5?"NA":m<7?"AS":m<9?"AN":"AE"}
+export const lvBox=(lv,en)=>lv?'<span class="el-lv" style="display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:10px;font-weight:800;font-size:14px;background:'+LVC[lv]+'">'+(en?LVN[lv][1]+" ("+LVN[lv][0]+")":LVN[lv][0])+'</span>':"";
 export async function corrections({list,seen,save,here,root,en,name}){
   let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
@@ -52,7 +61,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
     // An answer whose at is still to come is not shown yet (Roger, 17 Nov 2026: answers go out from 8:00 to 18:00, 2 hours after the comment).
     for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
       const an=(r.answers||{})[step]||{},text=[!(Date.parse(an.at)>Date.now())&&an.t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
-      if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
+      if(text)items.push({a,step,text,lv:lvOf(r,step),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
@@ -62,7 +71,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
     const put=()=>{const p=document.querySelector("section.panel#"+css(it.step))||document.getElementById(it.step);if(!p)return false;
       let b=p.querySelector(":scope>.el-correction");if(!b){b=document.createElement("div");b.className="el-correction";const h=p.querySelector(":scope>.panel-head");h?h.after(b):p.prepend(b)}
       b.style.cssText="margin:0 0 14px;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif";
-      b.innerHTML='<b style="display:block;margin-bottom:4px"></b><div style="white-space:pre-wrap"></div>';
+      b.innerHTML='<b style="display:block;margin-bottom:4px"></b>'+lvBox(it.lv,en)+'<div style="white-space:pre-wrap"></div>';
       b.querySelector("b").textContent=it.corr?T("✏️ La correcció del professor","✏️ Your teacher’s correction"):T("💬 La resposta del professor","💬 Your teacher’s answer");
       writing(b.querySelector("div"),it.text,T,window.elHandedText&&window.elHandedText(it.step));return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
