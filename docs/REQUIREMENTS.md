@@ -291,6 +291,7 @@ Starter (Beginners) sits below Base, and Pro (Native, 4 ESO) above Plus; student
   - **A spelling slip gets a spelling hint, never the grammar rule**: "Almost! Check the spelling of ‘laod’. Try again." (or "‘an other’ is one word", "Check the apostrophes"; Catalan for Starter). It is **still not right** (Roger chose "fix it and try again", 22 Nov 2026, as in the exams), but it is not one of the two tries before the answer shows.
   - **The grammar rule shows only for a real grammar mistake** (take / takes, Why 2 ESO doesn't…?, in / on). A real word in place of another keeps its rule.
   - **The Catalan of a Catalan → English question is natural Catalan**, never a calque of the English ("Per què 2n d'ESO no té planificació?", not "pla de temps"; Roger, 22 Nov 2026: "Això no és català").
+- **No Hand in button on a step** (Roger, 24 Nov 2026: "I don't want them to have to press any button, the system needs to understand it as done"): a step with boxes and a self-assessment (Reading log, research card, final product steps) counts as handed in by itself once every box and rating is filled in, and later changes update it; the page says what is still missing until then. Writings, Speaking and Talk keep their send buttons.
 - Students can't copy the theory into their notes; notes are optional, their own examples (19 Nov 2026).
 - Randomise answer options, never the questions.
 - The recall warm-up is done with no notes; practice is done at 80 %; the learning path's piece of writing or speaking is saved for the final product (Playbook).
