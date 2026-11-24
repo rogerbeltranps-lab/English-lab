@@ -153,10 +153,11 @@ const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing"}
 // criterion 3.2 (el-grading.js evidence) and the Speaking skill of the charts (students' 🕸 My skills, the dashboard's 🌱 Progress).
 const SPOKEN=(m,step)=>m==="surprise"||!m&&/^(speak|talk)/.test(step||"");   // fbItems: a Speaking / Talk recording (no mode), 🎲 Surprise questions
 const wCrits=(a,mode,step)=>{const g=W.EL_GRADING[a.ls]||{};if(g.only||!g.ind)return [];
-  return mode==="writing"?(g.ind["5.1"]?["5.1"]:[]):SPOKEN(mode,step)?Object.keys(g.ind).filter(c=>/^3\.\d+$/.test(c)):[]};
+  // 📐 a Shadowing hand-in gets a 3.2 level too (Roger, 24 Nov 2026: every activity NA to AE), judged with the shadowing indicators (lvOpts)
+  return mode==="writing"?(g.ind["5.1"]?["5.1"]:[]):SPOKEN(mode,step)?Object.keys(g.ind).filter(c=>/^3\.\d+$/.test(c)):mode==="shadow"?(g.ind["3.2"]?["3.2"]:[]):[]};
 const contentOf=a=>{const d=a.path.replace(/[^/]+\.html$/,m=>"data/"+m.replace(/\.html$/,".js"));return fs.existsSync(path.join(ROOT,d))?d:a.path};
 const lvOpts=(a,mode,step)=>{const L=wCrits(a,mode,step),course=a.ls.split("-")[0],g=W.EL_GRADING[a.ls]||{};
-  return {lvc:L,crit:Object.fromEntries(L.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:Object.fromEntries(L.map(c=>[c,(g.ind||{})[c]||[]])),content:contentOf(a)}};
+  return {lvc:L,crit:Object.fromEntries(L.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:Object.fromEntries(L.map(c=>[c,mode==="shadow"?W.ELMark.SHADOW_IND:(g.ind||{})[c]||[]])),content:contentOf(a)}};
 function fbSheetOf(grp,a,step,rows){const course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name])),lo=rows[0].mode!=="reply"?lvOpts(a,rows[0].mode,step):{lvc:[],crit:{},ind:{}};
   const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],...lo,mode:rows[0].mode,
@@ -331,6 +332,13 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
   const r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:m.a,step:m.step,crits:m.c,codes:sh.codes});if(r.err)throw new Error(r.err);
   const a=W.EL_CATALOG.find(x=>x.id===m.a),rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s,fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
+    if(x.redo){console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ↺ NOT A REAL TRY: sent back to redo ("+x.redo+")");if(!flags.has("--apply"))continue;
+      // 📐 Roger, 24 Nov 2026 ("Gaming the system"): its NA is saved, and it goes back as the dashboard's ↺ Redo does (hbBack): the step counts
+      // as not done until it is handed in again, within a week of today (elHandInBy), and the new hand-in is marked again
+      const at=new Date().toISOString(),ca=!row.route||row.route==="beginners",note=ca?"Les teves respostes no estan fetes: torna a fer aquest pas amb les teves paraules i torna’l a entregar.":"Your answers aren't finished: do this step again in your own words and hand it in again.";
+      await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",...m.c.map(c=>fp("levels",m.step,c)),fp("marked",m.step),fp("flags",m.step),fp("replies",m.step),fp("fbSig",m.step),fp("fbGo",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},levels:fsv({[m.step]:x.lv}),marked:fsv({[m.step]:at}),fbGo:fsv({[m.step]:GO}),
+          flags:fsv({[m.step]:{done:"redo",reopen:true,back:note,why:x.redo,at,auto:true}}),replies:fsv({[m.step]:note+(x.fb?"\n\n"+x.fb:"")}),fbSig:fsv({[m.step]:"redo"})}});continue}
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(auto?" · ↺ MOSTLY PASTED: no level, sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+")":x.flag?" · ⚠️ POSSIBLE COPY (no level, to the To do): "+x.flag:fb?" · feedback: "+x.fb:""));
     if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo on a level moment: no level, the note, the next hand-in goes back to the sheet

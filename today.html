@@ -115,6 +115,7 @@ table.pgt-t td.pgtot b{font-size:1.55rem}.pgtot .xbar{display:block;margin:5px a
 .dgb-ae{border-color:#7c3aed!important;background:#f5f3ff!important}.dgb-an{border-color:#2563eb!important;background:#eff6ff!important}.dgb-as{border-color:#16a34a!important;background:#f0fdf4!important}.dgb-na{border-color:#dc2626!important;background:#fef2f2!important}
 .cprub{display:grid;gap:6px}.cprl{border:1px solid #e2e8f0;border-left:4px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13.5px;color:#475569}.cprl b{display:block;color:#0f172a}.cprl small{font-weight:400;color:#64748b}.cprl.me{border-width:2px 2px 2px 6px;color:#0f172a}.cpyou{color:#c2410c;font-weight:800}
 .dgm{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;vertical-align:middle}.dgbx{display:inline-block;border:2px solid currentColor;border-radius:10px;padding:2px 9px;font-weight:900;font-size:13.5px;line-height:1.3;white-space:nowrap}.dgn{color:#64748b;font-weight:700;font-size:13px;white-space:nowrap}.dgn small{font-size:11px}.dgm.big .dgbx{font-size:1.15rem;padding:6px 14px;border-radius:12px}.dgm.big .dgn{font-size:15px}.fv-big .dgm{margin-top:4px}.prog td .dgm{flex-wrap:nowrap;margin-top:0}
+.lvby{display:block;font-size:11.5px;font-weight:600;color:#64748b;margin-top:2px}.lvby.na{color:#b91c1c}
 .dg{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:1px 8px;white-space:nowrap}.dg-ae{background:#ede9fe;color:#5b21b6}.dg-an{background:#dbeafe;color:#1e40af}.dg-as{background:#dcfce7;color:#166534}.dg-na{background:#fee2e2;color:#991b1b}
 /* 📚 Grammar and vocabulary (gvBox): one card per class game, its points under it, and ✏️ Fix my mistakes (fixPanel) */
 .gvlist{display:flex;flex-direction:column;gap:10px}.gvrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 220px;align-items:center;gap:10px}
@@ -559,6 +560,7 @@ function homeHtml(lss,ls,info){
   workData(lss);const miss=(S.wtabs||0)+tabsMiss(lateList(lss)),me=U&&U.uid;
   const unread=(D.ann||[]).filter(a=>String(a.text||"").trim()&&me&&!(a.read||{})[me]).length;
   const alerts=(miss?`<a class="hal late" href="#marks">⏰ <b>${miss>1?t(`Tens ${miss} activitats endarrerides`,`You have ${miss} late activities`):t("Tens 1 activitat endarrerida","You have 1 late activity")}</b><span>${miss>1?t("Mira-les","See them"):t("Mira-la","See it")} →</span></a>`:"")
+    +(lvNew()?`<a class="hal news" href="#marks">📐 <b>${t("Nou: ara compta com de bé fas cada activitat","New: how well you do each activity now counts")}</b><span>${t("Tens dues setmanes per entregar-la","You have two weeks to hand it in")} →</span></a>`:"")
     +(unread?`<a class="hal news" href="#news">📣 <b>${unread>1?t(`${unread} anuncis nous del professor`,`${unread} new announcements from your teacher`):t("1 anunci nou del professor","1 new announcement from your teacher")}</b><span>${t("Llegeix","Read")} →</span></a>`:"");
   const nx=nextFor(ls,info),{p,gi}=planOf(ls),num=p&&gi>=0&&nx?lpNums(p,gi)(nx.a):"";
   const cont=nx?`<div class="cont"><div class="ck">${t("Continua on ho vas deixar","Continue where you left off")}</div><div class="ct">${num?num+" · ":""}${esc(nx.a.title)}</div>`
@@ -589,6 +591,7 @@ function homeHtml(lss,ls,info){
   S.vy=null;
   if(vyOn(ls)){const chip=(h,i,l,b,cl)=>`<a class="vy-chip${cl?" "+cl:""}" href="${h}">${i} ${l}${b?` <b>${b}</b>`:""}</a>`;
     return voyageHome(ls,info,nx,(miss?chip("#marks","⏰",miss>1?t(`${miss} endarrerides`,`${miss} late`):t("1 endarrerida","1 late"),"","late"):"")
+      +(lvNew()?chip("#marks","📐",t("Nou: compta com de bé ho fas","New: how well you do counts"),"","news"):"")
       +(unread?chip("#news","📣",t("Anuncis","News"),unread,"news"):"")+chip("#todo","✅",t("Per fer","To do"),ntd||"")+chip("#homework","📝",t("Deures","Homework"),hwOpen.length||"")
       +chip(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),""),markMini(ls))}
   const gc=gamesCard(ls);
@@ -919,7 +922,11 @@ function marksHead(lss,ls){if(EL_CATALOG.some(a=>a.ls===ls.id&&a.checkpoint))cpL
   return `<div class="mkhead">${home?"":`<button type="button" class="g mkback" data-do="tab" data-t="home">‹ ${t("Les meves notes","My marks")}</button>`}`
     +(lss.length>1?`<div class="mkls">${lss.map(l=>`<button type="button" class="${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}" title="${esc(lsState(l))}">${lsName(l)}</button>`).join("")}</div>`:"")+`</div>`}
 const cpMark=ls=>{if(!D.cpd)return null;let s=0,m=0;cpList(ls).forEach(a=>{const d=cpOf(a),x=d&&(d.fb||d.sc);if(x&&x.max){s+=+x.score;m+=+x.max}});return m?{s,m}:null};
-function marksHome(lss,ls){const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],W=workData(lss);
+// the rule in plain words (Roger, 24 Nov 2026: "feedback will have NA to AE and students will have 2 weeks to turn in, after that they will have a NA")
+const lvRule=()=>t(`Des del ${when(lvFrom())}, compta <b>com de bé</b> fas cada activitat: Excel·lent, Notable, Satisfactori o No assoliment. Tens <b>dues setmanes</b> des de la classe (o des que són deures) per entregar-la; després és No assoliment i compta 0. Les vacances no compten.`,
+  `From ${when(lvFrom())}, <b>how well</b> you do each activity counts: Excellent, Very good, Satisfactory or Not satisfactory. You have <b>two weeks</b> from the class (or from when it is set as homework) to hand it in; after that it is Not satisfactory (No assoliment) and counts 0. Holidays don't count.`);
+const lvNew=()=>{if(!lvTerm()||ELWeek.today()>elHandInBy(lvFrom()))return false;try{return localStorage.getItem("el_lv_seen")!=="1"}catch(e){return true}};
+function marksHome(lss,ls){try{if(lvTerm())localStorage.setItem("el_lv_seen","1")}catch(e){}const M=lsMarks(ls),g=(window.EL_GRADING||{})[ls.id],W=workData(lss);
   const pr=D.me.group?(ELWeek.plans(D.me.group)||[]).find(y=>y.ls===ls.id):null,exDay=pr?ELWeek.exam(pr.p,pr.gi):null;
   const mk=m=>m==null?`<span class="mkm no">${t("encara no","not yet")}</span>`:`<span class="mkm">${f1(m)}</span>`;
   const row=(k,i,name,w,sub,m,tab)=>{const tg=tab?`button type="button" data-do="tab" data-t="${tab}"`:"div";
@@ -1535,7 +1542,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
       +fvPart("fk-g main","📚",t("Feina diària","Daily work"),t("els learning paths","the learning paths"),share,cont,share>W("exam")?t("la part més gran","the biggest part"):"",ptOf("daily")&&ptOne(ls,ptOf("daily")))
       +fvPart("fk-i","📝",t("Examen","Exam"),v.exam==null&&exDay?when(exDay):t("al final de la LS","at the end of the LS"),W("exam"),v.exam,"",ptOf("exam")&&ptOne(ls,ptOf("exam")))
       +fvPart("fk-a","🎬",t("Producte final","Final product"),hasFp(ls)?fpSub(ls):t("al final de la LS","at the end of the LS"),W("fp"),v.fp,"",ptOf("fp")&&ptOne(ls,ptOf("fp")))+`</div>`:"")
-    +`<div class="fv-warn">⚠️ <b>${t("Si no treballes cada dia, la teva nota baixa.","If you don't work every day, your mark goes down.")}</b> ${t("Cada activitat que no has fet quan tocava compta un 0 a l'avaluació contínua fins que la facis. Si la fas tard, compta igual que si l'haguessis fet a temps.","Every activity you haven't done by its day counts 0 in your continuous assessment until you do it. If you do it late, it counts the same as on time.")}${zeroLine(ls,M,g,p)}</div>`
+    +`<div class="fv-warn">⚠️ <b>${t("Si no treballes cada dia, la teva nota baixa.","If you don't work every day, your mark goes down.")}</b> ${lvTerm()?lvRule():t("Cada activitat que no has fet quan tocava compta un 0 a l'avaluació contínua fins que la facis. Si la fas tard, compta igual que si l'haguessis fet a temps.","Every activity you haven't done by its day counts 0 in your continuous assessment until you do it. If you do it late, it counts the same as on time.")}${zeroLine(ls,M,g,p)}</div>`
     +`<div class="wrap"><table class="xt prt"><thead><tr><th>${t("Part","Part")}</th><th>${t("Pes","Weight")}</th><th>${t("Nota fins ara","Mark so far")}</th><th></th></tr></thead><tbody>`
     +(share?row("📚 "+t("La meva feina diària als learning paths","My daily work in the learning paths")+` <small class="muted">(${t("avaluació contínua","continuous assessment")})</small>`,share,cont,t(`Les activitats dels learning paths${due.length?` · fetes ${done} de ${due.length} aquest trimestre`:""}`,`Your learning-path activities${due.length?` · ${done} of ${due.length} done this term`:""}`),"pb daily")
       +cw.map(b=>row(b.id==="gv"?t("Vocabulari, gramàtica i destreses","Vocabulary, grammar and skills"):b.id==="other"?t("Altres competències","Other competences"):esc(b.name),b.w,v[b.id],b.id==="gv"?(TX?t("El vocabulari i la gramàtica que recordes i practiques, i les pestanyes d'escoltar, llegir, parlar i escriure dels learning paths que has fet","The vocabulary and grammar you remember and practise, and the listening, reading, speaking and writing tabs of the learning paths you have done"):t("Està fet d'aquestes parts:","It is made of these parts:")):b.id==="other"&&other.length?t("Les competències que treballes a més d'escoltar, llegir, parlar i escriure:","The skills you work on besides listening, reading, speaking and writing:")+`<ul class="oc">${other.map(c=>`<li>${pill(c)} ${esc(easy(c))}${srcOf(c)}</li>`).join("")}</ul>`:"","in")+det(b.id)).join(""):"")
@@ -2022,6 +2029,15 @@ function hwBox(p,gi,info){const xs=ELWeek.studentHw(p,gi,((info||{}).homework||{
 // set it (or one of its tabs) as homework. Nothing from the plan's days (Roger: "I don't [want] students [to] see anything as to do nor the
 // week. I say when to do sth since otherwise is too much info"). Opening is enough: the teacher sets
 // nothing else. Homework has its own place (homeworkBox): only what the teacher set as homework.
+// 📐 Term 2 levels (Roger, 24 Nov 2026; el-points.js): teams/{group}.formative = {t2: "levels", from}. lvTerm(): this term counts levels;
+// lvBy(ls, a, tab): the last day to hand in that tab, when it started on or after `from` (else null: the term 1 rule)
+const lvFm=()=>(D.tm&&D.tm.formative)||{},lvFrom=()=>lvFm().from||window.EL_LV_FROM||"2026-11-30";
+const lvTerm=d=>lvFm()[elTerm(d)]==="levels";
+function lvBy(ls,a,tab){if(!D.me.group||!window.elHandInStarts)return null;const k=ls+"|"+D.me.group;S.lvs=S.lvs||{};
+  const f=S.lvs[k]||(S.lvs[k]=elHandInStarts(D.ls[ls]||{},D.me.group)),st=f(a.id,tab);if(!st||st<lvFrom()||!lvTerm(st))return null;
+  const fl=((((D.rs||{})[a.id]||{}).flags)||{})[tab];return elHandInBy(st,fl&&fl.done==="redo"?fl.at:null)}
+const lvTag=by=>!by?"":ELWeek.today()>by?` <small class="lvby na">${t("No assoliment · no entregada a temps","Not satisfactory · not handed in on time")}</small>`
+  :` <small class="lvby">📅 ${t("entrega-la fins al","hand it in by")} ${when(by)}</small>`;
 function todoItems(lss){if(!D.me.group)return [];
   return lss.filter(l=>!only(l.id)).flatMap(l=>{const {p,gi}=planOf(l);return elTodoList(l.id,D.ls[l.id]||{},D.me.group,doneSet,isDone,p,gi).map(x=>Object.assign(x,{l,p,gi}))})}
 // how many activities (tabs) a ✅ To do item holds: its open tabs not done, or 1 (a path with no tabs, or its checkpoint first); the To do
@@ -2057,7 +2073,7 @@ function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter
     // steps done, then only what is still to do ("Et falta"), each one a link; no green ✔ chips
     const miss=new Set(x.tabs.map(([id])=>id)),pc=ks.length>1?Math.round(n/ks.length*100):null;
     const chips=x.cp?`<a class="stp go2 miss" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
-      :x.tabs.length?((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>miss.has(id)).map(([id,tn])=>`<a class="stp go2 miss ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
+      :x.tabs.length?((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>miss.has(id)).map(([id,tn])=>`<a class="stp go2 miss ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →${lvTag(lvBy(x.l.id,a,id))}</a>`).join("")
       :`<a class="stp go2 miss" href="${tabHref(a)}">${/checkpoint/.test(a.id)?t("Fes-lo","Do it"):t("Obre-la","Open it")} →</a>`;
     const f1st=((window.EL_SECTIONS||{})[a.id]||[]).find(([id])=>miss.has(id));   // the name opens the first tab still to do, never tab 1 (Recall, done ✓: problem report, 2ESOA, 24 Nov 2026)
     return `<li class="${x.late?"late":""}"><div class="tdh"><b><a href="${x.cp?tabHref(x.cp):f1st?tabHref(a,f1st[0]):tabHref(a)}">${esc(nm)}</a></b>${pc!=null?`<span class="tdbar"><i style="width:${pc}%;background:${elPctCol(pc)}"></i></span><b class="tdpc">${pc} %</b>`:""}${tags}</div><div class="chips"><span class="tdlb">${t("Et falta:","Still to do:")}</span>${chips}</div></li>`};

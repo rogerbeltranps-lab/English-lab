@@ -63,3 +63,38 @@ window.elLsPts=function(ls,v){const g=(window.EL_GRADING||{})[ls];if(!g||!g.bloc
 // the daily work out of 10 from a stored progress ({gv, other, …}; results/{ls}__assessment.progress): its blocks by weight, the ones with a mark
 window.elDailyOf=function(ls,p){const g=(window.EL_GRADING||{})[ls];if(!g||!g.blocks||g.only||!p)return null;
   const cs=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"&&p[b.id]!=null),w=cs.reduce((n,b)=>n+(+b.w||0),0);return w?cs.reduce((n,b)=>n+p[b.id]*b.w,0)/w:null};
+// ---- 📐 Term 2: every activity gets a level (Roger, 24 Nov 2026: "all the new activities we do from now on will have an assessment NA
+// to AE"; "feedback will have NA to AE and students will have 2 weeks to turn in, after that they will have a NA"; "Go apply and merge").
+// teams/{group}.formative = {t2: "levels", from: "2026-11-30"}: in that term, a tab done in class or set as homework on or after `from`
+// counts its LEVEL, never "done": a hand-in its level from Beltran or Roig (results/{activity}.levels[step]), an auto-checked step the
+// level of its latest score, recall its first try; NA 2.5 · AS 5 · AN 7.5 · AE 10 (EL_DEGREE_MARK). Students have 14 days from that class
+// (or homework) day to hand it in, school holidays not counted (EL_TIMETABLE.off); ↺ Redo gives a week from the day it was sent back.
+// After the deadline a tab not handed in, or handed in late, is NA · not handed in (0). Tabs from before `from` keep the term 1 rule.
+window.EL_LV_FROM="2026-11-30";
+window.EL_LV_DAYS=14;
+// a % out of 10 → its degree, as the indicators count: fewer than half NA, half AS, 7 in 10 AN, 9 in 10 AE
+window.elPctLevel=p=>p==null||isNaN(p)?null:p>=9?"AE":p>=7?"AN":p>=5?"AS":"NA";
+const elLvOff=d=>{const T=window.EL_TIMETABLE;return !!T&&(T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d)};
+const elLvAdd=(s,n)=>{const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const elLvDay=x=>{if(!x||x===true)return null;if(typeof x==="string")return /^\d{4}-\d\d-\d\d/.test(x)?x.slice(0,10):null;
+  const ms=x.toMillis?x.toMillis():x.seconds!=null?x.seconds*1000:typeof x==="number"?x:Date.parse(x);if(!ms)return null;const d=new Date(ms);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+window.elLvDayOf=elLvDay;
+// the last day to hand in a tab that started on `start` (n school days' worth of calendar days, holidays skipped); redoAt: ↺ Redo's day
+window.elHandInBy=function(start,redoAt){if(!start)return null;let d=start,n=0;while(n<EL_LV_DAYS){d=elLvAdd(d,1);if(!elLvOff(d))n++}
+  const r=elLvDay(redoAt);if(r){let e=r,m=0;while(m<7){e=elLvAdd(e,1);if(!elLvOff(e))m++}if(e>d)d=e}return d};
+// the day each tab of an LS was first done in class (Time plan tick or a past class day of the agenda) or set as homework, for one group:
+// a function (activity id, tab id) → "YYYY-MM-DD" or null. A 📖 book chapter starts on its own Book day (chapter n = the n-th day the book
+// is on the agenda). Same sources as elDueBefore (el-catalog.js).
+window.elHandInStarts=function(info,gid,today){today=today||(window.ELWeek?ELWeek.today():elLvDay(Date.now()));const m={},book={};
+  const put=(k,d)=>{if(!d||d>today)return;if(!m[k]||d<m[k])m[k]=d};
+  const ag=window.elAgendaOf?elAgendaOf(info,gid):null;
+  Object.entries((ag&&ag.days)||{}).sort((a,b)=>a[0]<b[0]?-1:1).forEach(([d,its])=>(its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;
+    const id=it.slice(0,i),p=it.slice(i+1);if(/^game:/.test(p))return;
+    if(window.elBookPath&&elBookPath(id)){const b=book[id]=book[id]||[];if(!b.includes(d)&&d<=today)b.push(d);return}put(id+"#"+p,d)}));
+  Object.entries(((info&&info.done||{})[gid])||{}).forEach(([k,d])=>put(k,elLvDay(d)));
+  Object.values(((info&&info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object")return;const d=elLvDay(h.set)||elLvDay(h.at);
+    Object.entries(h.tabs).forEach(([id,ps])=>{if(!ps||!ps.length)put(id+"#",d);else ps.forEach(p=>put(id+"#"+p,d))})});
+  return (id,tab)=>{if(window.elBookPath&&elBookPath(id)){const n=+(String(tab).match(/^ch(\d+)$/)||[])[1];const b=(book[id]||[]).slice().sort();
+      const d=n?b[n-1]:b[0];return d||m[id+"#"+tab]||m[id+"#"]||null}
+    const a=m[id+"#"+tab],w=m[id+"#"];return a&&w?(a<w?a:w):a||w||null}};
