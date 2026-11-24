@@ -1337,6 +1337,8 @@ var LS2 = (function () {
   function wroteMsg(p) { const h = (state.steps || {})[p.id]; return ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. Ja no el pots canviar. Quan el professor l’hagi corregit, veuràs la correcció a dalt de tot d’aquesta secció: el teu text, una taula amb les errades i el text corregit.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. You can’t change it now. When your teacher has corrected it, you will see the correction at the top of this section: your text, a table with your mistakes and your text, corrected.'; }
   addEventListener('el-result', e => {
     const r = (e.detail || {}).result || {}, ms = v => v == null ? 0 : typeof v === 'number' ? v : v.toDate ? +v.toDate() : v.seconds ? v.seconds * 1000 : +new Date(v) || 0;
+    // ↩ sent back to redo from the dashboard (any handed-in step, Roger 24 Nov 2026): its done tick goes until the student hands it in again
+    if (window.elReopenedSteps) { const ks = elReopenedSteps(state, r).filter(k => state.done[k]); if (ks.length) { ks.forEach(k => { delete state.done[k]; if (state.doneAt) delete state.doneAt[k]; }); save(); } }
     (LP.panels || []).filter(p => p.type === 'writing' && toTeacher(p)).forEach(p => {
       const h = (state.steps || {})[p.id]; if (!h || reopened[p.id]) return;
       const fl = (r.flags || {})[p.id], at = ms(h.date);

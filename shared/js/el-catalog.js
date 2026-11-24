@@ -207,6 +207,7 @@ window.elStepsOptional=function(st,ks){const o=(st&&st.opt)||{};return ks.length
 // The same in a student's loaded progress, in memory only (nothing is saved): pg = {ls: {key: state JSON}}, rs = {activity id: result}.
 // Each corrected step gets done[step] and, when it has none, doneAt[step] = the day the text was first saved (draft or final version).
 window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||[]).forEach(a=>{if(a.manual||!a.keys||!a.keys.length)return;
+  elReopened(a,rs[a.id],pg);
   const r=rs[a.id],ks=elCorrected(a,r);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
   const ex=(r&&r.excused)||{};
   let ch=false;ks.forEach(k=>{
@@ -219,6 +220,12 @@ window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||
     const at=[st.drafts,st.finals].flatMap(o=>Object.entries(o||{}).filter(([x])=>x===k||x.indexOf(k+"_")===0).map(([,v])=>v&&v.at)).filter(Boolean).sort()[0]||((st.steps||{})[k]||{}).date;
     if(at)(st.doneAt=st.doneAt||{})[k]=(st.doneAt||{})[k]||at});
   if(ch)L[a.keys[0]]=JSON.stringify(st)})};
+// A step the teacher sent back to redo from the dashboard (↩ Send it back to redo, Roger 24 Nov 2026; flags[step] = {done: "redo", reopen:
+// true, at}): not done until the student hands it in again after that time (state.steps[step].date), in memory only, like elInjectCorrected.
+window.elReopenedSteps=function(st,r){const fl=(r&&r.flags)||{},sp=(st&&st.steps)||{};
+  return Object.keys(fl).filter(k=>fl[k]&&fl[k].done==="redo"&&fl[k].reopen&&!(String((sp[k]||{}).date||"")>String(fl[k].at||"")))};
+window.elReopened=function(a,r,pg){const L=pg&&pg[a.ls];if(!r||!r.flags||!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
+  const ks=elReopenedSteps(st,r).filter(k=>(st.done||{})[k]);if(!ks.length)return;ks.forEach(k=>{delete st.done[k];if(st.doneAt)delete st.doneAt[k]});L[a.keys[0]]=JSON.stringify(st)};
 // Every step of a learning path done (Roger, 4 Nov 2026: "some students have that they did everything and that the bonus counts, however
 // this is not true"): the steps themselves (EL_ACTIONS without the not-scored ones), never the Submit or "Mark as done" flag, which a
 // student can press with 1 step of 10 done. done = Set of the student's done steps, r = results/{activity}; an activity with no steps
