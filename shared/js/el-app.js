@@ -514,12 +514,23 @@
     box.innerHTML = h + "</ol>";
     voyTicks(true);
   }
+  // a stop ("path#tab") done in this browser's copy of the path's progress (localStorage, as el-cloud.js keeps it): every step of the tab
+  function voyDone(k) {
+    const m = /^([^#]+)#(.+)$/.exec(k || ""), C = window.EL_CATALOG; if (!m || !C || !window.elSecSteps || !window.elDoneSet) return false;
+    const a = C.find(x => x.id === m[1]); if (!a) return false;
+    const st = elSecSteps(a, m[2]).filter(s => !(a.skip || []).includes(s)); if (!st.length) return false;
+    const ds = new Set(); (a.keys || []).forEach(key => { let v = null; try { v = localStorage.getItem(key); } catch (e) {} if (v) elDoneSet(v).forEach(x => ds.add(x)); });
+    return st.every(s => ds.has(s));
+  }
   // this page's ticks from its own tabs (done, the one on screen), the count and the ports
   function voyTicks(first) {
     const box = $(".ellp-voy:not(.ellp-voyback)"); if (!box || box.hidden) return;
     box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
       li.classList.toggle("ok", tb.classList.contains("done"));
       const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
+    // the other pages' steps: the board's copy can be older than the work done since (problem report, 4ESOB, 24 Nov 2026: four steps
+    // done this morning on another path showed as not done), so a step also ticks when this browser's own copy of that path has it done
+    box.querySelectorAll("li.s[data-k]:not(.ok)").forEach(li => { if (li.querySelector("a[data-p]")) return; if (voyDone(li.dataset.k)) li.classList.add("ok"); });
     const all = [...box.querySelectorAll("li.s:not(.fp)")], ok = all.filter(l => l.classList.contains("ok")).length;
     box.querySelector("h2 small").textContent = t(`${ok} de ${all.length} fets`, `${ok} of ${all.length} done`);
     box.querySelector(".bar i").style.width = (all.length ? Math.round(ok / all.length * 100) : 0) + "%";
