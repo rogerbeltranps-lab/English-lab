@@ -46,7 +46,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   const news=[];
   for(const [,r] of await db.list("students/"+s.uid+"/results")){const a=act(r.activity),title=a?a.title:r.activity||"";
     Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.t&&recent(x.at))news.push(T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k))});
-    if(recent(r.updated))Object.keys(r.replies||{}).forEach(k=>{const m=(r.marked||{})[k];if(!m||recent(m))news.push(T("Correcció: ","Correction: ")+title+" · "+stepName(a,k))})}
+    if(recent(r.updated))Object.keys(r.replies||{}).filter(k=>!(Date.parse((r.fbGo||{})[k]||"")>Date.now())).forEach(k=>{const m=(r.marked||{})[k];if(!m||recent(m))news.push(T("Correcció: ","Correction: ")+title+" · "+stepName(a,k))})}
   const pr=pReplies.filter(x=>x.uid===s.uid&&!(x.at>Date.now()));if(pr.length)news.push(T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""));
   const uniq=[...new Set(news)];
   if(!tasks.length&&!uniq.length){skipped++;continue}

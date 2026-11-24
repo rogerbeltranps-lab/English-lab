@@ -20,7 +20,7 @@
 //   node tools/marking/marks.mjs comments                                  the comments sheet: every student comment on a hand-in still
 //        waiting for an answer (ELMark.open, not handed to the teacher), all groups, with the hand-in and the content file to read
 //   node tools/marking/marks.mjs answer <answer file> [--apply]             saves the EL-ANSWERS v1 answer: ANSWER → answers[step] =
-//        {t, q, at, made} (the student sees it as the teacher's answer from at: 8:00-18:00, 2 hours later; made = when it was written), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
+//        {t, q, at, made} (the student sees it as the teacher's answer from at: weekdays 17:00-21:00, at least 2 hours later; made = when it was written), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
 //   comments --new / answer <file> --new [--apply]   the same, only for the students who saved a new comment since the last instant run
 //        ("No new comments." and nothing else read when there is none): the instant run of "English Lab: problem reports (instant)"
 // The dashboard's ✏️ Corrections (Roger, 6 Nov 2026) shows when each piece was corrected and where the run is: fb-apply saves
@@ -37,7 +37,11 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {replyAt,whenText,namesIn} from "../problems/reply-time.mjs";
+import {replyAt,corrAt,whenText,namesIn} from "../problems/reply-time.mjs";
+// Corrections reach students on weekdays from 17:00 (Roger, 24 Nov 2026: "the same for all the corrections during weekdays at 17h"):
+// fb-apply and apply --feedback save results/{activity}.fbGo[step] = corrAt() with the correction (also a writing sent back to redo);
+// el-cloud.js held() keeps replies[step] (and its flag) from the student until then. --now (only when Roger asks) shows it at once.
+const GO=process.argv.includes("--now")?new Date().toISOString():new Date(corrAt()).toISOString(),goNote=()=>GO>new Date().toISOString()?" (students see the corrections from "+whenText(Date.parse(GO))+")":" (students see them now)";
 
 const PROJECT="english-lab-ietm",ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
 const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.env.EL_TODAY;   // a date for tests
@@ -293,14 +297,14 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(LV?Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ":"")+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again
-      await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbAt:fsv({[step]:at}),flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
+      await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step),fp("fbAt",step),fp("fbGo",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbAt:fsv({[step]:at}),fbGo:fsv({[step]:GO}),flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
     if(x.flag){await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),   // the teacher accepts it (the correction and the level are sent) or asks for it again in class
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[step]:{why:x.flag,lv:LV?x.lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at:new Date().toISOString()}})}});continue}
     const at=new Date().toISOString();
-    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step),...(LV?[...Object.keys(x.lv).map(c=>fp("levels",step,c)),fp("marked",step)]:[])].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at}),...(LV?{levels:fsv({[step]:x.lv}),marked:fsv({[step]:at})}:{})}})}
-  console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · sent back automatically (mostly pasted): ${r.rows.filter(x=>x.auto).length} · possible copies for the teacher: ${r.rows.filter(x=>x.flag&&!x.auto).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step),fp("fbGo",step),...(LV?[...Object.keys(x.lv).map(c=>fp("levels",step,c)),fp("marked",step)]:[])].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at}),fbGo:fsv({[step]:GO}),...(LV?{levels:fsv({[step]:x.lv}),marked:fsv({[step]:at})}:{})}})}
+  console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · sent back automatically (mostly pasted): ${r.rows.filter(x=>x.auto).length} · possible copies for the teacher: ${r.rows.filter(x=>x.flag&&!x.auto).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${goNote()}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="lv-ready"){const hasW=a=>{try{return /type:\s*'writing'/.test(fs.readFileSync(path.join(ROOT,contentOf(a)),"utf8"))}catch(e){return false}};
   for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course).filter(hasW))for(const step of ["write"]){const n=(await lvTodo(grp,a,step)).length;if(n)console.log(["LEVEL",grp.id,a.id,step,n+" corrected without a level"].join(" · "))}}
 else if(cmd==="lv-sheet"){const [gid,aid,step]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid),rows=a?await lvTodo(grp,a,step):[];
@@ -322,20 +326,20 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(auto?" · ↺ MOSTLY PASTED: no level, sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+")":x.flag?" · ⚠️ POSSIBLE COPY (no level, to the To do): "+x.flag:fb?" · feedback: "+x.fb:""));
     if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo on a level moment: no level, the note, the next hand-in goes back to the sheet
-      await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step),fp("replies",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at,done:"redo",auto:true}}),replies:fsv({[m.step]:redoNote(row.route,row.h.ty,x.flag)})}});continue}
+      await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step),fp("replies",m.step),fp("fbGo",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbGo:fsv({[m.step]:GO}),flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at,done:"redo",auto:true}}),replies:fsv({[m.step]:redoNote(row.route,row.h.ty,x.flag)})}});continue}
     if(x.flag){await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}})}});continue}
-    const paths=["ls","activity","updated",...m.c.map(c=>fp("levels",m.step,c)),fp("marked",m.step),...(fb?[fp("replies",m.step),fp("fbBy",m.step)]:[])];
+    const paths=["ls","activity","updated",...m.c.map(c=>fp("levels",m.step,c)),fp("marked",m.step),...(fb?[fp("replies",m.step),fp("fbBy",m.step),fp("fbGo",m.step)]:[])];
     await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+paths.map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),marked:fsv({[m.step]:new Date().toISOString()}),...(fb?{replies:fsv({[m.step]:x.fb}),fbBy:fsv({[m.step]:"marking"})}:{})}})}
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),marked:fsv({[m.step]:new Date().toISOString()}),...(fb?{replies:fsv({[m.step]:x.fb}),fbBy:fsv({[m.step]:"marking"}),fbGo:fsv({[m.step]:GO})}:{})}})}
   const nf=r.rows.filter(x=>x.flag).length,na=r.rows.filter(x=>x.auto).length;
-  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · sent back automatically (mostly pasted): ${na} · possible copies for the teacher: ${nf-na} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · sent back automatically (mostly pasted): ${na} · possible copies for the teacher: ${nf-na} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--feedback")||na?goNote():""}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="comments"||cmd==="answer"){const its=await comments();
   if(cmd==="comments"){console.log(its.length?W.ELMark.commentSheet({date:W.ELWeek.today(),items:its}):"No comments waiting for an answer.");if(NEW&&!its.length)await cmtDone()}
-  // Never straight away (Roger, 17 Nov 2026: "always answer from 8-18 and after 2 hours since u receive the message o report, don't use their
-  // names or surnames since sometimes it feels like AI"): an ANSWER is saved now with at = replyAt(now) (≥ 2 hours after the comment, inside
-  // 08:00-18:00 Madrid), and el-corrections.js shows it to the student only from then; --now (only when Roger asks) sends at once. An answer
+  // Never straight away (Roger, 17 Nov 2026: "after 2 hours since u receive the message o report, don't use their names or surnames since
+  // sometimes it feels like AI"; 24 Nov 2026: "These answers must be in the afternoon from 17h"): an ANSWER is saved now with
+  // at = replyAt(now) (≥ 2 hours after the comment, Monday to Friday 17:00-21:00 Madrid), and el-corrections.js shows it to the student only from then; --now (only when Roger asks) sends at once. An answer
   // with the student's name or surnames stops the whole file before anything is saved.
   else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString(),NOW=process.argv.includes("--now");
     const who=uid=>{const s=studs.find(y=>y.uid===uid)||{},ro=roster[(s.email||"").toLowerCase()]||{};return [s.name,ro.first,ro.surname1,ro.surname2,ro.name].filter(Boolean)};

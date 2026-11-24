@@ -363,7 +363,24 @@ Every LS from LS2 on ends with a Reflect page whose **first tab is a self-assess
 - **Several groups and Send later (Roger, 2 Nov 2026: "program announcements and be able to select more than one class"):** in the New announcement window every group chip toggles (course and Every group chips tick or untick their groups), so any set of groups can get one announcement (`to` = `all`, `c:<course>`, `g:<group>` or `groups`; label "2ESO A + 4ESO B"). "⏰ Send later" (datetime-local) stores `at` (ms). `myAnnouncements` in el-cloud.js drops announcements whose `at` is still in the future and dates the others by `at` (`created` := `at`), so the card, its 14 days and the board use the scheduled time. The dashboard lists scheduled ones as "⏰ scheduled for …". No email is sent for announcements (students only see them on the site); the rules are unchanged (a student could read a future one in the raw data, which is acceptable).
 - **Two languages, translated for free (Roger, 7 Nov 2026: "escriure el text en català i que sortís en anglès als grups que toca i en català als grups que toca"; "with a free translation tool… I don't want this feature to depend on you"):** the New announcement window has "I write in: Català / English / One text for everyone" (kept per computer in `localStorage.el_annL`, Català by default). With Català or English, a second box holds the other version, filled while he types by Google Translate's free web endpoint (`translate.googleapis.com/translate_a/single?client=gtx`, no key, CORS open; `annTranslate` in `el-announce.js`, web links kept as written) and editable; once he edits it, it no longer follows ("↻ Translate again" replaces it). Send waits while it translates and while the version is empty; if the service fails he writes it by hand. Stored as `text` (what he wrote) + `lang` + `ca` + `en`; `annText(a, en)` picks the student's version on the card, the board and the previews (Catalan for Starter, Base and no level; English for Core, Plus, Pro), old ones and private messages only have `text`. The email goes as two emails (each asks first): the whole Catalan text to Starter/Base, the whole English text to Core/Plus/Pro, subject and footer in that language. No rule change (only the teacher writes announcements).
 
-## Beltran's answers to students wait for school hours (Roger, 17 Nov 2026)
+## Beltran's answers and corrections wait for weekdays 17:00 (Roger, 17 Nov 2026; 24 Nov 2026)
+
+**Weekdays from 17:00 (Roger, 24 Nov 2026: "These answers must be in the afternoon from 17h and the same for all the corrections during
+weekdays at 17h"; "all the writing and corrections everyday at 17 except for weekends. Reports are done immediately but we don't send
+an answers until I press the button"; it replaces the 08:00-18:00 window below).** The scheduled task "English Lab: mark and correct"
+runs every weekday at 15:13 Madrid (was Wednesday); `ELMark.lastRun()` is the last weekday before today and the dashboard's `corrNext()`
+the next weekday run. Problem reports: `auto.mjs fixed` saves the ✅ card with `at` = 2100-01-01 and `auto.wait: true`; the report stays
+open (`pbWait`, "Fixed · send answer") until Roger's 📨 Send it (`pbNow` sets `at` = now). Comment answers: `replyAt()` now gives at least 2 hours after the comment or report,
+Monday to Friday 17:00-21:00 Madrid (a few random minutes, never after 20:55), else the next weekday 17:00-17:25. New `corrAt()`:
+now inside that window, else the next weekday at 17:00 sharp. `marks.mjs fb-apply` and `apply --feedback` (and both auto-redo notes)
+save `results/{activity}.fbGo[step]` = `corrAt()` with the correction; `--now` = at once. `el-cloud.js held()` (every student page reads
+results through it, and the teacher's 👁 student view applies `elHeld`) takes out `answers[step]` whose `at` and `replies`/`fbSig`/`flags[step]`
+whose `fbGo` are still to come, so the step's tab, the cards, the notebook, the board and the exam page never show them early, and a
+redo opens at the same time. `news.mjs` skips held replies. Dashboard: the correction dialog (`wrOpen`) shows 🕗 Not shown yet with
+📨 Show it now (`api.fbNow` sets `fbGo` to now); Roger's own answer (`api.reply`) clears `fbGo`, so it shows at once. Towards Nativeness
+(`tn-apply`, Roger's own course) is not held.
+
+### Before: school hours (17 Nov 2026)
 
 "Please don't answer straight away; always answer from 8-18 and after 2 hours since u receive the message o report, don't use their names
 or surnames since sometimes it feels like AI." Every automatic answer to a student (a fixed problem report's ✅ card and message,

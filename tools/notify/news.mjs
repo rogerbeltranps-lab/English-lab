@@ -35,7 +35,7 @@ const roster=Object.fromEntries(await db.list("roster"));
 const studs=(await db.list("students")).map(([uid,s])=>{const em=String(s.email||"").toLowerCase(),r=roster[em]||{};return {uid,email:em,group:r.group||s.group,first:r.first||String(s.name||"").split(/[ ,]/).filter(Boolean).pop()||""}})
   .filter(s=>s.email.endsWith(DOMAIN)&&!TESTERS.includes(s.email)&&W.EL_GROUPS.some(g=>g.id===s.group));
 const lsDoc={},hidden=async ls=>{if(!(ls in lsDoc))lsDoc[ls]=await db.get("ls/"+encodeURIComponent(ls))||{};return lsDoc[ls].status==="hidden"};
-// a card held until later (at: the 🌙 7:30 hold, or 8:00-18:00 two hours after the report, tools/problems/reply-time.mjs) is news when it shows
+// a card held until later (at: the 🌙 7:30 hold, or Beltran's answers and corrections: weekdays from 17:00, fbGo / answers.at, tools/problems/reply-time.mjs) is news when it shows
 const pReplies=(await db.since("problemReplies",new Date(t(last)-3*864e5).toISOString())).filter(x=>isNew(x.at||x.created));
 const act=id=>W.EL_CATALOG.find(a=>a.id===id)||null,stepName=(a,k)=>(((a&&a.steps)||[]).find(([s])=>s===k)||((W.EL_SECTIONS||{})[a&&a.id]||[]).find(([s])=>s===k)||[,k])[1];   // the page's own tab name
 const lsName=ls=>{const l=W.EL_LS.find(x=>x.id===ls);if(!l)return ls;return "LS"+(W.EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)+" · "+l.title.replace(/^\S+ · /,"")};
@@ -58,7 +58,7 @@ for(const s of studs){
       continue}
     if(fpOf[r.activity]&&r.score!=null&&r.max){fp[fpOf[r.activity]]=Math.round(r.score/r.max*100)/10;continue}
     Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.t&&x.at&&t(x.at)<=t(now))note("a:"+r.activity+":"+k,String(x.at),["💬",T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k),""])});
-    Object.entries(r.replies||{}).forEach(([k,x])=>{if(String(x||"").trim())note("r:"+r.activity+":"+k,hash(x),["✏️",T("Correcció: ","Correction: ")+title+" · "+stepName(a,k),""])});
+    Object.entries(r.replies||{}).forEach(([k,x])=>{if(String(x||"").trim()&&!(t((r.fbGo||{})[k]||0)>t(now)))note("r:"+r.activity+":"+k,hash(x),["✏️",T("Correcció: ","Correction: ")+title+" · "+stepName(a,k),""])});
   }
   Object.entries(fp).forEach(([ls,m])=>note("f:"+ls,String(m),["🎬",T("Nota del producte final: ","Final product mark: ")+lsName(ls),"?ls="+encodeURIComponent(ls)]));
   if(BASE)continue;

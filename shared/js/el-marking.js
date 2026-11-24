@@ -127,12 +127,13 @@ window.ELMark=(function(){
           done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
-  // Claude's marking runs once a week, on Wednesday at about 15:00 (Roger, 1 Nov 2026; it was Monday and Thursday mornings). A piece
+  // Claude's marking runs every weekday at about 15:15, so students see the corrections at 17:00 (Roger, 24 Nov 2026: "all the writing
+  // and corrections everyday at 17 except for weekends"; it was Wednesday only from 1 Nov 2026). A piece
   // (ready on day `since`: a level moment's ready day or later hand-in, or a hand-in waiting for a correction) is late when it was ready
-  // before the last Wednesday run and still has nothing: by then that run should have done it. The day of a run itself never counts as
+  // before the last run (the last weekday before today) and still has nothing: by then that run should have done it. The day of a run itself never counts as
   // late (the piece may have come in after 15:00). Same rule on the dashboard (❌ Claude's marking is late) and in marks.mjs audit.
-  const RUN_DAY=3;   // Wednesday (0 = Sunday)
-  function lastRun(today){const W=window.ELWeek,d=new Date(today+"T12:00:00Z").getUTCDay();return W.add(today,-(((d-RUN_DAY+7)%7)||7))}
+  // the last weekday before today (Monday to Friday; 0 = Sunday)
+  function lastRun(today){const W=window.ELWeek,d=new Date(today+"T12:00:00Z").getUTCDay();return W.add(today,-(d===1?3:d===0?2:1))}
   function late(since,today){return !!since&&since<lastRun(today)}
   // ---- Students' comments on hand-ins, answered by Claude (Roger, 31 Oct 2026: "Claude should answer properly with context").
   // h = the hand-in (state.steps[step]), x = results/{activity}. A comment still needs an answer unless it only says "no problem"
