@@ -374,7 +374,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -1417,7 +1417,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only · Back or ✕ Exit returns here")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
-    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
+    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="how"',"🎬","How it works","guides for teachers and students")}</div>`
     +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
@@ -1798,7 +1798,7 @@ function render0(){
     +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
     +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
     +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
-    +`<button class="nv" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`
+    +nv("how","🎬 How it works","","Guides for teachers and students")
     // ✦ Roger's own course, as a section of its own (tnPage)
     +((window.TN_LS||[]).length&&!DEMO?`<div class="sep"></div>`+nv("tn","✦ Towards Nativeness","","Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"):"");
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
@@ -1808,6 +1808,7 @@ function render0(){
   if(S.g==="tn"){$("#main").innerHTML=tnPage();return}
   if(S.g!=="online")visUnwatch();
   if(S.g==="online"){$("#main").innerHTML=onlinePage();return}
+  if(S.g==="how"){$("#main").innerHTML=howTo(matA);return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
   if(S.g==="lss"){$("#main").innerHTML=lssPage();return}
   if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
@@ -2803,7 +2804,7 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // students dashboard"): for teachers, and for students; since 2 Nov 2026 one student video per language holds the board part by part.
 const HOW_VIDEOS=[["For teachers",[["👩‍🏫 How the dashboard works","video/how-the-dashboard-works.mp4?v=20261101",true]]],
   ["For students · how the website works",[["🎓 In English (Amelia)","video/how-english-lab-works.mp4?v=20261102c",true],["🎓 In Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261102c",true]]]];
-function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
+function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Guides and videos made from the real site. Students can find the current guide in Help.</p><h3>For students · corrections and feedback</h3><p>How I correct your work: ${a("shared/help/how-i-correct-your-work.pdf","Open presentation (PDF) →","btn")} ${a("today.html#help","Student help guide →","chip")}</p>`
   +HOW_VIDEOS.map(([g,vs])=>vs.some(v=>v[2])?`<h3 style="margin:10px 0 4px">${esc(g)}</h3>`+vs.filter(v=>v[2]).map(([t,href])=>`<p style="margin:4px 0">${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join(""):"").join("")+`</div>`}
 const matA=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
 const MAT_R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],matRP=l=>MAT_R0.concat(l.pro?[["native","Pro"]]:[]);
@@ -2825,7 +2826,7 @@ function lsMat(l,noHead){const a=matA,R0=MAT_R0,RP=matRP,k=l.id.replace("-","/")
         return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
       :`<p class="muted">No paper worksheets for this LS.</p>`)}
 function matTab(){
-  return howTo(matA)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
+  return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
     const games=courseGames(c),a=matA,lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?gamesTable(games):`<p class="muted">No games yet.</p>`)
