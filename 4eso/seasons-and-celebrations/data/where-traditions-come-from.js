@@ -388,7 +388,8 @@ window.LP = (function () {
         safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
         daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
       } },
-    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
+    { id: 'shadow', type: 'shadow', hand: false, // opened before 24 Nov 2026: not handed in (ls2-engine.js R.shadow)
+      tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
       intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
       clip: { title: 'Culture Bites: the story behind two autumn celebrations', src: 'audio/culture-bites-origins.mp3', slow: 'audio/culture-bites-origins-slow.mp3', t: [53.08, 92.01], ts: [64.6, 111.38], lines: [
         ['Emma', 'Now, Thanksgiving. It takes place on the fourth Thursday of November, and this year that’s the twenty-sixth.'],

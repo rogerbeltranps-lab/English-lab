@@ -1005,7 +1005,7 @@ function audMount(root){(root||document).querySelectorAll("[data-au]:not([data-a
 // 🔇 no recording (Roger, 16 Nov 2026: "why don't I see the audio here?" on a Speaking handed in Sun 8 Nov at 18:00): recordings are only
 // kept since PR #444 (Sun 8 Nov, 19:45); before that, and when an upload did not reach Drive, the hand-in has no x.audio. Say so instead of nothing.
 const REC_FROM="2026-11-08T18:45:00Z";
-const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
+const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk|shadow/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
 const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+(x=>x&&x.audio&&x.audio.id?` <span class="au" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""} and see the correction" style="cursor:pointer">🔊</span>`:"")(((pstate(u,a)||{}).steps||{})[k])};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
 // the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
@@ -1029,13 +1029,14 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   // 🤖 Roig's feedback on a recording (Roger, 17 Nov 2026: "I also want to be able [to see] Gemini's corrections and feedback"): the notes
   // Roig wrote when the recording was handed in (field "Notes from the recording", el-mic.js → school script "audio") go in their own box
   // right under the player, before the Wednesday correction; the transcript is labelled as Roig's. Only the teacher sees the name Roig.
-  const sp=/speak|talk/.test(step),isNote=y=>sp&&/^Notes from the recording/.test(y.l),isTr=y=>sp&&(y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació");
+  // 🗣 a Shadowing hand-in (Roger, 24 Nov 2026: "students turn them in and roig will correct them") opens like a Speaking: player, Roig's notes, transcript
+  const sp=/speak|talk|shadow/.test(step),isNote=y=>sp&&/^Notes from the recording/.test(y.l),isTr=y=>sp&&(y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació");
   const notes=f.filter(isNote),aud=(((pstate(u,a)||{}).steps||{})[step]||{}).audio;
   const roig=!sp?"":notes.length?`<p style="margin:12px 0 4px"><b>🤖 Roig's feedback on the recording</b> <small class="muted">(task and pronunciation · written when it was handed in${aud&&aud.eur?" · €"+(+aud.eur).toFixed(3):""})</small></p>`+notes.map(y=>`<div class="hand" style="border-left:4px solid #7c3aed;background:#f5f3ff"><p style="white-space:pre-wrap;margin:0">${esc(y.v)}</p></div>`).join("")
     :aud&&aud.id?`<p class="muted">🤖 <b>No feedback from Roig</b> on this recording (the recording could not be checked when it was handed in): the afternoon correction is written from the transcript.</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.filter(y=>!isNote(y)).map(y=>`<p><b>${esc(y.l==="Text"&&sp?"What they said (transcript)":isTr(y)?"What they said (Roig's transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp?spkBox(u,aid,step):""}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp&&step!=="shadow"?spkBox(u,aid,step):""}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+fbHold(u,aid,step,x)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
@@ -2043,7 +2044,7 @@ const spkGet=(gid,ls,u,fid)=>((SPK.d[spkDoc(ls,gid)]||{})[u]||{})[fid]||null;
 // Classroom or by a link (fpgVideo, as 🎬 Final product); group videos are left out (Roig can't tell which voice is the student) and so
 // are YouTube links (no file).
 function spkRecs(studs,lss){const out=[];studs.forEach(s=>lss.forEach(ls=>acts(ls).forEach(a=>{const st=pstate(s.uid,a).steps||{};
-  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
+  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id&&!x.sh)out.push(   /* not Shadowing (x.sh): the words are the model's, not the student's own speaking */{u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
   lss.forEach(ls=>{const a=fpAct(ls);if(a)studs.forEach(s=>{const r=spkFpRec(s,a);if(r)out.push(r)})});
   return out.sort((p,q)=>tms(q.at)-tms(p.at))}
 const spkLevels=an=>SPK_LV.map(([k])=>an&&an[k]&&an[k].level!=null?+an[k].level:null);
@@ -2616,7 +2617,7 @@ const CK={write:["✍️","Writing","writings"],speak:["🎙","Speaking","speaki
 const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):typeof v.toMillis==="function"?v.toMillis():v.seconds?v.seconds*1000:0;
 const ckOf=(step,it)=>step==="speak"||/speak/.test(step)?"speak":step==="talk"||/talk/.test(step)?"talk":it&&it.mode==="reply"||step==="reflect"?"reflect":step==="write"||it&&it.mode==="writing"?"write":"other";
 // a step's name in any LS (cpName only knows the LS on screen)
-const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",reflect:"Reflection"})[step]||step};
+const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing",reflect:"Reflection"})[step]||step};
 const CORR={d:null,t:0,v:null,mkT:0,busy:false,failT:0};
 // Fresh after every run (Roger, 8 Nov 2026: "yesterday you said there were no corrections waiting but now I see corrections pending, why?"):
 // the waiting list is worked out from the copy of the students' work kept in this browser, and that copy was from Mon 2 Nov, before
