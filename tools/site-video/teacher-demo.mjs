@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -204,7 +204,10 @@ const body = (rel) => {
   if (rel === 'teacher.html') { const s = b.toString(), i = s.indexOf('<script src="shared/js/el-catalog.js">'); b = s.slice(0, i) + `<script>window.EL_DEMO_DATA=${JSON.stringify(D)}</script>\n` + s.slice(i); }
   return b;
 };
-if (process.argv.includes('--serve')) {
+// tools/smoke/check.mjs imports the data (and the page with it injected) without serving or taking pictures
+export { D, body };
+const MAIN = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+if (!MAIN) { /* imported */ } else if (process.argv.includes('--serve')) {
   http.createServer((q, r) => { const rel = decodeURIComponent(new URL(q.url, 'http://x').pathname).replace(/^\/+/, '') || 'teacher.html', b = body(rel);
     if (b == null) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[path.extname(rel)] || 'application/octet-stream' }); r.end(b); }).listen(8765);
   console.log('http://127.0.0.1:8765/teacher.html');
