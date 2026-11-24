@@ -88,6 +88,10 @@ function held(d){const now=Date.now(),o={};
     c.held=r.showFrom;o[k]=c}
   return o}
 window.elHeld=held;
+// 📣 held until the teacher publishes (Roger, 24 Nov 2026: "I only need a button to publish them when I want"): showFrom = 9999-12-31
+// (EL_HOLD) means no date yet; elHeldDay gives the day results come out, or null when it is "until the teacher publishes them"
+window.EL_HOLD="9999-12-31T00:00:00.000Z";
+window.elHeldDay=v=>{const t=typeof v==="number"?v:Date.parse(v||"");return isNaN(t)||t>=Date.parse("9000-01-01T00:00:00Z")?null:new Date(t)};
 // A result this page saved: put into the copy too (the server's time is unknown here, so "updated" stays out).
 function rcSaved(uid,id,data){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null");if(!c)return;const o=Object.assign({},data);delete o.updated;
   c.d[id]=Object.assign(c.d[id]||{},plain(o));rcPut(uid,c.d,c.t)}catch(e){}}

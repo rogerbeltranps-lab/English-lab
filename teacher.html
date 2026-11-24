@@ -1375,7 +1375,7 @@ function render(){
   const inTop={};document.querySelectorAll("#main .tp2s .agl+.agr").forEach(n=>{inTop["r|"+aglKey(n.previousElementSibling)]=[n.scrollTop,0]});
   {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w)inTop.w=[w.scrollTop,w.scrollLeft]}
   autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v;const r=n.nextElementSibling,q=inTop["r|"+aglKey(n)];if(q&&r&&r.classList.contains("agr"))r.scrollTop=q[0]});
-  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w&&inTop.w){w.scrollTop=inTop.w[0];w.scrollLeft=inTop.w[1]}}document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();setTimeout(()=>autoDay().then(autoGroup),1500);fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w&&inTop.w){w.scrollTop=inTop.w[0];w.scrollLeft=inTop.w[1]}}document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();setTimeout(wxAuto,2500);loadBar();setTimeout(()=>autoDay().then(autoGroup),1500);fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
@@ -2027,7 +2027,7 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     :[{label:"Activities",color:"#2563eb",fill:true,v:gA},{label:"Exam",color:"#b45309",shape:"square",v:gE}];
   const any=rs.some(s=>s.v.some(v=>v!=null)),lg=rs.map(s=>`<span><i class="sw" style="${s.dash?`border:2px dashed ${s.color};background:none`:`background:${s.color}`}"></i>${esc(s.label)}</span>`).join("");
   const radarB=`<div class="box elc-wrap prrad"><h2>🕸 Skills in ${esc(lsS(EL_LS.find(l=>l.id===ls)))}${me?` · ${esc(shortName(me).mid)}`:" · the group"}</h2>`
-    +`<p class="muted">Activities: the average of all tries. Exam: the points in each part.${held?` <b>🔒 Students can't see the exam yet${held.held===true?"":` (from ${esc(new Date(tms(held.held)).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))})`}.</b>`:""}</p>`
+    +`<p class="muted">Activities: the average of all tries. Exam: the points in each part.${held?` <b>🔒 Students can't see the exam yet${held.held===true?"":!elHeldDay(tms(held.held))?" (until you publish them in 📝 Exams)":` (from ${esc(new Date(tms(held.held)).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))})`}.</b>`:""}</p>`
     +(any&&window.ELCharts?`<div class="prlg">${lg}</div><div class="prradin">${ELCharts.radar({axes:PR_K.map(k=>({label:k,icon:PR_SK[k][0]})),series:rs,aria:"Skills radar"})}`
       +`<table class="prnum"><thead><tr><th></th>${rs.map(s=>`<th>${esc(s.label.replace("Group activities","Group"))}</th>`).join("")}</tr></thead><tbody>${PR_K.map((k,i)=>`<tr><td>${PR_SK[k][0]} ${k}</td>${rs.map(s=>`<td>${prPc(s.v[i])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
       :`<p class="muted">Nothing checked in this LS yet.</p>`)+`</div>`;
@@ -3420,8 +3420,8 @@ function examsTile(grp,ls,studs){const e=exOf(ls),on=studs.filter(s=>s.uid),nd=e
 // ---- 🖥 Web exams (Roger, 17 Nov 2026: shared/js/el-web-exam.js; EL_GRADING[ls].exam.web = {key, page}) ----
 // The students' exams are students/{uid}/exams/{key}: read here only when the 📝 Exams page of that LS is open (one read per exam taken;
 // 🔄 Refresh reads them again). The key is cpKeys/{key}.web {id: {a, q, s, p, extra}} (tools/web-exam). The exam opens and closes per
-// group (ls/{ls}.webExam[group].open). 📥 Save marks writes each finished exam into results/{ls}__assessment (sections, version, the
-// whole exam for the student's report), so the marks reach the boards then. After an exit, the copies of the answers taken at each exit
+// group (ls/{ls}.webExam[group].open). Each finished exam is saved by itself into results/{ls}__assessment (sections, version, the
+// whole exam for the student's report: wxSync, 24 Nov 2026); students see it when the teacher presses 📣 Publish (wxPublish). After an exit, the copies of the answers taken at each exit
 // (snaps, which the student can never change) show what changed after coming back with the password, and whether it won points.
 const WX={docs:{},ls:null,at:0,busy:false};
 const wxCfg=ls=>{const e=exOf(ls);return e&&e.web||null};
@@ -3472,7 +3472,7 @@ const wxMin=(a,b)=>{const x=Date.parse(a),y=Date.parse(b);return isNaN(x)||isNaN
 const hm=s=>String(s||"").slice(11,16);
 async function wxLoad(ls){const c=wxCfg(ls);if(!c||DEMO)return;WX.busy=true;WX.ls=ls;
   try{const q=await ALL("exams",1),o={};q.forEach(x=>{const d=x.data();if(d.key===c.key)o[up(x)]=Object.assign(d,{uid:up(x)})});WX.docs=o;WX.ls=ls;WX.at=Date.now()}catch(e){console.warn("web exams",e)}
-  WX.busy=false;render()}
+  WX.busy=false;render();wxSync(ls).catch(e=>console.warn("exam sync",e))}   // 💾 the marks save themselves
 // the exam questions and texts (the page's data file), for the students' reports
 const wxData=c=>window.EL_EXAM&&EL_EXAM.key===c.key?Promise.resolve(EL_EXAM):new Promise(r=>{const s=document.createElement("script");s.src=c.page.replace(/[^/]*$/,"")+"data/exam.js";s.onload=()=>r(window.EL_EXAM||null);s.onerror=()=>r(null);document.head.append(s)});
 const wxPlain=h=>String(h||"").replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>/gi,"\n\n").replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').trim();
@@ -3485,7 +3485,7 @@ function wxReport(d,K,ls,X){const e=exOf(ls),P=X&&X.papers[d.paper],qs=[];let n=
   return Object.assign({full:true,web:true,questions:qs,exam:Object.assign({listening:{about:A.about||"",text:(A.script||[]).map(([w,s])=>w+": "+s).join("\n")},reading:{title:"Text A and Text B",body:P?wxPlain(P.text):""}},
     wt?{writing:{title:"Writing",task:wt.q,points:wt.frame?["Frame: "+wt.frame]:[]}}:{})},wid?{writing:{original:txt||"(blank)"}}:{})}
 // 📄 a paper exam (Roger, 20 Nov 2026: Shafay and Sara did it on paper; "safay exam is missing"): results/{ls}__assessment.paper = "base-B (paper)",
-// written by hand or by a script. The web exam box shows those marks, and 📥 Save marks never overwrites them with the (empty) web exam.
+// written by hand or by a script. The web exam box shows those marks, and the automatic save (wxSync) never overwrites them with the (empty) web exam.
 const wxPaper=(u,ls)=>{const r=res(u,asId(ls));return r&&/paper/i.test(String(r.paper||""))&&r.sections?r:null};
 function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls),open=wxOpen(ls,grp.id);
   // a make-up exam (Roger, 17 Nov 2026: Elunei's LS1 exam): open only for students listed by email (ls/{ls}.webExam[group].only); students
@@ -3501,13 +3501,15 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
       :`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">🟢 ${W.go?"Started at "+new Date(W.go).toTimeString().slice(0,5)+" · ":""}${only.length?"only "+who:"open for "+esc(grp.name)}</span><button class="g" data-wx="close">🔒 Close the exam</button>`)
     +`<a class="g" href="${esc(link)}" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 12px;border:1px solid #cbd5e1;border-radius:10px">👁 Preview and 🔊 audio</a>`
     +`<button class="g" data-wx="copy" data-v="${esc(link)}">🔗 Copy the link</button><button class="g" data-wx="refresh">🔄 Refresh</button><button class="g" data-wx="mail" title="A student whose exam could not be turned in emailed you a sealed code: paste it here to read it and turn it in">📥 Open an emailed exam</button>`
-    +(n("done")+n("out")+n("stopped")?`<button data-wx="save">📥 Save marks (${n("done")+n("out")+n("stopped")})</button>`:"")+`</div>`;
+    +(()=>{const P=wxPubState(grp,ls,studs);if(!P.n)return "";const dt=x=>new Date(x).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(x).toTimeString().slice(0,5);
+      return P.pub===P.n?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">📣 Published${P.at?" "+dt(P.at):""}: students see them</span><button class="g" data-wx="unpub" title="Hide the results from the students again">🔒 Hide again</button>`
+        :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔒 ${P.n-P.pub} not published${P.sched?" · they come out by themselves "+dt(P.sched):": students can't see them"}</span><button data-wx="pub" style="background:#166534;color:#fff;border-color:#166534">📣 Publish the results (${P.n})</button>`})()+`</div>`;
   // 👤 a make-up exam for some students (Roger, 17 Nov 2026: "I must be able to go one student and make him do an exam, or some students"):
   // ticked by default = those with no exam mark and no web exam yet
   const pick=!open&&WX.pick===grp.id+ls?`<div class="box" style="margin:6px 0;padding:10px 12px;background:#f8fafc"><b>👤 Who does the exam?</b> <span class="muted">Only they are taken to it and can start it; the rest of ${esc(grp.name)} sees it closed.</span>
     <div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0">${studs.filter(s=>s.uid&&s.email).map(s=>`<label style="white-space:nowrap"><input type="checkbox" class="wxPk" value="${esc(String(s.email).toLowerCase())}"${late.includes(s)?" checked":""}> ${name(s)}${late.includes(s)?"":` <small class="muted">${wxDoc(s.uid)?"(web exam done)":"(has a mark)"}</small>`}</label>`).join("")}<label style="white-space:nowrap" title="The test account: set its 👁 student view to ${esc(grp.name)} so exam mode takes it to the exam with them"><input type="checkbox" class="wxPk" value="roger.beltran@ietramuntana.cat"> 🧪 Test account</label></div>
     <button data-wx="modefor">📝 Exam mode for the ticked students</button> <button class="g" data-wx="pick">Cancel</button></div>`:"";
-  const note=`<p class="muted">${K?"":'<b style="color:#dc2626">⚠ The answer key is not in the database yet (cpKeys/'+esc(c.key)+'): marks can\'t be worked out.</b> '}<b>📝 Exam mode</b> takes every student of the group with the site open to the exam (👤 or only the students you tick): they read the rules and wait in full screen; you explain, then <b>▶ Start the exam</b> starts it for all of them at once. Anyone who arrives later starts it with the Start button. Starter and Base get the Base paper, Core and Plus the Core one, with the questions in order and the options shuffled. If a student leaves full screen the exam stops (⛔): type your password on their Chromebook to let them back in. ${WX.at?"Read at "+new Date(WX.at).toTimeString().slice(0,5)+".":"Reading…"} <b>📥 Save marks</b> puts the finished exams in 📊 Assessment details and on the students' boards, where they show <b>4 days after the exam, at 8:00</b> (the exams still running are left out until they turn them in or you close the exam).</p>`;
+  const note=`<p class="muted">${K?"":'<b style="color:#dc2626">⚠ The answer key is not in the database yet (cpKeys/'+esc(c.key)+'): marks can\'t be worked out.</b> '}<b>📝 Exam mode</b> takes every student of the group with the site open to the exam (👤 or only the students you tick): they read the rules and wait in full screen; you explain, then <b>▶ Start the exam</b> starts it for all of them at once. Anyone who arrives later starts it with the Start button. Starter and Base get the Base paper, Core and Plus the Core one, with the questions in order and the options shuffled. If a student leaves full screen the exam stops (⛔): type your password on their Chromebook to let them back in. ${WX.at?"Read at "+new Date(WX.at).toTimeString().slice(0,5)+".":"Reading…"} Each finished exam is <b>saved by itself</b> (📊 Assessment details, Home and the reports), and saved again when you ✓ Accept an answer or correct a writing. Students see nothing until you press <b>📣 Publish the results</b> (the exams still running are left out until they turn them in or you close the exam).</p>`;
   const st=d=>({none:'<span class="muted">Not started</span>',in:"✍️ Working",out:"⛔ Stopped (left)",stopped:"⏹ Not turned in (closed)",done:"✅ Turned in"})[wxSt(d,open)];
   const row=s=>{if(!s.uid)return "";const pr=wxPaper(s.uid,ls);if(pr){const sc=pr.sections,tot=Object.values(sc).reduce((a,x)=>a+(+x.score||0),0),mx=Object.values(sc).reduce((a,x)=>a+(+x.max||0),0);
     return `<tr title="Paper exam: the marks saved in 📊 Assessment details"><td class="n">${name(s)}</td><td style="white-space:nowrap">📄 ${esc(String(pr.paper).replace(/\s*\(paper\)/i,"").replace("base","Base").replace("core","Core"))}</td><td>📄 On paper <small class="muted" title="Saved in 📊 Assessment details">💾</small></td>`
@@ -3574,21 +3576,76 @@ function wxWBox(u,ls,d){const w=wxW(u,ls,d);if(!w||!w.id)return "";const X=windo
     +`<div style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(w.txt.trim())||'<span class="muted">(blank)</span>'}</div>`
     +(before!=null&&before.trim()!==w.txt.trim()?`<details style="margin-top:6px"><summary>⚠️ The text when they first left (${wxWords(before)} words)</summary><div style="white-space:pre-wrap;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;line-height:1.6">${esc(before.trim())||'<span class="muted">(blank)</span>'}</div></details>`:"")
     +(()=>{const r=((res(u,asId(ls)).report||{}).writing)||{},rb=(r.rubric||[]).map(x=>Array.isArray(x)?x:[x.name,x.score,x.max]);if(!rb.length)return "";
-      return `<p style="margin:8px 0 0"><b>Corrected</b> (what the student sees): ${rb.map(([n,v,m])=>`${esc(n)} <b>${v}/${m}</b>`).join(" · ")} · ${(r.errors||[]).length} mistakes${r.feedback?`<br><span class="muted">💬 ${esc(r.feedback)}</span>`:""}</p>`})()
-    +`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:8px"><span class="muted">5.1 level:</span>${EL_DEGREES.map((l,i)=>`<button class="lv ${w.level===l?"on":""}" data-wx="wlv" data-u="${u}" data-l="${l}" title="${esc(l+" = "+f1(WXLV[l]*w.max)+"/"+w.max+(ind[i]?": "+ind[i]:""))}" style="${w.level===l?"background:"+LVCOL[l]+";border-color:"+LVCOL[l]:""}">${l}</button>`).join("")}<small class="muted">NA ${f1(WXLV.NA*w.max)} · AS ${f1(WXLV.AS*w.max)} · AN ${f1(WXLV.AN*w.max)} · AE ${w.max}</small></div>`}
-// students see the results 4 days after the exam, at 8:00 (Roger, 17 Nov 2026: "we release the results automatically 4 days later"):
-// results/{ls}__assessment .showFrom; until then the board shows no marks, report or writing level (el-cloud.js held)
-const wxShow=d=>{const x=new Date(d.done||d.started||Date.now());x.setDate(x.getDate()+4);x.setHours(8,0,0,0);return x.toISOString()};
-async function wxSave(ls,grp,studs){const c=wxCfg(ls),K=wxKey(ls),open=wxOpen(ls,grp.id);if(!K)return alert("The answer key is not in the database yet.");
-  const X=await wxData(c),todo=studs.filter(s=>s.uid&&wxDoc(s.uid)&&!wxPaper(s.uid,ls)&&["done","out","stopped"].includes(wxSt(wxDoc(s.uid),open)));   // a paper exam is never overwritten
-  const had=todo.filter(s=>Object.keys(res(s.uid,asId(ls)).sections||{}).length).length;
-  const nw=todo.filter(s=>{const w=wxW(s.uid,ls,wxDoc(s.uid));return w&&w.words&&w.score==null}).length;
-  if(!confirm(`Save the web exam marks of ${todo.length} student(s) in ${grp.name}?${had?`\n\n${had} already have exam marks: they are replaced (a writing you marked stays).`:""}${nw?`\n\n${nw} writing(s) not marked yet: their mark shows once you give the level.`:""}\n\nStudents see their marks and their exam, question by question, on their board 4 days after the exam, at 8:00.`))return;
-  const ps=todo.map(s=>{const d=wxDoc(s.uid),m=wxMark(d,K,ls),sections={};WXSEC.forEach(([k])=>sections[k]={score:m.sec[k].score,max:m.sec[k].max});
-    if(m.w&&m.w.score==null&&!m.w.words)sections.writing={score:0,max:m.w.max};   // a blank writing is 0; a written one keeps the level you gave it (or waits for one)
-    const cur=res(s.uid,asId(ls)),rp=wxReport(d,K,ls,X);if(((cur.report||{}).writing||{}).rubric)delete rp.writing;   // a corrected writing (tools/web-exam/writing.mjs) stays
-    return patch(s.uid,asId(ls),{sections,version:d.paper.startsWith("core")?"safe":"insecure",webPaper:d.paper,report:rp,showFrom:cur.showFrom||wxShow(d)})});
-  act(Promise.all(ps))}
+      return `<p style="margin:8px 0 0"><b>Corrected${r.by==="teacher"?" by you":""}</b> (what the student sees): ${rb.map(([n,v,m])=>`${esc(n)} <b>${v}/${m}</b>`).join(" · ")} · ${(r.errors||[]).length} mistakes${r.feedback?`<br><span class="muted">💬 ${esc(r.feedback)}</span>`:""}</p>`})()
+    +(()=>{const x=res(u,asId(ls)),rd=x.wredo;if(!w.words)return "";
+      return `<div class="row" style="justify-content:flex-start;gap:6px;margin-top:8px">${rd?`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔄 Waiting for a new correction (asked ${new Date(rd.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"})} ${new Date(rd.at).toTimeString().slice(0,5)})${rd.note?": "+esc(rd.note):""}</span><button class="g" data-wx="wredox" data-u="${u}">Cancel</button>`
+        :`<button class="g" data-wx="wredo" data-u="${u}" title="Beltran corrects this writing again in the next marking run">🔄 Correct again</button>`}<button class="g" data-wx="wedit" data-u="${u}" title="Change the points, the comment, the corrected text or the mistakes yourself">✏️ Correct it by hand</button></div>`
+        +(WX.edit===u?wxEditH(u,ls,d):"")
+})()
+    +(((((res(u,asId(ls)).report||{}).writing)||{}).rubric)?"":`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:8px"><span class="muted">5.1 level:</span>${EL_DEGREES.map((l,i)=>`<button class="lv ${w.level===l?"on":""}" data-wx="wlv" data-u="${u}" data-l="${l}" title="${esc(l+" = "+f1(WXLV[l]*w.max)+"/"+w.max+(ind[i]?": "+ind[i]:""))}" style="${w.level===l?"background:"+LVCOL[l]+";border-color:"+LVCOL[l]:""}">${l}</button>`).join("")}<small class="muted">NA ${f1(WXLV.NA*w.max)} · AS ${f1(WXLV.AS*w.max)} · AN ${f1(WXLV.AN*w.max)} · AE ${w.max}</small></div>`)}   // the level buttons only without a correction (a click replaced it: Luis, 23 Nov 2026)
+// 📣 Results come out when the teacher publishes them (Roger, 24 Nov 2026: "it makes no sense to save the exams, the exams are already saved,
+// I only need a button to publish them when I want"; it replaced "4 days later at 8:00" of 17 Nov): a mark saved for the first time gets
+// showFrom = EL_HOLD (9999-12-31: no date, el-cloud.js held hides it from students); 📣 Publish sets showFrom = now for the group.
+const WXHOLD="9999-12-31T00:00:00.000Z";
+window.elHeldDay=window.elHeldDay||(v=>{const t=typeof v==="number"?v:Date.parse(v||"");return isNaN(t)||t>=Date.parse("9000-01-01T00:00:00Z")?null:new Date(t)});
+const wxShow=()=>WXHOLD;
+// 💾 The marks save themselves (Roger, 24 Nov 2026: "in the teacher's board they must appear once corrected"; 📥 Save marks is gone):
+// what the old button wrote (sections listening…grammar, the question-by-question report, version) is written by wxSync for every exam that
+// is turned in (or stopped once the exam is closed), whenever the web exams of an LS are read: on 📝 Exams, after ✓ Accept / ✗ Undo, and
+// from Home when a corrected writing has no other parts yet (wxAuto). Only what changed is written; a paper exam and a corrected writing stay.
+function wxRec(d,K,ls,X,cur){const m=wxMark(d,K,ls),sections={};WXSEC.forEach(([k])=>sections[k]={score:m.sec[k].score,max:m.sec[k].max});
+  if(m.w&&m.w.score==null&&!m.w.words)sections.writing={score:0,max:m.w.max};   // a blank writing is 0; a written one waits for its correction
+  const rp=wxReport(d,K,ls,X);if(((cur.report||{}).writing||{}).rubric)delete rp.writing;   // a corrected writing (tools/web-exam/writing.mjs) stays
+  return {ls,sections,version:d.paper.startsWith("core")?"safe":"insecure",webPaper:d.paper,report:rp,showFrom:cur.showFrom||wxShow(d)}}
+const wxSig=x=>{const sc=x.sections||{},q=((x.report||{}).questions)||[];return WXSEC.map(([k])=>sc[k]?sc[k].score+"/"+sc[k].max:"-").join(",")+"|"+q.map(y=>(y.ok?1:0)+String(y.mine||"")).join("¦")+"|"+(x.webPaper||"")};
+async function wxSync(ls,only){const c=wxCfg(ls),K=wxKey(ls);if(!c||!K||DEMO||WX.ls!==ls)return 0;const X=await wxData(c);if(!X||X.key!==c.key)return 0;let n=0;
+  for(const [u,d] of Object.entries(WX.docs)){if(only&&!only.includes(u))continue;const s=S.P[u];if(!s||s.tester||wxPaper(u,ls))continue;
+    const st=wxSt(d,wxOpen(ls,s.group||d.group));if(!["done","out","stopped"].includes(st))continue;
+    const cur=res(u,asId(ls)),o=wxRec(d,K,ls,X,cur);if(wxSig(o)===wxSig(cur)&&cur.version===o.version)continue;
+    patch(u,asId(ls),o).catch(e=>console.warn("exam sync",u,e));n++}
+  if(n)render();return n}
+// from Home: an LS whose writings were corrected but whose other parts are not in the results yet → read its web exams once and sync
+const WXA={};
+function wxAuto(){if(DEMO||WX.busy||!S.D||!S.D.rs)return;const now=Date.now();
+  for(const l of EL_LS){const c=wxCfg(l.id);if(!c||now-(WXA[l.id]||0)<10*60e3)continue;
+    const need=Object.entries(S.D.rs).some(([u,r])=>{const x=(r||{})[asId(l.id)];return x&&((x.report||{}).writing||{}).rubric&&!(x.sections||{}).listening&&!/paper/i.test(String(x.paper||""))&&S.P[u]&&!S.P[u].tester});
+    if(!need)continue;WXA[l.id]=now;wxLoad(l.id);return}}
+// 📣 Publish the results of a group (and 🔒 hide them again)
+function wxPubState(grp,ls,studs){const xs=studs.filter(s=>s.uid).map(s=>res(s.uid,asId(ls))).filter(x=>x&&(x.sections||x.report)),now=Date.now();
+  const pub=xs.filter(x=>x.showFrom&&Date.parse(x.showFrom)<=now),sched=xs.filter(x=>x.showFrom&&Date.parse(x.showFrom)>now&&elHeldDay(x.showFrom)).map(x=>x.showFrom).sort();
+  return {n:xs.length,pub:pub.length,at:pub.map(x=>x.showFrom).sort().pop()||null,sched:sched.pop()||null}}
+function wxPublish(grp,ls,studs,on){const xs=studs.filter(s=>s.uid&&(res(s.uid,asId(ls)).sections||res(s.uid,asId(ls)).report));if(!xs.length)return;
+  if(!confirm(on?`Publish the ${xs.length} exam results of ${grp.name} now?\n\nEach student sees their marks, every question and their corrected writing on their board straight away. You can still accept answers and change a writing afterwards: they see the change at once.`
+    :`Hide the exam results of ${grp.name} from the students again?\n\nThey stay on your dashboard; students see them again when you press 📣 Publish.`))return;
+  const v=on?new Date().toISOString():WXHOLD;act(Promise.all(xs.map(s=>patch(s.uid,asId(ls),{ls,showFrom:v}))))}
+// ✍️ the writing correction, by hand (Roger, 24 Nov 2026: "change the writing correction with a button correct again or correct manually"):
+// the rubric rows, the comment, the corrected text and the mistakes (one per line: mistake → correction → why); the mark and the 5.1
+// level follow from the rubric, as in tools/web-exam/writing.mjs. 🔄 Correct again asks Beltran for a new correction: results .wredo
+// {at, note} + settings/marking.examRedo[uid__ls] (the marking run reads that one doc: writing.mjs redo), and the run starts (mkAsk).
+const wxDeg=m=>m<5?"NA":m<7?"AS":m<9?"AN":"AE";
+const wxStar=(a0,b0)=>{const a=a0.match(/\S+|\s+/g)||[],b=b0.match(/\S+|\s+/g)||[],n=a.length,m=b.length,L=Array.from({length:n+1},()=>new Array(m+1).fill(0));   // changed words in *…* (as writing.mjs)
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=a[i]===b[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  let i=0,j=0,out="",run="";const flush=()=>{if(run.trim()){const lead=run.match(/^\s*/)[0],trail=run.match(/\s*$/)[0];out+=lead+"*"+run.trim()+"*"+trail}else out+=run;run=""};
+  while(j<m){if(i<n&&a[i]===b[j]){flush();out+=b[j];i++;j++}else if(i<n&&L[i+1][j]>=L[i][j+1])i++;else{run+=b[j];j++}}flush();return out.replace(/\*([ \t]+)\*/g,"$1")};
+const WXRUB=[["C1 · Task achievement",8],["C2 · Grammar",4],["C3 · Vocabulary",4],["C4 · Organisation and cohesion",4]];
+function wxEditH(u,ls,d){const w=wxW(u,ls,d),r=((res(u,asId(ls)).report||{}).writing)||{},rb=(r.rubric||[]).map(x=>Array.isArray(x)?{name:x[0],score:x[1],max:x[2]}:x);
+  const rows=(rb.length?rb:WXRUB.map(([name,max])=>({name,score:"",max})));
+  return `<div class="box" data-wedit style="margin-top:8px;background:#f8fafc"><b>✏️ Correct it by hand</b> <span class="muted">The mark and the level follow from the rubric. Students see the change at once if the results are published.</span>`
+    +`<table style="margin:6px 0">${rows.map((x,i)=>`<tr><td style="text-align:left"><input class="wxRn" data-i="${i}" value="${esc(x.name)}" style="width:16em"></td><td><input class="wxRs" data-i="${i}" type="number" min="0" step="0.5" value="${esc(String(x.score))}" style="width:4.5em"> / <input class="wxRm" data-i="${i}" type="number" min="1" value="${esc(String(x.max))}" style="width:3.5em"></td></tr>`).join("")}</table>`
+    +`<label>💬 Comment<br><textarea class="wxFb" rows="3" style="width:100%">${esc(r.feedback||"")}</textarea></label>`
+    +`<label>✅ Corrected text <small class="muted">(the whole text, changing only the mistakes)</small><br><textarea class="wxCo" rows="6" style="width:100%">${esc(String(r.corrected||w.txt||"").replace(/\*/g,""))}</textarea></label>`
+    +`<label>❌ Mistakes <small class="muted">(one per line: mistake → correction → why)</small><br><textarea class="wxEr" rows="5" style="width:100%">${esc((r.errors||[]).map(x=>[x.orig,x.fix,x.why].map(y=>String(y||"").replace(/→/g,"->")).join(" → ")).join("\n"))}</textarea></label>`
+    +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-wx="wsave" data-u="${u}">💾 Save the correction</button><button class="g" data-wx="wedit" data-u="${u}">Cancel</button></div></div>`}
+function wxEditSave(u,ls){const box=$("#dlg [data-wedit]"),d=wxDoc(u),w=wxW(u,ls,d);if(!box||!w)return;const r=res(u,asId(ls)),old=((r.report||{}).writing)||{};
+  const rub=[...box.querySelectorAll(".wxRn")].map((x,i)=>({name:x.value.trim()||WXRUB[i]&&WXRUB[i][0]||"C"+(i+1),score:+box.querySelector(`.wxRs[data-i="${i}"]`).value||0,max:+box.querySelector(`.wxRm[data-i="${i}"]`).value||1}));
+  if(rub.some(x=>x.score<0||x.score>x.max))return alert("Each row needs points between 0 and its maximum.");
+  const got=rub.reduce((t,x)=>t+x.score,0),of=rub.reduce((t,x)=>t+x.max,0),orig=w.txt.trim(),score=orig?Math.round(got/of*w.max*10)/10:0,lv=wxDeg(score/w.max*10);
+  const co=box.querySelector(".wxCo").value.trim(),errors=box.querySelector(".wxEr").value.split("\n").map(l=>l.split("→").map(x=>x.trim())).filter(x=>x[0]).map(([orig,fix,why])=>({type:"",orig,fix:fix||"",why:why||""}));
+  const writing={original:orig||"(blank)",rubric:rub,feedback:box.querySelector(".wxFb").value.trim(),errors,corrected:co&&orig?wxStar(orig,co):null,by:"teacher",at:new Date().toISOString()};
+  if(old.copied)writing.copied=old.copied;
+  const o={ls,sections:{writing:{score,max:w.max}},levels:{writing:{"5.1":lv}},report:{writing},wredo:null,wdraft:null};if(!r.showFrom)o.showFrom=wxShow(d);
+  quick([patch(u,asId(ls),o),wxRedoOff(u,ls)]);WX.edit=null;wxDlg(u,ls)}
+const wxRedoOff=(u,ls)=>DEMO?null:put(["settings","marking"],{examRedo:{[u+"__"+ls]:F.deleteField()}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!b||!S.D)return;const k=b.dataset,ls=S.ls,grp=GR.find(g=>g.id===S.g),c=wxCfg(ls);if(!c||!grp)return;
   const studs=Object.values(S.P).filter(s=>s.group===S.g&&!s.away&&!s.tester);
   // ls/{ls}.webExam[group] = {open, mode, go, only, at} (the exam page and firestore.rules read it); live/{group}.exam = {on, href, ls,
@@ -3606,7 +3663,15 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
       wxSet({open:false,mode:false,go:null,only:null,at:new Date().toISOString()},null)},
     refresh:()=>{WX.ls=null;wxLoad(ls)},
     copy:async()=>{try{await navigator.clipboard.writeText(k.v);b.textContent="✓ Copied"}catch(x){prompt("Copy the link:",k.v)}},
-    save:()=>wxSave(ls,grp,studs),
+    pub:()=>wxPublish(grp,ls,studs,true),
+    unpub:()=>wxPublish(grp,ls,studs,false),
+    wedit:()=>{WX.edit=WX.edit===k.u?null:k.u;wxDlg(k.u,ls)},
+    wsave:()=>wxEditSave(k.u,ls),
+    wredo:()=>{const note=prompt("🔄 Correct again: Beltran corrects this writing again in the next marking run (it starts now).\n\nWhat should he look at? (optional)","");if(note===null)return;
+      const at=new Date().toISOString(),g=(S.P[k.u]||{}).group||"";
+      quick([patch(k.u,asId(ls),{ls,wredo:{at,note:note.trim()}}),DEMO?null:put(["settings","marking"],{examRedo:{[k.u+"__"+ls]:{uid:k.u,ls,key:c.key,group:g,at,note:note.trim()}}})]);
+      Promise.resolve(api.mkAsk(true)).catch(e=>console.warn("marking request",e));wxDlg(k.u,ls)},
+    wredox:()=>{quick([patch(k.u,asId(ls),{ls,wredo:null}),wxRedoOff(k.u,ls)]);wxDlg(k.u,ls)},
     dlg:()=>wxDlg(k.u,ls),
     mail:()=>{WX.mailTxt="";wxMailDlg(ls)},
     mopen:async()=>{const t=($("#wxMailIn")||{}).value||WX.mailTxt||"";WX.mailTxt=t;if(!window.ELExamSeal)return wxMailDlg(ls,null,"The page is still loading: try again in a second.");
@@ -3620,10 +3685,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
     wlv:()=>{const d=wxDoc(k.u),w=wxW(k.u,ls,d);if(!w)return;const sc=Math.round(WXLV[k.l]*w.max*10)/10;
       quick(patch(k.u,asId(ls),{sections:{writing:{score:sc,max:w.max}},levels:{writing:{"5.1":k.l}}}));render();wxDlg(k.u,ls)},
     acc:()=>{const K=wxKey(ls),it=K&&K[k.i];if(!it)return;it.extra=[...new Set((it.extra||[]).concat(k.v))];
-      Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).catch(x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
+      Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).then(()=>wxSync(ls),x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
     // ✗ Undo an accepted answer (Roger, 18 Nov 2026: "I accepted but it was a mistake, how do I undo this")
     unacc:()=>{const K=wxKey(ls),it=K&&K[k.i];if(!it)return;it.extra=(it.extra||[]).filter(x=>x!==k.v);
-      Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).catch(x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
+      Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).then(()=>wxSync(ls),x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
     reset:()=>{if(!confirm("Delete this student's exam? They start again from zero, with a new order. Their answers are lost."))return;$("#dlg").close();
       Promise.resolve(DEMO?null:F.deleteDoc(F.doc(db(),"students",k.u,"exams",c.key))).then(()=>{delete WX.docs[k.u];render()},x=>alert("Could not delete: "+x.message))}
   })[k.wx]?.()});
@@ -3640,7 +3705,7 @@ function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(xrSor
     return `<tr data-xrsel="${u}" data-ls="${esc(ls)}"${u===sel?' class="on"':""}><td class="n">${name(s)}</td><td>${x.version?esc(LV[x.version]||x.version):'<span class="muted">–</span>'}</td><td>${st(u)}${m&&m.out.length?`<br><small class="muted" title="Not done (late exam): left out of the mark, not 0">${esc(m.out.join(", "))} left out</small>`:""}</td>`
       +`<td><b>${m?f1(m.mark):"–"}</b></td><td>${rp||'<span class="muted">–</span>'}</td><td><button type="button" class="g mini" data-xr="open" data-u="${u}" data-ls="${esc(ls)}" title="Open the report bigger, on top of the dashboard">⤢</button></td></tr>`};
   return wxBox(grp,ls,studs)+`<div class="box"><h2>📝 ${esc(lsLabel(EL_LS.find(l=>l.id===ls)))} · exam ${ex?`<small class="muted">· ${esc(ELWeek.date(ex))}</small>`:""}</h2>`
-    +`<p class="muted"><b>${nd} of ${on.length} marked</b>${np?` · ${np} partly marked`:""}${avg!=null?` · average <b>${f1(avg)}</b>`:""} · ${nr} with a report${nOut?` · ${nOut} with a part left out (not done, not 0)`:""}${hd?` · <b style="color:#92400e">🔒 ${hold.length} hidden from the students until ${hd.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}, ${hd.toTimeString().slice(0,5)}</b> (they show by themselves then: nothing to accept)`:""}. Click a student to see their report on the right, exactly as they see it on their board; ⤢ opens it bigger. Type or change the points in 📊 Assessment details.</p>`
+    +`<p class="muted"><b>${nd} of ${on.length} marked</b>${np?` · ${np} partly marked`:""}${avg!=null?` · average <b>${f1(avg)}</b>`:""} · ${nr} with a report${nOut?` · ${nOut} with a part left out (not done, not 0)`:""}${hd?` · <b style="color:#92400e">🔒 ${hold.length} hidden from the students ${elHeldDay(hd.getTime())?"until "+hd.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+hd.toTimeString().slice(0,5)+"</b> (they show by themselves then, or press 📣 Publish the results above)":"</b> until you press 📣 Publish the results above"}`:""}. Click a student to see their report on the right, exactly as they see it on their board; ⤢ opens it bigger. Type or change the points in 📊 Assessment details.</p>`
     +`<div class="bar"><span class="muted">Order:</span> <button type="button" class="chip ${XR.best?"":"on"}" data-xr="best" data-v="0">A–Z</button><button type="button" class="chip ${XR.best?"on":""}" data-xr="best" data-v="1" title="Best exam mark at the top; students with no mark yet at the bottom">🏆 Best mark first</button></div>`
     +`<div class="fpwrap xrwrap"><div class="wrap"><table class="fpt xrt"><thead><tr><th>Student</th><th>Version</th><th>Marking</th><th>Exam<br><small class="muted">/10</small></th><th>Report</th><th></th></tr></thead><tbody>${studs.map(row).join("")}</tbody></table></div>`
     +`<aside class="fpside xrside" id="xrside" data-ls="${esc(ls)}" data-u="${sel||""}"${sel?"":' style="height:auto"'}>${sel?xrSideH(sel,ls):`<p class="muted">No exam marked yet in this LS. Once you type the points in 📊 Assessment details (or import them), each student's report shows here.</p>`}</aside></div></div>`}
