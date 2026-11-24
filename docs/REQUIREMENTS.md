@@ -575,7 +575,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 ---
 
-- **How it works / Help resources** (24 Nov 2026): the teacher dashboard has a dedicated How it works section, separate from Materials. The correction presentation is a permanent resource in student Help for both courses; no announcement, notification, homework or to-do item is created.
+- **How it works / Help resources** (24 Nov 2026): the teacher dashboard has a dedicated How it works section, separate from Materials. The correction presentation is an interactive HTML slide deck (not a PDF viewer), with slide navigation, keyboard controls and full screen, and is a permanent resource in student Help for both courses; no announcement, notification, homework or to-do item is created.
 
 ## 11. Technical work and deploying
 
