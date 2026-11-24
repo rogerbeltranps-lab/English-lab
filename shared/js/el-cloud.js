@@ -1577,7 +1577,7 @@ function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-t
 // the 🎓 class mode bar is fixed on top of the page: the page moves down by its height (body padding, the sticky top bar with 🔍 Dictionary,
 // the left menu and the path's column), so nothing hides behind it (problem report, 2ESOA, 13 Nov 2026: "the top green line is covering
 // the dictionary"). The 🌟 line under it counts too; ⛶ one step full screen (slpPlace, !important) adds the bars' height itself.
-function lockPad(){const b=document.getElementById("el-lock"),c=document.getElementById("el-cmcheer"),h=(b&&b.offsetHeight||0)+(c&&c.offsetHeight||0),R=document.documentElement;
+function lockPad(){const b=document.getElementById("el-lock")||document.getElementById("el-self"),c=document.getElementById("el-cmcheer"),h=(b&&b.offsetHeight||0)+(c&&c.offsetHeight||0),R=document.documentElement;
   if(h&&!document.getElementById("el-lock-pad-css")){const st=document.createElement("style");st.id="el-lock-pad-css";
     st.textContent="body.el-lockpad{padding-top:var(--el-lock-h,0px)}body.el-lockpad .topbar{top:var(--el-lock-h,0px)!important}body.el-lockpad .elrail{top:var(--el-lock-h,0px)!important}body.el-lockpad .ellpside{top:calc(var(--el-lock-h,0px) + 70px);max-height:calc(100vh - var(--el-lock-h,0px) - 80px)}";document.head.append(st)}
   if(R.style.getPropertyValue("--el-lock-h")!==h+"px")R.style.setProperty("--el-lock-h",h+"px");
@@ -1726,6 +1726,7 @@ function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
   if(cmReport(g))return;   // 📄 the teacher is showing the term report drafts: the student stays on their own
+  if(cmSelf(g)){if(LOCK){LOCK=null;lockBar()}return}   // 🧑‍🎓 self study: free on the site, their own pending work first
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
   if(g&&g.cm)return cmGo(g);
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
@@ -1828,6 +1829,32 @@ function cmLook(g){const l=g&&g.cm&&g.look;if(!l||l.s!==g.s||!(Date.now()-l.at<L
     +`#el-look div{display:flex;flex-direction:column;align-items:center;gap:6px}#el-look span{font-size:clamp(70px,14vw,150px);line-height:1;animation:ellk 1.6s ease-in-out infinite}`
     +`#el-look b{font-size:clamp(30px,5vw,56px);color:#fff}#el-look small{font-size:clamp(16px,2vw,22px);color:#e2e8f0}@keyframes ellk{50%{transform:scale(1.12)}}@media (prefers-reduced-motion:reduce){#el-look span{animation:none}}</style>`;
   document.body.append(x)}
+// 🧑‍🎓 Self study in class mode (Roger, 24 Nov 2026: "in class mode I want to have the option of self study to work on whatever they need
+// to"): while the teacher's class tab has 🧑‍🎓 Self study on (el-cm-agenda.js selfSet writes live/{group}.go.self = {s, at}; ✕ End self study
+// or ⏹ Stop clears it), every student in that class mode is let go (no 🎓 bar, no moves, every page of the site open, the class full screen
+// stays) and gets a bar at the top: ✅ My pending tasks (the ✅ To do card with its links, opened once by itself), 📖 the LS book and
+// 🎲 Games. When it goes, class mode takes them back to the teacher's step as usual. No extra reads: the To do list's own.
+const SELF_MS=90*60e3;
+const selfOn=g=>{const x=g&&g.cm&&g.self;return !!(x&&x.s===g.s&&Date.now()-x.at<SELF_MS&&elCmOn(g))};
+function selfOff(){const b=document.getElementById("el-self");if(b){b.remove();lockPad()}}
+function selfBook(){const c=courseOf(myGroup),ls=(window.EL_LS||[]).filter(l=>l.course===c&&!l.personal&&l.story).map(l=>l.id),last=ls[ls.length-1];
+  return last?(window.EL_CATALOG||[]).find(a=>a.ls===last&&/(^|\/)book\.html$/.test(a.path||"")):null}
+function cmSelf(g){const on=selfOn(g)&&!onDash&&!!user&&(isStudent(user)||!!AS)&&!window.EL_EXAM_LOCK;
+  if(!on){selfOff();return false}
+  const ca=lockCa(),t=(c,e)=>ca?c:e;let b=document.getElementById("el-self");
+  if(!b){b=document.createElement("div");b.id="el-self";b.setAttribute("role","status");
+    b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:700 15px system-ui,sans-serif;background:#4338ca;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
+    const bk=selfBook(),bs="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;text-decoration:none;";
+    b.innerHTML=`<span>🧑‍🎓 ${t("Estudi personal: treballa en el que necessitis","Self study: work on what you need")}</span>`
+      +`<button type="button" data-self="todo" style="${bs}background:#fff;color:#4338ca">✅ ${t("Les meves tasques pendents","My pending tasks")}</button>`
+      +(bk?`<a data-self="book" href="${new URL(bk.path,ROOT).href}#book" style="${bs}background:#4338ca;color:#fff">📖 ${t("El llibre","The book")}</a>`:"")
+      +`<a data-self="games" href="${new URL("lab/",ROOT).href}" style="${bs}background:#4338ca;color:#fff">🎲 ${t("Jocs","Games")}</a>`;
+    b.addEventListener("click",e=>{const x=e.target.closest("[data-self=todo]");if(!x)return;selfTodo()});
+    document.body.prepend(b);lockPad()}
+  const k="el_self_seen";let was="";try{was=sessionStorage.getItem(k)||""}catch(e){}
+  if(was!==String(g.self.at)&&!cmSelf.busy){cmSelf.busy=1;setTimeout(()=>selfTodo().then(ok=>{cmSelf.busy=0;if(ok)try{sessionStorage.setItem(k,String(g.self.at))}catch(e){}}),600)}   // once: their pending tasks (seen once it showed)
+  return true}
+function selfTodo(){if(document.getElementById("el-rem"))return Promise.resolve(true);return import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.remind({links:true})).catch(e=>{console.warn("self study",e);return false})}
 // 📄 Term report drafts in class (Roger, 23 Nov 2026: "make sure they dont see them… I will show them the draft in class, I will need a button
 // saying show draft"; "not before"): while the teacher's class tab has 📄 Show draft reports on (el-cm-agenda.js repSet writes
 // live/{group}.go.report = {s, at}; ✕ Hide or ⏹ Stop clears it), every student in that class mode is taken to their own report
@@ -1857,7 +1884,7 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
       b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:2147481990;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;font:800 clamp(18px,2.3vw,28px)/1.25 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(67,56,202,.3)";
       document.body.append(b)}
     b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
-    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";cmTopSpace()};
+    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock")||document.getElementById("el-self"),top=l?l.offsetHeight:0;b.style.top=top+"px";cmTopSpace()};
     clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
