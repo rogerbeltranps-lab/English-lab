@@ -342,7 +342,9 @@ const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];retur
 // they can only see it not do it"): when the group has an agenda, a tab of an open learning path that is on no class day at all (nor ticked
 // as done in class, set as homework or pulled up; nor a path planned whole) is 🏫 for class too: shown read-only, never To do, like a tab
 // planned for a later day (it gets no day on its note). The tabs for a later day + these: [panel id].
-const laterTabs=(a,info,gid)=>{const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
+// 📖 The book is always open to read (Roger, 24 Nov 2026: "they did the book as fast finishers so I want them to be able to see the book and
+// turn the pages"): never hidden or read-only because the Time plan has no Book day (or a later one); its chapters are due only on Book days
+const laterTabs=(a,info,gid)=>{if(a&&elBookPath(a))return [];const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
   const S=(window.EL_SECTIONS||{})[a.id],ids=elBookPath(a)?["book"]:S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
   const un=ids.filter(id=>elSecSteps(a,id).length&&!L.planned.has(a.id+"#"+id)&&!L.free.has(a.id+"#"+id));
   return un.length?[...new Set([...later,...un])]:later};
