@@ -368,7 +368,7 @@ Every LS from LS2 on ends with a Reflect page whose **first tab is a self-assess
 **Weekdays from 17:00 (Roger, 24 Nov 2026: "These answers must be in the afternoon from 17h and the same for all the corrections during
 weekdays at 17h"; "all the writing and corrections everyday at 17 except for weekends. Reports are done immediately but we don't send
 an answers until I press the button"; it replaces the 08:00-18:00 window below).** The scheduled task "English Lab: mark and correct"
-runs every weekday at 15:13 Madrid (was Wednesday); `ELMark.lastRun()` is the last weekday before today and the dashboard's `corrNext()`
+runs every weekday at 17:33 Madrid (Roger, 24 Nov 2026: "I want the corrections on weekdays at 17:33"; first 15:13, before that Wednesday), so its corrections fall inside the 17:00-21:00 window and students see them as soon as they are saved; `ELMark.lastRun()` is the last weekday before today and the dashboard's `corrNext()`
 the next weekday run. Problem reports: `auto.mjs fixed` saves the ✅ card with `at` = 2100-01-01 and `auto.wait: true`; the report stays
 open (`pbWait`, "Fixed · send answer") until Roger's 📨 Send it (`pbNow` sets `at` = now). Comment answers: `replyAt()` now gives at least 2 hours after the comment or report,
 Monday to Friday 17:00-21:00 Madrid (a few random minutes, never after 20:55), else the next weekday 17:00-17:25. New `corrAt()`:

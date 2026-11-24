@@ -127,11 +127,11 @@ window.ELMark=(function(){
           done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
-  // Claude's marking runs every weekday at about 15:15, so students see the corrections at 17:00 (Roger, 24 Nov 2026: "all the writing
+  // Claude's marking runs every weekday at 17:33 and students see the corrections as soon as they are written (Roger, 24 Nov 2026: "I want the corrections on weekdays at 17:33"; first 15:13 with students seeing them at 17:00: "all the writing
   // and corrections everyday at 17 except for weekends"; it was Wednesday only from 1 Nov 2026). A piece
   // (ready on day `since`: a level moment's ready day or later hand-in, or a hand-in waiting for a correction) is late when it was ready
   // before the last run (the last weekday before today) and still has nothing: by then that run should have done it. The day of a run itself never counts as
-  // late (the piece may have come in after 15:00). Same rule on the dashboard (❌ Claude's marking is late) and in marks.mjs audit.
+  // late (the piece may have come in after the run). Same rule on the dashboard (❌ Claude's marking is late) and in marks.mjs audit.
   // the last weekday before today (Monday to Friday; 0 = Sunday)
   function lastRun(today){const W=window.ELWeek,d=new Date(today+"T12:00:00Z").getUTCDay();return W.add(today,-(d===1?3:d===0?2:1))}
   function late(since,today){return !!since&&since<lastRun(today)}
