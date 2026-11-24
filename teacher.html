@@ -964,12 +964,12 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
   if(fl&&!fl.done)return {i:"⚠️ copy?",t:"Possible copy: waiting for you in the To do"+(fl.why?" ("+fl.why+")":""),c:"wrc"};
   if(mo){const lv=Object.values((x.levels||{})[k]||{});const mk=(x.marked||{})[k],again=mk&&day&&String(mk).slice(0,10)<day;
     if(lv.length&&!again)return {i:lv.join(" "),t:"Level given"+(mk?" on "+String(mk).slice(0,10):""),c:"wrl"};
-    return {i:late?"❌ late":"📨 Wed",t:(again?"Handed in again":"Handed in")+on+(late?": it should have been marked in the last Wednesday run":": marked in the Wednesday run"),c:late?"wrx":"wrw"}}
+    return {i:late?"❌ late":"📨 next run",t:(again?"Handed in again":"Handed in")+on+(late?": it should have been marked in the last afternoon run":": marked in the next afternoon run (weekdays)"),c:late?"wrx":"wrw"}}
   const v=sigOf(JSON.stringify(it.fields)),fs=(x.fbSig||{})[k],rp=(x.replies||{})[k];
   if(fs===v)return {i:"✏️ corrected",t:"Corrected (the student sees the correction in the step)",c:"wrk"};
   if(rp&&!fs)return {i:"✏️ answered",t:"You answered it by hand",c:"wrk"};
   if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return fl.back?{i:"↩ sent back",t:"You sent it back"+(fl.at?" on "+String(fl.at).slice(0,10):"")+": waiting for the new version",c:"wrc"}:{i:"🔁 redo",t:fl.auto?"Mostly pasted: sent back automatically on Wednesday to redo (note sent)":"Possible copy: sent back to redo (note sent)",c:"wrc"};
-  return {i:late?"❌ late":fs?"📨 new":"📨 Wed",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last Wednesday run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
+  return {i:late?"❌ late":fs?"📨 new":"📨 next run",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last afternoon run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
 // 🔊 the student's recording of a Speaking or Talk hand-in (Roger, 8 Nov 2026: "I should see an audio emoji which I can listen"): saved in
 // Teacher Studio › 04_Students (private) › Speaking recordings by the school Apps Script (el-mic.js upload); x.audio = {id, s}. It opens
 // in Drive, signed in as the teacher. No Firestore reads: it comes with the hand-in.
@@ -1032,14 +1032,14 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   const sp=/speak|talk/.test(step),isNote=y=>sp&&/^Notes from the recording/.test(y.l),isTr=y=>sp&&(y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació");
   const notes=f.filter(isNote),aud=(((pstate(u,a)||{}).steps||{})[step]||{}).audio;
   const roig=!sp?"":notes.length?`<p style="margin:12px 0 4px"><b>🤖 Roig's feedback on the recording</b> <small class="muted">(task and pronunciation · written when it was handed in${aud&&aud.eur?" · €"+(+aud.eur).toFixed(3):""})</small></p>`+notes.map(y=>`<div class="hand" style="border-left:4px solid #7c3aed;background:#f5f3ff"><p style="white-space:pre-wrap;margin:0">${esc(y.v)}</p></div>`).join("")
-    :aud&&aud.id?`<p class="muted">🤖 <b>No feedback from Roig</b> on this recording (the recording could not be checked when it was handed in): the Wednesday correction is written from the transcript.</p>`:"";
+    :aud&&aud.id?`<p class="muted">🤖 <b>No feedback from Roig</b> on this recording (the recording could not be checked when it was handed in): the afternoon correction is written from the transcript.</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.filter(y=>!isNote(y)).map(y=>`<p><b>${esc(y.l==="Text"&&sp?"What they said (transcript)":isTr(y)?"What they said (Roig's transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
     <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp?spkBox(u,aid,step):""}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+fbHold(u,aid,step,x)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
-      :`<p><b>Handed in</b> <small class="muted">(no correction yet: Beltran corrects it in the Wednesday run)</small></p>${more(f)}`}
+      :`<p><b>Handed in</b> <small class="muted">(no correction yet: Beltran corrects it in the next afternoon run, weekdays)</small></p>${more(f)}`}
     ${(h=>h&&(ELMark.q(h)||cmtCa(x,h,step))?`<div class="hand" style="border-left:4px solid #2563eb">${cmtBox(u,a,step,h,true)}</div>`:"")(((pstate(u,a)||{}).steps||{})[step])}
     ${canBack?backBox(u,aid,step,orig):""}
     <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
@@ -2698,7 +2698,7 @@ function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;
   return `<div class="wrap ctw"><table class="ctab"><thead><tr><th>Student</th><th>Course</th><th>Task</th><th>Day</th></tr></thead>${body}</table></div>`}
 const corrHead=(t,L)=>{const E=L.filter(i=>i.eur!=null),sum=E.reduce((a,i)=>a+i.eur,0);
   return `<div class="chead"><h2 style="margin:0">${t}</h2><span class="muted">${L.length?plural(new Set(L.map(i=>i.u)).size,"student")+" · "+plural(L.length,"correction"):""}${E.length?` · 💶 <b>${eurTx(sum,E.some(i=>i.est))}</b> in all`:""}</span></div>`};
-// the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
+// the next scheduled run: every weekday at about 15:15 (Madrid time; the scheduled task starts at 15:13; Roger, 24 Nov 2026)
 // what the asked card says: started at once by the school script (fd), or why not and what to do
 function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).request||{}).err,why=e==="no task token"?"the task's token is not in your school script yet"
     :e==="old script"?"your school script is the old version":e?"the school script said: "+esc(e):"";
@@ -2706,7 +2706,7 @@ function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).reques
   if(st.fd)return `Beltran got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} but has not started after 20 minutes. Open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`;
   return `It could not start at once${why?" ("+why+")":""}. A backup check on GitHub will start it, but that can take a few hours. To start it now, open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`}
 function corrNext(){const now=window.EL_NOW?new Date(window.EL_NOW):new Date();for(let k=0;k<8;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k);
-  if(d.getDay()===3&&!(k===0&&now.getHours()*60+now.getMinutes()>=14*60+43))return d}return null}
+  if(d.getDay()>=1&&d.getDay()<=5&&!(k===0&&now.getHours()*60+now.getMinutes()>=15*60+13))return d}return null}
 const corrWhen=v=>new Date(v).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const corrDay=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
 // where the request is: {s: "asked" | "running" | "done" | "idle", ...}
@@ -2730,9 +2730,9 @@ function corrPage(){
   // one line at the top instead of the big blue card (Roger, 14 Nov 2026: "The blue box is not needed"): when the next run is, what is
   // waiting, ✏️ Correct everything waiting now and 💶 Gemini this month; while Claude is asked or correcting, that state and ↻ Check again
   const card=`<div class="cbar2"><span>`+(chk&&st.s!=="running"&&st.s!=="asked"?`⏳ Fetching your students' latest work… <span class="muted">(Beltran corrected work on ${esc(corrWhen(corrRanAt()))})</span>`
-    :st.s==="running"?`✏️ <b>Beltran is correcting now</b> <span class="muted">· started ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":" (the Wednesday run)"} · usually 20 to 60 minutes</span>`
+    :st.s==="running"?`✏️ <b>Beltran is correcting now</b> <span class="muted">· started ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":" (the afternoon run)"} · usually 20 to 60 minutes</span>`
     :st.s==="asked"?`<b>${st.slow?"⚠️ Not started yet":"⏳ Starting now"}</b> <span class="muted">· asked ${esc(corrWhen(st.rq))}.</span> ${corrAskMsg(st,RUN)}`
-    :`Next correction: <b>${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"}, about 15:00</b> · ${allNow?`<b>${plural(allNow,"piece")} waiting</b>`:"nothing waiting"}${st.st?` <span class="muted">· last run ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}</span>`:""}`)
+    :`Next correction: <b>${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Monday"}, about 15:15</b> · ${allNow?`<b>${plural(allNow,"piece")} waiting</b>`:"nothing waiting"}${st.st?` <span class="muted">· last run ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}</span>`:""}`)
     +`</span><span class="cbtns">${st.s==="running"||st.s==="asked"?`<button class="mini" data-do="corrcheck">↻ Check again</button>`:""}${st.s==="asked"?`<button class="g mini" data-do="corrcancel">✕ Cancel the request</button>`:""}`
     +`${allNow&&st.s!=="running"&&st.s!=="asked"&&!chk?`<button class="mini" data-do="corrask">✏️ Correct everything waiting now</button>`:""}<button class="g mini" data-fpg="cost" title="What Roig cost this month: speaking recordings transcribed and final product videos watched">💶 Roig this month</button></span></div>`;
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
@@ -2752,7 +2752,7 @@ function corrPage(){
     return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Beltran corrects everything that is waiting now ("+fullName(s||{})+"'s work too): it starts within a few minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
   const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
   const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length&&!chk?fixB("Correct everything now","Beltran corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
-    +`<p class="muted">Everything students handed in that has no correction yet. Beltran corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
+    +`<p class="muted">Everything students handed in that has no correction yet. Beltran corrects it every weekday afternoon (students see it at 17:00), or now if you press the button. Click a piece to see what they wrote.</p>`
     +(chk?`<p class="muted">⏳ Fetching the latest work…</p></div>`:"")+(chk?"":(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Beltran in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
       ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
@@ -2762,19 +2762,19 @@ function corrPage(){
   const Gm=corrScan().gem.concat(corrFpGem()).filter(gf);setTimeout(corrFind);
   const gemB=`<div class="box">${corrHead("🔷 Roig's corrections",Gm)}<p class="muted">Speaking recordings Roig transcribed, with its notes on the task and pronunciation, and final product videos it drafted on the rubric. 💶 is what each one cost (≈ an estimate for the older ones). Click a day to open it.</p>`
     +corrTable(Gm,`Nothing from Roig yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
-  const claB=`<div class="box">${corrHead("✏️ Beltran's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected on Wednesdays (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got.</p>`
+  const claB=`<div class="box">${corrHead("✏️ Beltran's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected every weekday afternoon (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got.</p>`
     +corrTable(Dn,`No corrections yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
   const infoB=`<div class="box">${fold("corrinfo","ⓘ What runs on its own and what needs Beltran",`
     <h3>Works on its own</h3><p>The whole site: sign-in, saving answers, every activity that marks itself, checkpoints, games, class mode and full screen, this dashboard, marks and levels, announcements, homework and the calendar feed. The emails (problem alerts, your Saturday summary, the students' Sunday email) are sent by a free GitHub Action through your school's Apps Script.</p>
     <h3>Needs Beltran (scheduled tasks)</h3><ul>
-      <li><b>Wednesday about 15:00</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
+      <li><b>Every weekday about 15:15</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
       <li><b>A few minutes after a student comments on their work</b> · Beltran answers it (anything that needs you shows 🙋 in the To do; what it said is under 🗨️ in the To do, to edit or remove). <b>Friday 15:00</b> answers any comment left.</li>
-      <li><b>When students see it</b> · Beltran's corrections and answers (comments and problem reports) reach students only <b>Monday to Friday from 17:00</b>: Wednesday's corrections at 17:00, an answer at least 2 hours after the comment, and anything written in the evening (after 21:00) or at the weekend on the next weekday at 17:00. Until then it shows 🕗 Not shown yet here, with 📨 Show it now. What you write yourself shows at once.</li>
-      <li><b>Friday 19:37</b> · checks that Wednesday's run worked and warns you on your phone if it did not.</li>
-      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within a few minutes).</li>
+      <li><b>When students see it</b> · Beltran's corrections and answers to comments reach students only <b>Monday to Friday from 17:00</b>: the afternoon's corrections at 17:00, an answer to a comment at least 2 hours after it, and anything written in the evening (after 21:00) or at the weekend on the next weekday at 17:00. Until then it shows 🕗 Not shown yet here, with 📨 Show it now. What you write yourself shows at once. <b>Problem reports</b>: bugs and small tweaks are fixed at once, but the student's answer waits until you press 📨 Send it on the report.</li>
+      <li><b>Friday 19:37</b> · checks that the week's runs worked and warns you on your phone if it did not.</li>
+      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as the afternoon run, at once (it starts within a few minutes; students still see it from 17:00 on a weekday).</li>
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Beltran stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
-  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">What Roig and Beltran corrected, by student · Beltran corrects every Wednesday</div></div>`
+  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">What Roig and Beltran corrected, by student · Beltran corrects every weekday · students see it at 17:00</div></div>`
     +`${stale}${card}${gchips}<div class="hl">${gemB}${claB}</div><div class="hgrid" style="margin-top:12px"><div class="hl">${waitB}</div><div class="hl">${infoB}</div></div>`}
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
   if(k.k==="answer"||k.k==="gfp")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
@@ -2786,7 +2786,7 @@ const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_
 const askBadge=(n,g)=>n?` <small class="ask" data-do="ask" data-g="${g}" role="link" title="${n} student${n>1?"s":""} asked for a level change: click to answer (Accept or Decline in the group's To do)">🎯 ${n} level ask${n>1?"s":""}</small>`:"";
 const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
-  const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
+  const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 15:15";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
@@ -5297,7 +5297,9 @@ function sgBox(){
 // above "You answered … read ✓": "Pensava q això ja ho havia contestat"): any answer sent and not taken back, whichever button sent it
 // (📨 Send, ✏️ Edit first or ↩ Answer). It leaves the open list and every count, shows "💬 Answered", and its suggested reply goes away.
 const pbAns=x=>!x.teacher&&(x.msgs||[]).some(m=>!m.back);
-const pbDone=x=>!!x.fixed||pbAns(x);
+// a report Beltran fixed whose ✅ answer waits for your 📨 Send it (auto.wait, Roger 24 Nov 2026) stays in the open list until you send it
+const pbWait=x=>!!(x.fixed&&!x.teacher&&x.auto&&x.auto.wait&&!x.auto.shown&&tms(x.auto.go)>Date.now());
+const pbDone=x=>!!x.fixed&&!pbWait(x)||pbAns(x);
 function pbNew(){return ((S.D||{}).pb||[]).filter(x=>!pbDone(x)&&!x.seen)}
 // an idea you answered is not new any more, even if it was never marked as read (same rule as pbAns)
 function sgNew(){return ((S.D||{}).sg||[]).filter(x=>!x.read&&!sgDone(x))}
@@ -5329,7 +5331,7 @@ function pbBox(){
     return ibMail("pb-"+esc(x.id),esc(PB_KIND[x.kind]||x.kind),tags,x,gr(x),x.route?" "+route(x.route):"",pbWhen(x),wh,x.text,rest,tools)};
   const x=S.pbOpen&&L.find(y=>y.id===S.pbOpen);
   if(x)return `<div class="box ibx" id="probs"><button class="g ibback" data-do="pbview" data-id="">‹ All reports</button><div class="pbl">${li(x)}</div></div>`;
-  const st=x=>{if(x.fixed)return `<span class="iblab">${x.nobug?"Closed":"Fixed"}</span>`;if(pbAns(x))return '<span class="iblab" title="You answered the student">Answered</span>';const k=pbStatus(x.auto),todo=x.auto&&x.auto.reply&&!x.teacher;
+  const st=x=>{if(pbWait(x)&&!pbAns(x))return '<span class="iblab you" title="Beltran fixed it: the answer waits for you to press 📨 Send it">Fixed · send answer</span>';if(x.fixed)return `<span class="iblab">${x.nobug?"Closed":"Fixed"}</span>`;if(pbAns(x))return '<span class="iblab" title="You answered the student">Answered</span>';const k=pbStatus(x.auto),todo=x.auto&&x.auto.reply&&!x.teacher;
     return k?`<span class="iblab ${k==="you"?"you":""}" title="Beltran's check${todo?": a reply is ready for you to send":""}">${{fixed:"Fixed",nobug:"Not a bug",you:"Needs you"}[k]}${todo?" · reply ready":""}</span>`:""};
   const open=L.filter(x=>!pbDone(x)),done=L.filter(pbDone),row=x=>ibRow(x,"pbview",!pbDone(x)&&!x.seen,x.teacher?"<b>👨‍🏫 You</b>":esc(ibSender(x)),gr(x),esc(PB_KIND[x.kind]||x.kind),x.text,(x.msgs||[]).length,pbWhen(x),st(x));
   return `<div class="box ibx" id="probs"><h2>⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small></h2>`
@@ -5399,7 +5401,7 @@ const PB_ST={fixed:["✅ Fixed","Send and mark as fixed"],nobug:["👍 Not a bug
 const pbStatus=a=>a?PB_ST[a.status]?a.status:a.verdict==="fixed"?"fixed":"you":null;
 const pbAuto=x=>{const a=x.auto,st=pbStatus(a);if(!a||!(a.note||a.reply))return "";const en=!!x.route&&!elCa(x.route),[lab,btn]=PB_ST[st],ans=pbAns(x)&&!x.fixed;
   const sent=pbAns(x)||x.fixed||(a.verdict==="fixed"&&!a.reply),fixMode=st==="fixed"?"1":st==="nobug"?"close":"";
-  return `<div class="pbauto"><span class="pbst ${ans?"ans":st}">${ans?"💬 Answered":lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed&&!ans?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}${a.go>Date.now()&&!a.shown&&x.fixed&&!x.teacher?`<div class="pbhold">🕗 Not shown yet: the student gets Beltran's ✅ card at ${goWhen(a.go)} (weekdays from 17:00, at least 2 hours after the report).<button class="g" data-do="pbnow" data-id="${esc(x.id)}" title="The card shows on the student's next page from now">📨 Show it now</button></div>`:""}</div>`
+  return `<div class="pbauto"><span class="pbst ${ans?"ans":st}">${ans?"💬 Answered":lab}</span> ${a.verdict==="fixed"&&!a.status?"🤖 Fixed automatically: ":""}${esc(a.note||"")}${a.todo&&!x.fixed&&!ans?`<div class="pbtodo">👉 First: ${esc(a.todo)}</div>`:""}${a.go>Date.now()&&!a.shown&&x.fixed&&!x.teacher?`<div class="pbhold">${a.wait?`🕗 <b>Waiting for you</b>: the student gets Beltran's ✅ answer only when you press 📨 Send it.`:`🕗 Not shown yet: the student gets Beltran's ✅ card at ${goWhen(a.go)} (weekdays from 17:00, at least 2 hours after the report).`}<button class="g" data-do="pbnow" data-id="${esc(x.id)}" title="The card shows on the student's next page from now">📨 ${a.wait?"Send it":"Show it now"}</button></div>`:""}</div>`
     +(a.reply&&!sent&&!x.teacher?`<div class="pbsug"><b>💬 Suggested reply</b> <small class="muted">(${en?"English":"Catalan"} first, like their route${a.reply2?`, and the ${en?"Catalan":"English"} version under it`:"; ✏️ Edit first adds the other language"}; they see it on a card the next time they open a page)</small><p>${esc(pbRe(x,"reply"))}</p>${a.reply2?`<p><span class="muted">🌐 ${en?"Catalan":"English"}:</span> ${esc(pbRe(x,"reply2"))}</p>`:""}
     <button data-do="pbsug" data-id="${esc(x.id)}" data-f="${fixMode}" title="${st==="fixed"?"One card: the ✅ fixed note with this message under it":st==="nobug"?"The student gets this message and the report is closed":"The student gets this message; the report stays open"}">📨 ${btn}</button> <button class="g" data-do="pbsuged" data-id="${esc(x.id)}">✏️ Edit first</button></div>`:"")};
 // the card a student gets for an answer to their suggestion: in the language of their level now (Catalan for Starter, Base or no level yet)
