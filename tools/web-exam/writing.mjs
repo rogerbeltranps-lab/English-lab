@@ -13,6 +13,13 @@
 //       Without --apply it only prints what would change. --draft (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their
 //       provisional marks here") writes only results/{ls}__assessment.wdraft {score, max, level, at}: the dashboard's web exam table shows it
 //       as "≈ 6.5 draft" and a provisional exam mark; students never see it. The real import (--apply) removes the draft.
+//   node tools/web-exam/writing.mjs redo <out.json>
+//       🔄 Correct again (Roger, 24 Nov 2026: "change the writing correction with a button correct again or correct manually"): the writings
+//       the teacher asked to correct again on the dashboard (settings/marking.examRedo, one read), as `export` writes them plus `note` (what to
+//       look at), `key`, `ls` and `before` (the correction now). Correct them and `import <key> <ls> <marked.json> --apply` per exam key:
+//       the import clears results .wredo and the examRedo entry. "No writings to correct again." when there are none (the marking run's step).
+// Results come out when the teacher presses 📣 Publish on the dashboard (Roger, 24 Nov 2026): a record without showFrom gets 9999-12-31
+// (held until then); a showFrom already there (a date, or published) stays. The dashboard saves the other parts by itself (wxSync).
 // Both files hold personal data: keep them outside the repo (project files alumnes/ or the exam's folder).
 // Sign-in: FIREBASE_SERVICE_ACCOUNT (the cloud environment's secret), else the Firebase CLI login on Roger's computer (as tools/exam-marks).
 import fs from "node:fs";
@@ -24,7 +31,7 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT = "english-lab-ietm", ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const args = process.argv.slice(2), draft = args.includes("--draft"), apply = args.includes("--apply") || draft, [cmd, key, a3, a4] = args.filter(a => !a.startsWith("--"));
-if (!["export", "import"].includes(cmd) || !key || !a3 || (cmd === "import" && !a4)) {
+if (!(cmd === "redo" && key) && (!["export", "import"].includes(cmd) || !key || !a3 || (cmd === "import" && !a4))) {
   console.error("Usage: node writing.mjs export <exam key> <out.json>\n       node writing.mjs import <exam key> <ls id> <marked.json> [--apply]"); process.exit(1); }
 
 async function token() {
@@ -71,16 +78,39 @@ async function exams() {
 }
 const wid = d => ((d.order || {}).writing || [])[0];
 
+// the exam page's data file of this key (the tasks): every <course>/<ls>/data/exam.js
+function examData(k) {
+  for (const c of ["2eso", "4eso"]) for (const l of fs.readdirSync(path.join(ROOT, c), { withFileTypes: true })) {
+    const f = path.join(ROOT, c, l.name, "data/exam.js"); if (!l.isDirectory() || !fs.existsSync(f)) continue;
+    const ctx = { window: {} }; vm.runInNewContext(fs.readFileSync(f, "utf8"), ctx); if (ctx.window.EL_EXAM && ctx.window.EL_EXAM.key === k) return ctx.window.EL_EXAM; }
+  return null;
+}
+async function exportOne(uid, d, X) {
+  const id = wid(d); if (!id) return null;
+  const st = await api("GET", DOCS + "students/" + uid, null, true), s = st ? dec({ mapValue: { fields: st.fields } }) : {};
+  const it = X ? (X.papers[d.paper]?.sections.writing || []).find(x => x.id === id) : null, sn = (d.snaps || [])[0];
+  const text = String((d.answers || {})[id] || "").trim(), first = sn ? String((sn.answers || {})[id] || "").trim() : null;
+  return { name: s.name || "", email: s.email || "", group: d.group, paper: d.paper, lang: d.level === "beginners" ? "ca" : "en", status: d.status,
+    task: it ? it.q : "", min: it ? it.min : null, words: words(text), text, firstText: first != null && first !== text ? first : undefined };
+}
+if (cmd === "redo") {
+  const m = await api("GET", DOCS + "settings/marking", null, true), R = m && m.fields && m.fields.examRedo ? dec(m.fields.examRedo) : {}, out = {};
+  for (const r of Object.values(R || {})) {
+    if (!r || !r.uid || !r.key) continue;
+    const x = await api("GET", DOCS + "students/" + r.uid + "/exams/" + r.key, null, true); if (!x || !x.fields) { console.log("✗ " + r.uid + ": no exam " + r.key); continue; }
+    const one = await exportOne(r.uid, dec({ mapValue: { fields: x.fields } }), examData(r.key)); if (!one) continue;
+    const cur = await api("GET", DOCS + "students/" + r.uid + "/results/" + encodeURIComponent(r.ls + "__assessment"), null, true);
+    out[r.uid] = Object.assign(one, { key: r.key, ls: r.ls, note: r.note || "", asked: r.at, before: cur && cur.fields && cur.fields.report ? (dec(cur.fields.report) || {}).writing || null : null });
+  }
+  const n = Object.keys(out).length; if (!n) { console.log("No writings to correct again."); process.exit(0); }
+  fs.writeFileSync(key, JSON.stringify(out, null, 1));
+  console.log("✓ " + key + ": " + n + " writing(s) to correct again (" + [...new Set(Object.values(out).map(x => x.key + " " + x.ls))].join(", ") + "). Import each exam key with --apply.");
+  process.exit(0);
+}
 if (cmd === "export") {
-  const ctx = { window: {} }; vm.runInNewContext(fs.readFileSync(path.join(ROOT, "2eso/free-time-live/data/exam.js"), "utf8"), ctx);   // the tasks
-  const X = ctx.window.EL_EXAM, out = {};
+  const X = examData(key), out = {};
   for (const { uid, d } of await exams()) {
-    const id = wid(d); if (!id) continue;
-    const st = await api("GET", DOCS + "students/" + uid, null, true), s = st ? dec({ mapValue: { fields: st.fields } }) : {};
-    const it = X && X.key === key ? (X.papers[d.paper]?.sections.writing || []).find(x => x.id === id) : null, sn = (d.snaps || [])[0];
-    const text = String((d.answers || {})[id] || "").trim(), first = sn ? String((sn.answers || {})[id] || "").trim() : null;
-    out[uid] = { name: s.name || "", email: s.email || "", group: d.group, paper: d.paper, lang: d.level === "beginners" ? "ca" : "en", status: d.status,
-      task: it ? it.q : "", min: it ? it.min : null, words: words(text), text, firstText: first != null && first !== text ? first : undefined };
+    const one = await exportOne(uid, d, X); if (one) out[uid] = one;
   }
   fs.writeFileSync(a3, JSON.stringify(out, null, 1));
   const v = Object.values(out); console.log("✓ " + a3 + ": " + v.length + " writings (" + v.filter(x => x.status === "done").length + " turned in, " + v.filter(x => !x.words).length + " blank)");
@@ -110,11 +140,11 @@ if (cmd === "export") {
     // `updated` too: the dashboard only fetches results whose `updated` is newer than its copy (Roger, 23 Nov 2026: the saved marks didn't show)
     const upd = { timestampValue: new Date().toISOString() };
     if (draft) { await api("PATCH", rid + "?updateMask.fieldPaths=wdraft&updateMask.fieldPaths=updated", { fields: { wdraft: enc({ score, max: MAX, level: lv, at: new Date().toISOString() }), updated: upd } }); continue; }
-    // students see it 4 days after the exam at 8:00 Madrid (7:00 UTC in winter), as the dashboard's 📥 Save marks (showFrom; kept if already set)
+    // students see it when the teacher presses 📣 Publish (showFrom kept if already set, else held: 9999-12-31); a 🔄 Correct again is done
     const cur = await api("GET", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment"), null, true), sf = cur && cur.fields && cur.fields.showFrom && dec(cur.fields.showFrom);
-    const day = new Date(d.done || d.started || Date.now()); day.setUTCDate(day.getUTCDate() + 4); day.setUTCHours(7, 0, 0, 0);
-    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom", "wdraft", "updated"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
-      { fields: { ls: enc(ls), activity: enc(ls + "/assessment"), sections: enc({ writing: { score, max: MAX } }), levels: enc({ writing: { "5.1": lv } }), report: enc({ writing }), showFrom: enc(sf || day.toISOString()), updated: upd } });
+    await api("PATCH", DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment") + "?" + ["sections.writing", "levels.writing", "report.writing", "ls", "activity", "showFrom", "wdraft", "wredo", "updated"].map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&"),
+      { fields: { ls: enc(ls), activity: enc(ls + "/assessment"), sections: enc({ writing: { score, max: MAX } }), levels: enc({ writing: { "5.1": lv } }), report: enc({ writing }), showFrom: enc(sf || "9999-12-31T00:00:00.000Z"), updated: upd } });
+    await api("PATCH", DOCS + "settings/marking?updateMask.fieldPaths=" + encodeURIComponent("examRedo.`" + uid + "__" + ls + "`"), { fields: {} }).catch(e => console.warn("examRedo", e.message));
   }
   console.log(apply ? "\nWritten" + (draft ? " as drafts" : "") + ": " + n : "\nNothing written: run again with --draft (provisional, dashboard only) or --apply.");
 }

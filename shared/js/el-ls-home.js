@@ -230,7 +230,7 @@
   function skillsCard(){
     const D=skillData(),T=teach();
     const bar=(lab,p,k,note)=>`<div class="sk-b"><em>${lab}</em><span class="sk-bar"><i style="width:${p||0}%;background:${SKL[k][2]}"></i></span><strong${p==null?' class="na"':""}>${p==null?(note||"–"):p+" %"}</strong></div>`;
-    const heldTx=D.held?(()=>{const d=new Date(D.held);return t("Resultats de l'examen: ","Exam results: ")+d.toLocaleDateString(CA?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})})():"";
+    const heldTx=D.held?(()=>{const d=window.elHeldDay?elHeldDay(D.held):new Date(D.held);if(!d)return t("Resultats de l'examen: aviat","Exam results: soon");return t("Resultats de l'examen: ","Exam results: ")+d.toLocaleDateString(CA?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})})():"";
     const row=k=>{const a=D.act[k],e=D.ex[k],pa=a?pc(a.s,a.n):null,pe=e&&e.m?Math.round(e.s/e.m*100):null;
       return `<div class="sk-row" style="--k:${SKL[k][2]}"><span class="sk-ic" aria-hidden="true">${SKL[k][1]}</span><b class="sk-n">${esc(skName(k))}</b>`
         +bar(t("Activitats","Activities"),pa,k)+bar(t("Examen","Exam"),pe,k)+`</div>`};

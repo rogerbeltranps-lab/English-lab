@@ -452,12 +452,13 @@ The base is Roger's guide ***How we make exams*** (28 Oct 2026), updated with wh
 
 - Everything but the writing is marked automatically against the keys. Record the version each student took.
 - **Writing**: Claude marks it with the C1–C4 rubric (section 7), the corrected text, a mistakes table and feedback in Roger's voice (Catalan for Starter, English for everyone else, Base included, since 21 Nov 2026). A blank writing is 0. Writing rows are always named C1–C4.
-- **Preview first** (marks per student, average, how many passed), then save only on Roger's "apply". **The preview's marks also go on the dashboard as drafts** (Roger, 23 Nov 2026: "if you have a draft I want to be able to see their provisional marks here"): the web exam table shows "≈ 6.5 draft" in the Writing column and a provisional exam mark (≈); students never see a draft, and "apply" turns it into the real mark (`tools/web-exam/writing.mjs --draft`).
-- **Paper exams**: marked by hand from Roger's photos, doubtful items flagged; Roger enters them (Save marks skips paper rows).
+- **The marks save themselves; students see them only when Roger publishes** (Roger, 24 Nov 2026: "it makes no sense to save the exams, the exams are already saved, I only need a button to publish them when I want… in the teacher's board they must appear once corrected and the writing, I will accept what Claude says"). There is no 📥 Save marks: every finished web exam is written into the marks by itself (📊 Assessment details, Home, the reports), and Claude's writing correction is saved straight away (`writing.mjs import --apply`, no "apply" needed, since students can't see it yet), with a short preview to Roger (marks per student, average, how many passed). `--draft` stays only for a provisional mark Roger asks for.
+- **Changing a mark after it is saved, even after publishing**: ✓ Accept (or ✗ Undo) an answer in the student's web exam window, and every student's mark with that question is saved again; the writing has **✏️ Correct it by hand** (rubric points, comment, corrected text, mistakes; the mark and the 5.1 level follow) and **🔄 Correct again** (Beltran corrects it again in the next marking run, which starts at once; `writing.mjs redo`). Published results change for the student at once.
+- **Paper exams**: marked by hand from Roger's photos, doubtful items flagged; Roger enters them (the automatic save never touches paper rows).
 - **A part not done is left out, not 0** (14 Nov 2026): the mark is the other parts rescaled to 10.
 - A student who lost connection: use what was saved, only on Roger's word (20 Nov 2026).
-- **Results are held**: they show 4 days after the exam at 8:00 (17 Nov 2026), or on the day Roger chooses (2 ESO LS2: Fri 27 Nov 8:00). While held, the student sees neither the sections, the report, the writing level nor the exam in "My LS mark so far".
-- **Don't notify students or save marks until Roger says results can go out.** An email needs his "send".
+- **Results are held until Roger presses 📣 Publish the results** (Roger, 24 Nov 2026; it replaces "4 days after the exam at 8:00" of 17 Nov) in the group's 📝 Exams › 🖥 Web exam box; 🔒 Hide again takes them back. A date set before (2 ESO and 4 ESO LS2: Fri 27 Nov 8:00) still opens them by itself unless he publishes earlier. While held, the student sees neither the sections, the report, the writing level nor the exam in "My LS mark so far", and the board says the results come out soon.
+- **Don't notify students until Roger publishes.** An email needs his "send".
 - **The report**: the whole exam question by question (right ones too, with the student's answer, the right one, why, and what to review), the writing with its C1–C4 cards, mistakes table and own text next to the corrected one. Catalan for Starter, English otherwise (Base too).
 
 ### 6.12 The Google Forms format (LS1, Oct 2026)
@@ -685,6 +686,7 @@ Roger, 21 Nov 2026: "when it comes to contradictions, my last decisions are the 
 | 30 | Sample exam timing | Always open; opened a week before the exam (9 Nov 2026). | Playbook: the session before the exam. |
 | 31 | Flashcards typing | No typing on the cards (20 Nov 2026). | Playbook Part 1 (26 Oct). |
 | 32 | Base language | Base reads English, like Core; only Starter (and no route) gets Catalan (Roger, 21 Nov 2026). | "Starter and Base: Catalan" (Exams doc, AGENTS.md, the routine notes: fixed or marked replaced). |
+| 33 | Exam results | Marks save themselves; students see them when Roger presses 📣 Publish (24 Nov 2026). | 📥 Save marks, then results 4 days after the exam at 8:00 (17 Nov 2026). |
 
 ### 13.3 Still open: nothing newer was decided
 
