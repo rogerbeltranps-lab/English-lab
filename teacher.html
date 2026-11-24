@@ -1399,7 +1399,7 @@ function phoneBar(){
         if(w==="sv"||w==="svg"){TPH.sv=b.dataset.g||(GR.find(g=>g.id===fsGroup())||GR.find(g=>g.id===TPH.g)||GR[0]||{}).id||null;TPH.more=true;TPH.chip=null;tphMore();return}
         TPH.more=false;TPH.chip=null;TPH.sv=null;
         if(w==="cm"){const v=document.querySelector('#fsctl .cmbtn');tphMore();if(v)v.click();return}
-        S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
+        S.g="plan";S.place=w;S.year=S.reps=false;render();scrollTo(0,0);return}
       if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;TPH.sv=null;tphMore()}});
     document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;TPH.sv=null;tphMore()}});
   }
@@ -1452,7 +1452,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
 function classNow(at){const c=ELWeek.classAt(at);if(!c)return null;const x=ELWeek.now(c.gid);
   if(x&&ELWeek.tasks(x.p,x.gi).some(t=>t.kind==="self"&&t.date===ELWeek.today()))return null;return c}
 const classDone=c=>{CLS.done=c.key;try{sessionStorage.setItem("el_t_class",c.key)}catch(e){}};
-function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=false;S.ls=null;S.place="home";   // render() picks the group's current LS by the time plan
+function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=S.reps=false;S.ls=null;S.place="home";   // render() picks the group's current LS by the time plan
   render();scrollTo(0,0)}
 function classCheck(){const el=$("#classnow");if(!el||!S.D)return;const c=classNow(),g=c&&GR.find(x=>x.id===c.gid);
   if(!c||!g){el.innerHTML="";return}
@@ -1601,8 +1601,8 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"]};
-const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
+const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"],reports:["📄","Term reports"]};
+const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=S.reps=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
 // 📈 Learning paths, a group, an LS, the whole year) adds a step to the browser's history: Back returns to the screen before it, e.g. from
@@ -1864,6 +1864,7 @@ function render0(){
   const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,grp.id):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
   const head=`<div class="ph"><h1>${esc(grp.name)}</h1><div class="sub">${lsSel}${S.year?"":` <a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a>`} ${S.year?"":examTag(ex)}${!S.year&&VOY_COURSES.includes(grp.course)?` <a class="g vygo" href="#" data-do="place" data-p="voyage" title="Every student by steps done and LS mark so far: who is on course and who needs a push">⛵ Class voyage: who needs a push</a>`:""}</div></div>`;
   if(S.year){$("#main").innerHTML=placeHead(grp.name,"")+`<div class="bar">${filters}</div>`+yearView(grp,shown);return}
+  if(S.reps){$("#main").innerHTML=placeHead(grp.name,"")+repView(grp,shown);return}
   const back=grp.name+" · "+lsLabel(EL_LS.find(l=>l.id===ls));
   const todoH=todo(inG.filter(s=>!s.away),ls,list),nTodo=(todoH.split('<details class="cdone"')[0].match(/<li>/g)||[]).length;   // 🗨️ Claude's answers are not to do
   // 👥 Students is the group's place across LSs and terms (Roger, 9 Nov 2026: "I want to be able to choose the LS, the term (1, 2, or 3)
@@ -1898,10 +1899,11 @@ function render0(){
     plan2:()=>tp2Page(grp,ls,studs,lpAll),
     voyage:()=>vyRank(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
     prog:()=>prPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
-    spk:()=>spkPage(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
+    spk:()=>spkPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
+    reports:()=>repView(grp,inG.filter(s=>!s.away&&!s.tester),true)};
   // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
-  if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
+  if(place[S.place]){const wide=["students","att","msgs","reports"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
   else{S.place="home";
     const np=pbNew().length,nw=sgNew().length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
@@ -1924,6 +1926,7 @@ function render0(){
       +tTile("marks","📊","Assessment details","LS grade, criteria, self-assessment")
       +tTile("prog","🌱","Progress","skill mastery over time, skills radar, criteria: the group or one student")
       +tTile("spk","🗣","Speaking","words said well and wrong, vocabulary, grammar, how they build the talk: only for you")
+      +tTile("reports","📄","Term reports","each student's Term 1 report: how they worked, your comment, the whole report")
       +tTile("students","👥","Students' progress","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
@@ -4094,7 +4097,7 @@ function termTools(grp){const n=+String(S.term).slice(1),nowN=termOf(ELWeek.toda
   const fm=`<span class="muted" style="margin-left:10px" title="How the learning-path steps that have a score count in ${esc(T.en)}, in every group">Daily work in ${esc(T.en)}:</span> `
     +`<button class="chip ${m==="score"?"on":""}" data-do="tform" data-n="${n}" data-v="score" title="As until now: checkpoints and recall warm-ups count their first-try score, class games their % right, the rest done on time">scores count</button>`
     +`<button class="chip ${m==="done"?"on":""}" data-do="tform" data-n="${n}" data-v="done" title="Only done or not: every step counts 10 when done (0 only once it is ticked in class and its day has passed) and a class game they took part in counts 10; scores do not count">only done or not</button>`;
-  return `<div class="bar lsbar">${cl}${fm}<button class="chip" style="margin-left:10px" data-do="yearview" title="Each student's term and year marks, by competence">📆 Term and year marks</button></div>`}
+  return `<div class="bar lsbar">${cl}${fm}<button class="chip" style="margin-left:10px" data-do="yearview" title="Each student's term and year marks, by competence">📆 Term and year marks</button><button class="chip" style="margin-left:6px" data-do="repview" title="Every student's Term 1 report (draft): how they worked, the comment, and a link to the whole report">📄 Term reports</button></div>`}
 async function tformSet(n,v){const ps=GR.map(g=>{const t=S.D.tm[g.id]=S.D.tm[g.id]||{};t.formative=Object.assign({},t.formative,{["t"+n]:v==="done"?"done":null});
     return put(["teams",g.id],{formative:{["t"+n]:v==="done"?"done":DEMO?null:F.deleteField()}})}).filter(Boolean);
   TDC={};render();try{await Promise.all(ps);lsResync()}catch(e){alert("Could not save it: "+e.message)}}
@@ -4206,6 +4209,27 @@ function degStats(studs,markOf,label){const ms=studs.map(markOf),n={NA:0,AS:0,AN
   return `<div class="dstat"><div class="dshead"><b>${esc(label)}</b> · ${plural(t,"student")}${none?` <span class="muted">(${none} with no mark yet, left out)</span>`:""} · <b>${pass}</b> passed <span class="muted">(${Math.round(pass/t*100)} %)</span></div>`
     +`<div class="dsbar">${DSTAT.filter(([k])=>n[k]).map(([k,en])=>`<span style="width:${n[k]/t*100}%;background:${LVCOL[k]}" title="${k} · ${en}: ${n[k]} (${pc(k)} %)"></span>`).join("")}</div>`
     +`<div class="dscards">${DSTAT.map(([k,en])=>`<div class="dsc" style="border-top-color:${LVCOL[k]}"><span class="dsk"><i style="background:${LVCOL[k]}"></i>${k} · ${en}</span><span class="dsn"><b>${n[k]}</b> <span>${pc(k)} %</span></span></div>`).join("")}</div></div>`}
+// 📄 Term reports on the dashboard (Roger, 24 Nov 2026: "as a teacher I must see the reports… on my dashboard"): the group's students with
+// each one's draft (termReports/{email}.t1, written by tools/term-report/draft.mjs): how they worked (profile, done of due, % in the week of
+// the class, % at the last minute), the comment and a link to the whole report as the student sees it (today.html?student=uid#report).
+// Read once per session, on the first open (one read per report). Students see theirs only with 📄 Show draft reports in class mode.
+const REPS={d:null,busy:false,err:""};
+function repLoad(){if(REPS.busy||REPS.d)return;if(DEMO){REPS.d=DEMO.trep||{};return}REPS.busy=true;
+  F.getDocs(F.collection(db(),"termReports")).then(q=>{const o={};q.forEach(x=>o[x.id.toLowerCase()]=(x.data()||{}).t1||null);REPS.d=o},e=>{REPS.err=e.message||String(e)}).then(()=>{REPS.busy=false;if(S.reps||S.place==="reports")render()})}
+function repView(grp,studs,place){repLoad();
+  const back=place?"":`<div class="bar"><button class="chip" data-do="repclose">‹ Back to ${esc(grp.name)}</button></div>`;
+  if(REPS.err)return back+`<div class="box"><p class="muted">Couldn't read the reports: ${esc(REPS.err)}</p></div>`;
+  if(!REPS.d)return back+`<div class="box"><p class="muted">Loading the reports…</p></div>`;
+  const PF={steady:["🟢","Steady"],behind:["🟡","Behind"],last:["🟠","Last minute"],none:["🔴","Nothing done"]};
+  const rows=studs.filter(s=>!s.tester&&s.uid).map(s=>{const R=REPS.d[String(s.email||"").toLowerCase()],T=(R&&R.time)||{},pf=PF[T.profile]||["",""];
+    return `<tr><td style="text-align:left"><a href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener"><b>${name(s)}</b></a></td>`
+      +(R?`<td>${pf[0]} ${pf[1]}</td><td class="n">${T.done??"–"} / ${T.due??"–"}</td><td class="n" style="color:${elPctCol(T.inWeek||0)};font-weight:700">${T.inWeek??"–"}%</td><td class="n">${T.lastMin??"–"}%</td>`
+        +`<td style="text-align:left;font-size:13px;max-width:460px"><details><summary style="font:400 13px system-ui,sans-serif;cursor:pointer;text-align:left">${esc(String(R.comment||"").replace(/<[^>]+>/g,"").slice(0,90))}…</summary><p style="margin:6px 0;font-size:13.5px;line-height:1.45">${esc(String(R.comment||"").replace(/<[^>]+>/g,""))}</p></details></td>`
+        +`<td style="white-space:nowrap"><a class="chip" href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener">📄 Open ↗</a></td>`
+      :`<td colspan="6" class="muted">No report yet</td>`)+`</tr>`}).join("");
+  const n=k=>studs.filter(s=>{const R=REPS.d[String(s.email||"").toLowerCase()];return R&&R.time&&R.time.profile===k}).length;
+  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2><p class="muted">Drafts: students see theirs only when you press 📄 Show draft reports in class mode. 🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
+    +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
   const lss=EL_LS.filter(l=>l.course===grp.course),items=lss.flatMap(l=>lsItems(l,grp.id)),now=termOf(ELWeek.today()),live=studs.filter(s=>!s.away&&!s.tester);   // averages and level counts: never the teacher's or tester accounts
@@ -6635,16 +6659,16 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     const from=GR.find(g=>g.id===S.g),to=GR.find(g=>g.id===k.g);
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
-    else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=false;S.place="todo";render();
+    else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=S.reps=false}
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=S.reps=false;S.place="todo";render();
     const li=[...document.querySelectorAll("li")].find(l=>l.textContent.trim().startsWith("🎯"));
     if(li){li.scrollIntoView({block:"center"});li.classList.add("askhi");setTimeout(()=>li.classList.remove("askhi"),2500)}else scrollTo(0,0)},
-    place:()=>{e.preventDefault();if(k.p==="msgs"){S.msgTab=k.t||null;S.pbOpen=S.sgOpen=null}if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
+    place:()=>{e.preventDefault();if(k.p==="msgs"){S.msgTab=k.t||null;S.pbOpen=S.sgOpen=null}if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=S.reps=false;S.stuBoth=false;
       if(k.p==="qa"){S.qa.ls=k.ls;S.qa.g=k.g;S.g="qa";S.place="home";render();scrollTo(0,0);return}
       S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
       if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
-        if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),allacts:()=>{S.allActs=!S.allActs;try{localStorage.setItem("el_t_allacts",S.allActs?"1":"0")}catch(e){}render()},shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
+        if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=S.reps=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),allacts:()=>{S.allActs=!S.allActs;try{localStorage.setItem("el_t_allacts",S.allActs?"1":"0")}catch(e){}render()},shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
       if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},spkyear:()=>{S.spkYear=!!k.v;render()},spkstu:()=>{e.preventDefault();S.spkU=k.u;render();scrollTo(0,0)},
     spkrun:()=>{S.spkDone=null;spkRun(SPK.todo||[],SPK.gid)},spkstop:()=>{if(SPK.run)SPK.run.stop=true;t.disabled=true},
@@ -6814,7 +6838,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     vopen:()=>{if(e.target.closest("a[href]:not([data-do])"))return;S.on.open=S.on.open===k.id?null:k.id;render()},vstu:()=>{e.preventDefault();S.on.stu=k.u||null;S.on.open=null;if(k.u)S.on.v="hist";render();scrollTo(0,0)},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
-    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=S.reps=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
     glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
       quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
@@ -6837,10 +6861,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
     ptterm:()=>{S.term=k.t;render()},
-    lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
+    lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=S.reps=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
     tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
-    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?termLss(EL_LS.filter(l=>l.course===g.course),k.t,g.id):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},
