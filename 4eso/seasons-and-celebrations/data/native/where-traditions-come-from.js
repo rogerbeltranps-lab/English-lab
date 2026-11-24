@@ -114,7 +114,7 @@ window.LP.native = {
       { q: 'It is reported that the first feast lasted three days. REPORTED → The first feast ___ three days.', a: ['is reported to have lasted'], en: 'is reported to have lasted.' },
       { q: 'Every year my grandfather lit the first bonfire. WOULD → Every year my grandfather ___ the first bonfire.', a: ['would light'], en: 'would + infinitive for a repeated past action.' },
       { q: 'After they had moved to America, Irish families started carving pumpkins. HAVING → ___ to America, Irish families started carving pumpkins.', a: ['having moved'], en: 'Having + past participle = after they had…' },
-      { q: 'Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that'], en: 'Cleft: It was only in… that…' },
+      { q: 'Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that', 'only in 1863 when'], en: 'Cleft: It was only in… that…' },
       { q: 'The tradition has almost disappeared. VERGE → The tradition is ___ disappearing.', a: ['on the verge of'], en: 'on the verge of + -ing.' },
       { q: 'It is possible that the custom came from Scotland. MAY → The custom ___ from Scotland.', a: ['may have come'], en: 'may have + past participle = past possibility.' },
       { q: 'People no longer carve turnips. LONGER → Turnips ___ carved.', a: ['are no longer'], en: 'Passive + no longer.' },

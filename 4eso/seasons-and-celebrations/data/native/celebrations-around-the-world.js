@@ -118,7 +118,7 @@ window.LP.native = {
       { q: 'As soon as the clock struck twelve, everyone started singing. SOONER → No ___ twelve than everyone started singing.', a: ['sooner had the clock struck', 'sooner did the clock strike'], en: 'No sooner had + subject + past participle + than.' },
       { q: 'They had no idea that the party was for them. LITTLE → ___ that the party was for them.', a: ['little did they know', 'little did they realise', 'little did they realize'], en: 'Little did + subject + verb.' },
       { q: 'I love the atmosphere of Sant Joan most. WHAT → ___ the atmosphere.', a: ['what i love most about sant joan is', 'what i love about sant joan most is'], en: 'What + clause + is…' },
-      { q: 'Lincoln made Thanksgiving a national holiday in 1863. IT → ___ Lincoln made Thanksgiving a national holiday.', a: ['it was in 1863 that'], en: 'It was + focus + that…' },
+      { q: 'Lincoln made Thanksgiving a national holiday in 1863. IT → ___ Lincoln made Thanksgiving a national holiday.', a: ['it was in 1863 that', 'it was in 1863 when'], en: 'It was + focus + that…' },
       { q: 'You must not light fireworks indoors under any circumstances. CIRCUMSTANCES → Under ___ light fireworks indoors.', a: ['no circumstances must you', 'no circumstances should you'], en: 'Under no circumstances + inverted modal.' },
       { q: 'The only thing I want this New Year is some peace and quiet. ALL → ___ this New Year is some peace and quiet.', a: ['all i want'], en: 'All I want is…' },
       { q: 'The organisers did not apologise at any point. TIME → At ___ apologise.', a: ['no time did the organisers', 'no time did they'], en: 'At no time + did + subject + verb.' }
