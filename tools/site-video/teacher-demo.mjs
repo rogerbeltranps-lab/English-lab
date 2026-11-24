@@ -183,7 +183,19 @@ if (process.env.EL_DEMO_SPEAK) {
       voc: { topic: TOP.slice(i % 4, i % 4 + 4), conn: CON.slice(0, 2 + (sk + i) % 4), rep: i % 2 ? ['like'] : ['very'], l1: i === 1 ? ['pues'] : [], note: ['Basic but enough for the task.', 'Basic: mostly "like" and "play".', 'Varied, with chunks like "hang out" and "twice a week".', 'Basic, repeats "very".', 'Good range for A2.'][i], level: lv(2 + (i === 2)) },
       gram: { good: ['present simple: "I play"', 'like + -ing: "I like swimming"', 'frequency: "twice a week"'].slice(0, 1 + i % 3), errors: ERR.filter((x, j) => (j + i) % 2 === 0).slice(0, 2 + i % 3).map(([said, correct, rule]) => ({ said, correct, rule })), note: 'Mostly present simple; no past.', level: lv(2) },
       str: { opening: i !== 1, ending: i % 2 === 0, sentences: SEN[i], order: ['A list of hobbies, then when and with whom.', 'Jumps between ideas.', 'First, then, after that: a clear sequence with reasons.', 'A list.', 'Introduction, three hobbies with reasons, a short ending.'][i], note: '', level: lv(2 + (i % 2)) },
-      pron: { note: 'Understandable; the main problem is the vowel before s + consonant.', level: lv(3) }, task: { done: i === 1 ? 'partly' : 'yes', note: i === 1 ? 'Does not say how often.' : 'Covers what, when and with whom.' } } } };
+      pron: { note: 'Understandable; the main problem is the vowel before s + consonant.', level: lv(3) }, task: { done: i === 1 ? 'partly' : 'yes', note: i === 1 ? 'Does not say how often.' : 'Covers what, when and with whom.' },
+      n: { words: 70 + i * 9, clear: 46 + i * 7, sentences: 8 + (i % 3), correct: 3 + (i % 4), conn: 2 + (sk + i) % 4, secs: 40 + i * 4 } } } };
+    // 📈 two later recordings (What are they doing? Speaking, then Talk), each a little better, for the 📈 Over time chart
+    const wd = CAT.find((a) => a.id === c + '/ls2-what-are-they-doing'), wk = wd.keys[0], ws = JSON.parse(pg[wk] || '{"steps":{}}'); ws.steps = ws.steps || {};
+    [['speak', '2026-11-11T09:20:00Z', 1], ['talk', '2026-11-18T09:40:00Z', 2]].forEach(([k, at, g]) => {
+      const fid = 'demo-' + k + '-' + s.uid; ws.steps[k] = { title: k === 'talk' ? 'Talk: what are they doing?' : 'Speaking: a photo', date: at, audio: { id: fid, s: 45 + i * 5 + g * 6 } };
+      d[s.uid][fid] = { a: wd.id, k, at, model: 'gemini-flash-latest', eur: 0.0055, done: at, an: { summary: 'Clearer than last time.', fluency: g === 2 || i % 2 === 0 ? 'free' : 'hesitant',
+        good: [], sounds: SND.slice(0, Math.max(1, 3 - g)).map(([word, heard, tip]) => ({ word, heard, tip })), voc: { topic: TOP.slice(0, 3), conn: CON.slice(0, 2 + g + (i % 2)), rep: [], l1: [] },
+        gram: { good: [], errors: ERR.slice(0, Math.max(1, 3 - g)).map(([said, correct, rule]) => ({ said, correct, rule })) }, str: { opening: true, ending: g === 2, sentences: g === 2 ? 'complex' : 'joined', level: Math.min(4, lv(2) + g - 1) },
+        pron: { level: Math.min(4, lv(3) + (g === 2 ? 1 : 0)) },
+        n: { words: 80 + i * 9 + g * 12, clear: 58 + i * 7 + g * 10, sentences: 9 + g, correct: 4 + (i % 4) + g * 2, conn: 2 + g + (i % 2), secs: 45 + i * 5 + g * 6 } } };
+    });
+    pg[wk] = JSON.stringify(ws);
   });
 }
 

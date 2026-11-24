@@ -2101,7 +2101,32 @@ function spkCollect(items){const W={},G={},Ok={},C={},T={},L1={},Rep={},sen={},f
   const top=(M,k)=>Object.values(M).sort((p,q)=>q.who.size-p.who.size||q.n-p.n||String(p.word||p.rule).localeCompare(String(q.word||q.rule))).slice(0,k);
   return {n,W:top(W,40),G:top(G,15),Ok:top(Ok,30),C:top(C,20),T:top(T,30),L1:top(L1,10),Rep:top(Rep,10),sen,fl,op,en,
     lv:SPK_LV.map((x,i)=>prAvg(items.map(({rec})=>spkLevels(rec.an)[i])))}}
-function spkPage(grp,ls,studs){studs=studs.filter(s=>s.uid);const lss=EL_LS.filter(l=>l.course===grp.course),ids=S.spkYear?lss.map(l=>l.id):[ls];
+// 📈 Over time (Roger, 24 Nov 2026: "quantify the words they pronounce well and if not well better, and then the structure of the speech and over
+// time decide a way of comparing it"): Roig's counts of each recording (an.n: words, clear, sentences, correct, connectors, seconds; from school
+// script v38 on) week by week, as %: words said clearly, correct sentences, and the 🗣 pronunciation and 🧱 structure levels (out of 4, as %,
+// so recordings analysed before the counts still show). Connectors and words a minute go in each week's tooltip and the table.
+// One student: their own recordings; the whole group: the average of that week's recordings. No new Firestore reads.
+function spkMeasure(an){const n=an&&an.n||null,lv=spkLevels(an),pc=(a,b)=>a!=null&&b?Math.max(0,Math.min(100,a/b*100)):null;
+  return {clear:n?pc(n.clear,n.words):null,corr:n?pc(n.correct,n.sentences):null,pron:lv[0]!=null?lv[0]/4*100:null,str:lv[3]!=null?lv[3]/4*100:null,
+    conn:n&&n.conn!=null?+n.conn:an&&an.voc&&an.voc.conn?an.voc.conn.length:null,wpm:n&&n.words&&n.secs?n.words/n.secs*60:null}}
+const SPK_TR=[["clear","🗣","Words said clearly","#2563eb","circle",""],["corr","🧩","Correct sentences","#d97706","square",""],["pron","🔊","Pronunciation level","#7c3aed","diamond","5 4"],["str","🧱","Structure level","#0f766e","triangle","5 4"]];
+function spkTrend(done,me){if(!window.ELCharts)return "";
+  const ev=done.map(d=>({t:tms(d.r.at)||tms(d.rec.done)||tms(d.rec.at),m:spkMeasure(d.rec.an)})).filter(e=>e.t);if(!ev.length)return "";
+  const W=ELCharts.weeks(ev),wi=t=>W.indexOf(ELCharts.monday(t)),B=W.map(()=>[]);ev.forEach(e=>{const i=wi(e.t);if(i>=0)B[i].push(e.m)});
+  const avg=(xs,k)=>{const v=xs.map(m=>m[k]).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const lab=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"}),has=k=>ev.some(e=>e.m[k]!=null);
+  const ser=SPK_TR.filter(([k])=>has(k)).map(([k,ic,label,color,shape,dash])=>({label,icon:ic,color,shape,dash,v:B.map(xs=>avg(xs,k))}));
+  const tips=B.map((xs,i)=>{if(!xs.length)return "";const r=[`<b>Week of ${esc(lab(W[i]))}</b> <small>(${plural(xs.length,"recording")})</small>`];
+    ser.forEach((s,j)=>{const v=s.v[i];if(v!=null)r.push(`${s.icon} ${esc(s.label)}: <b>${s.label.includes("level")?f1(v/25)+" / 4":Math.round(v)+" %"}</b>`)});
+    const c=avg(xs,"conn"),w=avg(xs,"wpm");if(c!=null)r.push(`🔗 Connectors: <b>${f1(c)}</b>`);if(w!=null)r.push(`⏱ Words a minute: <b>${Math.round(w)}</b>`);return r.join("<br>")});
+  const first=ser.map(s=>{const v=s.v.filter(x=>x!=null);return v.length>1?{s,a:v[0],b:v[v.length-1]}:null}).filter(Boolean);
+  const chg=first.length?`<p class="spkp">${first.map(({s,a,b})=>`${s.icon} ${esc(s.label)}: <b>${s.label.includes("level")?f1(a/25)+" → "+f1(b/25):Math.round(a)+" % → "+Math.round(b)+" %"}</b>`).join(" · ")}</p>`:"";
+  const tv=(v,i,lvl)=>v==null?"–":lvl?f1(v/25):Math.round(v);
+  const table=`<details class="prtab"><summary>See it as a table</summary><div class="wrap"><table><thead><tr><th>Week of</th><th>Recordings</th>${ser.map(s=>`<th>${s.icon} ${esc(s.label)}</th>`).join("")}<th>🔗 Connectors</th><th>⏱ Words a minute</th></tr></thead><tbody>`
+    +W.map((w,i)=>B[i].length?`<tr><td>${esc(lab(w))}</td><td>${B[i].length}</td>${ser.map(s=>`<td>${tv(s.v[i],i,s.label.includes("level"))}</td>`).join("")}<td>${avg(B[i],"conn")==null?"–":f1(avg(B[i],"conn"))}</td><td>${avg(B[i],"wpm")==null?"–":Math.round(avg(B[i],"wpm"))}</td></tr>`:"").join("")+`</tbody></table></div></details>`;
+  return `<div class="box"><h2>📈 Over time</h2><p class="muted">${me?"Each week's recordings":"The group's recordings, averaged week by week"}: the % of words Roig heard said clearly, the % of correct sentences, and the pronunciation and structure levels (4 = 100 %). Hover a week for connectors and words a minute.</p>`
+    +chg+ELCharts.line({x:W.map(lab),tips,series:ser,h:280,noEnds:true,...(innerWidth<600?{w:420,h:320}:{}),aria:"Speaking over time, week by week"})+table+`</div>`}
+function spkPage(grp,ls,studs){studs=studs.filter(s=>s.uid);if(window.ELCharts)ELCharts.wire();const lss=EL_LS.filter(l=>l.course===grp.course),ids=S.spkYear?lss.map(l=>l.id):[ls];
   if(!spkEnsure(grp.id,ids,"spk"))return `<div class="box"><p class="muted">🗣 Loading the speaking analyses…</p></div>`;
   const me=studs.find(s=>s.uid===S.spkU)||null;if(!me)S.spkU="";
   const all=spkRecs(studs,ids),recs=me?all.filter(r=>r.u===me.uid):all,done=recs.map(r=>({r,u:r.u,rec:spkGet(grp.id,r.ls,r.u,r.fid)})).filter(x=>x.rec&&x.rec.an),todo=recs.filter(r=>!spkGet(grp.id,r.ls,r.u,r.fid));SPK.todo=todo;SPK.gid=grp.id;
@@ -2140,7 +2165,7 @@ function spkPage(grp,ls,studs){studs=studs.filter(s=>s.uid);const lss=EL_LS.filt
       const last=ds[0]&&ds[0].rec.an,ww=[...new Set(ds.flatMap(d=>(d.rec.an.sounds||[]).map(w=>w.word)))].slice(0,4);
       return `<tr><td><a href="#" data-do="spkstu" data-u="${esc(s.uid)}">${esc(fullName(s))}</a></td><td>${ds.length} of ${n}</td>${lv.map(v=>`<td>${v==null?'<span class="muted">–</span>':`<b style="color:${SPK_LC[Math.round(v)]}">${f1(v)}</b>`}</td>`).join("")}<td>${last&&last.fluency?SPK_FL[last.fluency]:""}</td><td>${last&&last.str&&last.str.sentences?esc(SPK_SEN[last.str.sentences]):""}</td><td>${ww.map(esc).join(", ")}</td></tr>`}).join("");
     body=`<div class="box"><h2>👥 Each student</h2><p class="muted">The average of their analysed recordings (out of 4) and their latest one. Click a name for their whole collection.</p><div class="wrap"><table class="spkt2"><thead><tr><th>Student</th><th>Analysed</th>${SPK_LV.map(([,ic,lab])=>`<th title="${lab}">${ic}</th>`).join("")}<th>Fluency</th><th>Sentences</th><th>Words said wrong</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
-  return head+cards+`<div class="prgrid">${wrong}${good}${gram}${voc}${str}</div>`+body}
+  return head+cards+spkTrend(done,me)+`<div class="prgrid">${wrong}${good}${gram}${voc}${str}</div>`+body}
 // ---- 🎬 Final product (Roger, 8 Nov 2026: "add a final product access there to mark students work (in all LS)"): a tile on the group page
 // that opens a list of the group's students for the selected LS's final product: video handed in, Gemini's draft, your mark, and a button that
 // opens the usual final product dialog (🎬 Gemini, watch it · ✅ Approve). 📥 Draft the whole group from Classroom is at the top, so no need to
