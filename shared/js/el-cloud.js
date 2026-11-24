@@ -586,7 +586,7 @@ function fsPanel(getG,redraw,owns){
   const P={G:null,X:null,live:null,list:[],here:[],ro:fsRoster,wl:{open:null,hide:false}},id=String(++fsPanelN);
   let sD=null,sL=null,sH=null,AT=null;
   const gname=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).name||g,E=t=>String(t==null?"":t).replace(/</g,"&lt;");
-  // in force now: the switch (P.X) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
+  // in force now: the switch (P.X), written by 🎓 Class mode (elFsEff in el-catalog.js; never by the timetable alone since 24 Nov 2026)
   P.tt=()=>(P.live&&P.live.tt)||elTT(P.G);P.eff=()=>elFsEff(P.X,P.tt());
   const w0=()=>elClassWatch(Object.assign({},P.live,{fs:P.eff()}),P.list,P.here);
   P.watch=function(){const g=getG();if(!g||P.G===g)return;[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=g;P.X=P.live=null;P.list=[];P.here=[];
@@ -600,8 +600,8 @@ function fsPanel(getG,redraw,owns){
   const onCr=()=>redraw();window.addEventListener("el-correct",onCr);fsAll.add(redraw);   // ✅ Correct together opened or closed (shared/correct/open.js)
   P.stop=()=>{[sD,sL,sH].forEach(f=>f&&f());sD=sL=sH=null;P.G=null;clearInterval(iv);window.removeEventListener("el-correct",onCr);fsAll.delete(redraw);
     const f=document.getElementById("el-fsfloat");if(f&&f.dataset.o===id){f.remove();frTop(0)}};
-  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
-  P.toggle=async()=>{const g=P.G,now=Date.now(),c=elSlotNow(P.tt(),now),v=P.eff()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
+  // on until the end of the class by the timetable (or LOCK_MS); off = null
+  P.toggle=async()=>{const g=P.G,now=Date.now(),c=elSlotNow(P.tt(),now),v=P.eff()?null:{on:true,at:now,until:c?c.end:now+LOCK_MS};
     try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});return v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);return "✗ Not saved: "+(e.code||e.message||e)}};
   P.hm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
   // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once)
@@ -649,7 +649,7 @@ function fsPanel(getG,redraw,owns){
     f.style.padding=dock?(P.wl.hide?"3px 16px":"4px 16px 5px"):P.wl.hide?"4px 6px":"8px 12px";
     const h=P.wl.hide?hb:dock?'<div style="display:flex;gap:4px 12px;align-items:center;flex-wrap:wrap"><b style="white-space:nowrap">👥 '+E(gname(g))+'</b>'+wl.line.replace("margin-top:4px","margin:0")+'<span style="flex:1"></span>'+hb+'</div>'+wl.list
       :'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+E(gname(g))+' in full screen':'🎮 '+E(gname(g))+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+P.hm(P.eff().until)+(P.eff().auto?' (class, by your timetable)':''):'')+'</div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+P.hm(P.eff().until):'')+'</div>'
       +wl.line+wl.list;
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}
     if(dock)frTop(f.offsetHeight);else if(!f.dataset.moving)place(f)};   // not while it is being dragged
@@ -1663,11 +1663,13 @@ let shellGo=false,fsKnown=false;   // fsKnown: the group's live doc has been rea
 const ownFs=()=>{const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !!(h&&(h.checkpoint||/sample-exam$/.test(h.id)))||!!window.EL_EXAM};
 function shellLeave(){if(!inShell||shellGo)return;shellGo=true;fsBye=true;try{FW.location.replace(location.href)}catch(e){}}
 function shellEnter(){if(inShell||shellGo||window.top!==window||ownFs())return false;shellGo=true;fsBye=true;
-  const u=new URL(SHELL);u.searchParams.set("u",location.pathname+location.search+location.hash);location.replace(u.href);return true}
+  const u=new URL(SHELL);u.searchParams.set("u",location.pathname+location.search+location.hash);
+  try{const r=document.referrer?new URL(document.referrer):null;if(r&&r.origin===location.origin&&!/\/class\.html$/.test(r.pathname)&&r.pathname!==location.pathname)u.searchParams.set("b",r.pathname+r.search+r.hash)}catch(e){}   // ↩ back (class.html)
+  location.replace(u.href);return true}
 const FD=FW.document,FE=FD.documentElement;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
-// FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs) or the group's class by the timetable (TT = live/{group}.tt),
-// elFsEff in el-catalog.js (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have class")
+// FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs), which 🎓 Class mode writes; elFsEff in el-catalog.js. The
+// timetable alone (TT = live/{group}.tt) no longer turns it on (Roger, 24 Nov 2026: "only … when I start class mode, not when it's English time")
 let fsWas=false,FSG=null,FSL=null,TT=null,SELF_ON=false;   // SELF_ON: 🧑‍🎓 self study (cmSelf): no full screen, no away cover
 // the group's timetable for "5 minutes before the class" (elClassOpenAt in el-catalog.js): kept for this page and the next ones in this browser
 function keepTT(tt){if(!tt||!tt.slots||!myGroup)return;(window.EL_LIVE_TT=window.EL_LIVE_TT||{})[myGroup]=tt;try{localStorage.setItem("el_tt_"+myGroup,JSON.stringify(tt))}catch(e){}}
@@ -1948,7 +1950,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
     if(r==="back")return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).then(()=>examEndIdle(o.g)).catch(x=>console.warn("class mode",x));quit(r==="saved"?"stopped · saved on your Time plan":"stopped")}
   // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
   // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
-  // (inside a class of the timetable full screen stays on by itself, elFsEff)
+  // (the only way students go full screen in class: the timetable alone never does it, Roger 24 Nov 2026)
   async function send(x){const now=Date.now(),go=Object.assign({cm:true,at:now,s:o.s,lock:true,until:o.until},x);last=x;
     let fsK=null;try{fsK=sessionStorage.getItem(CM_K+"_fs")}catch(e){}const w={go};if(fsK!==String(o.s))w.fs={on:true,at:now,until:o.until,cm:o.s};
     try{sessionStorage.setItem(CM_K+"_last",JSON.stringify(x))}catch(e){}
