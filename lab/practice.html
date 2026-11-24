@@ -402,18 +402,28 @@ function tcheck() {
    repetition… but for the entire unit… like Anki… all mixed with statistics"; decks hold what the class has done so far): one deck per LS
    with the cards of extract(), studied with shared/js/el-flashdeck.js. Progress is kept in this browser (el_flash_<uid>) and in the student's
    account (students/{uid}/flashcards/all, read once when the decks open, saved a few seconds after studying), so the Chromebook and the
-   phone share it. The teacher, testers seeing everything and the 👁 student view keep it in this browser only. */
+   phone share it. The teacher and testers seeing everything keep it in this browser only. The 👁 student view (the dashboard's 🧠 Flashcards
+   place, lab/practice.html?student=…#deck) reads the student's own copy once and shows their decks and statistics; what the teacher studies
+   there stays on that page only, never saved (Roger, 24 Nov 2026: "As a teacher I want to be able to see them"). */
 const FKEY = () => 'el_flash' + (U ? '_' + U.uid : '');   // per account: two students on one browser never share a deck
-const fdLoad = () => { try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
+let fdView = null;   // 👁 student view: the student's copy, in memory only
+const fdAs = () => !DEMO && window.ELCloud && ELCloud.viewing;
+const fdLoad = () => { if (fdAs()) return fdView || {}; try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
 const fdCloudOn = () => !DEMO && U && !all() && !ELCloud.viewing;
 const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
 function fdSave(P) {
+  if (fdAs()) { fdView = P; return; }
   try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
   if (fdCloudOn()) F.setDoc(fdRef(), { p: JSON.stringify(P), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
 }
 let fd = null, fdRead = null;
 const fdHost = document.createElement('div');
 function fdCloud() {   // once per visit: the account's copy, merged with this browser's (the latest review of each card wins)
+  if (fdAs() && !fdRead) {   // 👁 the student's own copy, read only
+    fdRead = F.getDoc(F.doc(ELCloud.db, 'students', ELCloud.viewing.uid, 'flashcards', 'all')).then(snap => { fdView = snap.exists() ? JSON.parse(snap.data().p || '{}') : {}; if (fd) fd.reload(); })
+      .catch(e => console.warn('flashcards read', e));
+    return;
+  }
   if (!fdCloudOn() || fdRead) return;
   fdRead = F.getDoc(fdRef()).then(snap => { const cloud = snap.exists() ? JSON.parse(snap.data().p || '{}') : null; if (!cloud) return;
     const m = ELFlashDeck.merge(fdLoad(), cloud); try { localStorage.setItem(FKEY(), JSON.stringify(m)) } catch (e) {} if (fd) fd.reload(); }).catch(e => console.warn('flashcards read', e));

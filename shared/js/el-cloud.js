@@ -2046,7 +2046,8 @@ onAuthStateChanged(auth,async u=>{
   // 👁 the teacher's student view of this tab: started by the student's board (today.html?student=uid), ended by the dashboard
   AS=null;
   if(isTeacher(u)){
-    const sp=onBoard&&new URLSearchParams(location.search).get("student"),was=asRead();
+    // (also 🎯 Practise: the dashboard's 🧠 Flashcards place opens a student's decks with lab/practice.html?student=uid#deck)
+    const sp=(onBoard||/\/lab\/practice\.html$/.test(location.pathname))&&new URLSearchParams(location.search).get("student"),was=asRead();
     if(sp&&(!was||was.uid!==sp))asSave({uid:sp});
     if(onDash)leaveAs(true);
     else if((AS=asRead())){
