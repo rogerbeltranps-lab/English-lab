@@ -1719,12 +1719,19 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
   // LS: the first try of each auto-corrected step of the open learning paths (its skill from el-voyage.js, as 🌱 Progress), averaged over the
   // students; Grammar and Vocabulary also take the class games of that LS (half and half when both exist); the whole: every first try, with the
   // games as one more half.
-  const FT={},all=[],LV=/_(beginners|insecure|safe|daring|native)$/;
-  if(window.ELCharts)as.filter(a=>!a.checkpoint&&!a.optional&&!/sample exam|first exam/i.test(a.title)).forEach(a=>studs.forEach(s=>Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
-    if(!t||!+t.max)return;const sk=ELCharts.skillOf(a,k.replace(LV,""));if(!sk)return;const v=Math.max(0,Math.min(100,t.score/t.max*100));(FT[sk]=FT[sk]||[]).push(v);all.push(v)})));
+  // Writing and Speaking have no auto-corrected first tries: a step with no check counts the level Beltran gives each corrected piece
+  // (5.1 for a writing, 3.2 for a recording; NA 25 · AS 50 · AN 75 · AE 100 %, as 🌱 Progress and the radar), so the rings are not
+  // "nothing yet" once writings are corrected (Roger, 24 Nov 2026: "But this isn't true. Students have a lot of writing activities").
+  const FT={},all=[],LV=/_(beginners|insecure|safe|daring|native)$/,LVN={},DM=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10};
+  if(window.ELCharts)as.filter(a=>!a.checkpoint&&!a.optional&&!/sample exam|first exam/i.test(a.title)).forEach(a=>studs.forEach(s=>{const seen=new Set();
+    Object.entries(pstate(s.uid,a).tries||{}).forEach(([k,t])=>{
+    if(!t||!+t.max)return;const pid=k.replace(LV,""),sk=ELCharts.skillOf(a,pid);if(!sk)return;seen.add(pid);const v=Math.max(0,Math.min(100,t.score/t.max*100));(FT[sk]=FT[sk]||[]).push(v);all.push(v)});
+    Object.entries(res(s.uid,a.id).levels||{}).forEach(([pid,cs])=>{if(seen.has(pid))return;const sk=ELCharts.skillOf(a,pid);if(!sk)return;
+      const ms=Object.values(cs||{}).map(d=>DM[d]).filter(n=>n!=null);if(!ms.length)return;const v=ms.reduce((n,m)=>n+m,0)/ms.length*10;
+      (FT[sk]=FT[sk]||[]).push(v);all.push(v);LVN[sk]=(LVN[sk]||0)+1})}));
   const mix=(a,g)=>a!=null&&g!=null?Math.round((a+g)/2):a!=null?a:g!=null?g:null,gm=[gs.grammar,gs.vocab].filter(v=>v!=null);
   const cw={all:mix(avgP(all),gm.length?avgP(gm):null),n:{all:all.length}};
-  ["Listening","Reading","Speaking","Vocabulary","Grammar","Writing"].forEach(k=>{cw[k]=mix(avgP(FT[k]||[]),k==="Grammar"?gs.grammar??null:k==="Vocabulary"?gs.vocab??null:null);cw.n[k]=(FT[k]||[]).length});
+  ["Listening","Reading","Speaking","Vocabulary","Grammar","Writing"].forEach(k=>{cw[k]=mix(avgP(FT[k]||[]),k==="Grammar"?gs.grammar??null:k==="Vocabulary"?gs.vocab??null:null);cw.n[k]=(FT[k]||[]).length});cw.lv=LVN;
   return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams,xr,cw}}
 const bCol=p=>elPctCol(p);   // the site's colour rule (el-catalog.js elPctCol)
 // ✅ Finish your activities, on the projector after the warm-up (Roger, 21 Nov 2026: the Work done in each learning path bars, "and on the
@@ -1773,11 +1780,12 @@ function xRings(g,x){if(!x)return "";const lab=lsLabel(x.l).split(" · ")[0],go=
 // 🙌 Class work on a group's card (in place of First tries): the same rings as the exam row, from the class activities (brief().cw): the whole
 // and each exam part's skill (Speaking too: the exam has none, the class does). A click opens 🔎 Questions (what they get right the first time).
 function classRings(g,b){const c=b.cw||{n:{}},go=`href="#" data-do="bgo" data-g="${g.id}" data-p="qa" data-ls="${b.ls}"`,ks=b.xr?b.xr.parts.map(q=>q.n):["Listening","Reading","Vocabulary","Grammar","Writing"];
-  const one=(ic,nm,k)=>{const p=c[k],n=c.n[k]||0,gm=k==="Grammar"?b.gs.grammar:k==="Vocabulary"?b.gs.vocab:null,src=`${n} first tries${gm!=null?` + the class ${k==="Grammar"?"grammar":"vocabulary"} games (${gm} %)`:k==="all"&&(b.gs.grammar!=null||b.gs.vocab!=null)?" + the class games":""}`;
+  const one=(ic,nm,k)=>{const p=c[k],lv=k==="all"?Object.values(c.lv||{}).reduce((x,y)=>x+y,0):(c.lv||{})[k]||0,n=(c.n[k]||0)-lv,gm=k==="Grammar"?b.gs.grammar:k==="Vocabulary"?b.gs.vocab:null,
+      pc=k==="Writing"?"writing":k==="Speaking"?"recording":"piece",src=`${n?n+" first tries":""}${n&&lv?" + ":""}${lv?`${lv} corrected ${pc}${lv===1?"":"s"} (Beltran's level${k==="Writing"?", 5.1":k==="Speaking"?", 3.2":""})`:""}${gm!=null?` + the class ${k==="Grammar"?"grammar":"vocabulary"} games (${gm} %)`:k==="all"&&(b.gs.grammar!=null||b.gs.vocab!=null)?" + the class games":""}`;
     const tip=p==null?`${nm}: nothing yet`:`${nm}: ${p} % right on average (${src})`;
-    return `<a class="bst bxr" ${go} title="${esc(tip)} · click: which questions they get right or wrong the first time">${elRing(p,"",46,tip)}<span><b>${ic} ${esc(nm)}</b><small>${p==null?"nothing yet":gm!=null?"first tries + games":"first tries"}</small></span></a>`};
+    return `<a class="bst bxr" ${go} title="${esc(tip)} · click: which questions they get right or wrong the first time">${elRing(p,"",46,tip)}<span><b>${ic} ${esc(nm)}</b><small>${p==null?"nothing yet":gm!=null?"first tries + games":lv&&!n?`${lv} corrected ${pc}${lv===1?"":"s"}`:lv?"first tries + corrected":"first tries"}</small></span></a>`};
   const sk=ks.concat(c.n.Speaking&&!ks.includes("Speaking")?["Speaking"]:[]);
-  return `<h3>Class work <small class="muted">· % right in the activities (first tries; grammar and vocabulary with the games)</small></h3><div class="bxg">`
+  return `<h3>Class work <small class="muted">· % right in the activities (first tries; grammar and vocabulary with the games; writing and speaking: the level of each corrected piece)</small></h3><div class="bxg">`
     +one("🙌","All class work","all")+sk.map(k=>one(XIC[k]||(k==="Speaking"?"🗣":"•"),k,k)).join("")+`</div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,nr=msgNew().length;
