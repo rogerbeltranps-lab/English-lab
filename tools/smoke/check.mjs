@@ -6,7 +6,7 @@
 //     as How it works opening Materials before PR #866);
 //   • the student board (today.html) and each of its places, in English (4 ESO Core) and in Catalan (2 ESO Base), demo data of
 //     tools/site-video/board/demo.mjs;
-//   • each LS2 page of both courses (LS home, learning paths, checkpoints, final product, book…), 🎯 Practise and 🎲 Games.
+//   • each LS2 page of both courses (LS home, learning paths, checkpoints, final product, book…), 🎯 Practise (and its 🧠 Flashcards) and 🎲 Games.
 // A page fails when it throws a JavaScript error, shows (almost) nothing, or on a phone is wider than the screen.
 // Nothing leaves this computer: every request outside the repo is blocked, and any try to reach the real database (Firestore, Google
 // sign-in) is a failure of its own, so a page in demo mode can never read or change real students' work.
@@ -151,7 +151,7 @@ const BOARD = ['', '#todo', '#homework', '#marks', '#progress', '#exam-practice'
 const SKIP = /^(.*-model|exam)\.html$/;   // the real exam page needs Roger's exam mode; the models are only videos
 for (const S of STUDENTS) {
   const lsPages = fs.readdirSync(path.join(ROOT, S.C.dir)).filter((f) => f.endsWith('.html') && !SKIP.test(f)).sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
-  const urls = [...BOARD.map((h) => 'today.html' + h), ...lsPages.map((f) => `${S.C.dir}/${f}`), 'lab/practice.html', 'lab/index.html']
+  const urls = [...BOARD.map((h) => 'today.html' + h), ...lsPages.map((f) => `${S.C.dir}/${f}`), 'lab/practice.html', 'lab/practice.html#deck', 'lab/index.html']
     .filter((u) => !FILTER || u.includes(FILTER) || S.lang === FILTER);
   for (const size of SIZES) {
     const c = await context(size, S);
