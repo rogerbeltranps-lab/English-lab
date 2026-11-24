@@ -374,7 +374,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -1005,7 +1005,7 @@ function audMount(root){(root||document).querySelectorAll("[data-au]:not([data-a
 // 🔇 no recording (Roger, 16 Nov 2026: "why don't I see the audio here?" on a Speaking handed in Sun 8 Nov at 18:00): recordings are only
 // kept since PR #444 (Sun 8 Nov, 19:45); before that, and when an upload did not reach Drive, the hand-in has no x.audio. Say so instead of nothing.
 const REC_FROM="2026-11-08T18:45:00Z";
-const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
+const noAudio=(x,step)=>x&&!(x.audio&&x.audio.id)&&/speak|talk|shadow/.test(step)?`<p class="muted">🔇 <b>No recording to listen to</b>: ${String(x.date||"")<REC_FROM?"it was handed in before recordings were saved (from Sun 8 Nov, 19:45), so only the transcript was kept.":"the recording did not reach Drive when it was handed in, so only the transcript was kept."}</p>`:"";
 const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+(x=>x&&x.audio&&x.audio.id?` <span class="au" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""} and see the correction" style="cursor:pointer">🔊</span>`:"")(((pstate(u,a)||{}).steps||{})[k])};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
 // the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
@@ -1029,13 +1029,14 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   // 🤖 Roig's feedback on a recording (Roger, 17 Nov 2026: "I also want to be able [to see] Gemini's corrections and feedback"): the notes
   // Roig wrote when the recording was handed in (field "Notes from the recording", el-mic.js → school script "audio") go in their own box
   // right under the player, before the Wednesday correction; the transcript is labelled as Roig's. Only the teacher sees the name Roig.
-  const sp=/speak|talk/.test(step),isNote=y=>sp&&/^Notes from the recording/.test(y.l),isTr=y=>sp&&(y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació");
+  // 🗣 a Shadowing hand-in (Roger, 24 Nov 2026: "students turn them in and roig will correct them") opens like a Speaking: player, Roig's notes, transcript
+  const sp=/speak|talk|shadow/.test(step),isNote=y=>sp&&/^Notes from the recording/.test(y.l),isTr=y=>sp&&(y.l==="Transcript of the recording"||y.l==="Transcripció de la gravació");
   const notes=f.filter(isNote),aud=(((pstate(u,a)||{}).steps||{})[step]||{}).audio;
   const roig=!sp?"":notes.length?`<p style="margin:12px 0 4px"><b>🤖 Roig's feedback on the recording</b> <small class="muted">(task and pronunciation · written when it was handed in${aud&&aud.eur?" · €"+(+aud.eur).toFixed(3):""})</small></p>`+notes.map(y=>`<div class="hand" style="border-left:4px solid #7c3aed;background:#f5f3ff"><p style="white-space:pre-wrap;margin:0">${esc(y.v)}</p></div>`).join("")
     :aud&&aud.id?`<p class="muted">🤖 <b>No feedback from Roig</b> on this recording (the recording could not be checked when it was handed in): the afternoon correction is written from the transcript.</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.filter(y=>!isNote(y)).map(y=>`<p><b>${esc(y.l==="Text"&&sp?"What they said (transcript)":isTr(y)?"What they said (Roig's transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp?spkBox(u,aid,step):""}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${(h=>audioBox(h)||noAudio(h,step))(((pstate(u,a)||{}).steps||{})[step])}${roig}${sp&&step!=="shadow"?spkBox(u,aid,step):""}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+fbHold(u,aid,step,x)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
@@ -1416,7 +1417,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only · Back or ✕ Exit returns here")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
-    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
+    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="how"',"🎬","How it works","guides for teachers and students")}</div>`
     +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
@@ -1797,7 +1798,7 @@ function render0(){
     +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
     +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
     +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
-    +`<button class="nv" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`
+    +nv("how","🎬 How it works","","Guides for teachers and students")
     // ✦ Roger's own course, as a section of its own (tnPage)
     +((window.TN_LS||[]).length&&!DEMO?`<div class="sep"></div>`+nv("tn","✦ Towards Nativeness","","Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"):"");
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
@@ -1807,6 +1808,7 @@ function render0(){
   if(S.g==="tn"){$("#main").innerHTML=tnPage();return}
   if(S.g!=="online")visUnwatch();
   if(S.g==="online"){$("#main").innerHTML=onlinePage();return}
+  if(S.g==="how"){$("#main").innerHTML=howTo(matA);return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
   if(S.g==="lss"){$("#main").innerHTML=lssPage();return}
   if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
@@ -2043,7 +2045,7 @@ const spkGet=(gid,ls,u,fid)=>((SPK.d[spkDoc(ls,gid)]||{})[u]||{})[fid]||null;
 // Classroom or by a link (fpgVideo, as 🎬 Final product); group videos are left out (Roig can't tell which voice is the student) and so
 // are YouTube links (no file).
 function spkRecs(studs,lss){const out=[];studs.forEach(s=>lss.forEach(ls=>acts(ls).forEach(a=>{const st=pstate(s.uid,a).steps||{};
-  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id)out.push({u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
+  Object.entries(st).forEach(([k,x])=>{if(x&&x.audio&&x.audio.id&&!x.sh)out.push(   /* not Shadowing (x.sh): the words are the model's, not the student's own speaking */{u:s.uid,s,a,k,ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||"",qs:spkQs(x)})})})));
   lss.forEach(ls=>{const a=fpAct(ls);if(a)studs.forEach(s=>{const r=spkFpRec(s,a);if(r)out.push(r)})});
   return out.sort((p,q)=>tms(q.at)-tms(p.at))}
 const spkLevels=an=>SPK_LV.map(([k])=>an&&an[k]&&an[k].level!=null?+an[k].level:null);
@@ -2616,7 +2618,7 @@ const CK={write:["✍️","Writing","writings"],speak:["🎙","Speaking","speaki
 const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):typeof v.toMillis==="function"?v.toMillis():v.seconds?v.seconds*1000:0;
 const ckOf=(step,it)=>step==="speak"||/speak/.test(step)?"speak":step==="talk"||/talk/.test(step)?"talk":it&&it.mode==="reply"||step==="reflect"?"reflect":step==="write"||it&&it.mode==="writing"?"write":"other";
 // a step's name in any LS (cpName only knows the LS on screen)
-const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",reflect:"Reflection"})[step]||step};
+const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing",reflect:"Reflection"})[step]||step};
 const CORR={d:null,t:0,v:null,mkT:0,busy:false,failT:0};
 // Fresh after every run (Roger, 8 Nov 2026: "yesterday you said there were no corrections waiting but now I see corrections pending, why?"):
 // the waiting list is worked out from the copy of the students' work kept in this browser, and that copy was from Mon 2 Nov, before
@@ -2802,7 +2804,7 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // students dashboard"): for teachers, and for students; since 2 Nov 2026 one student video per language holds the board part by part.
 const HOW_VIDEOS=[["For teachers",[["👩‍🏫 How the dashboard works","video/how-the-dashboard-works.mp4?v=20261101",true]]],
   ["For students · how the website works",[["🎓 In English (Amelia)","video/how-english-lab-works.mp4?v=20261102c",true],["🎓 In Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261102c",true]]]];
-function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
+function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Guides and videos made from the real site. Students can find the current guide in Help.</p><h3>For students · corrections and feedback</h3><p>How I correct your work: ${a("shared/help/how-i-correct-your-work.pdf","Open presentation (PDF) →","btn")} ${a("today.html#help","Student help guide →","chip")}</p>`
   +HOW_VIDEOS.map(([g,vs])=>vs.some(v=>v[2])?`<h3 style="margin:10px 0 4px">${esc(g)}</h3>`+vs.filter(v=>v[2]).map(([t,href])=>`<p style="margin:4px 0">${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join(""):"").join("")+`</div>`}
 const matA=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
 const MAT_R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],matRP=l=>MAT_R0.concat(l.pro?[["native","Pro"]]:[]);
@@ -2824,7 +2826,7 @@ function lsMat(l,noHead){const a=matA,R0=MAT_R0,RP=matRP,k=l.id.replace("-","/")
         return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
       :`<p class="muted">No paper worksheets for this LS.</p>`)}
 function matTab(){
-  return howTo(matA)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
+  return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
     const games=courseGames(c),a=matA,lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?gamesTable(games):`<p class="muted">No games yet.</p>`)

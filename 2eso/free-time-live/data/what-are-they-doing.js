@@ -214,7 +214,8 @@ window.LP = {
         { r: 'daring', q: 'Laia says “It’s really noisy.” Why?', o: ['Omar is watching a basketball match at the sports centre.', 'Laia is playing the guitar.', 'Omar is in the square with friends.'] },
         { r: 'daring', q: 'Which sentence is about now, not about a habit?', o: ['My sister is playing basketball.', 'I usually go swimming.', 'Do you go every Saturday?'] }
       ] },
-    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
+    { id: 'shadow', type: 'shadow', hand: false, // opened before 24 Nov 2026: not handed in (ls2-engine.js R.shadow)
+      tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
       intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
       clip: { title: 'Live from the sports hall (Emma and Sam)', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [0.38, 36.41], ts: [0.38, 42.22], lines: [
         ['Emma', 'Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],

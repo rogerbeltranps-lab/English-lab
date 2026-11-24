@@ -143,7 +143,7 @@ async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.
       const fl=(res.flags||{})[step];if(fl&&!fl.done||fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))continue;   // a possible copy waiting for the teacher, or redone in class and not handed in again
       (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title,mode:it.mode})}}
   for(const k in out)out[k].sort((x,y)=>x.s.uid<y.s.uid?-1:1);return out}
-const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk"};
+const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing"};
 // A writing's correction also gives a 5.1 level (Roger, 21 Nov 2026: corrected writings count in the Writing skill and criterion 5.1):
 // the LS's 5.1 indicators, saved as results/{activity}.levels[step]["5.1"] + marked[step] with the correction. LSs without 5.1 indicators
 // (LS1, exam + final product only) keep corrections without a level. The level never changes a mark (no grading block reads it); it is
@@ -301,7 +301,7 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
   const rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
     if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);
-    else if(row.mode==="surprise")x.fb=W.ELMark.sqText(x.fb);   // 🎲 one sentence + "➜ " things to improve (el-corrections.js)   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
+    else if(row.mode==="surprise"||row.mode==="shadow")x.fb=W.ELMark.sqText(x.fb);   // 🎲 one sentence + "➜ " things to improve (el-corrections.js)   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(LV?Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ":"")+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again
