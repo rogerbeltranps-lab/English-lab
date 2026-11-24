@@ -1664,14 +1664,14 @@ const FD=FW.document,FE=FD.documentElement;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
 // FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs) or the group's class by the timetable (TT = live/{group}.tt),
 // elFsEff in el-catalog.js (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have class")
-let fsWas=false,FSG=null,FSL=null,TT=null;
+let fsWas=false,FSG=null,FSL=null,TT=null,SELF_ON=false;   // SELF_ON: 🧑‍🎓 self study (cmSelf): no full screen, no away cover
 // the group's timetable for "5 minutes before the class" (elClassOpenAt in el-catalog.js): kept for this page and the next ones in this browser
 function keepTT(tt){if(!tt||!tt.slots||!myGroup)return;(window.EL_LIVE_TT=window.EL_LIVE_TT||{})[myGroup]=tt;try{localStorage.setItem("el_tt_"+myGroup,JSON.stringify(tt))}catch(e){}}
 function fsRefresh(){const was=FSG&&FSG.at;FSG=myGroup?elFsEff(FSL,TT):null;if((FSG&&FSG.at)!==was)beatAt=0}
 const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
 const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));   // FSG is refreshed every second
-function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;return !ownFs()}
+function fsWanted(){if(frozen||SELF_ON||!myGroup||!fsOnG()||!fsCan())return false;return !ownFs()}
 // fsLeft(false): a leave of the page (el-away.js below), not of the full screen; every write carries both counts of this class (n, aw/awMs)
 async function fsLeft(fs=true){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+(fs?1:0);if(fs)fsSS(k,String(n));const c=awayCount(FSG.at);
   try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n,aw:c.aw,awMs:c.awMs},{merge:true})}catch(e){console.warn("full screen",e)}}
@@ -1679,7 +1679,7 @@ function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.loc
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
   if(shellGo)return;
-  if(inShell&&(ownFs()||authKnown&&!isStudent(user)||fsKnown&&!fsOnG())){shellLeave();return}   // 🖥 the full screen is over (or this page has its own)
+  if(inShell&&(ownFs()||SELF_ON||authKnown&&!isStudent(user)||fsKnown&&!fsOnG())){shellLeave();return}   // 🖥 the full screen is over (or this page has its own)
   if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{const K=FW.navigator.keyboard;if(K&&K.unlock)K.unlock()}catch(e){}
     try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
   if(fsIs()){if(c)c.remove();fsWas=true;return}
@@ -1713,7 +1713,7 @@ document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document
 // window). Not on the exam, checkpoints or the sample exam (their own lock), nor for the teacher's student view.
 let awOff=false;
 awayWatch({FD,ca:lockCa,z:2147483003,key:()=>FSG&&FSG.at,
-  on:()=>!!(user&&isStudent(user)&&!AS&&myGroup&&fsOnG()&&!ownFs()&&!window.EL_EXAM_LOCK),
+  on:()=>!!(user&&isStudent(user)&&!AS&&myGroup&&fsOnG()&&!SELF_ON&&!ownFs()&&!window.EL_EXAM_LOCK),
   off:x=>{if(x){if(!awOff&&FD.visibilityState==="visible"){awOff=true;hereBeat(true)}}else if(awOff){awOff=false;hereBeat(false)}},
   back:()=>fsLeft(false),fsNeed:()=>fsWanted()&&!fsIs(),fsGo});
 const fsChanged=()=>{fsCheck();hereTick()},FSEV=["fullscreenchange","webkitfullscreenchange"];FSEV.forEach(t=>FD.addEventListener(t,fsChanged));
@@ -1831,8 +1831,8 @@ function cmLook(g){const l=g&&g.cm&&g.look;if(!l||l.s!==g.s||!(Date.now()-l.at<L
   document.body.append(x)}
 // 🧑‍🎓 Self study in class mode (Roger, 24 Nov 2026: "in class mode I want to have the option of self study to work on whatever they need
 // to"): while the teacher's class tab has 🧑‍🎓 Self study on (el-cm-agenda.js selfSet writes live/{group}.go.self = {s, at}; ✕ End self study
-// or ⏹ Stop clears it), every student in that class mode is let go (no 🎓 bar, no moves, every page of the site open, the class full screen
-// stays) and gets a bar at the top: ✅ My pending tasks (the ✅ To do card with its links, opened once by itself), 📖 the LS book and
+// or ⏹ Stop clears it), every student in that class mode is let go (no 🎓 bar, no moves, every page of the site open, full screen
+// off, no away cover: SELF_ON) and gets a bar at the top: ✅ My pending tasks (the ✅ To do card with its links, opened once by itself), 📖 the LS book and
 // 🎲 Games. When it goes, class mode takes them back to the teacher's step as usual. No extra reads: the To do list's own.
 const SELF_MS=90*60e3;
 const selfOn=g=>{const x=g&&g.cm&&g.self;return !!(x&&x.s===g.s&&Date.now()-x.at<SELF_MS&&elCmOn(g))};
@@ -1840,7 +1840,8 @@ function selfOff(){const b=document.getElementById("el-self");if(b){b.remove();l
 function selfBook(){const c=courseOf(myGroup),ls=(window.EL_LS||[]).filter(l=>l.course===c&&!l.personal&&l.story).map(l=>l.id),last=ls[ls.length-1];
   return last?(window.EL_CATALOG||[]).find(a=>a.ls===last&&/(^|\/)book\.html$/.test(a.path||"")):null}
 function cmSelf(g){const on=selfOn(g)&&!onDash&&!!user&&(isStudent(user)||!!AS)&&!window.EL_EXAM_LOCK;
-  if(!on){selfOff();return false}
+  if(!on){if(SELF_ON){SELF_ON=false;fsCheck()}selfOff();return false}
+  if(!SELF_ON){SELF_ON=true;fsCheck()}   // no full screen in self study (Roger, 24 Nov 2026: "in selfstudy students don't need to be in full screen")
   const ca=lockCa(),t=(c,e)=>ca?c:e;let b=document.getElementById("el-self");
   if(!b){b=document.createElement("div");b.id="el-self";b.setAttribute("role","status");
     b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:700 15px system-ui,sans-serif;background:#4338ca;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
