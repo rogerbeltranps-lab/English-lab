@@ -319,6 +319,13 @@ service cloud.firestore {
         // isTeacher: the teacher's OWN progress (uid is theirs), for the personal LS they do as a learner (✦ Towards Nativeness, Roger 17 Nov 2026).
         // Not inside signedIn(): that is school accounts only, and the teacher signs in with Gmail (18 Nov 2026: nothing of theirs was saved).
       }
+      // 🧠 Flashcards (Roger, 24 Nov 2026): the student's own spaced-repetition progress in 🎯 Practise (lab/practice.html,
+      // shared/js/el-flashdeck.js), one document 'all' holding { p: JSON text, at }. Only the student writes it; the teacher can read it.
+      match /flashcards/{doc} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create, update: if signedIn() && request.auth.uid == uid && doc == 'all'
+          && request.resource.data.keys().hasOnly(['p', 'at']) && request.resource.data.p is string && request.resource.data.p.size() < 900000;
+      }
       // route (level): only the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark; 30 Oct 2026: students never choose one).
       // A student can only ask for another route from their board: request (any route but Pro), an optional reason and requestedAt.
       // They never touch level, by, declined or the notice fields; the teacher accepts (sets the route) or declines on the dashboard.

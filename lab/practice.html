@@ -34,6 +34,7 @@
     .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer}.chip.on{background:#172033;color:#fff;border-color:#172033}
     select{border:1px solid #cbd5e1;border-radius:10px;padding:5px 8px;background:#fff;max-width:100%}
     .tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}.tabs .tab{grid-column:span 2}.tabs .tab.big{grid-column:span 3;font-size:1.15rem;padding:16px}
+    .tabs .tab.wide{grid-column:1/-1;font-size:1.2rem;padding:16px 18px;background:linear-gradient(120deg,#f5f3ff,#eef2ff);border-color:#ddd6fe}.tabs .tab.wide.on{background:linear-gradient(120deg,#6d28d9,#3157d5);color:#fff;border-color:#6d28d9}
     .tab{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;cursor:pointer;text-align:left;font-weight:800}
     .tab small{display:block;font-weight:600;color:var(--muted);margin-top:2px}.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.tab.on small{color:#dbe4ff}
     .card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fff}
@@ -66,13 +67,14 @@
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
       .mobile-tabs .tab-btn{white-space:nowrap;background:#fff;border:1px solid var(--line)}.mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}.tabs .tab,.tabs .tab.big{grid-column:span 1}.tabs .tab.big{font-size:1.05rem}}
+      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}.tabs .tab,.tabs .tab.big{grid-column:span 1}.tabs .tab.wide{grid-column:1/-1}.tabs .tab.big{font-size:1.05rem}}
     @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
   </style>
   <script src="../shared/js/el-catalog.js"></script>
   <script src="../shared/js/el-shadow.js"></script>
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
+  <script src="../shared/js/el-flashdeck.js"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
@@ -184,20 +186,50 @@ const MAXW = { beginners: 8, insecure: 10, safe: 14, daring: 18, native: 18 }, M
 const sentences = (text, lv) => plain(text).split(/(?<=[.!?])\s+(?=[A-Z“"‘'¿¡])/).map(s => s.trim())
   .filter(s => { const n = s.split(/\s+/).length; return n >= MINW[lv] && n <= MAXW[lv] && /[.!?]$/.test(s) && !/___|…|\[|\]|\s\/\s|\.\.\./.test(s); });
 
+// 🧠 Flashcards: one card per word (English → its Catalan or, on Pro, its meaning, with the example) and one per grammar or 💬 Expressions
+// question (the sentence with its gap → the sentence filled in and the rule). The card id comes from the text, so a card keeps its
+// progress wherever it is, and a new question is a new card.
+const GAP = /_{2,}(?:[\s/]*_{2,})*/g;
+const vCard = (en, ca, ex, star, part) => ({ id: 'v:' + norm(en), kind: 'v', part, front: esc(en), say: en, ex: ex || '', star: !!star,
+  back: `<div class="elfd-ans">${esc(ca || '')}</div>${ex ? `<div class="elfd-ex">${esc(ex)}</div>` : ''}` });
+function gCard(it, items, kind, part, lv, salt) {
+  const q = String(it.q), a = it.a[0], n = (q.match(GAP) || []).length, w = a.split(/\s+/), mk = x => '<mark>' + esc(x) + '</mark>';
+  let k = 0;
+  const filled = n === 1 ? q.replace(GAP, mk(a)) : n > 1 && n === w.length ? q.replace(GAP, () => mk(w[k++])) : null;
+  const clean = filled && filled.replace(/(<\/mark>)\s*\((?:not \/ )?[a-z' /]+\)/gi, '$1');   // "taught (teach)" → "taught"
+  const why = elCa(base(lv)) ? (it.ca || it.en || '') : (it.en || it.ca || ''), lvB = base(lv);
+  const opts = lvB === 'beginners' ? (it.opts || choices(it, items, salt)) : lvB === 'insecure' ? (it.opts || null) : null;
+  return { id: 'g:' + hash(plain(q) + '|' + a), kind, part, front: q.replace(GAP, '<span class="elfd-gap"></span>'), opts,
+    say: clean && !/→|:/.test(plain(q)) ? plain(clean) : '',
+    back: `<div class="elfd-ans">${clean || mk(a)}</div>${why ? `<div class="elfd-why">💡 ${esc(plain(why))}</div>` : ''}` };
+}
+
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
 function extract(pg, lv, off) {
-  const out = { words: [], grammar: [], build: [], listen: [], shadow: [] }, lp = pg.a.title, at = pg.a.id;
+  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
-    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at })));
+    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'))); }));
     ((pg.info[L] || {}).builders || []).forEach(b => out.build.push({ s: b.join(' '), lp, at }));
     const qs = pg.listening && pg.listening[L];
     if (pg.audio && Array.isArray(qs) && qs.length)
       out.listen.push({ key: at + '#listen', title: lp, lp, media: { kind: 'audio', src: pg.audio }, items: qs.map(q => ({ q: q.q, o: [q.o[q.a]].concat(q.o.filter((x, i) => i !== q.a)) })) });
     return out;
   }
-  const texts = [];
-  panelsOf(pg, lv).filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
+  const texts = [], PS = panelsOf(pg, lv), mainG = PS.find(p => p.type === 'typed' && p.id === 'grammar') || PS.find(p => p.type === 'typed' && /^grammar/.test(p.id));
+  PS.filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
+    // 🧠 Flashcards (Roger, 24 Nov 2026): every word of the Vocabulary steps and every grammar / 💬 Expressions question of the tabs open
+    // for the group, at the student's route, go to the LS deck (shared/js/el-flashdeck.js)
+    if (Array.isArray(p.groups) && p.groups.some(g => Array.isArray(g.items))) {
+      const core = new Set(forLevel(p.core, lv)), part = plain(byLevel(p.title, lv)) || t('Vocabulari', 'Vocabulary');
+      p.groups.filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => { const [en, ca, ex] = Array.isArray(it) ? it : [it.en, it.ca, it.ex]; if (en) out.cards.push(vCard(en, ca, ex, core.has(en), part)); }));
+    }
+    if (p.type === 'typed' && /^(grammar|mixed|vocabEx)/.test(p.id)) {
+      const items = forLevel(p.items, lv).filter(q => q && q.q && Array.isArray(q.a) && q.a.length && typeof q.a[0] === 'string');
+      const ptitle = id => { const x = (p.parts || []).find(y => y.id === id); return x ? plain(byLevel(x.title, lv)) : ''; };
+      const mixed = p.id === 'mixed' ? t('Barreja', 'Mixed practice') + (mainG ? ' · ' + plain(byLevel(mainG.title, lv)) : '') : '';
+      items.forEach((it, i) => out.cards.push(gCard(it, items, p.id === 'vocabEx' ? 'e' : 'g', mixed || (p.parts && p.parts.length > 1 && ptitle(it.p)) || plain(byLevel(p.title, lv)) || ptitle(it.p), lv, at + p.id + i)));
+    }
     if (p.type === 'vocab') {
       const core = new Set(forLevel(p.core, lv));
       (p.groups || []).filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => {
@@ -236,7 +268,7 @@ function extract(pg, lv, off) {
 /* ---------- who is here ---------- */
 const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
 const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, step: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
-if (!['words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
+if (!['deck', 'words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
 const all = () => DEMO ? !!DEMO.teacher : !!U && !ELCloud.viewing && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));   // viewing: the teacher's student view (el-cloud.js)
@@ -272,7 +304,7 @@ async function content() {
   pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).filter(l => S.ls === 'all' || l.id === S.ls).forEach(l => { if (!L.includes(l)) L.push(l);
     const ok = all() || c === myCourse() ? canDo : otherDo;
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
-  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
+  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], cards: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
   // Only the tabs the learning path itself shows (Roger, 22 Nov 2026: "Why some 4ESO students could do the future forms if they are scheduled
   // for next Wednesday?"): a tab the teacher locked, or one the Time plan keeps for a later class (or none yet), stays out of Practise
@@ -281,6 +313,8 @@ async function content() {
   const offOf = a => all() || !window.elSecLockedFor ? null : new Set(elSecLockedFor(a, D.ls[a.ls] || {}, D.group, new Set()));
   pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv, offOf(acts[i].a)); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
   const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  // 🧠 one deck per LS, newest first for students (as content() lists them), each card once
+  out.decks = out.ls.map(l => { const ids = new Set(); return { id: l.id, name: lsName(l), cards: out.cards.filter(c => c.ls === l && !ids.has(c.id) && ids.add(c.id)) }; }).filter(d => d.cards.length);
   return out;
 }
 
@@ -307,17 +341,18 @@ function filters(x) {
     ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
 }
 // Vocabulary and Grammar first and bigger (Roger, 7 Nov 2026), then sentence builder, listening and shadowing
-const TABS = [['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
+const TABS = [['deck', '🧠', 'Flashcards', 'Targetes', 'Tot el vocabulari i la gramàtica de cada LS', 'All the vocabulary and grammar of each LS'], ['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
   ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['shadow', '🗣', 'Shadowing', 'Shadowing', 'Escolta i repeteix', 'Listen and repeat']];
 let X = null, gen = 0;
 async function render() {
   const g = ++gen;
   $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
   const x = await content(); if (g !== gen) return; X = x;
-  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
+  const fs = ELFlashDeck.summary(x.decks, fdLoad()), fsN = fs.due + fs.new;
+  const n = { deck: fsN ? fsN + ' ' + t('per estudiar avui', 'to study today') : fs.total + ' ' + t('targetes', 'cards'), words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
   $('#app').innerHTML = header() + filters(x)
-    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
-  ({ words, grammar, build, listen, shadow })[S.tab]();
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : k === 'deck' ? ' wide' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
+  ({ deck, words, grammar, build, listen, shadow })[S.tab]();
 }
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
 const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
@@ -361,6 +396,33 @@ function tcheck() {
   test.forEach((w, i) => { const inp = $('#tw' + i), f = $('#tf' + i), right = variants(w.en).includes(norm(inp.value)); if (right) ok++;
     inp.className = 'typed ' + (right ? 'right' : 'wrong'); f.className = 'fb ' + (right ? 'ok' : 'no'); f.innerHTML = right ? '✓' : '✗ ' + t('Resposta', 'Answer') + ': <b>' + esc(w.en) + '</b>'; if (right) store.known[w.en] = Date.now(); });
   keep(); $('#tscore').textContent = ok + ' / ' + test.length + (ok === test.length ? ' 🎉' : '');
+}
+
+/* 🧠 Flashcards (Roger, 24 Nov 2026: "a flashcard activity with all the vocabulary and grammar done in each route and by LS… a spaced
+   repetition… but for the entire unit… like Anki… all mixed with statistics"; decks hold what the class has done so far): one deck per LS
+   with the cards of extract(), studied with shared/js/el-flashdeck.js. Progress is kept in this browser (el_flash_<uid>) and in the student's
+   account (students/{uid}/flashcards/all, read once when the decks open, saved a few seconds after studying), so the Chromebook and the
+   phone share it. The teacher, testers seeing everything and the 👁 student view keep it in this browser only. */
+const FKEY = () => 'el_flash' + (U ? '_' + U.uid : '');   // per account: two students on one browser never share a deck
+const fdLoad = () => { try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
+const fdCloudOn = () => !DEMO && U && !all() && !ELCloud.viewing;
+const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
+function fdSave(P) {
+  try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
+  if (fdCloudOn()) F.setDoc(fdRef(), { p: JSON.stringify(P), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
+}
+let fd = null, fdRead = null;
+const fdHost = document.createElement('div');
+function fdCloud() {   // once per visit: the account's copy, merged with this browser's (the latest review of each card wins)
+  if (!fdCloudOn() || fdRead) return;
+  fdRead = F.getDoc(fdRef()).then(snap => { const cloud = snap.exists() ? JSON.parse(snap.data().p || '{}') : null; if (!cloud) return;
+    const m = ELFlashDeck.merge(fdLoad(), cloud); try { localStorage.setItem(FKEY(), JSON.stringify(m)) } catch (e) {} if (fd) fd.reload(); }).catch(e => console.warn('flashcards read', e));
+}
+function deck() {
+  $('#body').innerHTML = '<div id="fdSlot"></div>'; $('#fdSlot').replaceWith(fdHost);
+  if (!fd) fd = ELFlashDeck.mount(fdHost, { decks: () => X.decks, ca: () => !EN, load: fdLoad, save: fdSave, say });
+  else fd.render();
+  fdCloud();
 }
 
 /* 🧩 Sentence builder: sentences of the route's models and examples, words shuffled */
@@ -624,7 +686,7 @@ async function srec(i) {
 /* ---------- clicks ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-do]'); if (!el || el.tagName === 'SELECT') return; const k = el.dataset;
-  const go = (f, r) => { f(); if (r) render(); else ({ words, grammar, build, listen, shadow })[S.tab](); };
+  const go = (f, r) => { f(); if (r) render(); else ({ deck, words, grammar, build, listen, shadow })[S.tab](); };
   ({
     course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
     level: () => { if (all()) go(() => { [S.course, S.level] = k.v.split('|'); S.step = stepOf(S.course, S.level); S.ls = 'all'; S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
@@ -661,7 +723,7 @@ function start() {
   document.title = t('Practica', 'Practise') + ' · English with Roger';
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
-  $('#lead').innerHTML = t('El vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
+  $('#lead').innerHTML = t('Targetes de cada LS, el vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Flashcards of every LS, vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
   S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // students get everything at their level in one place (no LS filter, newest LS first: content())
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';
