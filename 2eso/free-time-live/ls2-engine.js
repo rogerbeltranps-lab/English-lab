@@ -578,7 +578,7 @@ var LS2 = (function () {
     if (!rec || !Array.isArray(rec.v) || !Array.isArray(rec.q) || !rec.q.length) return rec;
     const A = state.ans && state.ans[id], N = state.nb && state.nb[id], re = N && N.re && typeof N.re === 'object' ? N.re : {};
     const useA = !!A && A !== rec && Array.isArray(A.q) && Array.isArray(A.v) && !A.from;
-    const out = Object.assign({}, rec, { v: rec.v.slice(), tries: Object.assign({}, rec.tries || {}) });
+    const out = Object.assign({}, rec, { q: rec.q.slice(), v: rec.v.slice(), tries: Object.assign({}, rec.tries || {}) });
     rec.q.forEach((q, i) => {
       if (!filledV(rec.v[i])) return;   // a question not answered in this try (a new try after ↺ Practise again) stays empty
       let at = rec === A ? ansAt(id, A, i) : firstAt(id), best = null;
@@ -590,14 +590,19 @@ var LS2 = (function () {
       Object.keys(out.tries).forEach(k => { if (new RegExp('^' + prefix + i + '(\\D|$)').test(k)) delete out.tries[k]; });
       if (best.t) out.tries[prefix + i] = best.t;
     });
+    // questions added to the step after this record (24 Nov 2026): their newest answers come along too
+    if (useA) A.q.forEach((q, j) => { if (!out.q.includes(q) && filledV(A.v[j])) { out.q.push(q); out.v.push(A.v[j]); } });
+    Object.keys(re).forEach(q => { const r = re[q], j = out.q.indexOf(q); if (r && filledV(r.v) && (j < 0 || !filledV(out.v[j]))) { if (j < 0) { out.q.push(q); out.v.push(r.v); } else out.v[j] = r.v; } });
     return out;
   }
   const okIn = f => !f ? null : f.classList.contains('ok') ? 1 : f.classList.contains('no') ? 0 : null;
   // question it's answer v goes into the newest answers (state.ans[id]): when it was checked (at) and whether it was right (ok)
   function setAns(id, it, v, ok, at) {
     const A = state.ans && state.ans[id]; if (!A || !Array.isArray(A.q) || !Array.isArray(A.v) || A.from) return false;
-    const j = A.q.indexOf(qid(it)); if (j < 0) return false;
     if (state.nb && state.nb[id] === A) state.nb[id] = JSON.parse(JSON.stringify(A));   // the notebook's first try never changes with it
+    let j = A.q.indexOf(qid(it));
+    // a question added after the step was done (24 Nov 2026): its first answer joins the record
+    if (j < 0) { if (!filledV(v)) return false; A.q.push(qid(it)); A.v.push(null); j = A.q.length - 1; }
     let ch = false;
     if (String(A.v[j]) !== String(v)) { A.v[j] = v; A.t = A.t || []; A.t[j] = at || new Date().toISOString(); ch = true; }
     if (ok != null) { A.ok = A.ok || []; if (A.ok[j] !== ok) { A.ok[j] = ok; ch = true; } }
@@ -704,6 +709,10 @@ var LS2 = (function () {
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
+  /* A step opened again (Roger, 24 Nov 2026, problem report 4ESOB: "he should see his latest answers"): a question still empty is not a
+     mistake to point at. It shows no red "Type an answer." (that line is only for a ✓ Check pressed on an empty box), so questions added
+     after the step was done look new, not lost. Only questions the saved answers do not have (k.v[i] null): a box left empty in a Check keeps it. */
+  const quiet = (k, prefix, items) => k.fresh && items.forEach((_, i) => { const f = $('#' + prefix + 'f' + i); if (k.v[i] == null && f && f.classList.contains('no')) { f.innerHTML = ''; f.className = 'feedback'; } });
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count, only): the step's own check (only: the questions to check and show; null = all); stays(id, prefix, listId, items, check)
   // wires Check, Do it again and the restore. src: the panel's whole list (p.items / p.practice), to place answers saved at another route.
@@ -737,7 +746,7 @@ var LS2 = (function () {
     retryBack(id);
     if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
-    if (k) { fill(items, prefix, k.v); check(false, k.c); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); quiet(k, prefix, items); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
     nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
@@ -774,7 +783,7 @@ var LS2 = (function () {
     Object.keys(tries).forEach(x => { delete tries[x]; }); Object.assign(tries, T0);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
     nbMerge(S, on && k0, on && k);
-    if (k) { fill(items, prefix, k.v); check(false, k.c); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); quiet(k, prefix, items); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* ✏️ Correct a wrong answer in the notebook, one question at a time (Roger, 19 Nov 2026: "I want them to be able to redo the questions
@@ -799,7 +808,9 @@ var LS2 = (function () {
     if (!S.open) S.open = new Set();
     if (!S.first) S.first = vals(S.items, S.prefix);   // frozen just now, with the last ✓ Check: what is on the page is the first try
     S.one.forEach(i => {
-      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q || !filledV((S.cur || S.first)[i])) return;
+      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q) return;
+      // a counted question still empty (added after the step was done, 24 Nov 2026) stays open: it can be answered and ✓ Checked here
+      if (!filledV((S.cur || S.first)[i])) { S.open.add(i); q.inert = false; q.classList.add('el-nbopen'); return; }
       const open = S.open.has(i), wrong = f.classList.contains('no');
       if (!wrong && !open) { if (!q.inert) [...q.children].forEach(c => { c.inert = true; }); return; }   // right (corrected too): it stays in pen
       q.inert = false;
