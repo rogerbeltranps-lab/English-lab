@@ -1770,8 +1770,21 @@ var LS2 = (function () {
      🔁 Listen and repeat (clip.cues: one sentence, a pause to say it, the next) sits next to 🗣 Shadowing (shared/js/el-shadow.js).
      A Listen and repeat run counts as a play. Listening buttons carry data-vs, so they still work in the teacher's read-only student
      view and in locked sections (el-cloud.js leaves [data-vs] on; Roger, 7 Nov 2026: "it's not working" in student view). */
+  /* Shadowing is handed in and Roig corrects it (Roger, 24 Nov 2026: "in the new shadowing activities I want students to turn them in
+     and roig will correct them"): every Shadowing step hands in the recording of the last go, like Speaking (handRec: Drive + Roig's
+     transcript and notes on how close it is to the model: words, stress, linking, melody, rhythm), and is done only then; the afternoon
+     correction (marks.mjs fb-*, mode "shadow") gives one thing done well and the things to improve. p.hand === false keeps the older
+     step (done after 3 plays and a self-rating, the recording only for the student): the two shadowing steps students had already
+     opened before 24 Nov 2026 (2 ESO LP2, 4 ESO LP3). */
+  const shadowTask = (c, mode, slow) => {
+    const plain = c.lines.map(l => Array.isArray(l) ? l[l.length - 1] : l).join(' ').replace(/\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+    const marked = c.marks ? [].concat(...c.marks).join(' ') : '';
+    const head = 'SHADOWING, not a free speaking task: the student ' + (mode === 'repeat' ? 'hears one model sentence at a time and repeats it in the pause' : 'speaks along with the model recording, just behind it') + (slow ? ' (the slower copy)' : '') +
+      '. The model voice may be heard in the background: judge only the student. In task: how much of the model they said (sentences or words left out or changed). In pronunciation: how close they are to the model in sounds, word and sentence stress, linking, melody (↗ ↘) and rhythm, then at most three words or sounds to practise. Model sentences' + (marked ? ' (stressed syllables in **, linked words ‿)' : '') + ': ';
+    return head + (marked && head.length + marked.length <= 1500 ? marked : plain);
+  };
   R.shadow = p => {
-    const id = p.id, c = p.clip, SH = window.elShadow;
+    const id = p.id, c = p.clip, SH = window.elShadow, hand = p.hand !== false;
     const repeatHow = ca() ? ['Prem ▶: sentiràs una frase i l’àudio s’aturarà.', 'Digues la frase en veu alta: copia les síl·labes fortes, les paraules unides i la melodia (↗ ↘).', 'La frase següent sona sola. Amb ↺ Una altra vegada la tornes a sentir.', 'Després prova 🗣 Shadowing: tot el fragment seguit, parlant alhora.']
       : ['Press ▶: you hear one sentence, then the audio stops.', 'Say the sentence aloud: copy the stressed words, the linking and the melody (↗ ↘).', 'The next sentence plays by itself. Press ↺ Again to hear a sentence once more.', 'Then try 🗣 Shadowing: the whole clip, speaking along.'];
     const howList = list => '<ol style="margin:6px 0;padding-left:22px;line-height:1.8">' + list.map(r => '<li>' + r + '</li>').join('') + '</ol>';
@@ -1787,11 +1800,13 @@ var LS2 = (function () {
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" data-vs id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
         '<div id="' + id + 'Key">' + (SH && SH.has(c) ? SH.key(ca()) : '') + '</div>' +
         '<div class="reading" id="' + id + 'Script">' + (SH ? SH.script(c, 'strong') : c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')) + '</div></div>' +
-        '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
+        '<div class="section-card"><h3>' + (hand ? (ca() ? 'Grava’t i entrega-ho' : 'Record yourself and hand it in') : ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (hand
+          ? (ca() ? 'Quan ja ho facis bé, prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes. Escolta’t, i si t’agrada, prem <strong>Entrega al professor</strong>. El professor escoltarà la gravació i et donarà consells de pronunciació aquí mateix. Si et tornes a gravar millor, torna-la a entregar.' : 'When you are ready, press <strong>Record and play</strong>: the clip plays and you say it with the speaker. Listen to yourself, and when you are happy with it, press <strong>Hand it in to my teacher</strong>. Your teacher will listen to it and give you pronunciation tips right here. If you record a better version, hand it in again.')
+          : (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.')) + '</p>' +
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button><button class="btn secondary" type="button" id="' + id + 'RecStop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
         [['3', ca() ? '😀 Ho he seguit tot' : '😀 I kept up all the way'], ['2', ca() ? '🙂 Gairebé tot' : '🙂 Most of it'], ['1', ca() ? '😕 Em perdia' : '😕 I got lost']].map(r => '<button class="btn secondary" type="button" data-rate="' + id + '" data-v="' + r[0] + '">' + r[1] + '</button>').join('') +
-        '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
+        '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (hand ? teacherBtn() : ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
       bind() {
         const key = id + '_' + level, m = $('#' + id + 'Media'), msg = $('#' + id + 'Msg');
         state.shadow = state.shadow || {}; const sh = state.shadow[key] = state.shadow[key] || { plays: 0 };
@@ -1820,6 +1835,8 @@ var LS2 = (function () {
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
         const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
+        let took = null;   // how the last recording was made (mode, slower copy), for Roig
+        if (hand) cantRow(recBtn.closest('.section-card'), id, 'Shadowing');
         recStop.onclick = () => { if (rp) rp.stop(); endAt = 0; halt(); };
         recBtn.onclick = async () => {
           if (processor) return; recBtn.disabled = true; if (rp) rp.stop();
@@ -1833,6 +1850,7 @@ var LS2 = (function () {
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
           const rr = repeat();   // Listen and repeat: the recording follows the pauses after each sentence (Roger, 7 Nov 2026)
+          took = { mode: rr ? 'repeat' : 'shadow', slow };
           recStop.disabled = false; recMsg.textContent = rr ? (ca() ? 'Gravant… repeteix cada frase quan s’aturi.' : 'Recording… say each sentence when it stops.') : (ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.');
           (c.video ? m : recBtn).scrollIntoView({ behavior: 'smooth', block: 'center' });   // the video has to be in view to follow it
           const fin = async () => {
@@ -1852,10 +1870,30 @@ var LS2 = (function () {
           if (rr) rp.start(0, fin); else play(fin);
         };
         count(); mark(); rate();
-        if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
-        $('#' + id + 'Done').onclick = () => {
+        const handed = () => { const h = (state.steps || {})[id]; if (!h) return; msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà els consells aquí mateix. Si et tornes a gravar millor, torna-la a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s tips will appear right here. If you record a better version, hand it in again.'; };
+        if (hand) handed();
+        else if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
+        let sending = false;
+        $('#' + id + 'Done').onclick = async () => {
           if ((sh.plays || 0) < 3) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escolta el fragment almenys 3 vegades (una per ronda).' : 'Play the clip at least 3 times (one for each round).'; return; }
           if (!sh.rate) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Tria com ha anat.' : 'Choose how it went.'; return; }
+          if (hand) {
+            if (processor) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Atura la gravació primer.' : 'Stop the recording first.'; return; }
+            if (sending) return;
+            // the recording has to cover most of the clip (60 % of the normal copy, at least 8 s)
+            const recMin = Math.max(8, Math.round((c.t[1] - c.t[0]) * 0.6));
+            if (recSecs(id + 'Rec') < recMin) { msg.className = 'feedback no'; msg.textContent = ca()
+              ? 'Grava’t fent tot el fragment (almenys ' + recMin + ' segons) amb Grava i escolta, i després entrega la gravació. Si el micròfon no funciona, prem 🎙️ No puc gravar.'
+              : 'Record yourself doing the whole clip (at least ' + recMin + ' seconds) with Record and play, then hand in your recording. If the microphone doesn’t work, press 🎙️ I can’t record.'; return; }
+            sending = true; msg.className = 'feedback'; msg.textContent = ca() ? 'Enviant la gravació al professor…' : 'Sending your recording to your teacher…';
+            const t = took || { mode: repeat() ? 'repeat' : 'shadow', slow }, title = 'Shadowing · ' + (c.title || ''), r = await handRec(id + 'Rec', id, title, shadowTask(c, t.mode, t.slow)); sending = false;
+            if (!r) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.' : 'Your recording could not be sent. Try again in a moment.'; return; }
+            const model = c.lines.map(l => Array.isArray(l) ? l[l.length - 1] : l).join(' ').replace(/\s+/g, ' ').trim();
+            state.steps = state.steps || {};
+            state.steps[id] = { level, title, ty: null, audio: r.audio, sh: 1, f: [{ l: 'Model sentences', v: model, model: 1 }, ...(r.f.length ? r.f : [{ l: ca() ? 'Transcripció' : 'Transcript', v: '' }])], how: t.mode + (t.slow ? ' · slower' : ''), rate: [], avg: null, comment: '', date: new Date().toISOString() };
+            sh.date = state.steps[id].date; complete(id); save(); handed(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
+            return;
+          }
           sh.date = new Date().toISOString(); complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Molt bé! Com més ho facis, més fàcil serà.' : 'Done ✓ Well done! The more you do it, the easier it gets.';
         };
