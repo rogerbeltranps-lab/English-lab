@@ -489,6 +489,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - **C1 Task achievement 8**: four aspects × 0–2 (0 no evidence, 1 partial, 2 developed), adapted to each paper and version.
 - **C2 Grammar 4 · C3 Vocabulary 4 · C4 Organisation and cohesion 4** (organisation 0–1, connectors 0–2, mechanics 0–1).
 - **Made-up facts never count** (Roger, 23 Nov 2026: "if someone makes up facts, it's okay no big deal, I only care about their English"): C1 checks that each point of the task is there, not that it is true, and the feedback never corrects facts.
+- **Informal English: right in an informal text, a mistake in a formal one** (Roger, 23 Nov 2026: "gonna should be accepted"; 24 Nov 2026: "gonna is a mistake in formal English"): *gonna*, *wanna* and other natural casual forms are accepted in an informal writing (a message, email or post to a friend) and corrected in a formal one (a formal email, a report, a letter to a school). Only a real error around them always counts (*I gonna* without *am*).
 - **No word-count penalty**: word ranges guide; brevity only costs points when ideas the task asks for are missing (in C1).
 - **No quotas as thresholds**: "5 expressions" or "2 connectors" describe an excellent text, they never block a mark. No minimum number of structures.
 - **One error, one penalty**: each error counts in one criterion only ("She get up": credit *get up* in vocabulary, penalise the -s in grammar).
