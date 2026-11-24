@@ -1144,13 +1144,22 @@ function gamesV(u,g){const G0=stuGames(u),dy=x=>String(x.day||"").slice(0,10)||E
   const inn=G0.list.filter(x=>!x.out&&!x.old&&(!S.seg||segIn(S.seg.sg,dy(x)))),full=x=>fm&&formMode(g,dayTerm(dy(x),g))==="done",of=inn.reduce((n,x)=>n+x.of,0);
   return of?inn.reduce((n,x)=>n+(full(x)?x.of:x.r),0)/of*10:null}
 function gvBlock(u,g){const parts=G().gv.parts.map(p0=>{const p={...p0,first:segSt(p0.first),time:segSt(p0.time)};p.none=!!S.seg&&!p.games&&!(p.first||p.time||[]).length;
+    let lvN=0;
     p.v=p.games?gamesV(u,g):p.first?avg(p.first.map(([id,k])=>missZ(firstV(u,id,k,g),id,k)))
-    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:(o===LATE?LATE_W:1)*10,id,k)}).filter(x=>x!==undefined));return p});
+    :(vs=>{if(lvN&&!vs.length)p.none=true;return avg(vs)})(lvTime(u,g,p.time,()=>lvN++));return p});
   // a part made only of checkpoints, none done (ill on every one): left out too, never 0
   return {mark:wavg(parts.filter(p=>!p.none&&(!p.games||p.v!=null)&&!(p.v==null&&p.first&&p.first.every(([id,k])=>isCpStep(id,k)))).map(p=>[p.v,p.w])),parts}}
+// a "time" part: done on time (10) as before, or in a "levels" term the level of each tab (lvV), the skills averaged per skill first so
+// each of the four skills weighs the same (Roger, 24 Nov 2026)
+function lvTime(u,g,time,seen){const plain=[],by={};let n=0;
+  time.forEach(([id,k])=>{if(stepMode(id,k,g)==="levels"){seen();const v=lvV(u,id,k,g);if(v===undefined)return;n++;
+      const sk=(window.ELCharts&&ELCharts.skillOf(byId(id)||{},k))||"other";(by[sk]=by[sk]||[]).push(v);return}
+    const o=onTime(u,id,k,g);if(o===undefined)return;plain.push(missZ(o==null?null:(o===LATE?LATE_W:1)*10,id,k))});
+  const per=Object.values(by).map(vs=>avg(vs)).filter(v=>v!=null),m=per.length?per.reduce((a,b)=>a+b,0)/per.length:null;
+  return plain.concat(m==null?[]:Array(n).fill(m))}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G(),A=segSt(g.auto[c]||[]),T=segSt(g.teacher[c]||[]);
-  const gg=(S.P[u]||{}).group||S.g,auto=avg(A.map(([id,k,first])=>missZ(first?firstV(u,id,k,gg):doneAt(u,id,k)?10:null,id,k)));
+  const gg=(S.P[u]||{}).group||S.g,auto=avg(A.map(([id,k,first])=>!first&&stepMode(id,k,gg)==="levels"?lvV(u,id,k,gg):missZ(first?firstV(u,id,k,gg):doneAt(u,id,k)?10:null,id,k)));
   const teacher=avg(T.map(([id,k])=>lvMark(lvOf(u,id,k,c))));
   // a half with no pieces drops out (1.1 and 1.2 in 4ESO LS2 have only steps), so it never counts 0
   const onlyCp=auto==null&&A.length&&A.every(([id,k])=>isCpStep(id,k));   // only missed checkpoints: left out
@@ -3832,7 +3841,7 @@ const colCrit=(a,c)=>{if(c.ks.length===1||colSkip(a,c))return stepCrit(a,c.ks[0]
   return cs.map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>'};
 const colCell=(u,a,c,d)=>{const n=c.ks.filter(k=>d.has(k)).length;
   return (n===c.ks.length?"✔":n?`<small title="${esc(c.ks.map(k=>tabName(a,k)+(d.has(k)?" ✔":": not done yet")).join("\n"))}">${n} of ${c.ks.length}</small>`:"")
-    +c.ks.map(k=>tryCell(u,a.id,k)+wrCell(u,a,k)+cmtCell(u,a,k)).join("")};
+    +c.ks.map(k=>tryCell(u,a.id,k)+lvChip(u,a.id,k)+wrCell(u,a,k)+cmtCell(u,a,k)).join("")};
 // a comment on a handed-in tab: ✉️ waiting for an answer, 🗨️ answered (by Claude or you); the cell opens it (stepPanel → cmtBox)
 const cmtCell=(u,a,k)=>{const h=((pstate(u,a)||{}).steps||{})[k];if(!h||!ELMark.q(h)||window.elNoComment&&elNoComment(ELMark.q(h)))return "";const xr=res(u,a.id);
   return waits(h,xr,k)?`<br><small title="💬 Comment waiting for an answer (Beltran answers it in a few minutes): click to see it">✉️ comment</small>`
@@ -4126,23 +4135,57 @@ function segSplit(it,gid){if(it.b.id!=="gv"&&it.b.id!=="other")return [it];const
 // like any missing step, 0 only when ticked in class and its day has passed; a class game played in that term counts 10 (taking part, not
 // the % right). Steps that already count as done on time stay the same. A step's term = the term of the day its tab was ticked in the Time
 // plan (else its due day, else today), moved on past a closed term's close day (🔒 Close term). Changes the LS mark and the term marks.
-const formMode=(g,n)=>((((S.D&&S.D.tm)||{})[g]||{}).formative||{})["t"+n]==="done"?"done":"score";
-const fmAny=()=>Object.values((S.D&&S.D.tm)||{}).some(x=>x&&x.formative&&Object.values(x.formative).includes("done"));
+// 📐 "levels" (Roger, 24 Nov 2026: "all the new activities we do from now on will have an assessment NA to AE"): .formative = {t2: "levels",
+// from: "2026-11-30"}; a tab done in class or set as homework on or after `from` counts its level (lvV below, el-points.js); earlier tabs
+// of that term count as "score" (the term 1 rule).
+const fmOf=g=>((((S.D&&S.D.tm)||{})[g]||{}).formative||{});
+const formMode=(g,n)=>{const v=fmOf(g)["t"+n];return v==="done"||v==="levels"?v:"score"};
+const lvFrom=g=>fmOf(g).from||EL_LV_FROM;
+const fmAny=()=>Object.values((S.D&&S.D.tm)||{}).some(x=>x&&x.formative&&Object.values(x.formative).some(v=>v==="done"||v==="levels"));
 let TDC={};const tickDaysC=(ls,g)=>{const k=ls+"|"+g,c=TDC[k];if(c&&Date.now()-c.t<4000)return c.dm;const dm=tickDays(ls,g);TDC[k]={t:Date.now(),dm};return dm};
 function dayTerm(d,g){const nT=EL_TERMS.length;let n=1;while(n<nT){const end=closeDay(g,n)||EL_TERMS[n-1].end;if(end&&d>end)n++;else break}return n}
-const stepMode=(id,k,g)=>{if(!g||!fmAny())return "score";const d=stepDay(tickDaysC(S.ls,g),id,k)||dueStep(id,k,g)||ELWeek.today();return formMode(g,dayTerm(d,g))};
-// the score of a step that counts its first try, or 10 if done in a "done" term
-const firstV=(u,id,k,g)=>{const f=firstOf(u,id,k);if(stepMode(id,k,g)!=="done")return pct(f);return f&&f.max||doneAt(u,id,k)?10:null};
+const stepMode=(id,k,g)=>{if(!g||!fmAny())return "score";const d=stepDay(tickDaysC(S.ls,g),id,k)||dueStep(id,k,g)||ELWeek.today(),m=formMode(g,dayTerm(d,g));
+  if(m!=="levels")return m;const st=lvStart(id,k,g);return st&&st>=lvFrom(g)?"levels":"score"};
+// the score of a step that counts its first try, or 10 if done in a "done" term, or the level of its first try in a "levels" term
+const firstV=(u,id,k,g)=>{const f=firstOf(u,id,k),m=stepMode(id,k,g);if(m==="levels"){const p=pct(f);return p==null?null:EL_DEGREE_MARK[elPctLevel(p)]}
+  if(m!=="done")return pct(f);return f&&f.max||doneAt(u,id,k)?10:null};
+// ---- 📐 levels: when each tab started (its class day or homework day), its hand-in deadline, and the step's level
+let LVS={};const lvStarts=(ls,g)=>{const k=ls+"|"+g,c=LVS[k];if(c&&Date.now()-c.t<4000)return c.f;const f=elHandInStarts(S.D.ls[ls]||{},g);LVS[k]={t:Date.now(),f};return f};
+const lvStart=(id,k,g)=>{const a=byId(id);if(!a||!g)return null;const x=lvStarts(a.ls,g)(id,elBookPath(id)?k:stepTab(a,k)||(secOf(a).length?k:"")),
+    y=elBookPath(id)?null:elLvDayOf(stepDay(tickDaysC(a.ls,g),id,k));return x&&y?(x<y?x:y):x||y};   // the agenda / homework, or the Time plan tick
+const lvRedo=(u,id,k)=>{const f=(res(u,id).flags||{})[k];return f&&f.done==="redo"?f.at:null};
+const lvDue=(u,id,k,g)=>elHandInBy(lvStart(id,k,g),lvRedo(u,id,k));
+// the level of a step: Beltran's / Roig's / Roger's level (results.levels[step], the English criteria), else the level of its latest score
+function stepLv(u,id,k){const L=Object.entries((res(u,id).levels||{})[k]||{}).filter(([c,l])=>!isTransC(c)&&EL_DEGREE_MARK[l]!=null);
+  if(L.length){const m=L.reduce((n,[,l])=>n+EL_DEGREE_MARK[l],0)/L.length;return {m,lv:L.length===1?L[0][1]:elDegree(m),src:"level"}}
+  const t=lastOf(u,id,k)||firstOf(u,id,k);if(t&&+t.max>0){const lv=elPctLevel(t.score/t.max*10);return {m:EL_DEGREE_MARK[lv],lv,src:"score"}}return null}
+// a step's value in a "levels" term: its level once handed in by the deadline (undefined while Beltran has not given it yet); not handed
+// in: left out until the deadline, then NA · not handed in (0, or left out with Missing work off); handed in after the deadline: 0
+function lvV(u,id,k,g){const by=lvDue(u,id,k,g);if(!by)return undefined;const d=doneAt(u,id,k);
+  if(!d)return ELWeek.today()>by?(S.dueZero?0:null):undefined;
+  if(d!==true&&ymd(d)>by)return 0;const x=stepLv(u,id,k);return x?x.m:undefined}
+// the cell of the Learning paths and activities table: the step's level, ⏳ days left, or NA · not handed in
+function lvChip(u,id,k){const g=(S.P[u]||{}).group||S.g;if(stepMode(id,k,g)!=="levels")return "";
+  if(k==="recall"||isCpStep(id,k)){const f=firstOf(u,id,k),lv=f&&+f.max>0?elPctLevel(f.score/f.max*10):null;   // recall: the level of the first try, no deadline
+    return lv?`<br><small class="deg" style="color:${LVCOL[lv]}" title="Level of the first try (recall counts its first try)">${lv}</small>`:""}
+  const by=lvDue(u,id,k,g);if(!by)return "";
+  const d=doneAt(u,id,k),today=ELWeek.today(),dt=ELWeek.date(by);
+  if(!d){if(today>by)return `<br><small class="deg" style="color:#dc2626" title="Not handed in by ${esc(dt)}: NA, counts 0">NA ✗</small>`;
+    const left=Math.round((Date.parse(by)-Date.parse(today))/864e5);return `<br><small style="color:${left<=3?"#ea580c":"#64748b"}" title="To hand in by ${esc(dt)}">⏳ ${left<=0?"today":left+" d"}</small>`}
+  if(d!==true&&ymd(d)>by)return `<br><small class="deg" style="color:#dc2626" title="Handed in on ${esc(ELWeek.date(ymd(d)))}, after the deadline (${esc(dt)}): NA, counts 0">NA · late</small>`;
+  const x=stepLv(u,id,k);return x?`<br><small class="deg" style="color:${LVCOL[x.lv]}" title="${x.src==="level"?"Level given with the correction":"Level of the latest score"}">${x.lv}</small>`:`<br><small class="muted" title="Handed in: the level comes with the next correction">⌛ level</small>`}
 // 🔒 / 📏 in the Students' progress term bar
 function termTools(grp){const n=+String(S.term).slice(1),nowN=termOf(ELWeek.today())||1,T=EL_TERMS[n-1];if(!T||!grp)return "";const c=closeDay(grp.id,n),m=formMode(grp.id,n);
   const cl=n<=nowN&&n<EL_TERMS.length?`<button class="chip ${c?"on":""}" data-do="tclose" data-g="${grp.id}" data-n="${n}" title="${c?`${esc(T.en)} is closed for ${esc(grp.name)} on ${esc(ELWeek.date(c))}: only what was ticked done by then counts in it, the rest is in ${esc(EL_TERMS[n].en)}. Click to change the day or reopen it`:`Close ${esc(T.en)} for ${esc(grp.name)}: its mark counts only what you ticked done in the Time plan, the rest of the learning paths goes to ${esc(EL_TERMS[n].en)}`}">🔒 ${c?`${esc(T.en)} closed · ${esc(ELWeek.date(c))}`:`Close ${esc(T.en)}…`}</button>`:"";
   const fm=`<span class="muted" style="margin-left:10px" title="How the learning-path steps that have a score count in ${esc(T.en)}, in every group">Daily work in ${esc(T.en)}:</span> `
     +`<button class="chip ${m==="score"?"on":""}" data-do="tform" data-n="${n}" data-v="score" title="As until now: checkpoints and recall warm-ups count their first-try score, class games their % right, the rest done on time">scores count</button>`
-    +`<button class="chip ${m==="done"?"on":""}" data-do="tform" data-n="${n}" data-v="done" title="Only done or not: every step counts 10 when done (0 only once it is ticked in class and its day has passed) and a class game they took part in counts 10; scores do not count">only done or not</button>`;
+    +`<button class="chip ${m==="done"?"on":""}" data-do="tform" data-n="${n}" data-v="done" title="Only done or not: every step counts 10 when done (0 only once it is ticked in class and its day has passed) and a class game they took part in counts 10; scores do not count">only done or not</button>`
+    +`<button class="chip ${m==="levels"?"on":""}" data-do="tform" data-n="${n}" data-v="levels" title="📐 Levels NA · AS · AN · AE (Roger, 24 Nov 2026): every tab done in class or set as homework from ${esc(ELWeek.date(lvFrom(grp.id)))} counts its level (the level of the correction, or of its latest score; recall its first try), and must be handed in within two weeks, school holidays not counted; after that it is NA (0). Earlier tabs count as scores count">📐 levels NA–AE</button>`;
   return `<div class="bar lsbar">${cl}${fm}<button class="chip" style="margin-left:10px" data-do="yearview" title="Each student's term and year marks, by competence">📆 Term and year marks</button></div>`}
-async function tformSet(n,v){const ps=GR.map(g=>{const t=S.D.tm[g.id]=S.D.tm[g.id]||{};t.formative=Object.assign({},t.formative,{["t"+n]:v==="done"?"done":null});
-    return put(["teams",g.id],{formative:{["t"+n]:v==="done"?"done":DEMO?null:F.deleteField()}})}).filter(Boolean);
-  TDC={};render();try{await Promise.all(ps);lsResync()}catch(e){alert("Could not save it: "+e.message)}}
+async function tformSet(n,v){const ps=GR.map(g=>{const t=S.D.tm[g.id]=S.D.tm[g.id]||{},x=v==="done"||v==="levels"?v:null,fr=v==="levels"?lvFrom(g.id):null;
+    t.formative=Object.assign({},t.formative,{["t"+n]:x},fr?{from:fr}:{});
+    return put(["teams",g.id],{formative:Object.assign({["t"+n]:x||(DEMO?null:F.deleteField())},fr?{from:fr}:{})})}).filter(Boolean);
+  TDC={};LVS={};render();try{await Promise.all(ps);lsResync()}catch(e){alert("Could not save it: "+e.message)}}
 // after a change in how terms count: the student board's stored marks of the group on screen, for every LS of its course
 function lsResync(){const g=GR.find(x=>x.id===S.g);if(!g)return;const o=S.ls;try{EL_LS.filter(l=>l.course===g.course).forEach(l=>{S.ls=l.id;try{progSync()}catch(e){console.warn("resync",l.id,e)}})}finally{S.ls=o}}
 // the Close term dialog: the close day, what counts in the term and what moves on, and each student's term marks before and after
