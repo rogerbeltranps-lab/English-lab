@@ -84,7 +84,8 @@
   const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):typeof v.toMillis==="function"?v.toMillis():v.seconds?v.seconds*1000:0;
   const monday=t=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
   // a step's skill: the voyage map's (el-voyage.js skill), only these six (recall, research and checkpoints mix things up: left out), as the LS page
-  function skillOf(a,pid){let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
+  function skillOf(a,pid){if(a&&a.sq)return "Speaking";   // 🎲 Surprise questions: every tab is a recording (its 3.2 level, Roger 24 Nov 2026)
+    let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
     if(!s)s=/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d/.test(pid)?"Reading":"";
     s=String(s).split(" · ")[0];return SK[s]?s:null}
   // One student's work by skill, from their progress (pg[ls][key] = the page's state as JSON) and results (rs[activity id]):
