@@ -5152,7 +5152,8 @@ function handIns(u,a){
 // ↩ Send it back to redo, on every handed-in step (Roger, 24 Nov 2026: "there should be a redo button here", on a Listening chart handed in
 // with one letter per box). Like a writing's ↩ Send it back (wrBack): the message goes on top of the step's correction and the step opens
 // again; flags[step] = {done: "redo", reopen: true, back, at}: the step counts as not done (elInjectCorrected, el-catalog.js; the student's
-// page clears its done tick, ls2-engine.js) until the student hands it in again after that time. Writings keep their own box (wrOpen).
+// page clears its done tick, ls2-engine.js) until the student hands it in again after that time; seen[step] takes its comment off the
+// To do, as No reply needed (Roger, 24 Nov 2026: "I sent this to redo and it's still here"). Writings keep their own box (wrOpen).
 const HB_BACK={ca:"Les teves respostes no estan fetes: torna a fer aquest pas amb les teves paraules i torna’l a entregar.",
   en:"Your answers aren't finished: do this step again in your own words and hand it in again."};
 function hbBackBox(u,a,id,x,xr){if(a.ls&&/-my-real-routine$/.test(a.ls))return "";
@@ -5165,7 +5166,7 @@ function hbBackBox(u,a,id,x,xr){if(a.ls&&/-my-real-routine$/.test(a.ls))return "
     <div class="row" style="justify-content:flex-start"><button data-do="hbback" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(id)}">↺ Redo</button></div></details>`}
 function hbBack(u,aid,step){const a=byId(aid),ta=document.getElementById("hb-"+step),msg=ta&&ta.value;if(!a||!msg||!msg.trim())return;
   const x=res(u,aid),old=String((x.replies||{})[step]||"").trim(),at=new Date().toISOString();
-  $("#dlg").close();act(patch(u,aid,{flags:{[step]:{done:"redo",reopen:true,back:msg.trim(),at}},replies:{[step]:msg.trim()+(old?"\n\n"+old:"")},fbSig:{[step]:"redo"},fbBy:{[step]:null}}))}
+  $("#dlg").close();act(patch(u,aid,{flags:{[step]:{done:"redo",reopen:true,back:msg.trim(),at}},replies:{[step]:msg.trim()+(old?"\n\n"+old:"")},fbSig:{[step]:"redo"},fbBy:{[step]:null},seen:{[step]:true}}))}
 const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
 function noGroup(studs){
   if(listed()){const hid=(S.D.acc||{}).hidden||{},shown=studs.filter(s=>!hid[s.uid]),gone=studs.filter(s=>hid[s.uid]);
