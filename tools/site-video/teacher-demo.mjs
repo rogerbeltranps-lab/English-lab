@@ -199,6 +199,20 @@ if (process.env.EL_DEMO_SPEAK) {
   });
 }
 
+// 🧠 Practise flashcards (students/{uid}/flashcards/all): most students of each group studied some days of the last two weeks, a few never
+{
+  const day = (t) => { const d = new Date(t - 4 * 36e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  D.flash = {};
+  for (const g of global.EL_GROUPS) Object.values(D.st).filter((s) => s.group === g.id).forEach((s, i) => {
+    if (i % 5 === 4) return;   // never used them
+    const ls = LS2[g.course], log = {}, c = {}, keen = rnd();
+    for (let k = 0; k < 14; k++) if (rnd() < keen) { const n = 5 + Math.floor(rnd() * 30), r = Math.floor(n * (0.4 + rnd() * 0.3)); log[day(Date.now() - k * 864e5)] = [n, Math.floor(n * (0.7 + rnd() * 0.25)), n * (6 + Math.floor(rnd() * 8)), Math.min(15, n - r), r, Math.floor(r * (0.65 + rnd() * 0.3))]; }
+    const seen = Object.values(log).reduce((a, x) => a + x[3], 0);
+    for (let k = 0; k < seen; k++) { const ivl = rnd() < 0.7 ? 1 + Math.floor(rnd() * (k % 7 ? 8 : 30)) : 0; c['v:demo' + k] = ivl ? [2, Date.now() + ivl * 864e5, ivl, 2500, 0, 3, 0, Date.now()] : [1, Date.now(), 0, 2500, 1, 1, 0, Date.now()]; }
+    if (Object.keys(log).length) D.flash[s.uid] = { decks: { [ls]: { c, log } } };
+  });
+}
+
 // none of the invented names may be a real student's (the private list, if it is on this machine)
 const LIST = process.env.EL_STUDENT_LIST;
 if (LIST && fs.existsSync(LIST)) {

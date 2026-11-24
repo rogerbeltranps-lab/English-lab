@@ -85,6 +85,9 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 @media (max-width:640px){.crgc{flex:1 1 140px;min-width:0}.crq div{grid-template-columns:70px 44px 1fr}.crq small{display:none}.crt th:nth-child(5),.crt td:nth-child(5){display:none}}
 
 /* 🌱 Progress (prPage; charts: shared/js/el-charts.js) */
+.fdt .prhd{margin-bottom:6px}.fdt .prhd>span{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.fdt .prstats{grid-template-columns:repeat(3,minmax(0,1fr))}.fdt table{width:100%;border-collapse:collapse;font-size:14px}.fdt th,.fdt td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}
+.fdt th{font-size:12.5px;color:#475569;font-weight:600}.fdt td.n{text-align:right}.fdt tr.no td{color:#94a3b8}.fdt .fdd{display:inline-flex;gap:3px}.fdt .fdd i{width:11px;height:11px;border-radius:3px;background:#e2e8f0}.fdt .fdd i.on{background:#7c3aed}
+@media (max-width:640px){.fdt .prstats{grid-template-columns:1fr}}
 .prstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:10px 0}.prcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center}
 .prcard .prci{font-size:22px;width:42px;height:42px;border-radius:12px;background:#f1f5f9;display:grid;place-items:center;flex:none}.prcard>span:last-child{display:flex;flex-direction:column;min-width:0}
 .prcard small{color:#64748b;font-size:13px}.prcard b{font-size:1.6rem;line-height:1.15}.prcard b i{font-style:normal;font-size:.95rem;color:#64748b;font-weight:600}.prcard em{font-style:normal;font-size:12px;color:#64748b}.prcard.warn .prci{background:#fff7ed}
@@ -1601,7 +1604,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"]};
+const PLACES={fd:["🧠","Flashcards"],att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1898,10 +1901,11 @@ function render0(){
     plan2:()=>tp2Page(grp,ls,studs,lpAll),
     voyage:()=>vyRank(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
     prog:()=>prPage(grp,ls,inG.filter(s=>!s.away&&!s.tester)),
+    fd:()=>fdtBox(grp,inG.filter(s=>!s.away&&!s.tester&&s.uid),EL_LS.filter(l=>l.course===grp.course)),
     spk:()=>spkPage(grp,ls,inG.filter(s=>!s.away&&!s.tester))};
   // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
   // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
-  if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
+  if(place[S.place]){const wide=["students","att","msgs","fd"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
   else{S.place="home";
     const np=pbNew().length,nw=sgNew().length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
@@ -1923,6 +1927,7 @@ function render0(){
       +examsTile(grp,ls,inG.filter(s=>!s.away&&!s.tester))
       +tTile("marks","📊","Assessment details","LS grade, criteria, self-assessment")
       +tTile("prog","🌱","Progress","skill mastery over time, skills radar, criteria: the group or one student")
+      +tTile("fd","🧠","Flashcards","who studies them, and their decks as they see them")
       +tTile("spk","🗣","Speaking","words said well and wrong, vocabulary, grammar, how they build the talk: only for you")
       +tTile("students","👥","Students' progress","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
@@ -2052,6 +2057,46 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
     crB=`<div class="box elc-wrap prcr"><h2>🎯 Average per assessment criterion</h2><p class="muted">${g.evidence?"The degree you confirmed, or the one the evidence suggests, out of 10.":"The points of the graded activities of each criterion, out of 10."} Lines at 5, 7 and 9: AS, AN, AE.${me?` The dot is ${esc(shortName(me).mid)}.`:""}</p>`
       +(cs.length?cs.map(row).join(""):`<p class="muted">This LS has no criteria yet.</p>`)+`</div>`}
   return cards+lineB+`<div class="prgrid">${radarB}${crB}</div>`}
+// ---- 🧠 Flashcards place on each group page (Roger, 24 Nov 2026: "Yes I want to see who uses them"; "As a teacher I want to be able to see
+// them… On my dashboard"): who studies, and a link to each student's decks as they see them (👁 student view, lab/practice.html?student=…#deck). Each student's Practise flashcards are saved in
+// students/{uid}/flashcards/all = {p: JSON of {decks: {ls: {c: {card: state}, log: {day: [reviews, right, seconds, new, reviews of review
+// cards, right of those]}}}}, at} (shared/js/el-flashdeck.js). Read only when this place opens, one read per student of the group, once per
+// session (🔄 Refresh reads again). Only the course's LSs count. Days start at 4:00, as on the students' cards. Teacher only, never on the projector.
+const FDT={d:{},ld:{}};
+const fdtDay=t=>{const d=new Date(t-4*36e5);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function fdtLoad(u){if(u in FDT.d)return Promise.resolve(FDT.d[u]);if(FDT.ld[u])return FDT.ld[u];
+  if(DEMO){FDT.d[u]=((DEMO.flash||{})[u])||null;return Promise.resolve(FDT.d[u])}
+  return FDT.ld[u]=F.getDoc(F.doc(db(),"students",u,"flashcards","all")).then(c=>{let P=null;if(c.exists()){try{P=JSON.parse(c.data().p||"{}")}catch(e){P=null}}FDT.d[u]=P;delete FDT.ld[u];return P},
+    e=>{console.warn("flashcards",e);delete FDT.ld[u];return null})}
+function fdtEnsure(gid,studs){const miss=studs.filter(s=>!(s.uid in FDT.d));if(!miss.length)return true;
+  Promise.all(miss.map(s=>fdtLoad(s.uid))).then(()=>{if(S.g===gid&&S.place==="fd")render()});return false}
+// one student's numbers, from their saved decks (only these LSs)
+function fdtStats(P,lss){const ids=new Set(lss.map(l=>l.id)),now=Date.now(),days=[...Array(7)].map((x,i)=>fdtDay(now-i*864e5)),m30=fdtDay(now-29*864e5),o={used:false,last:"",wk:new Set(),rev7:0,sec7:0,
+    cards:0,learnt:0,mature:0,r30:0,p30:0,all:new Set(),ls:{}};
+  Object.entries((P&&P.decks)||{}).forEach(([id,dk])=>{if(!ids.has(id))return;const L=dk.log||{},C=dk.c||{},z=o.ls[id]={cards:0,learnt:0,rev:0};
+    Object.entries(L).forEach(([day,a])=>{if(!a||!(a[0]>0))return;o.used=true;o.all.add(day);z.rev+=a[0];if(day>o.last)o.last=day;
+      if(days.includes(day)){o.wk.add(day);o.rev7+=a[0];o.sec7+=a[2]||0}if(day>=m30){o.r30+=a[4]||0;o.p30+=a[5]||0}});
+    Object.values(C).forEach(c=>{if(!c)return;o.cards++;z.cards++;if(c[0]===2){o.learnt++;z.learnt++;if(c[2]>=21)o.mature++}})});
+  let st=0;for(let i=o.all.has(days[0])?0:1;o.all.has(fdtDay(now-i*864e5));i++)st++;o.streak=st;   // days in a row up to today (or yesterday)
+  return o}
+function fdtBox(grp,studs,lss){const ok=fdtEnsure(grp.id,studs),hd=`<div class="prhd"><h2>Who uses them</h2><span><a class="btn mini" href="lab/practice.html#deck" target="_blank" rel="noopener" title="Every card of every route, as the teacher (choose a route at the top)">🧠 Open all the decks</a> ${ok?`<button class="btn g mini" data-do="fdtre" data-g="${esc(grp.id)}" title="Read the students' flashcards again">🔄 Refresh</button>`:""}</span></div>`;
+  if(!ok)return `<div class="box fdt">${hd}<p class="muted">Loading the students' flashcards…</p></div>`;
+  const rows=studs.map(s=>({s,x:fdtStats(FDT.d[s.uid],lss)})),wk=rows.filter(r=>r.x.wk.size),ever=rows.filter(r=>r.x.used),r30=rows.reduce((n,r)=>n+r.x.r30,0),p30=rows.reduce((n,r)=>n+r.x.p30,0);
+  const card=(ic,lab,big,sub)=>`<div class="prcard"><span class="prci">${ic}</span><span><small>${lab}</small><b>${big}</b><em>${sub}</em></span></div>`;
+  const today=fdtDay(Date.now()),dLab=d=>d===today?"today":d===fdtDay(Date.now()-864e5)?"yesterday":new Date(d+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+  const lsS=id=>{const l=EL_LS.find(x=>x.id===id);return l?lsLabel(l).split(" · ")[0]:id};
+  rows.sort((a,b)=>(b.x.wk.size-a.x.wk.size)||(b.x.last>a.x.last?1:b.x.last<a.x.last?-1:0)||(b.x.rev7-a.x.rev7)||fullName(a.s).localeCompare(fullName(b.s),"ca"));
+  const dots=x=>`<span class="fdd" title="${x.wk.size} of the last 7 days">${[...Array(7)].map((z,i)=>`<i class="${x.wk.has(fdtDay(Date.now()-(6-i)*864e5))?"on":""}"></i>`).join("")}</span>`;
+  const tip=x=>Object.entries(x.ls).map(([id,z])=>`${lsS(id)}: ${z.cards} cards studied, ${z.learnt} learnt`).join(" · ");
+  const nm=s=>`<a href="lab/practice.html?student=${encodeURIComponent(s.uid)}#deck" target="_blank" rel="noopener" title="👁 Open their flashcards as they see them, with their statistics">${esc(fullName(s))}</a>`;
+  const tr=({s,x})=>x.used?`<tr title="${esc(tip(x))}"><td>${nm(s)}</td><td>${dots(x)}</td><td>${esc(dLab(x.last))}</td><td class="n">${x.streak?"🔥 "+x.streak:"–"}</td><td class="n">${x.rev7}</td><td class="n">${x.sec7?Math.max(1,Math.round(x.sec7/60))+" min":"–"}</td>`
+      +`<td class="n">${x.learnt}${x.mature?` <small class="muted">(${x.mature} long-term)</small>`:""}</td><td class="n">${x.r30?`<span style="color:${elPctCol(x.p30/x.r30*100)}">${Math.round(x.p30/x.r30*100)} %</span>`:"–"}</td></tr>`
+    :`<tr class="no"><td>${nm(s)}</td><td colspan="7">not used yet</td></tr>`;
+  return `<div class="box fdt">${hd}<p class="muted prhow">The 🧠 Flashcards in 🎯 Practise: each student's own study, this course's LSs only. Never marked. Only on your screen. Hover a student for each LS; click a name to open <b>their decks as they see them</b> (👁 student view), with their own 📊 statistics.</p>`
+    +`<div class="prstats">${card("📅","Used them this week",wk.length+`<i> of ${studs.length}</i>`,`studied on at least 1 of the last 7 days · ${ever.length} have ever used them`)}`
+    +card("🔁","Cards studied this week",String(wk.reduce((n,r)=>n+r.x.rev7,0)),`${Math.round(wk.reduce((n,r)=>n+r.x.sec7,0)/60)} minutes in all`)
+    +card("🧠","Remembered",r30?Math.round(p30/r30*100)+"<i> %</i>":"–",r30?`of ${r30} cards reviewed again in the last 30 days`:"no cards reviewed again yet")+`</div>`
+    +`<div class="wrap"><table><thead><tr><th>Student</th><th>Last 7 days</th><th>Last studied</th><th>Days in a row</th><th>Cards this week</th><th>Time this week</th><th>Cards learnt</th><th>Remembered (30 days)</th></tr></thead><tbody>${rows.map(tr).join("")}</tbody></table></div></div>`}
 // ---- 🗣 Speaking (Roger, 20 Nov 2026: "I see there's no speaking data: why don't we make a collection of the words they pronounce well and
 // badly, and of how they structure the oral text at lexical and grammatical level"): Roig Flash listens again to every Speaking or Talk
 // recording (school script v34, action "speak_an": old recordings too) and writes an analysis FOR THE TEACHER ONLY: words said well and said
@@ -6646,7 +6691,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
         if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),allacts:()=>{S.allActs=!S.allActs;try{localStorage.setItem("el_t_allacts",S.allActs?"1":"0")}catch(e){}render()},shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
-      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},spkyear:()=>{S.spkYear=!!k.v;render()},spkstu:()=>{e.preventDefault();S.spkU=k.u;render();scrollTo(0,0)},
+      if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},vysort:()=>{S.vySort=k.s;render()},prsk:()=>{S.prSk=k.s;render()},fdtre:()=>{Object.keys(FDT.d).forEach(u=>{if((S.P[u]||{}).group===k.g)delete FDT.d[u]});render()},spkyear:()=>{S.spkYear=!!k.v;render()},spkstu:()=>{e.preventDefault();S.spkU=k.u;render();scrollTo(0,0)},
     spkrun:()=>{S.spkDone=null;spkRun(SPK.todo||[],SPK.gid)},spkstop:()=>{if(SPK.run)SPK.run.stop=true;t.disabled=true},
     spkagain:async()=>{const a=byId(k.a),s=S.P[k.u],x=a&&k.s!=="fp"&&(((pstate(k.u,a)||{}).steps||{})[k.s]),r=k.s==="fp"?a&&s&&spkFpRec(s,a):x&&x.audio&&{u:k.u,s,a,k:k.s,ls:a.ls,fid:x.audio.id,secs:x.audio.s||null,at:x.date||null,title:x.title||""};
       if(!r)return;t.disabled=true;t.textContent="⏳ Roig is listening…";
