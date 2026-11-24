@@ -514,9 +514,19 @@
     box.innerHTML = h + "</ol>";
     voyTicks(true);
   }
+  // a step of another page done in this browser since the board made its copy (problem report, 4ESOB, 24 Nov 2026: "when I change task
+  // it says I haven't done the others"): its ✓ comes from this browser's own progress of that page (EL_CATALOG keys, no reads). Only adds
+  // ticks, never removes one; not in the teacher's student view (this browser holds the teacher's own progress there).
+  function voyLocalDone(k) {
+    const i = String(k || "").lastIndexOf("#"); if (i < 0 || who.as || !window.elDoneSet || !window.elSecSteps) return false;
+    const id = k.slice(0, i), a = (window.EL_CATALOG || []).find(x => x.id === id); if (!a || !a.keys) return false;
+    const s = new Set(); a.keys.forEach(kk => { let v = null; try { v = localStorage.getItem(kk); } catch (e) {} if (v) elDoneSet(v).forEach(d => s.add(d)); });
+    const st = elSecSteps(a, k.slice(i + 1)); return st.length > 0 && st.every(d => s.has(d));
+  }
   // this page's ticks from its own tabs (done, the one on screen), the count and the ports
   function voyTicks(first) {
     const box = $(".ellp-voy:not(.ellp-voyback)"); if (!box || box.hidden) return;
+    box.querySelectorAll("li.s:not(.fp):not(.ok)").forEach(li => { if (!li.querySelector("a[data-p]") && voyLocalDone(li.dataset.k)) li.classList.add("ok"); });
     box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
       li.classList.toggle("ok", tb.classList.contains("done"));
       const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
