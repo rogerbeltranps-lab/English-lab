@@ -472,13 +472,11 @@ window.elSlotNow=function(tt,at){if(!tt||!tt.slots)return null;const d=new Date(
   for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
     if(m>=s-5&&m<s+len)return {start:z.getTime()+s*60e3,end:z.getTime()+(s+len)*60e3}}
   return null};
-// ⛶ Full screen by the timetable (Roger, 6 Nov 2026: "no need to release since they get released after the class"): during a class of the
-// group it is on by itself ({on, at: the start of the class, until: its end, auto: true}) and it ends with the class. The teacher's switch
-// (live/{group}.fs) still counts: {on: true, …} turns it on outside a class; {on: false, off: true, until: end of the class} switches it
-// off for that class only. Returns the full screen in force now, or null.
-window.elFsEff=function(fs,tt,at){const now=at||Date.now(),c=elSlotNow(tt,now);
-  if(fs&&fs.at&&now<(fs.until||fs.at+70*60e3)){if(fs.on)return fs;if(fs.off&&c&&fs.until>=c.end)return null}
-  return c?{on:true,at:c.start,until:c.end,auto:true}:null};
+// ⛶ The class full screen in force now, or null: only the teacher's switch, live/{group}.fs = {on, at, until} (🎓 Class mode writes it when it
+// starts and ⏹ Stop clears it). It no longer goes on by itself in a class of the timetable (Roger, 24 Nov 2026: "I only want students to go
+// full screen when I start class mode, not when it's English time"; it replaces "according to the teacher's timetable students should go full
+// screen when they have class", 6 Nov). Older {on: false, off: true} switches count as off. tt and at are kept for the callers.
+window.elFsEff=function(fs,tt,at){const now=at||Date.now();return fs&&fs.on&&fs.at&&now<(fs.until||fs.at+70*60e3)?fs:null};
 // 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever
 // you are in the LS"): live/{group}.go = {cm: true, u: page path from the site root, p: tab or "", pn: tab name, t: page title, at, s: when
 // class mode started, lock: true, until}. Written by the teacher's class tab each time it moves (el-cloud.js cmSend); open student pages go there.

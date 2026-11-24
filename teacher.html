@@ -1274,7 +1274,7 @@ const cmTabBtn=(ls,gid,a,p)=>{const x=cmOf(gid),on=x&&x.p===p&&new URL(x.u,locat
 // on, every student page beats live/{group}/here/{email} = {name, seen, off} once a minute (and off:true at once when its screen is closed
 // or hidden); the panel lists who stopped (elClassWatch in el-catalog.js). It shows during a class game too, also with full screen off.
 const FSW={g:null,stop:null,stopL:null,stopH:null,fs:null,x:undefined,list:[],here:[]};
-// in force now: the ⛶ switch (FSW.fs) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js; Roger, 6 Nov 2026)
+// in force now: the ⛶ switch (FSW.fs), written by 🎓 Class mode (elFsEff in el-catalog.js; never by the timetable alone, Roger 24 Nov 2026)
 const fsEff=gid=>elFsEff(FSW.g===gid?FSW.fs:null,elTT(gid));
 const fsW=()=>elClassWatch(Object.assign({},FSW.x,{fs:fsEff(FSW.g)}),FSW.list,FSW.here);
 function fsWatch(gid){if(DEMO||gid===FSW.g)return;[FSW.stop,FSW.stopL,FSW.stopH].forEach(f=>f&&f());FSW.stop=FSW.stopL=FSW.stopH=null;FSW.g=gid;FSW.fs=null;FSW.x=undefined;FSW.list=[];FSW.here=[];if(!gid)return fsDraw();
@@ -1344,8 +1344,8 @@ function fsDraw(){const n=document.getElementById("fsctl");if(!n)return;const g=
   // one short line of counts, the names only when a count is tapped (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen";
   // elWhoLine in el-catalog.js): nothing pops up by itself any more, so leaving and coming back no longer puts a name on the screen
   const wl=w.active?elWhoLine(w,{open:FSWL.open,av,why:fsWhy,hm:fsHm}):null;
-  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fshide" title="${FSWL.hide?"Show who is in, who left and who is not here":"Hide this message (the buttons stay)"}">${FSWL.hide?`👥 ${w.inn.length}/${w.n}`:"✕ Hide"}</button>`:""}</div>${svPop()}${FSWL.hide?"":cmInfo(g)}`
-    +(w.active&&!FSWL.hide?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>${wl.line}${wl.list}`:"");svKeep(n)}
+  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on only while class mode is on (Roger, 24 Nov 2026) -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fshide" title="${FSWL.hide?"Show who is in, who left and who is not here":"Hide this message (the buttons stay)"}">${FSWL.hide?`👥 ${w.inn.length}/${w.n}`:"✕ Hide"}</button>`:""}</div>${svPop()}${FSWL.hide?"":cmInfo(g)}`
+    +(w.active&&!FSWL.hide?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>${wl.line}${wl.list}`:"");svKeep(n)}
 const attApi=()=>({db:db(),doc:F.doc,setDoc:F.setDoc,onSnapshot:F.onSnapshot,deleteField:F.deleteField});
 document.addEventListener("click",e=>{const c=e.target.closest("#fsctl [data-wl]");if(c){e.preventDefault();FSWL.open=FSWL.open===c.dataset.wl?null:c.dataset.wl;fsDraw();return}
   const b=e.target.closest("#fsctl [data-att]");if(!b||!FSW.att)return;e.preventDefault();const a=FSW.att;
@@ -1577,7 +1577,7 @@ function segProgress(s,its,r1){if(!its.length)return null;const r3=v=>Math.round
 // ---- 🗓 Timetable (Roger, 6 Nov 2026: "I want a section where the teacher can add the schedule"): Home > 🗓 Timetable. The classes of
 // each group (day + start time), how long a class lasts and the days without classes (holidays). Saved in settings/timetable (only the
 // teacher) and each group's part in live/{group}.tt (elTTStore: days off as "from/to"), the document every student page already listens
-// to: full screen goes on by itself during each class and off when it ends (elFsEff), with no extra reads. The dashboard's class now,
+// to (no extra reads). Full screen no longer goes on by itself in a class: only 🎓 Class mode turns it on (elFsEff; Roger, 24 Nov 2026). The dashboard's class now,
 // next class, live refresh, class mode and the end of a class all use it (window.EL_TIMETABLE). The first one is the one in el-plan.js.
 const TT_DAYS=["Mon","Tue","Wed","Thu","Fri"];
 function ttApply(D){if(DEMO&&DEMO.tt)D.tt=DEMO.tt;
@@ -6719,8 +6719,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     svrep:()=>{e.preventDefault();SV.rep=!SV.rep;fsDraw()},   // 📄 the names open the term report (today.html#report)
     attre:()=>{e.preventDefault();attLoad(S.g,true);render()},
     attcell:()=>{e.preventDefault();attCell(k.id,k.e)},
-    // during a class (by the timetable) it is on by itself: switching it off = {on:false, off:true, until: the end of the class}, for this class only
-    fsgroup:()=>{e.preventDefault();const now=Date.now(),c=elSlotNow(elTT(k.gid),now),v=fsEff(k.gid)?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+70*60e3};
+    // on until the end of the class by the timetable (or 70 minutes); off = null
+    fsgroup:()=>{e.preventDefault();const now=Date.now(),c=elSlotNow(elTT(k.gid),now),v=fsEff(k.gid)?null:{on:true,at:now,until:c?c.end:now+70*60e3};
       if(DEMO){FSW.g=k.gid;FSW.fs=v;fsDraw();return}F.setDoc(F.doc(db(),"live",k.gid),{fs:v},{merge:true}).catch(x=>alert("Could not save: "+x.message))},
     tabsec:()=>{e.preventDefault();e.stopPropagation();const a=byId(k.a),off=new Set(elSecLocked(a,S.D.ls[k.ls]||{},k.gid));off.has(k.p)?off.delete(k.p):off.add(k.p);
       quick(api.secLock(k.ls,k.gid,a.id,(EL_SECTIONS[a.id]||[]).map(z=>z[0]).filter(id=>off.has(id))))},
