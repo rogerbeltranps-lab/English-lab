@@ -1842,6 +1842,9 @@ function selfBook(){const c=courseOf(myGroup),ls=(window.EL_LS||[]).filter(l=>l.
 function cmSelf(g){const on=selfOn(g)&&!onDash&&!!user&&(isStudent(user)||!!AS)&&!window.EL_EXAM_LOCK;
   if(!on){if(SELF_ON){SELF_ON=false;fsCheck()}selfOff();return false}
   if(!SELF_ON){SELF_ON=true;fsCheck()}   // no full screen in self study (Roger, 24 Nov 2026: "in selfstudy students don't need to be in full screen")
+  // 📖 the book is open for them while self study lasts, as ⚡ I've finished gives it (problem report, 2ESOB, 24 Nov 2026: a Book not on the
+  // Time plan stayed hidden or read-only, so students answered the PDF's questions instead and lost them): freed in place, like ffGrant
+  {const bk=selfBook();if(bk&&onPage(bk.path)){const f=window.EL_CM_FREE=window.EL_CM_FREE||new Set();if(!f.has("book")){f.add("book");if(window.elSecFree)elSecFree(["book"])}}}
   const ca=lockCa(),t=(c,e)=>ca?c:e;let b=document.getElementById("el-self");
   if(!b){b=document.createElement("div");b.id="el-self";b.setAttribute("role","status");
     b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:700 15px system-ui,sans-serif;background:#4338ca;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
