@@ -228,7 +228,7 @@ const fsvA=x=>Array.isArray(x)?{arrayValue:{values:x.map(fsvA)}}:x&&typeof x==="
 // from his own course (tn_mark), so only his writing is corrected. The scheduled task's prompt can't be changed from a thread, so `ready`,
 // and `fb-ready` check this themselves: `ready` prints his pieces first, and in a TN-only run neither lists student work (`audit` only reads).
 async function tnFull(){const m=doc(await api("GET",DOCS+"settings/marking"))||{},run=m.run||{},rq=(m.request||{}).at;
-  const madrid=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Madrid"})),wed=madrid.getDay()===3&&madrid.getHours()>=13&&madrid.getHours()<18;
+  const madrid=new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Madrid"})),wed=madrid.getDay()>=1&&madrid.getDay()<=5&&madrid.getHours()>=13&&madrid.getHours()<18;   // the weekday run (Roger, 24 Nov 2026: every weekday, students see it at 17:00; it was Wednesday only)
   return !!(wed||(rq&&(!run.started||String(rq)>String(run.started))))}
 const TN_ONLY="MODE: TOWARDS NATIVENESS ONLY (started from Roger's own course): correct only his writing below with tn-apply, then stop. Nothing is READY for students in this run: do not run sheets (fb-ready prints nothing; audit only reports).";
 async function tnPrint(full){const its=await tnItems();
