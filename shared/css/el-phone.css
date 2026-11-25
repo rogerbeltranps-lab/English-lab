@@ -308,8 +308,5 @@
   .elmz-say{max-width:min(280px,calc(100vw - 32px))}
 }
 @media (max-width:640px){
-  .tabs .tab.wide{padding-right:92px!important}
-  .tab .fdmz{right:10px;bottom:-4px}.tab .fdmz .elmz-img{width:60px!important;height:60px!important}
-  .tab .fdmz .elmz-badge{left:auto;right:-4px;bottom:-10px;font-size:15px;border-width:2px}
   .elfd-mz{margin-left:0;width:100%;justify-content:flex-end}.elfd-mz .elmz-img{width:60px!important;height:60px!important}.elfd-say{font-size:.88rem}
 }

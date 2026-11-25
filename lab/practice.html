@@ -34,7 +34,6 @@
     .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer}.chip.on{background:#172033;color:#fff;border-color:#172033}
     select{border:1px solid #cbd5e1;border-radius:10px;padding:5px 8px;background:#fff;max-width:100%}
     .tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}.tabs .tab{grid-column:span 2}.tabs .tab.big{grid-column:span 3;font-size:1.15rem;padding:16px}
-    .tabs .tab.wide{grid-column:1/-1;font-size:1.2rem;padding:16px 18px;background:linear-gradient(120deg,#f5f3ff,#eef2ff);border-color:#ddd6fe}.tabs .tab.wide.on{background:linear-gradient(120deg,#6d28d9,#3157d5);color:#fff;border-color:#6d28d9}
     .tab{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;cursor:pointer;text-align:left;font-weight:800}
     .tab small{display:block;font-weight:600;color:var(--muted);margin-top:2px}.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.tab.on small{color:#dbe4ff}
     .card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fff}
@@ -63,12 +62,11 @@
     .explain{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 16px;margin:0 0 12px;line-height:1.55}.explain p{margin:.35em 0}
     .slides{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.slides a{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:700}
     .picks{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.picks .w.on{background:var(--accent-soft);border-color:var(--accent)}.picks .w:disabled{text-decoration:line-through;opacity:.5;cursor:default}
-    .tabs .tab.wide{position:relative;padding-right:150px}.tab .fdmz{position:absolute;right:22px;bottom:-6px;display:flex;align-items:flex-end;pointer-events:none}.tab .fdmz .elmz-badge{position:absolute;left:-34px;bottom:8px}
     .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
       .mobile-tabs .tab-btn{white-space:nowrap;background:#fff;border:1px solid var(--line)}.mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}.tabs .tab,.tabs .tab.big{grid-column:span 1}.tabs .tab.wide{grid-column:1/-1}.tabs .tab.big{font-size:1.05rem}}
+      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}.tabs .tab,.tabs .tab.big{grid-column:span 1}.tabs .tab.big{font-size:1.05rem}}
     @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
   </style>
   <script src="../shared/js/el-catalog.js"></script>
@@ -76,7 +74,7 @@
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
   <script src="../shared/js/el-plan.js"></script>
-  <script src="../shared/js/el-flashdeck.js?v=20261125"></script>
+  <script src="../shared/js/el-flashdeck.js?v=20261125b"></script>
   <script src="../shared/js/el-mascot.js?v=20261125"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
@@ -193,7 +191,8 @@ const sentences = (text, lv) => plain(text).split(/(?<=[.!?])\s+(?=[A-Z“"‘'�
 // question (the sentence with its gap → the sentence filled in and the rule). The card id comes from the text, so a card keeps its
 // progress wherever it is, and a new question is a new card.
 const GAP = /_{2,}(?:[\s/]*_{2,})*/g;
-const vCard = (en, ca, ex, star, part) => ({ id: 'v:' + norm(en), kind: 'v', part, front: esc(en), say: en, ex: ex || '', star: !!star,
+// en / ca: the card the other way round, Catalan first (el-flashdeck.js; Roger, 25 Nov 2026); a Pro card's "ca" is an English meaning, so none
+const vCard = (en, ca, ex, star, part, pro) => ({ id: 'v:' + norm(en), kind: 'v', part, front: esc(en), say: en, ex: ex || '', star: !!star, en, ca: pro ? '' : (ca || ''),
   back: `<div class="elfd-ans">${esc(ca || '')}</div>${ex ? `<div class="elfd-ex">${esc(ex)}</div>` : ''}` });
 function gCard(it, items, kind, part, lv, salt) {
   const q = String(it.q), a = it.a[0], n = (q.match(GAP) || []).length, w = a.split(/\s+/), mk = x => '<mark>' + esc(x) + '</mark>';
@@ -212,7 +211,7 @@ function extract(pg, lv, off) {
   const out = { words: [], grammar: [], build: [], listen: [], shadow: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
-    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'))); }));
+    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'), lv === 'native')); }));
     ((pg.info[L] || {}).builders || []).forEach(b => out.build.push({ s: b.join(' '), lp, at }));
     const qs = pg.listening && pg.listening[L];
     if (pg.audio && Array.isArray(qs) && qs.length)
@@ -225,7 +224,7 @@ function extract(pg, lv, off) {
     // for the group, at the student's route, go to the LS deck (shared/js/el-flashdeck.js)
     if (Array.isArray(p.groups) && p.groups.some(g => Array.isArray(g.items))) {
       const core = new Set(forLevel(p.core, lv)), part = plain(byLevel(p.title, lv)) || t('Vocabulari', 'Vocabulary');
-      p.groups.filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => { const [en, ca, ex] = Array.isArray(it) ? it : [it.en, it.ca, it.ex]; if (en) out.cards.push(vCard(en, ca, ex, core.has(en), part)); }));
+      p.groups.filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => { const [en, ca, ex] = Array.isArray(it) ? it : [it.en, it.ca, it.ex]; if (en) out.cards.push(vCard(en, ca, ex, core.has(en), part, lv === 'native')); }));
     }
     if (p.type === 'typed' && /^(grammar|mixed|vocabEx)/.test(p.id)) {
       const items = forLevel(p.items, lv).filter(q => q && q.q && Array.isArray(q.a) && q.a.length && typeof q.a[0] === 'string');
@@ -270,8 +269,13 @@ function extract(pg, lv, off) {
 
 /* ---------- who is here ---------- */
 const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
+// 🧠 Flashcards apart from Practise (Roger, 25 Nov 2026: "I want practice and flashcards split in two. Students will see their flashcards
+// under progress"): lab/practice.html#deck is the 🧠 Flashcards page (its own menu item under 🎓 My progress, the mascot's link), with no
+// Practise tabs; lab/practice.html is Practise without the Flashcards tile. Going from one to the other reloads the page.
+const FC = location.hash === '#deck';
+addEventListener('hashchange', () => { if ((location.hash === '#deck') !== FC) location.reload(); });
 const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, step: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
-if (!['deck', 'words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
+if (FC) S.tab = 'deck'; else if (!['words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
 const all = () => DEMO ? !!DEMO.teacher : !!U && !ELCloud.viewing && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));   // viewing: the teacher's student view (el-cloud.js)
@@ -320,6 +324,10 @@ async function content() {
   out.decks = out.ls.map(l => { const ids = new Set(); return { id: l.id, name: lsName(l), cards: out.cards.filter(c => c.ls === l && !ids.has(c.id) && ids.add(c.id)) }; }).filter(d => d.cards.length);
   return out;
 }
+// tools/voice/harvest.js (preview only): every 🧠 Flashcards card of every course and route, so each one is recorded with Kokoro Heart
+if (DEMO && DEMO.harvest) window.EL_PRACTICE_HARVEST = async () => { const r = [], S0 = { ...S };
+  for (const c of Object.keys(COURSES)) for (const lv of levelsOf(c)) { Object.assign(S, { course: c, level: lv, ls: 'all', lp: 'all' }); (await content()).decks.forEach(d => d.cards.forEach(x => { if (x.say) r.push(x.say); if (x.kind === 'v' && x.ex) r.push(x.ex); })); }
+  Object.assign(S, S0); return r; };
 
 /* ---------- page ---------- */
 function header() {
@@ -344,18 +352,18 @@ function filters(x) {
     ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
 }
 // Vocabulary and Grammar first and bigger (Roger, 7 Nov 2026), then sentence builder, listening and shadowing
-const TABS = [['deck', '🧠', 'Flashcards', 'Targetes', 'Tot el vocabulari i la gramàtica de cada LS', 'All the vocabulary and grammar of each LS'], ['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
+const TABS = [['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
   ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['shadow', '🗣', 'Shadowing', 'Shadowing', 'Escolta i repeteix', 'Listen and repeat']];
 let X = null, gen = 0;
 async function render() {
   const g = ++gen;
   $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
   const x = await content(); if (g !== gen) return; X = x;
-  const fs = ELFlashDeck.summary(x.decks, fdLoad()), fsN = fs.due + fs.new;
   fdSum(fdLoad());
-  const n = { deck: fsN ? fsN + ' ' + t('per estudiar avui', 'to study today') : fs.total + ' ' + t('targetes', 'cards'), words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
+  if (FC) { $('#app').innerHTML = header() + '<div id="body"></div>'; return deck(); }
+  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
   $('#app').innerHTML = header() + filters(x)
-    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : k === 'deck' ? ' wide' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small>${k === 'deck' ? fdMz(fsN) : ''}</button>`).join('')}</div><div id="body"></div>`;
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
   ({ deck, words, grammar, build, listen, shadow })[S.tab]();
 }
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
@@ -415,14 +423,8 @@ const fdAs = () => !DEMO && window.ELCloud && ELCloud.viewing;
 const fdLoad = () => { if (fdAs()) return fdView || {}; try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
 const fdCloudOn = () => !DEMO && U && !all() && !ELCloud.viewing;
 const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
-// 🧑‍🎨 the streak mascot (shared/js/el-mascot.js; Roger, 24–25 Nov 2026): on the 🧠 Flashcards tile, in the mood of the student's streak
-// with the ⚡ badge. fdSum leaves the counts of today (el_flash_sum_<uid>: reviews due, new cards today, new cards a day) for the board's
+// fdSum leaves the counts of today (el_flash_sum_<uid>: reviews due, new cards today, new cards a day) for the board's
 // mascot, so the board knows how many cards are waiting without building the decks.
-function fdMz(left) {
-  const M = window.ELMascot; if (!M || all()) return '';
-  const x = M.data(null, fdLoad()); if (!x) return '';
-  return `<span class="fdmz">${M.img(M.mood({ st: x.st, left }), 84, '')}${M.badge(x.st.n)}</span>`;
-}
 function fdSum(P) {
   if (fdAs() || !X || all()) return;
   const s = ELFlashDeck.summary(X.decks, P); let un = 0;
@@ -748,11 +750,12 @@ function start() {
   S.course = S.course || (all() ? (c || '2eso') : c);
   EN = all() || (myLevel() ? !elCa(base(myLevel())) : false);
   document.documentElement.lang = EN ? 'en' : 'ca';
-  $('#title').textContent = t('Practica', 'Practise');
-  document.title = t('Practica', 'Practise') + ' · English with Roger';
+  $('#title').textContent = FC ? '🧠 ' + t('Targetes', 'Flashcards') : t('Practica', 'Practise');
+  document.title = (FC ? t('Targetes', 'Flashcards') : t('Practica', 'Practise')) + ' · English with Roger';
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
-  $('#lead').innerHTML = t('Targetes de cada LS, el vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Flashcards of every LS, vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
+  $('#lead').innerHTML = FC ? t('Tot el vocabulari i la gramàtica de cada LS, al teu nivell. Estudia una mica cada dia: cada targeta torna quan la necessites.', 'All the vocabulary and grammar of each LS, at your level. Study a little every day: each card comes back when you need it.')
+    : t('El vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
   S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // students get everything at their level in one place (no LS filter, newest LS first: content())
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';

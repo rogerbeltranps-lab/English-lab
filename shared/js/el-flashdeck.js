@@ -127,6 +127,14 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const D = id => (P.decks[id] = P.decks[id] || { c: {}, log: {} });
     const saveSoon = (() => { let tm = null; return now => { clearTimeout(tm); if (now) { o.save(P); return; } tm = setTimeout(() => o.save(P), 15e3); }; })();
     let view = { k: 'list' }, ses = null, layer = null;
+    // Which side comes first on a vocabulary card (Roger, 25 Nov 2026: "I want them to be able to choose whether they see the Catalan first or
+    // the English first… it makes more sense to say Fer fotos means take pictures"; "when they are collocations first Catalan as a default"):
+    // auto = a word of two or more words (a collocation, an expression) in Catalan first, a single word in English first; or always English /
+    // always Catalan first. The student's choice stays in this browser (el_fd_dir). Cards with no Catalan (Pro) stay English first.
+    const DIRS = ['auto', 'en', 'ca'];
+    let dir = (() => { try { const v = localStorage.getItem('el_fd_dir'); return DIRS.includes(v) ? v : 'auto'; } catch (e) { return 'auto'; } })();
+    const caFirst = c => c && c.kind === 'v' && !!c.ca && (dir === 'ca' || dir === 'auto' && /\S\s+\S/.test(String(c.en || '').trim()));
+    const dirLbl = () => dir === 'en' ? t('Primer l’anglès', 'English first') : dir === 'ca' ? t('Primer el català', 'Catalan first') : t('Primer: automàtic', 'First: automatic');
 
     const decks = () => (o.decks() || []).filter(d => d.cards.length);
     // 🧑‍🎨 the streak mascot (el-mascot.js), when the page has it: the Choose an LS header, Done for today, milestones
@@ -267,7 +275,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       const d = ses.d, c = ses.cur, now = Date.now(), st = x => D(deckOfCard(d, x)).c[x.id];
       const nN = ses.fresh.length, nL = ses.lrn.filter(x => st(x)[1] - now <= AHEAD * MIN).length, nR = ses.due.length + ses.extra.length;
       const kindOf = x => !x ? '' : !st(x) ? 'new' : st(x)[0] === S_REV ? 'due' : 'lrn';
-      const top = `<div class="elfd-top"><button class="elfd-x" data-fd="close">✕ ${t('Tanca', 'Close')}</button><span class="nm">${esc(d.name)}${ses.part ? ' · ' + esc(ses.part) : ''}</span><span class="grow"></span>
+      const top = `<div class="elfd-top"><button class="elfd-x" data-fd="close">✕ ${t('Tanca', 'Close')}</button><span class="nm">${esc(d.name)}${ses.part ? ' · ' + esc(ses.part) : ''}</span><span class="grow"></span><button class="b g sm elfd-dir" data-fd="dir" title="${esc(t('Automàtic: les expressions de més d’una paraula surten primer en català, i les paraules soles en anglès. Toca per canviar-ho.', 'Automatic: expressions of more than one word show the Catalan first, single words the English first. Tap to change it.'))}">⇄ ${dirLbl()}</button>
         <span class="elfd-cnt"><span class="new">${kindOf(c) === 'new' && !ses.shown ? '<u>' + (nN + 1) + '</u>' : nN}</span><span class="lrn">${kindOf(c) === 'lrn' && !ses.shown ? '<u>' + nL + '</u>' : nL}</span><span class="due">${kindOf(c) === 'due' && !ses.shown ? '<u>' + (nR + 1) + '</u>' : nR}</span></span></div>`;
       if (!c) {
         const later = ses.lrn.length ? Math.min(...ses.lrn.map(x => st(x)[1])) - now : 0;
@@ -277,13 +285,16 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
           <div class="elfd-acts"><button class="b" data-fd="statsnow">📊 ${t('Estadístiques', 'Stats')}</button><button class="b g" data-fd="close">${t('Tanca', 'Close')}</button></div></div>`;
       }
       const tag = `<div class="elfd-tag ${c.kind}">${icon(c.kind)} ${c.kind === 'v' ? t('Vocabulari', 'Vocabulary') : c.kind === 'e' ? 'Expressions' : t('Gramàtica', 'Grammar')} · ${esc(c.part)}</div>`;
-      const front = `<div class="elfd-front${c.kind === 'v' ? '' : ' s'}">${c.front}${c.star ? ' <span class="elfd-star">⭐</span>' : ''}</div>${c.opts && c.opts.length ? `<div class="elfd-opts">${c.opts.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
+      const rev = caFirst(c);
+      const front = `<div class="elfd-front${c.kind === 'v' ? '' : ' s'}">${rev ? esc(c.ca) : c.front}${c.star ? ' <span class="elfd-star">⭐</span>' : ''}</div>${c.opts && c.opts.length ? `<div class="elfd-opts">${c.opts.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}`;
       const listen = c.say ? `<button class="b g sm" data-fd="say">🔊 ${t('Escolta', 'Listen')}</button>` : '';
       const help = c.kind === 'v' ? t('Digues què vol dir en veu alta. Després gira la targeta.', 'Say what it means out loud. Then turn the card over.') : t('Digues la frase completa en veu alta. Després gira la targeta.', 'Say the whole sentence out loud. Then turn the card over.');
-      if (!ses.shown) return top + `<div class="elfd-card">${tag}${front}${c.kind === 'v' ? listen : ''}<p class="elfd-tag">${help}</p></div><button class="b elfd-show" data-fd="show">${t('Gira la targeta', 'Turn over')}</button><p class="elfd-keys">${t('Espai: girar', 'Space: turn over')}</p>`;
+      const help2 = rev ? t('Digues-ho en anglès en veu alta. Després gira la targeta.', 'Say it in English out loud. Then turn the card over.') : help;
+      if (!ses.shown) return top + `<div class="elfd-card">${tag}${front}${c.kind === 'v' && !rev ? listen : ''}<p class="elfd-tag">${help2}</p></div><button class="b elfd-show" data-fd="show">${t('Gira la targeta', 'Turn over')}</button><p class="elfd-keys">${t('Espai: girar', 'Space: turn over')}</p>`;
       const s = st(c), opt = [1, 2, 3, 4].map(a => { const early = ses.part && s && s[0] === S_REV && s[1] >= dayStart(now) + DAY && a >= 3; if (early) return t('igual', 'same'); const x = next(s, a, now); return span(x[0] === S_REV ? x[2] * DAY : until(x, now), ca()); });
       const L = [['De nou', 'Again'], ['Difícil', 'Hard'], ['Bé', 'Good'], ['Fàcil', 'Easy']];
-      return top + `<div class="elfd-card">${tag}${front}<div class="elfd-back">${c.back}${listen}</div></div>
+      const back = rev ? `<div class="elfd-ans">${esc(c.en)}</div>${c.ex ? `<div class="elfd-ex">${esc(c.ex)}</div>` : ''}` : c.back;
+      return top + `<div class="elfd-card">${tag}${front}<div class="elfd-back">${back}${listen}</div></div>
         <div class="elfd-rate">${L.map(([a, b], i) => `<button class="a${i + 1}" data-fd="ans" data-v="${i + 1}">${t(a, b)}<small>${opt[i]}</small></button>`).join('')}</div><p class="elfd-keys">${t('Tecles 1 2 3 4', 'Keys 1 2 3 4')}</p>`;
     }
 
@@ -306,6 +317,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       else if (k === 'show') { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }
       else if (k === 'ans') answer(+v);
       else if (k === 'say') say(ses.cur.say);
+      else if (k === 'dir') { dir = DIRS[(DIRS.indexOf(dir) + 1) % DIRS.length]; try { localStorage.setItem('el_fd_dir', dir); } catch (e) {} render(); }
     }
     host.addEventListener('click', click);
     document.addEventListener('keydown', e => {

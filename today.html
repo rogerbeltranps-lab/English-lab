@@ -336,7 +336,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261125"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125b"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-term-report.js?v=20261123"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
@@ -594,7 +594,7 @@ function meBox(lss,ls){
   return `<div class="pme"><div class="pmeh"><span class="pmea" aria-hidden="true">${esc(ini)}</span><div><b>${esc(nm)}</b><small>${esc(g?g.name:"")}${ls?" · "+lsName(ls):""}</small></div></div>`
     +levelBox(ls)
     +`<h2>${t("Les meves notes","My marks")}</h2><div class="pml">`+r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, el que tens endarrerit, exàmens","LS mark, what's late, exams"))
-    +r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))+r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))
+    +r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))+r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck","🧠",t("Targetes","Flashcards"),t("el vocabulari i la gramàtica de cada LS","the vocabulary and grammar of each LS"))
     +(ls?(window.elLsNum&&elLsNum(ls)!=="LS1"?r(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),t("índex, teoria, vocabulari i els teus apunts","index, theory, vocabulary and your notes")):r(lsHref(ls)+"#notes","🎯",t("Què entra a l'examen","What's in the exam"),t("el que hem fet, paraules clau, teoria i els teus apunts","what we've done, key terms, theory and your notes"))):"")+`</div>`
     +`<h2>${t("Més","More")}</h2><div class="pml">`+r("#units","🗂",t("Les meves Learning Situations","My Learning Situations"))
     +r("#news","📣",t("Anuncis del professor","Announcements from your teacher"))

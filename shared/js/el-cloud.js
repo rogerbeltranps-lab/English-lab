@@ -848,9 +848,22 @@ function bar(){
     // the same Problem window for 📓 the notebook, which covers this bar (el-notebook.js ⚠️; not in the teacher's student view)
     window.elReport=u&&!AS&&(isStudent(u)||isTeacher(u))?(x=>reportProblem(u,x)):null;
     if(!u)el.append("Not signed in ",b("Sign in",login));
-    else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};el.append((AS.name||AS.email||"")+" ");   // the student's own bar; its buttons do nothing here
-      const p=b("⚠️ "+(ca?"Problema":"Problem"),no);p.style.background="#b45309";el.append(p," ",b("💡 Idea",no)," ");
-      const x=b("✕ Exit",asExit);x.style.background="#dc2626";x.title="Exit the student view: back to your dashboard";el.append(x)}
+    // A student (and the teacher's 👁 student view) (Roger, 25 Nov 2026: "their name can go just below my name"; "students see the icons at the
+    // bottom right and when they hover them over they see the names"): the name sits under "English with Roger" in the side menu (in the bar
+    // only on a page without one) and the bar shows only icons, each with its name on hover (and as its label for screen readers)
+    const ic=(i,tip,f,bg)=>{const x=b(i,f);x.className="elcb-i";x.dataset.tip=tip;x.setAttribute("aria-label",tip);x.style.background=bg||"#0f766e";x.style.padding="4px 9px";return x};
+    tipCss();
+    if(AS||u&&isStudent(u)&&!isTeacher(u)){const nm=AS?(AS.name||AS.email||""):(u.displayName||u.email||"");window.EL_WHO_NAME=nm;if(!elWhoPlace())el.append(nm," ")}
+    else{window.EL_WHO_NAME="";elWhoPlace()}
+    if(!u){}
+    else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};   // the student's own bar; its buttons do nothing here
+      el.append(ic("⚠️",ca?"Avisa d'un problema":"Report a problem",no,"#b45309")," ",ic("💡",ca?"Suggereix una idea":"Suggest an idea",no)," ");
+      if(isTeacher(u)&&bellEl)el.append(bellEl," ");   // the teacher's 🔔 here too (Roger, 25 Nov 2026: "notifications should also appear here")
+      el.append(ic("✕","Exit the student view: back to your dashboard",asExit,"#dc2626"))}
+    else if(isStudent(u)&&!isTeacher(u)){
+      el.append(ic("⚠️",repEn()?"Report a problem":"Avisa d'un problema",()=>reportProblem(u),"#b45309")," ",ic("💡",repEn()?"Suggest an idea":"Suggereix una idea",()=>suggest(u))," ");
+      if(isTester(u))testerSel(u,el);
+      el.append(ic("🚪",repEn()?"Sign out":"Tanca la sessió",logout,"#475569"))}
     else{el.append(u.displayName||u.email," ");
       // no "My dashboard" / "Games" links here for students: the left menu already has both (Roger, 7 Nov 2026: "we don't need this
       // mini menu on the bottom"); the teacher keeps the Dashboard link
@@ -859,14 +872,27 @@ function bar(){
       else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Beltran looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
-      if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
+      if(isTester(u))testerSel(u,el);
+      el.append(b("Sign out",logout))}};
+}
+function testerSel(u,el){{const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
         s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ");
         const vg=viewGroup(u);if(vg){const c=courseOf(vg),lv=document.createElement("select");lv.title="Tester: see the site as a student on this level";
           lv.innerHTML='<option value="">Level: my own route</option>'+(window.EL_LEVELS||[]).filter(x=>x.id!=="native"||c==="4eso").map(x=>'<option value="'+x.id+'">'+(window.elLevelLabel?elLevelLabel(c,x.id):x.name)+'</option>').join("");
           lv.value=viewLevel(u)||"";lv.onchange=()=>{origSet.call(localStorage,"el_view_level",lv.value);location.reload()};el.append(lv," ")}}
-      el.append(b("Sign out",logout))}};
 }
+// the student's name under "English with Roger" in whichever side menu the page has; el-app.js calls it again after drawing its menu.
+// true when the name is on screen
+window.elWhoPlace=()=>{document.querySelectorAll(".el-who").forEach(e=>e.remove());const nm=window.EL_WHO_NAME;if(!nm)return false;
+  const br=[...document.querySelectorAll(".elrail .elr-brand,aside.side>.brand,aside.sidebar>.brand")];
+  br.forEach(e=>{const d=document.createElement("div");d.className="el-who";d.textContent=nm;e.after(d)});return br.some(e=>e.offsetParent)};
+const elWhoPlace=()=>window.elWhoPlace();
+// the icons' names on hover (bar above) and the student's name under "English with Roger"
+function tipCss(){if(document.getElementById("elcb-css"))return;const st=document.createElement("style");st.id="elcb-css";
+  st.textContent='#el-cloud-bar .elcb-i{position:relative;font-size:15px;line-height:1.2}#el-cloud-bar .elcb-i:hover:after,#el-cloud-bar .elcb-i:focus-visible:after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 9px);background:#0f172a;color:#fff;font:600 12px/1.3 system-ui,sans-serif;padding:5px 9px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px #0003;pointer-events:none;z-index:2}'
+    +'.el-who{padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.3 Inter,system-ui,sans-serif;color:#475569!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}aside.side>.el-who,aside.sidebar>.el-who{margin:-6px 0 14px}@media print{.el-who{display:none}}';
+  document.head.appendChild(st)}
 // Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
 // next to its Home link: header menu (course and LS pages), side and phone menus (Home, English Lab), top bar of activity pages.
 function menuLink(u){
