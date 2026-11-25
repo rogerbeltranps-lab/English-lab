@@ -26,6 +26,7 @@ if (!process.env.FIRESTORE_EMULATOR_HOST) {
   const bin = path.join(path.dirname(require.resolve('firebase-tools/package.json')), 'lib/bin/firebase.js');
   const args = [bin, 'emulators:exec', '--project', 'demo-english-lab', '--only', 'firestore,auth', '--config', cfg,
     [process.execPath, fileURLToPath(import.meta.url), ...process.argv.slice(2)].map((a) => JSON.stringify(a)).join(' ')];
+  if (process.env.SHOTS) process.env.SHOTS = path.resolve(process.env.SHOTS);   // the tests run in another folder: the pictures go where the caller meant
   const r = spawnSync(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', env: process.env, cwd: os.tmpdir(), maxBuffer: 64 << 20 });
   fs.rmSync(cfg, { force: true });
   if (r.status && !(r.stdout || '').includes('🤖')) process.stdout.write((r.stdout || '') + (r.stderr || ''));   // the emulator did not start: say why
@@ -58,7 +59,11 @@ for (const f of files) {
     try { await L.reset(); await t.run(ctx); }
     catch (e) { const m = String(e && e.message || e), w = (m.match(/waiting for (.*)/) || [])[1];
       fails.push('the test could not finish: ' + m.split('\n')[0] + (w ? ' (waiting for ' + w.slice(0, 160) + ')' : '')); }
+    const stuck = fails.length;   // the test stopped or a check failed: say where each device was and what it showed
     for (const [n, d] of devices.entries()) {
+      const last = d.pages[d.pages.length - 1];
+      if (stuck && last) { const txt = await last.evaluate(() => (document.body.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 220)).catch(() => '?');
+        fails.push('device ' + (n + 1) + ' was on ' + last.url().replace(/^https?:\/\/[^/]+\//, '') + ': "' + txt + '"'); }
       for (const e of new Set(d.errors)) fails.push('JavaScript error on ' + e);
       if (d.real.length) fails.push('tried to reach the REAL database: ' + [...new Set(d.real)].join(', '));
       if (d.missing.length) fails.push('a file it needs is missing: ' + [...new Set(d.missing)].join(', '));

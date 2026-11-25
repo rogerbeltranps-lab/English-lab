@@ -102,7 +102,8 @@ export async function user({ uid, email, password = 'test-pass-123', name = '' }
 // ---- a browser like a student's (Chromebook) or a phone ----
 export const CHROMEBOOK = { width: 1366, height: 768 }, PHONE = { width: 390, height: 844, phone: true };
 let browser = null;
-export async function launch() { browser = browser || (await chromium.launch()); return browser; }
+// RU_CHROME=path: another Chrome (to try a run with an older or newer browser than the one Playwright brings)
+export async function launch() { browser = browser || (await chromium.launch(process.env.RU_CHROME ? { executablePath: process.env.RU_CHROME } : {})); return browser; }
 export async function close() { if (browser) await browser.close(); browser = null; if (server) server.close(); server = null; if (admin) await admin.app.delete().catch(() => {}); admin = null; }
 // the site's files a page asked for and this repo does not have, since the last call
 export function missing() { const m = [...missingNow]; missingNow.clear(); return m; }
