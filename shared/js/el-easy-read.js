@@ -43,8 +43,11 @@
       '.el-er-btn{font:700 .95rem/1.2 system-ui,-apple-system,"Segoe UI",sans-serif!important;letter-spacing:0!important;word-spacing:0!important;border:0;border-radius:999px;padding:8px 16px;background:#eaf0ff;color:#2a4bd7!important;cursor:pointer}' +
       '.el-er-btn[aria-pressed="true"]{background:#2a4bd7;color:#fff!important}' +
       '.el-er-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px}' +
+      '.el-er-box>.el-ra-bar,.el-er-box>.el-er-bar{position:relative;z-index:3}' +
       '.el-er-panel{flex-basis:100%;display:grid;gap:6px;margin:4px 0 2px;padding:12px 14px;border-radius:12px;background:#f4f6fb;border:1px solid #d9dee8;color:#1c2330!important;font:500 .92rem/1.35 system-ui,-apple-system,"Segoe UI",sans-serif!important;letter-spacing:0!important;word-spacing:0!important;text-align:left}' +
       '.el-er-panel[hidden]{display:none!important}' +
+      // always usable, even inside a read-only page or section (pointer-events:none on the panel around it)
+      '.el-er-btn,.el-er-panel,.el-er-panel *,html.el-er-ruler .el-er-box{pointer-events:auto!important}.el-er-panel input:disabled{opacity:1}' +
       '.el-er-panel label{display:flex;gap:10px;align-items:center;cursor:pointer;color:#1c2330!important;font:inherit!important}' +
       '.el-er-panel input{width:18px;height:18px;accent-color:#2a4bd7;flex:none;margin:0}' +
       '.el-er-panel .el-er-legend{font-weight:800}' +
@@ -134,6 +137,20 @@
   }
   function set(k, v) { S[k] = v; save(); apply(); }
 
+  // Read-only pages (a step already done, the 👁 student view, a closed LS) and read-only or locked sections disable every input
+  // and button in them (el-cloud.js freeze, el-sec-off, el-sec-cls). Easy reading only changes how the text looks, so its own
+  // controls are always given back (Roger, 25 Nov 2026: "this dosen't work", the boxes greyed out on a finished step).
+  function guard(el) {
+    const fix = () => {
+      if (el.disabled) el.disabled = false;
+      if (el.tabIndex < 0) el.tabIndex = 0;
+      if (el.style.pointerEvents) el.style.pointerEvents = '';
+      if (el.dataset.elro) delete el.dataset.elro;
+      if (el.dataset.elcls) delete el.dataset.elcls;
+    };
+    fix();
+    new MutationObserver(fix).observe(el, { attributes: true, attributeFilter: ['disabled', 'style', 'tabindex', 'data-elro', 'data-elcls'] });
+  }
   function panel() {
     const p = doc.createElement('div'); p.className = 'el-er-panel'; p.hidden = true;
     p.innerHTML = OPTS.map(k => '<label><input type="checkbox" data-k="' + k + '"> <span>' + t(k) +
@@ -142,6 +159,7 @@
     p.querySelectorAll('input[data-k]').forEach(i => { i.onchange = () => set(i.dataset.k, i.checked); });
     p.querySelector('.el-er-done').onclick = () => { p.hidden = true; };
     p.querySelector('.el-er-quit').onclick = () => { p.hidden = true; set('on', false); };
+    p.querySelectorAll('input,button').forEach(guard);
     return p;
   }
   function attach(box) {
@@ -155,7 +173,7 @@
     if (ra && own) own.remove();
     if (!btn) {
       btn = doc.createElement('button'); btn.type = 'button'; btn.className = 'el-er-btn';
-      pn = panel();
+      guard(btn); pn = panel();
       btn.onclick = () => { if (!S.on) { set('on', true); pn.hidden = false; } else pn.hidden = !pn.hidden; };
       if (ra) { ra.appendChild(btn); ra.appendChild(pn); }
       else { const bar = doc.createElement('div'); bar.className = 'el-er-bar'; bar.append(btn, pn); box.insertBefore(bar, box.firstChild); }
