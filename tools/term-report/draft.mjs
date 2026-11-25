@@ -91,7 +91,9 @@ function timing(S,course,group){const ls=LS2[course],done=((DATA.ls[ls]||{}).don
   const actKey={};Object.entries(LPS).forEach(([k,v])=>actKey[v.act]=k);
   let due=0,dn=0,inWeek=0,lastMin=0,lateN=0;const wk={},late=[];
   Object.entries(done).forEach(([tab,d])=>{if(!d||d>T1_END)return;const [act,pid]=tab.split("#");const key=actKey[act];if(!key||!pid)return;due++;const s=st(S,key)||{};
-    if(!(s.done||{})[pid])return;dn++;const at=day((s.doneAt||{})[pid]);if(!at)return;
+    // the Vocabulary tab holds two steps (cards, practice): done when both are, as elTabGroups counts it (el-catalog.js)
+    const D=s.done||{},A=s.doneAt||{},two=pid==="vocab"&&!D.vocab&&D.cards!==undefined;
+    if(two?!(D.cards&&D.practice):!D[pid])return;dn++;const at=day(two?[A.cards,A.practice].filter(Boolean).sort().pop():A[pid]);if(!at)return;
     if(at<=addD(d,7))inWeek++;else{late.push(at);lateN++;if(at>=addD(T1_END,-6)||(exam&&at>=addD(exam,-3)&&at<=exam))lastMin++}});
   // the weekly bars: every learning-path step finished that week (not only the ticked ones)
   Object.entries(LPS).filter(([,v])=>v.course===course).forEach(([k])=>{const s=st(S,k);if(!s)return;Object.entries(s.done||{}).forEach(([pid,v])=>{const at=v&&day((s.doneAt||{})[pid]);if(at)wk[monday(at)]=(wk[monday(at)]||0)+1})});
