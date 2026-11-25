@@ -144,6 +144,8 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   await shot(page, name + '-0-cards');
   await page.waitForTimeout(3000);   // the usual cards come first, as before
   await closeCards(page);
+  // the problem answer's card (el-reply.js) can come a few seconds after the others: wait for it and close it too, then open the 🔔
+  if (await page.locator('#el-reply').waitFor({ state: 'attached', timeout: 10000 }).then(() => true, () => false)) await closeCards(page);
   const bell = page.locator('#el-nbell > button');
   ok(await bell.count(), `${name}: no 🔔 in the student's bar`);
   const n0 = (await bell.locator('b').textContent().catch(() => '')) || '';
