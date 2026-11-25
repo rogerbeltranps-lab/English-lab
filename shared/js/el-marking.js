@@ -161,7 +161,10 @@ window.ELMark=(function(){
   // fbBy[step], nor by the corrections without a level, fbSig[step]), or Claude answered this very comment (answers[step] = {t, q, at}; a new comment opens it again).
   // asked(): Claude handed it to the teacher (ask[step] = {why, q, at}); then it waits in the To do as 🙋 and Claude leaves it.
   const q=h=>String((h&&h.comment)||"").trim();
-  function open(h,x,step){x=x||{};const c=q(h);if(!c||(window.elNoComment&&elNoComment(c))||(x.seen||{})[step])return false;
+  // A step sent back to redo (flags[step].done "redo": ↺ Redo on the dashboard, or Beltran's own redo in marks.mjs) has its answer: the Redo
+  // note. Its comment waits again only on the next hand-in (Roger, 25 Nov 2026: a Reading log sent back to redo still asked him to answer its "4r").
+  const redone=(h,x,step)=>{const f=((x||{}).flags||{})[step];return !!f&&f.done==="redo"&&!(String((h&&h.date)||"")>String(f.at||""))};
+  function open(h,x,step){x=x||{};const c=q(h);if(!c||(window.elNoComment&&elNoComment(c))||(x.seen||{})[step]||redone(h,x,step))return false;
     if((x.replies||{})[step]&&!(x.fbBy||{})[step]&&!(x.fbSig||{})[step])return false;   // fbSig: a correction without a level (marks.mjs fb-apply)
     const an=(x.answers||{})[step];return !(an&&an.q===c)}
   const asked=(h,x,step)=>{const k=((x||{}).ask||{})[step];return !!(k&&k.q===q(h))};
@@ -214,5 +217,5 @@ window.ELMark=(function(){
   // 646 characters pasted for 383 kept, 271 keys in 16 s: "it's evident, why didn't you do it automatically?"): the characters pasted
   // beyond the final text (p − n) were deleted, and those keys are not counted as typed.
   const pasted=t=>{t=t||{};const n=+t.n||0,p=+t.p||0,typed=(+t.k||0)-Math.max(0,p-n);return n>=40&&p>=0.8*n&&typed<0.5*n};
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,sqText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted,SHADOW_IND};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,sqText,q,open,asked,redone,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted,SHADOW_IND};
 })();
