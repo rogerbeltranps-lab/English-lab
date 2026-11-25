@@ -1840,6 +1840,7 @@ function render0(){
   $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`+elTeacherMenu({dash:true,on:tmOn,mt:mtOn(),tn:tmTn,counts:tmN,asks:tmAsk,gtip:listed()?"Signed in / on the student list":"Students",
     extra:{corr:corrBadge(tmC),msgs:tmMsg?`<small class="${pbNew().length?"late":""}">${tmMsg}</small>`:""},
     none:n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):""});
+  if(window.elWhoPlace)elWhoPlace();   // Roger's name under "Teacher dashboard" (el-cloud.js; Roger, 25 Nov 2026)
   // the numbers the other teacher pages show on the same menu (elTmCache): no reads there
   if(!DEMO)try{localStorage.setItem("el_tmenu",JSON.stringify({t:Date.now(),n:tmN,ask:tmAskN,corr:tmC.chk?(elTmCache().corr||{n:0}):{n:tmC.n||0,late:!!tmC.late},msgs:{n:tmMsg,late:!!pbNew().length},mt:mtOn(),tn:tmTn}))}catch(e){}
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}

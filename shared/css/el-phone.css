@@ -309,10 +309,10 @@
 }
 /* 🧑‍🎨 the teacher's own mascot with his ⚡ streak on the dashboard (teacher.html, el-cloud.js mzBar): on a phone the account bar goes
    to the end of the page (section 8), so the mascot leaves it for the top right of the screen, as on the students' board (Roger,
-   25 Nov 2026: "On my cellphone I want this to be at the top right!", "On the teachers view"); the page header keeps room for it */
+   25 Nov 2026: "On my cellphone I want this to be at the top right!", "On the teachers view"); it stays there while the page scrolls
+   (Roger, 25 Nov 2026: "I want it to stay always there"); the page header keeps room for it */
 @media (max-width:640px){
-  body.tph{position:relative}
-  body.tph #el-cloud-bar .elcb-mz{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));right:12px;margin:0;z-index:30}
+  body.tph #el-cloud-bar .elcb-mz{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:12px;margin:0;z-index:30}
   body.tph #el-cloud-bar .elcb-mz .elmz-img{width:60px!important;height:60px!important}
   body.tph #el-cloud-bar .elcb-mz .elmz-badge{position:absolute;right:-6px;bottom:-10px;font-size:15px;z-index:1}
   body.tph:has(#el-cloud-bar .elcb-mz) :is(#msg,#loadbar,#main>.ph){padding-right:68px}
