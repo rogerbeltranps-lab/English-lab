@@ -119,6 +119,8 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv{text-decoration:none;display:flex;justify-content:space-between;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px;text-align:left;margin:0}
 .tside .nv:hover{background:#eaf0ff;color:#3157d5}.tside .nv.on{background:#0f172a;color:#fff}.tside .nv.c2eso.on{background:#16a34a}.tside .nv.c4eso.on{background:#2563eb}
 .tside .nv small{font-weight:600;font-size:12px;opacity:.75}.tside .sep{height:1px;background:#e2e8f0;margin:8px 8px}.tside .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
+/* the menu's items (elTeacherMenu, el-catalog.js): icon + label, the group's short name only on the narrow strip of other pages */
+.tside .nv .lb{margin-right:auto}.tside .nv .gi{display:none}
 .tside .nv.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.tside .nv.ann:hover{background:#ffedd5}
 /* 🛠 maintenance mode (mtDialog): the side menu button and the red bar on every page while it is on */
 .tside .nv.mton{background:#dc2626;color:#fff}.tside .nv.mton:hover{background:#b91c1c;color:#fff}.tside .nv small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
@@ -377,13 +379,20 @@ const CLS={link:false,ready:false,done:(()=>{try{return sessionStorage.getItem("
 const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}catch(e){return {}}})();
 const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStorage.setItem("el_t_tab","1");return !!v}catch(e){return false}})();   // true = this tab already had the dashboard open (reload)
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
+  // the teacher's menu on the other pages (elTeacherMenu, el-catalog.js) opens a place of the dashboard: ?g= a group or a menu item
+  // (plan = 🏠 Home, corr, lss…), ?p= a Home place (week, msgs, tt), ?do= annnew (📣 Announcement) or mtdlg (🛠 Maintenance), ?more=1
+  // (the phone's More sheet)
+  const TABS=["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"];
   if(gOf(q.get("g")))S.g=q.get("g");
+  else if(TABS.includes(q.get("g"))){S.g=q.get("g");if(S.g==="plan"&&["week","msgs","tt"].includes(q.get("p")))CLS.place=q.get("p")}
+  else if(q.has("do")||q.has("more"))S.g=TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g))?LAST.g:"plan";
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
-  CLS.link=q.has("course")||q.has("ls")||q.has("g");
-  if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
+  CLS.link=["course","ls","g","p","do","more"].some(k=>q.has(k));
+  CLS.todo=["annnew","mtdlg"].includes(q.get("do"))?q.get("do"):q.has("more")?"more":null;   // done once the dashboard is drawn (firstDraw)
+  if(CLS.link)history.replaceState(null,"",location.pathname+location.hash)})();
 const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
@@ -1396,8 +1405,7 @@ function render(){
 // on a computer (shared/css/el-phone.css, section 8): the menu, the pages and the buttons are the same ones, with their own data-do actions.
 const TPH={g:null,more:false,chip:null,sv:null};
 const tphIcon=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
-  corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
+const TPH_I=EL_TPH_I;   // the same icons as the tab bar on the teacher's other pages (elTeacherTabs, el-catalog.js)
 function phoneBar(){
   if(GR.some(g=>g.id===S.g))TPH.g=S.g;
   if(!TPH.g){const l=GR.find(g=>g.id===LAST.g);TPH.g=(l||GR[0]).id}
@@ -1818,36 +1826,21 @@ function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,n
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
-  const hp=(p,lab,tip,extra)=>`<button class="nv ${S.g==="plan"&&S.place===p?"on":""}" data-do="hplace" data-p="${p}" title="${tip}">${lab}${extra||""}</button>`;
   const nv=(g,lab,cls,tip,extra)=>`<button class="nv ${cls||""} ${S.g===g?"on":""}" data-do="tab" data-g="${g}" ${tip?`title="${tip}"`:""}>${lab}${extra||""}</button>`;
   $("#tabs").hidden=false;$("#shell").classList.add("on");
   $("#mtbar").innerHTML=mtOn()?`🛠 Maintenance mode is ON: students only see the maintenance message and the worksheets.<button data-do="mtoff">Turn it off</button><button class="g2" data-do="mtdlg">See the message</button>`:"";
-  $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`
-    // 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"): sent ones are in 💬 Messages
-    +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
-    +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
-    +nv("plan","🏠 Home",S.g==="plan"&&(S.place||"home")!=="home"?"off":"","How each class is doing: work done in each learning path, first tries, games and marks")
-    // 🧠 Flashcards (Roger, 25 Nov 2026: "between home and groups I want to have a flashcards button. There I see this per each LS and I can
-    // even try them and have my own statistics"): the students' Flashcards page, every course and route, your own progress saved to your account
-    +`<a class="nv" href="lab/practice.html#deck" title="Every LS's flashcards at every level: study them yourself, with your own statistics">🧠 Flashcards</a>`
-    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,`<span class="gn">${esc(g.name)}</span>`,"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0),g.id))).join("")
-    +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
-    // 🧭 Learning situations (Roger, 12 Nov 2026: "here I should have LSs sections; when i get in I should see the courses and choose one")
-    +nv("lss","🧭 Learning situations","","Every LS by course: its learning paths, groups, status and materials")
-    +`<div class="sep"></div>`
-    +nv("corr","✏️ Corrections","","What Beltran corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
-    // the Home tiles moved here (Roger, 9 Nov 2026: "all this info can only be on the left menu")
-    +hp("week","📅 Time plan","Every group's week and exam day","")
-    +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const m=msgsN();return m?`<small class="${pbNew().length?"late":""}">${m}</small>`:""})())
-    +hp("tt","🗓 Timetable","Your classes with each group, days off","")
-    +nv("qa","🔎 Questions","","Which questions students answer well or badly the first time, by route and group")
-    +nv("online","🟢 Online","","Who is on English Lab now, and the history of visits: when, for how long, which pages")
-    +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
-    +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
-    +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
-    +nv("how","🎬 How it works","","Guides for teachers and students")
-    // ✦ Roger's own course, as a section of its own (tnPage)
-    +((window.TN_LS||[]).length&&!DEMO?`<div class="sep"></div>`+nv("tn","✦ Towards Nativeness","","Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"):"");
+  // the side menu: the one list of every teacher page (elTeacherMenu in el-catalog.js; Roger, 25 Nov 2026: "this menu should always be
+  // the same"), here with the dashboard's buttons. 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"); 🧠 Flashcards
+  // between Home and Groups (Roger, 25 Nov 2026); the Home tiles moved to the menu (Roger, 9 Nov 2026: "all this info can only be on the
+  // left menu"); 🧭 Learning situations (Roger, 12 Nov 2026); ✦ Towards Nativeness, Roger's own course (tnPage)
+  const tmOn=S.g==="plan"?((S.place||"home")==="home"?"plan":S.place):S.g,tmN={},tmAsk={},tmAskN={};
+  GR.forEach(g=>{tmN[g.id]=String(cnt(g.id));const a=inGr(g.id).filter(s=>!s.away).reduce((x,s)=>x+lvAsks(s.uid).length,0);tmAskN[g.id]=a;tmAsk[g.id]=askBadge(a,g.id)});
+  const tmTn=!!(window.TN_LS||[]).length&&!DEMO,tmMsg=msgsN(),tmC=corrN();
+  $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`+elTeacherMenu({dash:true,on:tmOn,mt:mtOn(),tn:tmTn,counts:tmN,asks:tmAsk,gtip:listed()?"Signed in / on the student list":"Students",
+    extra:{corr:corrBadge(tmC),msgs:tmMsg?`<small class="${pbNew().length?"late":""}">${tmMsg}</small>`:""},
+    none:n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):""});
+  // the numbers the other teacher pages show on the same menu (elTmCache): no reads there
+  if(!DEMO)try{localStorage.setItem("el_tmenu",JSON.stringify({t:Date.now(),n:tmN,ask:tmAskN,corr:tmC.chk?(elTmCache().corr||{n:0}):{n:tmC.n||0,late:!!tmC.late},msgs:{n:tmMsg,late:!!pbNew().length},mt:mtOn(),tn:tmTn}))}catch(e){}
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
@@ -2909,7 +2902,7 @@ const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:tru
 const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_LS.some(x=>x.id===id));
 // the badge says what it is and opens the request itself (Roger, 10 Nov 2026: "I dont understand the target on the 2a")
 const askBadge=(n,g)=>n?` <small class="ask" data-do="ask" data-g="${g}" role="link" title="${n} student${n>1?"s":""} asked for a level change: click to answer (Accept or Decline in the group's To do)">🎯 ${n} level ask${n>1?"s":""}</small>`:"";
-const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
+const corrBadge=(c=corrN())=>{if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
   const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 15:15";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
@@ -7043,8 +7036,11 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;
   TOUCHED.clear();firstDraw()};
 // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
 function firstDraw(){
-  if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());return}}
-  render();corrFresh();if(hashPb()!=null)toProbs(hashPb())}
+  if(CLS.place){S.place=CLS.place;CLS.place=null}   // ?p= from the teacher's menu on another page (S.place is set to home after the link is read)
+  if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());tmTodo();return}}
+  render();corrFresh();if(hashPb()!=null)toProbs(hashPb());tmTodo()}
+// 📣 Announcement, 🛠 Maintenance or the phone's More, asked from the teacher's menu on another page (?do=, ?more=1)
+function tmTodo(){const w=CLS.todo;CLS.todo=null;if(w==="annnew")annDialog();else if(w==="mtdlg")mtDialog();else if(w==="more"&&document.getElementById("tpmore")){TPH.more=true;tphMore()}}
 // the light part read while the page shows the copy: then the page is drawn again from it (as liveDraw does: never while typing or
 // with a window open). Something that already replaced the copy (Update all, the daily update, a save's read-back) wins. Failed: again in 1 minute.
 async function freshen(){let D;try{D=await load()}catch(e){console.warn("load",e);S.copyErr=true;loadBar();setTimeout(freshen,60e3);return}

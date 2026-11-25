@@ -11,7 +11,8 @@
 //            teacher's and the test account's Courses and Learning Situations lists (#courses, #learning) stay, with this menu
 // It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
 // board's bottom bar (a phone):
-// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
+// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: the dashboard's own menu,
+// elTeacherMenu in el-catalog.js, Roger 25 Nov 2026).
 // Games replaced English Lab (Roger, 7 Nov 2026: "I want games on the left and vocabulary and grammar in practice, English Lab is not
 // needed anymore"): lab/ is now the Games page, and Practise has the vocabulary and grammar at the student's level.
 // LS1 pages keep their design (Roger's rule: leave LS1 alone). No Firestore reads: who is signed in, the group and the language
@@ -123,6 +124,10 @@
     const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
     return elStudentMenu({ root: ROOT, courses: [c], lss, group: who.group, ca: CA, board, here, app });
   }
+  // the teacher's menu (not the student view, not the test account): the item that is on here (🧠 Flashcards, 🎯 Practise, 🎲 Games)
+  const tmUse = () => who.role === "teacher" && !who.as && !!window.elTeacherMenu;
+  const tmHere = () => /practice\.html$/.test(path) ? (location.hash === "#deck" ? "fd" : "practise") : mode === "lab" ? "games" : "";
+  const tmItems = () => tmUse() ? elTeacherMenu({ root: ROOT, on: tmHere(), list: true }) : null;
   function rail(L) {
     let r = $(".elrail");
     if (!r) { r = document.createElement("nav"); r.className = "elrail"; r.setAttribute("aria-label", "Menu"); document.body.prepend(r); }
@@ -136,6 +141,16 @@
     const cmTab = document.documentElement.classList.contains("elcmtab");
     const sm = stuMenu(), mini = !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail && (!!sm || !cmTab);
     document.body.classList.toggle("elmini", mini);
+    // the teacher: the dashboard's side menu, the same list and look as on teacher.html (elTeacherMenu in el-catalog.js; Roger, 25 Nov
+    // 2026: "this menu should always be the same"); the narrow strip shows the same items as icons
+    const TM = tmItems();
+    if (TM) {
+      r.innerHTML = `<a class="elr-brand" href="${ROOT}teacher.html">Teacher dashboard</a><div class="eltm elw">${elTeacherMenu({ root: ROOT, on: tmHere() })}</div>`
+        + `<div class="eln">${TM.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.lb)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.ic}</i><span>${esc(x.lb)}</span></a>`).join("")}</div>`;
+      document.body.classList.add("elhas-rail");
+      if (mini) elMiniRail(r); else r.classList.remove("elopen");
+      return;
+    }
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
       + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
@@ -144,6 +159,8 @@
     if (mini) elMiniRail(r); else r.classList.remove("elopen");
   }
   function bar(L) {
+    // the teacher on a phone: the dashboard's tab bar (Home · Groups · Corrections · Messages · More; elTeacherTabs in el-catalog.js)
+    if (tmUse() && window.elTeacherTabs) { const o = $(".elbar"); if (o) o.remove(); document.body.classList.remove("elhas-bar"); elTeacherTabs({ root: ROOT }); return; }
     let b = $(".elbar");
     if (!b) { b = document.createElement("nav"); b.className = "elbar"; b.setAttribute("aria-label", "Menu"); document.body.append(b); }
     const sh = x => x.k === "board" ? t("Inici", "Home") : x.short;   // the board's bottom bar says Home
@@ -169,8 +186,14 @@
   function side(L) {   // Games and Practise: their side menu, as the board's buttons
     const tabs = $(".sidebar .nav-tabs");
     if (!tabs) return;
-    let s = $(".elside");
-    if (!s) { s = document.createElement("nav"); s.className = "elside"; s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    let s = $(".sidebar>nav.elside,.sidebar>nav.eltm");
+    if (!s) { s = document.createElement("nav"); s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    // the teacher: the dashboard's menu (elTeacherMenu), under the dashboard's name
+    const tm = tmUse(), br = $(".sidebar>.brand");
+    s.className = tm ? "eltm" : "elside";
+    if (br) { if (br.dataset.en == null) { br.dataset.en = br.textContent; br.dataset.h = br.getAttribute("href") || ""; }
+      br.textContent = tm ? "Teacher dashboard" : br.dataset.en; br.setAttribute("href", tm ? ROOT + "teacher.html" : br.dataset.h); }
+    if (tm) { s.innerHTML = elTeacherMenu({ root: ROOT, on: tmHere() }); return; }
     s.innerHTML = stuMenu() || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
