@@ -958,9 +958,19 @@ var LS2 = (function () {
     }
   });
 
+  /* 📝 A step can show another step's reading text (Roger, 25 Nov 2026, on the Reading log: "Yes; to make it easier to read", after a
+     Starter student couldn't find texts A and B and typed only the start of each line): textFrom: '<panel id>' borrows that panel's
+     media.text at the student's route (Pro's own panel when Pro replaces it), with textTitle as a small heading above it. The text is
+     the same .reading box, so 🔊 Listen, Aa Easy reading and 🖍 Underline work on it, and the marks made in the Reading tab show here
+     too (same text, same marks). The notebook keeps the text once, in the Reading step (el-exam.js readText reads only p.media). */
+  function mediaOf(p) {
+    const m = p.media || {}, src = p.textFrom && !m.text && LP.panels.find(x => x.id === p.textFrom), t = src && src.media && src.media.text;
+    return t && t !== true ? Object.assign({}, m, { text: t, _from: 1 }) : m;
+  }
   function mediaHtml(p) {
-    const m = p.media || {};
+    const m = mediaOf(p);
     let h = '';
+    if (m.text && m._from && p.textTitle) h += '<h3 class="el-log-text" style="margin:20px 0 8px">' + tx(p.textTitle) + '</h3>';
     if (m.text) h += '<div class="reading">' + byLevel(m.text) + '</div>'; // a string, or one text per route
     if (m.pages) h += '<div class="el-book" id="' + p.id + 'Book"></div>';   // 📖 the book's page pictures, one list per route (shared/js/el-book.js)
     if (m.youtube) h += '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + m.youtube + '" title="' + esc(m.title || 'Video') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>' +
