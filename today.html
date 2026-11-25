@@ -719,21 +719,43 @@ function vySq(ls,out){const A=window.elSqAct&&elSqAct(ls.id),i=A?out.findIndex(b
 // 🏁 To win the race (Roger, 21 Nov 2026: "A message could pop up saying that to win the race they need to do all the activities pending"):
 // once a day, on the board's map, a card over the map when ✅ To do has something (the same count as the To do tile); ✅ See them opens it.
 // Not in class time or class mode (in class the warm-up's games lead to the race map on the projector).
-function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyClass())return;const n=todoItems(lss).reduce((k,x)=>k+todoTabs(x),0);if(!n)return;
+function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyClass())return;
+  if(!DEMO&&F&&S.vy&&!RD[S.vy.skin])return;   // wait for the road document (the board draws again when it arrives), so the card can say your place
+const n=todoItems(lss).reduce((k,x)=>k+todoTabs(x),0);if(!n)return;
   const k="el_race_"+(AS||(U&&U.uid)||"demo"),d=new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
   try{if(localStorage.getItem(k)===d)return}catch(e){}   // seen once it is closed (the board draws again when the road arrives)
   const seen=()=>{try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}};
   // their own ✅ Finish all your activities card (Roger, 21 Nov 2026: "I thought that was what they saw when they open the website"; in class
   // he chose the website, not class): el-todo.js remind with the race line and links; closing it lights up the pending steps. The teacher's student view has no el-todo
   // on the board: the short card below.
-  if(!AS&&!vyRace.busy){vyRace.busy=1;import(new URL("shared/js/el-todo.js",location.href).href).then(m=>m.remind({race:true,links:true,done:()=>vyPend(lss,true)}))
+  if(!AS&&!vyRace.busy){vyRace.busy=1;import(new URL("shared/js/el-todo.js",location.href).href).then(m=>m.remind({race:true,links:true,pos:vyPos(n),done:()=>vyPend(lss,true)}))
     .then(ok=>{vyRace.busy=0;if(ok)seen();else vyRace0(lss,k,d,n)}).catch(()=>{vyRace.busy=0;vyRace0(lss,k,d,n)});return}
   if(AS)vyRace0(lss,k,d,n)}
+// 🏆 Your place in the race (Roger, 25 Nov 2026: "tell them their position"): the same ranking as the map, by steps done (the vehicles'
+// s on the road document, yours from your own steps). Students on the same number of steps share a place (two at the front are both 1st),
+// so the students who did nothing yet are never "25th of 25" one by one. Kind wording: 1st = in the lead, 2nd/3rd = on the podium, the
+// last quarter = "right now, but you can still catch up"; below the 1st, how many activities take them up a place (only when the
+// activities they have to do are enough). No classmates on the road yet (not read, or nobody else): no line. Ordinals in Catalan are
+// avoided ("a la posició 7"), so the line has no gender.
+function vyPos(n){const V=S.vy;if(!V||!window.elVoyage||!(V.mates||[]).length)return null;
+  const me=elVoyage.model(V).done,L=V.mates.map(m=>m.s|0),of=L.length+1,ahead=s=>L.filter(x=>x>s).length,r=1+ahead(me);
+  const ord=x=>x+(x%100>=11&&x%100<=13?"th":["th","st","nd","rd"][x%10]||"th");
+  const line=r===1?t(`🥇 Ets a la posició 1 de ${of} de la classe: vas al davant!`,`🥇 You're 1st out of ${of} in your class: you're in the lead!`)
+    :r<=3?t(`${r===2?"🥈":"🥉"} Ets a la posició ${r} de ${of} de la classe: ets al podi!`,`${r===2?"🥈":"🥉"} You're ${ord(r)} out of ${of} in your class: you're on the podium!`)
+    :r>Math.ceil(of*.75)?t(`🏁 Ara ets a la posició ${r} de ${of} de la classe, però encara pots remuntar!`,`🏁 You're ${ord(r)} out of ${of} in your class right now, but you can still catch up!`)
+    :t(`🏁 Ets a la posició ${r} de ${of} de la classe.`,`🏁 You're ${ord(r)} out of ${of} in your class.`);
+  let up="";if(r>1){const k=Math.min(...L.filter(x=>x>me))-me+1,r2=1+ahead(me+k);
+    const more=t(`Acaba ${k===1?"1 activitat":k+" activitats"} més`,`Finish ${k===1?"1 more activity":k+" more activities"}`);
+    if(k<=n)up=r2===1?t(`${more} i passaràs al davant!`,`${more} and you'll take the lead!`)
+      :t(`${more} i pujaràs a la posició ${r2}.`,`${more} and you'll move up to ${ord(r2)} place.`)}
+  else up=t("Acaba-les totes per seguir al davant.","Finish them all to stay in the lead.");
+  return {line,up}}
 function vyRace0(lss,k,d,n){const O=document.querySelector("#main .vy-ovl");if(!O||document.getElementById("el-rem"))return;
   const ic=elVoyage.skin(S.vy).veh.icon;
   O.innerHTML=`<div class="card">${window.ELMascot?`<div style="display:flex;justify-content:center;margin:-8px 0 -4px">${ELMascot.img("worried",120,"")}</div>`:`<div style="font-size:46px;line-height:1.1">${ic} 🏁</div>`}<h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
     +`<p>${t("Acaba totes les activitats pendents! Cada activitat que acabes et fa avançar.","Finish all your pending activities! Every activity you finish moves you forward.")}</p>`
     +`<p class="ce">${t(`Et falten ${nAct(n)}.`,`You have ${nAct(n)} left to do.`)}</p>`
+    +((P=>P?`<p class="vy-pos" style="margin:8px auto 4px;max-width:420px;background:#fff7e0;border:1px solid #e9cf94;border-radius:12px;padding:7px 12px;color:#4a2f0e"><b>${esc(P.line)}</b>${P.up?`<br>${esc(P.up)}`:""}</p>`:"")(vyPos(n)))
     +`<button type="button" data-r="ok">👍 ${t("D'acord","OK")}</button></div>`;
   O.classList.add("on");O.onclick=e=>{const b=e.target.closest("button[data-r]");if(!b)return;O.classList.remove("on");O.onclick=null;try{Storage.prototype.setItem.call(localStorage,k,d)}catch(e){}
     vyPend(lss,true)}}
@@ -769,7 +791,7 @@ function voyageRoad(ls,V){
     if(!n||mine&&mine.s===s&&mine.n===n)return;r[U.uid]={n,s};F.setDoc(ref,{[U.uid]:{n,s}},{merge:true}).catch(e=>console.warn("road",e))};
   if(RD[ls.id]){write();return}
   if(voyageRoad[ls.id])return;voyageRoad[ls.id]=1;
-  F.getDoc(ref).then(x=>{RD[ls.id]=x.exists()?x.data():{};write();if(placeNow()==="home"&&S.ls===ls.id&&$(".vy"))render()}).catch(e=>{console.warn("road",e);RD[ls.id]={}})}
+  F.getDoc(ref).then(x=>{RD[ls.id]=x.exists()?x.data():{};write();if(placeNow()==="home"&&S.ls===ls.id&&$(".vy"))render()}).catch(e=>{console.warn("road",e);RD[ls.id]={};if(placeNow()==="home"&&S.ls===ls.id&&$(".vy"))render()})}
 // 🧭 Your steps on the activity pages (el-app.js): the voyage's stops as the board sees them, kept in this browser (el_voyage_steps), so
 // the activity pages draw the same list with no reads (their own page's ticks come from the page itself). Not in the teacher's student view.
 // The teacher's view of a student's board keeps that student's copy too (u = the student), so the activity pages opened from it show the
