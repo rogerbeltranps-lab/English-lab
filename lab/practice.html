@@ -90,6 +90,9 @@
     <div id="app"></div>
   </section></main>
   </div>
+<!-- 🧠 Flashcards (#deck) is named from its first frame: the heading and the tab said "Practise · Loading…" until sign-in finished
+     (Roger, 25 Nov 2026, video "Look what happens"). start() then sets the student's language (Targetes for Starter). -->
+<script>if (location.hash === '#deck') { document.getElementById('title').textContent = '🧠 Flashcards'; document.title = 'Flashcards · English with Roger'; }</script>
 
 <!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
 <script src="../shared/js/el-app.js"></script>
