@@ -229,7 +229,7 @@ window.LP = (function () {
         { r: 'insecure', q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get', 'gather', 'come'] },
         { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
         { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange', 'give', 'swap'] },
-        { r: 'safe', q: 'The opposite of religious: ___', a: ['secular', 'non-religious', 'nonreligious', 'non religious', 'irreligious'] },
+        { r: 'safe', q: 'The opposite of religious: ___', a: ['secular', 'non-religious', 'nonreligious', 'non religious', 'irreligious', 'not religious'] },
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
       ] },
