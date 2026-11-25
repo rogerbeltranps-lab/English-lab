@@ -862,16 +862,17 @@ function bar(){
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};   // the student's own bar; its buttons do nothing here
       const mz=mzBar(ca);if(mz)el.append(mz," ");
       el.append(ic("⚠️",ca?"Avisa d'un problema":"Report a problem",no,"#b45309")," ",ic("💡",ca?"Suggereix una idea":"Suggest an idea",no)," ");
-      if(nbellEl)el.append(nbellEl," ");   // the student's own 🔔, as they see it (shared/js/el-notify.js)
+      if(nbellEl)el.append(nbellEl," ");   // the student's own 📬, as they see it (shared/js/el-notify.js)
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");   // the teacher's 🔔 here too (Roger, 25 Nov 2026: "notifications should also appear here")
       el.append(ic("✕","Exit the student view: back to your dashboard",asExit,"#dc2626"))}
     else if(isStudent(u)&&!isTeacher(u)){
       const mz=mzBar(!repEn());if(mz)el.append(mz," ");
       el.append(ic("⚠️",repEn()?"Report a problem":"Avisa d'un problema",()=>reportProblem(u),"#b45309")," ",ic("💡",repEn()?"Suggest an idea":"Suggereix una idea",()=>suggest(u))," ");
-      if(nbellEl)el.append(nbellEl," ");   // 🔔 their notifications (shared/js/el-notify.js)
+      if(nbellEl)el.append(nbellEl," ");   // 📬 their notifications (shared/js/el-notify.js)
       if(isTester(u))testerSel(u,el);
       el.append(ic("🚪",repEn()?"Sign out":"Tanca la sessió",logout,"#475569"))}
-    else{el.append(u.displayName||u.email," ");
+    else{if(isTeacher(u)){const mz=mzBar(false);if(mz)el.append(mz," ")}   // 🧑‍🎨 the teacher's own ⚡ streak too (Roger, 25 Nov 2026: "the mascot shoulb always visble here")
+      el.append(u.displayName||u.email," ");
       // no "My dashboard" / "Games" links here for students: the left menu already has both (Roger, 7 Nov 2026: "we don't need this
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
@@ -888,14 +889,24 @@ function bar(){
 // the flashcards copy in this browser (el_flash_<uid>), as on the board; the teacher's 👁 student view reads the student's copy once a tab.
 const noCorner=()=>!!window.EL_EXAM||/\/(exam|recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname);
 let mzReady=null,mzAs=null;
+// The account's copy of the flashcards (students/{uid}/flashcards/all), merged into this browser's, so the ⚡ also counts the cards studied on
+// another device (the phone, the Chromebook): read at most once every 30 minutes per browser (el_flash_chk_<uid>), then the bar and the
+// board's mascot redraw (event el-flash-sync). Problem seen 25 Nov 2026: students studied and their ⚡ stayed at 0.
+function mzSync(uid){const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
+  if(!uid||Date.now()-t<30*60e3)return;try{localStorage.setItem(k,String(Date.now()))}catch(e){}
+  getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{if(!s.exists()||!window.ELFlashDeck)return;const lk="el_flash_"+uid;let loc=null;
+    try{loc=JSON.parse(localStorage.getItem(lk)||"null")}catch(e){}
+    const m=window.ELFlashDeck.merge(loc||{},JSON.parse(s.data().p||"{}"));try{localStorage.setItem(lk,JSON.stringify(m))}catch(e){}
+    dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e))}
 function mzBar(ca){
-  if(onBoard||noCorner())return null;
-  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125c",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
+  if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
+  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
   let P=null;
   if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
       try{const c=JSON.parse(sessionStorage.getItem(k)||"null");if(c&&Date.now()-c.t<30*60e3){mzAs.P=c.P;}else getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{mzAs.P=s.exists()?JSON.parse(s.data().p||"{}"):{};
         try{sessionStorage.setItem(k,JSON.stringify({t:Date.now(),P:mzAs.P}))}catch(e){}draw(user)}).catch(()=>{})}catch(e){}}
     P=mzAs.P}
+  else if(user)mzSync(user.uid);
   const M=window.ELMascot,x=M.data(AS?null:(user||{}).uid,P);if(!x)return null;
   const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
   const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");
@@ -904,7 +915,7 @@ function mzBar(ca){
 // the flashcards page calls it after saving, so the ⚡ number and the mood follow the cards just studied without a reload
 // (problem report, 4ESOA, 25 Nov 2026: the bar still said ⚡ 0 after studying)
 window.elMascotRefresh=()=>{const old=document.querySelector(".elcb-mz");if(!old)return;const n=mzBar(old.dataset.ca==="1");if(n)old.replaceWith(n)};
-// 🔔 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
+// 📬 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
 // shared/js/el-notify.js): corrections, answers, redo, exam results, problem answers and announcements, as the student sees them. Built
 // from the reads the cards already make (results copy, students/{uid}, the two card loads): nothing held shows early, no reads of its own.
 let nbellP=null,nbellEl=null,NTM=null;
@@ -2162,10 +2173,10 @@ onAuthStateChanged(auth,async u=>{
   studyCard(u);
   storyCard(u);
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
-  // 🔔 the student's own notifications in the bar (shared/js/el-notify.js); the teacher's 👁 student view shows the student's, read-only
+  // 📬 the student's own notifications in the bar (shared/js/el-notify.js); the teacher's 👁 student view shows the student's, read-only
   if(u&&(AS||isStudent(u)&&!isTeacher(u))&&!nbellP&&!noCorner())nbellP=nbellStart(u).catch(e=>{console.warn("notifications",e);return null});
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
-  // Each one also goes into the 🔔 list, which keeps it after OK (el-notify.js history).
+  // Each one also goes into the 📬 list, which keeps it after OK (el-notify.js history).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
     load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now())))   // at: sent late, from 7:30, or held until 📨 Send it
       .then(L=>{nbFeed(nb=>nb.add(L.map(r=>NTM.replyItem(r,repEn(),m))));return L}),

@@ -5,7 +5,7 @@
 // the card back as "updated". "Later" hides it until the browser is closed. Nothing is shown for an LS the student's board does not list
 // (hidden, or not assigned to the group), nor for an exam with a section still empty (the teacher may be typing the marks).
 // From LS2 on too (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected"): results held until 📣 Publish
-// reach this card without sections (el-cloud.js held), so the card and the 🔔 (el-notify.js) come only once they are published.
+// reach this card without sections (el-cloud.js held), so the card and the 📬 (el-notify.js) come only once they are published.
 export const examSig=(e,sc)=>e.sections.map(([k,,mx])=>{const s=sc[k];return s&&s.score!=null&&s.score!==""?k+":"+s.score+"/"+(s.max||mx||e.max):s&&s.excused?k+":-":null});   // excused = a part the student could not do (late exam without the listening): left out, so it does not hold the card back
 
 // get(ls) → the assessment record or null, seen() → students/{uid}.examSeen or {}, save(ls,sig), visible(ls) → the board lists the LS.

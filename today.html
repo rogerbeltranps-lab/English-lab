@@ -337,7 +337,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261125c"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125d"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-term-report.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
@@ -549,10 +549,13 @@ function levelBox(ls){
 // I promise it works or do some shadowing, i promise it works"): Roger's avatar in the mood of the student's 🧠 Flashcards streak, with the
 // ⚡ badge always there; a tap opens 🧠 Flashcards. Once a day (never in class time) it says one line picked from what the student really
 // has pending: the flashcards, a 🗣 Shadowing or 📖 book tab of ✅ To do, late work; or a milestone (🎉, once) or a lost streak (😢, once).
-// No reads of its own: the flashcards copy in this browser (el_flash_<uid>); the 👁 student view reads the student's copy once.
+// No reads of its own: the flashcards copy in this browser (el_flash_<uid>), which the bar keeps merged with the account's (el-cloud.js
+// mzSync, every 30 minutes at most); the 👁 student view reads the student's copy once.
 const MZ={};
 function mzOff(){const e=document.getElementById("elmz");if(e)e.remove();const b=document.getElementById("elmz-say");if(b)b.remove()}
-function mzHome(lss){const M=window.ELMascot,ph=document.querySelector(".phead"),lv=document.getElementById("lvl");
+// the bar merged in the account's copy (el-cloud.js mzSync: cards studied on another device): draw again
+addEventListener("el-flash-sync",()=>{if(MZ.lss&&document.getElementById("elmz"))mzHome(MZ.lss)});
+function mzHome(lss){MZ.lss=lss;const M=window.ELMascot,ph=document.querySelector(".phead"),lv=document.getElementById("lvl");
   if(!M||!window.ELFlashDeck||!ph||!lv||!D||!D.me||!D.me.group||all()){mzOff();return}
   const uid=AS||(U&&U.uid)||"demo";
   if(AS&&!DEMO&&MZ.as!==AS){MZ.as=AS;MZ.P={};F.getDoc(F.doc(ELCloud.db,"students",AS,"flashcards","all")).then(s=>{MZ.P=s.exists()?JSON.parse(s.data().p||"{}"):{};if(document.getElementById("elmz"))mzHome(lss)}).catch(()=>{})}

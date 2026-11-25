@@ -53,7 +53,7 @@ function lvOf(r,step){const from=window.EL_LV_FROM||"2026-11-30",at=String(((r.m
   const m=ls.reduce((a,b)=>a+b,0)/ls.length;return m<5?"NA":m<7?"AS":m<9?"AN":"AE"}
 export const lvBox=(lv,en)=>lv?'<span class="el-lv" style="display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:10px;font-weight:800;font-size:14px;background:'+LVC[lv]+'">'+(en?LVN[lv][1]+" ("+LVN[lv][0]+")":LVN[lv][0])+'</span>':"";
 // Every answer and correction in the student's results: [{a (catalogue activity), r (the result), step, text, lv, k ("activity|step"), v (the
-// text's signature, as fbSeen keeps it), corr (a correction, not only an answer)}]. Also the 🔔 list (el-notify.js).
+// text's signature, as fbSeen keeps it), corr (a correction, not only an answer)}]. Also the 📬 list (el-notify.js).
 export function corrList(rs,cat){const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
     // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work.
@@ -80,7 +80,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
       writing(b.querySelector("div"),it.text,T,window.elHandedText&&window.elHandedText(it.step));return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
   }
-  if(Object.keys(shown).length){Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));dispatchEvent(new CustomEvent("el-fb-seen",{detail:shown}))}   // the 🔔 (el-notify.js) too
+  if(Object.keys(shown).length){Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));dispatchEvent(new CustomEvent("el-fb-seen",{detail:shown}))}   // the 📬 (el-notify.js) too
   let later={};try{later=JSON.parse(sessionStorage.getItem("el_corr_later")||"{}")}catch(e){}
   const todo=items.filter(x=>!shown[x.k]&&was[x.k]!==x.v&&later[x.k]!==x.v);
   if(!todo.length)return;
