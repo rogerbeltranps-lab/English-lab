@@ -194,6 +194,6 @@
   const go = () => { scan(); new MutationObserver(scan).observe(doc.body, { childList: true, subtree: true }); };
   if (doc.body) go(); else doc.addEventListener('DOMContentLoaded', go);
   // 🖍 Underline (Roger, 25 Nov 2026): its button sits beside this one (shared/js/el-underline.js)
-  if (ME && !root.ELUnderline && !doc.querySelector('script[src*="el-underline.js"]')) { const u = doc.createElement('script'); u.src = new URL('el-underline.js?v=1', ME).href; doc.head.appendChild(u); }
+  if (ME && !root.ELUnderline && !doc.querySelector('script[src*="el-underline.js"]')) { const u = doc.createElement('script'); u.src = new URL('el-underline.js?v=2', ME).href; doc.head.appendChild(u); }
   root.addEventListener('storage', e => { if (e.key === KEY) { try { S = Object.assign({}, DEF, JSON.parse(e.newValue || '{}')); } catch (x) {} apply(); } });
 })(window);
