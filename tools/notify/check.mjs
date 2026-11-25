@@ -1,12 +1,12 @@
-// 🔔 Check of the student's notifications and the 🧑‍🎨 mascot in the bottom-right bar (shared/js/el-notify.js, el-cloud.js nbellStart / mzBar).
+// 📬 Check of the student's notifications and the 🧑‍🎨 mascot in the bottom-right bar (shared/js/el-notify.js, el-cloud.js nbellStart / mzBar).
 // It opens real pages with the real el-cloud.js and a FAKE Firebase (in memory, an invented student "Alex Sample"), so nothing ever reaches
 // the real database, and checks that:
-//   • the 🔔 lists a correction, a step sent back to redo, published exam results, a problem answer and an announcement, newest first;
+//   • the 📬 lists a correction, a step sent back to redo, published exam results, a problem answer and an announcement, newest first;
 //   • nothing held shows: exam results waiting for 📣 Publish, an answer waiting for 17:00, a problem answer waiting for 📨 Send it;
 //   • the red number counts only what is new, and opening the list takes it away (and it stays away on the next page);
-//   • the 🔔 makes no Firestore reads of its own (the reads are the same with and without it);
-//   • the mascot with the ⚡ streak sits in the bar, but not on the board, an exam, a recall checkpoint or the sample exam;
-//   • the teacher's 👁 student view shows the student's 🔔 and writes nothing.
+//   • the 📬 makes no Firestore reads of its own (the reads are the same with and without it);
+//   • the mascot with the ⚡ streak sits in the bar on every page, the board too, but not on an exam, a recall checkpoint or the sample exam;
+//   • the teacher's 👁 student view shows the student's 📬 and writes nothing.
 // Usage: node tools/notify/check.mjs          → exit 1 and what broke.   SHOTS=dir also saves pictures (Chromebook and phone).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -145,7 +145,7 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   await page.waitForTimeout(3000);   // the usual cards come first, as before
   await closeCards(page);
   const bell = page.locator('#el-nbell > button');
-  ok(await bell.count(), `${name}: no 🔔 in the student's bar`);
+  ok(await bell.count(), `${name}: no 📬 in the student's bar`);
   const n0 = (await bell.locator('b').textContent().catch(() => '')) || '';
   await page.locator('#el-cloud-bar').scrollIntoViewIfNeeded().catch(() => {});
   await shot(page, name + '-1-bar');
@@ -171,21 +171,22 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   const mz = page.locator('#el-cloud-bar .elcb-mz');
   ok(await mz.count(), `${name}: no mascot in the bar`);
   ok(/5/.test(await mz.locator('.elmz-badge').textContent().catch(() => '')), `${name}: the ⚡ streak number is not 5`);
-  // next page: the number stays away, the board has no corner mascot, the sample exam has neither
+  // next page: the number stays away, the board has the mascot in the bar too, the sample exam has neither
   await page.goto('http://el.local/today.html');
   await settle(page, 3500); await closeCards(page);
   if (await page.locator('#el-nbell > button b').count()) { await page.evaluate(() => document.querySelector('#el-nbell > button').click()); await page.waitForTimeout(300);
     problems.push(`${name}: the red number came back on the next page: ` + (await page.locator('#el-npanel li.nw').allTextContents()).join(' | ')); await page.keyboard.press('Escape'); }
-  ok(!(await page.locator('#el-cloud-bar .elcb-mz').count()), `${name}: the board shows a second mascot in the bar`);
+  ok(await page.locator('#el-cloud-bar .elcb-mz').count(), `${name}: the board has no mascot in the bar`);
+  if (SHOTS) { await closeCards(page); await page.waitForTimeout(500); await page.locator('#el-cloud-bar').scrollIntoViewIfNeeded().catch(() => {}); const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, name + '-3-board-bar', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: Math.min(size[0] - Math.max(0, r.x - 30), r.width + 40), height: r.height + 80 }); }
   await page.goto('http://el.local/4eso/seasons-and-celebrations/sample-exam.html');
   await settle(page, 2500);
-  ok(!(await page.locator('#el-cloud-bar .elcb-mz, #el-nbell').count()), `${name}: the sample exam shows the mascot or the 🔔`);
+  ok(!(await page.locator('#el-cloud-bar .elcb-mz, #el-nbell').count()), `${name}: the sample exam shows the mascot or the 📬`);
   ok(!errs.length, `${name}: JavaScript errors: ${[...new Set(errs)].join(' | ')}`);
   ok(!real.length, `${name}: tried to reach the real database: ${[...new Set(real)].join(', ')}`);
   await ctx.close();
 }
 
-// reads: the same page with and without the 🔔 module (blocked) reads the same documents
+// reads: the same page with and without the 📬 module (blocked) reads the same documents
 {
   const reads = [];
   for (const block of [false, true]) {
@@ -196,10 +197,10 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
     reads.push((await page.evaluate(() => window.__FAKE.reads.filter((p) => !p.endsWith('~live')))).sort().join(','));
     await ctx.close();
   }
-  ok(reads[0] === reads[1], `the 🔔 makes reads of its own:\nwith:    ${reads[0]}\nwithout: ${reads[1]}`);
+  ok(reads[0] === reads[1], `the 📬 makes reads of its own:\nwith:    ${reads[0]}\nwithout: ${reads[1]}`);
 }
 
-// the teacher's 👁 student view: the student's 🔔, nothing written
+// the teacher's 👁 student view: the student's 📬, nothing written
 {
   const { ctx, page, errs } = await open([1366, 768], { teacher: true });
   await page.goto('http://el.local/today.html?student=' + UID);
@@ -208,7 +209,9 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   await settle(page, 4000);
   const before = await page.evaluate(() => window.__FAKE.writes.length);
   const bell = page.locator('#el-nbell > button');
-  ok(await bell.count(), '👁 student view: no student 🔔');
+  ok(await bell.count(), '👁 student view: no student 📬');
+  ok(!/🔔/.test(await bell.textContent().catch(() => '')), '👁 student view: the student\'s notifications use the teacher\'s 🔔');
+  if (SHOTS) { await page.locator('#el-cloud-bar').scrollIntoViewIfNeeded().catch(() => {}); const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, 'student-view-bar', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: r.width + 40, height: r.height + 80 }); }
   if (await bell.count()) { await bell.click(); await page.waitForTimeout(400);
     const txt = (await page.locator('#el-npanel li').allTextContents()).join('\n');
     ok(/corrected your work/.test(txt) && !/LS2 exam/.test(txt), '👁 student view: the list is not what the student sees:\n' + txt);
@@ -221,4 +224,4 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
 
 await browser.close();
 if (problems.length) { console.log('❌ ' + problems.length + ' problem(s):\n- ' + problems.join('\n- ')); process.exit(1); }
-console.log('✅ The students\' 🔔 and the mascot in the bar work, nothing held shows, no reads of their own.');
+console.log('✅ The students\' 📬 and the mascot in the bar work, nothing held shows, no reads of their own.');

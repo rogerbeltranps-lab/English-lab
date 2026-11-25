@@ -862,13 +862,13 @@ function bar(){
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};   // the student's own bar; its buttons do nothing here
       const mz=mzBar(ca);if(mz)el.append(mz," ");
       el.append(ic("⚠️",ca?"Avisa d'un problema":"Report a problem",no,"#b45309")," ",ic("💡",ca?"Suggereix una idea":"Suggest an idea",no)," ");
-      if(nbellEl)el.append(nbellEl," ");   // the student's own 🔔, as they see it (shared/js/el-notify.js)
+      if(nbellEl)el.append(nbellEl," ");   // the student's own 📬, as they see it (shared/js/el-notify.js)
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");   // the teacher's 🔔 here too (Roger, 25 Nov 2026: "notifications should also appear here")
       el.append(ic("✕","Exit the student view: back to your dashboard",asExit,"#dc2626"))}
     else if(isStudent(u)&&!isTeacher(u)){
       const mz=mzBar(!repEn());if(mz)el.append(mz," ");
       el.append(ic("⚠️",repEn()?"Report a problem":"Avisa d'un problema",()=>reportProblem(u),"#b45309")," ",ic("💡",repEn()?"Suggest an idea":"Suggereix una idea",()=>suggest(u))," ");
-      if(nbellEl)el.append(nbellEl," ");   // 🔔 their notifications (shared/js/el-notify.js)
+      if(nbellEl)el.append(nbellEl," ");   // 📬 their notifications (shared/js/el-notify.js)
       if(isTester(u))testerSel(u,el);
       el.append(ic("🚪",repEn()?"Sign out":"Tanca la sessió",logout,"#475569"))}
     else{el.append(u.displayName||u.email," ");
@@ -889,7 +889,7 @@ function bar(){
 const noCorner=()=>!!window.EL_EXAM||/\/(exam|recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname);
 let mzReady=null,mzAs=null;
 function mzBar(ca){
-  if(onBoard||noCorner())return null;
+  if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
   if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125c",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
   let P=null;
   if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
@@ -901,7 +901,7 @@ function mzBar(ca){
   const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");
   a.dataset.tip=tip;a.setAttribute("aria-label",tip);a.innerHTML=M.badge(n,"sm")+M.img(M.mood(x),50,"");
   return a}
-// 🔔 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
+// 📬 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
 // shared/js/el-notify.js): corrections, answers, redo, exam results, problem answers and announcements, as the student sees them. Built
 // from the reads the cards already make (results copy, students/{uid}, the two card loads): nothing held shows early, no reads of its own.
 let nbellP=null,nbellEl=null,NTM=null;
@@ -2157,10 +2157,10 @@ onAuthStateChanged(auth,async u=>{
   studyCard(u);
   storyCard(u);
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
-  // 🔔 the student's own notifications in the bar (shared/js/el-notify.js); the teacher's 👁 student view shows the student's, read-only
+  // 📬 the student's own notifications in the bar (shared/js/el-notify.js); the teacher's 👁 student view shows the student's, read-only
   if(u&&(AS||isStudent(u)&&!isTeacher(u))&&!nbellP&&!noCorner())nbellP=nbellStart(u).catch(e=>{console.warn("notifications",e);return null});
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
-  // Each one also goes into the 🔔 list, which keeps it after OK (el-notify.js history).
+  // Each one also goes into the 📬 list, which keeps it after OK (el-notify.js history).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
     load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now())))   // at: sent late, from 7:30, or held until 📨 Send it
       .then(L=>{nbFeed(nb=>nb.add(L.map(r=>NTM.replyItem(r,repEn(),m))));return L}),

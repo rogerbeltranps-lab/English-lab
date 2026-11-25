@@ -1,4 +1,5 @@
-// 🔔 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…"): a 🔔 in
+// 📬 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…"; 📬, not
+// the teacher's 📬, so the two never look the same in the 👁 student view: Roger, 25 Nov 2026: "it shoulndt be the same bell Icon"): a 📬 in
 // the bottom-right bar of every page for students (and in the teacher's 👁 student view, as the student sees it), between 💡 and 🚪.
 // The red number counts what is new; the list keeps the latest news from the teacher, newest first, each one a link:
 //   ✏️ a correction · 💬 an answer to a hand-in or a comment · ↺ a step sent back to redo   (results/{activity}.replies / answers / flags)
@@ -7,10 +8,10 @@
 //   📣 / ✉️ an announcement or a private message                                         (announcements, the same list as el-announce.js)
 // Held things never show early: everything comes from what the page already shows (el-cloud.js myResults takes out exam results waiting
 // for 📣 Publish and corrections or answers waiting for 17:00; problem answers waiting for 📨 Send it and late announcements are left out
-// by their own loads), so the 🔔 knows nothing the cards do not. No Firestore reads of its own: the results copy, students/{uid} (fbSeen,
+// by their own loads), so the 📬 knows nothing the cards do not. No Firestore reads of its own: the results copy, students/{uid} (fbSeen,
 // examSeen) and the two card loads are shared with the cards. Problem answers are deleted when the student presses OK, and announcements
-// are read once, so the 🔔 keeps a short history of both in this browser (el_nt_<uid>: up to 30 items) and what was already looked at.
-// "New" = not seen on its card or page yet (fbSeen / examSeen / OK) and not looked at in the 🔔; anything older than 21 days is never new.
+// are read once, so the 📬 keeps a short history of both in this browser (el_nt_<uid>: up to 30 items) and what was already looked at.
+// "New" = not seen on its card or page yet (fbSeen / examSeen / OK) and not looked at in the 📬; anything older than 21 days is never new.
 // Opening the list takes the number away; a click on a correction or exam saves it as seen, like its card does. Dates only, never times.
 const NEW_DAYS=21,KEEP=30,SHOW=15;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -42,7 +43,7 @@ export async function resultItems({rs,me,corr,examSig,course,root,board,en,name,
       fresh:exSeen[l.id]!==v,go:saveExam?()=>saveExam(l.id,v):null})}
   return out}
 
-// The 🔔 itself. uid = whose notifications, en = their language, ro = the teacher's 👁 student view (nothing saved, no history: the
+// The 📬 itself. uid = whose notifications, en = their language, ro = the teacher's 👁 student view (nothing saved, no history: the
 // history is in the student's own browser). Returns {el, live(items), add(items), seen(prefix)}.
 export function studentBell({uid,en,ro}){
   const T=(ca,e)=>en?e:ca,KEY="el_nt_"+uid;
@@ -81,7 +82,7 @@ export function studentBell({uid,en,ro}){
     return d.toDateString()===n.toDateString()?T("Avui","Today"):d.toDateString()===y.toDateString()?T("Ahir","Yesterday"):d.toLocaleDateString(en?"en-GB":"ca-ES",{day:"numeric",month:"short"})};
   let shownNew=new Set();
   const draw=()=>{const L=all(),n=L.filter(isNew).length;
-    b.innerHTML="🔔"+(n?"<b>"+n+"</b>":"");
+    b.innerHTML="📬"+(n?"<b>"+n+"</b>":"");
     const tip=n?T(n===1?"1 notificació nova":n+" notificacions noves",n===1?"1 new notification":n+" new notifications"):T("Notificacions","Notifications");
     b.dataset.tip=tip;b.setAttribute("aria-label",tip);
     if(n&&!rung&&b.animate){rung=true;b.animate([{transform:"rotate(0)"},{transform:"rotate(-16deg)"},{transform:"rotate(16deg)"},{transform:"rotate(0)"}],{duration:500,iterations:2,delay:1200})}
@@ -89,7 +90,7 @@ export function studentBell({uid,en,ro}){
     const li=(x,i)=>{const inner='<span class="ic" aria-hidden="true">'+esc(x.ic)+'</span><span class="tx"><b>'+esc(x.t)+"</b>"+(x.s?"<small>"+esc(x.s)+"</small>":"")+'</span><span class="dt">'+esc(day(x.at))+"</span>";
       return '<li class="'+(shownNew.has(x.k)?"nw":"")+'">'+(x.h?'<a href="'+esc(x.h)+'" data-i="'+i+'">'+inner+"</a>":'<button type="button" data-i="'+i+'" aria-expanded="false">'+inner+"</button>")+"</li>"};
     const shown=L.slice(0,SHOW);
-    p.innerHTML='<div class="hd"><b>🔔 '+T("Notificacions","Notifications")+'</b><button type="button" data-x aria-label="'+T("Tanca","Close")+'">✕</button></div>'
+    p.innerHTML='<div class="hd"><b>📬 '+T("Notificacions","Notifications")+'</b><button type="button" data-x aria-label="'+T("Tanca","Close")+'">✕</button></div>'
       +(shown.length?"<ul>"+shown.map(li).join("")+"</ul>":'<p class="none">'+T("Encara no tens cap notificació. Aquí veuràs les correccions, les respostes del professor i els resultats dels exàmens.","No notifications yet. Here you will see your corrections, your teacher's answers and your exam results.")+"</p>");
     p.querySelector("[data-x]").onclick=()=>show(false);
     p.querySelectorAll("[data-i]").forEach(e=>{const x=shown[+e.dataset.i];
@@ -119,7 +120,7 @@ export function studentBell({uid,en,ro}){
   draw();
   return api}
 
-// A problem answer (problemReplies, as el-reply.js shows it) and an announcement (as el-announce.js shows it) as 🔔 items.
+// A problem answer (problemReplies, as el-reply.js shows it) and an announcement (as el-announce.js shows it) as 📬 items.
 export function replyItem(r,en,R){const lang=typeof r.en==="boolean"?r.en:en,{title,body}=R.replyText(r,lang),[m,m2]=R.replyMsgs(r,lang);
   const ic=/^\S+/.exec(title)[0];
   return {k:"r:"+r.id+":",ic,t:title.replace(/^\S+\s+/,""),s:cut(m||body,90),at:ms(r.at)||ms(r.created),full:[body,m,m2&&(R.otherLabel(lang)+"\n"+m2)].filter(Boolean).join("\n\n")}}
