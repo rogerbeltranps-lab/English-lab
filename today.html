@@ -309,7 +309,8 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
     addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.querySelector("dialog[open]")&&parent.xrEsc)parent.xrEsc()})}catch(e){console.warn("exam embed",e)}})();</script>
 <style>html.embed .side,html.embed .mtabs,html.embed .bnav,html.embed #crumb,html.embed .phead,html.embed #note{display:none!important}html.embed .app{display:block}html.embed .page{max-width:none;padding:8px 10px}html.embed body{background:#fff}html.embed .t-exam{border:0;padding:0 2px}</style>
 <style>/* 📄 Term report (reportPlace): the course colour tints the band (2 ESO green, 4 ESO blue) */
-.cpwhy{display:block;margin:6px 0 0;padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;font-size:13.5px;line-height:1.45;color:#334155}.cpwhy ul{margin:4px 0 0;padding-left:18px}.cpwhy li{margin:2px 0}.cpwhy li span{color:#475569}
+.cpwhy{display:block;margin:6px 0 0;padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;font-size:13.5px;line-height:1.45;color:#334155}.cpcr{flex-wrap:wrap}.pgrep{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 16px;border-radius:14px;background:#1d4ed8;color:#fff!important;text-decoration:none;font-size:1.05rem}.pgrep:hover{background:#1e40af}.pgrep>span:first-child{font-size:1.6rem}.pgrep>span:nth-child(2){flex:1;min-width:0}.pgrep b{display:block}.pgrep small{display:block;color:#dbeafe;font-size:13px}.pgrep>span:last-child{font-size:1.4rem;font-weight:900}
+.cpwhy{flex:1 1 100%;margin-left:44px!important}.cpwhy>b{display:block;margin-bottom:2px}.cpwhy .cpwr{display:grid;grid-template-columns:1fr auto auto;gap:2px 10px;align-items:center;padding:3px 0;border-top:1px solid #e2e8f0}.cpwhy .cpwl{font-weight:600;min-width:0}.cpwhy .cpwl i{font-style:normal;font-weight:800;color:#64748b}.cpwhy .cpwn{font-weight:800;font-variant-numeric:tabular-nums}.cpwhy .dg small{font-weight:600;opacity:.85}.cpwhy .cpwd{grid-column:1/-1;color:#475569;font-size:12.5px}
 .trep{--rk:#2563eb}.trep[data-c="2eso"]{--rk:#15803d}
 .rph{background:var(--rk);color:#fff;border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin:12px 0 8px}
 .rph h2{color:#fff;margin:2px 0 0;font-size:1.35rem}.rph small{color:#fff;opacity:.92;font-size:13px}.rph .route{background:#fff;color:#0f172a}
@@ -602,7 +603,7 @@ function meBox(lss,ls){
   return `<div class="pme"><div class="pmeh"><span class="pmea" aria-hidden="true">${esc(ini)}</span><div><b>${esc(nm)}</b><small>${esc(g?g.name:"")}${ls?" · "+lsName(ls):""}</small></div></div>`
     +levelBox(ls)
     +`<h2>${t("Les meves notes","My marks")}</h2><div class="pml">`+r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, el que tens endarrerit, exàmens","LS mark, what's late, exams"))
-    +r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))+r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck","🧠",t("Targetes","Flashcards"),t("el vocabulari i la gramàtica de cada LS","the vocabulary and grammar of each LS"))
+    +r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck","🧠",t("Targetes","Flashcards"),t("el vocabulari i la gramàtica de cada LS","the vocabulary and grammar of each LS"))+r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))
     +(ls?(window.elLsNum&&elLsNum(ls)!=="LS1"?r(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),t("índex, teoria, vocabulari i els teus apunts","index, theory, vocabulary and your notes")):r(lsHref(ls)+"#notes","🎯",t("Què entra a l'examen","What's in the exam"),t("el que hem fet, paraules clau, teoria i els teus apunts","what we've done, key terms, theory and your notes"))):"")+`</div>`
     +`<h2>${t("Més","More")}</h2><div class="pml">`+r("#units","🗂",t("Les meves Learning Situations","My Learning Situations"))
     +r("#news","📣",t("Anuncis del professor","Announcements from your teacher"))
@@ -1430,7 +1431,7 @@ function examWriting(r,e){const w=r.writing;if(!w)return "";
   const crit=k=>((e&&e.sections||[]).find(x=>x[0]===k)||[])[3]||[];
   const bandName=[t("Excel·lent","Excellent"),t("Bé","Good"),t("A millorar","Needs work"),t("Insuficient","Not enough")];
   const row=([n,v,m])=>{const id=(String(n).match(/^\s*(C[1-4])\b/)||[])[1],d=WRUB[id];v=+v||0;m=+m||0;
-    if(!d)return `<div class="wr"><div class="wrh"><b>${esc(n)}</b><span class="wrs"><b>${pts1(v)}</b> / ${m}</span></div></div>`;
+    if(!d)return `<div class="cpwr"><div class="wrh"><b>${esc(n)}</b><span class="wrs"><b>${pts1(v)}</b> / ${m}</span></div></div>`;
     // copied (Roger, 3 Nov 2026: the students who copied need the rubric explained too): the row is explained as for everyone, with no
     // level of theirs marked, and says it gives 0 because the text was copied
     if(cp==="all"){const wt=tot[1]?Math.round(m/tot[1]*100):0;
@@ -1442,7 +1443,7 @@ function examWriting(r,e){const w=r.writing;if(!w)return "";
     // Roger, 2 Nov 2026 ("hauria de ser 3/4 i si vols la ponderació"): each row is marked by its level out of 4 (Excellent 4, Good 3,
     // Needs work 2, Not enough 1), and its weight in the writing (its points out of the writing's) is said apart, with the points it gives
     const lv=4-b,wt=tot[1]?Math.round(m/tot[1]*100):0;
-    return `<div class="wr"><div class="wrh"><b>${id} · ${t(d.ca,d.en)}</b> ${crit(d.k).map(pill).join("")}<span class="wrs">${bandName[b]} · <b style="color:${col(lv/4*100)}">${lv}</b> / 4 ${bar(lv/4*100)}</span></div>`
+    return `<div class="cpwr"><div class="wrh"><b>${id} · ${t(d.ca,d.en)}</b> ${crit(d.k).map(pill).join("")}<span class="wrs">${bandName[b]} · <b style="color:${col(lv/4*100)}">${lv}</b> / 4 ${bar(lv/4*100)}</span></div>`
       +`<p class="wrw"><b>${t("Què es valora?","What does it check?")}</b> ${d.what[L]}</p>`
       +`<ol class="wbands">${d.band.map((x,i)=>`<li class="${i===b?"on":""}"><small>${bandName[i]} · ${4-i}/4${i===b?` · ${t("el teu nivell","your level")}`:""}</small>${x[L]}<small class="wpts">${wRange(i,m)} ${t("de","of")} ${m} ${t("punts","points")}</small></li>`).join("")}</ol>`
       +`<p class="wrw wwt">⚖️ ${t(`<b>Pes:</b> aquest criteri és el ${wt} % del writing (${m} dels ${tot[1]} punts). Amb el teu nivell hi tens <b>${pts1(v)} de ${m} punts</b>.`,`<b>Weight:</b> this row is ${wt} % of the writing (${m} of its ${tot[1]} points). At your level it gives you <b>${pts1(v)} of ${m} points</b>.`)}</p>`
@@ -1712,13 +1713,17 @@ function repWhy(c,C){const by=new Map();(C.pcs||[]).filter(y=>y.m!=null&&y.w>0).
     const z=by.get(k)||{src:y.src,ls:y.ls,w:0,s:0};z.w+=y.w;z.s+=y.m*y.w;by.set(k,z)});
   if(!by.size)return "";
   const li=[...by.values()].map(z=>{const m=z.s/z.w,g=(window.EL_GRADING||{})[z.ls&&z.ls.id]||{},fa=g.fp&&g.fp.mark&&/^🎬/.test(z.src[0])?g.fp.a:null,R=fa&&(window.EL_FP_RUBRICS||{})[fa];
-    const head=`${esc(z.src[0])}${z.src[1]?" · "+esc(z.src[1]):""}${z.ls&&C.ls&&C.ls.size>1?` <i>${esc(elLsNum(z.ls))}</i>`:""}`;
+    const head=`${z.ls&&C.ls&&C.ls.size>1?`<i>${esc(elLsNum(z.ls))}</i> `:""}${esc(z.src[0])}${z.src[1]?" · "+esc(z.src[1]):""}`;
     if(R){const r=R.rows.find(x=>x.c===c),fb=String((D.rs[fa]||{}).feedback||""),H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/;
       const hit=r&&fb.split("\n").map(l=>l.trim().match(H)).find(h=>h&&h[1].trim().toLowerCase()===r.name.toLowerCase());
       if(r&&hit){const v=parseFloat(hit[3].replace(",",".")),L=4-Math.max(0,Math.min(4,Math.round(v/2.5)));
-        return `<li><b>${head} · ${esc(r.name)}</b>: ${f1(v)}/10 · ${esc(R.levels[L])}${r.d[L]?`. <span>${esc(r.d[L])}</span>`:""}</li>`}}
-    return `<li><b>${head}</b>: ${f1(m)}/10 · ${(degOf(m)||["",""])[1]}</li>`});
-  return `<span class="cpwhy"><b>${t("Per què aquest nivell","Why this level")}</b><ul>${li.join("")}</ul></span>`}
+        return `<span class="cpwr"><span class="cpwl">${head} · ${esc(r.name)}</span><span class="cpwn">${f1(v)}</span>${wdg(v)}${r.d[L]?`<span class="cpwd">${esc(R.levels[L])}: ${esc(r.d[L])}</span>`:""}</span>`}}
+    return `<span class="cpwr"><span class="cpwl">${head}</span><span class="cpwn">${f1(m)}</span>${wdg(m)}</span>`});
+  return `<span class="cpwhy"><b>${t("Per què aquest nivell","Why this level")}</b>${li.join("")}</span>`}
+// one short chip per line (Roger, 25 Nov 2026: "can you make this shorter or more compacted?"): the English name with the Catalan one-word
+// degree in brackets (students must see the translation), Catalan alone for Starter
+const wdg=m=>{const i=dgIdx(m);if(i<0)return "";const ca=["No assoliment","Satisfactori","Notable","Excel·lent"][i],en=["Not satisfactory","Satisfactory","Very good","Excellent"][i];
+  return `<span class="dg dg-${DGK[i]}">${EN?`${en} <small>(${ca})</small>`:ca}</span>`};
 // the English competences in the student's language, with their colours (CE1–CE6 as the board's pills, fk-1…fk-6)
 const CPN={1:["Interculturalitat","Cultures and respect"],2:["Comprensió oral","Listening"],3:["Expressió oral","Speaking"],4:["Comprensió escrita","Reading"],5:["Expressió escrita","Writing"],
   6:["Recerca i informació","Research and information"],7:["Lectura","Reading for pleasure"],8:["Mediació","Mediation"],9:["Aprendre a aprendre","Learning to learn"],10:["Comunicació ètica","Ethical communication"]};
@@ -1732,7 +1737,7 @@ function compBox(ls2,tm){const ps=ls2.flatMap(compPieces).filter(y=>!tm||y.term=
     const cc=CPC[k]||["#475569","#f1f5f9"];
     return `<div class="cpc ${K.m==null?"none":""}" style="--k:${cc[0]};--ks:${cc[1]}"><div class="cph"><span class="fv-chip"><span aria-hidden="true">${CPI[k]||"🧩"}</span> CE${k}</span><b>${esc((CPN[k]||[])[EN?1:0]||String(EL_COMPETENCES[k]||"").replace(/^CE\d+ · /,""))}</b><span class="cpm">${mk(K.m)}${dg(K.m)}</span></div>`
       +`<span class="fv-bar"><span style="width:${K.m==null?0:Math.max(0,Math.min(100,K.m*10))}%"></span></span>`
-      +`<ul class="cpl">${cs.map(c=>{const C=K.crit[c];return `<li><button type="button" class="cpcr" data-do="crit" data-c="${esc(c)}"${C.m!=null?` data-m="${C.m}" data-lss="${esc([...C.ls].map(l=>l.id).join(","))}"`:""}><span class="cpn">${esc(c)}</span><span class="cpt">${esc(easy(c))}<small>📍 ${[...C.src].map(([g,n])=>esc(g)+(n.size?" ("+[...n].map(esc).join(", ")+")":"")).join(" · ")}</small>${indLine(c,C)}${S.inRep?repWhy(c,C):""}</span><span class="cpm">${mk(C.m)}${dg(C.m)}</span></button></li>`}).join("")}</ul></div>`};
+      +`<ul class="cpl">${cs.map(c=>{const C=K.crit[c];return `<li><button type="button" class="cpcr" data-do="crit" data-c="${esc(c)}"${C.m!=null?` data-m="${C.m}" data-lss="${esc([...C.ls].map(l=>l.id).join(","))}"`:""}><span class="cpn">${esc(c)}</span><span class="cpt">${esc(easy(c))}<small>📍 ${[...C.src].map(([g,n])=>esc(g)+(n.size?" ("+[...n].map(esc).join(", ")+")":"")).join(" · ")}</small>${indLine(c,C)}</span><span class="cpm">${mk(C.m)}${dg(C.m)}</span>${S.inRep?repWhy(c,C):""}</button></li>`}).join("")}</ul></div>`};
   // the 3 strongest criteria and the 2 weakest (every one under 5 too): what you have learnt and what to work on most
   const all=ks.flatMap(k=>Object.entries(o[k].crit).filter(([,C])=>C.m!=null).map(([c,C])=>({c,m:C.m}))).sort((a,b)=>b.m-a.m);
   const top=all.slice(0,3).filter(x=>x.m>=5).map(x=>x.c),low=[...new Set([...all.filter(x=>x.m<5),...all.slice(3).slice(-2)].map(x=>x.c))].filter(c=>!top.includes(c));
@@ -1908,8 +1913,8 @@ function reportPlace(lss,ls){
   const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
   return `<div class="trep" data-c="${esc(course)}"><div class="rph"><div><small>${esc(g?g.name:"")} · English</small><h2>${esc(repName())}</h2></div>${lv?levelTag(course,lv):""}</div>`
     +`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Pot canviar: les activitats que acabis abans de divendres encara compten.","<b>Draft.</b> It can still change: the activities you finish before Friday still count.")}</p>`
+    +box("🎓",t("Les teves notes","Your marks"),"",glance)   // first, right under the Draft line (Roger, 25 Nov 2026: "this should be at the top under draft")
     +box("🧭",t("Aquest primer trimestre hem treballat","What we worked on this term"),t("i com t'ha anat cada punt","and how each point went for you"),worked)
-    +box("🎓",t("Les teves notes","Your marks"),"",glance)
     +compBox(mine,1)
     +((R.strong||[]).length||(R.work||[]).length?box("🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),"",`<div class="rpgv"><div><h3>💪 ${t("El que domines","What you know well")}</h3><div class="rptags">${tags(R.strong,"good")||`<span class="muted">–</span>`}</div></div><div><h3>🎯 ${t("El que has de treballar","What to work on")}</h3><div class="rptags">${tags(R.work,"work")||`<span class="muted">–</span>`}</div></div></div>`):"")
     +skGrowBox(course)
@@ -1944,7 +1949,10 @@ function progressPlace(lss,ls){
   const nd=these.filter(r=>r.st!=="coming"),nc=these.length-nd.length;
   const TB=tm?withBonus(termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)).filter(y=>y.term===tm)),tm):{m:termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)))},TM=TB.m,TD=degOf(TM);
   const tp=rows.filter(r=>r.l).map(r=>lsDone(r.l,tm)).filter(Boolean).flatMap(x=>x.parts),tw=tp.reduce((n,x)=>n+x.w,0),TP=tw?tp.reduce((n,x)=>n+x.w*x.f,0)/tw*100:null;
-  return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
+  // 📄 The term reports at the top of My progress, right under its title (Roger, 25 Nov 2026: "the reports will apear here on top"): one
+  // card per report the student can open (Term 1 now), whatever term is chosen below
+  const reps=repOk()?`<a class="pgrep" href="#report"><span aria-hidden="true">📄</span><span><b>${t("El meu informe del 1r trimestre (esborrany)","My Term 1 report (draft)")}</b><small>${t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`:"";
+  return reps+`<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
     +`<div class="pgtms"><div class="pgtm"><small>${t("Tasques fetes","Tasks done")}</small>${TP==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(TP)}">${Math.round(TP)} %</b>`}<span class="xbar"><span style="width:${TP==null?0:Math.max(0,Math.min(100,TP))}%;background:${TP==null?"#e2e8f0":col(TP)}"></span></span></div><div class="pgtm"><small>${tm===0?t("Nota del curs fins ara","Year mark so far"):tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:dgMark(TM)}${bonusNote(TB)}</div></div></div>`
     +`<p class="fvlead">${t("Les teves notes de cada Learning Situation, trimestre a trimestre. Tria un trimestre o tot el curs:","Your marks in each Learning Situation, term by term. Choose a term or the whole year:")}</p>`
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}${yr}</div>`

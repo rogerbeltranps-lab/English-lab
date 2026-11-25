@@ -775,10 +775,11 @@ window.elStudentMenu=function(o){
   // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
   // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
   // i revisem que estigui allà sempre?"): the board's #marks place
-  // 📝 Exam practice below it (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen"): the board's #exam-practice place
-  // 🎓 My progress below it (Roger, 9 Nov 2026: "a table with their results … they can choose term"): the board's #progress place
+  // 🎓 My progress right below My marks (Roger, 9 Nov 2026: "a table with their results … they can choose term"; 25 Nov 2026: "My progress
+  // should be under My marks"): the board's #progress place
   // 🧠 Flashcards below it, apart from Practise (Roger, 25 Nov 2026: "Students will see their flashcards under progress"): lab/practice.html#deck
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("flashcards","",R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0])+"#deck","🧠",t("Targetes","Flashcards"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+  // 📝 Exam practice below it (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen"): the board's #exam-practice place
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("flashcards","",R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0])+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
