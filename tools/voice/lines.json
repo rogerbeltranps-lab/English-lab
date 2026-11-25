@@ -9558,6 +9558,570 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "ed347abd",
+  "text": "I don't want students to see where the info comes from.",
+  "say": "I don't want students to see where the info comes from.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "45f3e260",
+  "text": "I need to know what the best option is.",
+  "say": "I need to know what the best option is.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "1c42d4ad",
+  "text": "Since you already have their emails…",
+  "say": "Since you already have their emails",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a84ea24d",
+  "text": "Students should always see their answers.",
+  "say": "Students should always see their answers.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "410d37d8",
+  "text": "I was wondering how long it will take.",
+  "say": "I was wondering how long it will take.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "15adbef9",
+  "text": "I want students to receive an email.",
+  "say": "I want students to receive an email.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8433a504",
+  "text": "Don't let them press the button twice.",
+  "say": "Don't let them press the button twice.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8f48efe0",
+  "text": "The app should allow you to save a draft.",
+  "say": "The app should allow you to save a draft.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4c91055b",
+  "text": "Ask every user to connect with their school email.",
+  "say": "Ask every user to connect with their school email.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9d786a91",
+  "text": "fix what doesn't work",
+  "say": "fix what doesn't work",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "73635b52",
+  "text": "Some students haven't done the exam yet.",
+  "say": "Some students haven't done the exam yet.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4f43415c",
+  "text": "When did we create this page?",
+  "say": "When did we create this page?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9e6b2167",
+  "text": "I 've just uploaded the photos, can you see them?",
+  "say": "I 've just uploaded the photos, can you see them?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "6d2e80df",
+  "text": "The bug? I finally figured it out . (it / out, right order)",
+  "say": "The bug? I finally figured it out .",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8ab0c427",
+  "text": "I can't put up with that noise any longer. (three-part verb)",
+  "say": "I can't put up with that noise any longer.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "662feffe",
+  "text": "I'm looking forward to hearing from you.",
+  "say": "I'm looking forward to hearing from you.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "d1fb0fd8",
+  "text": "Students got used to recording themselves.",
+  "say": "Students got used to recording themselves.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "01c43759",
+  "text": "I suggest that you start with one learning path.",
+  "say": "I suggest that you start with one learning path.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "01b89be7",
+  "text": "When I came up with the idea, I had never built an app.",
+  "say": "When I came up with the idea, I had never built an app.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ceb99044",
+  "text": "I was testing it in class when it crashed.",
+  "say": "I was testing it in class when it crashed.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "43fc1e60",
+  "text": "Since then, the app has taken off .",
+  "say": "Since then, the app has taken off .",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b69bbf8c",
+  "text": "We kept finding new bugs every day.",
+  "say": "We kept finding new bugs every day.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8f835e89",
+  "text": "Don't put it off any longer. (it / off)",
+  "say": "Don't put it off any longer.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "d90e590e",
+  "text": "Send me an HTML file with the results.",
+  "say": "Send me an HTML file with the results.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e8611885",
+  "text": "It's a European project. (a / an)",
+  "say": "It's a European project.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8e287eb8",
+  "text": "The idea is to have - clean code. (write - if nothing)",
+  "say": "The idea is to have - clean code.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "7fde6aeb",
+  "text": "I've used almost - 40% of my weekly limit. (write - if nothing)",
+  "say": "I've used almost - 40% of my weekly limit.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "dabe978a",
+  "text": "These criteria are different this year. (this/these + be)",
+  "say": "These criteria are different this year.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "fd65ac16",
+  "text": "When a student reaches ten cards, let them continue.",
+  "say": "When a student reaches ten cards, let them continue.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "f00f7789",
+  "text": "Who has checked the grammar? (one person or more)",
+  "say": "Who has checked the grammar?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5e64121a",
+  "text": "Add the reading texts to the students' notebooks.",
+  "say": "Add the reading texts to the students' notebooks.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "bbe7c8da",
+  "text": "I'd like to add an image to my message.",
+  "say": "I'd like to add an image to my message.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2da309c0",
+  "text": "The heading mustn't be on a different page from its text.",
+  "say": "The heading mustn't be on a different page from its text.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4b161c16",
+  "text": "It should look the same in the teacher's view.",
+  "say": "It should look the same in the teacher's view.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e4583f7c",
+  "text": "The assessment indicator is missing from some criteria.",
+  "say": "The assessment indicator is missing from some criteria.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "db964d7a",
+  "text": "The reports will go here, at the top.",
+  "say": "The reports will go here, at the top.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b459f256",
+  "text": "I want all the flashcards in the same format.",
+  "say": "I want all the flashcards in the same format.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a51a59c9",
+  "text": "Starters do an exam that is more difficult for them.",
+  "say": "Starters do an exam that is more difficult for them.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "754ed964",
+  "text": "For me, it's very difficult to improve.",
+  "say": "For me, it's very difficult to improve.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "62aa09dd",
+  "text": "We're already in the 2nd term.",
+  "say": "We're already in the 2nd term.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ff8f4703",
+  "text": "Speaking should count towards the diagram.",
+  "say": "Speaking should count towards the diagram.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4b899141",
+  "text": "We are not fussy about the number of words.",
+  "say": "We are not fussy about the number of words.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "76c3a7b1",
+  "text": "Are the marks in the table?",
+  "say": "Are the marks in the table?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "811025b5",
+  "text": "Do the reports for all the students.",
+  "say": "Do the reports for all the students.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "f1794290",
+  "text": "What do you mean by \"a few minutes after\"?",
+  "say": "What do you mean by \"a few minutes after\"?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ef932a41",
+  "text": "Today I won't make it to 4 ESO B.",
+  "say": "Today I won't make it to 4 ESO B.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5c5ee311",
+  "text": "Students see the corrections on weekdays at 5 pm.",
+  "say": "Students see the corrections on weekdays at 5 pm.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "197e6a45",
+  "text": "Is the script the one in my school account?",
+  "say": "Is the script the one in my school account?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "93795091",
+  "text": "I want a presentation to explain to my students how I correct.",
+  "say": "I want a presentation to explain to my students how I correct.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0b028eae",
+  "text": "Explain to me what it means.",
+  "say": "Explain to me what it means.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2134a69e",
+  "text": "You upload them to the website.",
+  "say": "You upload them to the website.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "aa049481",
+  "text": "Corrections come out between 5 and 6 pm.",
+  "say": "Corrections come out between 5 and 6 pm.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "73b9d5b5",
+  "text": "It happens when I switch between these sections.",
+  "say": "It happens when I switch between these sections.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b42d116a",
+  "text": "Students can switch between the notebook look and the computer look.",
+  "say": "Students can switch between the notebook look and the computer look.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "1b3d302b",
+  "text": "I want them as columns in both places.",
+  "say": "I want them as columns in both places.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "324e5c87",
+  "text": "Activities must be simple in format, not in content.",
+  "say": "Activities must be simple in format, not in content.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ecde7635",
+  "text": "I want a full screen with the menu at the top.",
+  "say": "I want a full screen with the menu at the top.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "6130ae7c",
+  "text": "A line with step 1 and an example next to it.",
+  "say": "A line with step 1 and an example next to it.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ad1e9641",
+  "text": "Open the activity in class mode.",
+  "say": "Open the activity in class mode.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "d250bb70",
+  "text": "The link is on the list at the top of the page.",
+  "say": "The link is on the list at the top of the page.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "878f5189",
+  "text": "It looks fine on my phone but not on the laptop.",
+  "say": "It looks fine on my phone but not on the laptop.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "f46f2d63",
+  "text": "My students are in 4th ESO.",
+  "say": "My students are in 4th ESO.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4424afee",
+  "text": "It's already on the list.",
+  "say": "It's already on the list.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "98d5b979",
+  "text": "Can you add it to the list?",
+  "say": "Can you add it to the list?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "eb039d71",
+  "text": "And it takes a while to see the mark in the table.",
+  "say": "And it takes a while to see the mark in the table.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "23f10b86",
+  "text": "I want this information in the students table.",
+  "say": "I want this information in the students table.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "336da2f0",
+  "text": "The post-it doesn't work in the notebook.",
+  "say": "The post-it doesn't work in the notebook.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "74b4f9fe",
+  "text": "Once they correct the SLP, it appears in their notebook, right?",
+  "say": "Once they correct the SLP, it appears in their notebook, right?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "3eea4c69",
+  "text": "Students write on the website, not in a pop-up.",
+  "say": "Students write on the website, not in a pop-up.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "3285b43c",
+  "text": "Can they use Google Translate on my website?",
+  "say": "Can they use Google Translate on my website?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0be023d8",
+  "text": "I'll ask students to upload it to the website.",
+  "say": "I'll ask students to upload it to the website.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e94f70f2",
+  "text": "It arrived in my personal Gmail.",
+  "say": "It arrived in my personal Gmail.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "216404a7",
+  "text": "What will appear in the drafts folder?",
+  "say": "What will appear in the drafts folder?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "1942d9d3",
+  "text": "The heading should appear at the top.",
+  "say": "The heading should appear at the top.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e051c25a",
+  "text": "The open problem should appear at the top.",
+  "say": "The open problem should appear at the top.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b6b601cd",
+  "text": "In class mode, the game appears automatically.",
+  "say": "In class mode, the game appears automatically.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "69ba2752",
+  "text": "Some colours don't work in note-taking mode.",
+  "say": "Some colours don't work in note-taking mode.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9c4d742c",
+  "text": "Can they go full screen in the activities?",
+  "say": "Can they go full screen in the activities?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "36a2cf2e",
+  "text": "I want to see this table in full screen.",
+  "say": "I want to see this table in full screen.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ec4ec4e9",
+  "text": "Some students in LS2 should be able to write.",
+  "say": "Some students in LS2 should be able to write.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b9e180c9",
+  "text": "Some students will read at different paces.",
+  "say": "Some students will read at different paces.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "04d5dd40",
+  "text": "I don't see the changes on my cellphone.",
+  "say": "I don't see the changes on my cellphone.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5dd9ca4e",
+  "text": "The favicon isn't showing on my phone's home screen.",
+  "say": "The favicon isn't showing on my phone's home screen.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5fcf6e80",
+  "text": "Check whether there's a problem on GitHub.",
+  "say": "Check whether there's a problem on GitHub.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "03b5f1c7",
+  "text": "The final task was posted on Classroom.",
+  "say": "The final task was posted on Classroom.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "3e50a0d7",
+  "text": "The icon isn't rounded on Windows.",
+  "say": "The icon isn't rounded on Windows.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "06887058",
+  "text": "Make the content bigger so I can see it well on the panel.",
+  "say": "Make the content bigger so I can see it well on the panel.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "71d90ed4",
+  "text": "I want to put them on the agenda.",
+  "say": "I want to put them on the agenda.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ca44636f",
+  "text": "When I make changes to the agenda…",
+  "say": "When I make changes to the agenda",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "f81415f3",
+  "text": "Apply the changes to the repository.",
+  "say": "Apply the changes to the repository.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "90eda9b5",
+  "text": "Explain it to everyone in the class.",
+  "say": "Explain it to everyone in the class.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "f7f91071",
+  "text": "They must see their avatar in a place where it doesn't hide anything.",
+  "say": "They must see their avatar in a place where it doesn't hide anything.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "344d784f",
+  "text": "I couldn't work on the grammar in teaching mode.",
+  "say": "I couldn't work on the grammar in teaching mode.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "72def7a4",
+  "text": "Is ChatGPT better at this?",
+  "say": "Is ChatGPT better at this?",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "ad783b99",
   "text": "We don't go to school on 25 December.",
   "say": "We don't go to school on 25 December.",

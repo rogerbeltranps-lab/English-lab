@@ -260,7 +260,7 @@ function gCard(it, items, kind, part, lv, salt) {
 
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
 function extract(pg, lv, off) {
-  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [], xdecks: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
     // LS1 words are cumulative, as on the LS1 page (cumulativeGroups): Plus keeps the Base and Core words and adds its own (Roger,
@@ -279,6 +279,10 @@ function extract(pg, lv, off) {
       out.listen.push({ key: at + '#listen', title: lp, lp, media: { kind: 'audio', src: pg.audio }, items: qs.map(q => ({ q: q.q, o: [q.o[q.a]].concat(q.o.filter((x, i) => i !== q.a)) })) });
     return out;
   }
+  // 🧠 a deck of its own that a page gives (LP.decks, e.g. the teacher’s own 📍 My prepositions, Roger 25 Nov 2026: "create a
+  // flashcard deck of prepositions with my slips"): one 💬 card per item, beside the LS deck, never a step of the page
+  (pg.LP.decks || []).forEach(d => { const items = (d.items || []).filter(q => q && q.q && Array.isArray(q.a) && q.a.length && typeof q.a[0] === 'string');
+    if (items.length) out.xdecks.push({ id: d.id, name: d.name, cards: items.map((it, i) => gCard(it, items, 'e', d.part || d.name, lv, at + d.id + i)) }); });
   const texts = [], PS = panelsOf(pg, lv), mainG = PS.find(p => p.type === 'typed' && p.id === 'grammar') || PS.find(p => p.type === 'typed' && /^grammar/.test(p.id));
   PS.filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
     out.tabs.push({ t: at + '#' + p.id, dir: pg.dir });   // the tabs open for the group: 🎲 Random questions draw from them
@@ -392,7 +396,7 @@ async function content() {
   pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).forEach(l => { if (!L.includes(l)) L.push(l);
     const ok = all() || c === myCourse() ? canDo : otherDo;
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
-  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [], lps: acts, ls: L };
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [], xdecks: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
   // Only the tabs the learning path itself shows (Roger, 22 Nov 2026: "Why some 4ESO students could do the future forms if they are scheduled
   // for next Wednesday?"): a tab the teacher locked, or one the Time plan keeps for a later class (or none yet), stays out of Practise
@@ -401,7 +405,9 @@ async function content() {
   const offOf = a => all() || !window.elSecLockedFor ? null : new Set(elSecLockedFor(a, D.ls[a.ls] || {}, D.group, new Set()));
   pages.forEach((pg, i) => { if (!pg) return; const x = extract(pg, acts[i].lv, offOf(acts[i].a)); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l, act: acts[i].a.id })))); });
   // 🧠 one deck per LS, newest first for students (as content() lists them), each card once
-  out.decks = out.ls.map(l => { const ids = new Set(); return { id: l.id, name: lsName(l), cards: out.cards.filter(c => c.ls === l && !ids.has(c.id) && ids.add(c.id)) }; }).filter(d => d.cards.length);
+  // (and right after it, the decks its pages give of their own: LP.decks)
+  out.decks = out.ls.flatMap(l => { const ids = new Set(); return [{ id: l.id, name: lsName(l), cards: out.cards.filter(c => c.ls === l && !ids.has(c.id) && ids.add(c.id)) }]
+    .concat(out.xdecks.filter(d => d.ls === l)); }).filter(d => d.cards.length);
   return out;
 }
 // 🎯 Practise per LS (Roger, 25 Nov 2026: "I want practice per LSs, so you can choose on LS (grammar, vocab, listening, reading, writing,

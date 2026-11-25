@@ -12,6 +12,39 @@
    (when items have ca), ✨ Make it idiomatic, 🗣 Spoken English and 🗣 Shadowing (when data/shadow.js has a clip for the batch: run
    tools/towards-nativeness/shadow.py after adding a batch). Older batches (from the fourth on) come back together in 🔁 Review, mixed. */
 window.TN_MISTAKES = [
+  // 📍 Prepositions only (Roger, 25 Nov 2026: "add them, and create a flashcard deck of prepositions with my slips"): his preposition
+  // slips from 21 Nov (evening) to 25 Nov. The same slips, as short chunks, are at the top of TN_PREPS (📍 step and the 🧠 deck).
+  { id: 'n25p', date: '21–25 Nov 2026 · prepositions', from: 'your messages', items: [
+    { s: 'Add the reading texts in the students’ notebooks.', bad: 'in the students’ notebooks', fix: ['to the students’ notebooks', 'to students’ notebooks', 'to the students’ notebook'], why: '<strong>add</strong> something <strong>to</strong> a place: add it to the notebook, to the list, to the page.', ca: 'Afegeix-ho a la llista de tasques.', en: ['Add it to the to-do list', 'Add it to my to-do list', 'Add it to the task list', 'Add it to my task list', 'Add it to the list of tasks', 'Add this to the to-do list', 'Add this to my to-do list'] },
+    { s: 'I’d like to add an image in my message.', bad: 'add an image in my message', fix: ['add an image to my message'], why: '<strong>add</strong> something <strong>to</strong> a message, an email or a document (again: add TO).', ca: 'Vull afegir una foto al missatge.', en: ['I want to add a photo to the message', 'I want to add a picture to the message', 'I want to add a photo to my message', 'I want to add a picture to my message', 'I’d like to add a photo to the message', 'I’d like to add a picture to the message', 'I’d like to add a photo to my message', 'I’d like to add a picture to my message'] },
+    { s: 'The headings mustn’t be in different pages.', bad: 'in different pages', fix: ['on different pages', 'on a different page', 'on a different page from their text'], why: 'Text is <strong>on</strong> a page: on page 84, on the next page.' },
+    { s: 'On the teacher’s view it should look the same.', bad: 'On the teacher’s view', fix: ['In the teacher’s view'], why: 'You are <strong>in</strong> a view, a mode or a version (but <strong>on</strong> a page or a screen).' },
+    { s: 'The assessment indicator is missing in some criteria.', bad: 'missing in', fix: ['missing from'], why: 'Something is missing <strong>from</strong> a place, a list or a group.' },
+    { s: 'The reports will go here, on top.', bad: 'on top', fix: ['at the top'], why: '<strong>at the top</strong> of a page = a place on it; <em>on top</em> = lying over something.' },
+    { s: 'I want all the flashcards with the same format.', bad: 'with the same format', fix: ['in the same format'], why: '<strong>in</strong> a format, a style, a colour, a language.' },
+    { s: 'Starters do an exam that is more difficult to them.', bad: 'more difficult to them', fix: ['more difficult for them', 'harder for them'], why: 'easy / difficult / hard <strong>for</strong> someone.', ca: 'Per a ells és massa difícil.', en: ['It’s too difficult for them', 'It is too difficult for them', 'It’s too hard for them', 'It is too hard for them'] },
+    { s: 'To me it’s very difficult to improve.', bad: 'To me', fix: ['For me'], why: 'Difficulty: <strong>for me</strong>. <em>To me</em> = in my opinion.' },
+    { s: 'The bonus is for the activities that were due to before the exam.', bad: 'due to before', fix: ['due before'], why: '<strong>due</strong> + a time: due before Monday, due on Friday. <em>Due to</em> = because of.' },
+    { s: 'We are at the 2nd term already.', bad: 'at the 2nd term', fix: ['in the 2nd term', 'in the second term'], why: '<strong>in</strong> a term, a week, a year; <em>at</em> is for a point: at the end of the term.' },
+    { s: 'The speaking should count for the diagram.', bad: 'count for', fix: ['count towards', 'count toward'], why: 'Work <strong>counts towards</strong> a mark, a grade or a total.', ca: 'Els primers intents no compten per a la nota.', en: ['First tries don’t count towards the mark', 'First tries do not count towards the mark', 'First tries don’t count toward the mark', 'First tries don’t count towards the grade', 'First tries don’t count toward the grade', 'First attempts don’t count towards the mark', 'First attempts don’t count towards the grade'] },
+    { s: 'We are not tiquismiquis with the number of words.', bad: 'tiquismiquis with', fix: ['fussy about', 'picky about'], why: '<em>tiquismiquis</em> = <strong>fussy / picky</strong>, and you are fussy <strong>about</strong> something.' },
+    { s: 'Are the marks on the table?', bad: 'on the table', fix: ['in the table'], why: 'Marks are <strong>in</strong> a table (inside its cells). <em>On the table</em> = on the furniture.', ca: 'Les notes ja són a la taula?', en: ['Are the marks in the table yet', 'Are the marks already in the table', 'Are the marks in the table already', 'Are the grades in the table yet', 'Are the grades already in the table'] },
+    { s: 'Do the reports of all students.', bad: 'reports of all students', fix: ['reports for all students', 'reports for all the students'], why: 'A report is made <strong>for</strong> someone.' },
+    { s: 'What do you mean a few minutes after?', bad: 'mean a few', fix: ['mean by a few'], why: 'Asking about someone’s words: what do you mean <strong>by</strong> X?' },
+    { s: 'Today I won’t make it for 4 ESO B and 2 ESO B.', bad: 'make it for', fix: ['make it to'], why: '<strong>make it to</strong> a class, a meeting or a place = manage to get there.', ca: 'Avui no arribaré a la reunió.', en: ['I won’t make it to the meeting today', 'I will not make it to the meeting today', 'Today I won’t make it to the meeting', 'I can’t make it to the meeting today', 'I won’t be able to make it to the meeting today'] },
+    { s: 'Students see the corrections during weekdays at 5 pm.', bad: 'during weekdays', fix: ['on weekdays'], why: '<strong>on</strong> weekdays, on Mondays, on school days.' },
+    { s: 'Is the script the one on my school account?', bad: 'on my school account', fix: ['in my school account'], why: 'Files and scripts are kept <strong>in</strong> an account (or in Drive).' },
+    { s: 'I want a presentation to explain my students how I correct.', bad: 'explain my students', fix: ['explain to my students'], why: '<strong>explain</strong> something <strong>to</strong> someone. Never <em>explain me</em> / <em>explain my students</em>.', ca: 'Explica-m’ho una altra vegada.', en: ['Explain it to me again', 'Explain that to me again', 'Explain this to me again', 'Can you explain it to me again', 'Could you explain it to me again', 'Can you explain that to me again', 'Could you explain that to me again'] },
+    { s: 'Explain me what it means.', bad: 'Explain me what it means', fix: ['Explain to me what it means', 'Explain what it means'], why: 'Your most frequent one: <strong>explain to me</strong>, or just explain what it means.' },
+    { s: 'You deploy them on the website.', bad: 'deploy them on', fix: ['upload them to', 'put them on'], why: 'You <strong>upload</strong> files <strong>to</strong> a website (you deploy code).' },
+    { s: 'The correction comes out from 17-18.', bad: 'from 17-18', fix: ['between 5 and 6 pm', 'between 5 and 6', 'from 5 to 6 pm', 'from 5 to 6'], why: 'A time window: <strong>between</strong> 5 <strong>and</strong> 6, or <strong>from</strong> 5 <strong>to</strong> 6 (and 5 pm, not 17h).' },
+    { s: 'It happens when I change among these sections.', bad: 'change among', fix: ['switch between', 'move between', 'go between'], why: 'Going back and forth: <strong>switch between</strong> sections or tabs.' },
+    { s: 'I want them to change from notebook-like or computer-like.', bad: 'change from notebook-like or computer-like', fix: ['switch between notebook-like and computer-like', 'switch between the notebook look and the computer look', 'change between notebook-like and computer-like'], why: 'Two options: <strong>between</strong> X <strong>and</strong> Y. <em>From X to Y</em> needs both ends.' },
+    { s: 'I want them as columns on both places.', bad: 'on both places', fix: ['in both places'], why: '<strong>in</strong> a place: in both places, in the same place.' },
+    { s: 'Activities must be simple, not regarding the content.', bad: 'simple, not regarding the content', fix: ['simple in format, not in content', 'simple in format, not content'], why: 'Say in what way with <strong>in</strong>: simple in format, rich in content.' },
+    { s: 'I want a full screen with the above menu.', bad: 'the above menu', fix: ['the menu at the top', 'the menu above'], why: '<em>above</em> goes after the noun (the menu above), or say <strong>at the top</strong>.' },
+    { s: 'They see a line with step 1 and by its side an example.', bad: 'and by its side an example', fix: ['with an example beside it', 'with an example next to it', 'and an example next to it', 'and an example beside it'], why: '<strong>beside it / next to it</strong> for things; <em>by her side</em> is for people.' }
+  ] },
   { id: 'n21b', date: '17–21 Nov 2026 · list 2', from: 'your newest messages', items: [
     { s: 'Did you include the mistakes I did these days?', bad: 'the mistakes I did these days', fix: ['the mistakes I’ve made recently', 'the mistakes I made recently', 'the mistakes I’ve made lately', 'the mistakes I’ve made over the last few days'], why: 'You <strong>make</strong> a mistake; <em>these days</em> = nowadays, so say <strong>recently</strong>.' },
     { s: 'I want to write the good sentence, not choose it.', bad: 'the good sentence', fix: ['the correct sentence', 'the right sentence'], why: 'For answers: <strong>correct / right</strong>. <em>Good</em> is about quality.' },
@@ -220,8 +253,41 @@ window.TN_MISTAKES = [
 ];
 
 /* 📍 in / on / at (Roger, 17 Nov 2026: "in/on prepositions like in/on the list are difficult for me"): its own strand, always the second
-   step. All your own preposition slips, from every list so far. Add new ones at the TOP when a new list has them (q with ___, a, en). */
+   step. All your own preposition slips, from every list so far. Add new ones at the TOP when a new list has them (q with ___, a, en).
+   🧠 They are also Roger's own flashcard deck, 📍 My prepositions (LP.decks below → lab/practice.html#deck, 4 ESO, only where Towards
+   Nativeness shows: Roger and the tester; Roger, 25 Nov 2026: "create a flashcard deck of prepositions with my slips"). A new chunk is a
+   new card; record its sentence with Kokoro Heart (tools/voice/harvest.js, then generate.py). */
 window.TN_PREPS = [
+  // 21–25 Nov 2026 (batch n25p), as short chunks
+  { q: 'Add the reading texts ___ the students’ notebooks.', a: ['to'], en: 'add something to a place.' },
+  { q: 'I’d like to add an image ___ my message.', a: ['to'], en: 'add something to a message / an email.' },
+  { q: 'The heading mustn’t be ___ a different page from its text.', a: ['on'], en: 'text is on a page.' },
+  { q: 'It should look the same ___ the teacher’s view.', a: ['in'], en: 'in a view / a mode / a version.' },
+  { q: 'The assessment indicator is missing ___ some criteria.', a: ['from'], en: 'missing from something.' },
+  { q: 'The reports will go here, ___ the top.', a: ['at'], en: 'at the top of a page (on top = lying over something).' },
+  { q: 'I want all the flashcards ___ the same format.', a: ['in'], en: 'in a format / a style / a colour.' },
+  { q: 'Starters do an exam that is more difficult ___ them.', a: ['for'], en: 'difficult / easy / hard for someone.' },
+  { q: '___ me, it’s very difficult to improve.', a: ['For'], en: 'difficulty: for me (to me = in my opinion).' },
+  { q: 'We’re already ___ the 2nd term.', a: ['in'], en: 'in a term / a week / a year.' },
+  { q: 'Speaking should count ___ the diagram.', a: ['towards', 'toward'], en: 'count towards a mark / a total.' },
+  { q: 'We are not fussy ___ the number of words.', a: ['about'], en: 'fussy / picky about something.' },
+  { q: 'Are the marks ___ the table?', a: ['in'], en: 'in a table: inside its cells.' },
+  { q: 'Do the reports ___ all the students.', a: ['for'], en: 'a report for someone.' },
+  { q: 'What do you mean ___ “a few minutes after”?', a: ['by'], en: 'what do you mean by X?' },
+  { q: 'Today I won’t make it ___ 4 ESO B.', a: ['to'], en: 'make it to a class / a meeting.' },
+  { q: 'Students see the corrections ___ weekdays at 5 pm.', a: ['on'], en: 'on weekdays / on Mondays.' },
+  { q: 'Is the script the one ___ my school account?', a: ['in'], en: 'in an account / in Drive.' },
+  { q: 'I want a presentation to explain ___ my students how I correct.', a: ['to'], en: 'explain something to someone.' },
+  { q: 'Explain ___ me what it means.', a: ['to'], en: 'explain to me (never “explain me”).' },
+  { q: 'You upload them ___ the website.', a: ['to'], en: 'upload to a website.' },
+  { q: 'Corrections come out ___ 5 and 6 pm.', a: ['between'], en: 'between … and … for a time window.' },
+  { q: 'It happens when I switch ___ these sections.', a: ['between'], en: 'switch between places / tabs.' },
+  { q: 'Students can switch ___ the notebook look and the computer look.', a: ['between'], en: 'between X and Y for two options.' },
+  { q: 'I want them as columns ___ both places.', a: ['in'], en: 'in a place.' },
+  { q: 'Activities must be simple ___ format, not in content.', a: ['in'], en: 'in what way: simple in format.' },
+  { q: 'I want a full screen with the menu ___ the top.', a: ['at'], en: 'at the top.' },
+  { q: 'A line with step 1 and an example next ___ it.', a: ['to'], en: 'next to it / beside it (things).' },
+  // earlier lists
   { q: 'Open the activity ___ class mode.', a: ['in'], en: 'in a mode: in class mode, in full screen.' },
   { q: 'The link is ___ the list ___ the top of the page.', a: ['on at', 'on / at'], en: 'on a list; at the top.' },
   { q: 'It looks fine ___ my phone but not ___ the laptop.', a: ['on on', 'on / on'], en: 'on a device.' },
@@ -306,10 +372,12 @@ window.TN_PREPS = [
     items: poolW.slice(0, 12) });
   // 📍 always the second step, right after the newest 🔍 Spot it (so 🗓 ends up third)
   if (window.TN_PREPS) panels.splice(1, 0, { id: 'preps', type: 'typed', tab: '📍 in / on / at', title: 'in / on / at: your own sentences', pill: 'Your weak spot',
-    intro: '<strong>on</strong> = things you look at, like a surface: on the list, on the website, on the screen, on my phone, on GitHub. <strong>in</strong> = things you put something inside: in the table, in the document, in the email, in the notebook, in the inbox, in class mode, in LS2. <strong>at</strong> = a point: at the top, at the end, at Starter level. <strong>to</strong> = movement: add to, apply to, upload to. Type the missing word.',
+    intro: '<strong>on</strong> = things you look at, like a surface: on the list, on the website, on the screen, on my phone, on GitHub. <strong>in</strong> = things you put something inside: in the table, in the document, in the email, in the notebook, in the inbox, in class mode, in LS2. <strong>at</strong> = a point: at the top, at the end, at Starter level. <strong>to</strong> = movement: add to, apply to, upload to. Type the missing word. The same slips are also a flashcard deck: <a href="../../lab/practice.html#deck">🧠 Flashcards</a> › 4 ESO › 📍 My prepositions.',
     items: window.TN_PREPS });
   if (older.length) panels.push({ id: 'review', type: 'typed', tab: '🔁 Review: older mistakes', title: 'Review: older mistakes, mixed', pill: 'Spaced review',
     intro: 'Mistakes from earlier lists come back here, mixed. If you still get one wrong, it is a habit to work on.',
     items: older.flatMap(b => b.items).map(m => ({ q: gap(m.s, m.bad), a: fixArr(m), en: m.why.replace(/<[^>]+>/g, '') })) });
-  window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels };
+  // 🧠 decks: extra flashcard decks this page gives lab/practice.html#deck (one card per item, 💬 kind, never a step of the page)
+  window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels,
+    decks: window.TN_PREPS ? [{ id: 'tn-prepositions', name: '📍 My prepositions', part: 'Prepositions: my slips', items: window.TN_PREPS }] : [] };
 })();
