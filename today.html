@@ -336,6 +336,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-term-report.js?v=20261123"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
@@ -538,6 +539,50 @@ function levelBox(ls){
   const lvBox=!lv?"":ask?`<button type="button" class="hlv ask" data-do="asklv" data-ls="${ls.id}">${lvIn}<em class="hask">${req?t("✋ Canvia la petició","✋ Change your request"):t("✋ Demana un canvi de nivell","✋ Ask for a level change")}</em></span></button>`
     :`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}">${lvIn}</span></div>`;
   return lvBox}
+// 🧑‍🎨 The streak mascot next to 🎯 My level (shared/js/el-mascot.js; Roger, 24–25 Nov 2026: "Can you put the mascot next to level and
+// always visible the strike?"; "Maybe if the students touch the avatar they can go to flashcards"; "And messages like do your flashcards,
+// I promise it works or do some shadowing, i promise it works"): Roger's avatar in the mood of the student's 🧠 Flashcards streak, with the
+// ⚡ badge always there; a tap opens 🧠 Flashcards. Once a day (never in class time) it says one line picked from what the student really
+// has pending: the flashcards, a 🗣 Shadowing or 📖 book tab of ✅ To do, late work; or a milestone (🎉, once) or a lost streak (😢, once).
+// No reads of its own: the flashcards copy in this browser (el_flash_<uid>); the 👁 student view reads the student's copy once.
+const MZ={};
+function mzOff(){const e=document.getElementById("elmz");if(e)e.remove();const b=document.getElementById("elmz-say");if(b)b.remove()}
+function mzHome(lss){const M=window.ELMascot,ph=document.querySelector(".phead"),lv=document.getElementById("lvl");
+  if(!M||!window.ELFlashDeck||!ph||!lv||!D||!D.me||!D.me.group||all()){mzOff();return}
+  const uid=AS||(U&&U.uid)||"demo";
+  if(AS&&!DEMO&&MZ.as!==AS){MZ.as=AS;MZ.P={};F.getDoc(F.doc(ELCloud.db,"students",AS,"flashcards","all")).then(s=>{MZ.P=s.exists()?JSON.parse(s.data().p||"{}"):{};if(document.getElementById("elmz"))mzHome(lss)}).catch(()=>{})}
+  const x=M.data(AS?null:uid,AS?MZ.P:null);if(!x){mzOff();return}
+  const k=n=>"el_mz_"+n+"_"+uid,sadNew=x.st.lost>=2&&M.seen.get(k("sad"))!==x.st.gap,mile=M.milestone(x.st),party=mile&&M.seen.get(k("party"))!==mile+"@"+x.today;
+  let mood=party?"party":M.mood(x,{sad:sadNew});
+  let el=document.getElementById("elmz");if(!el){el=document.createElement("a");el.id="elmz";el.className="elmz"}
+  if(el.nextElementSibling!==lv)ph.insertBefore(el,lv);
+  el.href="lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck";
+  el.title=t("🧠 Targetes","🧠 Flashcards");el.setAttribute("aria-label",t(`${x.st.n} dies seguits. Obre les targetes`,`${x.st.n} days in a row. Open Flashcards`));
+  el.innerHTML=M.img(mood,74,"")+M.badge(x.st.n);
+  if(AS||vyClass()||MZ.said===uid)return;
+  const day=x.today;if(!party&&!sadNew&&M.seen.get(k("say"))===day)return;
+  const sl=mzLine(lss,x,mood,party?mile:0,sadNew);if(!sl)return;MZ.said=uid;
+  // after the daily ✅ card (el-todo #el-rem, or the race card over the map) is closed, never on top of it
+  let tries=0;const go=()=>{if(!el.isConnected)return;if((document.getElementById("el-rem")||document.querySelector("#main .vy-ovl.on")||vyRace.busy)&&tries++<180){setTimeout(go,1000);return}
+    ph.style.position=ph.style.position||"relative";M.say(el,sl.h,{host:ph,href:sl.href,ms:9000});
+    M.seen.set(k("say"),day);if(party)M.seen.set(k("party"),mile+"@"+x.today);if(sadNew)M.seen.set(k("sad"),x.st.gap)};setTimeout(go,900)}
+// the line of the day: { h (html), href }; their language first only for Starter (t)
+function mzLine(lss,x,mood,mile,sad){const n=x.st.n,left=x.left;
+  if(mile)return {h:t(`<b>${n} dies seguits!</b> 🎉 Increïble, continua així!`,`<b>${n} days in a row!</b> 🎉 Amazing, keep going!`)};
+  if(sad)return {h:t("Oh, no! Has perdut la ratxa. Torna a començar avui: amb unes quantes <b>targetes</b> n'hi ha prou.","Oh no! You lost your streak. Start again today: a few <b>flashcards</b> are enough."),href:"lab/practice.html#deck"};
+  let its=[];try{its=todoItems(lss)}catch(e){}
+  const tab=re=>{for(const it of its)for(const tb of it.tabs||[])if(re.test(tb[0]))return tabHref(it.a,tb[0]);return null};
+  let late=0;try{late=(S.wtabs||0)+tabsMiss(lateList(lss))}catch(e){}
+  const L=[],sh=tab(/^shadow/),bk=tab(/^book$/);
+  if(!x.st.today){
+    if(left>0)L.push({h:t(`Tens <b>${left} ${left===1?"targeta":"targetes"}</b> esperant. Fes les targetes, t'ho prometo, funciona! 😉`,`<b>${left} ${left===1?"card is":"cards are"}</b> waiting. Do your flashcards, I promise it works! 😉`),href:"lab/practice.html#deck"});
+    else if(left==null)L.push({h:t("Prova les <b>🧠 Targetes</b>: cinc minuts al dia. T'ho prometo, funciona!","Try the <b>🧠 Flashcards</b>: five minutes a day. I promise it works!"),href:"lab/practice.html#deck"})}
+  if(sh)L.push({h:t("Encara tens <b>🗣 Shadowing</b> per fer. Fes una mica de shadowing, t'ho prometo, funciona!","You still have <b>🗣 Shadowing</b> to do. Do some shadowing, I promise it works!"),href:sh});
+  if(bk)L.push({h:t("Llegeix un capítol del <b>📖 llibre</b>. T'ho prometo, funciona!","Read a chapter of <b>📖 the book</b>. I promise it works!"),href:bk});
+  if(late)L.push({h:t(`Tens <b>${late} ${late===1?"activitat endarrerida":"activitats endarrerides"}</b>. Acaba'n una avui!`,`You have <b>${late} late ${late===1?"activity":"activities"}</b>. Finish one today!`),href:"#marks"});
+  if(!L.length&&mood==="sleeping")return {h:t("Tot fet per avui. Fins demà! 😴","All done for today. See you tomorrow! 😴")};
+  if(!L.length&&x.st.today&&n>1)return {h:t(`<b>${n} dies seguits!</b> Continua així ⚡`,`<b>${n} days in a row!</b> Keep going ⚡`)};
+  return L.length?L[Math.floor(Date.now()/864e5)%L.length]:null}
 // 👤 Me (the phone's Me tab, #me; Roger, 8 Nov 2026, phone remodel): who I am and my level, then every place of the side menu that the
 // phone's five tabs do not have (marks, LSs, books, grammar, games, help, phone, announcements) and the bar's ⚠️ Problem and 💡 Idea.
 // Only links to places that already exist: nothing new is read.
@@ -585,6 +630,7 @@ function homeHtml(lss,ls,info){
   // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
   const lvBox=levelBox(ls);
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox+(vyOn(ls)?"":markMini(ls)+repChip("vy-chip news"));
+  mzHome(lss);
   // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
   // estigui on està el requadre blau")
   // ⛵ the voyage: a row of small links (late, news, To do, Homework, My notebook) over the map
@@ -680,7 +726,7 @@ function vyRace(lss){const O=document.querySelector("#main .vy-ovl");if(!O||vyCl
   if(AS)vyRace0(lss,k,d,n)}
 function vyRace0(lss,k,d,n){const O=document.querySelector("#main .vy-ovl");if(!O||document.getElementById("el-rem"))return;
   const ic=elVoyage.skin(S.vy).veh.icon;
-  O.innerHTML=`<div class="card"><div style="font-size:46px;line-height:1.1">${ic} 🏁</div><h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
+  O.innerHTML=`<div class="card">${window.ELMascot?`<div style="display:flex;justify-content:center;margin:-8px 0 -4px">${ELMascot.img("worried",120,"")}</div>`:`<div style="font-size:46px;line-height:1.1">${ic} 🏁</div>`}<h3>${t("Vols guanyar la cursa?","Do you want to win the race?")}</h3>`
     +`<p>${t("Acaba totes les activitats pendents! Cada activitat que acabes et fa avançar.","Finish all your pending activities! Every activity you finish moves you forward.")}</p>`
     +`<p class="ce">${t(`Et falten ${nAct(n)}.`,`You have ${nAct(n)} left to do.`)}</p>`
     +`<button type="button" data-r="ok">👍 ${t("D'acord","OK")}</button></div>`;
@@ -1059,7 +1105,7 @@ function render(){
   if(placeNow()==="report"&&!repOk())try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}   // 📄 only while the teacher shows it (reportPlace)
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
-  if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
+  if(!lss.length){mzOff();$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
     $("#note").innerHTML=cls+annBox()+noteBox;$("#main").innerHTML="";if(canReply())wireAnn();return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;document.body.dataset.course=COURSE;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
@@ -1068,7 +1114,7 @@ function render(){
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
     $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy){elVoyage.wire($("#main"),S.vy);vyRace(lss);if(S.vyPend)vyPend(lss)}}
-  else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
+  else{mzOff();$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
   const lc=document.querySelector(".lscard");if(lc&&getComputedStyle(lc).position==="sticky")document.documentElement.style.setProperty("--lsh",(lc.offsetHeight+12)+"px");

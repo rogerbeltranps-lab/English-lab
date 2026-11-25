@@ -306,6 +306,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-marking.js"></script>
@@ -2089,7 +2090,8 @@ function fdtStats(P,lss){const ids=new Set(lss.map(l=>l.id)),now=Date.now(),days
     Object.entries(L).forEach(([day,a])=>{if(!a||!(a[0]>0))return;o.used=true;o.all.add(day);z.rev+=a[0];if(day>o.last)o.last=day;
       if(days.includes(day)){o.wk.add(day);o.rev7+=a[0];o.sec7+=a[2]||0}if(day>=m30){o.r30+=a[4]||0;o.p30+=a[5]||0}});
     Object.values(C).forEach(c=>{if(!c)return;o.cards++;z.cards++;if(c[0]===2){o.learnt++;z.learnt++;if(c[2]>=21)o.mature++}})});
-  let st=0;for(let i=o.all.has(days[0])?0:1;o.all.has(fdtDay(now-i*864e5));i++)st++;o.streak=st;   // days in a row up to today (or yesterday)
+  let st=0;if(window.ELFlashDeck)st=ELFlashDeck.streak({decks:Object.fromEntries(Object.entries((P&&P.decks)||{}).filter(([id])=>ids.has(id)))},now).n;   // ⚡ days in a row (weekends and holidays never break it)
+  else for(let i=o.all.has(days[0])?0:1;o.all.has(fdtDay(now-i*864e5));i++)st++;o.streak=st;
   return o}
 function fdtBox(grp,studs,lss){const ok=fdtEnsure(grp.id,studs),hd=`<div class="prhd"><h2>Who uses them</h2><span><a class="btn mini" href="lab/practice.html#deck" target="_blank" rel="noopener" title="Every card of every route, as the teacher (choose a route at the top)">🧠 Open all the decks</a> ${ok?`<button class="btn g mini" data-do="fdtre" data-g="${esc(grp.id)}" title="Read the students' flashcards again">🔄 Refresh</button>`:""}</span></div>`;
   if(!ok)return `<div class="box fdt">${hd}<p class="muted">Loading the students' flashcards…</p></div>`;
@@ -2101,7 +2103,7 @@ function fdtBox(grp,studs,lss){const ok=fdtEnsure(grp.id,studs),hd=`<div class="
   const dots=x=>`<span class="fdd" title="${x.wk.size} of the last 7 days">${[...Array(7)].map((z,i)=>`<i class="${x.wk.has(fdtDay(Date.now()-(6-i)*864e5))?"on":""}"></i>`).join("")}</span>`;
   const tip=x=>Object.entries(x.ls).map(([id,z])=>`${lsS(id)}: ${z.cards} cards studied, ${z.learnt} learnt`).join(" · ");
   const nm=s=>`<a href="lab/practice.html?student=${encodeURIComponent(s.uid)}#deck" target="_blank" rel="noopener" title="👁 Open their flashcards as they see them, with their statistics">${esc(fullName(s))}</a>`;
-  const tr=({s,x})=>x.used?`<tr title="${esc(tip(x))}"><td>${nm(s)}</td><td>${dots(x)}</td><td>${esc(dLab(x.last))}</td><td class="n">${x.streak?"🔥 "+x.streak:"–"}</td><td class="n">${x.rev7}</td><td class="n">${x.sec7?Math.max(1,Math.round(x.sec7/60))+" min":"–"}</td>`
+  const tr=({s,x})=>x.used?`<tr title="${esc(tip(x))}"><td>${nm(s)}</td><td>${dots(x)}</td><td>${esc(dLab(x.last))}</td><td class="n">${x.streak?(window.ELMascot?ELMascot.badge(x.streak,"sm"):"⚡ "+x.streak):"–"}</td><td class="n">${x.rev7}</td><td class="n">${x.sec7?Math.max(1,Math.round(x.sec7/60))+" min":"–"}</td>`
       +`<td class="n">${x.learnt}${x.mature?` <small class="muted">(${x.mature} long-term)</small>`:""}</td><td class="n">${x.r30?`<span style="color:${elPctCol(x.p30/x.r30*100)}">${Math.round(x.p30/x.r30*100)} %</span>`:"–"}</td></tr>`
     :`<tr class="no"><td>${nm(s)}</td><td colspan="7">not used yet</td></tr>`;
   return `<div class="box fdt">${hd}<p class="muted prhow">The 🧠 Flashcards in 🎯 Practise: each student's own study, this course's LSs only. Never marked. Only on your screen. Hover a student for each LS; click a name to open <b>their decks as they see them</b> (👁 student view), with their own 📊 statistics.</p>`

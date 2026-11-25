@@ -159,7 +159,7 @@ export async function remind(o){o=o||{};const r=await Promise.race([remP,new Pro
   const st=document.createElement("style");st.id="el-rem-css";st.textContent=`
 #el-rem{position:fixed;inset:0;z-index:2147482500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;font:16px/1.35 system-ui,sans-serif;color:#0f172a}
 #el-rem .bx{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.35);width:min(720px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;text-align:left}
-#el-rem .hd{background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;padding:16px 22px}#el-rem h2{margin:0;font:800 clamp(22px,2.6vw,30px)/1.2 system-ui,sans-serif;color:#fff}#el-rem .hd p{margin:6px 0 0;font-size:15px;color:#fff}
+#el-rem .hd{background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;padding:16px 22px}#el-rem .hd .mz{float:right;margin:-8px -6px -10px 12px}#el-rem h2{margin:0;font:800 clamp(22px,2.6vw,30px)/1.2 system-ui,sans-serif;color:#fff}#el-rem .hd p{margin:6px 0 0;font-size:15px;color:#fff}
 #el-rem .n,#el-rem .r b{color:#0f172a}
 #el-rem .bd{padding:12px 22px 6px;overflow:auto}#el-rem h3{margin:4px 0 6px;font:800 13px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
 #el-rem ul{list-style:none;margin:0;padding:0}#el-rem li{padding:8px 10px;border-radius:10px}#el-rem li:nth-child(odd){background:#f8fafc}
@@ -177,7 +177,7 @@ export async function remind(o){o=o||{};const r=await Promise.race([remP,new Pro
 @media print{#el-rem{display:none}}`;
   if(!document.getElementById("el-rem-css"))document.head.append(st);
   const el=document.createElement("div");el.id="el-rem";el.className="notranslate";el.translate=false;
-  el.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-rem-h"><div class="hd"><h2 id="el-rem-h">✅ ${todo?t("Acaba totes les activitats!","Finish all your activities!"):t("Ho tens tot fet!","You're up to date!")}</h2>
+  el.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-rem-h"><div class="hd">${window.ELMascot?`<span class="mz">${ELMascot.img(todo?"worried":"happy",76,"")}</span>`:""}<h2 id="el-rem-h">✅ ${todo?t("Acaba totes les activitats!","Finish all your activities!"):t("Ho tens tot fet!","You're up to date!")}</h2>
     <p>${todo?(o.race?t("Per guanyar la cursa, acaba-les totes: cada activitat que acabes et fa avançar. ","To win the race, finish them all: every activity you finish moves you forward. "):"")+t("Totes les activitats compten. Aquí tens el que vam fer a classe i el que encara et falta.","Every activity counts. Here is what we have done in class and what you still have to do."):t("Has fet totes les activitats que hem fet a classe. Molt bé!","You have done every activity we did in class. Well done!")}</p></div>
     <div class="bd">${D.lps.length?`<h3>${t("La meva feina a cada learning path","My work in each learning path")}</h3><ul>${rows}</ul>`:""}${hw}${exam}</div>
     <div class="ft"><p>${todo?(o.links?t("Clica una activitat per anar-hi. ","Click an activity to go there. "):"")+t("Acaba-les a casa o a classe quan acabis abans.","Finish them at home, or in class when you finish early."):t("Continua així!","Keep it up!")}</p><button type="button" data-x>👍 ${t("D'acord","OK")}</button></div></div>`;

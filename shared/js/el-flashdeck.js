@@ -107,12 +107,18 @@
 .elfd-cal .l1{background:#bbf7d0}.elfd-cal .l2{background:#4ade80}.elfd-cal .l3{background:#16a34a}.elfd-cal .l4{background:#14532d}.elfd-cal .td{outline:2px solid #172033;outline-offset:1px}
 .elfd-done{font-size:clamp(1.4rem,3.4vw,2.2rem);font-weight:800}
 html.elfd-on,html.elfd-on body{overflow:hidden}
+.elfd-mz{display:flex;align-items:center;gap:12px;margin-left:auto}.elfd-mz .elmz{margin-left:28px}
+.elfd-say{position:relative;background:#fff;border:2px solid #c7d2fe;border-radius:16px;padding:8px 12px;font-weight:600;font-size:.95rem;line-height:1.3;color:#1e293b;box-shadow:0 4px 12px rgba(15,23,42,.06);max-width:380px}
+.elfd-say b{color:#1d4ed8}.elfd-say:after{content:"";position:absolute;right:-17px;top:50%;margin-top:-8px;border:8px solid transparent;border-left-color:#c7d2fe}
+.elfd-head .elfd-side{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.elfd-card .elmz-img{margin:-6px auto -4px}
 @media (max-width:640px){.elfd-rate{gap:6px}.elfd-rate button{padding:9px 2px;font-size:.92rem}.elfd-n span{min-width:38px;font-size:1rem}.elfd-card{padding:16px;min-height:200px}.elfd-full{padding:12px}}`;
   const css = () => { if (document.getElementById('elfd-css')) return; const s = document.createElement('style'); s.id = 'elfd-css'; s.textContent = CSS; document.head.appendChild(s); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
   const COL = { new: '#60a5fa', lrn: '#f87171', young: '#86efac', mature: '#15803d' };
 
+  const streakOf = (P, now) => streak(P, now);
   function mount(host, o) {
     css();
     const ca = () => !!(o.ca && o.ca()), t = (c, e) => ca() ? c : e;
@@ -123,6 +129,24 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     let view = { k: 'list' }, ses = null, layer = null;
 
     const decks = () => (o.decks() || []).filter(d => d.cards.length);
+    // 🧑‍🎨 the streak mascot (el-mascot.js), when the page has it: the Choose an LS header, Done for today, milestones
+    const MZ = () => root.ELMascot, me = () => (o.me ? o.me() : null);
+    const leftToday = () => { const now = Date.now(); return decks().reduce((a, d) => { const n = counts(d, now); return a + n.newToday + n.lrn + n.due; }, 0); };
+    function mzHead() {
+      const M = MZ(); if (!M) return '';
+      const st = streak(P, Date.now()), left = leftToday(), m = M.mood({ st, left }), n = st.n;
+      const line = st.today && !left ? t('Tot fet per avui. Fins demà! 😴', 'All done for today. See you tomorrow! 😴')
+        : st.today ? (n > 1 ? t(`<b>${n} dies seguits!</b> Continua així ⚡`, `<b>${n} days in a row!</b> Keep going ⚡`) : t('Bon començament! Torna demà i seran 2 ⚡', 'Good start! Come back tomorrow to make it 2 ⚡'))
+        : n ? t(`Estudia avui i mantens la ratxa de <b>${n} ${n === 1 ? 'dia' : 'dies'}</b>!`, `Study today to keep your <b>${n}-day</b> streak!`)
+        : t("Unes quantes targetes cada dia i la ratxa ⚡ creix. T'ho prometo, funciona!", 'A few cards every day and your ⚡ streak grows. I promise it works!');
+      return `<div class="elfd-mz"><span class="elfd-say">${line}</span><span class="elmz" style="cursor:default">${M.img(m, 72, '')}${M.badge(n)}</span></div>`;
+    }
+    function mzDone() {   // the picture at the end of a session: 🎉 a milestone (once, shared with the board), 😴 nothing left today, or 🙂
+      const M = MZ(); if (!M) return { h: '', mile: 0 };
+      const st = streak(P, Date.now()), mile = M.milestone(st), k = 'el_mz_party_' + (me() || ''), v = mile + '@' + dayKey(Date.now());
+      if (mile && me() !== null && M.seen.get(k) !== v) { M.seen.set(k, v); return { h: M.img('party', 150, '') + M.badge(st.n, 'xl'), mile }; }
+      return { h: M.img(leftToday() ? (st.n >= 7 ? 'energised' : 'happy') : 'sleeping', 130, '') + M.badge(st.n), mile: 0 };
+    }
     const stOf = (d, c) => D(d.id).c[c.id];
     function counts(d, now) {
       const n = { new: 0, lrn: 0, due: 0, young: 0, mature: 0, total: d.cards.length }, end = dayStart(now) + DAY;
@@ -192,7 +216,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
           ${bar(s)}<small>${d.cards.length} ${t('targetes', 'cards')} · ${Math.round((s.mat + s.young) / s.n * 100)}% ${t('apreses', 'learnt')}</small><span class="go">${t('Obre', 'Open')} ›</span></button>`; };
       const all = ds.length > 1 ? todayOf({ id: '*' }) : null;
       return `<div class="elfd-head"><div><h3>${t('Tria una LS', 'Choose an LS')}</h3><p>${t('Cada LS té les seves targetes amb el vocabulari i la gramàtica que heu fet a classe.', 'Each LS has its own cards with the vocabulary and grammar you have done in class.')}</p></div>
-        <button class="b g" data-fd="stats" data-v="*">📊 ${t('Les meves estadístiques', 'My statistics')}</button></div>
+        <div class="elfd-side">${mzHead()}<button class="b g" data-fd="stats" data-v="*">📊 ${t('Les meves estadístiques', 'My statistics')}</button></div></div>
         <div class="elfd-lss">${ds.map(card).join('')}</div>
         ${all ? `<button class="b elfd-mix" data-fd="study" data-v="*" ${all.all ? '' : 'disabled'}>🔀 ${t('Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}${all.all ? ` · ${all.all}` : ''}</button>` : ''}`;
     }
@@ -219,7 +243,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       const sumDay = k => logs.reduce((a, L) => { const x = L[k]; if (x) x.forEach((v, i) => a[i] += v); return a; }, [0, 0, 0, 0, 0, 0]);
       const td = sumDay(dayKey(now)), s = strength(d, d.cards);
       let rv = 0, rok = 0; for (let i = 0; i < 30; i++) { const x = sumDay(dayKey(now - i * DAY)); rv += x[4]; rok += x[5]; }
-      let streak = 0; for (let i = sumDay(dayKey(now))[0] ? 0 : 1; i < 400; i++) { if (sumDay(dayKey(now - i * DAY))[0]) streak++; else break; }
+      const streak = streakOf(P, now).n;
       const end = dayStart(now) + DAY, fc = [0, 0, 0, 0, 0, 0, 0];
       d.cards.forEach(c => { const x = D(deckOfCard(d, c)).c[c.id]; if (!x) return; const i = x[1] < end ? 0 : Math.floor((x[1] - end) / DAY) + 1; if (i < 7) fc[i]++; });
       const mx = Math.max(1, ...fc), WD = ca() ? ['Avui', 'Demà'] : ['Today', 'Tmrw'], dn = i => i < 2 ? WD[i] : new Date(now + i * DAY).toLocaleDateString(ca() ? 'ca' : 'en-GB', { weekday: 'short' });
@@ -232,7 +256,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${d.id === '*' ? t('Totes les LS', 'All LSs') : esc(d.name)}</button></div><h3 style="margin:6px 0 6px">📊 ${d.id === '*' ? t('Les meves estadístiques · totes les LS', 'My statistics · all my LSs') : esc(d.name)}</h3>
         <h4>${t('Avui', 'Today')}</h4><div class="elfd-stat"><div><b>${td[0]}</b><small>${t('targetes estudiades', 'cards studied')}</small></div><div><b>${Math.round(td[2] / 60)} min</b><small>${t('de temps', 'of study')}</small></div>
           <div><b>${pct(td[1], td[0])}</b><small>${t('encertades', 'right')} (${td[0] - td[1]} ${t('cops “De nou”', '× Again')})</small></div><div><b>${td[3]}</b><small>${t('targetes noves', 'new cards')}</small></div></div>
-        <div class="elfd-stat"><div><b>🔥 ${streak}</b><small>${t(streak === 1 ? 'dia seguit' : 'dies seguits', streak === 1 ? 'day in a row' : 'days in a row')}</small></div><div><b>${pct(rok, rv)}</b><small>${t('record (repassos, 30 dies)', 'remembered (reviews, 30 days)')}</small></div></div>
+        <div class="elfd-stat"><div><b>${root.ELMascot ? ELMascot.badge(streak) : '⚡ ' + streak}</b><small>${t(streak === 1 ? 'dia seguit' : 'dies seguits', streak === 1 ? 'day in a row' : 'days in a row')}</small></div><div><b>${pct(rok, rv)}</b><small>${t('record (repassos, 30 dies)', 'remembered (reviews, 30 days)')}</small></div></div>
         <h4>${t('Les teves targetes', 'Your cards')} · ${s.n}</h4><div class="elfd-states">${[['nw', COL.new], ['lrn', COL.lrn], ['young', COL.young], ['mat', COL.mature]].map(([k, c]) => s[k] ? `<i style="width:${s[k] / s.n * 100}%;background:${c}" title="${s[k]}"></i>` : '').join('')}</div>
         <div class="elfd-key">${[['nw', COL.new, 'Noves', 'New'], ['lrn', COL.lrn, 'Aprenent', 'Learning'], ['young', COL.young, 'Joves', 'Young'], ['mat', COL.mature, 'Madures', 'Mature']].map(([k, c, a, b]) => `<span style="--c:${c}">${t(a, b)} <b>${s[k]}</b></span>`).join('')}</div>
         <h4>${t('Per repassar els propers 7 dies', 'To review in the next 7 days')}</h4><div class="elfd-fc">${fc.map((v, i) => `<div><b>${v}</b><i style="height:${v / mx * 100}%"></i>${esc(dn(i))}</div>`).join('')}</div>
@@ -247,7 +271,8 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
         <span class="elfd-cnt"><span class="new">${kindOf(c) === 'new' && !ses.shown ? '<u>' + (nN + 1) + '</u>' : nN}</span><span class="lrn">${kindOf(c) === 'lrn' && !ses.shown ? '<u>' + nL + '</u>' : nL}</span><span class="due">${kindOf(c) === 'due' && !ses.shown ? '<u>' + (nR + 1) + '</u>' : nR}</span></span></div>`;
       if (!c) {
         const later = ses.lrn.length ? Math.min(...ses.lrn.map(x => st(x)[1])) - now : 0;
-        return top + `<div class="elfd-card"><div class="elfd-done">🎉 ${t('Fet per avui!', 'Done for now!')}</div><p>${t(`Has estudiat ${ses.n} targetes.`, `You studied ${ses.n} cards.`)}</p>
+        const z = mzDone();
+        return top + `<div class="elfd-card">${z.h ? `<div class="elmz" style="cursor:default;margin-left:30px">${z.h}</div>` : ''}<div class="elfd-done">${z.mile ? t(`${z.mile} dies seguits! 🎉`, `${z.mile} days in a row! 🎉`) : (z.h ? '' : '🎉 ') + (later > 0 || leftToday() ? t('Fet per ara!', 'Done for now!') : t('Fet per avui!', 'Done for today!'))}</div><p>${t(`Has estudiat ${ses.n} targetes.`, `You studied ${ses.n} cards.`)}</p>
           <p class="elfd-tag">${later > 0 ? t('Algunes targetes tornen d’aquí a ', 'Some cards come back in ') + span(later, ca()) + '.' : t('Torna demà: repassar una mica cada dia és el que fa que tot es quedi.', 'Come back tomorrow: a little every day is what makes it stick.')}</p>
           <div class="elfd-acts"><button class="b" data-fd="statsnow">📊 ${t('Estadístiques', 'Stats')}</button><button class="b g" data-fd="close">${t('Tanca', 'Close')}</button></div></div>`;
       }
@@ -303,6 +328,21 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       out.new += Math.max(0, Math.min(nw, NEW_PER_DAY - ((dk.log[dayKey(now)] || [])[3] || 0))); });
     return out;
   }
+  // ⚡ days in a row (Roger, 25 Nov 2026, with the streak mascot): a day counts when the student studied at least one card, in any LS.
+  // Weekends and school holidays (EL_TIMETABLE.off, el-plan.js) never break it, and studying on them still counts. Today not studied yet
+  // doesn't break it either. → { n, today (studied today), lost (the streak that broke at the last school day missed, when n is 0), gap (that day) }
+  function streak(P, now) {
+    now = now || Date.now(); const on = new Set();
+    Object.values((P && P.decks) || {}).forEach(d => Object.entries((d && d.log) || {}).forEach(([k, a]) => { if (a && a[0] > 0) on.add(k); }));
+    const off = ((root.EL_TIMETABLE || {}).off) || [];
+    const rest = k => { const [y, m, dd] = k.split('-').map(Number), wd = new Date(y, m - 1, dd).getDay(); return wd === 0 || wd === 6 || off.some(o => Array.isArray(o) ? o[0] <= k && k <= o[1] : o === k); };
+    const today = dayKey(now), at = i => dayKey(dayStart(now) - i * DAY + 5 * 36e5);
+    let n = 0, i = on.has(today) ? 0 : 1, gap = null;
+    for (; i < 800; i++) { const k = at(i); if (on.has(k)) n++; else if (!rest(k)) { gap = k; break; } }
+    let lost = 0;
+    if (!n && gap) for (i++; i < 800; i++) { const k = at(i); if (on.has(k)) lost++; else if (!rest(k)) break; }
+    return { n, today: on.has(today), lost, gap: lost ? gap : null, used: on.size > 0 };
+  }
   // merge two saved copies (this device and the account): for each card the one reviewed last, for each day the bigger log
   function merge(a, b) {
     const out = { decks: {} }; a = a || {}; b = b || {};
@@ -314,5 +354,5 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     });
     return out;
   }
-  root.ELFlashDeck = { mount, summary, merge, next, dayKey, _span: span };
+  root.ELFlashDeck = { mount, summary, merge, next, dayKey, streak, _span: span };
 })(typeof window !== 'undefined' ? window : globalThis);
