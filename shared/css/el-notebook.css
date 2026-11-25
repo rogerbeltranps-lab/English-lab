@@ -681,3 +681,12 @@ html.el-nb-plain .nb-fpi textarea,html.el-nb-plain .nb-fpi-t{font-size:15px;line
 .nb-postit.k-fb,.nb-stab.k-fb{background:#c5e1a5}.nb-slip.nb-tfb{background:#f1f8e9;border-left:4px solid #8bc34a}.nb-slip.nb-tfb h4{color:#33691e}
 /* 🛟 a section that could not be laid out in pages (el-notebook.js layout) is kept whole on one page: it scrolls on the screen, runs on over more sheets on paper */
 .nb-page.nb-whole .nb-paper{overflow-y:auto}
+/* 📖 a Reading step's text, glued in like a printed page (Roger, 25 Nov 2026: "Add the reading texts in students notebooks"): plain print
+   letters, easy to read again, never tilted */
+.nb-slip.nb-rtext{transform:none;font:400 15px/1.55 var(--nb-sans);color:#1f2937;background:#fffefa;border-left:4px solid #f59e0b}
+.nb-slip.nb-rtext h4{font:700 15.5px/1.3 var(--nb-sans);color:#92400e;margin-bottom:6px}
+.nb-slip.nb-rtext p{margin:0 0 8px}
+.nb-slip.nb-rtext p:last-child{margin-bottom:0}
+.nb-slip.nb-rtext .tiny{font-size:13px;color:#4b5563}
+.nb-slip.nb-rtext .model{background:#f8fafc;border-left:3px solid #cbd5e1;padding:6px 10px;margin:6px 0}
+.nb-slip.nb-rtext p.nb-rh{margin:8px 0 2px}

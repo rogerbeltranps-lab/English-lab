@@ -47,7 +47,11 @@ window.ELNotebook = (function () {
       if (tag === 'BR') return '<br>';
       if (/^(SCRIPT|STYLE|TEMPLATE|IFRAME|OBJECT|SVG|MATH)$/.test(tag)) return '';
       const inner = [...node.childNodes].map(out).join('');
-      if (tag === 'DIV' || tag === 'P') return '<div>' + inner + '</div>';
+      // a list item, a heading, a table row… pasted from the board is a line of its own too (Roger, 25 Nov 2026: a pasted note had lost every line
+      // break: "▸ The first Thanksgiving took place in 1621.▸ Last year we ate chestnuts.B used to…")
+      if (/^(DIV|P|LI|H[1-6]|TR|BLOCKQUOTE|PRE|SECTION|ARTICLE|HEADER|FOOTER|DT|DD|FIGURE|FIGCAPTION)$/.test(tag)) return '<div>' + inner + '</div>';
+      if (/^(UL|OL|TABLE|TBODY|THEAD|DL)$/.test(tag)) return inner;
+      if (/^(TD|TH)$/.test(tag)) return inner + ' ';
       const cls = [...node.classList].filter(c => KEEP.has(c));
       return cls.length && node.textContent ? `<span class="${cls.join(' ')}">${inner}</span>` : inner;
     };
@@ -120,7 +124,7 @@ window.ELNotebook = (function () {
     const p = g.gt || {}, rd = /-rd$/.test(g.id), xp = /-vocabEx$/.test(g.id), txt = String(p.text || '').trim();   // xp: 💬 Expressions together
     const sum = (p.sum || []).length ? `<div class="nb-slip">${p.sum.map(b => `<div class="ex-rule">${H.safe(b)}</div>`).join('')}<span class="nb-clip">📎 ${t('de la pissarra', 'from the whiteboard')}</span></div>` : '';
     const mine = p.html || (p.dr && p.dr.length) ? `<div class="nb-notes">${clean(p.html, (p.dr || []).length)}${svg(p.dr)}</div>` : txt ? `<div class="nb-mine">${lines(txt)}</div>` : `<p class="nb-pencil">${t('No vas prendre apunts aquí.', 'You didn\'t take notes here.')}</p>`;
-    return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : xp ? '💬' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : xp ? t('Expressions junts', 'Expressions together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
+    return `<div class="nb-game" data-gs="gt-${fk(g.id)}"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : xp ? '💬' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : xp ? t('Expressions junts', 'Expressions together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine nb-labw"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
   const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬', fb: '💬' };
@@ -562,6 +566,10 @@ window.ELNotebook = (function () {
         let h = `<div class="nb-postit k-${pt.kind}">${ic} ${nm}${pt.day && pt.day !== true ? `<small>${esc(H.exDay(pt.day))}</small>` : ''}</div>`;
         if (pt.title && pt.title !== pt.name) h += `<div class="nb-h3">${esc(pt.title)}</div>`;
         const pid = key + '-p-' + fk(pt.id);
+        // 📖 the reading text, to read it again (Roger, 25 Nov 2026: "Add the reading texts in students notebooks"): a printed page glued in
+        // a post's or a text's bold title line is a heading of its own, so it never stays alone at the bottom of a page
+        const rtx = pt.text ? String(pt.text).replace(/<p>\s*(<strong>[^<]*<\/strong>)\s*<br\s*\/?>/g, '<p class="nb-rh">$1</p><p>').replace(/<p>\s*(<strong>[^<]*<\/strong>)\s*<\/p>/g, '<p class="nb-rh">$1</p>') : '';
+        if (rtx) h += `<div class="nb-slip nb-rtext"><h4>📖 ${t('El text', 'The text')}</h4>${rtx}</div>`;
         pt.terms.forEach((g, gi) => { h += `${pt.terms.length > 1 || g.g ? `<div class="nb-h3" data-gs="${pid}~v${gi}">${g.g}</div>` : ''}<ul class="nb-voc">${g.items.map(x => `<li><b>${x.en}</b>${x.ca ? ` <span>– ${x.ca}</span>` : ''}</li>`).join('')}</ul>`; });
         pt.grammar.forEach((g, gi) => { h += `<div class="nb-slip" data-gs="${pid}~${gi}"><h4>${g.ex && !/^Expressions\b/.test(g.title) ? '💬 Expressions · ' : ''}${g.title}</h4>${g.boxes.map(x => `<div class="ex-rule">${x}</div>`).join('')}</div>`; });
         if (pt.work) h += work(pt.work);
@@ -731,7 +739,7 @@ window.ELNotebook = (function () {
   });
 
   // ---------- the pages: nothing scrolls, what does not fit goes on to the next page ----------
-  const SPLIT = '.nb-front,.nb-fr-ls,.nb-fr-crit,.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-opts,.nb-rub,ul.nb-rbl,ul.nb-xparts,ul.nb-fbl,.nb-game,.nb-slip,.ex-rule,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
+  const SPLIT = '.nb-notes div,.nb-mine div,.nb-rtext p,.nb-rtext div,.nb-front,.nb-fr-ls,.nb-fr-crit,.nb-legend,.nb-blk,.nb-work,ol.nb-ans,.nb-opts,.nb-rub,ul.nb-rbl,ul.nb-xparts,ul.nb-fbl,.nb-game,.nb-slip,.ex-rule,.nt-s,ul.nb-voc,.nb-notes,ul.nb-idx,.nb-idx ul,.nb-mine,.nb-sticky ul';
   const SKIP = '.nb-mdate,.nb-ui';
   function flow(sp, frag, si) {
     let page, paper, cur, stack = [], leaves = 0;
@@ -750,7 +758,7 @@ window.ELNotebook = (function () {
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
     // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
     // part whose first line didn't fit (it goes up through the part's boxes)
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh,.nb-fr-res';
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-labw,.nb-rh,.nb-postit,.nb-wh,.nb-fr-lh,.nb-fr-res';
     const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
     const breakBefore = force => {
       const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
@@ -781,13 +789,20 @@ window.ELNotebook = (function () {
       if (node.nodeType === 1 && node.classList.contains('nb-break')) { if (leaves) newPage(); return; }
       cur.append(node); onLine(node);
       if (fits()) { if (counts(node)) leaves++; return; }
+      const canSplit = node.nodeType === 1 && node.matches(SPLIT);   // asked while it is on the page: '.nb-notes div' needs its parents
       node.remove();
-      if (node.nodeType === 1 && node.matches(SPLIT) && !node.classList.contains('nb-edit') && (node.childNodes.length > 1 || (node.firstChild && node.firstChild.nodeType === 1))) {
+      if (canSplit && !node.classList.contains('nb-edit') && (node.childNodes.length > 1 || (node.firstChild && (node.firstChild.nodeType === 1 || String(node.firstChild.nodeValue || '').length > 160)))) {
         const shell = node.cloneNode(false), c = shell.cloneNode(false); cur.append(c);
         if (!fits() && leaves) { c.remove(); breakBefore(true); return place(node); }
         stack.push(shell); cur = c;
         [...node.childNodes].forEach(place);
         stack.pop(); cur = cur.parentNode; return;
+      }
+      // a long run of text (a note pasted in one piece) goes on to the next page at the end of a sentence, never squeezed small
+      // (Roger, 25 Nov 2026: "the headings musn't be in different pages", a pasted note had shrunk to tiny letters)
+      if (node.nodeType === 3 && node.nodeValue.length > 160) {
+        const bits = node.nodeValue.split(/(?<=[.!?…:;▸▶•→])\s+/).filter(x => x.length);
+        if (bits.length > 1) { bits.forEach((b, i) => place(document.createTextNode(b + (i < bits.length - 1 ? ' ' : '')))); return; }
       }
       if (leaves && breakBefore() !== false) return place(node);
       // alone on a new page and still too tall: a bit smaller, so it fits
