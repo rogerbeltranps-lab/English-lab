@@ -116,7 +116,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tshell.on .dhead,.tshell.on #msg{display:none}
 .tside{position:sticky;top:0;max-height:100vh;overflow:auto;display:flex;flex-direction:column;gap:4px;padding:8px 0 16px;box-sizing:border-box}
 .tside .brand{font-weight:800;font-size:1.05rem;letter-spacing:-.02em;padding:8px 12px 12px}
-.tside .nv{display:flex;justify-content:space-between;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px;text-align:left;margin:0}
+.tside .nv{text-decoration:none;display:flex;justify-content:space-between;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px;text-align:left;margin:0}
 .tside .nv:hover{background:#eaf0ff;color:#3157d5}.tside .nv.on{background:#0f172a;color:#fff}.tside .nv.c2eso.on{background:#16a34a}.tside .nv.c4eso.on{background:#2563eb}
 .tside .nv small{font-weight:600;font-size:12px;opacity:.75}.tside .sep{height:1px;background:#e2e8f0;margin:8px 8px}.tside .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
 .tside .nv.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.tside .nv.ann:hover{background:#ffedd5}
@@ -306,7 +306,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261125b"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125c"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-marking.js"></script>
@@ -1453,7 +1453,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only · Back or ✕ Exit returns here")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
-    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="how"',"🎬","How it works","guides for teachers and students")}</div>`
+    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}<a href="lab/practice.html#deck"><i aria-hidden="true">🧠</i><span>Flashcards<small>every LS at every level, with your own statistics</small></span></a>${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="how"',"🎬","How it works","guides for teachers and students")}</div>`
     +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
@@ -1827,6 +1827,9 @@ function render0(){
     +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
     +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
     +nv("plan","🏠 Home",S.g==="plan"&&(S.place||"home")!=="home"?"off":"","How each class is doing: work done in each learning path, first tries, games and marks")
+    // 🧠 Flashcards (Roger, 25 Nov 2026: "between home and groups I want to have a flashcards button. There I see this per each LS and I can
+    // even try them and have my own statistics"): the students' Flashcards page, every course and route, your own progress saved to your account
+    +`<a class="nv" href="lab/practice.html#deck" title="Every LS's flashcards at every level: study them yourself, with your own statistics">🧠 Flashcards</a>`
     +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,`<span class="gn">${esc(g.name)}</span>`,"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0),g.id))).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
     // 🧭 Learning situations (Roger, 12 Nov 2026: "here I should have LSs sections; when i get in I should see the courses and choose one")

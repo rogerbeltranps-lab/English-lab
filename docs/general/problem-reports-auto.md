@@ -129,6 +129,10 @@ line, after the reports (or alone, when there is no open report):
    read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter and no route (Base reads English since 21 Nov 2026),
    English for Core, Plus and Pro, FORYOU for anything that needs Roger. Write the EL-ANSWERS v1 file in the scratchpad and run
    `node tools/marking/marks.mjs answer <file> --new --apply` (it saves `settings/marking.cmtRun`, so the next run skips them).
+   **A hand-in that is not a real try** (filler letters such as "rfr", "no" for an answer, the same word in every box), seen while
+   reading a comment or a report: send it back at once, without asking (Roger, 25 Nov 2026: "always when you detect that they've done
+   sth like this, you must ask them to redo it"): `node tools/marking/marks.mjs redo <S-code> <activity> <step> --why "…" --apply`
+   (as the dashboard's ↺ Redo; English note, Catalan for Starter). The comment itself still gets its ANSWER or FORYOU line.
 3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
    tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
    comment again). The Friday 15:00 task still answers any comment left.

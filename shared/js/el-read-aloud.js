@@ -14,7 +14,7 @@
   // the text a block shows, with a line break read as a full stop ("…11:05<br>Live from the wall" → "…11:05. Live from the wall")
   function said(n) {
     let s = '';
-    (function walk(x) { for (const c of x.childNodes) { if (c.nodeType === 3) s += c.nodeValue; else if (c.nodeType === 1 && !(c.classList && c.classList.contains('el-ra-bar'))) { if (c.tagName === 'BR') s += '\n'; else walk(c); } } })(n);
+    (function walk(x) { for (const c of x.childNodes) { if (c.nodeType === 3) s += c.nodeValue; else if (c.nodeType === 1 && !(c.classList && (c.classList.contains('el-ra-bar') || c.classList.contains('el-er-bar') || c.classList.contains('el-er-dim')))) { if (c.tagName === 'BR') s += '\n'; else walk(c); } } })(n);
     return s;
   }
   const speakable = s => String(s)
@@ -23,7 +23,7 @@
     .replace(/([^.!?:;,\s])[ \t]*\n+/g, '$1.\n').replace(/\s+/g, ' ').replace(/^[\s,]+|[\s,]+$/g, '').trim();
   // the blocks of a reading (paragraphs, list items, table rows: the innermost ones) and its key
   function parts(el) {
-    let bl = [...el.querySelectorAll(BLOCK)].filter(b => !b.closest('.el-ra-bar') && !b.querySelector(BLOCK));
+    let bl = [...el.querySelectorAll(BLOCK)].filter(b => !b.closest('.el-ra-bar, .el-er-bar') && !b.querySelector(BLOCK));
     if (!bl.length) bl = [el];
     const texts = bl.map(said), key = fnv(texts.join(' ').toLowerCase().replace(/[^a-z0-9]/g, ''));
     // the Catalan word help under a text ("Paraules: …", "Words: …") is not read

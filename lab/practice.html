@@ -91,7 +91,7 @@
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
   <script src="../shared/js/el-plan.js"></script>
-  <script src="../shared/js/el-flashdeck.js?v=20261125b"></script>
+  <script src="../shared/js/el-flashdeck.js?v=20261125c"></script>
   <script src="../shared/js/el-mascot.js?v=20261125"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
@@ -503,7 +503,8 @@ const FKEY = () => 'el_flash' + (U ? '_' + U.uid : '');   // per account: two st
 let fdView = null;   // 👁 student view: the student's copy, in memory only
 const fdAs = () => !DEMO && window.ELCloud && ELCloud.viewing;
 const fdLoad = () => { if (fdAs()) return fdView || {}; try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
-const fdCloudOn = () => !DEMO && U && !all() && !ELCloud.viewing;
+// the teacher's own study is saved too (Roger, 25 Nov 2026: "I can even try them and have my own statistics"); never in a 👁 student view
+const fdCloudOn = () => !DEMO && U && !ELCloud.viewing && (!all() || ELCloud.isTeacher(U));
 const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
 // fdSum leaves the counts of today (el_flash_sum_<uid>: reviews due, new cards today, new cards a day) for the board's
 // mascot, so the board knows how many cards are waiting without building the decks.

@@ -58,7 +58,7 @@
 .elfd-ls:hover{border-color:#7c3aed;box-shadow:0 12px 30px rgba(109,40,217,.12)}.elfd-ls .t{font-weight:800;font-size:1.12rem;margin-bottom:6px}
 .elfd-ls .big{font-size:2.4rem;font-weight:800;line-height:1;color:#6d28d9}.elfd-ls .big.ok{color:#15803d}.elfd-ls small{color:#667085;font-weight:600}.elfd-ls .ln{font-weight:700}
 .elfd-ls .elfd-bar{width:100%;margin:8px 0 2px}.elfd-ls .go{align-self:flex-end;margin-top:6px;background:#6d28d9;color:#fff;border-radius:999px;padding:6px 16px;font-weight:800}
-.elfd .b.elfd-mix{width:100%;padding:12px 18px;font-size:1.02rem;background:#172033}
+.elfd-mixc{display:flex;align-items:center;gap:16px;width:100%;margin-top:4px;border:0;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,#0f766e,#0369a1);color:#fff;text-align:left;cursor:pointer;font:inherit;box-shadow:0 10px 26px rgba(3,105,161,.18)}.elfd-mixc:hover{filter:brightness(1.08)}.elfd-mixc:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}.elfd-mixc .ic{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.18);font-size:1.9rem}.elfd-mixc .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.elfd-mixc .tx>b{font-size:1.3rem;line-height:1.2}.elfd-mixc small{font-weight:600;font-size:.95rem}.elfd-mixc small span{color:#fff!important}.elfd-mixc .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}.elfd-mixc .chip{background:rgba(255,255,255,.2);border-radius:999px;padding:3px 10px;font-weight:700;font-size:.88rem}.elfd-mixc .chip b{margin-left:2px}.elfd-mixc .go{flex:none;background:#fff;color:#0f766e;border-radius:999px;padding:9px 20px;font-weight:800;font-size:1.05rem}.elfd-mixc:disabled{background:#e2e8f0;color:#334155;box-shadow:none;cursor:default}.elfd-mixc:disabled small span,.elfd-mixc:disabled .chip{color:#334155!important}.elfd-mixc:disabled .chip{background:#fff}@media (max-width:640px){.elfd-mixc{flex-wrap:wrap;gap:12px;padding:16px}.elfd-mixc .ic{width:46px;height:46px;font-size:1.5rem}.elfd-mixc .tx{flex-basis:calc(100% - 62px)}.elfd-mixc .tx>b{font-size:1.15rem}.elfd-mixc .go{width:100%;text-align:center}}
 .elfd-main{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;border:0;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,#6d28d9,#3157d5);color:#fff;text-align:left;cursor:pointer;font:inherit}
 .elfd-main b{font-size:1.3rem}.elfd-main small{font-weight:600;opacity:.95}.elfd-main small span{color:#fff!important}.elfd-main:disabled{background:#e2e8f0;color:#334155;cursor:default}
 .elfd-deck{border:1px solid #e5e7eb;border-radius:18px;padding:14px 16px;margin:10px 0;background:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
@@ -226,7 +226,16 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       return `<div class="elfd-head"><div><h3>${t('Tria una LS', 'Choose an LS')}</h3><p>${t('Cada LS té les seves targetes amb el vocabulari i la gramàtica que heu fet a classe.', 'Each LS has its own cards with the vocabulary and grammar you have done in class.')}</p></div>
         <div class="elfd-side">${mzHead()}<button class="b g" data-fd="stats" data-v="*">📊 ${t('Les meves estadístiques', 'My statistics')}</button></div></div>
         <div class="elfd-lss">${ds.map(card).join('')}</div>
-        ${all ? `<button class="b elfd-mix" data-fd="study" data-v="*" ${all.all ? '' : 'disabled'}>🔀 ${t('Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}${all.all ? ` · ${all.all}` : ''}</button>` : ''}`;
+        ${all ? mixCard(ds, all) : ''}`;
+    }
+    // 🔀 every LS mixed (Roger, 25 Nov 2026: "this should be another color and more accesible or visual"): a big teal card like the LS
+    // page's ▶ Study everything mixed, with today's cards, one chip per LS and a ▶ Start pill; white text on a dark teal for contrast
+    function mixCard(ds, all) {
+      const chips = ds.map(d => { const n = todayOf(d).all; return `<span class="chip">${esc(String(d.name).split(' · ')[0])} <b>${n || '✓'}</b></span>`; }).join('');
+      return `<button class="elfd-mixc" data-fd="study" data-v="*" ${all.all ? '' : 'disabled'}><span class="ic" aria-hidden="true">🔀</span>
+        <span class="tx"><b>${t('Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}</b>
+        <small>${all.all ? `${all.all} ${t('targetes avui', 'cards today')}: ${todayLine(all)}` : t('Fet per avui ✓ Torna demà!', 'Done for today ✓ Come back tomorrow!')}</small>
+        <span class="chips">${chips}</span></span>${all.all ? `<span class="go">▶ ${t('Comença', 'Start')}</span>` : ''}</button>`;
     }
     function partsOf(d) {
       const m = new Map(); d.cards.forEach(c => { if (!m.has(c.part)) m.set(c.part, { part: c.part, kind: c.kind, cards: [] }); m.get(c.part).cards.push(c); });

@@ -367,4 +367,19 @@ else if(cmd==="comments"||cmd==="answer"){const its=await comments();
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
     if(NEW&&flags.has("--apply"))await cmtDone();
     console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.filter(x=>x.kind==="ANSWER").length} answers · ${r.rows.filter(x=>x.kind==="FORYOU").length} for the teacher · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}}
-else{console.log("Usage: node tools/marking/marks.mjs lv-ready | lv-sheet <group> <activity> <step> | lv-apply <group> <activity> <step> <answer file> [--apply] | tn-ready | tn-apply <answer file> [--apply] | ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}
+// ↺ Redo straight away (Roger, 25 Nov 2026: "always when you detect that they've done sth like this, you must ask them to redo it"):
+// a hand-in that is not a real try (filler letters, "no", blank-looking boxes), seen in any run (a comment, a report, marking), goes back
+// as the dashboard's ↺ Redo does (hbBack in teacher.html): flags[step] = {done:"redo", reopen:true, back, why, at, auto:true} + the note
+// on top of replies[step]; the step counts as not done until it is handed in again. <student> = the uid or the S- code (a uid prefix).
+//   node tools/marking/marks.mjs redo <student> <activity> <step> --why "reason for Roger" [--apply]
+else if(cmd==="redo"){const [who,aid,step]=args,pre=String(who||"").replace(/^S-/,""),ss=studs.filter(x=>pre&&x.uid.startsWith(pre)),a=W.EL_CATALOG.find(x=>x.id===aid);
+  if(ss.length!==1)throw new Error(ss.length?"More than one student starts with "+pre:"No student "+who);if(!a||!step)throw new Error("Unknown activity or step: "+aid+" "+step);
+  const s=ss[0],wi=process.argv.indexOf("--why"),why=wi>0?process.argv[wi+1]:"not a real try",rk=a.id.replace("/","__");
+  const lvs=Object.fromEntries(((await api("GET",DOCS+`students/${s.uid}/levels`))?.documents||[]).map(d=>[d.name.split("/").pop(),doc(d)])),route=W.elRouteOf(lvs,a.ls).level;
+  const res=doc(await api("GET",DOCS+`students/${s.uid}/results/${rk}`))||{},old=String((res.replies||{})[step]||"").trim(),at=new Date().toISOString();
+  const note=!route||CA_RT.includes(route)?"Les teves respostes no estan fetes: torna a fer aquest pas amb les teves paraules i torna’l a entregar.":"Your answers aren't finished: do this step again in your own words and hand it in again.";
+  console.log((flags.has("--apply")?"✓ ":"→ ")+"S-"+pre+" · "+a.id+" · "+step+" · ↺ sent back to redo ("+why+") · note: "+note);
+  if(flags.has("--apply"))await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+    {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},flags:fsv({[step]:{done:"redo",reopen:true,back:note,why,at,auto:true}}),replies:fsv({[step]:note+(old?"\n\n"+old:"")}),fbSig:fsv({[step]:"redo"})}});
+  else console.log("Nothing written: run again with --apply.")}
+else{console.log("Usage: node tools/marking/marks.mjs lv-ready | lv-sheet <group> <activity> <step> | lv-apply <group> <activity> <step> <answer file> [--apply] | tn-ready | tn-apply <answer file> [--apply] | ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply] | redo <student> <activity> <step> --why \"…\" [--apply]");process.exit(1)}
