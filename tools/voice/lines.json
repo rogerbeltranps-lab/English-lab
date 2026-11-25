@@ -8478,6 +8478,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "9c4e1451",
+  "text": "I like playing video games.",
+  "say": "I like playing video games.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "6870bf63",
   "text": "I love dancing, and right now I am dancing in my room!",
   "say": "I love dancing, and right now I am dancing in my room!",
@@ -8634,6 +8640,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "0f02c10b",
+  "text": "I go swimming every Saturday.",
+  "say": "I go swimming every Saturday.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "e075c4d7",
   "text": "Mia is wearing blue shorts and new trainers. (wear)",
   "say": "Mia is wearing blue shorts and new trainers.",
@@ -8655,6 +8667,12 @@
   "key": "c9a715d9",
   "text": "Our team always scores a lot of goals. (s...)",
   "say": "Our team always scores a lot of goals.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "55864aaf",
+  "text": "We beat the other team.",
+  "say": "We beat the other team.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8697,6 +8715,12 @@
   "key": "beb6ea5c",
   "text": "We go to the beach in summer.",
   "say": "We go to the beach in summer.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0f218caf",
+  "text": "We play every weekend.",
+  "say": "We play every weekend.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8745,6 +8769,12 @@
   "key": "6575683b",
   "text": "I don't understand this exercise. Can you help me?",
   "say": "I don't understand this exercise. Can you help me?",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "30490afa",
+  "text": "I need new gloves.",
+  "say": "I need new gloves.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8838,6 +8868,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "ba78039d",
+  "text": "The band is playing my favourite song.",
+  "say": "The band is playing my favourite song.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "01c24b2b",
   "text": "This month I am training for a race, so I ride every day.",
   "say": "This month I am training for a race, so I ride every day.",
@@ -8859,6 +8895,12 @@
   "key": "66bae619",
   "text": "Be quiet, please! I am thinking about my next video.",
   "say": "Be quiet, please! I am thinking about my next video.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "22222747",
+  "text": "Leo knows all the routes.",
+  "say": "Leo knows all the routes.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8895,6 +8937,12 @@
   "key": "387dc475",
   "text": "I think this tip is the best one. (opinion)",
   "say": "I think this tip is the best one.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "db16fc53",
+  "text": "It's cold, so I'm wearing a jacket.",
+  "say": "It's cold, so I'm wearing a jacket.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9090,6 +9138,18 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "a6de7a48",
+  "text": "on the twenty-fifth of December",
+  "say": "on the twenty-fifth of December",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "afe330f8",
+  "text": "on the first of November",
+  "say": "on the first of November",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "751c6f4e",
   "text": "We wait for the fireworks.",
   "say": "We wait for the fireworks.",
@@ -9216,6 +9276,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "901f3904",
+  "text": "The Pilgrims were the people who sailed on the Mayflower.",
+  "say": "The Pilgrims were the people who sailed on the Mayflower.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "4b245752",
   "text": "The square is the place where the parade ends.",
   "say": "The square is the place where the parade ends.",
@@ -9237,6 +9303,12 @@
   "key": "cf85a250",
   "text": "Lunar New Year is the day when Mei visits her grandparents.",
   "say": "Lunar New Year is the day when Mei visits her grandparents.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a63f4714",
+  "text": "Mei is a girl from Manchester who celebrates Lunar New Year.",
+  "say": "Mei is a girl from Manchester who celebrates Lunar New Year.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9294,6 +9366,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "e8049c18",
+  "text": "We also eat panellets.",
+  "say": "We also eat panellets.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "f6c3c48a",
   "text": "Thanksgiving takes place in November. (té lloc)",
   "say": "Thanksgiving takes place in November.",
@@ -9315,6 +9393,12 @@
   "key": "851313f9",
   "text": "My little brother was frightened of the scary costumes.",
   "say": "My little brother was frightened of the scary costumes.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e62362ae",
+  "text": "I'm very interested in the origins of Halloween.",
+  "say": "I'm very interested in the origins of Halloween.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9600,6 +9684,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "47451ae1",
+  "text": "My uncle picks them up.",
+  "say": "My uncle picks them up.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "68717da3",
   "text": "The date of Diwali depends on the moon.",
   "say": "The date of Diwali depends on the moon.",
@@ -9615,6 +9705,18 @@
   "key": "a2cb6cc6",
   "text": "Spain is known for its summer festivals.",
   "say": "Spain is known for its summer festivals.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e5e97bb7",
+  "text": "Pumpkins are associated with Halloween.",
+  "say": "Pumpkins are associated with Halloween.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a6234268",
+  "text": "I'm very interested in Diwali.",
+  "say": "I'm very interested in Diwali.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9636,6 +9738,24 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "0a420eb1",
+  "text": "I used to eat panellets every 31 October.",
+  "say": "I used to eat panellets every 31 October.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2f6902c9",
+  "text": "40 years ago, people in Spain didn't use to celebrate Halloween.",
+  "say": "40 years ago, people in Spain didn't use to celebrate Halloween.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "c5513a82",
+  "text": "We used to go to the Castanyada party.",
+  "say": "We used to go to the Castanyada party.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "a68368f5",
   "text": "Irish families brought Halloween to the USA in the 1800s.",
   "say": "Irish families brought Halloween to the USA in the 1800s.",
@@ -9645,6 +9765,30 @@
   "key": "aaf6bb63",
   "text": "In their first winter, the Pilgrims didn't have enough food.",
   "say": "In their first winter, the Pilgrims didn't have enough food.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "53eb7fca",
+  "text": "My mum used to dress up as a witch every Halloween.",
+  "say": "My mum used to dress up as a witch every Halloween.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "99c162e0",
+  "text": "My dad used to go trick or treating every year.",
+  "say": "My dad used to go trick or treating every year.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "52de4914",
+  "text": "In Ireland, people used to make lanterns from turnips.",
+  "say": "In Ireland, people used to make lanterns from turnips.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "61174a97",
+  "text": "My grandmother used to sing Christmas carols with the whole family.",
+  "say": "My grandmother used to sing Christmas carols with the whole family.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9660,9 +9804,39 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "9b100ad1",
+  "text": "Samhain was a Celtic festival which marked the end of summer.",
+  "say": "Samhain was a Celtic festival which marked the end of summer.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "103534cf",
+  "text": "Panellets are small cakes which we eat at the Castanyada.",
+  "say": "Panellets are small cakes which we eat at the Castanyada.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8ec690aa",
+  "text": "Plymouth is the town where the Pilgrims arrived in 1620.",
+  "say": "Plymouth is the town where the Pilgrims arrived in 1620.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "19e4f3da",
   "text": "December is the month when Hanukkah usually takes place.",
   "say": "December is the month when Hanukkah usually takes place.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "c15b03c3",
+  "text": "Squanto was the Wampanoag man who helped the Pilgrims.",
+  "say": "Squanto was the Wampanoag man who helped the Pilgrims.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "888de102",
+  "text": "1 November is the day when many families visit the cemetery.",
+  "say": "1 November is the day when many families visit the cemetery.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9690,6 +9864,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "67db8f76",
+  "text": "Both Diwali and Hanukkah are festivals of light.",
+  "say": "Both Diwali and Hanukkah are festivals of light.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "c5349e62",
   "text": "like Christmas, Hanukkah is a celebration in December.",
   "say": "like Christmas, Hanukkah is a celebration in December.",
@@ -9702,15 +9882,45 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "3e1d4405",
+  "text": "Halloween is very different from the Castanyada.",
+  "say": "Halloween is very different from the Castanyada.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "d5e71a3f",
   "text": "unlike Thanksgiving, Halloween is not a public holiday in the USA.",
   "say": "unlike Thanksgiving, Halloween is not a public holiday in the USA.",
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "ae61b9fe",
+  "text": "Diwali lasts five days, whereas Hanukkah lasts eight days.",
+  "say": "Diwali lasts five days, whereas Hanukkah lasts eight days.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "67694a51",
   "text": "Both Mei and Noah celebrate with their families.",
   "say": "Both Mei and Noah celebrate with their families.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8b8ee2b1",
+  "text": "The parade was very exciting.",
+  "say": "The parade was very exciting.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "61e16445",
+  "text": "I was very bored during the long speech.",
+  "say": "I was very bored during the long speech.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "b8545f92",
+  "text": "The film was frightening. I was frightened.",
+  "say": "The film was frightening. I was frightened.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9804,6 +10014,24 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "0220e6bb",
+  "text": "Pumpkins are carved.",
+  "say": "Pumpkins are carved.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "92cbf59c",
+  "text": "Gifts are exchanged at midnight.",
+  "say": "Gifts are exchanged at midnight.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0a800691",
+  "text": "Chestnuts aren't sold in summer.",
+  "say": "Chestnuts aren't sold in summer.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "e4fa9774",
   "text": "Lanterns are hung in the streets.",
   "say": "Lanterns are hung in the streets.",
@@ -9822,9 +10050,39 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "5b72bbea",
+  "text": "Every 31 October, my grandmother would make panellets with us.",
+  "say": "Every 31 October, my grandmother would make panellets with us.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "d9387585",
   "text": "Diwali, which is celebrated in autumn, is the festival of lights.",
   "say": "Diwali, which is celebrated in autumn, is the festival of lights.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4403f617",
+  "text": "The Castanyada, which takes place on 31 October, is a Catalan tradition.",
+  "say": "The Castanyada, which takes place on 31 October, is a Catalan tradition.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "79c28ea8",
+  "text": "Thanksgiving, which takes place in November, became official in 1863.",
+  "say": "Thanksgiving, which takes place in November, became official in 1863.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9b9821e1",
+  "text": "Abraham Lincoln, who was president in 1863, made it official.",
+  "say": "Abraham Lincoln, who was president in 1863, made it official.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4382a6b4",
+  "text": "Diwali, which is celebrated in autumn, is known as the festival of lights.",
+  "say": "Diwali, which is celebrated in autumn, is known as the festival of lights.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9876,6 +10134,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "e537d664",
+  "text": "We are meeting the head teacher on Monday at 9.",
+  "say": "We are meeting the head teacher on Monday at 9.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "046eeef9",
   "text": "We are going to raise money for a charity. We decided it last week.",
   "say": "We are going to raise money for a charity. We decided it last week.",
@@ -9897,6 +10161,66 @@
   "key": "c39fd2ae",
   "text": "although the hall is small, we can also use the gym.",
   "say": "although the hall is small, we can also use the gym.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "e9604165",
+  "text": "Never have I seen such a spectacular parade.",
+  "say": "Never have I seen such a spectacular parade.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "c93c9525",
+  "text": "Not only is the festival beautiful, but it is also free.",
+  "say": "Not only is the festival beautiful, but it is also free.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "fffa8f4d",
+  "text": "Only when the fireworks started did we realise how late it was.",
+  "say": "Only when the fireworks started did we realise how late it was.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8ece4d6b",
+  "text": "No sooner had the clock struck twelve than everyone started singing.",
+  "say": "No sooner had the clock struck twelve than everyone started singing.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "bd86308f",
+  "text": "Little did they know that the party was for them.",
+  "say": "Little did they know that the party was for them.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2ac262ed",
+  "text": "What I love most about Sant Joan is the atmosphere.",
+  "say": "What I love most about Sant Joan is the atmosphere.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "fb15abab",
+  "text": "It was in 1863 that Lincoln made Thanksgiving a national holiday.",
+  "say": "It was in 1863 that Lincoln made Thanksgiving a national holiday.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ecdbafe4",
+  "text": "Under no circumstances must you light fireworks indoors.",
+  "say": "Under no circumstances must you light fireworks indoors.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "d8193933",
+  "text": "All I want this New Year is some peace and quiet.",
+  "say": "All I want this New Year is some peace and quiet.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ce20a148",
+  "text": "At no time did the organisers apologise.",
+  "say": "At no time did the organisers apologise.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9942,9 +10266,189 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "292ea0ae",
-  "text": "(8) …, which is easier said than done",
-  "say": "8, which is easier said than done",
+  "key": "fbcb21d7",
+  "text": "Perhaps the answer lies in lowering our expectations, which is easier said than done.",
+  "say": "Perhaps the answer lies in lowering our expectations, which is easier said than done.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0526119f",
+  "text": "Halloween is thought to have begun in Ireland.",
+  "say": "Halloween is thought to have begun in Ireland.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a4edfbd2",
+  "text": "The festival is said to date back to Celtic times.",
+  "say": "The festival is said to date back to Celtic times.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5fd70e5b",
+  "text": "The first feast is reported to have lasted three days.",
+  "say": "The first feast is reported to have lasted three days.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "92688064",
+  "text": "Every year my grandfather would light the first bonfire.",
+  "say": "Every year my grandfather would light the first bonfire.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "03ae9c23",
+  "text": "Having moved to America, Irish families started carving pumpkins.",
+  "say": "Having moved to America, Irish families started carving pumpkins.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ca52dd94",
+  "text": "It was only in 1863 that Thanksgiving became official.",
+  "say": "It was only in 1863 that Thanksgiving became official.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0303c4f3",
+  "text": "The tradition is on the verge of disappearing.",
+  "say": "The tradition is on the verge of disappearing.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "02e976c2",
+  "text": "The custom may have come from Scotland.",
+  "say": "The custom may have come from Scotland.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2b6ff497",
+  "text": "Turnips are no longer carved.",
+  "say": "Turnips are no longer carved.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5cf7e358",
+  "text": "The festival changed a lot as a result of emigration.",
+  "say": "The festival changed a lot as a result of emigration.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "cca693dc",
+  "text": "Should it rain, we will use the gym.",
+  "say": "Should it rain, we will use the gym.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "c869c722",
+  "text": "Were the hall to be full, we would open the gym.",
+  "say": "Were the hall to be full, we would open the gym.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "54d9d215",
+  "text": "The event is to take place on 11 December.",
+  "say": "The event is to take place on 11 December.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "82cbdf38",
+  "text": "By ten we will have set up the stalls.",
+  "say": "By ten we will have set up the stalls.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ed4588d6",
+  "text": "We are on the point of confirming the band.",
+  "say": "We are on the point of confirming the band.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "904435f1",
+  "text": "There are bound to be problems with the sound.",
+  "say": "There are bound to be problems with the sound.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "8c5a156e",
+  "text": "Had we known about the exam, we would have chosen another date.",
+  "say": "Had we known about the exam, we would have chosen another date.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "de08869f",
+  "text": "There is every chance that families will come.",
+  "say": "There is every chance that families will come.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9b4dafbc",
+  "text": "At eleven the band will be playing.",
+  "say": "At eleven the band will be playing.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "7b061cc4",
+  "text": "Should you need anything, please contact Laia.",
+  "say": "Should you need anything, please contact Laia.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "0e2f4d08",
+  "text": "We would be grateful if you could reply by Friday.",
+  "say": "We would be grateful if you could reply by Friday.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "101c818a",
+  "text": "Should you have any questions, please contact us.",
+  "say": "Should you have any questions, please contact us.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "47a83147",
+  "text": "Were you to agree, we would start preparations at once.",
+  "say": "Were you to agree, we would start preparations at once.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "381f0860",
+  "text": "We were wondering if we could use the hall.",
+  "say": "We were wondering if we could use the hall.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "ae6d19c0",
+  "text": "Concerns have been raised about supervision.",
+  "say": "Concerns have been raised about supervision.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9eb9dcbc",
+  "text": "We will ensure that there is no disruption to lessons.",
+  "say": "We will ensure that there is no disruption to lessons.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "7492bb90",
+  "text": "Your help is much appreciated.",
+  "say": "Your help is much appreciated.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "a39a1f8e",
+  "text": "The event will be at no cost to the school.",
+  "say": "The event will be at no cost to the school.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "282b22ff",
+  "text": "We attach great importance to the event.",
+  "say": "We attach great importance to the event.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "4392dfeb",
+  "text": "Would you be willing to meet us?",
+  "say": "Would you be willing to meet us?",
   "src": "lab/practice.html#deck"
  }
 ]

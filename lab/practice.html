@@ -217,15 +217,44 @@ const GAP = /_{2,}(?:[\s/]*_{2,})*/g;
 // en / ca: the card the other way round, Catalan first (el-flashdeck.js; Roger, 25 Nov 2026); a Pro card's "ca" is an English meaning, so none
 const vCard = (en, ca, ex, star, part, pro) => ({ id: 'v:' + norm(en), kind: 'v', part, front: esc(en), say: en, ex: ex || '', star: !!star, en, ca: pro ? '' : (ca || ''),
   back: `<div class="elfd-ans">${esc(ca || '')}</div>${ex ? `<div class="elfd-ex">${esc(ex)}</div>` : ''}` });
+// The card shows what is right, all of it (Roger, 25 Nov 2026: "the relative clauses flashcard are missleading"): every right answer
+// that only swaps who, which or that (who / that, which / that); a "join" or "fix" question (… → …) turns over to the right sentence
+// alone, never the wrong one again, and it can be heard; an answer word keeps its capital from the question (November). The step can
+// give the card its own question (fq: the open cloze line with its sentence) or its right sentence (fc: a "fix" with only → ___);
+// the card id stays the step's, so its progress is kept.
+const RELW = /^(who|whom|which|that)$/i;
+function gAlts(it, w) {   // per word of the first answer, the other right words in that place when only a relative word changes
+  const alts = w.map(x => [x]);
+  it.a.slice(1).forEach(b => { const v = String(b).split(/\s+/); if (v.length !== w.length) return;
+    const diff = v.map((x, i) => norm(x) !== norm(w[i]) ? i : -1).filter(i => i >= 0);
+    if (diff.length && diff.every(i => RELW.test(v[i]) && RELW.test(w[i]))) diff.forEach(i => { if (!alts[i].some(y => norm(y) === norm(v[i]))) alts[i].push(v[i]); }); });
+  return alts;
+}
 function gCard(it, items, kind, part, lv, salt) {
-  const q = String(it.q), a = it.a[0], n = (q.match(GAP) || []).length, w = a.split(/\s+/), mk = x => '<mark>' + esc(x) + '</mark>';
-  let k = 0;
-  const filled = n === 1 ? q.replace(GAP, mk(a)) : n > 1 && n === w.length ? q.replace(GAP, () => mk(w[k++])) : null;
-  const clean = filled && filled.replace(/(<\/mark>)\s*\((?:not \/ )?[a-z' /]+\)/gi, '$1');   // "taught (teach)" → "taught"
-  const why = elCa(base(lv)) ? (it.ca || it.en || '') : (it.en || it.ca || ''), lvB = base(lv);
+  const q = String(it.fq || it.q), a = it.a[0], pq = plain(q), mk = x => '<mark>' + esc(x) + '</mark>';
+  const w = a.split(/\s+/).map(x => { if (x === 'i') return 'I'; if (RELW.test(x)) return x;   // "which takes place in november" → November, as in the question
+    const m = pq.match(new RegExp('(?<=[a-z0-9,;] )' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w’\'])', 'i'));
+    return m && m[0] !== x && /^[A-Z]/.test(m[0]) && m[0].slice(1) === x.slice(1) ? m[0] : x; });
+  const ai = q.lastIndexOf('→'), tail0 = ai >= 0 ? q.slice(ai + 1).trim() : '', gaps = x => (String(x).match(GAP) || []).length;
+  // the sentence the card turns over to: the part after the arrow when it holds the gap (with its capital: "we used to ___." → "We…",
+  // "___ such a parade." → "Never have I seen…"), the step's fc, or the whole question as before
+  const tail = /^[a-z]/.test(tail0) && /[.!?]$/.test(plain(tail0)) ? tail0.charAt(0).toUpperCase() + tail0.slice(1) : tail0;
+  const T = tail && gaps(tail) && /[a-z]/i.test(plain(tail.replace(GAP, ''))) ? tail : ai >= 0 && it.fc ? null : q, n = T ? gaps(T) : 0;
+  if (T === tail && /^[“"‘']?_/.test(tail)) w[0] = w[0].charAt(0).toUpperCase() + w[0].slice(1);
+  const alts = gAlts(it, w);
+  const fill = list => { let k = 0, f = null;
+    if (!T) f = esc(it.fc).replace(new RegExp('\\b' + a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'), m => mk(m));
+    else if (n === 1) f = T.replace(GAP, '<mark>' + list.map(x => x.map(esc).join(' / ')).join(' ') + '</mark>');
+    else if (n > 1 && n === list.length) f = T.replace(GAP, () => '<mark>' + list[k++].map(esc).join(' / ') + '</mark>');
+    return f && f.replace(/(<\/mark>)\s*\((?:not \/ )?[a-z' /]+\)/gi, '$1'); };   // "taught (teach)" → "taught"
+  const clean = fill(alts), spoken = fill(w.map(x => [x]));
+  const lvB = base(lv), why0 = elCa(lvB) ? (it.ca || it.en || '') : (it.en || it.ca || '');
+  // "People: who." on a card that shows who / that: "who / that: both are right."
+  const two = alts.find(x => x.length > 1 && x.some(y => /^that$/i.test(y)));
+  const why = why0 && two && !/\bthat\b/i.test(plain(why0)) ? plain(why0) + ' ' + two.join(' / ') + (elCa(lvB) ? ': les dues són correctes.' : ': both are right.') : why0;
   const opts = lvB === 'beginners' ? (it.opts || choices(it, items, salt)) : lvB === 'insecure' ? (it.opts || null) : null;
-  return { id: 'g:' + hash(plain(q) + '|' + a), kind, part, front: q.replace(GAP, '<span class="elfd-gap"></span>'), opts,
-    say: clean && !/→|:/.test(plain(q)) ? plain(clean) : '',
+  return { id: 'g:' + hash(plain(it.q) + '|' + a), kind, part, front: q.replace(GAP, '<span class="elfd-gap"></span>'), opts,
+    say: spoken && !/→|:/.test(plain(spoken)) ? (T === q ? plain(spoken) : plain(spoken).replace(/\s+([.,!?;:])/g, '$1')) : '',
     back: `<div class="elfd-ans">${clean || mk(a)}</div>${why ? `<div class="elfd-why">💡 ${esc(plain(why))}</div>` : ''}` };
 }
 

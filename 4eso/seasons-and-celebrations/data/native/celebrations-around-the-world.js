@@ -138,7 +138,7 @@ window.LP.native = {
       { q: '(5) not the celebrations…, ___ rather the pressure', a: ['but'], en: 'not X but rather Y.' },
       { q: '(6) ___ more we expect to feel, the more we notice…', a: ['the'], en: 'The more…, the more…' },
       { q: '(7) the answer lies ___ lowering our expectations', a: ['in'], en: 'lie in = consist of, be found in.' },
-      { q: '(8) …, ___ is easier said than done', a: ['which'], en: 'Sentence relative clause: which refers to the whole idea.' }
+      { q: '(8) …, ___ is easier said than done', fq: 'Perhaps the answer lies in lowering our expectations, ___ is easier said than done.', a: ['which'], en: 'Sentence relative clause: which refers to the whole idea.' }
     ] },
 
   write: { type: 'writing', product: 1, tab: 'Writing', title: 'Piece 1: an article (C2 Proficiency Writing, Part 2)',

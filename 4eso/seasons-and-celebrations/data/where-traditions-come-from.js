@@ -482,7 +482,7 @@ window.LP = (function () {
         { p: 'rel', only: ['daring', 'native'], k: 'fix', q: '“The Castanyada, that takes place on 31 October, is a Catalan tradition.” → The Castanyada, ___ takes place on 31 October, is a Catalan tradition.', a: ['which'], en: 'Non-defining relatives never use that.' },
         { p: 'rel', r: 'daring', k: 'join', q: 'Thanksgiving became official in 1863. It takes place in November. → Thanksgiving, ___ ___ ___ ___ ___, became official in 1863.', a: ['which takes place in november'], en: 'Non-defining relative with which, between commas.' },
         { p: 'rel', r: 'daring', k: 'join', q: 'Abraham Lincoln made it official. He was president in 1863. → Abraham Lincoln, ___ ___ ___ ___ ___, made it official.', a: ['who was president in 1863'], en: 'Non-defining relative with who.' },
-        { p: 'rel', r: 'daring', k: 'fix', q: '“Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' },
+        { p: 'rel', r: 'daring', k: 'fix', q: '“Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], fc: 'Diwali, which is celebrated in autumn, is known as the festival of lights.', en: 'Non-defining relatives never use that.' },
         /* ➕ extra: Starter and Base */
         { p: 'rel', only: ['beginners', 'insecure'], opts: ['where', 'which', 'who'], q: 'The square is the place ___ the parade ends.', a: ['where'], ca: 'Lloc → where.', en: 'A place → where.' },
         { p: 'rel', only: ['beginners', 'insecure'], q: 'Halloween is a festival ___ started in Ireland.', a: ['which', 'that'], d: ['who', 'where'], ca: 'Cosa → which.', en: 'A thing → which.' },
