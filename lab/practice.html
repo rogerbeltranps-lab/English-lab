@@ -521,6 +521,7 @@ function fdSave(P) {
   if (fdAs()) { fdView = P; return; }
   try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
   fdSum(P);
+  if (window.elMascotRefresh) elMascotRefresh();   // the ⚡ streak in the bottom-right bar follows at once
   if (fdCloudOn()) F.setDoc(fdRef(), { p: JSON.stringify(P), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
 }
 let fd = null, fdRead = null;

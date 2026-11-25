@@ -899,8 +899,11 @@ function mzBar(ca){
   const M=window.ELMascot,x=M.data(AS?null:(user||{}).uid,P);if(!x)return null;
   const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
   const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");
-  a.dataset.tip=tip;a.setAttribute("aria-label",tip);a.innerHTML=M.badge(n,"sm")+M.img(M.mood(x),50,"");
+  a.dataset.tip=tip;a.dataset.ca=ca?"1":"";a.setAttribute("aria-label",tip);a.innerHTML=M.badge(n,"sm")+M.img(M.mood(x),50,"");
   return a}
+// the flashcards page calls it after saving, so the ⚡ number and the mood follow the cards just studied without a reload
+// (problem report, 4ESOA, 25 Nov 2026: the bar still said ⚡ 0 after studying)
+window.elMascotRefresh=()=>{const old=document.querySelector(".elcb-mz");if(!old)return;const n=mzBar(old.dataset.ca==="1");if(n)old.replaceWith(n)};
 // 🔔 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
 // shared/js/el-notify.js): corrections, answers, redo, exam results, problem answers and announcements, as the student sees them. Built
 // from the reads the cards already make (results copy, students/{uid}, the two card loads): nothing held shows early, no reads of its own.
