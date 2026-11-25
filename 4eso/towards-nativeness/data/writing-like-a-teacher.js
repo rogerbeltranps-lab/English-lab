@@ -44,51 +44,51 @@ window.LP = {
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: An email that works', pill: 'C1',
       intro: 'A department head writes to a new colleague about how to write to families. Read for the advice.',
       media: { text: '<p><strong>Subject: A few tips before your first parents’ emails</strong></p>' +
-        '<p>Dear Laia,</p>' +
+        '<p>Dear Oriol,</p>' +
         '<p>Welcome to the department! As promised at yesterday’s staff meeting, here are a few tips for writing to families. None of this is in the official guide, but it has saved me a lot of trouble over the years.</p>' +
         '<p>First, keep it short. Parents read our emails on their phones, usually at the end of a long day. Three short paragraphs are plenty: what has happened, what you would like them to do, and when. If there is a deadline, put it in the first two lines. A good test is whether the email still makes sense if they only read the subject line and the first sentence.</p>' +
         '<p>Second, avoid our own jargon. We talk about <em>LSs</em>, <em>criteria</em> and <em>indicators</em> all day, but most families have no idea what an LS is. Write “the project we’re doing this term” instead. The same goes for the words we borrow from Catalan without noticing: in English it is <em>next school year</em>, not <em>the next course</em>, and the building we work in is <em>the school</em>, not <em>the centre</em>.</p>' +
         '<p>Third, be careful with feedback. Feedback is uncountable, so you give <em>some feedback</em> or <em>a piece of feedback</em>, never <em>a feedback</em>. More importantly, start with something the student has done well, even if it is small. Families are far more likely to support you if they feel you’ve noticed their child.</p>' +
         '<p>Finally, never send anything in anger. If an email from a family upsets you, write your reply, save it as a draft and read it again the next morning. You will almost always end up changing it, and you will rarely regret the delay.</p>' +
         '<p>I’m attaching the template I use for the first email of the year. Feel free to adapt it to your own style.</p>' +
-        '<p>Best wishes,<br>Montse</p>' },
+        '<p>Best wishes,<br>Pere</p>' },
       items: [
-        { q: 'Why does Montse recommend short emails?', o: ['Parents read them on their phones after a long day.', 'Long emails are against school rules.', 'Short emails sound more polite.'] },
+        { q: 'Why does Pere recommend short emails?', o: ['Parents read them on their phones after a long day.', 'Long emails are against school rules.', 'Short emails sound more polite.'] },
         { q: 'Where should a deadline go?', o: ['in the first two lines', 'at the end', 'in the subject line only'] },
-        { q: 'What does she suggest instead of “LS”?', o: ['“the project we’re doing this term”', '“the learning situation”', '“the unit”'] },
+        { q: 'What does he suggest instead of “LS”?', o: ['“the project we’re doing this term”', '“the learning situation”', '“the unit”'] },
         { q: 'Which is correct, according to the email?', o: ['some feedback', 'a feedback', 'feedbacks'] },
         { q: 'Why start with something the student has done well?', o: ['Families support you more if they feel you’ve noticed their child.', 'It is required by the official guide.', 'It makes the email shorter.'] },
-        { q: 'What does she advise when a family email upsets you?', o: ['Save your reply as a draft and reread it the next morning.', 'Forward it to the head of department.', 'Reply immediately and honestly.'] }
+        { q: 'What does he advise when a family email upsets you?', o: ['Save your reply as a draft and reread it the next morning.', 'Forward it to the head of department.', 'Reply immediately and honestly.'] }
       ] },
 
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The staff meeting', pill: 'C1 · three voices',
       intro: 'Part of a department meeting. Listen for the decisions and who will do what.',
       media: { audio: 'audio/lp4-staff-meeting.mp3', title: 'The staff meeting', script: [
-        ['Montse', 'Okay, everyone, let’s make a start. We’ve only got forty minutes. First item: the programme for next school year.'],
+        ['Pere', 'Okay, everyone, let’s make a start. We’ve only got forty minutes. First item: the programme for next school year.'],
         ['David', 'Have the criteria changed again?'],
-        ['Montse', 'Some of them have. The new criteria are in the master document. I’ve highlighted the ones that are different.'],
-        ['Laia', 'Sorry, quick question. Is there one indicator per criterion, or more?'],
-        ['Montse', 'Three per criterion, at least for second and fourth ESO. Which reminds me, David, could you adapt the second ESO LSs to the new criteria by the end of the month?'],
-        ['David', 'Sure. Although that’s a lot of work. Could Laia give me a hand with the indicators?'],
-        ['Laia', 'Happy to. I’ve got a free period on Thursdays.'],
-        ['Montse', 'Perfect. Second item: parents’ evening. It’s next Thursday from five to eight. Please hand in your reports by Tuesday so that I can check them.'],
+        ['Pere', 'Some of them have. The new criteria are in the master document. I’ve highlighted the ones that are different.'],
+        ['Oriol', 'Sorry, quick question. Is there one indicator per criterion, or more?'],
+        ['Pere', 'Three per criterion, at least for second and fourth ESO. Which reminds me, David, could you adapt the second ESO LSs to the new criteria by the end of the month?'],
+        ['David', 'Sure. Although that’s a lot of work. Could Oriol give me a hand with the indicators?'],
+        ['Oriol', 'Happy to. I’ve got a free period on Thursdays.'],
+        ['Pere', 'Perfect. Second item: parents’ evening. It’s next Thursday from five to eight. Please hand in your reports by Tuesday so that I can check them.'],
         ['David', 'Tuesday? That’s a bit tight.'],
-        ['Montse', 'I know, but the head wants them on the website by Wednesday. And please, keep the comments short and give some positive feedback first.'],
-        ['Laia', 'Should we email the families as well?'],
-        ['Montse', 'Yes. I’m sending you a template right now. There you go. Adapt it as much as you like, but don’t use too much jargon. Families don’t know what an LS is.'],
+        ['Pere', 'I know, but the head wants them on the website by Wednesday. And please, keep the comments short and give some positive feedback first.'],
+        ['Oriol', 'Should we email the families as well?'],
+        ['Pere', 'Yes. I’m sending you a template right now. There you go. Adapt it as much as you like, but don’t use too much jargon. Families don’t know what an LS is.'],
         ['David', 'Fair enough. Anything else?'],
-        ['Montse', 'Just one thing. Can somebody cover my class on Friday? I’ve got a course in Barcelona.'],
-        ['Laia', 'I can do it.'],
-        ['Montse', 'Brilliant. Thanks, Laia. Right, that’s everything.']
+        ['Pere', 'Just one thing. Can somebody cover my class on Friday? I’ve got a course in Barcelona.'],
+        ['Oriol', 'I can do it.'],
+        ['Pere', 'Brilliant. Thanks, Oriol. Right, that’s everything.']
       ] },
       chunks: ['the programme for next school year', 'the new criteria are in the master document', 'adapt the second ESO LSs to the new criteria', 'give some positive feedback first', 'can somebody cover my class'],
       items: [
         { q: 'Where are the new criteria?', o: ['in the master document', 'on the website', 'in an email from the head'] },
         { q: 'How many indicators does each criterion have?', o: ['three', 'one', 'it depends on the teacher'] },
-        { q: 'What will David do by the end of the month?', o: ['adapt the 2nd ESO LSs to the new criteria', 'write the parents’ emails', 'cover Montse’s class'] },
-        { q: 'Why must reports be handed in by Tuesday?', o: ['The head wants them on the website by Wednesday.', 'Parents’ evening is on Tuesday.', 'Montse is away on Friday.'] },
-        { q: 'What does Montse do while she talks about the template?', o: ['She sends it.', 'She prints it.', 'She reads it aloud.'] },
-        { q: 'Why does Montse need someone to cover her class?', o: ['She has a course in Barcelona.', 'She is ill.', 'She has a meeting with the head.'] }
+        { q: 'What will David do by the end of the month?', o: ['adapt the 2nd ESO LSs to the new criteria', 'write the parents’ emails', 'cover Pere’s class'] },
+        { q: 'Why must reports be handed in by Tuesday?', o: ['The head wants them on the website by Wednesday.', 'Parents’ evening is on Tuesday.', 'Pere is away on Friday.'] },
+        { q: 'What does Pere do while he talks about the template?', o: ['He sends it.', 'He prints it.', 'He reads it aloud.'] },
+        { q: 'Why does Pere need someone to cover his class?', o: ['He has a course in Barcelona.', 'He is ill.', 'He has a meeting with the head.'] }
       ] },
 
     { id: 'movie', type: 'movie', tab: '🎬 Movie dictation', title: 'Movie dictation: speeches and big moments', pill: 'Real films',
@@ -161,7 +161,7 @@ window.LP = {
     { id: 'write', type: 'writing', tab: 'Writing', title: 'Writing: an email presenting one of your LSs',
       intro: 'This is the final product of LS3 in your learning situations doc. Your text goes to your teacher for correction: grammar and idiom only.',
       task: 'Write an email (180–230 words) to the head of department, or to a colleague from another school, presenting one of your learning situations: its title, level, objectives, final product and how it is assessed. No Catalan school words, every this / these and a / an correct, no chains of “of”.',
-      model: 'Subject: Seasons & Celebrations, our 4th ESO LS for the first term\n\nDear Montse,\n\nAs we agreed at the last staff meeting, I’m attaching a summary of the LS I’ve designed for 4th ESO this term…',
+      model: 'Subject: Seasons & Celebrations, our 4th ESO LS for the first term\n\nDear Pere,\n\nAs we agreed at the last staff meeting, I’m attaching a summary of the LS I’ve designed for 4th ESO this term…',
       min: { daring: 180 },
       checklist: { daring: ['subject line and a clear opening sentence', 'English school words only (next school year, the school, master document…)', 'a / an by sound (an LS)', 'these + plural, criterion / criteria', 'feedback, info, code with no a', 'compounds and ’s instead of chains of of'] } },
 

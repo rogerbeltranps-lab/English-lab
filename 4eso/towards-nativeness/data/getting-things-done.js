@@ -63,30 +63,30 @@ window.LP = {
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The Monday meeting', pill: 'C1 · two voices',
       intro: 'A head of department and a teacher share out the jobs for the week. Listen for who does what.',
       media: { audio: 'audio/lp2-monday-meeting.mp3', title: 'The Monday meeting', script: [
-        ['Claire', 'Right, let’s get this over with, shall we? We’ve got a lot to get through this week.'],
+        ['James', 'Right, let’s get this over with, shall we? We’ve got a lot to get through this week.'],
         ['Marc', 'Go ahead. I’ve got my list here.'],
-        ['Claire', 'First, the exams. Have you made the second version yet?'],
+        ['James', 'First, the exams. Have you made the second version yet?'],
         ['Marc', 'Not yet, I’m afraid. I’ve been putting it off, to be honest. I’ll make it tonight and send it to you tomorrow morning.'],
-        ['Claire', 'Perfect. And I’d like you to do a quick test with the answer key before you send it. Last time there were two mistakes in it.'],
+        ['James', 'Perfect. And I’d like you to do a quick test with the answer key before you send it. Last time there were two mistakes in it.'],
         ['Marc', 'Fair point. I’ll do that.'],
-        ['Claire', 'Second thing. The head wants every department to make changes to the reports. She wants them to be shorter and to include one comment per student.'],
+        ['James', 'Second thing. The head wants every department to make changes to the reports. She wants them to be shorter and to include one comment per student.'],
         ['Marc', 'One comment per student? For a hundred and twenty students? That’s a daunting task.'],
-        ['Claire', 'I know, but she won’t let us skip it. What I was wondering is if we could share it out. You deal with fourth, I’ll deal with second.'],
+        ['James', 'I know, but she won’t let us skip it. What I was wondering is if we could share it out. You deal with fourth, I’ll deal with second.'],
         ['Marc', 'That sounds fair. And the parents who haven’t replied about the trip?'],
-        ['Claire', 'I’ll chase them up. I’m sending the reminder as we speak, actually. There, done.'],
+        ['James', 'I’ll chase them up. I’m sending the reminder as we speak, actually. There, done.'],
         ['Marc', 'Great. Anything else?'],
-        ['Claire', 'Just one. The new website. I’m not sold on the colours. Could you ask the students to vote on two options? Let them choose, it’s their site.'],
+        ['James', 'Just one. The new website. I’m not sold on the colours. Could you ask the students to vote on two options? Let them choose, it’s their site.'],
         ['Marc', 'Good idea. I’ll make a quick poll.'],
-        ['Claire', 'Lovely. Right, I think that’s everything. Thanks, Marc, you’re doing a great job.']
+        ['James', 'Lovely. Right, I think that’s everything. Thanks, Marc, you’re doing a great job.']
       ] },
       chunks: ['let’s get this over with', 'I’ve been putting it off', 'do a quick test with the answer key', 'I’ll chase them up', 'let them choose'],
       items: [
-        { q: 'Why hasn’t Marc made the second exam yet?', o: ['He’s been putting it off.', 'He was ill.', 'Claire told him to wait.'] },
-        { q: 'What does Claire ask Marc to do before he sends the exam?', o: ['test it with the answer key', 'show it to the head', 'make it shorter'] },
+        { q: 'Why hasn’t Marc made the second exam yet?', o: ['He’s been putting it off.', 'He was ill.', 'James told him to wait.'] },
+        { q: 'What does James ask Marc to do before he sends the exam?', o: ['test it with the answer key', 'show it to the head', 'make it shorter'] },
         { q: 'What does the head want the reports to be like?', o: ['shorter, with one comment per student', 'longer and more detailed', 'the same as last year'] },
-        { q: 'How do they solve the problem of the reports?', o: ['They share them out by year group.', 'Claire does them all.', 'They ask the head for more time.'] },
-        { q: 'What is Claire doing while she talks about the parents?', o: ['sending the reminder', 'writing the poll', 'making the exam'] },
-        { q: 'How will they choose the website colours?', o: ['The students will vote on two options.', 'Claire will decide.', 'The head will choose.'] }
+        { q: 'How do they solve the problem of the reports?', o: ['They share them out by year group.', 'James does them all.', 'They ask the head for more time.'] },
+        { q: 'What is James doing while he talks about the parents?', o: ['sending the reminder', 'writing the poll', 'making the exam'] },
+        { q: 'How will they choose the website colours?', o: ['The students will vote on two options.', 'James will decide.', 'The head will choose.'] }
       ] },
 
     { id: 'movie', type: 'movie', tab: '🎬 Movie dictation', title: 'Movie dictation: going for it', pill: 'Real films',

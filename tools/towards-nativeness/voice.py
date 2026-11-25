@@ -10,11 +10,12 @@ from kokoro_onnx import Kokoro
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LS = os.path.join(ROOT, '4eso', 'towards-nativeness')
-VOICES = {  # speaker -> (voice, lang)
-    'Anna': ('af_heart', 'en-us'), 'Tom': ('am_michael', 'en-us'),
-    'Claire': ('af_heart', 'en-us'), 'Marc': ('bm_george', 'en-gb'),
-    'Host': ('af_heart', 'en-us'), 'Jordi': ('am_puck', 'en-us'),
-    'Montse': ('af_heart', 'en-us'), 'David': ('bm_lewis', 'en-gb'), 'Laia': ('bf_isabella', 'en-gb'),
+VOICES = {  # speaker -> (voice, lang). Since 25 Nov 2026 every speaker is a man (Roger: "I wanted a man"); the ElevenLabs
+    # recordings come from listenings-eleven.mjs, this Kokoro version stays as the free fallback.
+    'Sam': ('am_michael', 'en-us'), 'Tom': ('am_puck', 'en-us'),
+    'James': ('am_michael', 'en-us'), 'Marc': ('bm_george', 'en-gb'),
+    'Host': ('am_michael', 'en-us'), 'Jordi': ('am_puck', 'en-us'),
+    'Pere': ('am_michael', 'en-us'), 'David': ('bm_lewis', 'en-gb'), 'Oriol': ('am_puck', 'en-us'),
 }
 k = Kokoro(sys.argv[2], sys.argv[3])
 force = '--force' in sys.argv
