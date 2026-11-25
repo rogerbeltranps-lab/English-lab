@@ -8556,9 +8556,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "9efe539a",
-  "text": "are you listening to music? — Yes, I am.",
-  "say": "are you listening to music? — Yes, I am.",
+  "key": "acec48fa",
+  "text": "Are you listening to music? — Yes, I am.",
+  "say": "Are you listening to music? — Yes, I am.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8580,9 +8580,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "1a752e36",
-  "text": "do you usually train on Tuesdays? — Yes, we do.",
-  "say": "do you usually train on Tuesdays? — Yes, we do.",
+  "key": "ac473396",
+  "text": "Do you usually train on Tuesdays? — Yes, we do.",
+  "say": "Do you usually train on Tuesdays? — Yes, we do.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8604,9 +8604,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "4d463e73",
-  "text": "do you like playing online? — Yes, I do.",
-  "say": "do you like playing online? — Yes, I do.",
+  "key": "5d036853",
+  "text": "Do you like playing online? — Yes, I do.",
+  "say": "Do you like playing online? — Yes, I do.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8754,9 +8754,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "eb117b2e",
-  "text": "do you know the rules of this game?",
-  "say": "do you know the rules of this game?",
+  "key": "cfb0844e",
+  "text": "Do you know the rules of this game?",
+  "say": "Do you know the rules of this game?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8790,9 +8790,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "c17975fa",
-  "text": "keep your phone out of your bedroom. (mantenir)",
-  "say": "keep your phone out of your bedroom.",
+  "key": "344ece9a",
+  "text": "Keep your phone out of your bedroom. (mantenir)",
+  "say": "Keep your phone out of your bedroom.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -8856,9 +8856,27 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "7336a7f1",
+  "text": "She's studying for the exam.",
+  "say": "She's studying for the exam.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "928207d8",
+  "text": "They are running in the park.",
+  "say": "They are running in the park.",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "9f37f01f",
   "text": "Twenty teams are taking part in the tournament this weekend.",
   "say": "Twenty teams are taking part in the tournament this weekend.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "54d5b362",
+  "text": "Why are the fans cheering?",
+  "say": "Why are the fans cheering?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9354,15 +9372,15 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "5c4ebb4a",
-  "text": "first , we clean the house. Then we decorate it.",
-  "say": "first , we clean the house. Then we decorate it.",
+  "key": "28e2612a",
+  "text": "First , we clean the house. Then we decorate it.",
+  "say": "First , we clean the house. Then we decorate it.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "a1b29d99",
-  "text": "finally , we all eat together.",
-  "say": "finally , we all eat together.",
+  "key": "c0968e39",
+  "text": "Finally , we all eat together.",
+  "say": "Finally , we all eat together.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9468,9 +9486,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "90c9ec04",
-  "text": "First, we clean the house. then , we decorate it.",
-  "say": "First, we clean the house. then , we decorate it.",
+  "key": "e00fa8e4",
+  "text": "First, we clean the house. Then , we decorate it.",
+  "say": "First, we clean the house. Then , we decorate it.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9486,9 +9504,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "be7fa784",
-  "text": "there will be music and food.",
-  "say": "there will be music and food.",
+  "key": "76e46924",
+  "text": "There will be music and food.",
+  "say": "There will be music and food.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9522,9 +9540,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "40bbf0d1",
-  "text": "there will be a stall for each festival.",
-  "say": "there will be a stall for each festival.",
+  "key": "98dce571",
+  "text": "There will be a stall for each festival.",
+  "say": "There will be a stall for each festival.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9564,9 +9582,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "7eb39e4f",
-  "text": "does your family decorate the house? — Yes, it does.",
-  "say": "does your family decorate the house? — Yes, it does.",
+  "key": "c2cc826f",
+  "text": "Does your family decorate the house? — Yes, it does.",
+  "say": "Does your family decorate the house? — Yes, it does.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9576,9 +9594,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "006eb838",
-  "text": "does Diwali last five days?",
-  "say": "does Diwali last five days?",
+  "key": "07112398",
+  "text": "Does Diwali last five days?",
+  "say": "Does Diwali last five days?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9606,9 +9624,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "68149208",
-  "text": "are you going to come?",
-  "say": "are you going to come?",
+  "key": "cf516428",
+  "text": "Are you going to come?",
+  "say": "Are you going to come?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9750,6 +9768,12 @@
   "src": "lab/practice.html#deck"
  },
  {
+  "key": "adf492c4",
+  "text": "Did people use to wear masks at Samhain?",
+  "say": "Did people use to wear masks at Samhain?",
+  "src": "lab/practice.html#deck"
+ },
+ {
   "key": "c5513a82",
   "text": "We used to go to the Castanyada party.",
   "say": "We used to go to the Castanyada party.",
@@ -9846,9 +9870,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "d7e907df",
-  "text": "both Halloween and the Castanyada take place on 31 October.",
-  "say": "both Halloween and the Castanyada take place on 31 October.",
+  "key": "1626eb3f",
+  "text": "Both Halloween and the Castanyada take place on 31 October.",
+  "say": "Both Halloween and the Castanyada take place on 31 October.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9858,9 +9882,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "cd71ca6f",
-  "text": "unlike Halloween, the Castanyada is a family celebration at home.",
-  "say": "unlike Halloween, the Castanyada is a family celebration at home.",
+  "key": "5262230f",
+  "text": "Unlike Halloween, the Castanyada is a family celebration at home.",
+  "say": "Unlike Halloween, the Castanyada is a family celebration at home.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9870,9 +9894,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "c5349e62",
-  "text": "like Christmas, Hanukkah is a celebration in December.",
-  "say": "like Christmas, Hanukkah is a celebration in December.",
+  "key": "6944c8c2",
+  "text": "Like Christmas, Hanukkah is a celebration in December.",
+  "say": "Like Christmas, Hanukkah is a celebration in December.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -9888,9 +9912,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "d5e71a3f",
-  "text": "unlike Thanksgiving, Halloween is not a public holiday in the USA.",
-  "say": "unlike Thanksgiving, Halloween is not a public holiday in the USA.",
+  "key": "293e4b9f",
+  "text": "Unlike Thanksgiving, Halloween is not a public holiday in the USA.",
+  "say": "Unlike Thanksgiving, Halloween is not a public holiday in the USA.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10002,15 +10026,15 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "d07dabb9",
-  "text": "would it be possible to start at 10.00?",
-  "say": "would it be possible to start at 10.00?",
+  "key": "7ec46fd9",
+  "text": "Would it be possible to start at 10.00?",
+  "say": "Would it be possible to start at 10.00?",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "085e6f79",
-  "text": "could we put up posters in the corridor?",
-  "say": "could we put up posters in the corridor?",
+  "key": "ee2fa719",
+  "text": "Could we put up posters in the corridor?",
+  "say": "Could we put up posters in the corridor?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10086,15 +10110,15 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "7e2448cd",
-  "text": "although Halloween started in Europe, it is now very popular in the USA.",
-  "say": "although Halloween started in Europe, it is now very popular in the USA.",
+  "key": "0388ecad",
+  "text": "Although Halloween started in Europe, it is now very popular in the USA.",
+  "say": "Although Halloween started in Europe, it is now very popular in the USA.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "353ee177",
-  "text": "Many families love the feast. on the other hand , some Native Americans see it as a day of mourning. (3 words)",
-  "say": "Many families love the feast. on the other hand , some Native Americans see it as a day of mourning.",
+  "key": "d886b217",
+  "text": "Many families love the feast. On the other hand , some Native Americans see it as a day of mourning. (3 words)",
+  "say": "Many families love the feast. On the other hand , some Native Americans see it as a day of mourning.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10110,9 +10134,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "8bb41cb1",
-  "text": "although it is commercialised, Halloween is still fun for children.",
-  "say": "although it is commercialised, Halloween is still fun for children.",
+  "key": "214a9411",
+  "text": "Although it is commercialised, Halloween is still fun for children.",
+  "say": "Although it is commercialised, Halloween is still fun for children.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10158,9 +10182,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "c39fd2ae",
-  "text": "although the hall is small, we can also use the gym.",
-  "say": "although the hall is small, we can also use the gym.",
+  "key": "0efc72ce",
+  "text": "Although the hall is small, we can also use the gym.",
+  "say": "Although the hall is small, we can also use the gym.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10224,45 +10248,45 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "fc064de5",
-  "text": "(1) supposedly devoted to joy",
-  "say": "1 supposedly devoted to joy",
+  "key": "e3e262ad",
+  "text": "For a season supposedly devoted to joy, December can be strangely exhausting.",
+  "say": "For a season supposedly devoted to joy, December can be strangely exhausting.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "c3de75f8",
-  "text": "(2) with the endless lists… (= because of all)",
-  "say": "2 with the endless lists",
+  "key": "976da053",
+  "text": "With the endless lists, the crowded shops and the obligatory gatherings, many people reach January feeling as though they need a holiday from their holidays.",
+  "say": "With the endless lists, the crowded shops and the obligatory gatherings, many people reach January feeling as though they need a holiday from their holidays.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "37e72b25",
-  "text": "(3) feeling as though they need a holiday",
-  "say": "3 feeling as though they need a holiday",
+  "key": "e6ba3e63",
+  "text": "Many people reach January feeling as though they need a holiday from their holidays.",
+  "say": "Many people reach January feeling as though they need a holiday from their holidays.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "d996107e",
-  "text": "(4) it is not the celebrations themselves that wear us down",
-  "say": "4 it is not the celebrations themselves that wear us down",
+  "key": "dfe6ec59",
+  "text": "Psychologists point out that it is not the celebrations themselves that wear us down.",
+  "say": "Psychologists point out that it is not the celebrations themselves that wear us down.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "672dce9d",
-  "text": "(5) not the celebrations…, but rather the pressure",
-  "say": "5 not the celebrations, but rather the pressure",
+  "key": "e8c205a0",
+  "text": "It is not the celebrations that wear us down, but rather the pressure to enjoy them.",
+  "say": "It is not the celebrations that wear us down, but rather the pressure to enjoy them.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "82d818a6",
-  "text": "(6) the more we expect to feel, the more we notice…",
-  "say": "6 the more we expect to feel, the more we notice",
+  "key": "ff2065b8",
+  "text": "The more we expect to feel, the more we notice what we are not feeling.",
+  "say": "The more we expect to feel, the more we notice what we are not feeling.",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "22b56dcc",
-  "text": "(7) the answer lies in lowering our expectations",
-  "say": "7 the answer lies in lowering our expectations",
+  "key": "747a4973",
+  "text": "Perhaps the answer lies in lowering our expectations.",
+  "say": "Perhaps the answer lies in lowering our expectations.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10329,6 +10353,54 @@
   "key": "5cf7e358",
   "text": "The festival changed a lot as a result of emigration.",
   "say": "The festival changed a lot as a result of emigration.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "7473294a",
+  "text": "Many customs we think of as ancient are, in fact, surprisingly recent.",
+  "say": "Many customs we think of as ancient are, in fact, surprisingly recent.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "2c0e25d5",
+  "text": "The historian Eric Hobsbawm called such customs \"invented traditions\": practices that claim continuity with the past.",
+  "say": "The historian Eric Hobsbawm called such customs \"invented traditions\": practices that claim continuity with the past.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "88d8be4f",
+  "text": "Invented traditions were created to give a group a sense of belonging.",
+  "say": "Invented traditions were created to give a group a sense of belonging.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "62b97253",
+  "text": "The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any ancestral clan custom.",
+  "say": "The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any ancestral clan custom.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "9c23fcbd",
+  "text": "None of this makes such traditions meaningless.",
+  "say": "None of this makes such traditions meaningless.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "5b27642f",
+  "text": "Their attraction lies precisely in the fact that they feel old.",
+  "say": "Their attraction lies precisely in the fact that they feel old.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "dfb05b0a",
+  "text": "The willingness of people to embrace them says a great deal about our need for roots.",
+  "say": "The willingness of people to embrace them says a great deal about our need for roots.",
+  "src": "lab/practice.html#deck"
+ },
+ {
+  "key": "81df09a7",
+  "text": "Critics who dismiss them as mere fabrications miss the point.",
+  "say": "Critics who dismiss them as mere fabrications miss the point.",
   "src": "lab/practice.html#deck"
  },
  {
