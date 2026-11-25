@@ -76,6 +76,9 @@
     .wbox{width:100%;border:2px solid #cbd5e1;border-radius:14px;padding:10px 12px;line-height:1.5;resize:vertical;font:inherit}
     .chk{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:10px 14px;margin:8px 0;display:flex;flex-direction:column;gap:6px}
     .pq{margin:6px 0}
+    .rqdots{display:flex;gap:6px;margin:6px 0 12px}.rqdots span{width:38px;height:8px;border-radius:99px;background:#e9d5ff}.rqdots .on{background:#7c3aed}.rqdots .done{background:#4c1d95}
+    .rqcard{border:2px solid #7c3aed;border-radius:18px;padding:16px 18px;background:#faf5ff;margin:0 0 12px}.rqn{font-size:.8rem;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.04em}
+    .rqq{font-size:1.4rem;font-weight:750;line-height:1.3;margin:8px 0}.rqstart{background:#fff4dc;color:#7a4a00;border-radius:12px;padding:8px 12px;font-weight:650;display:inline-block;margin:4px 0}
     .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -225,7 +228,7 @@ function gCard(it, items, kind, part, lv, salt) {
 
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
 function extract(pg, lv, off) {
-  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
     (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'), lv === 'native')); }));
@@ -237,6 +240,7 @@ function extract(pg, lv, off) {
   }
   const texts = [], PS = panelsOf(pg, lv), mainG = PS.find(p => p.type === 'typed' && p.id === 'grammar') || PS.find(p => p.type === 'typed' && /^grammar/.test(p.id));
   PS.filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
+    out.tabs.push({ t: at + '#' + p.id, dir: pg.dir });   // the tabs open for the group: 🎲 Random questions draw from them
     // 🧠 Flashcards (Roger, 24 Nov 2026): every word of the Vocabulary steps and every grammar / 💬 Expressions question of the tabs open
     // for the group, at the student's route, go to the LS deck (shared/js/el-flashdeck.js)
     if (Array.isArray(p.groups) && p.groups.some(g => Array.isArray(g.items))) {
@@ -347,7 +351,7 @@ async function content() {
   pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).forEach(l => { if (!L.includes(l)) L.push(l);
     const ok = all() || c === myCourse() ? canDo : otherDo;
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
-  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], cards: [], lps: acts, ls: L };
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
   // Only the tabs the learning path itself shows (Roger, 22 Nov 2026: "Why some 4ESO students could do the future forms if they are scheduled
   // for next Wednesday?"): a tab the teacher locked, or one the Time plan keeps for a later class (or none yet), stays out of Practise
@@ -361,7 +365,7 @@ async function content() {
 }
 // 🎯 Practise per LS (Roger, 25 Nov 2026: "I want practice per LSs, so you can choose on LS (grammar, vocab, listening, reading, writing,
 // speaking) or both"): content() reads every LS once; view() keeps one LS ('all' = every LS mixed) and, for the teacher, one learning path
-const SKILLS = ['words', 'grammar', 'build', 'listen', 'read', 'write', 'speak', 'shadow'];
+const SKILLS = ['words', 'grammar', 'build', 'listen', 'read', 'write', 'speak', 'shadow', 'tabs'];
 function view(A, ls) {
   const V = Object.assign({}, A), seen = new Set(), on = y => (ls === 'all' || y.ls.id === ls) && (S.lp === 'all' || y.act === S.lp);
   SKILLS.forEach(k => { V[k] = A[k].filter(on); });
@@ -370,7 +374,7 @@ function view(A, ls) {
   return V;
 }
 // how much each skill holds (a skill tile, an LS card): writing = sentence builder + tasks, speaking = shadowing clips + tasks
-const counts = V => ({ words: V.words.length, grammar: V.grammar.length, listen: V.listen.length, read: V.read.length, write: V.write.length + (V.build.length ? 1 : 0), speak: V.speak.length + V.shadow.length });
+const counts = V => ({ words: V.words.length, grammar: V.grammar.length, listen: V.listen.length, read: V.read.length, write: V.write.length + (V.build.length ? 1 : 0), speak: V.speak.length + V.shadow.length + (V.tabs.length ? 1 : 0) });
 // tools/voice/harvest.js (preview only): every 🧠 Flashcards card of every course and route, so each one is recorded with Kokoro Heart
 if (DEMO && DEMO.harvest) window.EL_PRACTICE_HARVEST = async () => { const r = [], S0 = { ...S };
   for (const c of Object.keys(COURSES)) for (const lv of levelsOf(c)) { Object.assign(S, { course: c, level: lv, ls: 'all', lp: 'all' }); (await content()).decks.forEach(d => d.cards.forEach(x => { if (x.say) r.push(x.say); if (x.kind === 'v' && x.ex) r.push(x.ex); })); }
@@ -836,9 +840,11 @@ function write() {
 function speak() {
   if (!X.shadow.length && !X.speak.length) return $('#body').innerHTML = none();
   if (/^sh:\d+$/.test(S.open || '')) return shadow(+S.open.slice(3));
+  if (S.open === 'rq') return rq();
   const x = X.speak.find(y => y.key === S.open);
   if (!x) {
     $('#body').innerHTML = `<div class="how">${t('Fes shadowing amb un fragment, o prepara i grava una de les tasques de parlar de les LS. Escolta’t i torna-ho a provar: la gravació no s’envia enlloc.', 'Shadow a clip, or prepare and record one of the LS speaking tasks. Listen to yourself and try again: the recording is not sent anywhere.')}</div><div class="list">`
+      + (X.tabs.length ? `<button class="item mixq" data-do="open" data-v="rq"><b>🎲 ${t('Preguntes a l’atzar', 'Random questions')}</b><small>${t('Quatre preguntes que no esperes. Respon en veu alta i grava’t.', 'Four questions you don’t expect. Answer out loud and record yourself.')}</small></button>` : '')
       + X.shadow.map((c, i) => `<button class="item" data-do="open" data-v="sh:${i}"><b>🗣 Shadowing · ${esc(c.title)}</b><small>${srcLine(esc(c.lp) + ' · ')}${t('Escolta i repeteix', 'Listen and repeat')}</small>${store.shadow[c.key] ? `<small class="done">✓ ${t('Vegades', 'Plays')}: ${store.shadow[c.key]}</small>` : ''}</button>`).join('')
       + X.speak.map(y => `<button class="item" data-do="open" data-v="${esc(y.key)}"><b>${y.kind === 'talk' ? '💬' : '🎙'} ${esc(y.title)}</b><small>${srcLine(esc(y.lp) + ' · ')}${y.kind === 'talk' ? t('Respon les preguntes', 'Answer the questions') : t('Parla i grava’t', 'Speak and record yourself')}</small></button>`).join('') + '</div>';
     return;
@@ -850,6 +856,49 @@ function speak() {
     <div class="row"><button class="btn sm" data-do="rec" id="tr">● ${t('Grava’t', 'Record yourself')}</button><button class="btn g sm" data-do="recstop" id="trs" hidden>■ Stop</button></div>
     <audio id="tra" controls hidden></audio><p class="muted" id="trm">${t('La gravació no s’envia enlloc.', 'The recording is not sent anywhere.')}</p></div>`;
 }
+/* 🎲 Random questions (Roger, 25 Nov 2026: "yes add both things"): the 🎲 Surprise questions banks of each LS (data/surprise.js written,
+   data/surprise-auto.js automatic; shared/js/el-surprise.js pool), drawn from the tabs open for the group in the LS on screen (or every LS),
+   one per step easy → harder (About you · Describe it · Use the grammar · Your opinion), at the student's level: Starter the Catalan and a
+   sentence start, Base the help words, Core 💡 Help on a tap, Plus and Pro none. At the student's own pace (no timer), ● Record yourself
+   optional, and nothing is sent or marked: the real 🎲 Surprise questions of the Time plan stay as they are. */
+const RQ = { qs: [], i: -1, last: [], help: false, loaded: {} };
+async function rqLoad() {
+  const dirs = [...new Set(X.tabs.map(x => x.dir))];
+  if (!window.elSurprise) await loadScript(ROOT + 'shared/js/el-surprise.js');
+  for (const d of dirs) if (!RQ.loaded[d]) { RQ.loaded[d] = 1; await loadScript(d + 'data/surprise.js'); await loadScript(d + 'data/surprise-auto.js'); }
+}
+function rqDraw() {
+  const lv = S.level, P = [];
+  X.ls.forEach(l => { const tabs = X.tabs.filter(x => x.ls === l).map(x => x.t); if (tabs.length && window.elSurprise) P.push(...elSurprise.pool({ bank: l.id, tabs }, lv)); });
+  const used = new Set(), old = q => RQ.last.includes(q.q), pick = arr => { const f = arr.filter(q => !used.has(q.q) && !old(q)), from = f.length ? f : arr.filter(q => !used.has(q.q)); if (!from.length) return null; const q = from[Math.floor(Math.random() * from.length)]; used.add(q.q); return q; };
+  const got = [0, 1, 2, 3].map(i => { const T = P.filter(q => q.tier === i); return pick(T.filter(q => q.src === 'W')) || pick(T.filter(q => q.src === 'A')) || pick(T); });   // written first, as in el-surprise.js
+  got.forEach((q, i) => { if (!q) got[i] = pick(P); });
+  RQ.qs = got.filter(Boolean).sort((a, b) => a.tier - b.tier); RQ.last = RQ.qs.map(q => q.q); RQ.i = -1; RQ.help = false;
+}
+const TIER = [['Sobre tu', 'About you'], ['Descriu-ho', 'Describe it'], ['Fes servir la gramàtica', 'Use the grammar'], ['La teva opinió', 'Your opinion']];
+async function rq() {
+  const back = backRow(t('Tot el Speaking', 'All speaking'));
+  if (!window.elSurprise || X.tabs.some(x => !RQ.loaded[x.dir])) { $('#body').innerHTML = back + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`; await rqLoad(); if (S.open !== 'rq') return; if (!RQ.qs.length) rqDraw(); }
+  if (!RQ.qs.length) rqDraw();
+  if (!RQ.qs.length) return $('#body').innerHTML = back + `<div class="empty">${t('Encara no hi ha preguntes per a aquesta LS.', 'There are no questions for this LS yet.')}</div>`;
+  const lv = base(S.level), q = RQ.qs[RQ.i], n = RQ.qs.length;
+  const dots = `<div class="rqdots">${RQ.qs.map((x, i) => `<span class="${i < RQ.i ? 'done' : i === RQ.i ? 'on' : ''}"></span>`).join('')}</div>`;
+  const on = !!(trc && trc.state === 'recording');
+  const recRow = `<div class="row"><button class="btn sm" data-do="rec" id="tr"${on ? ' disabled' : ''}>● ${t('Grava’t', 'Record yourself')}</button><button class="btn g sm" data-do="recstop" id="trs"${on ? '' : ' hidden'}>■ Stop</button></div><audio id="tra" controls${RQ.url && !on && RQ.i >= RQ.qs.length ? ` src="${RQ.url}"` : ' hidden'}></audio><p class="muted" id="trm">${on ? t('Gravant… respon en veu alta.', 'Recording… answer out loud.') : RQ.i < 0 ? t('La gravació comença amb la primera pregunta i no s’envia enlloc.', 'The recording starts with the first question. It is not sent anywhere.') : t('La gravació no s’envia enlloc.', 'The recording is not sent anywhere.')}</p>`;
+  let mid;
+  if (RQ.i < 0) mid = `<div class="how">${t('Prem <b>Comença</b>: sortiran quatre preguntes, una darrere l’altra, de més fàcil a més difícil. Respon cada una en veu alta, amb frases completes. Si vols, grava’t i després escolta’t.', 'Press <b>Start</b>: four questions will come up, one after another, from easy to harder. Answer each one out loud, in full sentences. Record yourself if you like, and listen to yourself afterwards.')}</div>
+    <div class="row"><button class="btn" data-do="rqgo">▶ ${t('Comença', 'Start')}</button></div>`;
+  else if (q) {
+    const hh = Array.isArray(q.h) ? q.h.join(' · ') : q.h;   // a sentence start, or help words
+    const help = hh ? lv === 'beginners' ? `<p class="rqstart">${esc(hh)}</p>` : lv === 'insecure' ? `<p class="rqstart">💡 ${esc(hh)}</p>` : lv === 'safe' ? (RQ.help ? `<p class="rqstart">💡 ${esc(hh)}</p>` : `<button class="btn g sm" data-do="rqhelp">💡 ${t('Ajuda', 'Help')}</button>`) : '' : '';
+    mid = `<div class="rqcard"><div class="rqn">${t('Pregunta', 'Question')} ${RQ.i + 1} / ${n} · ${esc(t(...TIER[q.tier] || TIER[0]))}</div><p class="rqq">${esc(q.q)}</p>${lv === 'beginners' && q.ca ? `<p class="muted">${esc(q.ca)}</p>` : ''}${help}
+      <div class="row"><button class="btn g sm" data-do="say" data-v="${esc(q.q)}">🔊 ${t('Escolta-la', 'Hear it')}</button><button class="btn" data-do="rqnext">${RQ.i + 1 < n ? t('Següent pregunta', 'Next question') + ' ›' : '✓ ' + t('He acabat', 'I’ve finished')}</button></div></div>`;
+  } else mid = `<div class="card"><h3>🎉 ${t('Fet!', 'Done!')}</h3><p class="muted">${t('Les teves preguntes', 'Your questions')}:</p><ol>${RQ.qs.map(x => `<li>${esc(x.q)}</li>`).join('')}</ol>
+    <div class="row"><button class="btn" data-do="rqnew">🎲 ${t('Unes altres preguntes', 'New questions')}</button></div></div>`;
+  $('#body').innerHTML = back + `<div class="card"><h3>🎲 ${t('Preguntes a l’atzar', 'Random questions')}</h3>${dots}${mid}${recRow}</div>`;
+}
+const rqSay = () => { const q = RQ.qs[RQ.i]; if (q) say(q.q); };
+
 let trc = null;
 async function trecStart() {
   if (trc) return;
@@ -858,7 +907,7 @@ async function trecStart() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true }), chunks = [], r = new MediaRecorder(stream);
     trc = r; r.ondataavailable = e => chunks.push(e.data);
     r.onstop = () => { stream.getTracks().forEach(x => x.stop()); trc = null; const a = $('#tra'), b = $('#tr'), st = $('#trs');
-      if (a) { a.src = URL.createObjectURL(new Blob(chunks, { type: r.mimeType || 'audio/webm' })); a.hidden = false; } if (b) b.disabled = false; if (st) st.hidden = true;
+      const url = URL.createObjectURL(new Blob(chunks, { type: r.mimeType || 'audio/webm' })); RQ.url = url; if (a) { a.src = url; a.hidden = false; } if (b) b.disabled = false; if (st) st.hidden = true;
       msg(t('Escolta’t i torna-ho a provar si vols. La gravació no s’envia enlloc.', 'Listen to yourself and try again if you like. The recording is not sent anywhere.')); };
     r.start(); $('#tr').disabled = true; $('#trs').hidden = false; msg(t('Gravant… prem Stop quan acabis.', 'Recording… press Stop when you finish.'));
   } catch (e) { trc = null; msg(t('No s’ha pogut fer servir el micròfon.', 'The microphone could not be used.')); }
@@ -889,6 +938,9 @@ document.addEventListener('click', e => {
     splay: () => splay(+k.i), sstop: () => { if (PL[+k.i]) PL[+k.i].stop(); const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
     shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; $('#sk' + k.i).hidden = s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
     srec: () => srec(+k.i),
+    rqgo: () => { RQ.i = 0; RQ.help = false; RQ.url = null; rq(); rqSay(); if (!trc) trecStart(); },
+    rqnext: () => { RQ.i++; RQ.help = false; if (RQ.i >= RQ.qs.length && trc && trc.state === 'recording') trc.stop(); rq(); rqSay(); },
+    rqhelp: () => { RQ.help = true; rq(); }, rqnew: () => { rqDraw(); RQ.url = null; rq(); },
     rec: () => trecStart(), recstop: () => { if (trc && trc.state === 'recording') trc.stop(); },
     model: () => { const m = $('#tmodel'); if (m) { m.hidden = !m.hidden; el.textContent = m.hidden ? '👀 ' + t('Mostra el model', 'Show the model') : t('Amaga el model', 'Hide the model'); } },
     saymodel: () => { const x = X.speak.find(y => y.key === S.open); if (x && x.model) say(plain(x.model)); },
