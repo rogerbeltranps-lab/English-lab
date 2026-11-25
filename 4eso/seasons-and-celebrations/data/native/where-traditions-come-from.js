@@ -127,14 +127,14 @@ window.LP.native = {
       '<div class="reading" style="font-weight:400">Many customs we think of as ancient are, in fact, (1) ___ (SURPRISE) recent. The historian Eric Hobsbawm called them “invented traditions”: practices that claim (2) ___ (CONTINUE) with the past but were created to give a group a sense of (3) ___ (BELONG). The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any (4) ___ (ANCESTOR) clan custom. None of this makes such traditions (5) ___ (MEANING). Their (6) ___ (ATTRACT) lies precisely in the fact that they feel old, and the (7) ___ (WILLING) of people to embrace them says a great deal about our need for roots. Critics who dismiss them as mere (8) ___ (FABRICATE) miss the point.</div>'
     ],
     items: [
-      { q: '(1) SURPRISE', a: ['surprisingly'], en: 'Adverb before an adjective.' },
-      { q: '(2) CONTINUE', a: ['continuity'], en: 'Noun: claim continuity with.' },
-      { q: '(3) BELONG', a: ['belonging'], en: 'a sense of belonging.' },
-      { q: '(4) ANCESTOR', a: ['ancestral'], en: 'Adjective before a noun: ancestral.' },
-      { q: '(5) MEANING', a: ['meaningless'], en: 'Negative: none of this makes them meaningless.' },
-      { q: '(6) ATTRACT', a: ['attraction', 'attractiveness', 'appeal'], en: 'Noun after “Their”.' },
-      { q: '(7) WILLING', a: ['willingness'], en: 'Noun after “the”.' },
-      { q: '(8) FABRICATE', a: ['fabrications', 'fabrication'], en: 'Noun after “mere”.' }
+      { q: '(1) SURPRISE', fq: 'Many customs we think of as ancient are, in fact, ___ (SURPRISE) recent.', a: ['surprisingly'], en: 'Adverb before an adjective.' },
+      { q: '(2) CONTINUE', fq: 'The historian Eric Hobsbawm called such customs “invented traditions”: practices that claim ___ (CONTINUE) with the past.', a: ['continuity'], en: 'Noun: claim continuity with.' },
+      { q: '(3) BELONG', fq: 'Invented traditions were created to give a group a sense of ___ (BELONG).', a: ['belonging'], en: 'a sense of belonging.' },
+      { q: '(4) ANCESTOR', fq: 'The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any ___ (ANCESTOR) clan custom.', a: ['ancestral'], en: 'Adjective before a noun: ancestral.' },
+      { q: '(5) MEANING', fq: 'None of this makes such traditions ___ (MEANING).', a: ['meaningless'], en: 'Negative: none of this makes them meaningless.' },
+      { q: '(6) ATTRACT', fq: 'Their ___ (ATTRACT) lies precisely in the fact that they feel old.', a: ['attraction', 'attractiveness', 'appeal'], en: 'Noun after “Their”.' },
+      { q: '(7) WILLING', fq: 'The ___ (WILLING) of people to embrace them says a great deal about our need for roots.', a: ['willingness'], en: 'Noun after “the”.' },
+      { q: '(8) FABRICATE', fq: 'Critics who dismiss them as mere ___ (FABRICATE) miss the point.', a: ['fabrications', 'fabrication'], en: 'Noun after “mere”.' }
     ] },
 
   write: { type: 'writing', product: 2, tab: 'Writing', title: 'Piece 2: essay (C2 Proficiency Writing, Part 1)',
