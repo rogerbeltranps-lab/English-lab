@@ -629,14 +629,14 @@ function homeHtml(lss,ls,info){
   // 🎯 the student's level and route in the free space right of the greeting (Roger, 7 Nov 2026: "here I want their level
   // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
   const lvBox=levelBox(ls);
-  const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox+(vyOn(ls)?"":markMini(ls));
+  const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox+(vyOn(ls)?"":markMini(ls)+repChip("vy-chip news"));
   mzHome(lss);
   // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
   // estigui on està el requadre blau")
   // ⛵ the voyage: a row of small links (late, news, To do, Homework, My notebook) over the map
   S.vy=null;
   if(vyOn(ls)){const chip=(h,i,l,b,cl)=>`<a class="vy-chip${cl?" "+cl:""}" href="${h}">${i} ${l}${b?` <b>${b}</b>`:""}</a>`;
-    return voyageHome(ls,info,nx,(miss?chip("#marks","⏰",miss>1?t(`${miss} endarrerides`,`${miss} late`):t("1 endarrerida","1 late"),"","late"):"")
+    return voyageHome(ls,info,nx,repChip("vy-chip news")+(miss?chip("#marks","⏰",miss>1?t(`${miss} endarrerides`,`${miss} late`):t("1 endarrerida","1 late"),"","late"):"")
       +(lvNew()?chip("#marks","📐",t("Nou: compta com de bé ho fas","New: how well you do counts"),"","news"):"")
       +(unread?chip("#news","📣",t("Anuncis","News"),unread,"news"):"")+chip("#todo","✅",t("Per fer","To do"),ntd||"")+chip("#homework","📝",t("Deures","Homework"),hwOpen.length||"")
       +chip(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),""),markMini(ls))}
@@ -1801,7 +1801,10 @@ function fxDo(d){const F=S.fx;if(!F)return;
 // The teacher sees any student's from the 👁 student view (today.html?student=uid#report). What we worked on comes from el-term-report.js
 // (Roger's own words), each point with the student's % and one line written by tools/term-report/draft.mjs; the marks, criteria and the
 // skills chart are worked out here, live, as on 📊 My marks and 🎓 My progress; when the work was done and the comment come from the draft.
-const repOk=()=>!!(DEMO||AS||all()||window.EL_REP_ON);
+// or at any time once the teacher publishes the group's drafts (📣 Publish the draft on the dashboard: teams/{group}.repPub.t1; Roger, 24 Nov 2026)
+const repPub=()=>!!(((D&&D.tm)||{}).repPub||{}).t1;
+const repOk=()=>!!(DEMO||AS||all()||window.EL_REP_ON||repPub());
+const repChip=cls=>repPub()&&!all()?`<a class="${cls}" href="#report">📄 ${t("El meu informe del 1r trimestre (esborrany)","My Term 1 report (draft)")}</a>`:"";
 const repTxt=s=>esc(s).replace(/&lt;(\/?)i&gt;/g,"<$1i>");   // the draft's lines: plain text with <i> only
 // the level names: English with the official Catalan in brackets (Roger, 23 Nov 2026: "students must see the translation though")
 const REP_DEG=[["No assoliment","Not satisfactory"],["Assoliment satisfactori","Satisfactory"],["Assoliment notable","Very good"],["Assoliment excel·lent","Excellent"]];

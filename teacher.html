@@ -4306,6 +4306,14 @@ function degStats(studs,markOf,label){const ms=studs.map(markOf),n={NA:0,AS:0,AN
 const REPS={d:null,busy:false,err:""};
 function repLoad(){if(REPS.busy||REPS.d)return;if(DEMO){REPS.d=DEMO.trep||{};return}REPS.busy=true;
   F.getDocs(F.collection(db(),"termReports")).then(q=>{const o={};q.forEach(x=>o[x.id.toLowerCase()]=(x.data()||{}).t1||null);REPS.d=o},e=>{REPS.err=e.message||String(e)}).then(()=>{REPS.busy=false;if(S.reps||S.place==="reports")render()})}
+// 📣 Publish the draft reports of a group (Roger, 24 Nov 2026: "students see them tomorrow as a draft and then we'll prepare the new version.
+// Can you make a publish draft button?"): teams/{group}.repPub.t1 = when; the Firestore rules then let the group's students read their own
+// termReports/{email} at any time, and their board shows 📄 My Term 1 report (draft). 🔒 Hide sets it back to null.
+function repPublish(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
+  if(!confirm(on?`Publish the Term 1 draft reports of ${g.name} now?\n\nEach student can open their own report on their board (📄 My Term 1 report · draft) until you hide them again. They never see anyone else's.`
+    :`Hide the draft reports of ${g.name} again?\n\nStudents will see theirs only while you press 📄 Show draft reports in class mode.`))return;
+  const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repPub=Object.assign({},t.repPub,{t1:v});
+  const p=put(["teams",gid],{repPub:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
 function repView(grp,studs,place){repLoad();
   const back=place?"":`<div class="bar"><button class="chip" data-do="repclose">‹ Back to ${esc(grp.name)}</button></div>`;
   if(REPS.err)return back+`<div class="box"><p class="muted">Couldn't read the reports: ${esc(REPS.err)}</p></div>`;
@@ -4318,7 +4326,11 @@ function repView(grp,studs,place){repLoad();
         +`<td style="white-space:nowrap"><a class="chip" href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener">📄 Open ↗</a></td>`
       :`<td colspan="6" class="muted">No report yet</td>`)+`</tr>`}).join("");
   const n=k=>studs.filter(s=>{const R=REPS.d[String(s.email||"").toLowerCase()];return R&&R.time&&R.time.profile===k}).length;
-  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2><p class="muted">Drafts: students see theirs only when you press 📄 Show draft reports in class mode. 🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
+  const pub=((S.D.tm[grp.id]||{}).repPub||{}).t1;
+  const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${pub
+      ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">📣 Draft published ${esc(new Date(pub).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(pub).toTimeString().slice(0,5))}: every student of ${esc(grp.name)} can open theirs on their board</span><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide the drafts again</button>`
+      :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Not published: students see theirs only while you press 📄 Show draft reports in class mode</span><button data-do="reppub" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">📣 Publish the draft</button>`}</div>`;
+  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
     +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
@@ -6954,7 +6966,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=S.reps=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
     tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
-    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reppub:()=>repPublish(k.g,k.v==="1"),
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?termLss(EL_LS.filter(l=>l.course===g.course),k.t,g.id):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},
