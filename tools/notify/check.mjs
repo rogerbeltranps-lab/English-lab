@@ -168,6 +168,7 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   ok(!/LS2 exam/.test(txt), `${name}: HELD LS2 exam results show!`);
   ok(!/HELD/.test(txt) && !(await page.content()).includes('HELD-'), `${name}: a held answer or problem answer shows!`);
   const dots = await page.locator('#el-npanel li.nw').count();
+  ok(list.some((t, i) => /LS1 exam results are ready/.test(t)) && (await page.locator('#el-npanel li.nw', { hasText: 'LS1 exam results are ready' }).count()) === 1, `${name}: the LS1 exam results (out since October, never seen) are not marked new`);
   ok(+n0 >= 1 && +n0 === dots, `${name}: the red number (${n0 || 'empty'}) is not the number of new items in the list (${dots})`);
   await page.locator('#el-npanel [data-x]').click();
   ok(!(await bell.locator('b').count()), `${name}: the red number is still there after opening the list`);
