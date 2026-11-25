@@ -254,9 +254,8 @@ window.TN_MISTAKES = [
 
 /* 📍 in / on / at (Roger, 17 Nov 2026: "in/on prepositions like in/on the list are difficult for me"): its own strand, always the second
    step. All your own preposition slips, from every list so far. Add new ones at the TOP when a new list has them (q with ___, a, en).
-   🧠 They are also Roger's own flashcard deck, 📍 My prepositions (LP.decks below → lab/practice.html#deck, 4 ESO, only where Towards
-   Nativeness shows: Roger and the tester; Roger, 25 Nov 2026: "create a flashcard deck of prepositions with my slips"). A new chunk is a
-   new card; record its sentence with Kokoro Heart (tools/voice/harvest.js, then generate.py). */
+   🧠 They are also the 🧠 Preposition flashcards step of this page (below). A new chunk is a new card; record its sentence with Kokoro
+   Heart (tools/voice/harvest.js, then generate.py). */
 window.TN_PREPS = [
   // 21–25 Nov 2026 (batch n25p), as short chunks
   { q: 'Add the reading texts ___ the students’ notebooks.', a: ['to'], en: 'add something to a place.' },
@@ -372,12 +371,28 @@ window.TN_PREPS = [
     items: poolW.slice(0, 12) });
   // 📍 always the second step, right after the newest 🔍 Spot it (so 🗓 ends up third)
   if (window.TN_PREPS) panels.splice(1, 0, { id: 'preps', type: 'typed', tab: '📍 in / on / at', title: 'in / on / at: your own sentences', pill: 'Your weak spot',
-    intro: '<strong>on</strong> = things you look at, like a surface: on the list, on the website, on the screen, on my phone, on GitHub. <strong>in</strong> = things you put something inside: in the table, in the document, in the email, in the notebook, in the inbox, in class mode, in LS2. <strong>at</strong> = a point: at the top, at the end, at Starter level. <strong>to</strong> = movement: add to, apply to, upload to. Type the missing word. The same slips are also a flashcard deck: <a href="../../lab/practice.html#deck">🧠 Flashcards</a> › 4 ESO › 📍 My prepositions.',
+    intro: '<strong>on</strong> = things you look at, like a surface: on the list, on the website, on the screen, on my phone, on GitHub. <strong>in</strong> = things you put something inside: in the table, in the document, in the email, in the notebook, in the inbox, in class mode, in LS2. <strong>at</strong> = a point: at the top, at the end, at Starter level. <strong>to</strong> = movement: add to, apply to, upload to. Type the missing word. The same slips are also flashcards in the next step, 🧠 Preposition flashcards.',
     items: window.TN_PREPS });
   if (older.length) panels.push({ id: 'review', type: 'typed', tab: '🔁 Review: older mistakes', title: 'Review: older mistakes, mixed', pill: 'Spaced review',
     intro: 'Mistakes from earlier lists come back here, mixed. If you still get one wrong, it is a habit to work on.',
     items: older.flatMap(b => b.items).map(m => ({ q: gap(m.s, m.bad), a: fixArr(m), en: m.why.replace(/<[^>]+>/g, '') })) });
-  // 🧠 decks: extra flashcard decks this page gives lab/practice.html#deck (one card per item, 💬 kind, never a step of the page)
-  window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels,
-    decks: window.TN_PREPS ? [{ id: 'tn-prepositions', name: '📍 My prepositions', part: 'Prepositions: my slips', items: window.TN_PREPS }] : [] };
+  /* 🧠 Preposition flashcards (Roger, 25 Nov 2026: "create a flashcard deck of prepositions with my slips"; "It should only be in Towards
+     Nativeness, not for the students"): every TN_PREPS slip is a card (the sentence with a gap → the sentence with the preposition and the
+     rule), studied with spaced repetition like 🧠 Flashcards (shared/js/el-flashdeck.js, opened straight on this one deck). Only on this
+     page, never in lab/practice.html. Not a step: nothing to finish. Progress: localStorage tnPrepDeck (a tn… key, so it follows Roger's
+     account). Voice: Kokoro Heart (tools/voice/harvest.js reads TN_PREPS). Right after 📍 in / on / at. */
+  const P = window.TN_PREPS || [], GAPS = /_{2,}/g, esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const filled = (it, mk) => { const n = (it.q.match(GAPS) || []).length, w = String(it.a[0]).split(/\s*\/\s*|\s+/); let k = 0;
+    return esc(it.q).replace(GAPS, () => mk(n > 1 ? w[k++] || '' : it.a[0])); };
+  window.TN_PREP_CARDS = P.map(it => ({ id: 'p:' + it.q.toLowerCase(), kind: 'e', part: 'Prepositions: my slips', front: esc(it.q).replace(GAPS, '<span class="elfd-gap"></span>'),
+    say: filled(it, x => x).replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'),
+    back: '<div class="elfd-ans">' + filled(it, x => '<mark>' + esc(x) + '</mark>') + '</div>' + (it.en ? '<div class="elfd-why">💡 ' + esc(it.en) + '</div>' : '') }));
+  if (P.length) panels.splice(panels.findIndex(p => p.id === 'preps') + 1, 0, { id: 'prepdeck', type: 'info', tab: '🧠 Preposition flashcards', title: 'Preposition flashcards: all your slips',
+    pill: 'Spaced repetition', intro: 'Every preposition slip you’ve made, as a flashcard. Say the missing word aloud, turn the card, then tap how well you knew it: each card comes back when you need it. Up to 15 new cards a day.',
+    html: '<style>#tnPrepDeck,#tnPrepDeck button{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}</style><div id="tnPrepDeck"></div>',   // the deck in its own plain font, not the notebook look's
+    after() { const host = document.getElementById('tnPrepDeck'); if (!host || !window.ELFlashDeck) return;
+      const load = () => { try { return JSON.parse(localStorage.getItem('tnPrepDeck') || '{}'); } catch (e) { return {}; } };
+      ELFlashDeck.mount(host, { decks: () => [{ id: 'tn-prepositions', name: '📍 My prepositions', cards: window.TN_PREP_CARDS }], only: 'tn-prepositions', ca: () => false,
+        load, save: x => { try { localStorage.setItem('tnPrepDeck', JSON.stringify(x)); } catch (e) {} }, me: () => null }); } });
+  window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels };
 })();
