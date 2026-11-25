@@ -891,7 +891,7 @@ const elWhoPlace=()=>window.elWhoPlace();
 // the icons' names on hover (bar above) and the student's name under "English with Roger"
 function tipCss(){if(document.getElementById("elcb-css"))return;const st=document.createElement("style");st.id="elcb-css";
   st.textContent='#el-cloud-bar .elcb-i{position:relative;font-size:15px;line-height:1.2}#el-cloud-bar .elcb-i:hover:after,#el-cloud-bar .elcb-i:focus-visible:after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 9px);background:#0f172a;color:#fff;font:600 12px/1.3 system-ui,sans-serif;padding:5px 9px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px #0003;pointer-events:none;z-index:2}'
-    +'.el-who{padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.3 Inter,system-ui,sans-serif;color:#475569!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}aside.side>.el-who,aside.sidebar>.el-who{margin:-6px 0 14px}@media print{.el-who{display:none}}';
+    +'.el-who{flex:none;padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.35 Inter,system-ui,sans-serif;color:#475569!important;overflow-wrap:anywhere}aside.side>.el-who{margin:-15px 0 0}aside.sidebar>.el-who{margin:-6px 0 14px}@media print{.el-who{display:none}}';
   document.head.appendChild(st)}
 // Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
 // next to its Home link: header menu (course and LS pages), side and phone menus (Home, English Lab), top bar of activity pages.
