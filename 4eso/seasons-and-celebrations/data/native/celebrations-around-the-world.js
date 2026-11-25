@@ -132,13 +132,13 @@ window.LP.native = {
       '<strong>Tip:</strong> look at what comes after each gap as well as before it: (5) and (6) are parts of two-part structures.'
     ],
     items: [
-      { q: '(1) supposedly devoted ___ joy', a: ['to'], en: 'devoted to.' },
-      { q: '(2) ___ the endless lists… (= because of all)', a: ['with', 'between', 'what with'], en: 'With / What with = because of all these things.' },
-      { q: '(3) feeling ___ though they need a holiday', a: ['as'], en: 'as though = as if.' },
-      { q: '(4) it is not the celebrations ___ that wear us down', a: ['themselves'], en: 'Emphatic pronoun: the celebrations themselves.' },
-      { q: '(5) not the celebrations…, ___ rather the pressure', a: ['but'], en: 'not X but rather Y.' },
-      { q: '(6) ___ more we expect to feel, the more we notice…', a: ['the'], en: 'The more…, the more…' },
-      { q: '(7) the answer lies ___ lowering our expectations', a: ['in'], en: 'lie in = consist of, be found in.' },
+      { q: '(1) supposedly devoted ___ joy', fq: 'For a season supposedly devoted ___ joy, December can be strangely exhausting.', a: ['to'], en: 'devoted to.' },
+      { q: '(2) ___ the endless lists… (= because of all)', fq: '___ the endless lists, the crowded shops and the obligatory gatherings, many people reach January feeling as though they need a holiday from their holidays.', a: ['with', 'between', 'what with'], en: 'With / What with = because of all these things.' },
+      { q: '(3) feeling ___ though they need a holiday', fq: 'Many people reach January feeling ___ though they need a holiday from their holidays.', a: ['as'], en: 'as though = as if.' },
+      { q: '(4) it is not the celebrations ___ that wear us down', fq: 'Psychologists point out that it is not the celebrations ___ that wear us down.', a: ['themselves'], en: 'Emphatic pronoun: the celebrations themselves.' },
+      { q: '(5) not the celebrations…, ___ rather the pressure', fq: 'It is not the celebrations that wear us down, ___ rather the pressure to enjoy them.', a: ['but'], en: 'not X but rather Y.' },
+      { q: '(6) ___ more we expect to feel, the more we notice…', fq: '___ more we expect to feel, the more we notice what we are not feeling.', a: ['the'], en: 'The more…, the more…' },
+      { q: '(7) the answer lies ___ lowering our expectations', fq: 'Perhaps the answer lies ___ lowering our expectations.', a: ['in'], en: 'lie in = consist of, be found in.' },
       { q: '(8) …, ___ is easier said than done', fq: 'Perhaps the answer lies in lowering our expectations, ___ is easier said than done.', a: ['which'], en: 'Sentence relative clause: which refers to the whole idea.' }
     ] },
 

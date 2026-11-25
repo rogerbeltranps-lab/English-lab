@@ -328,3 +328,10 @@
 @media (max-width:640px){
   .trep .cpwhy{margin-left:0!important}.trep .cpwhy .cpwr{grid-template-columns:auto 1fr}.trep .cpwhy .cpwl{grid-column:1/-1}.trep .cpwhy .dg{justify-self:start}.trep .cpcr>.cpm{margin-left:auto}
 }
+
+/* 📝 The next exam at the top of the board (today.html nextExamPill; Roger, 25 Nov 2026): on a phone one line each, without the dots */
+@media (max-width:640px){
+  #sub .nxex{flex-direction:column;align-items:flex-start;gap:2px;font-size:14px;padding:8px 12px;text-align:left}
+  #sub .nxex>*{align-self:flex-start;text-align:left}
+  #sub .nxex span::before{display:none}
+}

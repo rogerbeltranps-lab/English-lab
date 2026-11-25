@@ -235,17 +235,21 @@ function gCard(it, items, kind, part, lv, salt) {
   const w = a.split(/\s+/).map(x => { if (x === 'i') return 'I'; if (RELW.test(x)) return x;   // "which takes place in november" → November, as in the question
     const m = pq.match(new RegExp('(?<=[a-z0-9,;] )' + x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w’\'])', 'i'));
     return m && m[0] !== x && /^[A-Z]/.test(m[0]) && m[0].slice(1) === x.slice(1) ? m[0] : x; });
-  const ai = q.lastIndexOf('→'), tail0 = ai >= 0 ? q.slice(ai + 1).trim() : '', gaps = x => (String(x).match(GAP) || []).length;
+  // gaps side by side are one gap ("___ ___"), unless the answer has one word for each ("→ ___ people ___ ___ wear masks?" = did / use / to)
+  const ai = q.lastIndexOf('→'), tail0 = ai >= 0 ? q.slice(ai + 1).trim() : '', one = x => (String(x).match(/_{2,}/g) || []).length;
+  const G = (String(q).match(GAP) || []).length > 1 && one(q) === w.length && (String(q).match(GAP) || []).length !== w.length ? /_{2,}/g : GAP, gaps = x => (String(x).match(G) || []).length;
   // the sentence the card turns over to: the part after the arrow when it holds the gap (with its capital: "we used to ___." → "We…",
   // "___ such a parade." → "Never have I seen…"), the step's fc, or the whole question as before
   const tail = /^[a-z]/.test(tail0) && /[.!?]$/.test(plain(tail0)) ? tail0.charAt(0).toUpperCase() + tail0.slice(1) : tail0;
-  const T = tail && gaps(tail) && /[a-z]/i.test(plain(tail.replace(GAP, ''))) ? tail : ai >= 0 && it.fc ? null : q, n = T ? gaps(T) : 0;
+  const T = tail && gaps(tail) && /[a-z]/i.test(plain(tail.replace(G, ''))) ? tail : ai >= 0 && it.fc ? null : q, n = T ? gaps(T) : 0;
   if (T === tail && /^[“"‘']?_/.test(tail)) w[0] = w[0].charAt(0).toUpperCase() + w[0].slice(1);
   const alts = gAlts(it, w);
+  // a gap that starts a sentence starts with a capital ("Many families love the feast. On the other hand, …", "With the endless lists…")
+  const up = (x, at) => /^[a-z]/.test(x) && (!plain(at) || /[.!?][”"’']?\s*$/.test(plain(at))) ? x.charAt(0).toUpperCase() + x.slice(1) : x;
   const fill = list => { let k = 0, f = null;
     if (!T) f = esc(it.fc).replace(new RegExp('\\b' + a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'), m => mk(m));
-    else if (n === 1) f = T.replace(GAP, '<mark>' + list.map(x => x.map(esc).join(' / ')).join(' ') + '</mark>');
-    else if (n > 1 && n === list.length) f = T.replace(GAP, () => '<mark>' + list[k++].map(esc).join(' / ') + '</mark>');
+    else if (n === 1) f = T.replace(G, (g, o) => '<mark>' + list.map((x, j) => x.map(y => j ? y : up(y, T.slice(0, o))).map(esc).join(' / ')).join(' ') + '</mark>');
+    else if (n > 1 && n === list.length) f = T.replace(G, (g, o) => '<mark>' + list[k++].map(y => k > 1 ? y : up(y, T.slice(0, o))).map(esc).join(' / ') + '</mark>');
     return f && f.replace(/(<\/mark>)\s*\((?:not \/ )?[a-z' /]+\)/gi, '$1'); };   // "taught (teach)" → "taught"
   const clean = fill(alts), spoken = fill(w.map(x => [x]));
   const lvB = base(lv), why0 = elCa(lvB) ? (it.ca || it.en || '') : (it.en || it.ca || '');
@@ -253,8 +257,8 @@ function gCard(it, items, kind, part, lv, salt) {
   const two = alts.find(x => x.length > 1 && x.some(y => /^that$/i.test(y)));
   const why = why0 && two && !/\bthat\b/i.test(plain(why0)) ? plain(why0) + ' ' + two.join(' / ') + (elCa(lvB) ? ': les dues són correctes.' : ': both are right.') : why0;
   const opts = lvB === 'beginners' ? (it.opts || choices(it, items, salt)) : lvB === 'insecure' ? (it.opts || null) : null;
-  return { id: 'g:' + hash(plain(it.q) + '|' + a), kind, part, front: q.replace(GAP, '<span class="elfd-gap"></span>'), opts,
-    say: spoken && !/→|:/.test(plain(spoken)) ? (T === q ? plain(spoken) : plain(spoken).replace(/\s+([.,!?;:])/g, '$1')) : '',
+  return { id: 'g:' + hash(plain(it.q) + '|' + a), kind, part, front: q.replace(G, '<span class="elfd-gap"></span>'), opts,
+    say: spoken && (it.fq ? !/→/.test(plain(spoken)) : !/→|:/.test(plain(spoken))) ? (T === q && !it.fq ? plain(spoken) : plain(spoken).replace(/\s+([.,!?;:])/g, '$1')) : '',
     back: `<div class="elfd-ans">${clean || mk(a)}</div>${why ? `<div class="elfd-why">💡 ${esc(plain(why))}</div>` : ''}` };
 }
 
