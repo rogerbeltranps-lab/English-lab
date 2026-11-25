@@ -34,6 +34,7 @@ window.ELExam = (function () {
     const run = s => { if (s) try { new Function('window', s)(W); } catch (e) { console.warn('exam data', page, e); } };
     run(await src(b + 'data/' + page + '.js'));
     if (native && W.LP) run(await src(b + 'data/native/' + page + '.js'));
+    if (W.LP && W.GS_NATIVE) W.LP._gsn = W.GS_NATIVE;   // 4 ESO LS2 Getting started: Pro's own lists (its essay, readText)
     return W.LP || null;
   }
   // the learning paths of this LS, in the order of the LS page (its <ol class="lps">), without checkpoints, extras and the final product
@@ -101,7 +102,7 @@ window.ELExam = (function () {
         const todo = work || did || fb || ['info', 'summary', 'self'].includes(p.type) ? null : toDo(p, level, tx);
         const exk = window.elExcused ? elExcused(a, RS[a.id]) : [], stp = window.elSecSteps ? elSecSteps(a, p.id) : [], opt = !!todo && stp.length > 0 && stp.every(k => exk.includes(k));
         parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
-          terms: termsOf(p), grammar: gramOf(p), work, todo, opt, fb });
+          terms: termsOf(p), grammar: gramOf(p), text: readText(p, level, LP), work, todo, opt, fb });
       });
       const left = [...new Set([...Object.keys(R.replies || {}), ...Object.keys(R.answers || {})])].filter(k => !panels.some(p => p.id === k)).map(k => fbOf(k)).filter(Boolean);
       if (left.length) parts.push({ id: 'fb', name: ca ? 'Feedback del professor' : 'Your teacher\'s feedback', title: '', day: null, kind: 'fb', terms: [], grammar: [], work: null, todo: null, opt: false, fb: left.length > 1 ? { many: left } : left[0] });
@@ -109,6 +110,21 @@ window.ELExam = (function () {
     }
     const sm = sample(doc);
     return { lps: out, dropped, exam: pl.exam, sample: sm && base ? base + sm : sm };
+  }
+  /* 📖 the text of a Reading step, at the student's route, so it can be read again in the notebook (Roger, 25 Nov 2026: "Add the reading
+     texts in students notebooks"): media.text (a string, or one text per route, as ls2-engine.js byLevel picks it: Pro → Plus → Core, Starter
+     → Base); 4 ESO LS2 Getting started keeps its chat in media.chat (one per route) and Pro reads its essay (GS_NATIVE.readingHtml).
+     Only the repo's own text, without scripts or on… handlers. '' when the step has no text. */
+  const byLv = (o, level) => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring
+    : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure != null ? o.insecure : '');
+  function readText(p, level, LP) {
+    const m = (p && p.media) || {}; let h = '';
+    if (m.text === true) {
+      if (level === 'native' && LP && LP._gsn && LP._gsn.readingHtml) h = LP._gsn.readingHtml;
+      else { const c = m.chat && (m.chat[level] || (level === 'native' && m.chat.daring) || m.chat.insecure);
+        h = Array.isArray(c) ? c.filter(Array.isArray).map(([w, x]) => '<p><b>' + w + ':</b> ' + x + '</p>').join('') : ''; }
+    } else if (m.text) h = String(byLv(m.text, level) || '');
+    return h.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/\son\w+\s*=\s*("[^"]*"|'[^']*')/gi, '').trim();
   }
   // the student's own state of a learning path (the engine's localStorage, kept in sync by el-cloud.js): its first catalog key
   function mine0(id) {
