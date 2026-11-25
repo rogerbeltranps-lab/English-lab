@@ -97,6 +97,13 @@
 //   9. v19 (Roger, 12 Nov 2026: "can you read the emails of the school account and tell me which need my reply"): READ ONLY.
 //      {key, action: "inbox", days (1-30, default 7), max (1-50, default 30)} → {ok, threads: [{id, subject, unread, starred, messages:
 //      [{from, to, cc, date, body}]}]}. It never sends, marks as read, labels, archives or deletes anything.
+//  25. v39 (Roger, 25 Nov 2026: "I need you to run my task app, there I want you to add things to do, for instance the ones who need to
+//      do the exam and when"): Google Tasks of this school account, with the key only. Needs the advanced service Google Tasks API
+//      (editor › Services + › Google Tasks API › Add; it switches the API on by itself, no Google Cloud setup).
+//      {key, action: "tasks", list (default "English Lab"), items: [{title, notes, due: "YYYY-MM-DD"}]} → {ok, list, done: [{title, id}
+//      | {title, skipped}]}: a task with the same title already in the list (done or not) is skipped, so a run can be repeated.
+//      {key, action: "tasks_list", list} → {ok, list, tasks: [{id, title, notes, due, status}]} · {key, action: "tasks_done", list, ids}
+//      → {ok, done}. It never deletes a task or a list.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -166,6 +173,9 @@ function doPost(e) {
   if (m.action === "mark") return out(startMarking(m.at));
   if (m.action === "inbox") return out(readInbox(m));
   if (m.action === "backup") return out(keyOk ? saveBackup(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks") return out(keyOk ? tasksAdd(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks_list") return out(keyOk ? tasksList(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks_done") return out(keyOk ? tasksDone(m) : {ok: false, error: "wrong key"});
   const to = clean(m.to), bcc = clean(m.bcc);
   if ((!to.length && !bcc.length) || !m.subject || !m.body) return out({ok: false, error: "nothing to send"});
   if (to.length + bcc.length > 50) return out({ok: false, error: "too many people in one email (50 at most)"});
@@ -1151,4 +1161,44 @@ function lateStatus() {
     return Utilities.formatDate(new Date(o.at || 0), LATE_TZ, "EEE d MMM HH:mm") + " · " + m.subject + " · " + (m.bcc ? String(m.bcc).split(",").length + " in Bcc" : m.to); }).join("\n")
     : "Nothing waiting");
   Logger.log("Now in Madrid: " + Utilities.formatDate(new Date(), LATE_TZ, "EEE d MMM HH:mm") + " · next 7:30 if late: " + (lateNext(new Date()) ? new Date(lateNext(new Date())).toISOString() : "not late now"));
+}
+
+// v39: Roger's to-dos in Google Tasks (advanced service "Tasks", Google Tasks API v1)
+function taskListId(name) {
+  const ls = Tasks.Tasklists.list({maxResults: 100}).items || [];
+  const f = ls.find(function (l) { return l.title === name; });
+  return f ? f.id : Tasks.Tasklists.insert({title: name}).id;
+}
+function allTasks(id) {
+  let out = [], tok;
+  do { const r = Tasks.Tasks.list(id, {showCompleted: true, showHidden: true, maxResults: 100, pageToken: tok});
+    out = out.concat(r.items || []); tok = r.nextPageToken; } while (tok);
+  return out;
+}
+function tasksAdd(m) {
+  try {
+    const list = String(m.list || "English Lab").slice(0, 100), id = taskListId(list);
+    const have = allTasks(id).map(function (t) { return t.title; }), done = [];
+    (m.items || []).slice(0, 30).forEach(function (it) {
+      const title = String(it.title || "").trim().slice(0, 250); if (!title) return;
+      if (have.indexOf(title) >= 0) { done.push({title: title, skipped: "already there"}); return; }
+      const t = {title: title}; if (it.notes) t.notes = String(it.notes).slice(0, 4000);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(it.due || ""))) t.due = it.due + "T00:00:00.000Z";
+      done.push({title: title, id: Tasks.Tasks.insert(t, id).id}); have.push(title);
+    });
+    return {ok: true, list: list, done: done};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
+}
+function tasksList(m) {
+  try {
+    const list = String(m.list || "English Lab"), id = taskListId(list);
+    return {ok: true, list: list, tasks: allTasks(id).map(function (t) { return {id: t.id, title: t.title, notes: t.notes || "", due: t.due || "", status: t.status}; })};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
+}
+function tasksDone(m) {
+  try {
+    const id = taskListId(String(m.list || "English Lab")), done = [];
+    (m.ids || []).slice(0, 30).forEach(function (t) { Tasks.Tasks.patch({status: "completed"}, id, String(t)); done.push(t); });
+    return {ok: true, done: done};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
 }
