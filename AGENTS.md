@@ -531,4 +531,3 @@ Roger is the student here ("I'll be the teacher but the student here"): a hidden
 - `todo()` in `teacher.html`: comment lines = who · step (activity) · comment, then `.todoyou` = "👉 You: …" with Answer it / No reply needed (🙋) or "Nothing for you yet: Beltran answers it himself" (✉️). When Beltran's reason mentions a Redo, the line says where Redo is.
 - `needBox(u,a)` on top of `cellPanel`: 👉 What's left for you (🙋 comments, possible copies → Check it, an unmarked final product) or ✅ Nothing left for you here, plus grey info lines (redo pending via `redoOf`, ✉️ comments, levels Beltran still has to give). `cpOpen` opens with the same yellow line (Accept or Redo).
 - Not a final product: `levelRows` + general feedback + Save sit in `details.opt` ("✏️ Change a level or write general feedback", closed). `levelRows` shows "↺ sent back to redo" instead of the level buttons on a step waiting for its redo; `hbBackBox` says who sent it back (Beltran when `flags.auto`).
-
