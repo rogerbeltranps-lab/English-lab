@@ -93,10 +93,19 @@
   // try), a teacher level when the step has no checks; each step counts the same (as the LS page). Practice (graded:false, LS1) is left out.
   // ev = [{t, sk, v (0-1), ls}]: the dated checks for the line: each step's first try and its latest check (the tries in between have no
   // date) and a teacher level on the day it was marked; practice counts here (it is evidence of how a skill grows).
-  function work(pg,rs){const ev=[],act={},M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10},cat=window.EL_CATALOG||[];
+  // games (optional) = the student's class games [{kind: vocab | grammar, r, of, day, ls}] (myGames on the board, gameResults on the dashboard):
+  // each play is a dated Vocabulary or Grammar point on its day (Roger, 25 Nov 2026: "the students have done all kind of activities during the
+  // term, so they should see a term progress"). Only in ev (the line): the % per skill of an LS (act) stays the learning path steps.
+  // A teacher level (results.levels) is dated by the day the student handed the piece in (steps[pid].date, doneAt), not the day it was
+  // marked: levels given later (the 21 and 24 Nov 2026 back-fills) go back to the week the work was done.
+  function work(pg,rs,games){const ev=[],act={},M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10},cat=window.EL_CATALOG||[];
+    (games||[]).forEach(g=>{const sk=g&&{vocab:"Vocabulary",grammar:"Grammar"}[g.kind],t=g&&g.day?Date.parse(g.day+"T12:00:00"):0;
+      if(sk&&t&&+g.of>0)ev.push({t,sk,v:Math.max(0,Math.min(1,(+g.r||0)/+g.of)),ls:g.ls||"",game:true})});
     (window.EL_LS||[]).forEach(l=>{const ls=l.id,P=pg[ls]||{},A={},put=(k,v)=>{const z=A[k]||(A[k]={s:0,n:0});z.s+=Math.max(0,Math.min(1,v));z.n++};
-      cat.filter(a=>a.ls===ls).forEach(a=>{if(/checkpoint/.test(a.id))return;const seen=new Set(),pr=a.graded===false;
+      cat.filter(a=>a.ls===ls).forEach(a=>{if(/checkpoint/.test(a.id))return;const seen=new Set(),pr=a.graded===false,hd={};
         (a.keys||[]).forEach(key=>{let st=null;try{st=typeof P[key]==="string"?JSON.parse(P[key]):null}catch(e){}if(!st||typeof st!=="object")return;
+          Object.entries(st.steps||{}).forEach(([k,x])=>{const t=x&&tms(x.date);if(t)hd[k.replace(LVL,"")]=t});
+          Object.entries(st.doneAt||{}).forEach(([k,d])=>{const p=k.replace(LVL,""),t=tms(d);if(t&&!hd[p])hd[p]=t});
           const AL=st.all||{},F=st.tries||{},L=st.last||{},ok=x=>x&&+x.max>0,sc=x=>Math.min(1,(+x.score||0)/+x.max);
           new Set([...Object.keys(AL),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(LVL,""),sk=skillOf(a,pid);if(!sk)return;
             const f=F[k],l=L[k],two=ok(l)&&(!ok(f)||Math.abs(tms(l.date)-tms(f.date))>5000);
@@ -105,9 +114,14 @@
             if(ok(f)&&tms(f.date))ev.push({t:tms(f.date),sk,v:sc(f),ls});if(two&&tms(l.date))ev.push({t:tms(l.date),sk,v:sc(l),ls})})});
         const x=rs[a.id]||{};Object.entries(x.levels||{}).forEach(([pid,cs])=>{const sk=skillOf(a,pid);if(!sk)return;
           const ms=Object.values(cs||{}).map(d=>M[d]).filter(n=>n!=null);if(!ms.length)return;const v=ms.reduce((n,m)=>n+m,0)/ms.length/10;
-          if(!seen.has(pid)&&!pr)put(sk,v);const t=tms((x.marked||{})[pid]);if(t)ev.push({t,sk,v,ls})})});
+          if(!seen.has(pid)&&!pr)put(sk,v);const t=hd[pid]||tms((x.marked||{})[pid]);if(t)ev.push({t,sk,v,ls})})});
       if(Object.keys(A).length)act[ls]=A});
     return {ev,act}}
+  // the last day of an LS that has no Time plan (LS1: its pages kept no dates): the Friday before the next LS of the course starts on its
+  // Time plan. Its exam and final product go there on 📈 How my skills grow (the student's and the teacher's). 0 when unknown.
+  function lsEnd(id){const L=(window.EL_LS||[]).filter(x=>!x.personal),l=L.find(x=>x.id===id);if(!l)return 0;const C=L.filter(x=>x.course===l.course);
+    for(const n of C.slice(C.indexOf(l)+1)){const r=(((window.EL_PLAN||{})[n.id]||{}).rows||[])[0],t=r&&r.from?Date.parse(r.from+"T12:00:00"):0;if(t)return t-3*864e5}
+    return 0}
   // the weeks (Mondays) from the first check to this week
   function weeks(ev){if(!ev.length)return [];const W=[];for(let d=new Date(monday(Math.min(...ev.map(e=>e.t))));d.getTime()<=monday(Date.now());d.setDate(d.getDate()+7))W.push(d.getTime());return W}
   // the base look of the charts and the tooltip, once (the teacher dashboard and the student board both use it)
@@ -115,5 +129,5 @@
     +".elc-tip{position:fixed;z-index:60;background:#0f172a;color:#fff;font-size:13px;line-height:1.45;border-radius:10px;padding:8px 11px;pointer-events:none;box-shadow:0 6px 18px #0f172a40;max-width:280px}.elc-tip small{color:#cbd5e1}";
     document.head.appendChild(st)}catch(e){}
 
-  window.ELCharts={line,radar,wire,SK,skillOf,work,weeks,monday,tms};
+  window.ELCharts={line,radar,wire,SK,skillOf,work,weeks,monday,tms,lsEnd};
 })();

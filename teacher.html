@@ -322,7 +322,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
 <script src="shared/print/lp-list.js"></script>
-<script src="shared/js/el-step-titles.js" defer></script><script src="shared/js/el-voyage.js" defer></script><script src="shared/js/el-charts.js" defer></script><!-- 🌱 Progress: the skill of each step (as the LS page) and the charts -->
+<script src="shared/js/el-step-titles.js" defer></script><script src="shared/js/el-voyage.js" defer></script><script src="shared/js/el-charts.js?v=20261125" defer></script><!-- 🌱 Progress: the skill of each step (as the LS page) and the charts -->
 <script type="module">
 import {replyText,replyColor,replyMsgs,otherLabel,MSG_MAX} from "./shared/js/el-reply.js";
 import {ANN_MAX,annMs,annLast,annHtml,annText,annTranslate,annCardHtml,annCardStyle,lateHold} from "./shared/js/el-announce.js";
@@ -1967,8 +1967,12 @@ const PR_SK={Reading:["📖","#1d4ed8","circle",""],Listening:["🎧","#7e22ce",
   Grammar:["🧩","#b91c1c","circle","6 4"],Vocabulary:["🔤","#0f766e","square","6 4"]},PR_K=Object.keys(PR_SK);
 let PRC={d:null,m:new Map()};
 // One student's work by skill (ELCharts.work, shared with the student's 🎓 My progress): act[ls][skill] = {s, n} as the LS page, ev = the dated checks
-function prStu(u){if(PRC.d!==S.D||PRC.v!==SPK.v)PRC={d:S.D,v:SPK.v,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
-  const o=window.ELCharts?ELCharts.work(S.D.pg[u]||{},S.D.rs[u]||{}):{ev:[],act:{}};
+// The class games (gameResults, already read for every group) are dated Vocabulary and Grammar points too (Roger, 25 Nov 2026: "they should
+// see a term progress"), as on the student's chart: each play on its day, only on the line.
+function prGames(u){const s=S.P[u]||{},gl=GAMES[s.group],em=String(s.email||"").toLowerCase();if(!gl||gl.busy||!em)return [];
+  return gl.list.map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.cb?y.a||0:x.done,day:x.day,ls:x.lsId}:null}).filter(Boolean)}
+function prStu(u){const gv=Object.values(GAMES).map(g=>g.busy?"-":g.list.length).join();if(PRC.d!==S.D||PRC.v!==SPK.v||PRC.gv!==gv)PRC={d:S.D,v:SPK.v,gv,m:new Map()};if(PRC.m.has(u))return PRC.m.get(u);
+  const o=window.ELCharts?ELCharts.work(S.D.pg[u]||{},S.D.rs[u]||{},prGames(u)):{ev:[],act:{}};
   // 🗣 Roig's speaking analysis of each recording (spkPage): the average of its four levels out of 4, on the day it was handed in. Teacher
   // only: the students' own charts (today.html) cannot read it.
   EL_LS.forEach(l=>Object.values(((SPK.d[spkDoc(l.id,(S.P[u]||{}).group)]||{})[u])||{}).forEach(r=>{const sc=r&&spkScore(r.an);if(sc==null)return;
@@ -1977,8 +1981,9 @@ function prStu(u){if(PRC.d!==S.D||PRC.v!==SPK.v)PRC={d:S.D,v:SPK.v,m:new Map()};
   // final product results": LS1's pages saved no dated tries, only what was done): o.mil = [{k: exam|fp, ls, t, v (0-100), parts {skill: %}}].
   // The exam on its Time plan day (else the LS's last check), its parts by skill; the final product on its due day: its mark, and its spoken
   // part for Speaking (LS1: the whole final product; from LS2 on: the rubric rows of the oral production criteria, 3.x). The teacher sees held exams.
+  // An LS with no Time plan (LS1) puts both on its last day (ELCharts.lsEnd: the Friday before the next LS starts; Roger, 25 Nov 2026).
   o.mil=[];const gid=(S.P[u]||{}).group,day=d=>d?Date.parse(d+"T12:00:00")||0:0;
-  EL_LS.forEach(l=>{const g=(window.EL_GRADING||{})[l.id];if(!g)return;const px=planX(l.id,gid),ts=o.ev.filter(e=>e.ls===l.id).map(e=>e.t),last=ts.length?Math.max(...ts):0,ex0=px.p&&px.gi>=0?day(ELWeek.exam(px.p,px.gi)):0;
+  EL_LS.forEach(l=>{const g=(window.EL_GRADING||{})[l.id];if(!g)return;const px=planX(l.id,gid),ts=o.ev.filter(e=>e.ls===l.id).map(e=>e.t),last=ts.length?Math.max(...ts):0,ex0=px.p&&px.gi>=0?day(ELWeek.exam(px.p,px.gi)):px.p?0:ELCharts.lsEnd(l.id);
     if(g.exam){const em=examMark(u,l.id);if(em){const pe=prExam(u,l.id),parts={};Object.entries(pe.ex).forEach(([k,z])=>{if(z.m)parts[k]=z.s/z.m*100});
       const t=ex0||last;if(t)o.mil.push({k:"exam",ls:l.id,t:Math.min(t,Date.now()),v:em.mark*10,parts})}}
     if(g.fp&&g.fp.a){const R=res(u,g.fp.a),pr=res(u,asId(l.id)).progress||{},m=R.max?(+R.score||0)/R.max*10:pr.fp!=null?+pr.fp:null;if(m==null)return;
@@ -2044,8 +2049,8 @@ function prPage(grp,ls,studs){if(window.ELCharts)ELCharts.wire();
       +W.map((w,i)=>ser.some(s=>!s.thin&&s.v[i]!=null)?`<tr><td>${esc(lab(w))}</td>${ser.filter(s=>!s.thin).map(s=>`<td>${tv(s.v,i)}</td>`).join("")}</tr>`:"").join("")+`</tbody></table></div></details>`}
   const who=`<select id="prstu" aria-label="Whose progress"><option value="">👥 Whole group (average)</option>${studs.slice().sort((a,b)=>fullName(a).localeCompare(fullName(b),"ca")).map(s=>`<option value="${esc(s.uid)}" ${me&&me.uid===s.uid?"selected":""}>${esc(fullName(s))}</option>`).join("")}</select>`;
   const chips=`<div class="bar prsk"><button class="chip ${sel==="all"?"on":""}" data-do="prsk" data-s="all">All skills</button>`+PR_K.map(k=>`<button class="chip ${sel===k?"on":""}" data-do="prsk" data-s="${k}"><i class="sw" style="background:${PR_SK[k][1]}"></i>${PR_SK[k][0]} ${k}</button>`).join("")+`</div>`;
-  const how=me?(sel==="all"?`Each point is the average of ${esc(shortName(me).mid)}'s checks in that skill that week (first tries and latest checks, and the levels you gave).`:`${esc(shortName(me).mid)} in ${sel}, week by week, with the group's average (dotted).`)
-    :sel==="all"?"Each point is the group's average in that skill that week: each student's checks that week (first tries and latest checks, and the levels you gave), then the average of the students.":`The group's average in ${sel} week by week; each faint line is one student. Pick a student above to follow them.`;
+  const how=me?(sel==="all"?`Each point is the average of ${esc(shortName(me).mid)}'s checks in that skill that week (first tries and latest checks, the levels you gave in the week the work was handed in, and the class games).`:`${esc(shortName(me).mid)} in ${sel}, week by week, with the group's average (dotted).`)
+    :sel==="all"?"Each point is the group's average in that skill that week: each student's checks that week (first tries and latest checks, the levels you gave in the week the work was handed in, and the class games), then the average of the students.":`The group's average in ${sel} week by week; each faint line is one student. Pick a student above to follow them.`;
   const lineB=`<div class="box prline elc-wrap"><div class="prhd"><h2>📈 Skill mastery over time</h2>${who}</div><p class="muted prhow">${how} Above the dashed 50 % line is a pass. Speaking comes from Roig's analysis of the recordings (🗣 Speaking). ★ the exam and ■ the final product of each LS, with their marks (one skill: that part).</p>${chips}`
     +(line||`<p class="muted">No checked activities yet${me?" for "+esc(shortName(me).mid):""}.</p>`)+table+`</div>`;
   // ---- 🕸 skills in this LS: activities (all tries) and exam
