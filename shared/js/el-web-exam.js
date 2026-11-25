@@ -17,6 +17,12 @@
    - Page text can't be copied, and nothing from outside can be pasted; students can copy and paste their own text inside their boxes (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
      saves them (dashboard → results/{ls}__assessment, as every exam).
    The teacher (and window.EL_EXAM_PREVIEW) sees a preview with every paper and the audio, and nothing is saved. */
+// Aa Easy reading on the exam's reading text (Roger, 25 Nov 2026: exams too; shared/js/el-easy-read.js, .wx-text).
+(function () {
+  if (!window.EL_EXAM || window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=1', me).href; document.head.appendChild(s);
+})();
 (function () {
   const X = window.EL_EXAM; if (!X) return;
   const FS = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';

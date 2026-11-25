@@ -62,8 +62,11 @@ function rcGet(uid){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null")
 function rcPut(uid,d,t){try{origSet.call(localStorage,RC+uid,JSON.stringify({t:t||Date.now(),d}))}catch(e){}}
 // fresh: read from the server (the board), otherwise the copy in this browser while it is younger than 30 minutes.
 function myResults(uid,fresh){
-  const c=!fresh&&rcGet(uid);if(c)return Promise.resolve(c).then(held);
-  return once("rs:"+uid,async()=>{const d={};(await getDocs(collection(db,"students",uid,"results"))).forEach(x=>d[x.id]=x.data());rcPut(uid,plain(d));return d}).then(held);
+  // window.EL_RS_RAW: the results as saved, exam marks included, only for the 📄 Term report (today.html reportPlace: Roger, 25 Nov 2026,
+  // "the reports must have them anyway, and I decide when to publish everthing!"); every other page gets the held copy
+  const keep=d=>{window.EL_RS_RAW=d;return held(d)};
+  const c=!fresh&&rcGet(uid);if(c)return Promise.resolve(c).then(keep);
+  return once("rs:"+uid,async()=>{const d={};(await getDocs(collection(db,"students",uid,"results"))).forEach(x=>d[x.id]=x.data());rcPut(uid,plain(d));return d}).then(keep);
 }
 // Exam results held back (Roger, 17 Nov 2026, the web exam: "we release the results automatically 4 days later"): a record with
 // showFrom (an ISO time, written by the dashboard's 📥 Save marks and tools/web-exam/writing.mjs) shows no exam marks, report or writing

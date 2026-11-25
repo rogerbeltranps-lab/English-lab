@@ -62,6 +62,23 @@
     .explain{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 16px;margin:0 0 12px;line-height:1.55}.explain p{margin:.35em 0}
     .slides{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.slides a{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:700}
     .picks{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.picks .w.on{background:var(--accent-soft);border-color:var(--accent)}.picks .w:disabled{text-decoration:line-through;opacity:.5;cursor:default}
+    /* 🎯 Practise per LS (25 Nov 2026): Choose an LS, then a skill */
+    h2.pick{margin:4px 0 12px}
+    .lsgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+    .lsc{--c:#3157d5;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;cursor:pointer;background:#fff;border:1px solid var(--line);border-top:6px solid var(--c);border-radius:20px;padding:16px 18px;color:var(--text)}
+    .lsc:hover{box-shadow:var(--shadow)}.lsc .lsn{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}.lsc .lss{color:var(--muted);font-weight:600}
+    .lsc .lsk{display:flex;flex-wrap:wrap;gap:6px}.lsc .lsk span{background:#f1f5f9;border-radius:999px;padding:3px 9px;font-weight:700;font-size:.88rem}
+    .lsc .lsgo{margin-top:auto;align-self:flex-end;color:var(--c);font-weight:800}
+    .lsc.mix{--c:#7c3aed;background:#faf5ff;border-color:#e9d5ff;border-top-color:#7c3aed}
+    .lshd{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 4px}.lshd h2{margin:0}
+    .tab.zero{opacity:.55}.item.mixq{background:#faf5ff;border-color:#e9d5ff}
+    .rtext{background:#fffdf7;border:1px solid #f3e8c8;border-radius:14px;padding:12px 18px;line-height:1.65;font-size:1.04rem}.rtext p{margin:.5em 0}.rtext .tiny{font-size:.86rem;color:var(--muted)}
+    .wbox{width:100%;border:2px solid #cbd5e1;border-radius:14px;padding:10px 12px;line-height:1.5;resize:vertical;font:inherit}
+    .chk{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:10px 14px;margin:8px 0;display:flex;flex-direction:column;gap:6px}
+    .pq{margin:6px 0}
+    .rqdots{display:flex;gap:6px;margin:6px 0 12px}.rqdots span{width:38px;height:8px;border-radius:99px;background:#e9d5ff}.rqdots .on{background:#7c3aed}.rqdots .done{background:#4c1d95}
+    .rqcard{border:2px solid #7c3aed;border-radius:18px;padding:16px 18px;background:#faf5ff;margin:0 0 12px}.rqn{font-size:.8rem;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.04em}
+    .rqq{font-size:1.4rem;font-weight:750;line-height:1.3;margin:8px 0}.rqstart{background:#fff4dc;color:#7a4a00;border-radius:12px;padding:8px 12px;font-weight:650;display:inline-block;margin:4px 0}
     .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -90,6 +107,9 @@
     <div id="app"></div>
   </section></main>
   </div>
+<!-- 🧠 Flashcards (#deck) is named from its first frame: the heading and the tab said "Practise · Loading…" until sign-in finished
+     (Roger, 25 Nov 2026, video "Look what happens"). start() then sets the student's language (Targetes for Starter). -->
+<script>if (location.hash === '#deck') { document.getElementById('title').textContent = '🧠 Flashcards'; document.title = 'Flashcards · English with Roger'; }</script>
 
 <!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
 <script src="../shared/js/el-app.js"></script>
@@ -110,7 +130,7 @@ const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
 const KEY = 'el_practice';   // el_ keys stay in this browser
 const store = (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch (e) { return {} } })();
 const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(store)) } catch (e) {} };
-store.known = store.known || {}; store.listen = store.listen || {}; store.shadow = store.shadow || {}; store.gram = store.gram || {};
+store.known = store.known || {}; store.listen = store.listen || {}; store.shadow = store.shadow || {}; store.gram = store.gram || {}; store.write = store.write || {};
 
 /* ---------- routes, as in the LS2 engine: cumulative r: tags, Starter falls back to Base, Pro to Plus ---------- */
 const base = lv => lv === 'native' ? 'daring' : lv;
@@ -121,6 +141,9 @@ const byLevel = (o, lv) => o == null ? '' : typeof o === 'string' ? o
   : o.ca != null || o.en != null ? (elCa(base(lv)) ? (o.ca || o.en) : (o.en || o.ca))
   : (o[lv] ?? o[base(lv)] ?? (base(lv) === 'daring' ? o.safe : null) ?? o.insecure ?? '');
 const tx = o => o == null ? '' : typeof o === 'string' ? o : (o.en || o.ca || '');
+// a route's own value, with no borrowing from the routes above it (a writing frame or a model is only for the routes that have one)
+const strict = (o, lv) => o == null ? '' : typeof o !== 'object' || Array.isArray(o) ? o
+  : o.ca != null || o.en != null ? byLevel(o, lv) : (o[lv] ?? o[base(lv)] ?? (base(lv) === 'beginners' ? o.insecure : null) ?? '');
 const ls1Level = lv => lv === 'beginners' ? 'insecure' : base(lv);
 
 /* ---------- reading the LS content ---------- */
@@ -208,7 +231,7 @@ function gCard(it, items, kind, part, lv, salt) {
 
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
 function extract(pg, lv, off) {
-  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
     (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'), lv === 'native')); }));
@@ -220,6 +243,7 @@ function extract(pg, lv, off) {
   }
   const texts = [], PS = panelsOf(pg, lv), mainG = PS.find(p => p.type === 'typed' && p.id === 'grammar') || PS.find(p => p.type === 'typed' && /^grammar/.test(p.id));
   PS.filter(p => !(off && off.has(elTabOf(at, p.id)))).forEach(p => {
+    out.tabs.push({ t: at + '#' + p.id, dir: pg.dir });   // the tabs open for the group: 🎲 Random questions draw from them
     // 🧠 Flashcards (Roger, 24 Nov 2026): every word of the Vocabulary steps and every grammar / 💬 Expressions question of the tabs open
     // for the group, at the student's route, go to the LS deck (shared/js/el-flashdeck.js)
     if (Array.isArray(p.groups) && p.groups.some(g => Array.isArray(g.items))) {
@@ -240,6 +264,17 @@ function extract(pg, lv, off) {
       }));
     }
     const m = p.media;
+    // 📖 Reading (Roger, 25 Nov 2026: "practice per LSs… grammar, vocab, listening, reading, writing, speaking"): the reading texts of the
+    // path (an mc / quiz panel with media.text) at the route, with their questions
+    if (m && m.text && p.items && /^(mc|quiz)$/.test(p.type)) {
+      const items = forLevel(p.items, lv).filter(q => Array.isArray(q.o) && q.o.length > 1), text = byLevel(m.text, lv);
+      if (text && items.length) out.read.push({ key: at + '#' + p.id, title: plain(byLevel(p.title, lv)).replace(/^(Reading|Lectura)\s*:\s*/i, '') || tx(p.tab), lp, media: { kind: 'text', html: text }, items });
+    }
+    // ✍️ Writing and 🗣 Speaking / 💬 Talk tasks of the path, to do again on your own: the route's task, frame, checklist and model
+    if (p.type === 'writing' && p.task) out.write.push({ key: at + '#' + p.id, title: plain(byLevel(p.title, lv)), lp, task: byLevel(p.task, lv), frame: strict(p.frame, lv),
+      model: strict(p.model, lv), min: typeof p.min === 'number' ? p.min : +strict(p.min, lv) || 0, checklist: [].concat(strict(p.checklist, lv) || []).filter(x => typeof x === 'string') });
+    if ((p.type === 'speaking' || p.type === 'talk') && p.task) out.speak.push({ key: at + '#' + p.id, kind: p.type, title: plain(byLevel(p.title, lv)), lp, task: byLevel(p.task, lv), model: strict(p.model, lv),
+      partner: p.type === 'talk' ? forLevel(p.partner, lv).filter(x => x && x.q) : [] });
     if (m && p.items && /^(mc|quiz)$/.test(p.type)) {
       let media = null;
       if (m.audio) media = { kind: 'audio', src: pg.dir + m.audio, slow: pg.dir + m.audio.replace(/\.mp3$/, '-slow.mp3'), script: m.script };
@@ -274,8 +309,16 @@ const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
 // Practise tabs; lab/practice.html is Practise without the Flashcards tile. Going from one to the other reloads the page.
 const FC = location.hash === '#deck';
 addEventListener('hashchange', () => { if ((location.hash === '#deck') !== FC) location.reload(); });
-const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, step: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
-if (FC) S.tab = 'deck'; else if (!['words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
+// The page's place is in the address (#<LS id or all>/<skill>, e.g. #4eso-seasons-and-celebrations/grammar), so Back goes back one choice;
+// no address = Choose an LS. An old link with only a skill (#grammar, #build, #shadow) opens that skill with every LS mixed.
+const TABK = ['words', 'grammar', 'listen', 'read', 'write', 'speak'], OLDTAB = { build: 'write', shadow: 'speak' };
+function fromHash() {
+  const h = decodeURIComponent(location.hash.slice(1)); if (!h || h === 'deck') return { ls: null, tab: null };
+  const [a, b] = h.split('/'), sk = x => OLDTAB[x] || x;
+  if (TABK.includes(sk(a))) return { ls: 'all', tab: sk(a) };
+  return { ls: a, tab: TABK.includes(sk(b)) ? sk(b) : null };
+}
+const S = Object.assign({ course: null, level: null, step: null, lp: 'all', mode: 'cards', coreOnly: null, open: null }, FC ? { ls: 'all', tab: 'deck' } : fromHash());
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
 const all = () => DEMO ? !!DEMO.teacher : !!U && !ELCloud.viewing && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));   // viewing: the teacher's student view (el-cloud.js)
@@ -308,22 +351,33 @@ const name = lv => (EL_LEVELS.find(l => l.id === lv) || {}).name || lv;
 /* ---------- content for the level on screen ---------- */
 async function content() {
   const acts = [], L = [];
-  pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).filter(l => S.ls === 'all' || l.id === S.ls).forEach(l => { if (!L.includes(l)) L.push(l);
+  pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).forEach(l => { if (!L.includes(l)) L.push(l);
     const ok = all() || c === myCourse() ? canDo : otherDo;
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
-  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], cards: [], lps: acts, ls: L };
+  const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
   // Only the tabs the learning path itself shows (Roger, 22 Nov 2026: "Why some 4ESO students could do the future forms if they are scheduled
   // for next Wednesday?"): a tab the teacher locked, or one the Time plan keeps for a later class (or none yet), stays out of Practise
   // until the path page opens it (elSecLockedFor in el-catalog.js, the same test as the LP page; REQUIREMENTS §3 "No class work shown
   // in advance"). The teacher and testers still see everything.
   const offOf = a => all() || !window.elSecLockedFor ? null : new Set(elSecLockedFor(a, D.ls[a.ls] || {}, D.group, new Set()));
-  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv, offOf(acts[i].a)); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
-  const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  pages.forEach((pg, i) => { if (!pg) return; const x = extract(pg, acts[i].lv, offOf(acts[i].a)); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l, act: acts[i].a.id })))); });
   // 🧠 one deck per LS, newest first for students (as content() lists them), each card once
   out.decks = out.ls.map(l => { const ids = new Set(); return { id: l.id, name: lsName(l), cards: out.cards.filter(c => c.ls === l && !ids.has(c.id) && ids.add(c.id)) }; }).filter(d => d.cards.length);
   return out;
 }
+// 🎯 Practise per LS (Roger, 25 Nov 2026: "I want practice per LSs, so you can choose on LS (grammar, vocab, listening, reading, writing,
+// speaking) or both"): content() reads every LS once; view() keeps one LS ('all' = every LS mixed) and, for the teacher, one learning path
+const SKILLS = ['words', 'grammar', 'build', 'listen', 'read', 'write', 'speak', 'shadow', 'tabs'];
+function view(A, ls) {
+  const V = Object.assign({}, A), seen = new Set(), on = y => (ls === 'all' || y.ls.id === ls) && (S.lp === 'all' || y.act === S.lp);
+  SKILLS.forEach(k => { V[k] = A[k].filter(on); });
+  V.words = V.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  V.lps = A.lps.filter(({ l }) => ls === 'all' || l.id === ls); V.ls = A.ls.filter(l => ls === 'all' || l.id === ls);
+  return V;
+}
+// how much each skill holds (a skill tile, an LS card): writing = sentence builder + tasks, speaking = shadowing clips + tasks
+const counts = V => ({ words: V.words.length, grammar: V.grammar.length, listen: V.listen.length, read: V.read.length, write: V.write.length + (V.build.length ? 1 : 0), speak: V.speak.length + V.shadow.length + (V.tabs.length ? 1 : 0) });
 // tools/voice/harvest.js (preview only): every 🧠 Flashcards card of every course and route, so each one is recorded with Kokoro Heart
 if (DEMO && DEMO.harvest) window.EL_PRACTICE_HARVEST = async () => { const r = [], S0 = { ...S };
   for (const c of Object.keys(COURSES)) for (const lv of levelsOf(c)) { Object.assign(S, { course: c, level: lv, ls: 'all', lp: 'all' }); (await content()).decks.forEach(d => d.cards.forEach(x => { if (x.say) r.push(x.say); if (x.kind === 'v' && x.ex) r.push(x.ex); })); }
@@ -345,27 +399,58 @@ function header() {
 // Students do not see where the practice comes from (Roger, 7 Nov 2026: "I don't want students to see where the info comes from.
 // This is too much info"): no LS chips, no Learning Path list, no LP names on cards, listenings or clips. Teacher and testers keep them.
 const srcLine = s => all() ? s : '';
-function filters(x) {
-  if (!all()) return '';
-  const L = stepLS();
-  return `<div class="row">${L.length > 1 ? `<button class="chip ${S.ls === 'all' ? 'on' : ''}" data-do="ls" data-v="all">${t('Totes les LS', 'All LSs')}</button>` : ''}${L.map((l, i) => `<button class="chip ${S.ls === l.id ? 'on' : ''}" data-do="ls" data-v="${l.id}">${esc(lsName(l))}</button>`).join('')}
-    ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
+function filters(x) {   // the teacher and testers: one learning path of the LS on screen
+  if (!all() || x.lps.length < 2) return '';
+  return `<div class="row"><select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select></div>`;
 }
-// Vocabulary and Grammar first and bigger (Roger, 7 Nov 2026), then sentence builder, listening and shadowing
-const TABS = [['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
-  ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['shadow', '🗣', 'Shadowing', 'Shadowing', 'Escolta i repeteix', 'Listen and repeat']];
-let X = null, gen = 0;
+// The six skills (Roger, 25 Nov 2026: "grammar, vocab, listening, reading, writing, speaking"): Writing holds the sentence builder and the
+// paths' writing tasks, Speaking the shadowing clips and the paths' Speaking and Talk tasks
+const TABS = [['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes i prova', 'Cards and a quick test'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'],
+  ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['read', '📖', 'Reading', 'Reading', 'Textos amb preguntes', 'Texts with questions'],
+  ['write', '✍️', 'Writing', 'Writing', 'Ordena frases i escriu', 'Build sentences and write'], ['speak', '🗣', 'Speaking', 'Speaking', 'Shadowing i parla', 'Shadowing and speaking']];
+let X = null, XA = null, gen = 0;
+const lsCol = l => l.course === '2eso' ? '#15803d' : '#2563eb';   // course palettes: 2 ESO green, 4 ESO blue
+const lsTitle = ls => ls === 'all' ? '🔀 ' + t('Totes les meves LS barrejades', 'All my LSs mixed') : lsName(XA.ls.find(l => l.id === ls) || { course: S.course, title: ls });
+const chips = n => TABS.filter(([k]) => n[k]).map(([k, i, en, ca]) => `<span title="${esc(t(ca, en))}">${i} ${n[k]}</span>`).join('');
+// 1. Choose an LS: one card per LS (newest first) and 🔀 every LS mixed
+function chooser() {
+  const L = XA.ls.map(l => ({ l, n: counts(view(XA, l.id)) })).filter(x => Object.values(x.n).some(Boolean));
+  if (!L.length) return none();
+  const mix = L.length > 1 ? `<button class="lsc mix" data-do="ls" data-v="all"><span class="lsn">🔀 ${t('Totes les meves LS barrejades', 'All my LSs mixed')}</span><span class="lss">${t('Tot el que has fet a cada LS, junt', 'Everything from every LS together')}</span><span class="lsk">${chips(counts(view(XA, 'all')))}</span><span class="lsgo">${t('Obre', 'Open')} ›</span></button>` : '';
+  return `<h2 class="pick">${t('Tria una LS', 'Choose an LS')}</h2><div class="lsgrid">${L.map(({ l, n }) => `<button class="lsc" style="--c:${lsCol(l)}" data-do="ls" data-v="${esc(l.id)}"><span class="lsn">${esc(lsName(l))}</span><span class="lsk">${chips(n)}</span><span class="lsgo">${t('Obre', 'Open')} ›</span></button>`).join('')}${mix}</div>`;
+}
+// 2. Choose a skill: the LS (or 🔀 all of them), six tiles, then the practice itself
+function skills() {
+  const n = counts(X), back = XA.ls.length > 1 || S.ls !== 'all';
+  return `<div class="lshd">${back ? `<button class="btn g sm" data-do="home">← ${t('Totes les LS', 'All LSs')}</button>` : ''}<h2>${esc(lsTitle(S.ls))}</h2></div>` + filters(X)
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab ${S.tab === k ? 'on' : ''}${n[k] ? '' : ' zero'}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
+}
+function body() {
+  if (!S.tab) return $('#body').innerHTML = `<div class="empty">👆 ${t('Tria què vols practicar.', 'Choose what you want to practise.')}</div>`;
+  ({ deck, words, grammar, listen, read: listen, write, speak })[S.tab]();
+}
 async function render() {
-  const g = ++gen;
-  $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
-  const x = await content(); if (g !== gen) return; X = x;
+  const g = ++gen, key = S.course + '|' + S.level;
+  if (trc && trc.state === 'recording') trc.stop();
+  if (!XA || XA.key !== key) {
+    $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
+    const x = await content(); if (g !== gen) return; x.key = key; XA = x;
+  }
   fdSum(fdLoad());
-  if (FC) { $('#app').innerHTML = header() + '<div id="body"></div>'; return deck(); }
-  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
-  $('#app').innerHTML = header() + filters(x)
-    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
-  ({ deck, words, grammar, build, listen, shadow })[S.tab]();
+  if (FC) { X = XA; $('#app').innerHTML = header() + '<div id="body"></div>'; return deck(); }
+  if (S.ls && S.ls !== 'all' && !XA.ls.some(l => l.id === S.ls)) { S.ls = null; history.replaceState(null, '', location.pathname + location.search); }   // an LS of another course or level
+  if (!S.ls) { X = XA; $('#app').innerHTML = header() + chooser(); return; }
+  X = view(XA, S.ls);
+  $('#app').innerHTML = header() + skills();
+  body();
 }
+// one choice = one step back with the browser's ← (the address keeps the LS and the skill)
+function nav(ls, tab) {
+  S.ls = ls; S.tab = tab; S.open = null; S.lp = 'all'; MIXQ = null;
+  history.pushState(null, '', ls ? '#' + ls + (tab ? '/' + tab : '') : location.pathname + location.search);
+  render(); window.scrollTo({ top: 0 });
+}
+addEventListener('popstate', () => { if ((location.hash === '#deck') !== FC) return; Object.assign(S, fromHash(), { open: (history.state || {}).open || null }); MIXQ = null; render(); });
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
 const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
 const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
@@ -427,9 +512,9 @@ const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
 // fdSum leaves the counts of today (el_flash_sum_<uid>: reviews due, new cards today, new cards a day) for the board's
 // mascot, so the board knows how many cards are waiting without building the decks.
 function fdSum(P) {
-  if (fdAs() || !X || all()) return;
-  const s = ELFlashDeck.summary(X.decks, P); let un = 0;
-  (X.decks || []).forEach(d => { const c = ((P.decks || {})[d.id] || {}).c || {}; un += Math.min(15, d.cards.filter(x => !c[x.id]).length); });
+  if (fdAs() || !XA || all()) return;
+  const s = ELFlashDeck.summary(XA.decks, P); let un = 0;
+  (XA.decks || []).forEach(d => { const c = ((P.decks || {})[d.id] || {}).c || {}; un += Math.min(15, d.cards.filter(x => !c[x.id]).length); });
   try { localStorage.setItem('el_flash_sum' + (U ? '_' + U.uid : ''), JSON.stringify({ d: ELFlashDeck.dayKey(Date.now()), due: s.due, nw: s.new, un })) } catch (e) {}
 }
 function fdSave(P) {
@@ -463,7 +548,7 @@ function build() {
   if (!X.build.length) return $('#body').innerHTML = none();
   const ids = X.build.map(b => b.s).join('|');
   if (set.ids !== ids) { set = shuffle(X.build).slice(0, 6); set.ids = ids; set.words = set.map(b => shuffle(b.s.split(/\s+/).map((w, i) => ({ w, i })))); built = set.map(() => []); }
-  $('#body').innerHTML = `<div class="card"><div class="how">${t('Toca les paraules en ordre per fer la frase. Toca una paraula de la frase per treure-la. Després prem <b>Comprova</b>.', 'Tap the words in order to build the sentence. Tap a word in your sentence to take it out. Then press <b>Check</b>.')}</div>`
+  $('#body').innerHTML = backRow(t('Tot el Writing', 'All writing')) + `<div class="card"><h3>🧩 Sentence builder</h3><div class="how">${t('Toca les paraules en ordre per fer la frase. Toca una paraula de la frase per treure-la. Després prem <b>Comprova</b>.', 'Tap the words in order to build the sentence. Tap a word in your sentence to take it out. Then press <b>Check</b>.')}</div>`
     + set.map((b, i) => `<div class="q"><p>${i + 1}. ${srcLine(`<small class="muted">${esc(b.lp)}</small>`)}</p><div class="line" id="bl${i}">${built[i].map(j => `<button class="w" data-do="unpick" data-i="${i}" data-j="${j}">${esc(set.words[i][j].w)}</button>`).join('')}</div>
       <div class="bank">${set.words[i].map((x, j) => `<button class="w ${built[i].includes(j) ? 'used' : ''}" data-do="pick" data-i="${i}" data-j="${j}">${esc(x.w)}</button>`).join('')}</div><div class="fb" id="bf${i}"></div></div>`).join('')
     + `<div class="row"><button class="btn" data-do="bcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="bnew">${t('Unes altres frases', 'New sentences')}</button><span class="fb" id="bscore"></span></div></div>`;
@@ -476,15 +561,19 @@ function bcheck() {
   $('#bscore').textContent = ok + ' / ' + set.length + (ok === set.length ? ' 🎉' : '');
 }
 
-/* 🎧 Listening: the LS listenings and videos with the route's questions; Starter starts on the slow copy */
+/* 🎧 Listening: the LS listenings and videos with the route's questions; Starter starts on the slow copy.
+   📖 Reading (25 Nov 2026) works the same way, with the route's text instead of the recording. */
 let ans = {};
+const QL = () => S.tab === 'read' ? X.read : X.listen;
+const qHint = q => elCa(base(S.level)) ? q.h : (q.he || '');   // Starter's hint in Catalan, the others' in English
 const itemTitle = x => all() ? x.title : x.title.replace(/\s*\((warm-up|escalfament)\)\s*$/i, '');   // LS1 listenings are named after their path
 function listen() {
-  if (!X.listen.length) return $('#body').innerHTML = none();
-  const e = X.listen.find(x => x.key === S.open);
+  const RD = S.tab === 'read', LS = QL();
+  if (!LS.length) return $('#body').innerHTML = none();
+  const e = LS.find(x => x.key === S.open);
   if (!e) {
-    $('#body').innerHTML = `<div class="how">${t('Tria una escolta. Escolta-la, respon les preguntes i comprova. Pots repetir-la tantes vegades com vulguis.', 'Choose a listening. Listen, answer the questions and check. You can do it again as many times as you like.')}</div><div class="list">`
-      + X.listen.map(x => { const b = store.listen[x.key + '@' + S.level]; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${x.media.kind === 'audio' ? '🎧' : '🎬'} ${esc(itemTitle(x))}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('') + `</div>`;
+    $('#body').innerHTML = `<div class="how">${RD ? t('Tria un text. Llegeix-lo, respon les preguntes i comprova. Pots repetir-lo tantes vegades com vulguis.', 'Choose a text. Read it, answer the questions and check. You can do it again as many times as you like.') : t('Tria una escolta. Escolta-la, respon les preguntes i comprova. Pots repetir-la tantes vegades com vulguis.', 'Choose a listening. Listen, answer the questions and check. You can do it again as many times as you like.')}</div><div class="list">`
+      + LS.map(x => { const b = store.listen[x.key + '@' + S.level]; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${{ audio: '🎧', text: '📖' }[x.media.kind] || '🎬'} ${esc(itemTitle(x))}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('') + `</div>`;
     return;
   }
   const slow = elCa(base(S.level)) && base(S.level) === 'beginners', m = e.media;
@@ -493,17 +582,18 @@ function listen() {
   let media = '';
   if (m.kind === 'audio') media = `<audio id="aud" controls preload="metadata" src="${esc(slow && m.slow ? m.slow : m.src)}"></audio>${m.slow ? `<div class="row"><button class="btn sm" data-do="speed" data-v="0" aria-pressed="${!slow}">${t('Velocitat normal', 'Normal speed')}</button><button class="btn sm" data-do="speed" data-v="1" aria-pressed="${slow}">${t('Més lent', 'Slower')}</button></div>` : ''}`;
   else if (m.kind === 'video') media = m.list.map(v => `<p><b>${esc(v.title || '')}</b></p><video controls preload="metadata" playsinline poster="${esc(v.poster)}" src="${esc(slow ? v.slow : v.src)}"><track kind="subtitles" srclang="en" label="English" src="${esc(slow ? v.vttSlow : v.vtt)}" ${slow ? 'default' : ''}></video>`).join('') + `<p class="muted">${t('Subtítols: botó CC del vídeo. Mira’l primer sense.', 'Subtitles: the CC button on the video. Watch it once without them first.')}</p>`;
+  else if (m.kind === 'text') media = `<div class="rtext">${m.html}</div>`;
   else media = `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.id)}" title="${esc(e.title)}" allowfullscreen></iframe></div>`;
-  $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${t('Totes les escoltes', 'All listenings')}</button></div><div class="card"><h3>${esc(itemTitle(e))}</h3>${e.lp !== e.title && all() ? `<p class="muted">${esc(e.lp)}</p>` : ''}${media}${m.credit ? `<p class="muted"><small>${esc(m.credit)}</small></p>` : ''}</div>
+  $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${RD ? t('Tots els textos', 'All texts') : t('Totes les escoltes', 'All listenings')}</button></div><div class="card"><h3>${esc(itemTitle(e))}</h3>${e.lp !== e.title && all() ? `<p class="muted">${esc(e.lp)}</p>` : ''}${media}${m.credit ? `<p class="muted"><small>${esc(m.credit)}</small></p>` : ''}</div>
     <div class="card">${e.items.map((q, i) => `<div class="q"><p>${i + 1}. ${esc(q.q)}</p><div class="opts">${e.order[i].map((o, j) => `<button class="opt" data-do="ans" data-i="${i}" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" id="lf${i}"></div></div>`).join('')}
     <div class="row"><button class="btn" data-do="lcheck">${t('Comprova', 'Check')}</button><span class="fb" id="lscore"></span></div><div id="lscript"></div></div>`;
 }
 function lcheck() {
-  const e = X.listen.find(x => x.key === S.open); let ok = 0;
+  const e = QL().find(x => x.key === S.open); let ok = 0;
   e.items.forEach((q, i) => {
     const j = ans[i], right = j != null && e.order[i][j] === q.o[0], f = $('#lf' + i); if (right) ok++;
     $$(`[data-do="ans"][data-i="${i}"]`).forEach((b, k) => { b.classList.toggle('right', e.order[i][k] === q.o[0] && (right || j != null)); b.classList.toggle('wrong', k === j && !right); });
-    f.className = 'fb ' + (right ? 'ok' : 'no'); f.innerHTML = right ? '✓' : (j == null ? t('Tria una resposta.', 'Choose an answer.') : '✗') + (q.h && elCa(base(S.level)) && j != null && !right ? ' <span class="hint">💡 ' + esc(q.h) + '</span>' : '');
+    f.className = 'fb ' + (right ? 'ok' : 'no'); f.innerHTML = right ? '✓' : (j == null ? t('Tria una resposta.', 'Choose an answer.') : '✗') + (qHint(q) && j != null && !right ? ' <span class="hint">💡 ' + esc(qHint(q)) + '</span>' : '');
   });
   const k = e.key + '@' + S.level, sc = ok + '/' + e.items.length, prev = store.listen[k];
   if (!prev || ok > +prev.split('/')[0]) { store.listen[k] = sc; keep(); }
@@ -518,7 +608,7 @@ function lcheck() {
 const SLIDES = [['2eso-my-real-routine', 'grammar/2eso-present-simple.html', 'Present Simple'], ['4eso-my-real-routine', 'grammar/4eso-present-simple-phrasal-verbs.html', 'Phrasal verbs'],
   ['4eso-seasons-and-celebrations', 'grammar/4eso-present-simple-customs.html', 'Customs & dates']];
 let gtries = {};
-const gKey = () => S.open + '@' + S.level;
+const gKey = () => S.open + (S.open === 'mixq' ? '@' + S.ls : '') + '@' + S.level;
 // a Mixed tab is named after the grammar topic of its learning path ("Mixed practice · like + -ing and imperatives"): several are called the same
 const gTitle = g => { if (!g.mixed) return g.title; const main = X.grammar.find(x => !x.mixed && x.key.split('#')[0] === g.key.split('#')[0]);
   return main ? t('Barreja', 'Mixed practice') + ' · ' + main.title : g.title; };
@@ -629,30 +719,39 @@ function choices(it, items, salt) {
   return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
 }
 const gChoices = (it, items, i) => choices(it, items, S.open + i);
+// 🔀 Mixed questions (25 Nov 2026, "or both"): 10 questions drawn from every grammar topic on screen (one LS, or every LS mixed); a new
+// draw each time it opens or with ↺ Practise again. Only the best score is kept.
+let MIXQ = null;
+function gFind() {
+  if (S.open !== 'mixq') return X.grammar.find(x => x.key === S.open);
+  if (!MIXQ) MIXQ = { key: 'mixq', mix: true, title: '🎲 ' + t('Preguntes barrejades', 'Mixed questions'), explain: [],
+    items: shuffle(X.grammar.flatMap(x => x.items.map(it => Object.assign({}, it, { set: x.items })))).slice(0, 10) };
+  return MIXQ;
+}
 function grammar() {
   if (!X.grammar.length) return $('#body').innerHTML = none();
-  const g = X.grammar.find(x => x.key === S.open);
+  const g = gFind();
   const slides = SLIDES.filter(([ls]) => X.ls.some(l => l.id === ls));
   if (!g) {
     $('#body').innerHTML = `<div class="how">${t('Tria un tema. Llegeix l’explicació, completa les frases i prem <b>Comprova</b>.', 'Choose a topic. Read the explanation, complete the sentences and press <b>Check</b>.')}</div>`
       + (slides.length ? `<div class="slides"><span class="muted" style="align-self:center">📽 ${t('Explicacions de classe', 'Class explanations')}:</span>${slides.map(([, h, n]) => `<a href="${h}">${esc(n)}</a>`).join('')}</div>` : '')
-      + `<div class="list">${X.grammar.map((x, i) => { const b = (store.gram[x.key + '@' + S.level] || {}).best; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${x.mixed ? '🔀' : '📘'} ${esc(gTitle(x))}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('')}</div>`;
+      + `<div class="list">${X.grammar.length > 1 ? `<button class="item mixq" data-do="open" data-v="mixq"><b>🎲 ${t('Preguntes barrejades', 'Mixed questions')}</b><small>${t('10 preguntes de tots els temes', '10 questions from every topic')}</small>${(store.gram['mixq@' + S.ls + '@' + S.level] || {}).best ? `<small class="done">✓ ${t('Millor', 'Best')}: ${store.gram['mixq@' + S.ls + '@' + S.level].best}</small>` : ''}</button>` : ''}${X.grammar.map((x, i) => { const b = (store.gram[x.key + '@' + S.level] || {}).best; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${x.mixed ? '🔀' : '📘'} ${esc(gTitle(x))}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('')}</div>`;
     return;
   }
   const st = starterLv();
   $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${t('Tots els temes', 'All topics')}</button></div>
-    <div class="card"><h3>${g.mixed ? '🔀' : '📘'} ${esc(gTitle(g))}</h3>${g.explain.length ? `<div class="explain">${g.explain.map(e => `<div style="margin:.35em 0">${e}</div>`).join('')}</div>` : ''}
+    <div class="card"><h3>${g.mix ? '' : g.mixed ? '🔀 ' : '📘 '}${esc(gTitle(g))}</h3>${g.explain.length ? `<div class="explain">${g.explain.map(e => `<div style="margin:.35em 0">${e}</div>`).join('')}</div>` : ''}
     <div class="how">${st ? 'Tria la resposta correcta. Si falles, torna-ho a provar: a la segona vegada veuràs la resposta.' : t('Escriu la forma correcta a cada frase. Si falles dues vegades, veuràs la resposta.', 'Type the right form in each sentence. After two wrong tries you will see the answer.')}</div>
     ${g.items.map((it, i) => `<div class="q"><p>${i + 1}. ${it.q}</p><input class="typed" id="gq${i}" autocomplete="off" autocapitalize="off" spellcheck="false"${st ? ` readonly placeholder="Tria una opció"` : ''}>
-      ${st ? `<div class="picks">${gChoices(it, g.items, i).map(o => `<button class="w" data-do="gpick" data-i="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}<div class="fb" id="gf${i}"></div></div>`).join('')}
+      ${st ? `<div class="picks">${gChoices(it, it.set || g.items, i).map(o => `<button class="w" data-do="gpick" data-i="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}<div class="fb" id="gf${i}"></div></div>`).join('')}
     <div class="row"><button class="btn" data-do="gcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="gagain">↺ ${t('Torna a practicar', 'Practise again')}</button><span class="fb" id="gscore"></span></div></div>`;
   // what they typed last time, with its correction (not counted as a new try)
-  const kept = store.gram[gKey()];
+  const kept = !g.mix && store.gram[gKey()];
   if (kept && kept.v) { (kept.tr || []).forEach((n, i) => { gtries[g.key + i] = n; }); kept.v.forEach((v, i) => { const b = $('#gq' + i); if (b) b.value = v || ''; $$(`[data-do="gpick"][data-i="${i}"]`).forEach(x => x.classList.toggle('on', norm(x.dataset.v) === norm(v))); }); gcheck(false); }
   $$('#body input.typed').forEach(b => b.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gcheck(true); } }));
 }
 function gcheck(count) {
-  const g = X.grammar.find(x => x.key === S.open); if (!g) return;
+  const g = gFind(); if (!g) return;
   let ok = 0; const v = [];
   g.items.forEach((it, i) => {
     const box = $('#gq' + i), val = box.value, n = norm(val), right = !!n && it.a.some(a => expand(a) === expand(val)), f = $('#gf' + i), k = g.key + i;
@@ -667,7 +766,8 @@ function gcheck(count) {
       : '✗ ' + (why ? `<span class="hint">💡 ${esc(why)}</span> ` : '') + (show ? t('Resposta', 'Answer') + ': <b>' + esc(it.a[0]) + '</b>' : t('Torna-ho a provar.', 'Try again.'));
   });
   const k = gKey(), prev = store.gram[k] || {}, sc = ok + '/' + g.items.length;
-  if (count) { store.gram[k] = { v, tr: g.items.map((x, i) => gtries[g.key + i] || 0), best: !prev.best || ok > +prev.best.split('/')[0] ? sc : prev.best }; keep(); }
+  if (count && g.mix) { if (!prev.best || ok > +prev.best.split('/')[0]) { store.gram[k] = { best: sc }; keep(); } }
+  else if (count) { store.gram[k] = { v, tr: g.items.map((x, i) => gtries[g.key + i] || 0), best: !prev.best || ok > +prev.best.split('/')[0] ? sc : prev.best }; keep(); }
   $('#gscore').textContent = sc + (ok === g.items.length ? ' 🎉' : '');
 }
 
@@ -676,11 +776,11 @@ function gcheck(count) {
    Marks + two modes (Roger, 7 Nov 2026, shared/js/el-shadow.js): stress, linking and ↗ ↘ on the script with a key and a show/hide
    button; 🔁 Listen and repeat (one sentence, time to say it, the next) or 🗣 Shadowing (all of it, speaking along). */
 let rec = null, PL = [];
-function shadow() {
-  if (!X.shadow.length) return $('#body').innerHTML = none();
+function shadow(only) {   // one clip of 🗣 Speaking (only = its place in X.shadow)
+  if (!X.shadow[only]) return $('#body').innerHTML = none();
   const ca = elCa(base(S.level));
-  $('#body').innerHTML = `<div class="how"><b>${t('Com es fa', 'How it works')}</b> · ${t('1. Escolta i llegeix. 2. Murmura les paraules alhora. 3. Repeteix en veu alta just darrere la veu. 4. Amaga el text i fes-ho sense mirar. Millor amb auriculars.', '1. Listen and read. 2. Mumble the words along. 3. Say it aloud just behind the speaker. 4. Hide the script and do it without looking. Best with headphones.')}</div>`
-    + X.shadow.map((c, i) => `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${srcLine(esc(c.lp) + ' · ')}${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>${elShadow.bar(c, !EN, 'btn g sm')}
+  $('#body').innerHTML = backRow(t('Tot el Speaking', 'All speaking')) + `<div class="how"><b>${t('Com es fa', 'How it works')}</b> · ${t('1. Escolta i llegeix. 2. Murmura les paraules alhora. 3. Repeteix en veu alta just darrere la veu. 4. Amaga el text i fes-ho sense mirar. Millor amb auriculars.', '1. Listen and read. 2. Mumble the words along. 3. Say it aloud just behind the speaker. 4. Hide the script and do it without looking. Best with headphones.')}</div>`
+    + X.shadow.map((c, i) => i !== only ? '' : `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${srcLine(esc(c.lp) + ' · ')}${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>${elShadow.bar(c, !EN, 'btn g sm')}
       ${c.video ? `<video id="sm${i}" preload="none" playsinline poster="${esc(c.poster || c.src.replace(/\.mp4$/, '-poster.jpg'))}"></video>` : `<audio id="sm${i}" preload="metadata"></audio>`}
       <div class="row"><button class="btn sm" data-do="splay" data-i="${i}">▶ ${t('Escolta el fragment', 'Play the clip')}</button><button class="btn g sm" data-do="sstop" data-i="${i}">■ Stop</button>
       ${c.slow ? `<label><input type="checkbox" id="ss${i}" ${ca ? 'checked' : ''}> ${t('Més lent', 'Slower')}</label>` : ''}<button class="btn g sm" data-do="shide" data-i="${i}">${t('Amaga el text', 'Hide the script')}</button>
@@ -688,9 +788,9 @@ function shadow() {
       <div id="stt${i}">${elShadow.turnBox(!EN)}</div><div id="sk${i}">${elShadow.has(c) ? elShadow.key(!EN) : ''}</div>
       <div class="script" id="st${i}">${elShadow.script(c, 'b')}</div><audio id="sme${i}" controls hidden></audio><p class="muted" id="smsg${i}"></p></div>`).join('');
   const slowOn = (c, i) => !!(($('#ss' + i) || {}).checked && c.slow);
-  PL = X.shadow.map((c, i) => elShadow.player({ media: $('#sm' + i), clip: c, src: () => slowOn(c, i) ? c.slow : c.src, slow: () => slowOn(c, i), scriptEl: $('#st' + i), turnEl: $('#stt' + i + ' .shm-turn'), ca: !EN,
-    onStart: () => { PL.forEach((p, j) => j !== i && p.stop()); store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key]; } }));
-  elShadow.bindBar($('#body'), { lines: [], marks: [], cues: [] }, !EN, () => PL.forEach((p, i) => { p.stop(); p.sync(); const m = $('#sm' + i); if (m) { m.pause(); m.ontimeupdate = null; } }));
+  PL = X.shadow.map((c, i) => i !== only ? null : elShadow.player({ media: $('#sm' + i), clip: c, src: () => slowOn(c, i) ? c.slow : c.src, slow: () => slowOn(c, i), scriptEl: $('#st' + i), turnEl: $('#stt' + i + ' .shm-turn'), ca: !EN,
+    onStart: () => { PL.forEach((p, j) => p && j !== i && p.stop()); store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key]; } }));
+  elShadow.bindBar($('#body'), { lines: [], marks: [], cues: [] }, !EN, () => PL.forEach((p, i) => { if (!p) return; p.stop(); p.sync(); const m = $('#sm' + i); if (m) { m.pause(); m.ontimeupdate = null; } }));
 }
 function splay(i, done) {
   if (!done && PL[i] && PL[i].has && elShadow.mode() === 'repeat') return PL[i].start(0);
@@ -715,15 +815,117 @@ async function srec(i) {
   } catch (e) { msg.textContent = t('No s’ha pogut fer servir el micròfon.', 'The microphone could not be used.'); rec = null; }
 }
 
+/* ✍️ Writing (Roger, 25 Nov 2026): 🧩 Sentence builder, then the writing tasks of the paths at the route (task, frame, checklist,
+   model when the path has one). The student writes on the page and checks the text with the checklist and the model: nothing is handed in
+   or corrected, and the text stays in this browser (el_practice). 🗣 Speaking: the shadowing clips and the paths' Speaking and Talk tasks
+   (the model, 🔊 the model read aloud, the partner's questions for a Talk), with ● Record yourself to listen back: the recording is never sent. */
+const backRow = label => `<div class="row"><button class="btn g sm" data-do="close">← ${label}</button></div>`;
+const words_ = s => (String(s).trim().match(/\S+/g) || []).length;
+function write() {
+  if (!X.build.length && !X.write.length) return $('#body').innerHTML = none();
+  if (S.open === 'build') return build();
+  const w = X.write.find(x => x.key === S.open);
+  if (!w) {
+    $('#body').innerHTML = `<div class="how">${t('Ordena paraules per fer frases, o torna a escriure un dels textos de les LS. No s’entrega res: és per practicar.', 'Put words in order to build sentences, or write one of the LS texts again. Nothing is handed in: it is for practice.')}</div><div class="list">`
+      + (X.build.length ? `<button class="item" data-do="open" data-v="build"><b>🧩 Sentence builder</b><small>${t('Ordena les paraules', 'Put the words in order')} · ${X.build.length} ${t('frases', 'sentences')}</small></button>` : '')
+      + X.write.map(x => { const d = store.write[x.key + '@' + S.level]; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>✍️ ${esc(x.title)}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.min ? t(`Unes ${x.min} paraules`, `About ${x.min} words`) : t('Escriu un text', 'Write a text')}</small>${d && words_(d) ? `<small class="done">✓ ${t('Esborrany guardat', 'Draft saved')} · ${words_(d)} ${t('paraules', 'words')}</small>` : ''}</button>`; }).join('') + '</div>';
+    return;
+  }
+  const k = w.key + '@' + S.level;
+  $('#body').innerHTML = backRow(t('Tot el Writing', 'All writing')) + `<div class="card"><h3>✍️ ${esc(w.title)}</h3><div class="explain">${w.task}</div>${w.frame ? `<div class="how">${w.frame}</div>` : ''}
+    <textarea class="wbox" id="wtxt" rows="9" autocomplete="off" autocapitalize="sentences" spellcheck="false" autocorrect="off" placeholder="${t('Escriu aquí…', 'Write here…')}">${esc(store.write[k] || '')}</textarea>
+    <p class="muted"><span id="wcount">0</span> ${t('paraules', 'words')}${w.min ? ' · ' + t(`objectiu: unes ${w.min}`, `aim: about ${w.min}`) : ''} · ${t('Es guarda en aquest aparell. No s’envia enlloc.', 'It is saved on this device. It is not sent anywhere.')}</p>
+    ${w.checklist.length ? `<div class="chk"><b>${t('Revisa el teu text', 'Check your text')}</b>${w.checklist.map(c => `<label><input type="checkbox"> ${c}</label>`).join('')}</div>` : ''}
+    ${w.model ? `<div class="row"><button class="btn g sm" data-do="model">👀 ${t('Mostra el model', 'Show the model')}</button></div><div class="script" id="tmodel" hidden>${w.model}</div>` : ''}</div>`;
+  const box = $('#wtxt'), cnt = () => { $('#wcount').textContent = words_(box.value); };
+  let tm = null; cnt();
+  box.addEventListener('input', () => { cnt(); clearTimeout(tm); tm = setTimeout(() => { store.write[k] = box.value.slice(0, 4000); keep(); }, 400); });
+}
+function speak() {
+  if (!X.shadow.length && !X.speak.length) return $('#body').innerHTML = none();
+  if (/^sh:\d+$/.test(S.open || '')) return shadow(+S.open.slice(3));
+  if (S.open === 'rq') return rq();
+  const x = X.speak.find(y => y.key === S.open);
+  if (!x) {
+    $('#body').innerHTML = `<div class="how">${t('Fes shadowing amb un fragment, o prepara i grava una de les tasques de parlar de les LS. Escolta’t i torna-ho a provar: la gravació no s’envia enlloc.', 'Shadow a clip, or prepare and record one of the LS speaking tasks. Listen to yourself and try again: the recording is not sent anywhere.')}</div><div class="list">`
+      + (X.tabs.length ? `<button class="item mixq" data-do="open" data-v="rq"><b>🎲 ${t('Preguntes a l’atzar', 'Random questions')}</b><small>${t('Quatre preguntes que no esperes. Respon en veu alta i grava’t.', 'Four questions you don’t expect. Answer out loud and record yourself.')}</small></button>` : '')
+      + X.shadow.map((c, i) => `<button class="item" data-do="open" data-v="sh:${i}"><b>🗣 Shadowing · ${esc(c.title)}</b><small>${srcLine(esc(c.lp) + ' · ')}${t('Escolta i repeteix', 'Listen and repeat')}</small>${store.shadow[c.key] ? `<small class="done">✓ ${t('Vegades', 'Plays')}: ${store.shadow[c.key]}</small>` : ''}</button>`).join('')
+      + X.speak.map(y => `<button class="item" data-do="open" data-v="${esc(y.key)}"><b>${y.kind === 'talk' ? '💬' : '🎙'} ${esc(y.title)}</b><small>${srcLine(esc(y.lp) + ' · ')}${y.kind === 'talk' ? t('Respon les preguntes', 'Answer the questions') : t('Parla i grava’t', 'Speak and record yourself')}</small></button>`).join('') + '</div>';
+    return;
+  }
+  const ca = elCa(base(S.level));
+  $('#body').innerHTML = backRow(t('Tot el Speaking', 'All speaking')) + `<div class="card"><h3>${x.kind === 'talk' ? '💬' : '🎙'} ${esc(x.title)}</h3><div class="explain">${x.task}</div>
+    ${x.partner.length ? `<div class="how"><b>${t('Les preguntes del company', 'Your partner’s questions')}</b>${x.partner.map((q, i) => `<div class="pq"><button class="btn g sm" data-do="say" data-v="${esc(q.q)}" aria-label="🔊">🔊</button> ${i + 1}. ${esc(q.q)}${ca && q.ca ? ` <span class="muted">(${esc(q.ca)})</span>` : ''}</div>`).join('')}</div>` : ''}
+    ${x.model ? `<div class="row"><button class="btn g sm" data-do="model">👀 ${t('Mostra el model', 'Show the model')}</button><button class="btn g sm" data-do="saymodel">🔊 ${t('Escolta el model', 'Listen to the model')}</button></div><div class="script" id="tmodel" hidden>${x.model}</div>` : ''}
+    <div class="row"><button class="btn sm" data-do="rec" id="tr">● ${t('Grava’t', 'Record yourself')}</button><button class="btn g sm" data-do="recstop" id="trs" hidden>■ Stop</button></div>
+    <audio id="tra" controls hidden></audio><p class="muted" id="trm">${t('La gravació no s’envia enlloc.', 'The recording is not sent anywhere.')}</p></div>`;
+}
+/* 🎲 Random questions (Roger, 25 Nov 2026: "yes add both things"): the 🎲 Surprise questions banks of each LS (data/surprise.js written,
+   data/surprise-auto.js automatic; shared/js/el-surprise.js pool), drawn from the tabs open for the group in the LS on screen (or every LS),
+   one per step easy → harder (About you · Describe it · Use the grammar · Your opinion), at the student's level: Starter the Catalan and a
+   sentence start, Base the help words, Core 💡 Help on a tap, Plus and Pro none. At the student's own pace (no timer), ● Record yourself
+   optional, and nothing is sent or marked: the real 🎲 Surprise questions of the Time plan stay as they are. */
+const RQ = { qs: [], i: -1, last: [], help: false, loaded: {} };
+async function rqLoad() {
+  const dirs = [...new Set(X.tabs.map(x => x.dir))];
+  if (!window.elSurprise) await loadScript(ROOT + 'shared/js/el-surprise.js');
+  for (const d of dirs) if (!RQ.loaded[d]) { RQ.loaded[d] = 1; await loadScript(d + 'data/surprise.js'); await loadScript(d + 'data/surprise-auto.js'); }
+}
+function rqDraw() {
+  const lv = S.level, P = [];
+  X.ls.forEach(l => { const tabs = X.tabs.filter(x => x.ls === l).map(x => x.t); if (tabs.length && window.elSurprise) P.push(...elSurprise.pool({ bank: l.id, tabs }, lv)); });
+  const used = new Set(), old = q => RQ.last.includes(q.q), pick = arr => { const f = arr.filter(q => !used.has(q.q) && !old(q)), from = f.length ? f : arr.filter(q => !used.has(q.q)); if (!from.length) return null; const q = from[Math.floor(Math.random() * from.length)]; used.add(q.q); return q; };
+  const got = [0, 1, 2, 3].map(i => { const T = P.filter(q => q.tier === i); return pick(T.filter(q => q.src === 'W')) || pick(T.filter(q => q.src === 'A')) || pick(T); });   // written first, as in el-surprise.js
+  got.forEach((q, i) => { if (!q) got[i] = pick(P); });
+  RQ.qs = got.filter(Boolean).sort((a, b) => a.tier - b.tier); RQ.last = RQ.qs.map(q => q.q); RQ.i = -1; RQ.help = false;
+}
+const TIER = [['Sobre tu', 'About you'], ['Descriu-ho', 'Describe it'], ['Fes servir la gramàtica', 'Use the grammar'], ['La teva opinió', 'Your opinion']];
+async function rq() {
+  const back = backRow(t('Tot el Speaking', 'All speaking'));
+  if (!window.elSurprise || X.tabs.some(x => !RQ.loaded[x.dir])) { $('#body').innerHTML = back + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`; await rqLoad(); if (S.open !== 'rq') return; if (!RQ.qs.length) rqDraw(); }
+  if (!RQ.qs.length) rqDraw();
+  if (!RQ.qs.length) return $('#body').innerHTML = back + `<div class="empty">${t('Encara no hi ha preguntes per a aquesta LS.', 'There are no questions for this LS yet.')}</div>`;
+  const lv = base(S.level), q = RQ.qs[RQ.i], n = RQ.qs.length;
+  const dots = `<div class="rqdots">${RQ.qs.map((x, i) => `<span class="${i < RQ.i ? 'done' : i === RQ.i ? 'on' : ''}"></span>`).join('')}</div>`;
+  const on = !!(trc && trc.state === 'recording');
+  const recRow = `<div class="row"><button class="btn sm" data-do="rec" id="tr"${on ? ' disabled' : ''}>● ${t('Grava’t', 'Record yourself')}</button><button class="btn g sm" data-do="recstop" id="trs"${on ? '' : ' hidden'}>■ Stop</button></div><audio id="tra" controls${RQ.url && !on && RQ.i >= RQ.qs.length ? ` src="${RQ.url}"` : ' hidden'}></audio><p class="muted" id="trm">${on ? t('Gravant… respon en veu alta.', 'Recording… answer out loud.') : RQ.i < 0 ? t('La gravació comença amb la primera pregunta i no s’envia enlloc.', 'The recording starts with the first question. It is not sent anywhere.') : t('La gravació no s’envia enlloc.', 'The recording is not sent anywhere.')}</p>`;
+  let mid;
+  if (RQ.i < 0) mid = `<div class="how">${t('Prem <b>Comença</b>: sortiran quatre preguntes, una darrere l’altra, de més fàcil a més difícil. Respon cada una en veu alta, amb frases completes. Si vols, grava’t i després escolta’t.', 'Press <b>Start</b>: four questions will come up, one after another, from easy to harder. Answer each one out loud, in full sentences. Record yourself if you like, and listen to yourself afterwards.')}</div>
+    <div class="row"><button class="btn" data-do="rqgo">▶ ${t('Comença', 'Start')}</button></div>`;
+  else if (q) {
+    const hh = Array.isArray(q.h) ? q.h.join(' · ') : q.h;   // a sentence start, or help words
+    const help = hh ? lv === 'beginners' ? `<p class="rqstart">${esc(hh)}</p>` : lv === 'insecure' ? `<p class="rqstart">💡 ${esc(hh)}</p>` : lv === 'safe' ? (RQ.help ? `<p class="rqstart">💡 ${esc(hh)}</p>` : `<button class="btn g sm" data-do="rqhelp">💡 ${t('Ajuda', 'Help')}</button>`) : '' : '';
+    mid = `<div class="rqcard"><div class="rqn">${t('Pregunta', 'Question')} ${RQ.i + 1} / ${n} · ${esc(t(...TIER[q.tier] || TIER[0]))}</div><p class="rqq">${esc(q.q)}</p>${lv === 'beginners' && q.ca ? `<p class="muted">${esc(q.ca)}</p>` : ''}${help}
+      <div class="row"><button class="btn g sm" data-do="say" data-v="${esc(q.q)}">🔊 ${t('Escolta-la', 'Hear it')}</button><button class="btn" data-do="rqnext">${RQ.i + 1 < n ? t('Següent pregunta', 'Next question') + ' ›' : '✓ ' + t('He acabat', 'I’ve finished')}</button></div></div>`;
+  } else mid = `<div class="card"><h3>🎉 ${t('Fet!', 'Done!')}</h3><p class="muted">${t('Les teves preguntes', 'Your questions')}:</p><ol>${RQ.qs.map(x => `<li>${esc(x.q)}</li>`).join('')}</ol>
+    <div class="row"><button class="btn" data-do="rqnew">🎲 ${t('Unes altres preguntes', 'New questions')}</button></div></div>`;
+  $('#body').innerHTML = back + `<div class="card"><h3>🎲 ${t('Preguntes a l’atzar', 'Random questions')}</h3>${dots}${mid}${recRow}</div>`;
+}
+const rqSay = () => { const q = RQ.qs[RQ.i]; if (q) say(q.q); };
+
+let trc = null;
+async function trecStart() {
+  if (trc) return;
+  const msg = m => { const e = $('#trm'); if (e) e.textContent = m; };
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }), chunks = [], r = new MediaRecorder(stream);
+    trc = r; r.ondataavailable = e => chunks.push(e.data);
+    r.onstop = () => { stream.getTracks().forEach(x => x.stop()); trc = null; const a = $('#tra'), b = $('#tr'), st = $('#trs');
+      const url = URL.createObjectURL(new Blob(chunks, { type: r.mimeType || 'audio/webm' })); RQ.url = url; if (a) { a.src = url; a.hidden = false; } if (b) b.disabled = false; if (st) st.hidden = true;
+      msg(t('Escolta’t i torna-ho a provar si vols. La gravació no s’envia enlloc.', 'Listen to yourself and try again if you like. The recording is not sent anywhere.')); };
+    r.start(); $('#tr').disabled = true; $('#trs').hidden = false; msg(t('Gravant… prem Stop quan acabis.', 'Recording… press Stop when you finish.'));
+  } catch (e) { trc = null; msg(t('No s’ha pogut fer servir el micròfon.', 'The microphone could not be used.')); }
+}
+
 /* ---------- clicks ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-do]'); if (!el || el.tagName === 'SELECT') return; const k = el.dataset;
-  const go = (f, r) => { f(); if (r) render(); else ({ deck, words, grammar, build, listen, shadow })[S.tab](); };
+  const go = (f, r) => { f(); if (r) render(); else body(); };
   ({
-    course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
-    level: () => { if (all()) go(() => { [S.course, S.level] = k.v.split('|'); S.step = stepOf(S.course, S.level); S.ls = 'all'; S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
-    ls: () => go(() => { S.ls = k.v; S.lp = 'all'; S.open = null; }, 1),
-    tab: () => { S.tab = k.v; S.open = null; history.replaceState(null, '', '#' + k.v); render(); },
+    course: () => go(() => { S.course = k.v; S.lp = 'all'; S.open = null; }, 1),
+    level: () => { if (all()) go(() => { [S.course, S.level] = k.v.split('|'); S.step = stepOf(S.course, S.level); S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
+    ls: () => nav(k.v, null), home: () => nav(null, null),
+    tab: () => { if (S.tab === k.v && !S.open) return; nav(S.ls, k.v); setTimeout(() => { const b = $('#body'); if (b && innerWidth < 981) window.scrollTo({ top: Math.max(0, b.getBoundingClientRect().top + scrollY - 70) }); }); },
     mode: () => go(() => { S.mode = k.v; }),
     core: () => go(() => { S.coreOnly = el.checked; }),
     say: () => say(k.v),
@@ -732,15 +934,21 @@ document.addEventListener('click', e => {
     pick: () => go(() => { if (!built[k.i].includes(+k.j)) built[k.i].push(+k.j); }),
     unpick: () => go(() => { built[k.i] = built[k.i].filter(j => j !== +k.j); }),
     bcheck, bnew: () => go(() => { set.ids = null; }),
-    open: () => { go(() => { S.open = k.v; }); window.scrollTo({ top: Math.max(0, $('#body').getBoundingClientRect().top + scrollY - 90) }); },
-    close: () => go(() => { S.open = null; }),
+    open: () => { history.pushState({ open: k.v }, '', location.href); go(() => { S.open = k.v; if (k.v === 'mixq') { MIXQ = null; Object.keys(gtries).forEach(x => { if (x.startsWith('mixq')) delete gtries[x]; }); } }); window.scrollTo({ top: Math.max(0, $('#body').getBoundingClientRect().top + scrollY - 90) }); },
+    close: () => { if ((history.state || {}).open) history.back(); else go(() => { S.open = null; }); },   // ← back to the list = the browser's ← too
     ans: () => { ans[k.i] = +k.j; $$(`[data-do="ans"][data-i="${k.i}"]`).forEach((b, j) => b.classList.toggle('on', j === +k.j)); },
     lcheck,
-    speed: () => { const e = X.listen.find(x => x.key === S.open), a = $('#aud'); a.src = k.v === '1' ? e.media.slow : e.media.src; a.currentTime = 0; $$('[data-do="speed"]').forEach(b => b.setAttribute('aria-pressed', b === el)); },
+    speed: () => { const e = QL().find(x => x.key === S.open), a = $('#aud'); a.src = k.v === '1' ? e.media.slow : e.media.src; a.currentTime = 0; $$('[data-do="speed"]').forEach(b => b.setAttribute('aria-pressed', b === el)); },
     splay: () => splay(+k.i), sstop: () => { if (PL[+k.i]) PL[+k.i].stop(); const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
     shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; $('#sk' + k.i).hidden = s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
     srec: () => srec(+k.i),
-    gcheck: () => gcheck(true), gagain: () => go(() => { const b = (store.gram[gKey()] || {}).best; if (b) store.gram[gKey()] = { best: b }; else delete store.gram[gKey()]; keep(); Object.keys(gtries).forEach(x => { if (x.startsWith(S.open)) delete gtries[x]; }); }),
+    rqgo: () => { RQ.i = 0; RQ.help = false; RQ.url = null; rq(); rqSay(); if (!trc) trecStart(); },
+    rqnext: () => { RQ.i++; RQ.help = false; if (RQ.i >= RQ.qs.length && trc && trc.state === 'recording') trc.stop(); rq(); rqSay(); },
+    rqhelp: () => { RQ.help = true; rq(); }, rqnew: () => { rqDraw(); RQ.url = null; rq(); },
+    rec: () => trecStart(), recstop: () => { if (trc && trc.state === 'recording') trc.stop(); },
+    model: () => { const m = $('#tmodel'); if (m) { m.hidden = !m.hidden; el.textContent = m.hidden ? '👀 ' + t('Mostra el model', 'Show the model') : t('Amaga el model', 'Hide the model'); } },
+    saymodel: () => { const x = X.speak.find(y => y.key === S.open); if (x && x.model) say(plain(x.model)); },
+    gcheck: () => gcheck(true), gagain: () => go(() => { if (S.open === 'mixq') { MIXQ = null; Object.keys(gtries).forEach(x => { if (x.startsWith('mixq')) delete gtries[x]; }); return; } const b = (store.gram[gKey()] || {}).best; if (b) store.gram[gKey()] = { best: b }; else delete store.gram[gKey()]; keep(); Object.keys(gtries).forEach(x => { if (x.startsWith(S.open)) delete gtries[x]; }); }),
     gpick: () => { const b = $('#gq' + k.i); if (b) { b.value = k.v; $$(`[data-do="gpick"][data-i="${k.i}"]`).forEach(x => x.classList.toggle('on', x === el)); } }
   })[k.do]?.();
 });
@@ -756,7 +964,7 @@ function start() {
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
   $('#lead').innerHTML = FC ? t('Tot el vocabulari i la gramàtica de cada LS, al teu nivell. Estudia una mica cada dia: cada targeta torna quan la necessites.', 'All the vocabulary and grammar of each LS, at your level. Study a little every day: each card comes back when you need it.')
-    : t('El vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
+    : t('Tria una LS, o totes barrejades, i després què vols practicar: vocabulari, gramàtica, listening, reading, writing o speaking. Tot és del teu nivell i no s’entrega res: practica tant com vulguis.', 'Choose an LS, or all of them mixed, and then what you want to practise: vocabulary, grammar, listening, reading, writing or speaking. It is all at your level and nothing is handed in: practise as much as you like.');
   S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // students get everything at their level in one place (no LS filter, newest LS first: content())
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';
