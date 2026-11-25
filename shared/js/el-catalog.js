@@ -813,6 +813,85 @@ window.elPhoneTabs=function(o){
   return b;
 };
 
+// ---- The teacher's side menu, ONE for every teacher page (Roger, 25 Nov 2026: "this menu should always be the same", showing the menu
+// of 🧠 Flashcards next to the dashboard's). The dashboard (teacher.html) draws it with its own buttons (dash: true); Games, Practise,
+// Flashcards, the LS homes, the learning paths, the vocabulary games and the course pages (el-app.js, el-ls-home.js) draw the same list,
+// in the same look (shared/css/el-app.css section 11), as links that open that place of the dashboard (teacher.html?g=…, ?p=…, ?do=…).
+// 🎯 Practise and 🎲 Games are in it too, so nothing the old menu had is lost. The numbers (students per group, level asks, corrections
+// waiting, new messages, 🛠 Maintenance ON) are the ones the dashboard showed last on this browser (el_tmenu, saved by teacher.html):
+// no Firestore reads. Items: [key, icon, label, what it opens, tooltip, extra class]; "lab:…" a heading, "sep" a line, "groups" the
+// groups, "tn" ✦ Towards Nativeness (only when the dashboard has it).
+window.EL_TMENU=[
+  ["ann","📣","Announcement",{do:"annnew"},"Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages","ann"],
+  ["mt","🛠","Maintenance",{do:"mtdlg"},"Close the site to students for a while: they see a maintenance message with worksheets to print"],
+  ["plan","🏠","Home",{g:"plan"},"How each class is doing: work done in each learning path, first tries, games and marks"],
+  ["fd","🧠","Flashcards",{href:"lab/practice.html#deck"},"Every LS's flashcards at every level: study them yourself, with your own statistics"],
+  "lab:Groups","groups",
+  ["lss","🧭","Learning situations",{g:"lss"},"Every LS by course: its learning paths, groups, status and materials"],
+  "sep",
+  ["corr","✏️","Corrections",{g:"corr"},"What Beltran corrected and when, what is still waiting, and Correct everything waiting now"],
+  ["week","📅","Time plan",{p:"week"},"Every group's week and exam day"],
+  ["msgs","💬","Messages",{p:"msgs"},"Announcements, problems and ideas"],
+  ["tt","🗓","Timetable",{p:"tt"},"Your classes with each group, days off"],
+  ["qa","🔎","Questions",{g:"qa"},"Which questions students answer well or badly the first time, by route and group"],
+  ["online","🟢","Online",{g:"online"},"Who is on English Lab now, and the history of visits: when, for how long, which pages"],
+  ["cres","📊","Class results",{g:"cres"},"Grammar and reading together, lesson by lesson: who did it and the % right on their first check"],
+  ["mat","📚","Materials",{g:"mat"},"Class games, paper worksheets and study PDFs of every LS"],
+  ["practise","🎯","Practise",{href:"lab/practice.html"},"The students' Practise, at every level"],
+  ["games","🎲","Games",{href:"lab/"},"The vocabulary and grammar games"],
+  ["ref","📖","Reference",{g:"ref"},"Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked"],
+  ["how","🎬","How it works",{g:"how"},"Guides for teachers and students"],
+  "tn"
+];
+window.EL_TMENU_TN=["tn","✦","Towards Nativeness",{g:"tn"},"Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"];
+// what the dashboard showed last on this browser: {t, n:{group:"29/29"}, ask:{group:n}, corr:{n,late}, msgs:{n,late}, mt, tn}; the
+// waiting counts only while fresh (12 hours), so an old number never stays on the menu for days
+window.elTmCache=function(){let c=null;try{c=JSON.parse(localStorage.getItem("el_tmenu")||"null")}catch(e){}c=c&&typeof c==="object"?c:{};
+  if(!(Date.now()-(c.t||0)<12*3600e3)){delete c.corr;delete c.msgs;delete c.ask}return c};
+// o: {root (the site root URL; "" on teacher.html), dash (teacher.html: buttons with data-do), on (the key that is on), cls ({key: extra
+// class}), extra ({key: html after the label}), counts ({group: "29/29"}), asks ({group: html}), none (html of the No group button, dash
+// only), mt (maintenance on), tn (✦ Towards Nativeness), list (true: the items as data, for the narrow strip of icons)}
+window.elTeacherMenu=function(o){
+  o=o||{};const R=o.root||"",D=R+"teacher.html",q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const C=o.dash?{}:elTmCache(),mt=o.dash?!!o.mt:!!C.mt,tn=o.dash?!!o.tn:!!C.tn,cls=Object.assign({},o.cls),extra=Object.assign({},o.extra),counts=o.counts||C.n||{},asks=o.asks||{};
+  if(mt){cls.mt=((cls.mt||"")+" mton").trim();extra.mt=(extra.mt||"")+'<small class="mt">ON</small>'}
+  if(!o.dash){const b=(x,n)=>x&&x.n?`<small class="${x.late?"late":""}" title="${x.n} ${n}">${x.n}</small>`:"";
+    if(!extra.corr)extra.corr=b(C.corr,"waiting to be corrected");if(!extra.msgs)extra.msgs=b(C.msgs,"new");
+    Object.entries(C.ask||{}).forEach(([g,n])=>{if(n&&!asks[g])asks[g]=` <small class="ask" title="${n} student${n>1?"s":""} asked for a level change">🎯 ${n} level ask${n>1?"s":""}</small>`})}
+  const href=w=>w.href?R+w.href:w.do?D+"?do="+w.do:w.p?D+"?g=plan&p="+w.p:D+"?g="+w.g;
+  const att=w=>w.href?`href="${R+w.href}"`:w.do?`data-do="${w.do}"`:w.p?`data-do="hplace" data-p="${w.p}"`:`data-do="tab" data-g="${w.g}"`;
+  const L=[];
+  const one=([k,ic,lb,w,tip,c0])=>L.push({k,ic,lb,tip,h:href(w),att:att(w),link:!!w.href,cls:[c0,cls[k]].filter(Boolean).join(" "),extra:extra[k]||"",on:o.on===k});
+  EL_TMENU.forEach(x=>{
+    if(x==="sep")L.push({sep:1});
+    else if(typeof x==="string"&&x.startsWith("lab:"))L.push({lab:x.slice(4)});
+    else if(x==="groups"){(window.EL_GROUPS||[]).forEach(g=>{L.push({k:g.id,g:1,ic:g.name.replace(/^(\d)ESO\s*/,"$1"),lb:g.name,tip:o.dash?o.gtip||"Students":"Open "+g.name,h:D+"?g="+g.id,att:`data-do="tab" data-g="${g.id}"`,cls:"c"+g.course+(cls[g.id]?" "+cls[g.id]:""),
+        extra:(counts[g.id]!=null?`<small>${q(counts[g.id])}</small>`:"")+(asks[g.id]||""),on:o.on===g.id})});if(o.dash&&o.none)L.push({raw:o.none})}
+    else if(x==="tn"){if(tn){L.push({sep:1});one(EL_TMENU_TN)}}
+    else one(x)});
+  if(o.list)return L.filter(x=>x.k);
+  return L.map(x=>x.sep?`<div class="sep"></div>`:x.lab?`<div class="lab">${q(x.lab)}</div>`:x.raw?x.raw
+    :(o.dash&&!x.link?`<button class="nv tm ${x.cls}${x.on?" on":""}" ${x.att} title="${q(x.tip)}">`:`<a class="nv tm ${x.cls}${x.on?" on":""}" href="${x.h}" title="${q(x.tip)}"${x.on?' aria-current="page"':""}>`)
+      +(x.g?`<span class="ic gi" aria-hidden="true">${q(x.ic)}</span><span class="lb gn">${q(x.lb)}</span>`:`<span class="ic" aria-hidden="true">${x.ic}</span><span class="lb">${q(x.lb)}</span>`)
+      +x.extra+(o.dash&&!x.link?`</button>`:`</a>`)).join("");
+};
+// the dashboard's tab bar on a phone (teacher.html phoneBar), on the teacher's other pages: Home · Groups · Corrections · Messages · More,
+// each opening that place of the dashboard (More: the dashboard with its More sheet open)
+window.EL_TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
+  corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
+window.elTeacherTabs=function(o){
+  o=o||{};const R=o.root||"",D=R+"teacher.html",C=elTmCache(),GS=window.EL_GROUPS||[];
+  let last=null;try{last=(JSON.parse(localStorage.getItem("el_t_last")||"{}")||{}).g}catch(e){}
+  const G=GS.find(g=>g.id===last)||GS[0]||{id:""},sv=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const it=[["home",D+"?g=plan","Home"],["groups",D+"?g="+G.id,"Groups"],["corr",D+"?g=corr","Corrections",(C.corr||{}).n],["msgs",D+"?g=plan&p=msgs","Messages",(C.msgs||{}).n],["more",D+"?more=1","More"]];
+  let b=document.querySelector("nav.elptabs");
+  if(!b){b=document.createElement("nav");b.className="elptabs";document.body.append(b)}
+  b.setAttribute("aria-label","Dashboard menu");
+  b.innerHTML=it.map(([k,h,l,n])=>`<a href="${h}"><span class="pi">${sv(EL_TPH_I[k])}</span><span class="pl">${l}</span>${n?`<b>${n>99?"99+":n}</b>`:""}</a>`).join("");
+  document.body.classList.add("elptab");
+  return b;
+};
+
 // On an LS (its home and its learning paths) the students' side menu is a strip of icons that opens over the page (Roger, 8 Nov 2026:
 // "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or logos of each side. If the
 // mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set body.elmini and call this with
@@ -857,7 +936,7 @@ window.elMiniRail=function(r){
   // menu"). html.elcmag = 📋 Today wanted (sessionStorage el_cm_ag, kept by el-cm-agenda.js; not set yet = wanted: it opens when class
   // mode starts), so the menu does not flash before it docks.
   try { if (sessionStorage.getItem("el_cm_ag") !== "0") h.classList.add("elcmag"); } catch (e) { h.classList.add("elcmag"); }
-  st.textContent = "html.elcmtab.elcmag .elrail .elside,html.elcmtab.elcmag .elrail .eln,html.elcmtab.elcmag aside.side .nvs,"
+  st.textContent = "html.elcmtab.elcmag .elrail .elside,html.elcmtab.elcmag .elrail .eltm,html.elcmtab.elcmag .elrail .eln,html.elcmtab.elcmag aside.side .nvs,"
     + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav,html.elcmtab .elptabs{display:none!important}"
     + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
     + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"
