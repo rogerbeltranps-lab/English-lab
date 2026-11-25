@@ -927,14 +927,16 @@ function testerSel(u,el){{const s=document.createElement("select");s.title="Test
 // the student's name under "English with Roger" in whichever side menu the page has; el-app.js calls it again after drawing its menu.
 // true when the name is on screen
 window.elWhoPlace=()=>{document.querySelectorAll(".el-who").forEach(e=>e.remove());const nm=window.EL_WHO_NAME;if(!nm)return false;
-  const br=[...document.querySelectorAll(".elrail .elr-brand,aside.side>.brand,aside.sidebar>.brand")];
-  br.forEach(e=>{const d=document.createElement("div");d.className="el-who";d.textContent=nm;e.after(d)});return br.some(e=>e.offsetParent)};
+  const br=[...document.querySelectorAll(".elrail .elr-brand,aside.side>.brand,aside.side>.elmtop>.brand,aside.sidebar>.brand")];
+  // in the icon strip of an LS (elMiniRail) the brand sits in the ☰ row: the name goes under that row, not inside it, where it was
+  // squeezed into a few pixels and broke letter by letter (problem report, 4ESOB, 25 Nov 2026)
+  br.forEach(e=>{const d=document.createElement("div");d.className="el-who";d.textContent=nm;(e.parentElement.classList.contains("elmtop")?e.parentElement:e).after(d)});return br.some(e=>e.offsetParent)};
 const elWhoPlace=()=>window.elWhoPlace();
 // the icons' names on hover (bar above) and the student's name under "English with Roger"
 function tipCss(){if(document.getElementById("elcb-css"))return;const st=document.createElement("style");st.id="elcb-css";
   st.textContent='#el-cloud-bar .elcb-i{position:relative;font-size:15px;line-height:1.2}#el-cloud-bar .elcb-i:hover:after,#el-cloud-bar .elcb-i:focus-visible:after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 9px);background:#0f172a;color:#fff;font:600 12px/1.3 system-ui,sans-serif;padding:5px 9px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px #0003;pointer-events:none;z-index:2}'
     +'#el-cloud-bar .elcb-mz{display:inline-flex;align-items:center;gap:3px;text-decoration:none;margin:-22px 2px -4px 0;padding:0;background:none}#el-cloud-bar .elcb-mz .elmz-img{width:50px!important;height:50px!important}#el-cloud-bar .elcb-mz:hover .elmz-img{transform:translateY(-2px) rotate(-2deg)}#el-cloud-bar .elcb-mz .elmz-badge{font-size:14px}@media (max-width:640px){html body #el-cloud-bar[style]{margin-bottom:76px!important}#el-cloud-bar .elcb-nm{flex-basis:100%;text-align:center}#el-cloud-bar .elcb-mz{margin-top:-14px}#el-cloud-bar .elcb-mz .elmz-img{width:44px!important;height:44px!important}}'
-    +'.el-who{flex:none;padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.35 Inter,system-ui,sans-serif;color:#475569!important;overflow-wrap:anywhere}aside.side>.el-who{margin:-15px 0 0}aside.sidebar>.el-who{margin:-6px 0 14px}@media print{.el-who{display:none}}';
+    +'.el-who{flex:none;padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.35 Inter,system-ui,sans-serif;color:#475569!important;overflow-wrap:anywhere}aside.side>.el-who{margin:-15px 0 0}aside.sidebar>.el-who{margin:-6px 0 14px}body.elmini .elmtop+.el-who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;padding:0 8px 0 56px;margin:-10px 0 0;opacity:0;transition:opacity .12s ease}body.elmini :is(.elrail,aside.side):is(.elopen,:has(:focus-visible))>.elmtop+.el-who{opacity:1;transition-delay:.12s}@media (hover:hover){body.elmini :is(.elrail,aside.side):hover>.elmtop+.el-who{opacity:1;transition-delay:.27s}}@media (max-width:980px){body.elmini .elmtop+.el-who,.elrail>.el-who{display:none}}@media print{.el-who{display:none}}';
   document.head.appendChild(st)}
 // Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
 // next to its Home link: header menu (course and LS pages), side and phone menus (Home, English Lab), top bar of activity pages.
