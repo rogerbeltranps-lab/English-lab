@@ -52,16 +52,20 @@ function lvOf(r,step){const from=window.EL_LV_FROM||"2026-11-30",at=String(((r.m
   const ls=Object.entries((r.levels||{})[step]||{}).filter(([c,l])=>!/^(CC|CD|CPSAA|CE)\s?\d/.test(c)&&LVM[l]).map(([,l])=>LVM[l]);if(!ls.length)return null;
   const m=ls.reduce((a,b)=>a+b,0)/ls.length;return m<5?"NA":m<7?"AS":m<9?"AN":"AE"}
 export const lvBox=(lv,en)=>lv?'<span class="el-lv" style="display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:10px;font-weight:800;font-size:14px;background:'+LVC[lv]+'">'+(en?LVN[lv][1]+" ("+LVN[lv][0]+")":LVN[lv][0])+'</span>':"";
-export async function corrections({list,seen,save,here,root,en,name}){
-  let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
-  const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
-  const items=[];
+// Every answer and correction in the student's results: [{a (catalogue activity), r (the result), step, text, lv, k ("activity|step"), v (the
+// text's signature, as fbSeen keeps it), corr (a correction, not only an answer)}]. Also the 🔔 list (el-notify.js).
+export function corrList(rs,cat){const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
     // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work.
     // An answer whose at is still to come is not shown yet (Roger, 17 Nov 2026: answers go out from 8:00 to 18:00, 2 hours after the comment).
     for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
       const an=(r.answers||{})[step]||{},text=[!(Date.parse(an.at)>Date.now())&&an.t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
-      if(text)items.push({a,step,text,lv:lvOf(r,step),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
+      if(text)items.push({a,r,step,text,lv:lvOf(r,step),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
+  return items}
+export async function corrections({list,seen,save,here,root,en,name}){
+  let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
+  const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
+  const items=corrList(rs,cat);
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
@@ -76,7 +80,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
       writing(b.querySelector("div"),it.text,T,window.elHandedText&&window.elHandedText(it.step));return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
   }
-  if(Object.keys(shown).length)Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));
+  if(Object.keys(shown).length){Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));dispatchEvent(new CustomEvent("el-fb-seen",{detail:shown}))}   // the 🔔 (el-notify.js) too
   let later={};try{later=JSON.parse(sessionStorage.getItem("el_corr_later")||"{}")}catch(e){}
   const todo=items.filter(x=>!shown[x.k]&&was[x.k]!==x.v&&later[x.k]!==x.v);
   if(!todo.length)return;

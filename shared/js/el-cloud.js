@@ -853,15 +853,19 @@ function bar(){
     // only on a page without one) and the bar shows only icons, each with its name on hover (and as its label for screen readers)
     const ic=(i,tip,f,bg)=>{const x=b(i,f);x.className="elcb-i";x.dataset.tip=tip;x.setAttribute("aria-label",tip);x.style.background=bg||"#0f766e";x.style.padding="4px 9px";return x};
     tipCss();
-    if(AS||u&&isStudent(u)&&!isTeacher(u)){const nm=AS?(AS.name||AS.email||""):(u.displayName||u.email||"");window.EL_WHO_NAME=nm;if(!elWhoPlace())el.append(nm," ")}
+    if(AS||u&&isStudent(u)&&!isTeacher(u)){const nm=AS?(AS.name||AS.email||""):(u.displayName||u.email||"");window.EL_WHO_NAME=nm;if(!elWhoPlace()){const sp=document.createElement("span");sp.className="elcb-nm";sp.textContent=nm;el.append(sp," ")}}
     else{window.EL_WHO_NAME="";elWhoPlace()}
     if(!u){}
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};   // the student's own bar; its buttons do nothing here
+      const mz=mzBar(ca);if(mz)el.append(mz," ");
       el.append(ic("⚠️",ca?"Avisa d'un problema":"Report a problem",no,"#b45309")," ",ic("💡",ca?"Suggereix una idea":"Suggest an idea",no)," ");
+      if(nbellEl)el.append(nbellEl," ");   // the student's own 🔔, as they see it (shared/js/el-notify.js)
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");   // the teacher's 🔔 here too (Roger, 25 Nov 2026: "notifications should also appear here")
       el.append(ic("✕","Exit the student view: back to your dashboard",asExit,"#dc2626"))}
     else if(isStudent(u)&&!isTeacher(u)){
+      const mz=mzBar(!repEn());if(mz)el.append(mz," ");
       el.append(ic("⚠️",repEn()?"Report a problem":"Avisa d'un problema",()=>reportProblem(u),"#b45309")," ",ic("💡",repEn()?"Suggest an idea":"Suggereix una idea",()=>suggest(u))," ");
+      if(nbellEl)el.append(nbellEl," ");   // 🔔 their notifications (shared/js/el-notify.js)
       if(isTester(u))testerSel(u,el);
       el.append(ic("🚪",repEn()?"Sign out":"Tanca la sessió",logout,"#475569"))}
     else{el.append(u.displayName||u.email," ");
@@ -875,6 +879,41 @@ function bar(){
       if(isTester(u))testerSel(u,el);
       el.append(b("Sign out",logout))}};
 }
+// 🧑‍🎨 The streak mascot in the bar (Roger, 25 Nov 2026, on the ✅ To do button and the bottom-right icons: "can they have the mascot here
+// too? with the numbers"): Roger's avatar in the mood of the student's 🧠 Flashcards streak with the ⚡ number, on every student page
+// except the board (where it sits beside 🎯 My level) and exams, recall checkpoints and the sample exam; a tap opens 🧠 Flashcards. No reads:
+// the flashcards copy in this browser (el_flash_<uid>), as on the board; the teacher's 👁 student view reads the student's copy once a tab.
+const noCorner=()=>!!window.EL_EXAM||/\/(exam|recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname);
+let mzReady=null,mzAs=null;
+function mzBar(ca){
+  if(onBoard||noCorner())return null;
+  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125c",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
+  let P=null;
+  if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
+      try{const c=JSON.parse(sessionStorage.getItem(k)||"null");if(c&&Date.now()-c.t<30*60e3){mzAs.P=c.P;}else getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{mzAs.P=s.exists()?JSON.parse(s.data().p||"{}"):{};
+        try{sessionStorage.setItem(k,JSON.stringify({t:Date.now(),P:mzAs.P}))}catch(e){}draw(user)}).catch(()=>{})}catch(e){}}
+    P=mzAs.P}
+  const M=window.ELMascot,x=M.data(AS?null:(user||{}).uid,P);if(!x)return null;
+  const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
+  const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");
+  a.dataset.tip=tip;a.setAttribute("aria-label",tip);a.innerHTML=M.badge(n,"sm")+M.img(M.mood(x),50,"");
+  return a}
+// 🔔 The student's own notifications (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected…";
+// shared/js/el-notify.js): corrections, answers, redo, exam results, problem answers and announcements, as the student sees them. Built
+// from the reads the cards already make (results copy, students/{uid}, the two card loads): nothing held shows early, no reads of its own.
+let nbellP=null,nbellEl=null,NTM=null;
+const nbFeed=f=>{if(nbellP)nbellP.then(nb=>{if(nb)f(nb)}).catch(e=>console.warn("notifications",e))};
+function nbellStart(u){const id=AS?AS.uid:u.uid,ro=!!AS;
+  return import("./el-notify.js").then(m=>{NTM=m;const nb=m.studentBell({uid:id,en:repEn(),ro});nbellEl=nb.el;draw(user);
+    loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
+      .then(()=>Promise.all([import("./el-corrections.js"),import("./el-exam-notice.js"),myResults(id),myDoc(id)]))
+      .then(([C,X,rs,me])=>m.resultItems({rs,me,corr:C.corrList,examSig:X.examSig,course:courseOf(myGroup),root:ROOT,board:BOARD,en:repEn(),
+        name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(y=>y.a===aid&&y.step===step);if(x)return x.name}return null},
+        visible:async ls=>{if(!myGroup)return false;const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)},
+        saveFb:ro?null:o=>setDoc(doc(db,"students",id),{fbSeen:o},{merge:true}),
+        saveExam:ro?null:(ls,v)=>setDoc(doc(db,"students",id),{examSeen:{[ls]:v}},{merge:true})}))
+      .then(items=>nb.live(items)).catch(e=>console.warn("notifications",e));
+    return nb})}
 function testerSel(u,el){{const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
         s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ");
@@ -891,6 +930,7 @@ const elWhoPlace=()=>window.elWhoPlace();
 // the icons' names on hover (bar above) and the student's name under "English with Roger"
 function tipCss(){if(document.getElementById("elcb-css"))return;const st=document.createElement("style");st.id="elcb-css";
   st.textContent='#el-cloud-bar .elcb-i{position:relative;font-size:15px;line-height:1.2}#el-cloud-bar .elcb-i:hover:after,#el-cloud-bar .elcb-i:focus-visible:after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 9px);background:#0f172a;color:#fff;font:600 12px/1.3 system-ui,sans-serif;padding:5px 9px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 12px #0003;pointer-events:none;z-index:2}'
+    +'#el-cloud-bar .elcb-mz{display:inline-flex;align-items:center;gap:3px;text-decoration:none;margin:-22px 2px -4px 0;padding:0;background:none}#el-cloud-bar .elcb-mz .elmz-img{width:50px!important;height:50px!important}#el-cloud-bar .elcb-mz:hover .elmz-img{transform:translateY(-2px) rotate(-2deg)}#el-cloud-bar .elcb-mz .elmz-badge{font-size:14px}@media (max-width:640px){html body #el-cloud-bar[style]{margin-bottom:76px!important}#el-cloud-bar .elcb-nm{flex-basis:100%;text-align:center}#el-cloud-bar .elcb-mz{margin-top:-14px}#el-cloud-bar .elcb-mz .elmz-img{width:44px!important;height:44px!important}}'
     +'.el-who{flex:none;padding:0 10px;margin:-2px 0 10px;font:600 .88rem/1.35 Inter,system-ui,sans-serif;color:#475569!important;overflow-wrap:anywhere}aside.side>.el-who{margin:-15px 0 0}aside.sidebar>.el-who{margin:-6px 0 14px}@media print{.el-who{display:none}}';
   document.head.appendChild(st)}
 // Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
@@ -2114,14 +2154,19 @@ onAuthStateChanged(auth,async u=>{
   studyCard(u);
   storyCard(u);
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
+  // 🔔 the student's own notifications in the bar (shared/js/el-notify.js); the teacher's 👁 student view shows the student's, read-only
+  if(u&&(AS||isStudent(u)&&!isTeacher(u))&&!nbellP&&!noCorner())nbellP=nbellStart(u).catch(e=>{console.warn("notifications",e);return null});
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
+  // Each one also goes into the 🔔 list, which keeps it after OK (el-notify.js history).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
-    load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now()))),   // at: sent late, from 7:30
-    done:id=>deleteDoc(doc(db,"problemReplies",id))})).catch(e=>console.warn("replies",e));
+    load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now())))   // at: sent late, from 7:30, or held until 📨 Send it
+      .then(L=>{nbFeed(nb=>nb.add(L.map(r=>NTM.replyItem(r,repEn(),m))));return L}),
+    done:id=>{nbFeed(nb=>nb.seen("r:"+id+":"));return deleteDoc(doc(db,"problemReplies",id))}})).catch(e=>console.warn("replies",e));
   // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
   if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
-    load:()=>quiet("an",u,async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid])),
-    done:id=>updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()}),reply:(id,text)=>annReply(u,id,text)})).catch(e=>console.warn("announcements",e));
+    load:()=>quiet("an",u,async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid]))
+      .then(L=>{nbFeed(nb=>nb.add(L.map(a=>NTM.annItem(a,repEn(),m,BOARD))));return L}),
+    done:id=>{nbFeed(nb=>nb.seen("a:"+id+":"));return updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()})},reply:(id,text)=>annReply(u,id,text)})).catch(e=>console.warn("announcements",e));
   // "Your exam results are ready": a card once per new set of exam marks, with a link to the board on that LS (shared/js/el-exam-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-exam-notice"))loadScript("shared/js/el-grading.js",()=>window.EL_GRADING)
     .then(()=>import("./el-exam-notice.js")).then(m=>m.examNotice({course:courseOf(myGroup),en:repEn(),board:BOARD,
