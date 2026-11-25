@@ -89,7 +89,7 @@
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
     const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return (cl[i] || {}).personal ? "✦" : i >= 0 ? "LS" + (i + 1) : "LS"; })();   // a personal LS (Towards Nativeness) has no number
     const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "")
-      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "games";
+      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : "games";
     const L = [];
     if (who.role === "none") {
       L.push(["home", "⌂", "Home", "Home", ROOT + "index.html"]);
@@ -101,6 +101,7 @@
       if (c) L.push(["all", "🗂", t("Totes les Learning Situations", "All Learning Situations"), t("Totes les LS", "All LS"), ROOT + c + "/index.html"]);
       L.push(["games", "🎲", t("Jocs", "Games"), t("Jocs", "Games"), ROOT + "lab/"]);
       if (teach) L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
+      if (teach) L.push(["flashcards", "🧠", "Flashcards", "Flashcards", ROOT + "lab/practice.html#deck"]);   // 🧠 Flashcards apart from Practise (Roger, 25 Nov 2026)
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
@@ -117,7 +118,7 @@
     const c = who.course || course0 || (curLs || "").split("-")[0];
     if (!c) return null;
     const ML = elMenuLs([c], who.group), lss = !curLs || ML.some(l => l.id === curLs) ? ML : [...ML, ...(window.EL_LS || []).filter(l => l.id === curLs)];
-    const here = /practice\.html$/.test(path) ? "practise" : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
+    const here = /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
     let app = false; try { app = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) {}
     const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
     return elStudentMenu({ root: ROOT, courses: [c], lss, group: who.group, ca: CA, board, here, app });
@@ -139,6 +140,7 @@
       + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
+    if (window.elWhoPlace) elWhoPlace();   // the student's name under "English with Roger" (el-cloud.js, Roger 25 Nov 2026)
     if (mini) elMiniRail(r); else r.classList.remove("elopen");
   }
   function bar(L) {
@@ -151,8 +153,10 @@
     // and Practise and Games as the two halves of its Practise tab
     if (who.role === "student" && window.elPhoneTabs) {
       const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
-      elPhoneTabs({ root: ROOT, board, ls: curLs, here: mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
-      if (mode === "lab") {
+      // 🧠 Flashcards (lab/practice.html#deck) sits under 🎓 My progress, so on a phone it belongs to the Me tab, without the Practise / Games halves
+      const fc = /practice\.html$/.test(path) && location.hash === "#deck";
+      elPhoneTabs({ root: ROOT, board, ls: curLs, here: fc ? "me" : mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
+      if (mode === "lab" && !fc) {
         const main = $("main.content");
         let sg = $(".elpseg");
         if (main && !sg) { sg = document.createElement("nav"); sg.className = "elpseg"; main.before(sg); }

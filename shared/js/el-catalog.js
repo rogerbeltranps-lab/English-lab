@@ -765,7 +765,7 @@ window.elMenuLs=function(courses,group){
     .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
 };
 // o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
-// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"flashcards"|"help"|"phone",
 // app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
 window.elStudentMenu=function(o){
   const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
@@ -777,7 +777,8 @@ window.elStudentMenu=function(o){
   // i revisem que estigui allà sempre?"): the board's #marks place
   // 📝 Exam practice below it (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen"): the board's #exam-practice place
   // 🎓 My progress below it (Roger, 9 Nov 2026: "a table with their results … they can choose term"): the board's #progress place
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+  // 🧠 Flashcards below it, apart from Practise (Roger, 25 Nov 2026: "Students will see their flashcards under progress"): lab/practice.html#deck
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("flashcards","",R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0])+"#deck","🧠",t("Targetes","Flashcards"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
