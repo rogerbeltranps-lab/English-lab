@@ -366,7 +366,8 @@
     // the rows of a stop are centred on it; yours is the first row; at the destination the rows start at the left edge
     const y0=s=>s.y-s.ex/2,YO=wide?78:74;
     const XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),y0(s)+48])(M.stops[i]):[8+YW/2,finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;M.spot=spot;
-    const row=r=>r.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
+    // no title on a classmate's vehicle: the name is already on its label (Roger, 25 Nov 2026: "the names twice when hovering over the boats don't make sense")
+    const row=r=>r.map(m=>`<div class="vy-boat">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
     M.stops.forEach((s,i)=>(s.rows||[]).forEach((r,k)=>{if(!r.length)return;const off=k===0&&i===meI&&V.me?YW:0,wB=r.reduce((a,m)=>a+bw(m),0);
       h+=`<div class="vy-mates" style="left:${s.right?s.x-40-wB-off:s.x+40+off}px;top:${y0(s)+k*RH}px">${row(r)}</div>`}));
     finRows.forEach((r,k)=>{if(!r.length)return;const off=k===0&&meI===n&&V.me?YW:0;h+=`<div class="vy-mates" style="left:${8+off}px;top:${finY+k*RH}px">${row(r)}</div>`});
