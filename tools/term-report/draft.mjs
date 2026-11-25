@@ -42,7 +42,14 @@ const lc=s=>/^(La |Halloween|Diwali|Free |My |Seasons)/.test(s)?s:s[0].toLowerCa
 const short=p=>strip(p).split(/[:(]/)[0].trim().replace(/\.$/,"");
 const st=(S,key)=>{for(const l of Object.values(S.pg||{})){const v=l&&l[key];if(v){try{return typeof v==="string"?JSON.parse(v):v}catch(e){return null}}}return null};
 const lvlOf=(S,course)=>((S.lv||{})[LS2[course]]||{}).level||((S.lv||{})[LS1[course]]||{}).level||"";
-const held=(S,ls)=>{const x=(S.rs||{})[ls+"/assessment"]||{};return !!(x.held||(x.showFrom&&NOW<Date.parse(x.showFrom)))};
+// The exam counts in the reports even while its results are held (Roger, 25 Nov 2026: "the reports must have them anyway, and I decide
+// when to publish everthing!"): he publishes the reports himself (📣 Publish the draft), so nothing is left out here.
+const held=()=>false;
+// a writing mistake only illustrates the rubric row of its point (Roger, 25 Nov 2026, on a linkers point that showed a verb-s mistake:
+// "did we really do this?"): organisation = linkers, punctuation, capitals; vocabulary = words and expressions; task = content; the rest grammar
+const WKIND=t=>{t=String(t||"");return /spell|ortogra/i.test(t)?"spell":/task|reused|content|tasca/i.test(t)?"task":/punctu|capital|linker|connect|cohes|organi|paragraph|majúsc|puntua/i.test(t)?"org"
+  :/vocab|expression|colloc|phrasal|word|time|lèxic|expressi/i.test(t)?"vocab":"grammar"};
+const WKEY={wtask:"task",wgrammar:"grammar",wvocab:"vocab",worg:"org"};
 const games=S=>Object.values(S.mg||{}).filter(g=>g&&g.title&&g.of);
 const latestGame=(S,title)=>games(S).filter(g=>g.title===title).sort((a,b)=>String(b.day||"").localeCompare(String(a.day||"")))[0]||null;
 
@@ -62,13 +69,13 @@ function evidence(S,pt,course){const ev=[];
       const parts={listening:"Listening",reading:"Reading",vocabulary:"Vocabulary",grammar:"Grammar",vchoose:"Vocabulary",vcomplete:"Vocabulary",gchoose:"Grammar",gcomplete:"Grammar"};
       const want=new Set(s.k.map(k=>parts[k]).filter(Boolean));
       (r.questions||[]).filter(q=>q&&!q.ok&&want.has(q.part)&&q.right).forEach(q=>ev.push({k:"exam",q:strip(q.text||""),mine:strip(q.mine||""),fix:strip(q.right).replace(/\.$/,""),why:q.why}));
-      if(s.k.some(k=>/^w|writing/.test(k)))((r.writing||{}).errors||[]).filter(e=>e&&!/ortograf|spelling/i.test(e.type||"")).forEach(e=>ev.push({k:"write",mine:e.orig,fix:e.fix,why:e.why}))}
+      const wk=s.k.includes("writing")?null:new Set(s.k.map(k=>WKEY[k]).filter(Boolean));if(wk===null||wk.size)((r.writing||{}).errors||[]).filter(e=>e&&WKIND(e.type)!=="spell"&&(wk===null||wk.has(WKIND(e.type)))).forEach(e=>ev.push({k:"write",mine:e.orig,fix:e.fix,why:e.why}))}
     if(s.fp){const fb=String(((S.rs||{})[s.fp]||{}).feedback||"");const ok=fb.split("\n").find(l=>/^✔/.test(l.trim())),go=fb.split("\n").find(l=>/^➜/.test(l.trim()));
       if(ok)ev.push({k:"fpok",t:ok.trim().replace(/^✔\s*/,"")});if(go)ev.push({k:"fpgo",t:go.trim().replace(/^➜\s*/,"")})}}
   return ev}
 const BAND={ca:[[90,"Excel·lent."],[80,"Molt bé."],[60,"Bé."],[50,"Hi vas arribant."],[0,"Aquí has de treballar més."]],en:[[90,"Excellent."],[80,"Very good."],[60,"Good."],[50,"Getting there."],[0,"This needs more work."]]};
 function lineOf(pct,ev,L,pt){if(pct==null)return L==="ca"?"Encara no has fet prou activitats d'aquest punt per saber com et va.":"You haven't done enough activities on this point yet for us to know how it's going.";
-  const b=BAND[L].find(([m])=>pct>=m)[1],e=ev.find(x=>x.k!=="fpok"&&x.k!=="fpgo"),ok=ev.find(x=>x.k==="fpok"),go=ev.find(x=>x.k==="fpgo");
+  const b=BAND[L].find(([m])=>pct>=m)[1],e=ev.find(x=>x.k!=="fpok"&&x.k!=="fpgo"&&String(x.fix||"").replace(/<[^>]+>/g,"").trim()),ok=ev.find(x=>x.k==="fpok"),go=ev.find(x=>x.k==="fpgo");
   // a final product split in two points: the first says what went well, the second what to improve
   const fpw=(pt.src.find(s=>s.fp)||{}).part;
   if(ok||go)return [b,fpw!=="go"&&ok?esc(ok.t):"",fpw!=="ok"&&pct<90&&go?(L==="ca"?"Per millorar: ":"To improve: ")+esc(go.t):""].filter(Boolean).join(" ");
