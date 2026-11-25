@@ -154,8 +154,9 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   if (SHOTS) { const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, name + '-1b-bar-closeup', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: Math.min(size[0] - Math.max(0, r.x - 30), r.width + 40), height: r.height + 80 }); }
   await bell.click();
   await page.waitForTimeout(500);
-  // the card loads add their items a moment later on a slow machine: give the list up to 4 s to hold the problem answer
-  await page.waitForFunction(() => /answered you/.test(document.getElementById('el-npanel')?.textContent || ''), null, { timeout: 4000 }).catch(() => {});
+  // the card loads add their items a moment later on a slow machine (GitHub's runners are several times slower than a Chromebook and
+  // missed it twice at 4 s, on the phone pass): give the open list up to 15 s to hold the problem answer (it redraws while open)
+  await page.waitForFunction(() => /answered you/.test(document.getElementById('el-npanel')?.textContent || ''), null, { timeout: 15000 }).catch(() => {});
   const list = await page.locator('#el-npanel li').allTextContents();
   const txt = list.join('\n');
   if (process.env.DEBUG) console.log(name, list);
@@ -163,11 +164,12 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   ok(/corrected your work/.test(txt) && /Listening chart/.test(txt), `${name}: the corrected Listening chart is missing:\n${txt}`);
   ok(/redo it/.test(txt), `${name}: the ↺ redo is missing`);
   ok(/LS1 exam results are ready/.test(txt), `${name}: the published LS1 exam results are missing`);
-  ok(/answered you/.test(txt), `${name}: the problem answer is missing`);
+  ok(/answered you/.test(txt), `${name}: the problem answer is missing (reply card ${await page.locator('#el-reply').count() ? 'still open' : 'closed or never shown'}; list:\n${txt})`);
   ok(/Announcement/.test(txt), `${name}: the announcement is missing`);
   ok(!/LS2 exam/.test(txt), `${name}: HELD LS2 exam results show!`);
   ok(!/HELD/.test(txt) && !(await page.content()).includes('HELD-'), `${name}: a held answer or problem answer shows!`);
   const dots = await page.locator('#el-npanel li.nw').count();
+  ok(list.some((t, i) => /LS1 exam results are ready/.test(t)) && (await page.locator('#el-npanel li.nw', { hasText: 'LS1 exam results are ready' }).count()) === 1, `${name}: the LS1 exam results (out since October, never seen) are not marked new`);
   ok(+n0 >= 1 && +n0 === dots, `${name}: the red number (${n0 || 'empty'}) is not the number of new items in the list (${dots})`);
   await page.locator('#el-npanel [data-x]').click();
   ok(!(await bell.locator('b').count()), `${name}: the red number is still there after opening the list`);

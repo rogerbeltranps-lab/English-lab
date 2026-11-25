@@ -11,7 +11,8 @@
 // by their own loads), so the 📬 knows nothing the cards do not. No Firestore reads of its own: the results copy, students/{uid} (fbSeen,
 // examSeen) and the two card loads are shared with the cards. Problem answers are deleted when the student presses OK, and announcements
 // are read once, so the 📬 keeps a short history of both in this browser (el_nt_<uid>: up to 30 items) and what was already looked at.
-// "New" = not seen on its card or page yet (fbSeen / examSeen / OK) and not looked at in the 📬; anything older than 21 days is never new.
+// "New" = not seen on its card or page yet (fbSeen / examSeen / OK) and not looked at in the 📬; anything older than 21 days is never new,
+// except exam results the student has not seen yet.
 // Opening the list takes the number away; a click on a correction or exam saves it as seen, like its card does. Dates only, never times.
 const NEW_DAYS=21,KEEP=30,SHOW=15;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -77,7 +78,9 @@ export function studentBell({uid,en,ro}){
   const p=document.createElement("div");p.id="el-npanel";p.hidden=true;p.setAttribute("role","dialog");p.setAttribute("aria-label",T("Notificacions","Notifications"));
   w.append(b);document.body.append(p);
   const all=()=>{const m=new Map();for(const x of [...st.log,...live])if(!m.has(x.k))m.set(x.k,x);return [...m.values()].sort((a,c)=>(c.at||0)-(a.at||0))};
-  const isNew=x=>!st.seen[x.k]&&x.fresh!==false&&(x.at||0)>Date.now()-NEW_DAYS*864e5;
+  // exam results stay new until the student has seen them, however old (Roger, 25 Nov 2026: "here there should be a notification, like 1
+  // in red": LS1 results out on 30 Oct, never opened, showed no number because they were older than 21 days)
+  const isNew=x=>!st.seen[x.k]&&x.fresh!==false&&(x.k.startsWith("x:")||(x.at||0)>Date.now()-NEW_DAYS*864e5);
   const day=t=>{if(!t)return "";const d=new Date(t),n=new Date(),y=new Date(n);y.setDate(n.getDate()-1);
     return d.toDateString()===n.toDateString()?T("Avui","Today"):d.toDateString()===y.toDateString()?T("Ahir","Yesterday"):d.toLocaleDateString(en?"en-GB":"ca-ES",{day:"numeric",month:"short"})};
   let shownNew=new Set();
