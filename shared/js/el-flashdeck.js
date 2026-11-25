@@ -125,7 +125,13 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const say = x => { try { (o.say || (y => root.ELVoice && root.ELVoice.say(y)))(x); } catch (e) {} };
     let P = o.load() || {}; P.decks = P.decks || {};
     const D = id => (P.decks[id] = P.decks[id] || { c: {}, log: {} });
-    const saveSoon = (() => { let tm = null; return now => { clearTimeout(tm); if (now) { o.save(P); return; } tm = setTimeout(() => o.save(P), 15e3); }; })();
+    // Saved only after studying (dirty), and merged with the copy saved last (another tab, or the account's copy the page merged in), so a tab
+    // left open on an old copy never wipes cards studied elsewhere when it is hidden or closed (problem seen 25 Nov 2026: students studied
+    // and their ⚡ stayed at 0, their saved copy empty).
+    let dirty = false;
+    const sync = () => { P = merge(o.load() || {}, P); P.decks = P.decks || {}; };
+    const flush = () => { if (!dirty) return; dirty = false; sync(); o.save(P); };
+    const saveSoon = (() => { let tm = null; return now => { clearTimeout(tm); if (now) { flush(); return; } tm = setTimeout(flush, 15e3); }; })();
     let view = { k: 'list' }, ses = null, layer = null;
     // Which side comes first on a vocabulary card (Roger, 25 Nov 2026: "I want them to be able to choose whether they see the Catalan first or
     // the English first… it makes more sense to say Fer fotos means take pictures"; "when they are collocations first Catalan as a default"):
@@ -204,7 +210,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       ses.n++;
       const i = ses.lrn.indexOf(c); if (i >= 0) ses.lrn.splice(i, 1);
       if (nu[0] !== S_REV) ses.lrn.push(c);
-      saveSoon(); pick();
+      dirty = true; saveSoon(); pick();
     }
 
     // ---------- screens ----------
@@ -336,9 +342,10 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       else if (ses.shown && /^[1-4]$/.test(e.key)) { e.preventDefault(); answer(+e.key); }
     });
     addEventListener('pagehide', () => saveSoon(true));
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveSoon(true); });
+    // hidden: save what was studied here; visible again: take in what another tab saved meanwhile
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveSoon(true); else { sync(); if (!ses) render(); } });
     render();
-    return { render, close, reload() { P = o.load() || {}; P.decks = P.decks || {}; render(); },
+    return { render, close, reload() { sync(); render(); },   // the account's copy came in: merged, never replacing cards studied meanwhile
       summary() { const ds = decks(), now = Date.now(); return ds.reduce((a, d) => { const n = counts(d, now); a.due += n.due + n.lrn; a.new += n.newToday; a.total += n.total; return a; }, { due: 0, new: 0, total: 0 }); } };
   }
   // the numbers the tile on Practise shows before the deck is open

@@ -871,7 +871,8 @@ function bar(){
       if(nbellEl)el.append(nbellEl," ");   // 📬 their notifications (shared/js/el-notify.js)
       if(isTester(u))testerSel(u,el);
       el.append(ic("🚪",repEn()?"Sign out":"Tanca la sessió",logout,"#475569"))}
-    else{el.append(u.displayName||u.email," ");
+    else{if(isTeacher(u)){const mz=mzBar(false);if(mz)el.append(mz," ")}   // 🧑‍🎨 the teacher's own ⚡ streak too (Roger, 25 Nov 2026: "the mascot shoulb always visble here")
+      el.append(u.displayName||u.email," ");
       // no "My dashboard" / "Games" links here for students: the left menu already has both (Roger, 7 Nov 2026: "we don't need this
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
@@ -888,14 +889,24 @@ function bar(){
 // the flashcards copy in this browser (el_flash_<uid>), as on the board; the teacher's 👁 student view reads the student's copy once a tab.
 const noCorner=()=>!!window.EL_EXAM||/\/(exam|recall-checkpoint[^/]*|sample-exam)\.html$/.test(location.pathname);
 let mzReady=null,mzAs=null;
+// The account's copy of the flashcards (students/{uid}/flashcards/all), merged into this browser's, so the ⚡ also counts the cards studied on
+// another device (the phone, the Chromebook): read at most once every 30 minutes per browser (el_flash_chk_<uid>), then the bar and the
+// board's mascot redraw (event el-flash-sync). Problem seen 25 Nov 2026: students studied and their ⚡ stayed at 0.
+function mzSync(uid){const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
+  if(!uid||Date.now()-t<30*60e3)return;try{localStorage.setItem(k,String(Date.now()))}catch(e){}
+  getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{if(!s.exists()||!window.ELFlashDeck)return;const lk="el_flash_"+uid;let loc=null;
+    try{loc=JSON.parse(localStorage.getItem(lk)||"null")}catch(e){}
+    const m=window.ELFlashDeck.merge(loc||{},JSON.parse(s.data().p||"{}"));try{localStorage.setItem(lk,JSON.stringify(m))}catch(e){}
+    dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e))}
 function mzBar(ca){
   if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
-  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125c",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
+  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
   let P=null;
   if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
       try{const c=JSON.parse(sessionStorage.getItem(k)||"null");if(c&&Date.now()-c.t<30*60e3){mzAs.P=c.P;}else getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{mzAs.P=s.exists()?JSON.parse(s.data().p||"{}"):{};
         try{sessionStorage.setItem(k,JSON.stringify({t:Date.now(),P:mzAs.P}))}catch(e){}draw(user)}).catch(()=>{})}catch(e){}}
     P=mzAs.P}
+  else if(user)mzSync(user.uid);
   const M=window.ELMascot,x=M.data(AS?null:(user||{}).uid,P);if(!x)return null;
   const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
   const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");

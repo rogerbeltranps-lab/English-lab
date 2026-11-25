@@ -6,7 +6,7 @@
 //   • the red number counts only what is new, and opening the list takes it away (and it stays away on the next page);
 //   • the 📬 makes no Firestore reads of its own (the reads are the same with and without it);
 //   • the mascot with the ⚡ streak sits in the bar on every page, the board too, but not on an exam, a recall checkpoint or the sample exam;
-//   • the teacher's 👁 student view shows the student's 📬 and writes nothing.
+//   • the teacher's own bar has the mascot too; the teacher's 👁 student view shows the student's 📬 and writes nothing.
 // Usage: node tools/notify/check.mjs          → exit 1 and what broke.   SHOTS=dir also saves pictures (Chromebook and phone).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -194,7 +194,8 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
     if (block) await page.route('**/el-notify.js', (r) => r.fulfill({ status: 200, body: 'export function studentBell(){throw new Error("off")}', contentType: 'text/javascript' }));
     await page.goto('http://el.local/' + LP);
     await settle(page, 4000);
-    reads.push((await page.evaluate(() => window.__FAKE.reads.filter((p) => !p.endsWith('~live')))).sort().join(','));
+    // the mascot's own read of the account's flashcards (el-cloud.js mzSync, once every 30 minutes) is not the 📬's
+    reads.push((await page.evaluate(() => window.__FAKE.reads.filter((p) => !p.endsWith('~live') && !p.endsWith('/flashcards/all')))).sort().join(','));
     await ctx.close();
   }
   ok(reads[0] === reads[1], `the 📬 makes reads of its own:\nwith:    ${reads[0]}\nwithout: ${reads[1]}`);
@@ -203,6 +204,11 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
 // the teacher's 👁 student view: the student's 📬, nothing written
 {
   const { ctx, page, errs } = await open([1366, 768], { teacher: true });
+  // the teacher's own bar has the mascot with his ⚡ too (Roger, 25 Nov 2026: "the mascot shoulb always visble here")
+  await page.goto('http://el.local/' + LP);
+  await settle(page, 4000);
+  ok(await page.locator('#el-cloud-bar .elcb-mz').count(), "teacher: no mascot in the teacher's own bar");
+  if (SHOTS) { await page.locator('#el-cloud-bar').scrollIntoViewIfNeeded().catch(() => {}); const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, 'teacher-bar', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: r.width + 40, height: r.height + 80 }); }
   await page.goto('http://el.local/today.html?student=' + UID);
   await settle(page, 3000);
   await page.goto('http://el.local/' + LP);

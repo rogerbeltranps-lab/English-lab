@@ -91,7 +91,7 @@
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
   <script src="../shared/js/el-plan.js"></script>
-  <script src="../shared/js/el-flashdeck.js?v=20261125c"></script>
+  <script src="../shared/js/el-flashdeck.js?v=20261125d"></script>
   <script src="../shared/js/el-mascot.js?v=20261125"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
@@ -521,9 +521,17 @@ function fdSave(P) {
   if (fdAs()) { fdView = P; return; }
   try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
   fdSum(P);
-  if (fdCloudOn()) F.setDoc(fdRef(), { p: JSON.stringify(P), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
+  if (!fdCloudOn()) return;
+  // the account's copy may have cards studied on another device since it was read (a phone, a tab left open): read it again first when the
+  // last read is over 5 minutes old, merge, then write, so a save never wipes them (25 Nov 2026: students studied and their ⚡ stayed at 0)
+  const put = Q => F.setDoc(fdRef(), { p: JSON.stringify(Q), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
+  if (Date.now() - fdReadAt < 5 * 60e3 || document.visibilityState === 'hidden') { put(P); return; }   // leaving the page: no time to read
+  fdReadAt = Date.now();
+  F.getDoc(fdRef()).then(snap => { const cloud = snap.exists() ? JSON.parse(snap.data().p || '{}') : null;
+    const m = cloud ? ELFlashDeck.merge(fdLoad(), cloud) : fdLoad(); try { localStorage.setItem(FKEY(), JSON.stringify(m)) } catch (e) {} put(m); if (cloud && fd) fd.reload(); })
+    .catch(e => { console.warn('flashcards read', e); put(P); });
 }
-let fd = null, fdRead = null;
+let fd = null, fdRead = null, fdReadAt = 0;
 const fdHost = document.createElement('div');
 function fdCloud() {   // once per visit: the account's copy, merged with this browser's (the latest review of each card wins)
   if (fdAs() && !fdRead) {   // 👁 the student's own copy, read only
@@ -532,6 +540,7 @@ function fdCloud() {   // once per visit: the account's copy, merged with this b
     return;
   }
   if (!fdCloudOn() || fdRead) return;
+  fdReadAt = Date.now();
   fdRead = F.getDoc(fdRef()).then(snap => { const cloud = snap.exists() ? JSON.parse(snap.data().p || '{}') : null; if (!cloud) return;
     const m = ELFlashDeck.merge(fdLoad(), cloud); try { localStorage.setItem(FKEY(), JSON.stringify(m)) } catch (e) {} if (fd) fd.reload(); }).catch(e => console.warn('flashcards read', e));
 }
