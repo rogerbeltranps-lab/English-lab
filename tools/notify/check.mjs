@@ -144,6 +144,8 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   await shot(page, name + '-0-cards');
   await page.waitForTimeout(3000);   // the usual cards come first, as before
   await closeCards(page);
+  // the problem answer's card (el-reply.js) can come a few seconds after the others: wait for it and close it too, then open the 🔔
+  if (await page.locator('#el-reply').waitFor({ state: 'attached', timeout: 10000 }).then(() => true, () => false)) await closeCards(page);
   const bell = page.locator('#el-nbell > button');
   ok(await bell.count(), `${name}: no 🔔 in the student's bar`);
   const n0 = (await bell.locator('b').textContent().catch(() => '')) || '';
@@ -152,9 +154,6 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   if (SHOTS) { const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, name + '-1b-bar-closeup', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: Math.min(size[0] - Math.max(0, r.x - 30), r.width + 40), height: r.height + 80 }); }
   await bell.click();
   await page.waitForTimeout(500);
-  // the problem answers arrive a moment after the rest (their own query): reopen the list until they are in, at most ~10 s
-  for (let i = 0; i < 10 && !(await page.locator('#el-npanel li', { hasText: 'answered you' }).count()); i++) {
-    await bell.click(); await page.waitForTimeout(1000); if (!(await page.locator('#el-npanel').isVisible().catch(() => false))) await bell.click(); await page.waitForTimeout(300); }
   const list = await page.locator('#el-npanel li').allTextContents();
   const txt = list.join('\n');
   if (process.env.DEBUG) console.log(name, list);
