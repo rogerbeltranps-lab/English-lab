@@ -809,8 +809,10 @@ function voyageRoad(ls,V){
 // same Your steps (Roger, 20 Nov 2026).
 function voyageKeep(ls,V){try{const M=elVoyage.model(V),k=x=>elVoyage.sk(x,EN);
   const sk=elVoyage.skin(V);
-  localStorage.setItem("el_voyage_steps",JSON.stringify({u:AS||(U&&U.uid)||"demo",ls:ls.id,at:Date.now(),en:EN,now:V.now,fp:V.fp,vb:[sk.veh.icon,...sk.w.map],
-    items:M.items.map(x=>x.port?{p:x.port.f,c:x.port.c,ok:!!x.done}:(o=>({k:x.key,h:x.href,t:x.t,s:o.n,i:o.i,c:o.c,d:!!x.done}))(k(x.sk)))}))}catch(e){}}
+  const j=JSON.stringify({u:AS||(U&&U.uid)||"demo",ls:ls.id,at:Date.now(),en:EN,now:V.now,fp:V.fp,vb:[sk.veh.icon,...sk.w.map],
+    items:M.items.map(x=>x.port?{p:x.port.f,c:x.port.c,ok:!!x.done}:(o=>({k:x.key,h:x.href,t:x.t,s:o.n,i:o.i,c:o.c,d:!!x.done}))(k(x.sk)))});
+  // the LS page's own 🧭 Your steps (el-ls-home.js) keeps one copy per LS, so LS3's page still has its list after the board shows LS2
+  localStorage.setItem("el_voyage_steps",j);localStorage.setItem("el_voyage_steps_"+ls.id,j)}catch(e){}}
 function voyageHome(ls,info,nx,top,side){S.vy=voyageData(ls,info,nx);voyageRoad(ls,S.vy);voyageKeep(ls,S.vy);
   if(window.elNbFab)elNbFab(new URL(lsHref(ls)+"#notes",location.href).href);   // the floating 📓 button, as the notebook card did
   return (side?`<div class="hvtop"><div class="vy-chips">${top}</div>${side}</div>`:`<div class="vy-chips">${top}</div>`)+elVoyage.html(S.vy)+lsNowHtml(ls,info,nx)}
