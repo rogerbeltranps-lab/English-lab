@@ -36,7 +36,8 @@ window.elTermSpan=id=>{const i=EL_TERMS.findIndex(t=>t.id===id);return [i>0?EL_T
 window.elDueWork=function(gid,term,infoOf){
   const [from,to]=elTermSpan(term),today=ELWeek.today(),out=[];
   ELWeek.plans(gid).forEach(x=>{const info=infoOf(x.ls)||{status:"hidden"};if(info.status==="hidden")return;
-    const db=window.EL_RAW_OPEN||!window.elDueBefore?null:elDueBefore(info,gid);
+    // a term that has ended: only the tabs taught by its last day (Roger, 25 Nov 2026: "all the activities that were due to before the Monday exam")
+    const db=window.EL_RAW_OPEN||!window.elDueBefore?null:elDueBefore(info,gid,to<today?ELWeek.add(to,1):undefined);
     Object.keys(x.p.due||{}).forEach(id=>{const a=(window.EL_CATALOG||[]).find(y=>y.id===id),d=ELWeek.due(x.p,id,x.gi);
       if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecNeverOpened(a,info,gid).length)return;
       const tabs=elTaughtTabs(a,db);if(tabs===false)return;

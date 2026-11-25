@@ -317,7 +317,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
-<script src="shared/js/el-points.js?v=20261121b"></script>
+<script src="shared/js/el-points.js?v=20261125"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
@@ -3377,10 +3377,12 @@ const ptTabsN=(s,m)=>(m||[]).reduce((n,[a,,o])=>n+ptLeft(s.uid,a,o).length,0);
 // works it out (only it sees every student's work) and keeps it in teams/{group}.bestOk.{term} for the student board; it rewrites it
 // whenever it renders and the value has changed, so it follows new work, new due days and point changes.
 const ptOk=s=>{const m=ptMiss(s);return !!m&&!m.length},ptBestOk=g=>Math.max(0,...ptStuds(g).filter(ptOk).map(ptOn));
-function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const term=S.term;
+// Every term so far, not only the current one (25 Nov 2026: Term 1's bestOk stayed at its last value of term 1, 0, so the board gave every
+// student with all the work done the whole +0.5): the bonus is now in the term mark, so an ended term must stay true too.
+function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const now=EL_TERMS.findIndex(x=>x.id===S.term);
   // only groups fetched in this visit: never from an old copy
-  GR.filter(g=>DEMO||FRESH.has(g.id)).forEach(g=>{const v=ptBestOk(g.id),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
-    t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))})}
+  GR.filter(g=>DEMO||FRESH.has(g.id)).forEach(g=>EL_TERMS.slice(0,now+1).forEach(T=>{const term=T.id,v=withS("term",term,()=>ptBestOk(g.id)),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
+    t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))}))}
 const pt={
   add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
     if(DEMO)return null;const b=F.writeBatch(db());b.set(F.doc(db(),"points",k),sub({[term]:F.increment(d)}),{merge:true});b.set(F.doc(db(),"teams",g),sub({best:{[term]:best}}),{merge:true});return b.commit()}
