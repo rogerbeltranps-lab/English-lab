@@ -320,3 +320,11 @@
 @media (max-width:640px){
   .elfd-mz{margin-left:0;width:100%;justify-content:flex-end}.elfd-mz .elmz-img{width:60px!important;height:60px!important}.elfd-say{font-size:.88rem}
 }
+/* 📄 Term report criteria cards: a long degree name ("Very good (Assoliment notable)") wraps instead of pushing the card past the screen */
+@media (max-width:640px){
+  .trep .cpc{min-width:0}.trep .cph .cpm{white-space:normal;align-items:flex-start;margin-left:0}.trep .cpm .dg{white-space:normal}
+}
+/* 📄 Why this level on a phone: the whole card's width, the piece on one line and its mark and degree under it */
+@media (max-width:640px){
+  .trep .cpwhy{margin-left:0!important}.trep .cpwhy .cpwr{grid-template-columns:auto 1fr}.trep .cpwhy .cpwl{grid-column:1/-1}.trep .cpwhy .dg{justify-self:start}.trep .cpcr>.cpm{margin-left:auto}
+}
