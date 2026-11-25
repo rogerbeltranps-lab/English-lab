@@ -263,7 +263,16 @@ function extract(pg, lv, off) {
   const out = { words: [], grammar: [], build: [], listen: [], read: [], write: [], speak: [], shadow: [], tabs: [], cards: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
-    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, plain(g) || t('Vocabulari', 'Vocabulary'), lv === 'native')); }));
+    // LS1 words are cumulative, as on the LS1 page (cumulativeGroups): Plus keeps the Base and Core words and adds its own (Roger,
+    // 25 Nov 2026: "this is wrong it cant all be make": a Plus LS1 deck held only the make / do / have / take collocations)
+    const G = [];
+    ROUTES.slice(1, ROUTES.indexOf(L) + 1).forEach(k => (pg.vocab && pg.vocab[k] || []).forEach(([g, list]) => {
+      let x = G.find(y => y[0] === g); if (!x) G.push(x = [g, []]);
+      (list || []).forEach(en => { if (!x[1].includes(en)) x[1].push(en); }); }));
+    // groups named only by their verb (MAKE · DO · HAVE · TAKE & PAY) are one part, so the card asks which verb goes with it
+    const VERB = /^[A-Z]+(\s*&\s*[A-Z]+)*$/, verbs = G.filter(([g]) => VERB.test(plain(g))).map(([g]) => plain(g).toLowerCase().replace(/\s*&\s*/g, ', '));
+    const collo = verbs.length > 1 ? t('Col·locacions', 'Collocations') + ': ' + verbs.join(', ').replace(/, ([^,]+)$/, ' & $1') : '';
+    G.forEach(([g, list]) => list.forEach(en => { out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at }); out.cards.push(vCard(en, pg.ca[en], pg.ex[en], false, (collo && VERB.test(plain(g)) ? collo : plain(g)) || t('Vocabulari', 'Vocabulary'), lv === 'native')); }));
     ((pg.info[L] || {}).builders || []).forEach(b => out.build.push({ s: b.join(' '), lp, at }));
     const qs = pg.listening && pg.listening[L];
     if (pg.audio && Array.isArray(qs) && qs.length)
