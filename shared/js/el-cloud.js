@@ -2186,12 +2186,12 @@ onAuthStateChanged(auth,async u=>{
   // Each one also goes into the 📬 list, which keeps it after OK (el-notify.js history).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
     load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())).filter(r=>!(r.at>Date.now())))   // at: sent late, from 7:30, or held until 📨 Send it
-      .then(L=>{nbFeed(nb=>nb.add(L.map(r=>NTM.replyItem(r,repEn(),m))));return L}),
+      .then(L=>{const c=L.slice();nbFeed(nb=>nb.add(c.map(r=>NTM.replyItem(r,repEn(),m))));return L}),   // a copy: the cards take answers off L as they are closed, maybe before the 📬 is ready
     done:id=>{nbFeed(nb=>nb.seen("r:"+id+":"));return deleteDoc(doc(db,"problemReplies",id))}})).catch(e=>console.warn("replies",e));
   // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
   if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
     load:()=>quiet("an",u,async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid]))
-      .then(L=>{nbFeed(nb=>nb.add(L.map(a=>NTM.annItem(a,repEn(),m,BOARD))));return L}),
+      .then(L=>{const c=L.slice();nbFeed(nb=>nb.add(c.map(a=>NTM.annItem(a,repEn(),m,BOARD))));return L}),
     done:id=>{nbFeed(nb=>nb.seen("a:"+id+":"));return updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()})},reply:(id,text)=>annReply(u,id,text)})).catch(e=>console.warn("announcements",e));
   // "Your exam results are ready": a card once per new set of exam marks, with a link to the board on that LS (shared/js/el-exam-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-exam-notice"))loadScript("shared/js/el-grading.js",()=>window.EL_GRADING)
