@@ -22,3 +22,5 @@ jobs:
       # as in answers-stay.yml: Ubuntu's font servers are sometimes unreachable; the runner's own libraries are enough
       - run: timeout 180 npx playwright install-deps chromium || echo "::warning::Ubuntu's servers could not be reached; using the runner's own libraries"
       - run: node tools/smoke/check.mjs
+      # 🔔 the students' notifications and the mascot in the bar, with a fake in-memory database (Roger, 25 Nov 2026): nothing held shows early
+      - run: node tools/notify/check.mjs
