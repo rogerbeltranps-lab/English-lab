@@ -119,6 +119,8 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv{text-decoration:none;display:flex;justify-content:space-between;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px;text-align:left;margin:0}
 .tside .nv:hover{background:#eaf0ff;color:#3157d5}.tside .nv.on{background:#0f172a;color:#fff}.tside .nv.c2eso.on{background:#16a34a}.tside .nv.c4eso.on{background:#2563eb}
 .tside .nv small{font-weight:600;font-size:12px;opacity:.75}.tside .sep{height:1px;background:#e2e8f0;margin:8px 8px}.tside .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
+/* the menu's items (elTeacherMenu, el-catalog.js): icon + label, the group's short name only on the narrow strip of other pages */
+.tside .nv .lb{margin-right:auto}.tside .nv .gi{display:none}
 .tside .nv.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.tside .nv.ann:hover{background:#ffedd5}
 /* 🛠 maintenance mode (mtDialog): the side menu button and the red bar on every page while it is on */
 .tside .nv.mton{background:#dc2626;color:#fff}.tside .nv.mton:hover{background:#b91c1c;color:#fff}.tside .nv small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
@@ -317,7 +319,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
-<script src="shared/js/el-points.js?v=20261121b"></script>
+<script src="shared/js/el-points.js?v=20261125"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
@@ -377,13 +379,20 @@ const CLS={link:false,ready:false,done:(()=>{try{return sessionStorage.getItem("
 const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}catch(e){return {}}})();
 const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStorage.setItem("el_t_tab","1");return !!v}catch(e){return false}})();   // true = this tab already had the dashboard open (reload)
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
+  // the teacher's menu on the other pages (elTeacherMenu, el-catalog.js) opens a place of the dashboard: ?g= a group or a menu item
+  // (plan = 🏠 Home, corr, lss…), ?p= a Home place (week, msgs, tt), ?do= annnew (📣 Announcement) or mtdlg (🛠 Maintenance), ?more=1
+  // (the phone's More sheet)
+  const TABS=["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"];
   if(gOf(q.get("g")))S.g=q.get("g");
+  else if(TABS.includes(q.get("g"))){S.g=q.get("g");if(S.g==="plan"&&["week","msgs","tt"].includes(q.get("p")))CLS.place=q.get("p")}
+  else if(q.has("do")||q.has("more"))S.g=TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g))?LAST.g:"plan";
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
-  CLS.link=q.has("course")||q.has("ls")||q.has("g");
-  if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
+  CLS.link=["course","ls","g","p","do","more"].some(k=>q.has(k));
+  CLS.todo=["annnew","mtdlg"].includes(q.get("do"))?q.get("do"):q.has("more")?"more":null;   // done once the dashboard is drawn (firstDraw)
+  if(CLS.link)history.replaceState(null,"",location.pathname+location.hash)})();
 const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
@@ -1396,8 +1405,7 @@ function render(){
 // on a computer (shared/css/el-phone.css, section 8): the menu, the pages and the buttons are the same ones, with their own data-do actions.
 const TPH={g:null,more:false,chip:null,sv:null};
 const tphIcon=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
-  corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
+const TPH_I=EL_TPH_I;   // the same icons as the tab bar on the teacher's other pages (elTeacherTabs, el-catalog.js)
 function phoneBar(){
   if(GR.some(g=>g.id===S.g))TPH.g=S.g;
   if(!TPH.g){const l=GR.find(g=>g.id===LAST.g);TPH.g=(l||GR[0]).id}
@@ -1818,36 +1826,21 @@ function homePage(){const t=ELWeek.today(),np=pbNew().length,nw=sgNew().length,n
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
-  const hp=(p,lab,tip,extra)=>`<button class="nv ${S.g==="plan"&&S.place===p?"on":""}" data-do="hplace" data-p="${p}" title="${tip}">${lab}${extra||""}</button>`;
   const nv=(g,lab,cls,tip,extra)=>`<button class="nv ${cls||""} ${S.g===g?"on":""}" data-do="tab" data-g="${g}" ${tip?`title="${tip}"`:""}>${lab}${extra||""}</button>`;
   $("#tabs").hidden=false;$("#shell").classList.add("on");
   $("#mtbar").innerHTML=mtOn()?`🛠 Maintenance mode is ON: students only see the maintenance message and the worksheets.<button data-do="mtoff">Turn it off</button><button class="g2" data-do="mtdlg">See the message</button>`:"";
-  $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`
-    // 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"): sent ones are in 💬 Messages
-    +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
-    +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
-    +nv("plan","🏠 Home",S.g==="plan"&&(S.place||"home")!=="home"?"off":"","How each class is doing: work done in each learning path, first tries, games and marks")
-    // 🧠 Flashcards (Roger, 25 Nov 2026: "between home and groups I want to have a flashcards button. There I see this per each LS and I can
-    // even try them and have my own statistics"): the students' Flashcards page, every course and route, your own progress saved to your account
-    +`<a class="nv" href="lab/practice.html#deck" title="Every LS's flashcards at every level: study them yourself, with your own statistics">🧠 Flashcards</a>`
-    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,`<span class="gn">${esc(g.name)}</span>`,"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0),g.id))).join("")
-    +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
-    // 🧭 Learning situations (Roger, 12 Nov 2026: "here I should have LSs sections; when i get in I should see the courses and choose one")
-    +nv("lss","🧭 Learning situations","","Every LS by course: its learning paths, groups, status and materials")
-    +`<div class="sep"></div>`
-    +nv("corr","✏️ Corrections","","What Beltran corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
-    // the Home tiles moved here (Roger, 9 Nov 2026: "all this info can only be on the left menu")
-    +hp("week","📅 Time plan","Every group's week and exam day","")
-    +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const m=msgsN();return m?`<small class="${pbNew().length?"late":""}">${m}</small>`:""})())
-    +hp("tt","🗓 Timetable","Your classes with each group, days off","")
-    +nv("qa","🔎 Questions","","Which questions students answer well or badly the first time, by route and group")
-    +nv("online","🟢 Online","","Who is on English Lab now, and the history of visits: when, for how long, which pages")
-    +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
-    +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
-    +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
-    +nv("how","🎬 How it works","","Guides for teachers and students")
-    // ✦ Roger's own course, as a section of its own (tnPage)
-    +((window.TN_LS||[]).length&&!DEMO?`<div class="sep"></div>`+nv("tn","✦ Towards Nativeness","","Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"):"");
+  // the side menu: the one list of every teacher page (elTeacherMenu in el-catalog.js; Roger, 25 Nov 2026: "this menu should always be
+  // the same"), here with the dashboard's buttons. 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"); 🧠 Flashcards
+  // between Home and Groups (Roger, 25 Nov 2026); the Home tiles moved to the menu (Roger, 9 Nov 2026: "all this info can only be on the
+  // left menu"); 🧭 Learning situations (Roger, 12 Nov 2026); ✦ Towards Nativeness, Roger's own course (tnPage)
+  const tmOn=S.g==="plan"?((S.place||"home")==="home"?"plan":S.place):S.g,tmN={},tmAsk={},tmAskN={};
+  GR.forEach(g=>{tmN[g.id]=String(cnt(g.id));const a=inGr(g.id).filter(s=>!s.away).reduce((x,s)=>x+lvAsks(s.uid).length,0);tmAskN[g.id]=a;tmAsk[g.id]=askBadge(a,g.id)});
+  const tmTn=!!(window.TN_LS||[]).length&&!DEMO,tmMsg=msgsN(),tmC=corrN();
+  $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`+elTeacherMenu({dash:true,on:tmOn,mt:mtOn(),tn:tmTn,counts:tmN,asks:tmAsk,gtip:listed()?"Signed in / on the student list":"Students",
+    extra:{corr:corrBadge(tmC),msgs:tmMsg?`<small class="${pbNew().length?"late":""}">${tmMsg}</small>`:""},
+    none:n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):""});
+  // the numbers the other teacher pages show on the same menu (elTmCache): no reads there
+  if(!DEMO)try{localStorage.setItem("el_tmenu",JSON.stringify({t:Date.now(),n:tmN,ask:tmAskN,corr:tmC.chk?(elTmCache().corr||{n:0}):{n:tmC.n||0,late:!!tmC.late},msgs:{n:tmMsg,late:!!pbNew().length},mt:mtOn(),tn:tmTn}))}catch(e){}
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
@@ -2909,7 +2902,7 @@ const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:tru
 const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_LS.some(x=>x.id===id));
 // the badge says what it is and opens the request itself (Roger, 10 Nov 2026: "I dont understand the target on the 2a")
 const askBadge=(n,g)=>n?` <small class="ask" data-do="ask" data-g="${g}" role="link" title="${n} student${n>1?"s":""} asked for a level change: click to answer (Accept or Decline in the group's To do)">🎯 ${n} level ask${n>1?"s":""}</small>`:"";
-const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
+const corrBadge=(c=corrN())=>{if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
   const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 15:15";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
@@ -3377,10 +3370,12 @@ const ptTabsN=(s,m)=>(m||[]).reduce((n,[a,,o])=>n+ptLeft(s.uid,a,o).length,0);
 // works it out (only it sees every student's work) and keeps it in teams/{group}.bestOk.{term} for the student board; it rewrites it
 // whenever it renders and the value has changed, so it follows new work, new due days and point changes.
 const ptOk=s=>{const m=ptMiss(s);return !!m&&!m.length},ptBestOk=g=>Math.max(0,...ptStuds(g).filter(ptOk).map(ptOn));
-function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const term=S.term;
+// Every term so far, not only the current one (25 Nov 2026: Term 1's bestOk stayed at its last value of term 1, 0, so the board gave every
+// student with all the work done the whole +0.5): the bonus is now in the term mark, so an ended term must stay true too.
+function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const now=EL_TERMS.findIndex(x=>x.id===S.term);
   // only groups fetched in this visit: never from an old copy
-  GR.filter(g=>DEMO||FRESH.has(g.id)).forEach(g=>{const v=ptBestOk(g.id),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
-    t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))})}
+  GR.filter(g=>DEMO||FRESH.has(g.id)).forEach(g=>EL_TERMS.slice(0,now+1).forEach(T=>{const term=T.id,v=withS("term",term,()=>ptBestOk(g.id)),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
+    t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))}))}
 const pt={
   add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
     if(DEMO)return null;const b=F.writeBatch(db());b.set(F.doc(db(),"points",k),sub({[term]:F.increment(d)}),{merge:true});b.set(F.doc(db(),"teams",g),sub({best:{[term]:best}}),{merge:true});return b.commit()}
@@ -3928,9 +3923,10 @@ function progress(studs,list,stu,ids){
   const row=[...ents.filter(e=>!e.r),...(TN?[{mark:true}]:[]),...ents.filter(e=>e.r)],
     openE=e=>!fpIds.has(e.a.id)&&!S.folded.has(e.a.id)&&e.cols.length>0,any=row.some(e=>!e.mark&&openE(e))||multi,rs=any?' rowspan="2"':"",
     firstE=new Set(ids.map(id=>row.find(e=>!e.mark&&e.a.ls===id)).filter(Boolean)),lsbE=e=>multi&&firstE.has(e)?" lsb":"",
-    tMark=s=>byComp(marksOf(s,TI).filter(r=>!r.tr&&r.it.term===TN)).mark,
+    tBest=TN&&EL_TERMS[TN-1]?withS("term",EL_TERMS[TN-1].id,()=>ptBestOk(S.g)):0,
+    tMark=s=>termFinal(byComp(marksOf(s,TI).filter(r=>!r.tr&&r.it.term===TN)).mark,TN&&EL_TERMS[TN-1]?termBonus(s,EL_TERMS[TN-1],tBest):0),
     markTh=`<th class="first lsb tmk"${rs} title="${esc(tName(TN))} mark so far: every assessed item of ${esc(tName(TN))} by competence (the same mark as 📆 Term and year marks). On its left what counts in ${esc(tName(TN))}; on its right what goes in a later term.">🗓 ${esc(tName(TN))}<br>mark<br><small class="muted">so far</small></th>`,
-    markTd=s=>{const m=s.away?null:tMark(s);return `<td class="first lsb tmk">${m==null?"–":`<b>${f1(m)}</b><br><small>${deg(elDegree(m))}</small>`}</td>`};
+    markTd=s=>{const x=s.away?termFinal(null):tMark(s);return `<td class="first lsb tmk">${x.m==null?"–":`${tfCell(x)}<br><small>${deg(elDegree(x.m))}</small>`}</td>`};
   // 🧩 📚 class game circles: in Students a column of their own after the points (Roger, 9 Nov 2026: "I want the circles of percentage of
   // the grammar and vocab too … here"), so an LS with no class games saved says so instead of showing nothing
   if(stu)loadPerf();const cpL=CPERF[S.g],cpN=!cpL||cpL.busy||cpL.list.some(x=>x.day&&elTerm(x.day)===S.term);
@@ -4275,6 +4271,11 @@ function compBar(share,avg){const ks=Object.keys(share).sort(compSort),t=ks.redu
   return `<div class="cbar">${ks.map(k=>`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(lab(k))}">${pc(k)>=8?esc(compShort(k).split(" ")[0])+" "+Math.round(pc(k))+"%":""}</span>`).join("")}</div>`
     +`<div class="clegend">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(lab(k))}</span>`).join("")}</div>`}
 const termBonus=(s,t,best)=>withS("term",t.id,()=>s.away||!pkey(s)?null:ptGets(s,best,ptMiss(s)));
+// The term mark includes the points bonus (Roger, 25 Nov 2026: "the final marks of the term should include the 0,5 if they done all the
+// activities that were due to before the Monday exam"): base = the mark by competence, b = termBonus (0 with any activity due in the term
+// still not done; Term 1 = everything due by Fri 20 Nov, before the LS2 exams). Capped at 10. Returns {m, base, b} (m null with no mark).
+const termFinal=(base,b)=>({base,b:b||0,m:base==null?null:Math.min(10,base+(b||0))});
+const tfCell=x=>x.m==null?"–":`<b>${f1(x.m)}</b>${x.b?` <small class="muted" title="${esc(f1(x.base))} + ${esc(elNum(x.b,"en"))} points bonus (class games, every activity due in the term done)">${esc(f1(x.base))} + ${esc(elNum(x.b,"en"))} ⭐</small>`:""}`;
 // Map of the integrated competences per LS (Roger, 31 Oct 2026: "we should also have this map in the year distribution"): one row per
 // competence (CE1, CE6–CE10), one column per LS of the course. ● = assessed, with its criteria: from the LS's grading plan once the LS is on
 // the site (its items' pieces), else from the programme (EL_COMP_MAP prog). ○ worked implicitly, ◇ planned, — not worked: EL_COMP_MAP work
@@ -4368,18 +4369,23 @@ function yearView(grp,studs){
           :`<p class="muted">No assessed items yet: they appear here when its grading plan is added.</p>`)+`</div>`};
     const cards=mine.map(card).join("")+free.map(k=>`<div class="ycard yfree"><b>LS${k}</b><p class="muted">Not created yet: it appears here when it is added.</p></div>`).join("")
       +(from.length?`<div class="ycard"><b>From earlier LSs</b><ul>${from.map(it=>`<li>${lsLabel(it.l).replace(/ · .*/,"")} · ${esc(it.b.name)} <b>${it.b.w} %</b> <small class="muted">${when(it)}</small></li>`).join("")}</ul></div>`:"");
-    const best=withS("term",t.id,()=>ptBestOk(grp.id)),pts=n<=now,ga=avg(live.map(s=>byComp(R[s.uid].filter(f)).mark).filter(v=>v!=null));
-    const extra={n:pts?2:1,head:`<th class="first">${esc(t.en)} mark</th>${pts?`<th title="Points bonus of this term (Points box): only with all the work done">+ Points</th>`:""}`,
-      row:s=>{const m=byComp(R[s.uid].filter(f)).mark,b=pts?termBonus(s,t,best):null;return `<td class="first tot"><b>${f1(m)}</b> ${deg(elDegree(m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}`}};
+    const best=withS("term",t.id,()=>ptBestOk(grp.id)),pts=n<=now,TF=s=>termFinal(byComp(R[s.uid].filter(f)).mark,pts?termBonus(s,t,best):0),ga=avg(live.map(s=>TF(s).m).filter(v=>v!=null));
+    const extra={n:pts?2:1,head:`<th class="first" title="By competence, plus the points bonus when every activity due in the term is done">${esc(t.en)} mark</th>${pts?`<th title="Points bonus of this term (Points box), already in the mark: only with every activity due in the term done">⭐ Bonus</th>`:""}`,
+      row:s=>{const x=TF(s),b=pts?termBonus(s,t,best):null;return `<td class="first tot">${tfCell(x)} ${deg(elDegree(x.m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}`}};
     const cd=closeDay(grp.id,n),head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${cd?" · 🔒 closed on "+esc(ELWeek.date(cd)):""}${ga==null?"":" · group average "+f1(ga)}</small>`;
     const cbtn=n<=now&&n<EL_TERMS.length?`<p><button class="g" data-do="tclose" data-g="${grp.id}" data-n="${n}">🔒 ${cd?`Closed on ${esc(ELWeek.date(cd))}: change or reopen`:`Close ${esc(t.en)}…`}</button> <small class="muted">${cd?`Only the learning-path work ticked done by then counts here; the rest is in ${esc(EL_TERMS[n].en)}.`:`Counts only what you ticked done in the Time plan; the rest of the learning paths goes to ${esc(EL_TERMS[n].en)}.`}</small></p>`:"";
     const body=cbtn+(its.length?`<h3>Competences in ${esc(t.en)}</h3>${compBar(shareOf(its),grpAvg(f))}`:"")+`<div class="ycards">${cards}</div>`
-      +(its.length?degStats(live,s=>byComp(R[s.uid].filter(f)).mark,`${t.en} mark`)+table(r=>f(r),"t"+n,extra)+trTable(f,"t"+n):`<p class="muted">Nothing assessed in this term yet.</p>`);
+      +(its.length?degStats(live,s=>TF(s).m,`${t.en} mark`)+table(r=>f(r),"t"+n,extra)+trTable(f,"t"+n):`<p class="muted">Nothing assessed in this term yet.</p>`);
     return `<div class="box yterm ${n===now?"ynow":""}">${fold("yt"+n,head,body)}</div>`}).join("");
   const tn=EL_TERMS.map((t,i)=>i+1).filter(n=>items.some(it=>it.term===n));
-  const yextra={n:tn.length+1,head:tn.map((n,j)=>`<th class="${j?"":"first"}">${esc(EL_TERMS[n-1].en)}</th>`).join("")+`<th class="first">Year mark</th>`,
-    row:s=>tn.map((n,j)=>`<td class="${j?"":"first"}">${f1(byComp(R[s.uid].filter(r=>r.it.term===n)).mark)}</td>`).join("")+(y=>`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td>`)(yearOf(R[s.uid]).mark)};
-  const summary=!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2>${compBar(shareOf(items),grpAvg(()=>true,"y"))}${degStats(live,s=>yearOf(R[s.uid]).mark,"Year mark")}${table(()=>true,"y",yextra)}${trTable(()=>true,"y")}</div>`;
+  // each term with its points bonus; the year mark adds each term's bonus with the term's weight (×1, ×2, ×3), like the term marks
+  const yBest=tn.map(n=>n<=now?withS("term",EL_TERMS[n-1].id,()=>ptBestOk(grp.id)):0),
+    yTerm=(s,n,j)=>termFinal(byComp(R[s.uid].filter(r=>r.it.term===n)).mark,n<=now?termBonus(s,EL_TERMS[n-1],yBest[j]):0),
+    yMark=s=>{const y=yearOf(R[s.uid]).mark;if(y==null)return null;const ts=tn.map((n,j)=>[n,yTerm(s,n,j)]).filter(([,x])=>x.m!=null),w=ts.reduce((a,[n])=>a+n,0);
+      return Math.min(10,y+(w?ts.reduce((a,[n,x])=>a+n*x.b,0)/w:0))};
+  const yextra={n:tn.length+1,head:tn.map((n,j)=>`<th class="${j?"":"first"}">${esc(EL_TERMS[n-1].en)}</th>`).join("")+`<th class="first" title="Each competence's term marks × 1, 2, 3, plus each term's points bonus with the same weights">Year mark</th>`,
+    row:s=>tn.map((n,j)=>`<td class="${j?"":"first"}">${tfCell(yTerm(s,n,j))}</td>`).join("")+(y=>`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td>`)(yMark(s))};
+  const summary=!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2>${compBar(shareOf(items),grpAvg(()=>true,"y"))}${degStats(live,yMark,"Year mark")}${table(()=>true,"y",yextra)}${trTable(()=>true,"y")}</div>`;
   const key=`<p class="muted">Each term shows its two LSs (LS1–LS2 in ${esc(EL_TERMS[0].en)}, LS3–LS4 in the next one…). A new LS appears in its slot as soon as it is added to the site, and its items as soon as its grading plan is added. An item counts in the term of its date in the time plan (exam day, last due day of its activities), so an LS can give items to the next term (→).</p>`
     +`<p class="muted"><b>By competence.</b> Every item is split among the criteria it assesses, and each criterion belongs to a competence. <b>By how much it is worked</b> (default): a competence's share of an LS is how many steps of the LS activities work on its criteria, among the competences the LS assesses (LS1 has no step criteria, so it uses the grading plan). <b>By the grading plan</b>: its criteria's weight in the LS mark (exam sections by their points, final product rubric rows by their weight, grammar and vocabulary by the criteria of its steps, other competences equally). Either way each LS weighs 100, a competence assessed in two LSs counts twice, and the competence worked more in an LS counts more. The coloured bars show each competence's share in the LS, the term and the year. <b>Competence mark</b>: its criteria weighted; a degree you confirmed in “Result per assessment criterion” replaces the marks of that criterion in that LS. <b>Term mark</b>: the competences weighted by their share. <b>Year mark</b> (continuous assessment): each competence's year mark is its term marks weighted by the term number (Term 1 ×1, Term 2 ×2, Term 3 ×3), only the terms with a mark for it, so a competence assessed in one term keeps that mark and the four communicative competences show where the student ends up; then the competences are weighted by their share of the year. <b>Transversal competences</b> (CC, CD, CPSAA, entrepreneurial) are not part of the English mark: they are left out of the shares, bars and marks and shown apart with their own marks. Process and teamwork rows have no competence, so they are left out. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Click a mark to see its criteria and items.</p>`;
   return `<div class="box"><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0">not counted yet</button> <span class="muted">· Share of each competence:</span> <button class="chip ${S.yShare==="plan"?"":"on"}" data-do="yshare" data-v="work" title="How many steps of the LS activities work on its criteria">by how much it is worked</button><button class="chip ${S.yShare==="plan"?"on":""}" data-do="yshare" data-v="plan" title="Its criteria's weight in the LS mark (grading plan)">by the grading plan</button></div>${fold("ykey","How it is worked out",key,"key")}</div>`
@@ -7043,8 +7049,11 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;
   TOUCHED.clear();firstDraw()};
 // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
 function firstDraw(){
-  if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());return}}
-  render();corrFresh();if(hashPb()!=null)toProbs(hashPb())}
+  if(CLS.place){S.place=CLS.place;CLS.place=null}   // ?p= from the teacher's menu on another page (S.place is set to home after the link is read)
+  if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());tmTodo();return}}
+  render();corrFresh();if(hashPb()!=null)toProbs(hashPb());tmTodo()}
+// 📣 Announcement, 🛠 Maintenance or the phone's More, asked from the teacher's menu on another page (?do=, ?more=1)
+function tmTodo(){const w=CLS.todo;CLS.todo=null;if(w==="annnew")annDialog();else if(w==="mtdlg")mtDialog();else if(w==="more"&&document.getElementById("tpmore")){TPH.more=true;tphMore()}}
 // the light part read while the page shows the copy: then the page is drawn again from it (as liveDraw does: never while typing or
 // with a window open). Something that already replaced the copy (Update all, the daily update, a save's read-back) wins. Failed: again in 1 minute.
 async function freshen(){let D;try{D=await load()}catch(e){console.warn("load",e);S.copyErr=true;loadBar();setTimeout(freshen,60e3);return}

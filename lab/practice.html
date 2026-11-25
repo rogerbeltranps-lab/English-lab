@@ -521,6 +521,7 @@ function fdSave(P) {
   if (fdAs()) { fdView = P; return; }
   try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
   fdSum(P);
+  if (window.elMascotRefresh) elMascotRefresh();   // the ⚡ streak in the bottom-right bar follows at once
   if (!fdCloudOn()) return;
   // the account's copy may have cards studied on another device since it was read (a phone, a tab left open): read it again first when the
   // last read is over 5 minutes old, merge, then write, so a save never wipes them (25 Nov 2026: students studied and their ⚡ stayed at 0)

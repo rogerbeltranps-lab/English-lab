@@ -36,8 +36,16 @@
     const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u)||String(txt).match(/^(LS\d+) · (.*)$/),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:"🗂");
       return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
     let html;
-    if(teach()||who.role==="tester"){
-      const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
+    // the teacher: the dashboard's side menu, the same on every teacher page (elTeacherMenu in el-catalog.js; Roger, 25 Nov 2026: "this
+    // menu should always be the same"), under the dashboard's name
+    const tm=teach()&&!!window.elTeacherMenu,br=$("aside.side .brand");
+    if(br){if(br.dataset.en==null){br.dataset.en=br.textContent;br.dataset.h=br.getAttribute("href")||""}
+      br.textContent=tm?"Teacher dashboard":br.dataset.en;br.setAttribute("href",tm?ROOT+"teacher.html":br.dataset.h)}
+    $$(".nvs,.nvs-m").forEach(n=>n.classList.toggle("eltm",tm));
+    if(tm){
+      html=elTeacherMenu({root:ROOT});
+    }else if(who.role==="tester"){
+      const first=a(boardHref(),"🏠 My dashboard");
       html=first+`<div class="nvsep"></div>`+["2eso","4eso"].map(c=>`<div class="nvh">${CN[c]}</div>`+a(ROOT+c+"/index.html",CN[c]+" · Learning Situations","sub")
         +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
@@ -57,10 +65,14 @@
     // collapse in every LS"; only the menu, LS1's content stays as it is)
     const mini=stu&&!!window.elMiniRail;document.body.classList.toggle("elmini",mini);
     if(mini)elMiniRail($("aside.side"));
+    else{const top=$("aside.side>.elmtop");if(top){const b=top.querySelector(".brand");if(b)top.before(b);top.remove()}}   // drawn first for a student (the strip), then the teacher: the brand comes back out of the ☰ row
     const b=$("#bnav");if(b)b.innerHTML=stu?[["","🏠",t("Inici","Home")],["#todo","✅",t("Per fer","To do")],["#homework","📝",t("Deures","Homework")],["#marks","📊",t("Notes","Marks")],[null,"📚","LS"],["#help","❓",t("Ajuda","Help")]]
       .map(([h,i,l])=>h===null?`<a class="on" aria-current="page" href="#"><i>${i}</i>${l}</a>`:`<a href="${boardHref()}${h}"><i>${i}</i>${l}</a>`).join(""):"";
     // a phone (≤640 px): the students' tab bar of every page instead (elPhoneTabs in el-catalog.js, shared/css/el-phone.css; Roger, 8 Nov 2026)
     if(stu&&window.elPhoneTabs)elPhoneTabs({root:ROOT,board:boardHref(),ls:LS,here:"ls",ca:CA});
+    // the teacher on a phone: the dashboard's tab bar (elTeacherTabs); nobody else keeps a students' bar drawn before sign-in was known
+    else if(tm&&window.elTeacherTabs)elTeacherTabs({root:ROOT});
+    else{const p=$("nav.elptabs");if(p)p.remove();document.body.classList.remove("elptab")}
   }
   // ---- places (#study, #about, #final): the board's rule, little on the menu and the details inside each place
   const PLACES=["study","about","final","notes"];   // notes: 📝 Your notes from the class games (el-notes.js)
