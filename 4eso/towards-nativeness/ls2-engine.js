@@ -36,7 +36,16 @@ var LS2 = (function () {
   /* A step is done once every activity has been answered and checked, whatever the score (Roger, 6 Nov 2026: "when all the activities
      have been done the SLP counts as done"). The score still shows, the first try still counts for the mark. */
   const answered = (items, prefix) => vals(items, prefix).every(v => v != null && String(v).trim() !== '');
-  const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+  /* 🇺🇸 American English (Roger, 25 Nov 2026: "I try to use the American grammar, remember this"): the US and the British form of a word are
+     the same answer (color = colour, organize = organise, center = centre, program = programme, toward = towards, burned = burnt,
+     traveled = travelled, gray = grey, on the weekend = at the weekend). The models shown are American. */
+  const us = s => s.replace(/\b(col|fav|behavi|neighb|hon|hum|lab|flav|harb|rum)our(s|ed|ing|ite|ites|ful|able)?\b/g, '$1or$2')
+    .replace(/\b(organ|real|recogn|apolog|priorit|summar|personal|custom|minim|maxim|special|standard|optim|memor|categor|emphas|critic|util|final|visual|character|author|familiar|general|modern|normal)is(e|es|ed|ing|ation|ations)\b/g, '$1iz$2')
+    .replace(/\banalys(e|es|ed|ing)\b/g, 'analyz$1').replace(/\b(cent|theat)re(s)?\b/g, '$1er$2').replace(/\bprogrammes?\b/g, m => m.endsWith('s') ? 'programs' : 'program')
+    .replace(/\b(toward|afterward|backward|forward)s\b/g, '$1').replace(/\b(burn|learn|spell|dream|spill|spoil)t\b/g, '$1ed')
+    .replace(/\b(travel|cancel|label|model|signal)l(ed|ing|er|ers)\b/g, '$1$2').replace(/\bgrey\b/g, 'gray').replace(/\bpractis(e|es|ed|ing)\b/g, 'practic$1')
+    .replace(/\bcatalogue(s)?\b/g, 'catalog$1').replace(/\blicence\b/g, 'license').replace(/\bat (the )?weekends?\b/g, m => m.replace(/^at/, 'on'));
+  const norm = s => us(String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim());
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const words = s => (String(s).trim().match(/\S+/g) || []).length;
@@ -263,7 +272,7 @@ var LS2 = (function () {
   }
   /* 📱 cellphone, cell phone, mobile phone, smartphone, my mobile = phone (Roger, 21 Nov 2026: "on my cellphone" should be right; 22 Nov
      "I haven't tried it on my cellphone yet" in Catalan → English). Only the phone word: "yet", tenses and word order still count. */
-  const phone = s => s.replace(/\b(?:cell ?phone|mobile phone|smart ?phone)\b/g, 'phone').replace(/\b(my|your|his|her|our|their|the|a) mobile\b/g, '$1 phone');
+  const phone = s => (s.replace(/\b(?:cell ?phone|mobile phone|smart ?phone)\b/g, 'phone').replace(/\b(my|your|his|her|our|their|the|a) mobile\b/g, '$1 phone'));
   /* ✍ The answer box shows the whole sentence (Roger, 22 Nov 2026, iPhone: "I can't see my sentence": a one-line box beside ✓ Check cut a
      long answer off). A typed answer is a <textarea rows=1 class="typed el-grow">: it wraps and grows a line at a time as the student types,
      Enter never adds a line (it checks, as before) and a pasted line break becomes a space. Setting .value from code (restoring answers,

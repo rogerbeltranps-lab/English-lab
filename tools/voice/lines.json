@@ -5826,9 +5826,9 @@
   "src": "4eso/towards-nativeness/data/telling-the-story.js"
  },
  {
-  "key": "05bd7558",
-  "text": "I burnt through my credits in two days.",
-  "say": "I burnt through my credits in two days.",
+  "key": "dc011ad3",
+  "text": "I burned through my credits in two days.",
+  "say": "I burned through my credits in two days.",
   "src": "4eso/towards-nativeness/data/telling-the-story.js"
  },
  {
@@ -6414,394 +6414,2440 @@
   "src": "flashcards"
  },
  {
-  "key": "5e64121a",
-  "text": "Add the reading texts to the students' notebooks.",
-  "say": "Add the reading texts to the students' notebooks.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "8b1f7990",
+  "text": "Did you include the mistakes I've made recently?",
+  "say": "Did you include the mistakes I've made recently?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "bbe7c8da",
-  "text": "I'd like to add an image to my message.",
-  "say": "I'd like to add an image to my message.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "89828f41",
+  "text": "I want to write the correct sentence, not choose it.",
+  "say": "I want to write the correct sentence, not choose it.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "2da309c0",
-  "text": "The heading mustn't be on a different page from its text.",
-  "say": "The heading mustn't be on a different page from its text.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "711464d4",
+  "text": "I want fast finishers to read the book.",
+  "say": "I want fast finishers to read the book.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "4b161c16",
-  "text": "It should look the same in the teacher's view.",
-  "say": "It should look the same in the teacher's view.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "cd79ba3e",
+  "text": "Include the exam ones.",
+  "say": "Include the exam ones.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "e4583f7c",
-  "text": "The assessment indicator is missing from some criteria.",
-  "say": "The assessment indicator is missing from some criteria.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "1266d55f",
+  "text": "I want to have them ready by Monday.",
+  "say": "I want to have them ready by Monday.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "db964d7a",
-  "text": "The reports will go here, at the top.",
-  "say": "The reports will go here, at the top.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "5951b53b",
+  "text": "We will mark them like the other speaking activities.",
+  "say": "We will mark them like the other speaking activities.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "b459f256",
-  "text": "I want all the flashcards in the same format.",
-  "say": "I want all the flashcards in the same format.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "3d0b2f7e",
+  "text": "It can be done at that moment or set as homework.",
+  "say": "It can be done at that moment or set as homework.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "a51a59c9",
-  "text": "Starters do an exam that is more difficult for them.",
-  "say": "Starters do an exam that is more difficult for them.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "039524e5",
+  "text": "When I tap the %, I want to see who's done it and who hasn't.",
+  "say": "When I tap the %, I want to see who's done it and who hasn't.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "754ed964",
-  "text": "For me, it's very difficult to improve.",
-  "say": "For me, it's very difficult to improve.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "b87425b3",
+  "text": "I thought that was what they saw when they opened the website.",
+  "say": "I thought that was what they saw when they opened the website.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "62aa09dd",
-  "text": "We're already in the 2nd term.",
-  "say": "We're already in the 2nd term.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "10bb1d6b",
+  "text": "It opens when they press the To do button.",
+  "say": "It opens when they press the To do button.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ff8f4703",
-  "text": "Speaking should count towards the diagram.",
-  "say": "Speaking should count towards the diagram.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "3fb75cc3",
+  "text": "Correct the missing writings.",
+  "say": "Correct the missing writings.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "4b899141",
-  "text": "We are not fussy about the number of words.",
-  "say": "We are not fussy about the number of words.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "9c62d677",
+  "text": "I don't understand the colours or the labels.",
+  "say": "I don't understand the colours or the labels.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "76c3a7b1",
-  "text": "Are the marks in the table?",
-  "say": "Are the marks in the table?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "457e5f66",
+  "text": "I won't make it because I have a doctor's appointment.",
+  "say": "I won't make it because I have a doctor's appointment.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "811025b5",
-  "text": "Do the reports for all the students.",
-  "say": "Do the reports for all the students.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "95456b6d",
+  "text": "We need to label it Sample exam 1.",
+  "say": "We need to label it Sample exam 1.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "f1794290",
-  "text": "What do you mean by \"a few minutes after\"?",
-  "say": "What do you mean by \"a few minutes after\"?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "ffa83f41",
+  "text": "Go ahead with the plan and next week's activities.",
+  "say": "Go ahead with the plan and next week's activities.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ef932a41",
-  "text": "Today I won't make it to 4 ESO B.",
-  "say": "Today I won't make it to 4 ESO B.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "ed6d5c42",
+  "text": "Put the summary as columns.",
+  "say": "Put the summary as columns.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "5c5ee311",
-  "text": "Students see the corrections on weekdays at 5 pm.",
-  "say": "Students see the corrections on weekdays at 5 pm.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "243d3c08",
+  "text": "This website is for teaching, not for self-study.",
+  "say": "This website is for teaching, not for self-study.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "197e6a45",
-  "text": "Is the script the one in my school account?",
-  "say": "Is the script the one in my school account?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "7e20b5e4",
+  "text": "We don't have as much time as we should.",
+  "say": "We don't have as much time as we should.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "93795091",
-  "text": "I want a presentation to explain to my students how I correct.",
-  "say": "I want a presentation to explain to my students how I correct.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "9f084dd9",
+  "text": "The same thing happens in 2 ESO.",
+  "say": "The same thing happens in 2 ESO.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "0b028eae",
-  "text": "Explain to me what it means.",
-  "say": "Explain to me what it means.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "4a0e4a7a",
+  "text": "I see you have a lot of docs here.",
+  "say": "I see you have a lot of docs here.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "2134a69e",
-  "text": "You upload them to the website.",
-  "say": "You upload them to the website.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "2b0ca9c1",
+  "text": "What's happening with the writing?",
+  "say": "What's happening with the writing?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "aa049481",
-  "text": "Corrections come out between 5 and 6 pm.",
-  "say": "Corrections come out between 5 and 6 pm.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "f8bde4b5",
+  "text": "Change the green colour to the blue one.",
+  "say": "Change the green colour to the blue one.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "73b9d5b5",
-  "text": "It happens when I switch between these sections.",
-  "say": "It happens when I switch between these sections.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "5ec0b716",
+  "text": "60 should already be green.",
+  "say": "60 should already be green.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "b42d116a",
-  "text": "Students can switch between the notebook look and the computer look.",
-  "say": "Students can switch between the notebook look and the computer look.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "7c884486",
+  "text": "Make a backup of the data.",
+  "say": "Make a backup of the data.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "1b3d302b",
-  "text": "I want them as columns in both places.",
-  "say": "I want them as columns in both places.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "6b8e8ad8",
+  "text": "Where is the data I have on my students?",
+  "say": "Where is the data I have on my students?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "324e5c87",
-  "text": "Activities must be simple in format, not in content.",
-  "say": "Activities must be simple in format, not in content.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "5ad64cb0",
+  "text": "Has this already been done?",
+  "say": "Has this already been done?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ecde7635",
-  "text": "I want a full screen with the menu at the top.",
-  "say": "I want a full screen with the menu at the top.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "97f86d1e",
+  "text": "Suggest replies according to the website.",
+  "say": "Suggest replies according to the website.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "6130ae7c",
-  "text": "A line with step 1 and an example next to it.",
-  "say": "A line with step 1 and an example next to it.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "bdf6f130",
+  "text": "Write an email reminding them that speaking is compulsory.",
+  "say": "Write an email reminding them that speaking is compulsory.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ad1e9641",
-  "text": "Open the activity in class mode.",
-  "say": "Open the activity in class mode.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "423f17c5",
+  "text": "It's a document that helps you work better.",
+  "say": "It's a document that helps you work better.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "d250bb70",
-  "text": "The link is on the list at the top of the page.",
-  "say": "The link is on the list at the top of the page.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "ce2653af",
+  "text": "Where is it better for you to have them?",
+  "say": "Where is it better for you to have them?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "878f5189",
-  "text": "It looks fine on my phone but not on the laptop.",
-  "say": "It looks fine on my phone but not on the laptop.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "6b36fe9f",
+  "text": "Show the answer 2 hours after they receive the message.",
+  "say": "Show the answer 2 hours after they receive the message.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "f46f2d63",
-  "text": "My students are in 4th ESO.",
-  "say": "My students are in 4th ESO.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "37fd744b",
+  "text": "What's the point of that?",
+  "say": "What's the point of that?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "4424afee",
-  "text": "It's already on the list.",
-  "say": "It's already on the list.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "c543adf8",
+  "text": "I want the students to see their exam results on the dashboard.",
+  "say": "I want the students to see their exam results on the dashboard.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "98d5b979",
-  "text": "Can you add it to the list?",
-  "say": "Can you add it to the list?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "b3c7eabe",
+  "text": "I want everything to be clear for the students.",
+  "say": "I want everything to be clear for the students.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "eb039d71",
-  "text": "And it takes a while to see the mark in the table.",
-  "say": "And it takes a while to see the mark in the table.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "28d7ac86",
+  "text": "The student view still shows the old marks.",
+  "say": "The student view still shows the old marks.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "23f10b86",
-  "text": "I want this information in the students table.",
-  "say": "I want this information in the students table.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "4cb4abe7",
+  "text": "Where can I see the exam results?",
+  "say": "Where can I see the exam results?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "336da2f0",
-  "text": "The post-it doesn't work in the notebook.",
-  "say": "The post-it doesn't work in the notebook.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "2ecc67c9",
+  "text": "Open the sample exam first.",
+  "say": "Open the sample exam first.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "74b4f9fe",
-  "text": "Once they correct the SLP, it appears in their notebook, right?",
-  "say": "Once they correct the SLP, it appears in their notebook, right?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "cba21929",
+  "text": "My 2nd ESO group played the game in class mode.",
+  "say": "My 2nd ESO group played the game in class mode.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "3eea4c69",
-  "text": "Students write on the website, not in a pop-up.",
-  "say": "Students write on the website, not in a pop-up.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "31b01790",
+  "text": "We started LS2 on Monday.",
+  "say": "We started LS2 on Monday.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "3285b43c",
-  "text": "Can they use Google Translate on my website?",
-  "say": "Can they use Google Translate on my website?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "c34638db",
+  "text": "Can you make a copy of the 4th ESO path?",
+  "say": "Can you make a copy of the 4th ESO path?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "0be023d8",
-  "text": "I'll ask students to upload it to the website.",
-  "say": "I'll ask students to upload it to the website.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "7296a394",
+  "text": "They need to make the video before Friday.",
+  "say": "They need to make the video before Friday.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "e94f70f2",
-  "text": "It arrived in my personal Gmail.",
-  "say": "It arrived in my personal Gmail.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "fd333d0f",
+  "text": "The games are played at the end of the class.",
+  "say": "The games are played at the end of the class.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "216404a7",
-  "text": "What will appear in the drafts folder?",
-  "say": "What will appear in the drafts folder?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "6abf386b",
+  "text": "I checked it twice and it's wrong again.",
+  "say": "I checked it twice and it's wrong again.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f3d9a6ff",
+  "text": "This time it will be different.",
+  "say": "This time it will be different.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6cf9599a",
+  "text": "When I open the page, it shows an error.",
+  "say": "When I open the page, it shows an error.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "988fc96f",
+  "text": "It's very slow on my phone today.",
+  "say": "It's very slow on my phone today.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6d5e1bfd",
+  "text": "Is it closed because it's Saturday?",
+  "say": "Is it closed because it's Saturday?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "797b0ed1",
+  "text": "The menu is missing on this page.",
+  "say": "The menu is missing on this page.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "27f2f2a3",
+  "text": "Why is English Lab so slow today?",
+  "say": "Why is English Lab so slow today?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9956e097",
+  "text": "Is that what you did with the exam results?",
+  "say": "Is that what you did with the exam results?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8b1bdc39",
+  "text": "There are three pending activities in the student view.",
+  "say": "There are three pending activities in the student view.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "02eb2000",
+  "text": "They gave us an easy exam.",
+  "say": "They gave us an easy exam.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "155cfab1",
+  "text": "I'll send you an email with the sample exam.",
+  "say": "I'll send you an email with the sample exam.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "289ba172",
+  "text": "We can only enter marks on Fridays.",
+  "say": "We can only enter marks on Fridays.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2f0baeae",
+  "text": "First I need to plan the sessions for LS2.",
+  "say": "First I need to plan the sessions for LS2.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "47fc3e28",
+  "text": "The button should always be on.",
+  "say": "The button should always be on.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c89805a9",
+  "text": "Students write their texts on the website.",
+  "say": "Students write their texts on the website.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f51d55a1",
+  "text": "Can I enter marks on the dashboard?",
+  "say": "Can I enter marks on the dashboard?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5c97568b",
+  "text": "Is this the latest version of the website?",
+  "say": "Is this the latest version of the website?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "54b4a2ab",
+  "text": "Could you explain to me how the export works?",
+  "say": "Could you explain to me how the export works?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f339ae28",
+  "text": "I can hear two songs.",
+  "say": "I can hear two songs.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b0953dc0",
+  "text": "Can you switch between these sections?",
+  "say": "Can you switch between these sections?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ab0720d2",
+  "text": "Change \"Marks\" to \"Assessment details\".",
+  "say": "Change \"Marks\" to \"Assessment details\".",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2dddf2fe",
+  "text": "Where did you get the dictionary from?",
+  "say": "Where did you get the dictionary from?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "618460fd",
+  "text": "Is that free?",
+  "say": "Is that free?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "314ecaa3",
+  "text": "I want the games to have different questions.",
+  "say": "I want the games to have different questions.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d80142bd",
+  "text": "Again, the text isn't the same for everyone.",
+  "say": "Again, the text isn't the same for everyone.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f498e97e",
+  "text": "I'd like to give a short introduction to the concepts.",
+  "say": "I'd like to give a short introduction to the concepts.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3362465a",
+  "text": "I want to copy it, not move it.",
+  "say": "I want to copy it, not move it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "36f4ce14",
+  "text": "Can students add notes wherever they want?",
+  "say": "Can students add notes wherever they want?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "df7fb329",
+  "text": "There are too many activities.",
+  "say": "There are too many activities.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7866116b",
+  "text": "I need messages to explain how it works.",
+  "say": "I need messages to explain how it works.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
   "key": "1942d9d3",
   "text": "The heading should appear at the top.",
   "say": "The heading should appear at the top.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "e051c25a",
-  "text": "The open problem should appear at the top.",
-  "say": "The open problem should appear at the top.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "b9f2ffd7",
+  "text": "Preparing these materials takes a lot of effort.",
+  "say": "Preparing these materials takes a lot of effort.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "b6b601cd",
-  "text": "In class mode, the game appears automatically.",
-  "say": "In class mode, the game appears automatically.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "08ed4292",
+  "text": "I want them all to feel comfortable.",
+  "say": "I want them all to feel comfortable.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "69ba2752",
-  "text": "Some colours don't work in note-taking mode.",
-  "say": "Some colours don't work in note-taking mode.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "97c0c70b",
+  "text": "Suggestions help me provide better resources.",
+  "say": "Suggestions help me provide better resources.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "9c4d742c",
-  "text": "Can they go full screen in the activities?",
-  "say": "Can they go full screen in the activities?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "081091c7",
+  "text": "Do I need to ask for Hajra to be reassessed?",
+  "say": "Do I need to ask for Hajra to be reassessed?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "36a2cf2e",
-  "text": "I want to see this table in full screen.",
-  "say": "I want to see this table in full screen.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "6feefea2",
+  "text": "It takes a while to see the mark.",
+  "say": "It takes a while to see the mark.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ec4ec4e9",
-  "text": "Some students in LS2 should be able to write.",
-  "say": "Some students in LS2 should be able to write.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "fff9627a",
+  "text": "Did Gemini rewatch the video?",
+  "say": "Did Gemini rewatch the video?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "9522e145",
-  "text": "Make sure it works: in 2 ESO A it didn't work today.",
-  "say": "Make sure it works: in 2 ESO A it didn't work today.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "61bdc8be",
+  "text": "And on each video, the money it cost.",
+  "say": "And on each video, the money it cost.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "b9e180c9",
-  "text": "Some students will read at different paces.",
-  "say": "Some students will read at different paces.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "38cc545b",
+  "text": "If they can't record, ask them to report it.",
+  "say": "If they can't record, ask them to report it.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "04d5dd40",
-  "text": "I don't see the changes on my cellphone.",
-  "say": "I don't see the changes on my cellphone.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "9fc2cf16",
+  "text": "I want Gemini to see my changes.",
+  "say": "I want Gemini to see my changes.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "5dd9ca4e",
-  "text": "The favicon isn't showing on my phone's home screen.",
-  "say": "The favicon isn't showing on my phone's home screen.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "0be023d8",
+  "text": "I'll ask students to upload it to the website.",
+  "say": "I'll ask students to upload it to the website.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "5fcf6e80",
-  "text": "Check whether there's a problem on GitHub.",
-  "say": "Check whether there's a problem on GitHub.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "3944ff04",
+  "text": "I want to receive a notification when students upload it.",
+  "say": "I want to receive a notification when students upload it.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "03b5f1c7",
-  "text": "The final task was posted on Classroom.",
-  "say": "The final task was posted on Classroom.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "064abca0",
+  "text": "It hasn't arrived yet.",
+  "say": "It hasn't arrived yet.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "3e50a0d7",
-  "text": "The icon isn't rounded on Windows.",
-  "say": "The icon isn't rounded on Windows.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "e94f70f2",
+  "text": "It arrived in my personal Gmail.",
+  "say": "It arrived in my personal Gmail.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "06887058",
-  "text": "Make the content bigger so I can see it well on the panel.",
-  "say": "Make the content bigger so I can see it well on the panel.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "388493d8",
+  "text": "Next term we'll be stricter.",
+  "say": "Next term we'll be stricter.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "71d90ed4",
-  "text": "I want to put them on the agenda.",
-  "say": "I want to put them on the agenda.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "15057b06",
+  "text": "They didn't do the listening and I won't take it into account.",
+  "say": "They didn't do the listening and I won't take it into account.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "ca44636f",
-  "text": "When I make changes to the agenda…",
-  "say": "When I make changes to the agenda",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "7cdd07bb",
+  "text": "Is the feedback like the other reports?",
+  "say": "Is the feedback like the other reports?",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "f81415f3",
-  "text": "Apply the changes to the repository.",
-  "say": "Apply the changes to the repository.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "4ea5a050",
+  "text": "Also, I'd like a section for exams.",
+  "say": "Also, I'd like a section for exams.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "90eda9b5",
-  "text": "Explain it to everyone in the class.",
-  "say": "Explain it to everyone in the class.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "8453475c",
+  "text": "I answered Emil already.",
+  "say": "I answered Emil already.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
-  "key": "f7f91071",
-  "text": "They must see their avatar in a place where it doesn't hide anything.",
-  "say": "They must see their avatar in a place where it doesn't hide anything.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "key": "ca05931a",
+  "text": "Take this out everywhere.",
+  "say": "Take this out everywhere.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6544ac10",
+  "text": "I understand the first 4 questions.",
+  "say": "I understand the first 4 questions.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "329e1159",
+  "text": "Does vocab have this option too?",
+  "say": "Does vocab have this option too?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9adfe92b",
+  "text": "I need to see when Gemini last read this.",
+  "say": "I need to see when Gemini last read this.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7a849afc",
+  "text": "Now we only have one grammar game per LS.",
+  "say": "Now we only have one grammar game per LS.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c993edf2",
+  "text": "Some colours don't work when they are in note-taking mode.",
+  "say": "Some colours don't work when they are in note-taking mode.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e3c20982",
+  "text": "I want a short explanation.",
+  "say": "I want a short explanation.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "45774167",
+  "text": "Then I'll give them time to do their questions.",
+  "say": "Then I'll give them time to do their questions.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "db3e2046",
+  "text": "Can we label it as expressions?",
+  "say": "Can we label it as expressions?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "974ec7ef",
+  "text": "We need to add 6 activities to each section.",
+  "say": "We need to add 6 activities to each section.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "94cfcbe8",
+  "text": "Fast finishers always have the option to read the book.",
+  "say": "Fast finishers always have the option to read the book.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5b2f0949",
+  "text": "Leave them as they are for now.",
+  "say": "Leave them as they are for now.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a80c367f",
+  "text": "If it happens again, I'll let you know.",
+  "say": "If it happens again, I'll let you know.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7b8f3880",
+  "text": "Let's merge and I'll see if it works.",
+  "say": "Let's merge and I'll see if it works.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1d0c29dd",
+  "text": "There are times when students need to move between them.",
+  "say": "There are times when students need to move between them.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e711783e",
+  "text": "Víctor says his answers weren't saved.",
+  "say": "Víctor says his answers weren't saved.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c2e0fc63",
+  "text": "If you could create the feeling of turning pages, that'd be amazing.",
+  "say": "If you could create the feeling of turning pages, that'd be amazing.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3853d594",
+  "text": "The colour doesn't match the rest.",
+  "say": "The colour doesn't match the rest.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e4368ab3",
+  "text": "I want the buttons to shrink to a square.",
+  "say": "I want the buttons to shrink to a square.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4470b3ca",
+  "text": "I want a mark where the introduction ends.",
+  "say": "I want a mark where the introduction ends.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5fe01266",
+  "text": "Can you add a saying like \"Deeds are your monuments\" or something like that?",
+  "say": "Can you add a saying like \"Deeds are your monuments\" or something like that?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a2be8631",
+  "text": "Show me the scheduled emails to Àlex.",
+  "say": "Show me the scheduled emails to Àlex.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2ce1a27e",
+  "text": "I was in 2 ESO A.",
+  "say": "I was in 2 ESO A.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
   "key": "344d784f",
   "text": "I couldn't work on the grammar in teaching mode.",
   "say": "I couldn't work on the grammar in teaching mode.",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "668a1e02",
+  "text": "Right now I only see who has checked the grammar.",
+  "say": "Right now I only see who has checked the grammar.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2f9ed46f",
+  "text": "I need to see who is in class in class mode.",
+  "say": "I need to see who is in class in class mode.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1472a632",
+  "text": "I want them to turn pages by dragging them.",
+  "say": "I want them to turn pages by dragging them.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b9e180c9",
+  "text": "Some students will read at different paces.",
+  "say": "Some students will read at different paces.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ec5860f2",
+  "text": "Don't allow students to press answers super fast.",
+  "say": "Don't allow students to press answers super fast.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0e36bf4c",
+  "text": "If they are wrong, they get another question.",
+  "say": "If they are wrong, they get another question.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "eda6d893",
+  "text": "Don't allow students to bully a person when playing.",
+  "say": "Don't allow students to bully a person when playing.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "444885b9",
+  "text": "They win badges, armour and features.",
+  "say": "They win badges, armour and features.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c1647aad",
+  "text": "They have an avatar that transforms over the games.",
+  "say": "They have an avatar that transforms over the games.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f7f91071",
+  "text": "They must see their avatar in a place where it doesn't hide anything.",
+  "say": "They must see their avatar in a place where it doesn't hide anything.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ef483d11",
+  "text": "I want a mini game like hangman with the grammar.",
+  "say": "I want a mini game like hangman with the grammar.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b7ae0b2c",
+  "text": "I don't want the spellchecker to underline their mistakes.",
+  "say": "I don't want the spellchecker to underline their mistakes.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "731d38f1",
+  "text": "And here?",
+  "say": "And here?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "22260cdb",
+  "text": "The same thing happens here.",
+  "say": "The same thing happens here.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0ba69570",
+  "text": "The final product should appear in LS1.",
+  "say": "The final product should appear in LS1.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e6d2e127",
+  "text": "Do you need any of them?",
+  "say": "Do you need any of them?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "04c70c61",
+  "text": "Why isn't this here yet?",
+  "say": "Why isn't this here yet?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ed347abd",
+  "text": "I don't want students to see where the info comes from.",
+  "say": "I don't want students to see where the info comes from.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "36a2cf2e",
+  "text": "I want to see this table in full screen.",
+  "say": "I want to see this table in full screen.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e53a6ccf",
+  "text": "We'll make this video.",
+  "say": "We'll make this video.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d2121007",
+  "text": "When I make changes to the agenda.",
+  "say": "When I make changes to the agenda.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d4e81fd7",
+  "text": "Games should always be grammar and vocabulary.",
+  "say": "Games should always be grammar and vocabulary.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "829e3b61",
+  "text": "I want to see the screen better.",
+  "say": "I want to see the screen better.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1a79e0d0",
+  "text": "If a student does something wrong…",
+  "say": "If a student does something wrong",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "dab4d50d",
+  "text": "When did we create this?",
+  "say": "When did we create this?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2f7aaa89",
+  "text": "I want to keep your challenge section.",
+  "say": "I want to keep your challenge section.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2f4db5f0",
+  "text": "I can press a button to plan.",
+  "say": "I can press a button to plan.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b2198434",
+  "text": "This doesn't fit the new style, it's too messy.",
+  "say": "This doesn't fit the new style, it's too messy.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "03f35f87",
+  "text": "What's done is done.",
+  "say": "What's done is done.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2483a9c1",
+  "text": "They should work like a game.",
+  "say": "They should work like a game.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3fc36a66",
+  "text": "It should look more or less like this one.",
+  "say": "It should look more or less like this one.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "970ac989",
+  "text": "I want a full-screen view with the menu at the top.",
+  "say": "I want a full-screen view with the menu at the top.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e9ad22e9",
+  "text": "I can't read some of the letters properly here.",
+  "say": "I can't read some of the letters properly here.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6ed51885",
+  "text": "I want everything to be ready before class.",
+  "say": "I want everything to be ready before class.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f52bbe57",
+  "text": "Why is English Lab so pricey?",
+  "say": "Why is English Lab so pricey?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "54db47ad",
+  "text": "We can make the last version of the answers the one that counts.",
+  "say": "We can make the last version of the answers the one that counts.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "423f1dc5",
+  "text": "Yes, go ahead. I need to smooth things over with the families.",
+  "say": "Yes, go ahead. I need to smooth things over with the families.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a0b0a392",
+  "text": "It takes a while to see the mark in the table.",
+  "say": "It takes a while to see the mark in the table.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9fcc5ea9",
+  "text": "On my iPad, the page doesn't scroll all the way to the top.",
+  "say": "On my iPad, the page doesn't scroll all the way to the top.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6975ebdd",
+  "text": "OK, merge. Now that I know, I won't ask the students to do it again.",
+  "say": "OK, merge. Now that I know, I won't ask the students to do it again.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c618faf7",
+  "text": "I want to know the percentage the class got last time.",
+  "say": "I want to know the percentage the class got last time.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "469f4ace",
+  "text": "The difficulty builds as we go.",
+  "say": "The difficulty builds as we go.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "419fcca6",
+  "text": "If I haven't had time to teach something, there are no questions on it.",
+  "say": "If I haven't had time to teach something, there are no questions on it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "76f38bb9",
+  "text": "It's not about quantity but quality.",
+  "say": "It's not about quantity but quality.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "bca7838f",
+  "text": "If I close it, I want to be able to come back to it.",
+  "say": "If I close it, I want to be able to come back to it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6cfb26e9",
+  "text": "Do students see this? I end up here when I press the notebook.",
+  "say": "Do students see this? I end up here when I press the notebook.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d8cc7fda",
+  "text": "Can we make it feel like you're writing in the notebook?",
+  "say": "Can we make it feel like you're writing in the notebook?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "06887058",
+  "text": "Make the content bigger so I can see it well on the panel.",
+  "say": "Make the content bigger so I can see it well on the panel.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6d4b1796",
+  "text": "I mean: little tweaks get merged, big changes start a thread.",
+  "say": "I mean: little tweaks get merged, big changes start a thread.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2efc4a1a",
+  "text": "They should have a button to go back to exactly where they were.",
+  "say": "They should have a button to go back to exactly where they were.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1db4d376",
+  "text": "Call it Roig everywhere on the website instead of Gemini, so nobody knows what it is.",
+  "say": "Call it Roig everywhere on the website instead of Gemini, so nobody knows what it is.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a93e404d",
+  "text": "Is it because it's Saturday?",
+  "say": "Is it because it's Saturday?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "983e6629",
+  "text": "The table full screen is missing here.",
+  "say": "The table full screen is missing here.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fba62e68",
+  "text": "A microphone is covered.",
+  "say": "A microphone is covered.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "05c0baa4",
+  "text": "Can I switch between these sections?",
+  "say": "Can I switch between these sections?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a61ea857",
+  "text": "Is that what you did?",
+  "say": "Is that what you did?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ff5ac2b0",
+  "text": "Ah, yes, that's the idea.",
+  "say": "Ah, yes, that's the idea.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9e2588bc",
+  "text": "Nope, I meant like this one.",
+  "say": "Nope, I meant like this one.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e9bdd03a",
+  "text": "By the way, can they look up phrasal verbs?",
+  "say": "By the way, can they look up phrasal verbs?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "aff2b340",
+  "text": "But the readings aren't always the same, are they?",
+  "say": "But the readings aren't always the same, are they?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "19d52745",
+  "text": "So, is it merged?",
+  "say": "So, is it merged?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a0583b8b",
+  "text": "What does \"Send and confirm\" mean?",
+  "say": "What does \"Send and confirm\" mean?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "95584d88",
+  "text": "But where? In the script called English Lab?",
+  "say": "But where? In the script called English Lab?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "26e683e1",
+  "text": "When you correct me, you need to change that.",
+  "say": "When you correct me, you need to change that.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b9304a86",
+  "text": "I want the students to make the video before Friday.",
+  "say": "I want the students to make the video before Friday.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "861eea0c",
+  "text": "Based on the marks, the 4th ESO group is doing better.",
+  "say": "Based on the marks, the 4th ESO group is doing better.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "be63fa08",
+  "text": "It should always be on.",
+  "say": "It should always be on.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "de146dbc",
+  "text": "Why is English Lab so expensive?",
+  "say": "Why is English Lab so expensive?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "357b80f5",
+  "text": "There are three pending writings.",
+  "say": "There are three pending writings.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "53c4d028",
+  "text": "Send me an email with the exam results.",
+  "say": "Send me an email with the exam results.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9a198d8f",
+  "text": "First I need to plan LS2.",
+  "say": "First I need to plan LS2.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9b86f84b",
+  "text": "You have to enter the marks on the website.",
+  "say": "You have to enter the marks on the website.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ff28619d",
+  "text": "Is it the latest version?",
+  "say": "Is it the latest version?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8786b4e0",
+  "text": "Can you explain it to me?",
+  "say": "Can you explain it to me?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ee50d877",
+  "text": "Change Notes to Grades.",
+  "say": "Change Notes to Grades.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4adb88d4",
+  "text": "Where did you get these images from?",
+  "say": "Where did you get these images from?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1201ddea",
+  "text": "I want the students to read the book at home.",
+  "say": "I want the students to read the book at home.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3269ec4a",
+  "text": "Can students change the color?",
+  "say": "Can students change the color?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "592390a7",
+  "text": "There are too many questions in this section.",
+  "say": "There are too many questions in this section.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ea7c7d48",
+  "text": "Explain to them how it works.",
+  "say": "Explain to them how it works.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d79c1381",
+  "text": "How much did the video cost?",
+  "say": "How much did the video cost?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "821104a1",
+  "text": "The first three questions are easy.",
+  "say": "The first three questions are easy.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "332b2cb0",
+  "text": "We have a vocabulary game for each unit.",
+  "say": "We have a vocabulary game for each unit.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "83b9965a",
+  "text": "The students always do their homework.",
+  "say": "The students always do their homework.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0b8004d3",
+  "text": "Show me the scheduled emails.",
+  "say": "Show me the scheduled emails.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6f03114d",
+  "text": "I want to see who is in class in class mode.",
+  "say": "I want to see who is in class in class mode.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "45e57f85",
+  "text": "Júlia is at Core level.",
+  "say": "Júlia is at Core level.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7ef288a4",
+  "text": "We'll make this video tomorrow.",
+  "say": "We'll make this video tomorrow.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4f43415c",
+  "text": "When did we create this page?",
+  "say": "When did we create this page?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5e64121a",
+  "text": "Add the reading texts to the students' notebooks.",
+  "say": "Add the reading texts to the students' notebooks.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "bbe7c8da",
+  "text": "I'd like to add an image to my message.",
+  "say": "I'd like to add an image to my message.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2da309c0",
+  "text": "The heading mustn't be on a different page from its text.",
+  "say": "The heading mustn't be on a different page from its text.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4b161c16",
+  "text": "It should look the same in the teacher's view.",
+  "say": "It should look the same in the teacher's view.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e4583f7c",
+  "text": "The assessment indicator is missing from some criteria.",
+  "say": "The assessment indicator is missing from some criteria.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "db964d7a",
+  "text": "The reports will go here, at the top.",
+  "say": "The reports will go here, at the top.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b459f256",
+  "text": "I want all the flashcards in the same format.",
+  "say": "I want all the flashcards in the same format.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a51a59c9",
+  "text": "Starters do an exam that is more difficult for them.",
+  "say": "Starters do an exam that is more difficult for them.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "754ed964",
+  "text": "For me, it's very difficult to improve.",
+  "say": "For me, it's very difficult to improve.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "62aa09dd",
+  "text": "We're already in the 2nd term.",
+  "say": "We're already in the 2nd term.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "60d426f0",
+  "text": "Speaking should count toward the diagram.",
+  "say": "Speaking should count toward the diagram.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4b899141",
+  "text": "We are not fussy about the number of words.",
+  "say": "We are not fussy about the number of words.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "76c3a7b1",
+  "text": "Are the marks in the table?",
+  "say": "Are the marks in the table?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "811025b5",
+  "text": "Do the reports for all the students.",
+  "say": "Do the reports for all the students.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f1794290",
+  "text": "What do you mean by \"a few minutes after\"?",
+  "say": "What do you mean by \"a few minutes after\"?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ef932a41",
+  "text": "Today I won't make it to 4 ESO B.",
+  "say": "Today I won't make it to 4 ESO B.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5c5ee311",
+  "text": "Students see the corrections on weekdays at 5 pm.",
+  "say": "Students see the corrections on weekdays at 5 pm.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "197e6a45",
+  "text": "Is the script the one in my school account?",
+  "say": "Is the script the one in my school account?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "93795091",
+  "text": "I want a presentation to explain to my students how I correct.",
+  "say": "I want a presentation to explain to my students how I correct.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0b028eae",
+  "text": "Explain to me what it means.",
+  "say": "Explain to me what it means.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2134a69e",
+  "text": "You upload them to the website.",
+  "say": "You upload them to the website.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "aa049481",
+  "text": "Corrections come out between 5 and 6 pm.",
+  "say": "Corrections come out between 5 and 6 pm.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "73b9d5b5",
+  "text": "It happens when I switch between these sections.",
+  "say": "It happens when I switch between these sections.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b42d116a",
+  "text": "Students can switch between the notebook look and the computer look.",
+  "say": "Students can switch between the notebook look and the computer look.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1b3d302b",
+  "text": "I want them as columns in both places.",
+  "say": "I want them as columns in both places.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "324e5c87",
+  "text": "Activities must be simple in format, not in content.",
+  "say": "Activities must be simple in format, not in content.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ecde7635",
+  "text": "I want a full screen with the menu at the top.",
+  "say": "I want a full screen with the menu at the top.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6130ae7c",
+  "text": "A line with step 1 and an example next to it.",
+  "say": "A line with step 1 and an example next to it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ad1e9641",
+  "text": "Open the activity in class mode.",
+  "say": "Open the activity in class mode.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d250bb70",
+  "text": "The link is on the list at the top of the page.",
+  "say": "The link is on the list at the top of the page.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "878f5189",
+  "text": "It looks fine on my phone but not on the laptop.",
+  "say": "It looks fine on my phone but not on the laptop.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f46f2d63",
+  "text": "My students are in 4th ESO.",
+  "say": "My students are in 4th ESO.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4424afee",
+  "text": "It's already on the list.",
+  "say": "It's already on the list.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "98d5b979",
+  "text": "Can you add it to the list?",
+  "say": "Can you add it to the list?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "eb039d71",
+  "text": "And it takes a while to see the mark in the table.",
+  "say": "And it takes a while to see the mark in the table.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "23f10b86",
+  "text": "I want this information in the students table.",
+  "say": "I want this information in the students table.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "336da2f0",
+  "text": "The post-it doesn't work in the notebook.",
+  "say": "The post-it doesn't work in the notebook.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "74b4f9fe",
+  "text": "Once they correct the SLP, it appears in their notebook, right?",
+  "say": "Once they correct the SLP, it appears in their notebook, right?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3eea4c69",
+  "text": "Students write on the website, not in a pop-up.",
+  "say": "Students write on the website, not in a pop-up.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3285b43c",
+  "text": "Can they use Google Translate on my website?",
+  "say": "Can they use Google Translate on my website?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "216404a7",
+  "text": "What will appear in the drafts folder?",
+  "say": "What will appear in the drafts folder?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e051c25a",
+  "text": "The open problem should appear at the top.",
+  "say": "The open problem should appear at the top.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b6b601cd",
+  "text": "In class mode, the game appears automatically.",
+  "say": "In class mode, the game appears automatically.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "69ba2752",
+  "text": "Some colours don't work in note-taking mode.",
+  "say": "Some colours don't work in note-taking mode.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9c4d742c",
+  "text": "Can they go full screen in the activities?",
+  "say": "Can they go full screen in the activities?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ec4ec4e9",
+  "text": "Some students in LS2 should be able to write.",
+  "say": "Some students in LS2 should be able to write.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9522e145",
+  "text": "Make sure it works: in 2 ESO A it didn't work today.",
+  "say": "Make sure it works: in 2 ESO A it didn't work today.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "04d5dd40",
+  "text": "I don't see the changes on my cellphone.",
+  "say": "I don't see the changes on my cellphone.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5dd9ca4e",
+  "text": "The favicon isn't showing on my phone's home screen.",
+  "say": "The favicon isn't showing on my phone's home screen.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5fcf6e80",
+  "text": "Check whether there's a problem on GitHub.",
+  "say": "Check whether there's a problem on GitHub.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "03b5f1c7",
+  "text": "The final task was posted on Classroom.",
+  "say": "The final task was posted on Classroom.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3e50a0d7",
+  "text": "The icon isn't rounded on Windows.",
+  "say": "The icon isn't rounded on Windows.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "71d90ed4",
+  "text": "I want to put them on the agenda.",
+  "say": "I want to put them on the agenda.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ca44636f",
+  "text": "When I make changes to the agenda…",
+  "say": "When I make changes to the agenda",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f81415f3",
+  "text": "Apply the changes to the repository.",
+  "say": "Apply the changes to the repository.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "90eda9b5",
+  "text": "Explain it to everyone in the class.",
+  "say": "Explain it to everyone in the class.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
   "key": "72def7a4",
   "text": "Is ChatGPT better at this?",
   "say": "Is ChatGPT better at this?",
-  "src": "4eso/towards-nativeness/my-latest-mistakes"
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "42cf0610",
+  "text": "it turns out",
+  "say": "it turns out",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c3497de3",
+  "text": "agree on / with",
+  "say": "agree on, with",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e3eaf5e8",
+  "text": "I don't see the changes on my phone.",
+  "say": "I don't see the changes on my phone.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "29508601",
+  "text": "How long will I have to wait?",
+  "say": "How long will I have to wait?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "65e7a32b",
+  "text": "Home still doesn't work.",
+  "say": "Home still doesn't work.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "11e405b0",
+  "text": "The English Lab button doesn't take me here.",
+  "say": "The English Lab button doesn't take me here.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "633ede6b",
+  "text": "What exactly did you do?",
+  "say": "What exactly did you do?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2021faea",
+  "text": "Why doesn't 2 ESO have a time plan?",
+  "say": "Why doesn't 2 ESO have a time plan?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "439385c1",
+  "text": "The button is at the top of the table.",
+  "say": "The button is at the top of the table.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "79853c8a",
+  "text": "Why is Claude failing to connect with my project?",
+  "say": "Why is Claude failing to connect with my project?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "41323ed1",
+  "text": "I asked ChatGPT this.",
+  "say": "I asked ChatGPT this.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c6613ff4",
+  "text": "It's still not working.",
+  "say": "It's still not working.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f8ce3c7b",
+  "text": "I haven't tried it on my phone yet.",
+  "say": "I haven't tried it on my phone yet.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e715fa29",
+  "text": "This button doesn't take me to the right page.",
+  "say": "This button doesn't take me to the right page.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "55ac713e",
+  "text": "The menu is at the top right.",
+  "say": "The menu is at the top right.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f3ff5e17",
+  "text": "It turns out the file had a different name.",
+  "say": "It turns out the file had a different name.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c11deefd",
+  "text": "It works, doesn't it.",
+  "say": "It works, doesn't it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d089db74",
+  "text": "Why doesn't it load on Safari?",
+  "say": "Why doesn't it load on Safari?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7acca2ae",
+  "text": "Make it indirect: \"Where does the info come from?\" → I don't want students to see where the info comes from.",
+  "say": "Make it indirect: \"Where does the info come from?\" → I don't want students to see where the info comes from.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1806dd30",
+  "text": "Make it indirect: \"What is the best option?\" → I need to know what the best option is.",
+  "say": "Make it indirect: \"What is the best option?\" → I need to know what the best option is.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "be0bea7a",
+  "text": "Put \"already\" in: Since you have their emails, send it now. → Since you already have their emails…",
+  "say": "Put \"already\" in: Since you have their emails, send it now. → Since you already have their emails",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9694c681",
+  "text": "Put \"always\" in: Students should see their answers. → Students should always see their answers.",
+  "say": "Put \"always\" in: Students should see their answers. → Students should always see their answers.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4e9f464c",
+  "text": "Tag: We can't download it, can we?",
+  "say": "Tag: We can't download it, can we?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2572e3b4",
+  "text": "Tag: The students have finished, haven't they?",
+  "say": "Tag: The students have finished, haven't they?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "acbaa652",
+  "text": "Did you put them there yourself?",
+  "say": "Did you put them there yourself?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "78c77183",
+  "text": "What should the prompt be?",
+  "say": "What should the prompt be?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c6849db9",
+  "text": "Indirect: \"How long will it take?\" → I was wondering how long it will take.",
+  "say": "Indirect: \"How long will it take?\" → I was wondering how long it will take.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4ef8692d",
+  "text": "So is Opus better for my website?",
+  "say": "So is Opus better for my website?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5ab5656e",
+  "text": "But can't you do it yourself?",
+  "say": "But can't you do it yourself?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7ed1501c",
+  "text": "It's taking ages.",
+  "say": "It's taking ages.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6e50b2a9",
+  "text": "I've already used almost 40% of my weekly limit.",
+  "say": "I've already used almost 40% of my weekly limit.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "db378a02",
+  "text": "Some sections scroll sideways and the layout looks weird.",
+  "say": "Some sections scroll sideways and the layout looks weird.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "da4f87d2",
+  "text": "make changes",
+  "say": "make changes",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "884c6060",
+  "text": "You didn't make the changes I asked for.",
+  "say": "You didn't make the changes I asked for.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "27a7160e",
+  "text": "I want students to receive a notification.",
+  "say": "I want students to receive a notification.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "395fe1cf",
+  "text": "Maybe it's better to leave it.",
+  "say": "Maybe it's better to leave it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9a4b556f",
+  "text": "In general the audio isn't working well.",
+  "say": "In general the audio isn't working well.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d72c15c8",
+  "text": "Did you fix that?",
+  "say": "Did you fix that?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "efed4c79",
+  "text": "Make it possible to select the PDF.",
+  "say": "Make it possible to select the PDF.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "80d78c28",
+  "text": "I want the rubric to be in the Drive too.",
+  "say": "I want the rubric to be in the Drive too.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d1e40621",
+  "text": "I'm attaching the document.",
+  "say": "I'm attaching the document.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1ed65789",
+  "text": "Don't make changes without my permission.",
+  "say": "Don't make changes without my permission.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0459da12",
+  "text": "Let the students choose.",
+  "say": "Let the students choose.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ceab7ed4",
+  "text": "Did you fix it?",
+  "say": "Did you fix it?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "95f5f8cd",
+  "text": "I'd like to see the web version.",
+  "say": "I'd like to see the web version.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fa6396a1",
+  "text": "I've been putting it off.",
+  "say": "I've been putting it off.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "15adbef9",
+  "text": "I want students to receive an email.",
+  "say": "I want students to receive an email.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8433a504",
+  "text": "Don't let them press the button twice.",
+  "say": "Don't let them press the button twice.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8f48efe0",
+  "text": "The app should allow you to save a draft.",
+  "say": "The app should allow you to save a draft.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "4c91055b",
+  "text": "Ask every user to connect with their school email.",
+  "say": "Ask every user to connect with their school email.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c6c59469",
+  "text": "Add the subject: \"It says Kokoro couldn't load.\"",
+  "say": "Add the subject: \"It says Kokoro couldn't load.\"",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e6377a5d",
+  "text": "Add the subject: \"There should be nothing at the top.\"",
+  "say": "Add the subject: \"There should be nothing at the top.\"",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b4364c2e",
+  "text": "Fix it: \"fix what it doesn't work\" → fix what doesn't work",
+  "say": "Fix it: \"fix what it doesn't work\" → fix what doesn't work",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "73635b52",
+  "text": "Some students haven't done the exam yet.",
+  "say": "Some students haven't done the exam yet.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9e6b2167",
+  "text": "I 've just uploaded the photos, can you see them?",
+  "say": "I 've just uploaded the photos, can you see them?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0ccece85",
+  "text": "I need you to make an HTML page.",
+  "say": "I need you to make an HTML page.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "527e6eba",
+  "text": "Go ahead then and apply the changes to the repository.",
+  "say": "Go ahead then and apply the changes to the repository.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5c02f841",
+  "text": "Don't change any content, just list the errors you find and how to fix them.",
+  "say": "Don't change any content, just list the errors you find and how to fix them.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5c486b35",
+  "text": "I want to let fast finishers do further activities.",
+  "say": "I want to let fast finishers do further activities.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7a060bab",
+  "text": "Yes, add \"I've finished\", but make it take them to the book section.",
+  "say": "Yes, add \"I've finished\", but make it take them to the book section.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fe5acc73",
+  "text": "Once I finish, I'd like to use one of the two LSs as a model for the next ones.",
+  "say": "Once I finish, I'd like to use one of the two LSs as a model for the next ones.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "754a2082",
+  "text": "I want the option to say \"send it anyway\", so always ask me.",
+  "say": "I want the option to say \"send it anyway\", so always ask me.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "55912a99",
+  "text": "keep in mind",
+  "say": "keep in mind",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "bbbb4307",
+  "text": "I want you to check it.",
+  "say": "I want you to check it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2970620f",
+  "text": "I recommend that you start small.",
+  "say": "I recommend that you start small.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "beab2b35",
+  "text": "I'm looking forward to showing you the app.",
+  "say": "I'm looking forward to showing you the app.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "74fbfff6",
+  "text": "I figured it out after an hour.",
+  "say": "I figured it out after an hour.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "862c7205",
+  "text": "Keep the design, please.",
+  "say": "Keep the design, please.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e279d3ba",
+  "text": "It works here.",
+  "say": "It works here.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "32e9554f",
+  "text": "No wonder it fails.",
+  "say": "No wonder it fails.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "2717a03f",
+  "text": "When I had the idea, I had never built an app.",
+  "say": "When I had the idea, I had never built an app.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fbc839ef",
+  "text": "When I started, I had never coded?",
+  "say": "When I started, I had never coded?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7423dd1e",
+  "text": "I'm really looking forward to showing you the app.",
+  "say": "I'm really looking forward to showing you the app.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c1dd52b5",
+  "text": "I ended up redoing the whole dashboard.",
+  "say": "I ended up redoing the whole dashboard.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b9ff5837",
+  "text": "Keep the design.",
+  "say": "Keep the design.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "410d37d8",
+  "text": "I was wondering how long it will take.",
+  "say": "I was wondering how long it will take.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "00eff13b",
+  "text": "Since then, it has taken off.",
+  "say": "Since then, it has taken off.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "60148a9e",
+  "text": "The bug? I finally figured it out.",
+  "say": "The bug? I finally figured it out.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "78ab438d",
+  "text": "I can't put up with that noise any longer.",
+  "say": "I can't put up with that noise any longer.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "662feffe",
+  "text": "I'm looking forward to hearing from you.",
+  "say": "I'm looking forward to hearing from you.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d1fb0fd8",
+  "text": "Students got used to recording themselves.",
+  "say": "Students got used to recording themselves.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "01c43759",
+  "text": "I suggest that you start with one learning path.",
+  "say": "I suggest that you start with one learning path.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "01b89be7",
+  "text": "When I came up with the idea, I had never built an app.",
+  "say": "When I came up with the idea, I had never built an app.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "ceb99044",
+  "text": "I was testing it in class when it crashed.",
+  "say": "I was testing it in class when it crashed.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "7e37da9c",
+  "text": "Since then, the app has taken off.",
+  "say": "Since then, the app has taken off.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b69bbf8c",
+  "text": "We kept finding new bugs every day.",
+  "say": "We kept finding new bugs every day.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "66c77f3b",
+  "text": "Don't put it off any longer.",
+  "say": "Don't put it off any longer.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "57f26c2e",
+  "text": "You can start from scratch.",
+  "say": "You can start from scratch.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fb93f0c9",
+  "text": "When I had the idea, I'd never built an app.",
+  "say": "When I had the idea, I'd never built an app.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "23ecc965",
+  "text": "The idea is that they can read on from the last chapter they read.",
+  "say": "The idea is that they can read on from the last chapter they read.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "85ae976a",
+  "text": "Students couldn't leave the game once they'd finished it.",
+  "say": "Students couldn't leave the game once they'd finished it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "da26d9d9",
+  "text": "Whenever they moved from one page to another, they dropped out of full screen.",
+  "say": "Whenever they moved from one page to another, they dropped out of full screen.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f158568d",
+  "text": "Students say it's hard to organize their thoughts on the website.",
+  "say": "Students say it's hard to organize their thoughts on the website.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "677d6ada",
+  "text": "Designing LSs that are a bit complex takes me ages.",
+  "say": "Designing LSs that are a bit complex takes me ages.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e5c7fb55",
+  "text": "I was seeing the right game, but the students were playing a hacker game.",
+  "say": "I was seeing the right game, but the students were playing a hacker game.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "47e4dc29",
+  "text": "Didn't we agree there wouldn't be any transcripts in the speaking activities?",
+  "say": "Didn't we agree there wouldn't be any transcripts in the speaking activities?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "5211b64d",
+  "text": "next school year",
+  "say": "next school year",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "76551ba8",
+  "text": "the school",
+  "say": "the school",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8432a38b",
+  "text": "a master document",
+  "say": "a master document",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8a2259d7",
+  "text": "indicators",
+  "say": "indicators",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "083605a5",
+  "text": "development / designing",
+  "say": "development, designing",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a83d5e9f",
+  "text": "track progress",
+  "say": "track progress",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3b6f18fc",
+  "text": "adapt to",
+  "say": "adapt to",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c623e35f",
+  "text": "2nd / 4th ESO",
+  "say": "2nd, 4th ESO",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3684a602",
+  "text": "feedback",
+  "say": "feedback",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "faba109e",
+  "text": "info / information",
+  "say": "info, information",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f9316cf4",
+  "text": "code",
+  "say": "code",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e9500e3d",
+  "text": "stuff",
+  "say": "stuff",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "be007fcd",
+  "text": "the audio files",
+  "say": "the audio files",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "f9039d5b",
+  "text": "the exam guide",
+  "say": "the exam guide",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8dd433b0",
+  "text": "the app's name",
+  "say": "the app's name",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "c83d6cb4",
+  "text": "Now I want you to do the same with the 2nd ESO LSs.",
+  "say": "Now I want you to do the same with the 2nd ESO LSs.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "017a09aa",
+  "text": "Each objective has one assessment criterion.",
+  "say": "Each objective has one assessment criterion.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "782cfe12",
+  "text": "I mean these indicators.",
+  "say": "I mean these indicators.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d647fd4a",
+  "text": "During an LS, students work in groups.",
+  "say": "During an LS, students work in groups.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0e842101",
+  "text": "This project has too much info.",
+  "say": "This project has too much info.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "491da07e",
+  "text": "The dashboard needs a new button.",
+  "say": "The dashboard needs a new button.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "52240135",
+  "text": "Create a master document with all the competences.",
+  "say": "Create a master document with all the competences.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "98322008",
+  "text": "Next school year I'll change the program.",
+  "say": "Next school year I'll change the program.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e4913384",
+  "text": "Send me a list of emails.",
+  "say": "Send me a list of emails.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "0ab1afc0",
+  "text": "The criteria are only shown to the teacher.",
+  "say": "The criteria are only shown to the teacher.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "79075389",
+  "text": "Next school year we'll have three 2nd ESO groups.",
+  "say": "Next school year we'll have three 2nd ESO groups.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "624cf491",
+  "text": "These criteria are different from those in 3rd and 4th ESO.",
+  "say": "These criteria are different from those in 3rd and 4th ESO.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "52a7c22d",
+  "text": "There's too much info on the website.",
+  "say": "There's too much info on the website.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3eb29220",
+  "text": "Adapt the 4th ESO LSs to what we've agreed.",
+  "say": "Adapt the 4th ESO LSs to what we've agreed.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "715d7257",
+  "text": "Send me a list of the emails.",
+  "say": "Send me a list of the emails.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b7ea9d4f",
+  "text": "I give them some feedback every week.",
+  "say": "I give them some feedback every week.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "d90e590e",
+  "text": "Send me an HTML file with the results.",
+  "say": "Send me an HTML file with the results.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "01f3993b",
+  "text": "It's a European project.",
+  "say": "It's a European project.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "1a6266fb",
+  "text": "The idea is to have - clean code.",
+  "say": "The idea is to have - clean code.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9de7bae2",
+  "text": "I've used almost - 40% of my weekly limit.",
+  "say": "I've used almost - 40% of my weekly limit.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "9e31715b",
+  "text": "These criteria are different this year.",
+  "say": "These criteria are different this year.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "fd65ac16",
+  "text": "When a student reaches ten cards, let them continue.",
+  "say": "When a student reaches ten cards, let them continue.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "42679395",
+  "text": "Who has checked the grammar?",
+  "say": "Who has checked the grammar?",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "085040fd",
+  "text": "Rewrite: \"the name of the app\" → the app's name",
+  "say": "Rewrite: \"the name of the app\" → the app's name",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "cd9d9f7f",
+  "text": "Rewrite: \"the guide of the exam\" → the exam guide",
+  "say": "Rewrite: \"the guide of the exam\" → the exam guide",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "6277cd5f",
+  "text": "Rewrite: \"all the sections of all the learning paths\" → every section of every learning path",
+  "say": "Rewrite: \"all the sections of all the learning paths\" → every section of every learning path",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a9b8c316",
+  "text": "Now I want you to do the same with the 2 ESO LSs.",
+  "say": "Now I want you to do the same with the 2 ESO LSs.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "3e10e0ac",
+  "text": "Adapt the 4 ESO LSs to what we've agreed.",
+  "say": "Adapt the 4 ESO LSs to what we've agreed.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "345cd603",
+  "text": "These are the docs that explain how to write the objectives.",
+  "say": "These are the docs that explain how to write the objectives.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "a476fc2a",
+  "text": "Please check whether any students who hadn't done the LS1 exam have finally done it.",
+  "say": "Please check whether any students who hadn't done the LS1 exam have finally done it.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "99166be7",
+  "text": "The doc you created is missing the verb to be.",
+  "say": "The doc you created is missing the verb to be.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "8ab92512",
+  "text": "Send Nael an email telling him his video has no sound.",
+  "say": "Send Nael an email telling him his video has no sound.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "e488ae96",
+  "text": "Not handed in or no link should be a 0 by default.",
+  "say": "Not handed in or no link should be a 0 by default.",
+  "src": "4eso/towards-nativeness/flashcards"
+ },
+ {
+  "key": "b452afb9",
+  "text": "The final task was posted on Classroom on 23 Oct.",
+  "say": "The final task was posted on Classroom on 23 Oct.",
+  "src": "4eso/towards-nativeness/flashcards"
  },
  {
   "key": "02e055cf",
@@ -9948,12 +11994,6 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "ed347abd",
-  "text": "I don't want students to see where the info comes from.",
-  "say": "I don't want students to see where the info comes from.",
-  "src": "lab/practice.html#deck"
- },
- {
   "key": "45f3e260",
   "text": "I need to know what the best option is.",
   "say": "I need to know what the best option is.",
@@ -9972,57 +12012,9 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "410d37d8",
-  "text": "I was wondering how long it will take.",
-  "say": "I was wondering how long it will take.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "15adbef9",
-  "text": "I want students to receive an email.",
-  "say": "I want students to receive an email.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "8433a504",
-  "text": "Don't let them press the button twice.",
-  "say": "Don't let them press the button twice.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "8f48efe0",
-  "text": "The app should allow you to save a draft.",
-  "say": "The app should allow you to save a draft.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "4c91055b",
-  "text": "Ask every user to connect with their school email.",
-  "say": "Ask every user to connect with their school email.",
-  "src": "lab/practice.html#deck"
- },
- {
   "key": "9d786a91",
   "text": "fix what doesn't work",
   "say": "fix what doesn't work",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "73635b52",
-  "text": "Some students haven't done the exam yet.",
-  "say": "Some students haven't done the exam yet.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "4f43415c",
-  "text": "When did we create this page?",
-  "say": "When did we create this page?",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "9e6b2167",
-  "text": "I 've just uploaded the photos, can you see them?",
-  "say": "I 've just uploaded the photos, can you see them?",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10038,57 +12030,15 @@
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "662feffe",
-  "text": "I'm looking forward to hearing from you.",
-  "say": "I'm looking forward to hearing from you.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "d1fb0fd8",
-  "text": "Students got used to recording themselves.",
-  "say": "Students got used to recording themselves.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "01c43759",
-  "text": "I suggest that you start with one learning path.",
-  "say": "I suggest that you start with one learning path.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "01b89be7",
-  "text": "When I came up with the idea, I had never built an app.",
-  "say": "When I came up with the idea, I had never built an app.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "ceb99044",
-  "text": "I was testing it in class when it crashed.",
-  "say": "I was testing it in class when it crashed.",
-  "src": "lab/practice.html#deck"
- },
- {
   "key": "43fc1e60",
   "text": "Since then, the app has taken off .",
   "say": "Since then, the app has taken off .",
   "src": "lab/practice.html#deck"
  },
  {
-  "key": "b69bbf8c",
-  "text": "We kept finding new bugs every day.",
-  "say": "We kept finding new bugs every day.",
-  "src": "lab/practice.html#deck"
- },
- {
   "key": "8f835e89",
   "text": "Don't put it off any longer. (it / off)",
   "say": "Don't put it off any longer.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "d90e590e",
-  "text": "Send me an HTML file with the results.",
-  "say": "Send me an HTML file with the results.",
   "src": "lab/practice.html#deck"
  },
  {
@@ -10113,12 +12063,6 @@
   "key": "dabe978a",
   "text": "These criteria are different this year. (this/these + be)",
   "say": "These criteria are different this year.",
-  "src": "lab/practice.html#deck"
- },
- {
-  "key": "fd65ac16",
-  "text": "When a student reaches ten cards, let them continue.",
-  "say": "When a student reaches ten cards, let them continue.",
   "src": "lab/practice.html#deck"
  },
  {

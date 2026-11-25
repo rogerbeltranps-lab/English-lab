@@ -13,7 +13,7 @@ window.LP = {
         { s: 'This project has too many info.', a: ['This project has too much info.'], ex: 'info is uncountable: <strong>too much info</strong>.' },
         { s: 'The dashboard need a new button.', a: ['The dashboard needs a new button.'], ex: 'he / she / it + <strong>-s</strong>: the dashboard needs.' },
         { s: 'Create a document mare with all the competences.', a: ['Create a master document with all the competences.'], ex: '<strong>a master document</strong>.' },
-        { s: 'For the next course I’ll change the programme.', a: ['Next school year I’ll change the programme.', 'For next school year I’ll change the programme.', 'For the next school year I’ll change the programme.'], ex: '<em>el curs vinent</em> → <strong>next school year</strong>.' },
+        { s: 'For the next course I’ll change the program.', a: ['Next school year I’ll change the program.', 'For next school year I’ll change the program.', 'For the next school year I’ll change the program.'], ex: '<em>el curs vinent</em> → <strong>next school year</strong>.' },
         { s: 'Send me a list of mails.', a: ['Send me a list of emails.', 'Send me a list of email addresses.'], ex: '<strong>a list of emails</strong> (mail = the post, uncountable).' },
         { s: 'The criteria is only shown to the teacher.', a: ['The criteria are only shown to the teacher.'], ex: 'criteria is plural: <strong>the criteria are shown</strong>.' }
       ] },
@@ -29,7 +29,7 @@ window.LP = {
         { g: 'Noun phrases the English way', items: [['the exam guide (not the exam’s guide)', 'la guia de l’examen', 'Add a note to the exam guide.'], ['the app’s name (not the name of the app)', 'el nom de l’app', 'The app’s name is on the cover.'], ['my Linux terminal', 'el meu terminal de Linux', 'Open my Linux terminal.'], ['the Healthy Habits writing section', 'la secció d’escriptura de Healthy Habits', 'The Healthy Habits writing section is new.'], ['a given competence', 'una competència donada', 'From a given competence, I design an objective.']] }
       ],
       practice: [
-        { q: 'I’m changing the programme for ___ school year.', a: ['next'] },
+        { q: 'I’m changing the program for ___ school year.', a: ['next'] },
         { q: 'Each objective has one assessment ___.', a: ['criterion'] },
         { q: 'During ___ LS, students work on one final product.', a: ['an'] },
         { q: 'There’s too ___ info on the home page.', a: ['much'] },
@@ -64,7 +64,7 @@ window.LP = {
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The staff meeting', pill: 'C1 · three voices',
       intro: 'Part of a department meeting. Listen for the decisions and who will do what.',
       media: { audio: 'audio/lp4-staff-meeting.mp3', title: 'The staff meeting', script: [
-        ['Montse', 'Okay, everyone, let’s make a start. We’ve only got forty minutes. First item: the programme for next school year.'],
+        ['Montse', 'Okay, everyone, let’s make a start. We’ve only got forty minutes. First item: the program for next school year.'],
         ['David', 'Have the criteria changed again?'],
         ['Montse', 'Some of them have. The new criteria are in the master document. I’ve highlighted the ones that are different.'],
         ['Laia', 'Sorry, quick question. Is there one indicator per criterion, or more?'],
@@ -81,7 +81,7 @@ window.LP = {
         ['Laia', 'I can do it.'],
         ['Montse', 'Brilliant. Thanks, Laia. Right, that’s everything.']
       ] },
-      chunks: ['the programme for next school year', 'the new criteria are in the master document', 'adapt the second ESO LSs to the new criteria', 'give some positive feedback first', 'can somebody cover my class'],
+      chunks: ['the program for next school year', 'the new criteria are in the master document', 'adapt the second ESO LSs to the new criteria', 'give some positive feedback first', 'can somebody cover my class'],
       items: [
         { q: 'Where are the new criteria?', o: ['in the master document', 'on the website', 'in an email from the head'] },
         { q: 'How many indicators does each criterion have?', o: ['three', 'one', 'it depends on the teacher'] },
