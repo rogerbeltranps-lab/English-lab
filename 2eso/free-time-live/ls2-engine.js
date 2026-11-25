@@ -736,7 +736,7 @@ var LS2 = (function () {
       L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('input.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
     }
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
-    // ⛵ a student who sees only the notebook look (window.elNbOnly, el-app.js; Roger, 19 Nov 2026): the new try is a fresh notebook page
+    // ⛵ a student keeps the look they chose (window.elNbOnly, el-app.js; Roger, 25 Nov 2026): in the notebook look the new try is a fresh notebook page
     // (state.nbAgain[id]: the page shows the latest try from now on, as the laptop look did); the first try still counts for the mark
     $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); if (nbk && window.elNbOnly) { state.nbAgain = state.nbAgain || {}; state.nbAgain[id] = 1; } forget(id, prefix); if (nbk && window.elLpNb && !window.elNbOnly) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };

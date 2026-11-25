@@ -573,7 +573,7 @@
   // A checked activity keeps its first try in the notebook; ↺ Practise again moves to the laptop look, where the new try and its results stay.
   // LS2 on, the same pages as ⛶ Full screen (not a recall checkpoint or the sample exam), and not the 📖 Book (it has its own pages).
   const NBOK = FSOK && !/\/book\.html$/.test(path), NBKEY = "el_lpnb", NBDEF = true;
-  const nbOn = () => { if (voyOn()) return true; let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
+  const nbOn = () => { let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
   function nbSet(on) { try { localStorage.setItem(NBKEY, on ? "1" : "0"); } catch (e) {} nbDraw(); }
   if (NBOK) window.elLpNb = on => nbSet(!!on);   // ↺ Practise again in the notebook look takes the page back to the laptop look (ls2-engine.js)
   function nbDraw() {
@@ -583,10 +583,11 @@
       const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114b"; document.head.append(l); }
     // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
     if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
-    // ⛵ 4 ESO students see only the notebook look (Roger, 19 Nov 2026: "I want students to only see the notebook style in the activities"):
-    // no 🖥 Normal page button; ↺ Practise again then starts a fresh notebook page (window.elNbOnly, ls2-engine.js). The teacher keeps the switch.
+    // Students open in the notebook look and can switch again (Roger, 25 Nov 2026: "I want student to be able to change from notebook-like
+    // or computer like again when doing the activities"; it replaces the notebook-only look of 19 Nov). Their own choice is kept:
+    // ↺ Practise again starts a fresh notebook page and coming back from a game keeps the look (window.elNbOnly, ls2-engine.js);
+    // only the teacher's page goes back to the laptop look then.
     window.elNbOnly = voyOn(); H.classList.toggle("el-voy", voyOn());
-    if (voyOn()) { $$(".lp-panels>.panel>.panel-head>.ellpnb").forEach(b => b.remove()); return; }
     const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
     const tip = on ? t("Torna a veure aquest pas com una pàgina web normal", "Show this step as a normal web page again") : t("Mostra aquest pas com la teva llibreta", "Show this step like your notebook");
     $$(".lp-panels>.panel>.panel-head").forEach(h => {
