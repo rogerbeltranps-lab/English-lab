@@ -309,6 +309,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
     addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.querySelector("dialog[open]")&&parent.xrEsc)parent.xrEsc()})}catch(e){console.warn("exam embed",e)}})();</script>
 <style>html.embed .side,html.embed .mtabs,html.embed .bnav,html.embed #crumb,html.embed .phead,html.embed #note{display:none!important}html.embed .app{display:block}html.embed .page{max-width:none;padding:8px 10px}html.embed body{background:#fff}html.embed .t-exam{border:0;padding:0 2px}</style>
 <style>/* 📄 Term report (reportPlace): the course colour tints the band (2 ESO green, 4 ESO blue) */
+.cpwhy{display:block;margin:6px 0 0;padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;font-size:13.5px;line-height:1.45;color:#334155}.cpwhy ul{margin:4px 0 0;padding-left:18px}.cpwhy li{margin:2px 0}.cpwhy li span{color:#475569}
 .trep{--rk:#2563eb}.trep[data-c="2eso"]{--rk:#15803d}
 .rph{background:var(--rk);color:#fff;border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin:12px 0 8px}
 .rph h2{color:#fff;margin:2px 0 0;font-size:1.35rem}.rph small{color:#fff;opacity:.92;font-size:13px}.rph .route{background:#fff;color:#0f172a}
@@ -337,7 +338,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261125c"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
-<script src="shared/js/el-term-report.js?v=20261123"></script>
+<script src="shared/js/el-term-report.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261121b"></script>
@@ -395,6 +396,10 @@ async function load(u){
   const mail=(AS?D.me.email||"":u.email||"").toLowerCase();
   D.me.name=D.me.name||(AS?mail:u.displayName||u.email);
   if(!AS&&ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
+  // 📄 the Term report shows the exam marks even while the results are held (Roger, 25 Nov 2026: "the reports must have them anyway, and I
+  // decide when to publish everthing!"): D.rsRep = the results as saved, without the hold; only reportPlace uses it
+  {const raw=AS?D.rs:(window.EL_RS_RAW||{}),o={};for(const r of Object.values(raw))if(r&&r.activity){const c=Object.assign({},r);delete c.showFrom;delete c.held;o[r.activity]=c}
+    D.rsRep=Object.keys(o).length?o:null}
   if(AS&&window.elHeld)D.rs=elHeld(D.rs);   // the teacher sees the board as the student does: exam results held until their day (el-cloud.js)
   elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
   await Promise.all([
@@ -931,7 +936,7 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="me")return meBox(lss,ls);
   if(place==="examprep")return examPrep(lss);
   if(place==="progress")return progressPlace(lss,ls);
-  if(place==="report"){S.inRep=true;try{return reportPlace(lss,ls)}finally{S.inRep=false}}
+  if(place==="report"){S.inRep=true;const rs0=D.rs;if(D.rsRep)D.rs=D.rsRep;try{return reportPlace(lss,ls)}finally{S.inRep=false;D.rs=rs0}}
   // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
   // only on 📈 My formative assessment (Roger, 14 Nov 2026: "in my final product and exams, students only need to see that, not my activities,
   // since it's shown in My formative assessment"): 🎯 checkpoints, 🎬 final product and 📝 exams show only their own content
@@ -1622,7 +1627,8 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
   const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(q=>(q.first||q.time||[]).map(y=>y[0])):[],other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
   const secMax=(e,k)=>{const y=e.sections.find(z=>z[0]===k);return y&&y[2]||e.max},spread=(cs,w,m,src)=>cs.map(c=>({c,w:w/cs.length,m,src}));
   const fz=fpMissed(l)?0:null,fpM=()=>{const f=D.rs[g.fp.a]||{};return pr.fp??(f.max?(f.score||0)/f.max*10:fz)},out=[];
-  g.blocks.forEach(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean)),term=+rep[b.id]||(date?termOfDay(date):lsT),w=b.w;let pcs=[];
+  const noFp=S.inRep&&S.repNoFp&&S.repNoFp.has(l.id);   // 📄 the term report leaves out a final product that counts in the next term
+  g.blocks.forEach(b=>{if(noFp&&b.id==="fp")return;const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean)),term=+rep[b.id]||(date?termOfDay(date):lsT),w=b.w;let pcs=[];
     if(b.id==="exam"&&g.exam){const e=g.exam,tot=e.sections.reduce((n,[k])=>n+secMax(e,k),0),gvc=Object.keys(gvS);
       pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
         if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
@@ -1648,7 +1654,7 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
 // competences' marks weighted by their share, i.e. every piece of the term with a mark, weighted
 const termMark=ps=>{const h=ps.filter(y=>y.m!=null&&y.w>0),w=h.reduce((n,y)=>n+y.w,0);return w?h.reduce((n,y)=>n+y.m*y.w,0)/w:null};
 // competences of some pieces: {k: {m, crit: {c: {m, w, src}}}}; a mark is the weighted average of the pieces that have one
-function compOfPieces(ps){const o={};ps.forEach(y=>{const k=String(y.c).split(".")[0],K=o[k]=o[k]||{w:0,sw:0,sm:0,crit:{}},C=K.crit[y.c]=K.crit[y.c]||{w:0,sw:0,sm:0,src:new Map(),ls:new Set()};if(y.ls)C.ls.add(y.ls);
+function compOfPieces(ps){const o={};ps.forEach(y=>{const k=String(y.c).split(".")[0],K=o[k]=o[k]||{w:0,sw:0,sm:0,crit:{}},C=K.crit[y.c]=K.crit[y.c]||{w:0,sw:0,sm:0,src:new Map(),ls:new Set()};if(y.ls)C.ls.add(y.ls);(C.pcs=C.pcs||[]).push(y);
     K.w+=y.w;C.w+=y.w;if(!C.src.has(y.src[0]))C.src.set(y.src[0],new Set());if(y.src[1])C.src.get(y.src[0]).add(y.src[1]);if(y.m!=null){K.sw+=y.w;K.sm+=y.m*y.w;C.sw+=y.w;C.sm+=y.m*y.w}});
   Object.values(o).forEach(K=>{K.m=K.sw?K.sm/K.sw:null;Object.values(K.crit).forEach(C=>C.m=C.sw?C.sm/C.sw:null)});return o}
 // the four official degrees (DOIGC: NA / AS / AN / AE), in words students understand
@@ -1668,6 +1674,20 @@ const indLss=(c,lss)=>[...lss].filter(l=>indOf(l,c));
 const dgMark=(m,big)=>{const i=dgIdx(m);return i<0?"":`<span class="dgm${big?" big":""}"><span class="dgbx dg-${DGK[i]}">${dgName(i)}</span><span class="dgn">${f1(m)}<small>&nbsp;/&nbsp;10</small></span></span>`};
 function indLine(c,C){const i=dgIdx(C.m);if(i<0)return "";const L=indLss(c,C.ls||[]);
   return `<span class="cpind dgb-${DGK[i]}"><b>${dgName(i)}</b>${L.map(l=>`<span>${L.length>1?`<i>${esc(elLsNum(l))}</i> `:""}${esc(indOf(l,c)[i])}</span>`).join("")}</span>`}
+// 📄 Why this level, under each criterion of the term report (Roger, 25 Nov 2026: "here there should be a and explanation of the assessment
+// indicator"): every piece of work the criterion's mark comes from, with its own mark; a final product marked with a rubric (LS1) gives the
+// student's level in that criterion's row and the row's descriptor, word for word (EL_FP_RUBRICS), so the student reads why.
+function repWhy(c,C){const by=new Map();(C.pcs||[]).filter(y=>y.m!=null&&y.w>0).forEach(y=>{const k=y.src[0]+"|"+(y.src[1]||"")+"|"+(y.ls?y.ls.id:"");
+    const z=by.get(k)||{src:y.src,ls:y.ls,w:0,s:0};z.w+=y.w;z.s+=y.m*y.w;by.set(k,z)});
+  if(!by.size)return "";
+  const li=[...by.values()].map(z=>{const m=z.s/z.w,g=(window.EL_GRADING||{})[z.ls&&z.ls.id]||{},fa=g.fp&&g.fp.mark&&/^🎬/.test(z.src[0])?g.fp.a:null,R=fa&&(window.EL_FP_RUBRICS||{})[fa];
+    const head=`${esc(z.src[0])}${z.src[1]?" · "+esc(z.src[1]):""}${z.ls&&C.ls&&C.ls.size>1?` <i>${esc(elLsNum(z.ls))}</i>`:""}`;
+    if(R){const r=R.rows.find(x=>x.c===c),fb=String((D.rs[fa]||{}).feedback||""),H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/;
+      const hit=r&&fb.split("\n").map(l=>l.trim().match(H)).find(h=>h&&h[1].trim().toLowerCase()===r.name.toLowerCase());
+      if(r&&hit){const v=parseFloat(hit[3].replace(",",".")),L=4-Math.max(0,Math.min(4,Math.round(v/2.5)));
+        return `<li><b>${head} · ${esc(r.name)}</b>: ${f1(v)}/10 · ${esc(R.levels[L])}${r.d[L]?`. <span>${esc(r.d[L])}</span>`:""}</li>`}}
+    return `<li><b>${head}</b>: ${f1(m)}/10 · ${(degOf(m)||["",""])[1]}</li>`});
+  return `<span class="cpwhy"><b>${t("Per què aquest nivell","Why this level")}</b><ul>${li.join("")}</ul></span>`}
 // the English competences in the student's language, with their colours (CE1–CE6 as the board's pills, fk-1…fk-6)
 const CPN={1:["Interculturalitat","Cultures and respect"],2:["Comprensió oral","Listening"],3:["Expressió oral","Speaking"],4:["Comprensió escrita","Reading"],5:["Expressió escrita","Writing"],
   6:["Recerca i informació","Research and information"],7:["Lectura","Reading for pleasure"],8:["Mediació","Mediation"],9:["Aprendre a aprendre","Learning to learn"],10:["Comunicació ètica","Ethical communication"]};
@@ -1681,7 +1701,7 @@ function compBox(ls2,tm){const ps=ls2.flatMap(compPieces).filter(y=>!tm||y.term=
     const cc=CPC[k]||["#475569","#f1f5f9"];
     return `<div class="cpc ${K.m==null?"none":""}" style="--k:${cc[0]};--ks:${cc[1]}"><div class="cph"><span class="fv-chip"><span aria-hidden="true">${CPI[k]||"🧩"}</span> CE${k}</span><b>${esc((CPN[k]||[])[EN?1:0]||String(EL_COMPETENCES[k]||"").replace(/^CE\d+ · /,""))}</b><span class="cpm">${mk(K.m)}${dg(K.m)}</span></div>`
       +`<span class="fv-bar"><span style="width:${K.m==null?0:Math.max(0,Math.min(100,K.m*10))}%"></span></span>`
-      +`<ul class="cpl">${cs.map(c=>{const C=K.crit[c];return `<li><button type="button" class="cpcr" data-do="crit" data-c="${esc(c)}"${C.m!=null?` data-m="${C.m}" data-lss="${esc([...C.ls].map(l=>l.id).join(","))}"`:""}><span class="cpn">${esc(c)}</span><span class="cpt">${esc(easy(c))}<small>📍 ${[...C.src].map(([g,n])=>esc(g)+(n.size?" ("+[...n].map(esc).join(", ")+")":"")).join(" · ")}</small>${indLine(c,C)}</span><span class="cpm">${mk(C.m)}${dg(C.m)}</span></button></li>`}).join("")}</ul></div>`};
+      +`<ul class="cpl">${cs.map(c=>{const C=K.crit[c];return `<li><button type="button" class="cpcr" data-do="crit" data-c="${esc(c)}"${C.m!=null?` data-m="${C.m}" data-lss="${esc([...C.ls].map(l=>l.id).join(","))}"`:""}><span class="cpn">${esc(c)}</span><span class="cpt">${esc(easy(c))}<small>📍 ${[...C.src].map(([g,n])=>esc(g)+(n.size?" ("+[...n].map(esc).join(", ")+")":"")).join(" · ")}</small>${indLine(c,C)}${S.inRep?repWhy(c,C):""}</span><span class="cpm">${mk(C.m)}${dg(C.m)}</span></button></li>`}).join("")}</ul></div>`};
   // the 3 strongest criteria and the 2 weakest (every one under 5 too): what you have learnt and what to work on most
   const all=ks.flatMap(k=>Object.entries(o[k].crit).filter(([,C])=>C.m!=null).map(([c,C])=>({c,m:C.m}))).sort((a,b)=>b.m-a.m);
   const top=all.slice(0,3).filter(x=>x.m>=5).map(x=>x.c),low=[...new Set([...all.filter(x=>x.m<5),...all.slice(3).slice(-2)].map(x=>x.c))].filter(c=>!top.includes(c));
@@ -1838,7 +1858,8 @@ function reportPlace(lss,ls){
     +`<div class="rpl rphow"><h3>${t("Com hem treballat i avaluat","How we worked and how you were assessed")}</h3><ul>${(C.how[EN?"en":"ca"]||[]).map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`;
   // the marks: the term (as 🎓 My progress), each LS (LS1 whole; LS2 part by part while its final product counts in term 2)
   const TM=termMark(mine.flatMap(compPieces).filter(y=>y.term===1));
-  const lsTile=l=>{const M=lsMarks(l);if(!M)return "";const Pt=lsPts(l,M),part=Pt&&!Pt.all;
+  S.repNoFp=new Set(C.lss.filter(x=>x.fpLater).map(x=>x.ls));
+  const lsTile=l=>{const M=lsMarks(l);if(!M)return "";const P0=lsPts(l,M),Pt=P0&&S.repNoFp.has(l.id)?Object.assign({},P0,{all:false,parts:P0.parts.filter(p=>p.k!=="fp")}):P0,part=Pt&&!Pt.all;
     return `<div class="rpm"><h3>${esc(window.elLsNum?elLsNum(l):"")} · ${esc(String(l.title).replace(/^\S+ · /,""))}</h3>${part?ptLine(l,Pt):repDeg(M.total)}</div>`};
   const glance=`<div class="rpms"><div class="rpm main"><h3>${t("Nota del 1r trimestre","Term 1 mark")}</h3>${repDeg(TM,true)}<p class="muted">${t("Amb tots els criteris de les dues LS del trimestre.","From every criterion of the term's two LSs.")}</p></div>${mine.map(lsTile).join("")}</div>`;
   const tags=(ix,c)=>(ix||[]).map(i=>P[i]?`<span class="rptag ${c}">${esc(short(EN?P[i].en:P[i].ca))}</span>`:"").join("");
