@@ -147,7 +147,7 @@ dialog.fxd{max-width:640px}.fxpt{margin:2px 0 10px;display:flex;flex-direction:c
 .page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}.lsgo h2{margin:0 0 10px}.study{background:#f0fdf4;border-color:#bbf7d0}.study p{margin:4px 0 8px}.study .row{display:flex;gap:8px;flex-wrap:wrap}.lsgo .row{display:flex;gap:10px;flex-wrap:wrap}.lsgo a.go{font-size:16px;padding:10px 18px;border-radius:12px}
 @media (max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}.mtabs .nv{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs .nv.on{background:#3157d5;color:#fff;border-color:#3157d5}.mtabs .nv.sub{padding:12px 14px;font-weight:700}}</style>
 <style>/* Simple board (Roger, 6 Nov 2026): a home with one Continue button and four places; Chromebook screens first */
-body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.4em 0 .1em}body[data-place="home"] #sub{font-size:17px;margin:0 0 14px}
+body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.4em 0 .1em}body[data-place="home"] #sub{font-size:17px;margin:0 0 14px}#sub .nxex{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;width:fit-content;max-width:100%;margin:8px 0 0;padding:6px 14px;border-radius:14px;background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d;font-size:15px;line-height:1.35}#sub .nxex b{color:#991b1b}#sub .nxex span+span::before,#sub .nxex b+span::before{content:"·";margin-right:10px;color:#f87171}#sub .nxex.soon{background:#b91c1c;border-color:#b91c1c;color:#fff}#sub .nxex.soon b{color:#fff}#sub .nxex.soon span::before{color:#fecaca!important}
 #crumb a.back{display:inline-flex;align-items:center;gap:4px;margin:6px 0 0;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}#crumb a.back:hover{background:#eaf0ff}
 .vy-chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px}a.vy-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#0f172a;text-decoration:none;font-size:14px;font-weight:600}a.vy-chip:hover{border-color:#3157d5}a.vy-chip b{background:#3157d5;color:#fff;border-radius:999px;padding:0 7px;font-size:12px}a.vy-chip.late{background:#fef2f2;border-color:#fca5a5;color:#991b1b}a.vy-chip.news{background:#fff7ed;border-color:#fdba74;color:#9a3412}a.vy-chip.news b{background:#ea580c}
 .hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start;margin-top:6px}.hl{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -338,7 +338,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261125d"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125f"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-term-report.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
@@ -522,8 +522,15 @@ const placeTitle=p=>({examprep:t("Practica per l'examen","Exam practice"),progre
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
-function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n=ex?ELWeek.days(ELWeek.today(),ex):null;
-  return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${(dt=>n>1?t(`examen ${dt}, d'aquí a ${n} dies`,`exam ${dt}, in ${n} days`):n===1?t(`examen demà, ${dt}`,`exam tomorrow, ${dt}`):t("examen avui","exam today"))(ELWeek.date(ex,EN?"en":"ca"))}</b>`:"")}   // the exam's date beside the countdown (problem report, 2ESOB, 13 Nov 2026)
+function homeSub(g,ls){return (g?esc(g.name)+" · ":"")+lsName(ls)+nextExamPill()}
+// 📝 The group's next exam at the top of the board (Roger, 25 Nov 2026: "All the groups should be able to see when their next exam is … at the top
+// of the students board"; "the exam was done already it shouldnt be there"): the earliest exam from today on, of any LS: the LS's own exam of
+// the time plan or one the teacher set on the dashboard (the term exam), with its title and note (ELWeek.nextExam). A past exam never shows.
+// The exam's date beside the countdown (problem report, 2ESOB, 13 Nov 2026). No reads of its own: the LS docs are already read.
+function nextExamPill(){const x=D.me.group&&ELWeek.nextExam(D.me.group,D.ls);if(!x)return "";const n=x.n,dt=ELWeek.date(x.d,EN?"en":"ca"),l=EL_LS.find(y=>y.id===x.ls);
+  const when=n>1?t(`${dt} · d'aquí a ${n} dies`,`${dt} · in ${n} days`):n===1?t(`demà, ${dt}`,`tomorrow, ${dt}`):t(`avui, ${dt}`,`today, ${dt}`);
+  const tt=x.plan?(l?l.title.split(" · ")[0]:""):t(x.tc||x.t,x.t||x.tc),nt=x.plan?"":t(x.nc||x.nt,x.nt||x.nc);
+  return `<span class="nxex${n<=3?" soon":""}"><b>📝 ${t("Proper examen","Next exam")}: ${esc(when)}</b>${tt?`<span>${esc(tt)}</span>`:""}${nt?`<span>${esc(nt)}</span>`:""}</span>`}
 // the student's next step: the first open learning path (in the order of the group's plan) with a step still to do, as on 📋 My learning paths
 function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
   const {p,gi}=planOf(ls),dr=(gi>=0&&(p._dropped||{})[gi])||[],today=ELWeek.today(),dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null;
@@ -1287,7 +1294,7 @@ async function goLive(){
   // 📌 a learning path pulled up by the teacher shows at once: only the LS docs of the group's open LSs (one read each when the board opens)
   const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};setInterval(pdraw,30e3);   // gone when the class it was made in ends (until)
   EL_LS.filter(l=>{const i=D.ls[l.id];return i&&i.status==="open"&&elLsForGroup(l,i,g)}).forEach(l=>F.onSnapshot(F.doc(db,"ls",l.id),x=>{const d=x.exists()?x.data():{},i=D.ls[l.id];
-    i.push=d.push||{};if(window.elSqSync&&elSqAct(l.id))elSqSync(l.id,d.sq||{});if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
+    i.push=d.push||{};if(window.elSqSync&&elSqAct(l.id))elSqSync(l.id,d.sq||{});if(d.open)i.open=d.open;if(d.done)i.done=d.done;if(d.planEdits)i.planEdits=d.planEdits;if(d.homework)i.homework=d.homework;if(d.exams)i.exams=d.exams;if(d.secLocked)i.secLocked=d.secLocked;if(d.cpShown)i.cpShown=d.cpShown;if(d.cpClosed)i.cpClosed=d.cpClosed;pdraw()},e=>console.warn("pull",e)));   // the agenda too, so a tab dragged to today opens on the board (elPlanLater)
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
   const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsLine()};
   F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw()},e=>console.warn("points",e));
@@ -2219,7 +2226,9 @@ function agendaBox(ls,info){const g=D.me.group,ag=g&&window.elAgendaOf?elAgendaO
   // no class work here any more (Roger, 20 Nov 2026: "they see activities in blue, because we have to do them in class, this shouldnt appear"):
   // only the exam, homework, deadlines and the teacher's notes; a day with only class work is left out
   const days=Object.keys(ag.days||{}).filter(d=>d>=today&&(ag.days[d]||[]).some(x=>/^note:\s*\S/.test(String(x))));if(ex&&ex>=today&&!days.includes(ex))days.push(ex);
-  hws.forEach(h=>{if(!days.includes(h.x.date))days.push(h.x.date)});days.sort();
+  hws.forEach(h=>{if(!days.includes(h.x.date))days.push(h.x.date)});
+  // 📝 the exams the teacher set on the dashboard for this LS (the term exam; Roger, 25 Nov 2026), with their title and note
+  const xs=ELWeek.examsOf(g,{[ls.id]:info}).filter(e=>!e.plan&&e.d>=today),xOn=d=>xs.filter(e=>e.d===d);xs.forEach(e=>{if(!days.includes(e.d))days.push(e.d)});days.sort();
   if(!days.length)return "";
   const lsn=elLsName(ls),site=new URL("today.html",location.href).href;
   const cal=(title,d)=>` <a class="calb" href="${ELWeek.gcalDay(title,d,t("Anglès · ","English · ")+lsn+"\n"+site)}" target="_blank" rel="noopener" title="${t("Afegeix-ho al teu Google Calendar","Add it to your Google Calendar")}">📅 ${t("Afegeix-ho al calendari","Add to your calendar")}</a>`;
@@ -2227,9 +2236,10 @@ function agendaBox(ls,info){const g=D.me.group,ag=g&&window.elAgendaOf?elAgendaO
     // ⏰ a deadline the teacher added to the day on the Time plan (⏰ Deadline, e.g. the final product): with the calendar button
     its.forEach(it=>{if(/^note:/.test(it)){const x=it.slice(5).trim();if(!x)return;const m=x.match(/^⏰\s*(?:Deadline:\s*)?(.*)$/);
         lines.push(m?`<li class="dl">⏰ <b>${t("Data límit","Deadline")}: ${esc(m[1]||t("lliurament","hand-in"))}</b>${cal("⏰ "+t("Anglès","English")+": "+(m[1]||t("data límit","deadline")),d)}</li>`:`<li>📌 ${esc(x)}</li>`)}});
-    const isEx=d===ex,n=ELWeek.days(today,d);
+    const isEx=d===ex,n=ELWeek.days(today,d),xt=e=>t(e.tc||e.t,e.t||e.tc)||t("Examen","Exam"),xn=e=>t(e.nc||e.nt,e.nt||e.nc);
+    const xl=xOn(d).map(e=>`<li>📝 <b>${esc(xt(e))}</b>${xn(e)?` · ${esc(xn(e))}`:""}${cal("📝 "+t("Anglès","English")+": "+xt(e),d)}</li>`);
     const hw=hwOn(d).map(h=>`<li class="hwd ${h.done?"dn":""}">🏠 <b>${t("Deures","Homework")}:</b> ${esc(h.x.text)}${h.done?` <span class="ok">✔ ${t("Fet","Done")}</span>`:cal("🏠 "+t("Deures d'anglès","English homework")+": "+h.x.text,d)}</li>`);
-    return `<div class="agd ${d===today?"now":""} ${isEx?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${hw.join("")}${lines.join("")}</ul></div>`};
+    return `<div class="agd ${d===today?"now":""} ${isEx||xl.length?"ex":""}"><h4>${d===today?t("Avui","Today")+" · ":n===1?t("Demà","Tomorrow")+" · ":""}${when(d)}</h4><ul>${isEx?`<li>📝 <b>${t("Examen","Exam")} · ${esc(lsn)}</b>${cal("📝 "+t("Examen d'anglès","English exam")+" · "+lsn,d)}</li>`:""}${xl.join("")}${hw.join("")}${lines.join("")}</ul></div>`};
   return `<div class="box agbox"><h2>📅 ${t("Agenda","Agenda")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted" style="margin:0 0 6px">${t("Els deures, les dates límit i el dia de l'examen. 📅 els posa al teu calendari.","Your homework, deadlines and the exam day. 📅 puts them in your calendar.")}</p>${days.map(dayHtml).join("")}</div>`}
 function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;

@@ -109,6 +109,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .spkr{padding:8px 0;border-bottom:1px solid #e2e8f0}#spkstu{font:inherit;padding:5px 10px;border:1px solid #cbd5e1;border-radius:10px;max-width:100%}
 @media (max-width:640px){.spkb{grid-template-columns:minmax(0,120px) minmax(0,1fr) 30px}}
 @media (max-width:1100px){.prgrid{grid-template-columns:minmax(0,1fr)}}@media (max-width:760px){.prstats{grid-template-columns:repeat(2,minmax(0,1fr))}.prradin{grid-template-columns:minmax(0,1fr)}}
+.todoyou{margin:3px 0 2px}.todoyou button{margin-left:4px}.need{margin:8px 0 12px;padding:10px 12px;border-radius:10px;background:#fef3c7;border:1px solid #fcd34d;color:#422006}.need.ok{background:#dcfce7;border-color:#86efac;color:#14532d}.need ul{margin:6px 0 0;padding-left:20px}.need li{margin:4px 0}.need .info{color:#475569;font-size:13px}details.opt{margin-top:10px;border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px}details.opt>summary{cursor:pointer;font-weight:600;color:#475569}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
@@ -131,7 +132,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .mtgrid th:first-child{font-weight:400}.mtgrid input{margin:0;cursor:pointer;width:16px;height:16px}.mtgrid tbody tr:hover{background:#f8fafc}
 .mtall{border:0;background:none;padding:2px 0;font:inherit;color:#0f172a;cursor:pointer;text-align:left}.mtall:hover{color:#1d4ed8;text-decoration:underline}th .mtall{font-weight:700;font-size:13px}
 .mtprev{border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;padding:18px 14px;margin:8px 0}.mtprev .mt-box{font-size:14px}.mtprev .mt-box h1{font-size:20px}.mtprev .mt-ic{font-size:32px}
-.ph h1{font-size:2.1rem;letter-spacing:-.02em;margin:.25em 0 .1em}.ph .sub{font-size:16px;color:#475569;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}.ph .sub select{font-size:15px;padding:4px 6px;border-radius:8px}
+.ph h1{font-size:2.1rem;letter-spacing:-.02em;margin:.25em 0 .1em}.ph .sub{font-size:16px;color:#475569;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}.ph .sub select{font-size:15px;padding:4px 6px;border-radius:8px}.ph .sub a.exam{text-decoration:none;color:#991b1b;cursor:pointer}.ph .sub a.exam:hover{outline:2px solid #fca5a5}.exf{display:flex;flex-wrap:wrap;gap:8px 14px;margin:6px 0 10px}.exf label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:#334155;font-weight:600}.exf .w{flex-basis:100%}.exf .w input{width:100%;box-sizing:border-box}.exf input,.exf select{font:inherit;font-size:15px;font-weight:400;padding:5px 8px;border:1px solid #cbd5e1;border-radius:8px}.exf label.exg{display:inline-flex;flex-direction:row;align-items:center;gap:6px;white-space:nowrap;font-weight:400;font-size:15px;margin:0 14px 0 6px;vertical-align:middle}.exf input[type=checkbox]{width:18px;height:18px;padding:0;margin:0}
 .ph h1.hi{max-width:1100px;line-height:1.15;text-wrap:pretty}.ph h1.hi .cheer{vertical-align:middle;border:0;background:#eef2ff;color:#3157d5;border-radius:999px;width:34px;height:34px;font-size:18px;font-weight:700;cursor:pointer;padding:0;margin-left:4px}.ph h1.hi .cheer:hover{background:#dbe4ff}
 .ph h1.pt{font-size:1.6rem}.crumb{margin:4px 0 0}.crumb a.back{display:inline-flex;align-items:center;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}.crumb a.back:hover{background:#eaf0ff}
 .hgrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:22px;align-items:start}.hl{display:flex;flex-direction:column;gap:12px;min-width:0}.hl .box{margin:0}
@@ -282,7 +283,7 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 @media(max-width:900px){.tp2s .tp2col{position:static;height:auto;display:block}.tp2s .agw{display:grid}.tp2s .agr{overflow:visible}.tp2s{grid-template-columns:1fr}.tp2sr{position:static;max-height:none}.tp2sr .lpall .wrap{max-height:75vh}}
 @media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
 </style>
-<link rel="stylesheet" href="shared/css/el-phone.css?v=20261125m"></head><body>
+<link rel="stylesheet" href="shared/css/el-phone.css?v=20261125n"></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
@@ -308,10 +309,10 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261125d"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261125f"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
-<script src="shared/js/el-marking.js"></script>
+<script src="shared/js/el-marking.js?v=20261125todo"></script>
 <script src="shared/js/el-fix.js?v=1"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
@@ -1209,7 +1210,7 @@ const teamOf=(u,id)=>res(u,id).team||"";
 const teamMates=(id,team,g)=>team?Object.values(S.P).filter(s=>!s.away&&!s.tester&&s.group===g&&teamOf(s.uid,id)===team):[];
 // Level rows of an activity's dialog (moments of el-grading.js), and the final product group rows
 function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.moments||[]).filter(m=>m.a===a.id);if(!ms.length)return "";
-  const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
+  const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${redoOf(u,a,m.step)?'<span class="muted">↺ sent back to redo: no level until they hand it in again</span>':lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
   let h=`<label>Levels <small class="muted">(hover a level to read its indicator; click it again to clear)</small></label><table class="lvt"><tbody>${ms.filter(m=>!m.group).flatMap(m=>m.c.map(c=>row(m,c))).join("")}</tbody></table>`;
   const gm=ms.find(m=>m.group);if(!gm)return h;
   const s=S.P[u],team=teamOf(u,a.id),mates=teamMates(a.id,team,s.group),teams=[...new Set(Object.values(S.P).filter(p=>!p.away&&p.group===s.group).map(p=>teamOf(p.uid,a.id)).filter(Boolean))].sort();
@@ -1774,7 +1775,7 @@ function remSave(g,b){try{const n=ELWeek.now(g.id);if(!n||n.ls!==b.ls||!b.studs.
   const steps=M?M.items.map(x=>x.port?{port:x.port.f+" "+x.port.c}:{sk:elVoyage.sk(x.sk,true),t:x.t,pc:pc[x.key]}):beds.flatMap(z=>z.plants.map(q=>({sk:{n:"",i:"",c:"#475569"},t:q.name,pc:pc[q.key]})));
   const L=EL_LS.find(y=>y.id===ls);localStorage.setItem("el_rem_"+g.id,JSON.stringify({at:Date.now(),g:g.id,gname:g.name,ls:L?lsLabel(L):ls,N,lps,steps}))}catch(e){console.warn("finish reminder",e)}}
 const agLabOf=(gid,a)=>{const x=ELWeek.now(gid);return x&&x.p?agLab(Object.assign({gid},x),a):shortTi(a)};
-function briefBox(g,ls0){const b=brief(g,ls0);remSave(g,b);const t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
+function briefBox(g,ls0){const b=brief(g,ls0);remSave(g,b);const t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),nx=ELWeek.nextExam(g.id,S.D.ls);   // 📝 the group's next exam of any LS (the term exam too), never a past one (Roger, 25 Nov 2026)
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
   const N=b.studs.length,stat=(ic,lab,p,tip,go)=>`<a class="bst" href="${go.href||"#"}" ${go.href?`target="_blank" rel="noopener"`:`data-do="bgo" data-g="${g.id}" data-p="${go.p}" data-ls="${b.ls}"`} title="${esc(tip)} · ${esc(go.t)}">${elRing(p,"",40,tip)}<span><b>${ic} ${lab}</b><small>${p==null?"nothing yet":p+" % right"}</small></span></a>`;
   const gl=((window.EL_GAMES||[]).find(z=>z.course===g.course&&l&&String(z.ls||"").toLowerCase().endsWith(l.title.split(" · ").pop().toLowerCase()))||{}).ls||"",
@@ -1782,7 +1783,7 @@ function briefBox(g,ls0){const b=brief(g,ls0);remSave(g,b);const t=ELWeek.today(
   const lps=b.lps.length?b.lps.map(z=>`<a class="blp" href="#" data-do="bgo" data-g="${g.id}" data-p="students" data-ls="${b.ls}" data-lp="${esc(z.a.id)}" title="Open it in ${esc(g.name)}'s Students' progress table · ${esc(z.lab)}: on average ${z.pc??0} % of its steps done · ${z.fin} of ${N} students finished every step"><span class="bln">${esc(z.lab)}</span><span class="bbar"><i style="width:${z.pc||0}%;background:${bCol(z.pc)}"></i></span><b>${z.pc??0} %</b><small>${z.fin}/${N} finished</small></a>`).join("")
     :`<p class="muted">No learning path open for ${esc(g.name)} yet.</p>`;
   const exs=b.exams.map(e=>`<a class="bex" href="#" data-do="bgo" data-g="${g.id}" data-p="marks" data-ls="${e.l.id}" title="Open ${esc(g.name)}'s assessment details for ${lsLabel(e.l)}"><b>${lsLabel(e.l).split(" · ")[0]}</b> ${e.ex==null?`<span class="muted">exam not marked yet</span>`:`exam <b>${f1(e.ex)}</b> <small>(${e.n})</small>${e.ls!=null?` · LS mark <b>${f1(e.ls)}</b> <small>(${e.ln})</small>`:""}`}</a>`).join("");
-  return `<div class="brf c${g.course} ${ls0?"one":""}">${ls0?`<div class="bhd"><b>📊 How ${esc(g.name)} is doing</b><span>`:`<div class="bhr"><a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>`}${l?lsLabel(l):"No time plan yet"}${dn!=null&&dn>=0?` · exam ${dn===0?"today":dn===1?"tomorrow":"in "+dn+" days"}`:""}${when?" · "+when:""} · ${N} students</span>${ls0?"</div>":"</a>"+bCm(g,c)+"</div>"}`
+  return `<div class="brf c${g.course} ${ls0?"one":""}">${ls0?`<div class="bhd"><b>📊 How ${esc(g.name)} is doing</b><span>`:`<div class="bhr"><a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>`}${l?lsLabel(l):"No time plan yet"}${nx?` · 📝 ${esc(exTitle(nx))} ${exWhen(nx.n)}`:""}${when?" · "+when:""} · ${N} students</span>${ls0?"</div>":"</a>"+bCm(g,c)+"</div>"}`
     +`<div class="bcols"><div class="bcol"><h3>Work done in each learning path</h3><div class="blps">${lps}</div></div><div class="bcol">`
     +classRings(g,b)
     +`<h3>Assessment details <small class="muted">· average marks out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div>${xRings(g,b.xr)}</div>`}
@@ -1871,7 +1872,7 @@ function render0(){
   const lsSel=filters.slice(0,filters.indexOf("</select>")+9),stuF=`<span class="muted">Route:</span> `+["all","beginners","insecure","safe","daring","native","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"");
   const p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,grp.id):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
-  const head=`<div class="ph"><h1>${esc(grp.name)}</h1><div class="sub">${lsSel}${S.year?"":` <a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a>`} ${S.year?"":examTag(ex)}${!S.year&&VOY_COURSES.includes(grp.course)?` <a class="g vygo" href="#" data-do="place" data-p="voyage" title="Every student by steps done and LS mark so far: who is on course and who needs a push">⛵ Class voyage: who needs a push</a>`:""}</div></div>`;
+  const head=`<div class="ph"><h1>${esc(grp.name)}</h1><div class="sub">${lsSel}${S.year?"":` <a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a>`} ${S.year?"":nextExamTag(grp.id)}${!S.year&&VOY_COURSES.includes(grp.course)?` <a class="g vygo" href="#" data-do="place" data-p="voyage" title="Every student by steps done and LS mark so far: who is on course and who needs a push">⛵ Class voyage: who needs a push</a>`:""}</div></div>`;
   if(S.year){$("#main").innerHTML=placeHead(grp.name,"")+`<div class="bar">${filters}</div>`+yearView(grp,shown);return}
   if(S.reps){$("#main").innerHTML=placeHead(grp.name,"")+repView(grp,shown);return}
   const back=grp.name+" · "+lsLabel(EL_LS.find(l=>l.id===ls));
@@ -3248,9 +3249,14 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
   return `<div class="box rtbox">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
 function todo(studs,ls,list){   // studs: signed-in students only. Final product items and route requests from the students' boards (Roger, 30 Oct 2026); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
-  // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it in the Friday run, or you do it first
+  // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it himself, or you do it first. Each line says plainly what is left for you
+  // (Roger, 25 Nov 2026: "here it's unclear what I have to do … I'm tired of this"): who · where · the comment, then 👉 You: … with the buttons.
+  // A step sent back to redo is never here (ELMark.open: the Redo note is its answer).
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>{const h=handedIn(s.uid,a)[id],x=(S.D.rs[s.uid]||{})[a.id]||{},k=ELMark.asked(h,x,id)&&x.ask[id];
-    out.push(`${k?"🙋":"✉️"} <b>${name(s)}</b> ${k?"needs you on":"commented on"} <b>${esc(t)}</b> (${esc(a.title)}): “${esc(h.comment)}”${k?` <small class="muted">· Beltran: ${esc(k.why)}</small>`:` <small class="muted" title="Beltran answers a comment a few minutes after the student sends it (Friday 15:00 answers any left)">· Beltran answers it in a few minutes</small>`} <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button> <button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`)})));
+    const head=`${k?"🙋":"✉️"} <b>${name(s)}</b> · ${esc(t)} <small class="muted">(${esc(a.title)})</small> · comment: “${esc(h.comment)}”`,
+      nr=`<button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`;
+    out.push(head+(k?`<div class="todoyou">👉 <b>You:</b> answer the comment, or press <b>No reply needed</b> if there is nothing to say.${/redo/i.test(k.why||"")?" If the work is not a real try, press <b>Answer it</b> and use <b>↺ Redo</b> in the step instead.":""} <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer it</button> ${nr}</div><small class="muted">Beltran left it to you: ${esc(k.why)}</small>`
+      :`<div class="todoyou muted">Nothing for you yet: Beltran answers it himself. <button class="g" data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer it myself</button> ${nr}</div>`))})));
   // from any LS of the course, not only the one on screen: the board's 🎯 My level asks in the student's current LS (Roger, 8 Nov 2026)
   studs.forEach(s=>lvAsks(s.uid).forEach(([id,l])=>
     out.push(`🎯 <b>${name(s)}</b> asks for a level change: ${route(elRouteOf(S.D.lv[s.uid],id).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:' <small class="muted">· no reason given</small>'}${id!==ls?` <small class="muted">· in ${lsName(id)}</small>`:""} <button data-do="acc" data-u="${s.uid}" data-ls="${id}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}" data-ls="${id}">Decline</button>`)));
@@ -3338,6 +3344,7 @@ const REDO=ELMark.REDO;
 function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
   const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
   dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+    <div class="need"><b>👉 What's left for you:</b> decide if it is their own work. Press <b>✔ Accept</b> if it is, or <b>↺ Redo</b> to send it back (at the bottom).</div>
     <p><b>Why:</b> ${esc(f.why)}${f.at?` <small class="muted">(flagged on ${ELWeek.date(ymd(f.at))})</small>`:""}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
     <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
@@ -4495,7 +4502,49 @@ const isDone=(u,a)=>elAllDone(a,doneSet(u,a),(S.D.rs[u]||{})[a.id]);   // every 
 const dropTag=x=>{const dr=((x.p||{})._dropped||{})[x.gi]||[];if(!dr.length)return "";
   return `<div class="dropt">✂ Dropped (no time), not in the exam and not counted: ${dr.map(id=>{const a=byId(id),lab=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0];
     return `<b>${esc((lab?"LP"+lab+" ":"")+(a?a.title.split(/[:(]/)[0].trim():id))}</b> <button class="g mini" data-do="lpdrop" data-gid="${x.gid}" data-ls="${x.ls}" data-a="${esc(id)}" data-v="0" title="Count it again">↩</button>`}).join(" · ")}</div>`};
-const examTag=d=>{if(!d)return "";const n=ELWeek.days(ELWeek.today(),d);return `<span class="exam ${n<0?"past":""}">📝 Exam: ${ELWeek.date(d)}${n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"}</span>`};
+// a past exam is not shown (Roger, 25 Nov 2026: "the exam was done already it shouldnt be there")
+const examTag=d=>{if(!d)return "";const n=ELWeek.days(ELWeek.today(),d);if(n<0)return "";return `<span class="exam">📝 Exam: ${ELWeek.date(d)}${n>1?` · in ${n} days`:n===1?" · tomorrow":" · today"}</span>`};
+// 📝 Each group's next exam and the exams the teacher sets (Roger, 25 Nov 2026: "All the groups should be able to see when their next exam
+// is, and make an option for the teacher to set exams so that they appear at the top"): the group page's heading shows the next exam of
+// any LS (ELWeek.nextExam: the LS's own exam of the time plan, or one set here, e.g. the term exam), and a click opens 📝 Exam dates to add,
+// change or remove the group's exams. They are kept in ls/{ls}.exams[group] = [{d, t, tc, n, nc}] (title and note, English and Catalan for
+// Starter): students already read the LS docs, so their board shows the next exam at the top (today.html nextExamPill) with no new reads.
+const exWhen=n=>n>1?`in ${n} days`:n===1?"tomorrow":"today";
+const exTitle=x=>x.plan?((EL_LS.find(l=>l.id===x.ls)||{}).title||x.ls).split(" · ")[0]+" exam":x.t||x.tc||"Exam";
+function nextExamTag(gid){const x=ELWeek.nextExam(gid,S.D.ls);
+  return `<a href="#" class="exam" data-do="exdates" data-gid="${gid}" title="Students see their next exam at the top of their board. Click to add, change or remove this group's exam dates.">${x?`📝 Next exam: ${ELWeek.date(x.d)} · ${exWhen(x.n)} · ${esc(exTitle(x))}`:"📝 No exam coming · ＋ Set one"} ✏️</a>`}
+function exDates(gid,edit){const g=GR.find(x=>x.id===gid);if(!g)return;const t=ELWeek.today(),all=ELWeek.examsOf(gid,S.D.ls),cur=all.filter(x=>x.d>=t),old=all.filter(x=>x.d<t&&!x.plan);
+  const lss=EL_LS.filter(l=>l.course===g.course),e=edit?all.find(x=>!x.plan&&x.ls===edit.ls&&x.k===+edit.k):null,nw=ELWeek.now(gid),ls0=e?e.ls:(lss.find(l=>l.id===S.ls)||lss.find(l=>nw&&l.id===nw.ls)||lss[lss.length-1]||{}).id;
+  const row=x=>`<li><b>${ELWeek.date(x.d)}</b> <span class="muted">(${exWhen(ELWeek.days(t,x.d))})</span> · ${esc(exTitle(x))}${x.nt?` · <span class="muted">${esc(x.nt)}</span>`:""}`
+    +(x.plan?` <span class="muted">· from the 📅 Time plan (move it there)</span>`:` <button class="g mini" data-do="exdates" data-gid="${gid}" data-ls="${x.ls}" data-k="${x.k}">✏️ Change</button> <button class="g mini" data-do="exdel" data-gid="${gid}" data-ls="${x.ls}" data-k="${x.k}">🗑 Remove</button>`)+`</li>`;
+  const v=f=>esc(e?e[f]||"":"");
+  dlg(`<h2>📝 Exam dates · ${esc(g.name)}</h2><p class="muted">Students see the next one at the top of their board, with its title and note (in Catalan for Starter), and in their 📅 Agenda. A past exam is not shown.</p>`
+    +(cur.length?`<ul>${cur.map(row).join("")}</ul>`:`<p>No exam coming yet.</p>`)
+    +`<h3>${e?"✏️ Change this exam":"＋ Add an exam"}</h3><div class="exf">
+      <label>Day <input type="date" id="exD" value="${e?e.d:""}" min="${t}"></label>
+      <label>LS <select id="exL">${lss.map(l=>`<option value="${l.id}" ${l.id===ls0?"selected":""}>${lsLabel(l)}</option>`).join("")}</select></label>
+      <label class="w">Title <input id="exT" value="${v("t")}" placeholder="Term exam: LS1 + LS2"></label>
+      <label class="w">Note <input id="exN" value="${v("nt")}" placeholder="Study with 🧠 Flashcards"></label>
+      <label class="w">Title in Catalan (Starter) <input id="exTc" value="${v("tc")}" placeholder="Empty: translated for you"></label>
+      <label class="w">Note in Catalan (Starter) <input id="exNc" value="${v("nc")}" placeholder="Empty: translated for you"></label>
+      ${e?"":`<div class="w">For: ${GR.filter(x=>x.course===g.course).map(x=>`<label class="exg"><input type="checkbox" class="exG" value="${x.id}" ${x.id===gid?"checked":""}> ${esc(x.name)}</label>`).join(" ")}</div>`}
+    </div><div class="row"><button data-do="exsave" data-gid="${gid}" ${e?`data-ls="${e.ls}" data-k="${e.k}"`:""}>💾 Save</button>${e?` <button class="g" data-do="exdates" data-gid="${gid}">Cancel</button>`:""} <span id="exMsg" class="muted"></span></div>`
+    +(old.length?`<details><summary class="muted">Past exams set here (${old.length})</summary><ul>${old.map(x=>`<li>${ELWeek.date(x.d)} · ${esc(exTitle(x))} <button class="g mini" data-do="exdel" data-gid="${gid}" data-ls="${x.ls}" data-k="${x.k}">🗑 Remove</button></li>`).join("")}</ul></details>`:""))}
+// writes one group's exam list of one LS: ls/{ls}.exams[group] (the whole list; the other groups' lists stay as they are)
+function exPut(ls,gid,list){const i=S.D.ls[ls]=S.D.ls[ls]||{status:"hidden",enabled:[]};i.exams=Object.assign({},i.exams,{[gid]:list});if(DEMO)return null;return put(["ls",ls],{exams:{[gid]:list}})}
+const exList=(ls,gid)=>(((S.D.ls[ls]||{}).exams||{})[gid]||[]).slice();
+async function exSave(k){const d=$("#exD").value,ls=$("#exL").value,msg=$("#exMsg"),q=id=>$(id).value.replace(/\s+/g," ").trim();
+  if(!/^\d{4}-\d\d-\d\d$/.test(d))return msg.textContent="Choose the day.";
+  const o={d,t:q("#exT"),n:q("#exN"),tc:q("#exTc"),nc:q("#exNc")};if(!o.t)return msg.textContent="Write a title, e.g. Term exam: LS1 + LS2.";
+  msg.textContent="Saving…";
+  for(const [f,c] of [["t","tc"],["n","nc"]])if(o[f]&&!o[c])try{o[c]=(await annTranslate(o[f],"en","ca")).trim()}catch(e){}   // Catalan for Starter: a free translation when left empty
+  Object.keys(o).forEach(f=>{if(!o[f])delete o[f]});
+  const gs=k.ls!=null&&k.k!=null?[k.gid]:[...document.querySelectorAll(".exG:checked")].map(x=>x.value);if(!gs.length)return msg.textContent="Tick at least one group.";
+  const w=[];gs.forEach(gid=>{
+    if(k.ls!=null&&k.k!=null){const a=exList(k.ls,gid);a.splice(+k.k,1);if(k.ls===ls){a.splice(+k.k,0,o);w.push(exPut(ls,gid,a));return}w.push(exPut(k.ls,gid,a))}
+    const a=exList(ls,gid).filter(x=>!(x.d===o.d&&x.t===o.t));a.push(o);a.sort((x,y)=>x.d<y.d?-1:1);w.push(exPut(ls,gid,a))});
+  try{await Promise.all(w)}catch(e){msg.textContent="✗ Not saved: "+(e.code||e.message);return}
+  render();exDates(k.gid)}
 // Teacher checklist: every session line of a plan can be ticked; saved in teacherPlan/{group}.ticks["ls|line"] (teacher only).
 // Tips: EL_PLAN[ls].tips, [text found in the line, tip], shown under each line that contains the text (💡 Tips on/off).
 // x = {ls, p, gi, gid}: a plan, its column and the group.
@@ -5285,12 +5334,34 @@ function cmtBox(u,a,id,x,lite){const xr=res(u,a.id),rp=xr.replies||{},wait=waits
       :cmtGone(xr,x,id)?`<p class="muted">🗑 You removed Beltran's answer${cmtGone(xr,x,id).removed?" on "+esc(ymd(tms(cmtGone(xr,x,id).removed))):""}: the student sees no answer.</p>`:"")
     // lite (the correction dialog, wrOpen): what was sent for the step is already above it, so the box to answer shows only when nothing was sent
     +(lite&&rp[id]?(wait?`<div class="row" style="margin-top:4px"><button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button></div>`:""):`<p><b>${fb?((xr.fbWho||{})[id]==="teacher"?"✏️ Your correction of the work":"🤖 Correction of the work (sent by Beltran)"):ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div>`)}
+// 👉 What's left for you, on top of a student's activity window (Roger, 25 Nov 2026: "So it should be clearer"; "here it's unclear what I have to
+// do … I'm tired of this"): the things only Roger can do (a comment Beltran left to him, a possible copy, a final product to mark), each with
+// its button, or ✅ Nothing left for you here; then, in grey, what is moving without him (a step sent back to redo, a comment or a level
+// Beltran is doing). Nothing new is read.
+const redoOf=(u,a,id)=>{const fl=(res(u,a.id).flags||{})[id],h=handedIn(u,a)[id];return fl&&fl.done==="redo"&&!(String((h||{}).date||"")>String(fl.at||""))?fl:null};
+const redoWho=fl=>fl.auto?"Beltran":"you";
+function needBox(u,a){const x=res(u,a.id),H=handedIn(u,a),nm=id=>{const st=(a.steps||[]).find(z=>z[0]===id);return st?st[1]:tabName(a,id)},todo=[],info=[];
+  const nr=id=>`<button class="g mini" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`;
+  (a.steps||[]).forEach(([id])=>{const h=H[id];if(!h)return;const fl=redoOf(u,a,id);
+    if(fl)return info.push(`↺ <b>${esc(nm(id))}</b>: ${redoWho(fl)} sent it back to redo on ${esc(ELWeek.date(ymd(fl.at)))}. Nothing to do until the student hands it in again.`);
+    if(!waits(h,x,id))return;
+    if(ELMark.asked(h,x,id))todo.push(`💬 <b>${esc(nm(id))}</b>: answer the comment “${esc(h.comment)}” in the step below, or press ${nr(id)} if there is nothing to say.`
+      +(/redo/i.test(x.ask[id].why||"")?` If the work itself is not a real try, open <b>↺ Redo</b> in that step instead: it answers the comment too.`:""));
+    else info.push(`✉️ <b>${esc(nm(id))}</b>: Beltran answers the comment “${esc(h.comment)}” himself. ${nr(id)}`)});
+  Object.entries(x.flags||{}).forEach(([id,f])=>{if(f&&f.why&&!f.done)todo.push(`⚠️ <b>${esc(nm(id))}</b>: possible copy. Decide if it is their own work. <button class="mini" data-do="cpopen" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}">Check it</button>`)});
+  if(a.manual&&a.graded&&x.max==null&&Object.keys(H).length)todo.push(`🎬 Give the final product its mark below and press <b>Save</b>.`);
+  const g=G();if(g&&a.ls===S.ls&&!a.manual)(g.moments||[]).filter(m=>m.a===a.id&&!m.group).forEach(m=>{if(!H[m.step]||redoOf(u,a,m.step)||(x.flags||{})[m.step]&&!(x.flags||{})[m.step].done)return;
+    if(!m.c.every(c=>lvOf(u,a.id,m.step,c)))info.push(`📐 <b>${esc(m.name)}</b>: Beltran gives the level in the weekday run.`)});
+  const inf=info.length?`<ul>${info.map(t=>`<li class="info">${t}</li>`).join("")}</ul>`:"";
+  return todo.length?`<div class="need"><b>👉 What's left for you</b><ul>${todo.map(t=>`<li>${t}</li>`).join("")}</ul>${inf}</div>`
+    :`<div class="need ok"><b>✅ Nothing left for you here.</b> <span class="info">Everything below is only to look at, or to change if you want to.</span>${inf}</div>`}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{},cas=xr.answers||{};
   return `<label>Hand-ins and self-assessment</label>`+a.steps.map(([id,title])=>{const x=sp[id];if(!x)return `<details><summary class="muted">${esc(title)} · not handed in</summary></details>`;
     const wait=waits(x,xr,id),ca=cmtCa(xr,x,id);
-    return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Beltran left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Beltran":cmtGone(xr,x,id)?" · Beltran's answer removed":x.comment?" · no reply needed":""}</summary><div class="hand">`
+    const rd=redoOf(u,a,id);
+    return `<details ${wait?"open":""}><summary>${esc(title)} · ${rd?"↺ sent back to redo":"✓"} ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Beltran left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Beltran":cmtGone(xr,x,id)?" · Beltran's answer removed":x.comment&&!rd?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
       +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+(audioBox(x)||noAudio(x,id))
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
@@ -5307,7 +5378,7 @@ const HB_BACK={ca:"Les teves respostes no estan fetes: torna a fer aquest pas am
 function hbBackBox(u,a,id,x,xr){if(a.ls&&/-my-real-routine$/.test(a.ls))return "";
   const fl=(xr.flags||{})[id],lv=level(u,a.ls),L=!lv||lv==="beginners"?"ca":"en";   // Catalan only for Starter and no route (Base reads English since 21 Nov 2026)
   if(fl&&fl.done==="redo"&&fl.reopen&&!(String(x.date||"")>String(fl.at||"")))
-    return `<p class="muted">↺ Redo: you sent it back on ${esc(ELWeek.date(ymd(fl.at)))}: it counts as not done until they hand it in again.</p>`;
+    return `<p class="muted">↺ Redo: ${redoWho(fl)} sent it back on ${esc(ELWeek.date(ymd(fl.at)))}: it counts as not done until they hand it in again.</p>`;
   return `<details style="margin-top:8px"><summary><b>↺ Redo</b> <small class="muted">· send it back to the student</small></summary>
     <p class="muted">They get this message on top of the step (in ${L==="ca"?"Catalan":"English"}, their route's language; you can change it). The step counts as not done until they hand it in again.</p>
     <textarea id="hb-${esc(id)}" style="min-height:60px">${esc(HB_BACK[L])}</textarea>
@@ -6068,16 +6139,20 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
     state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
+    +needBox(u,a)
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===LATE?"✔ late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.checkpoint?cpPanel(u,a):"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
-    +levelRows(u,a)
-    +fpgBox(u,a)
-    +`<div id="fpman">`+(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
-    +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`
-    +(a.manual?fpStuRub(u,a):"")
-    +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`,a.manual&&!!fpRub(a));
+    +(a.manual?levelRows(u,a)+fpgBox(u,a)+`<div id="fpman"><label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`
+        +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`+fpStuRub(u,a)
+        +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`
+      // not a final product: the levels and the general feedback are Beltran's (weekday run), so they wait folded away unless you want them
+      // (Roger, 25 Nov 2026: the empty Levels and Feedback + Save looked like more work to do)
+      :`<details class="opt"><summary>✏️ Change a level or write general feedback <small class="muted">(optional: Beltran gives the levels${x.feedback?" · feedback written":""})</small></summary>`
+        +levelRows(u,a)+fpgBox(u,a)+`<div id="fpman"><label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`
+        +`<div class="row"><button data-do="save" data-u="${u}" data-a="${id}">Save feedback</button></div></details>`
+        +(x.locked?`<div class="row"><button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button></div>`:"")),a.manual&&!!fpRub(a));
 }
 
 // ---- 🎬 Gemini watches the final product video (Roger, 8 Nov 2026: "I give the video to Gemini and Gemini gives me the feedback, then if I
@@ -6848,6 +6923,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     agself:()=>{e.preventDefault();agSave(planX(k.ls,k.gid),ag=>{rmIt(ag,k.d,"self")})},
     agmore:()=>{e.preventDefault();S.agExt=S.agExt||{};const q=k.ls+"|"+k.gid;S.agExt[q]=(S.agExt[q]||0)+1;render()},
     sendto:()=>{e.preventDefault();sendTo(planX(k.ls,k.gid),+k.i,k.line,+k.dir,k.only||null)},
+    exdates:()=>{e.preventDefault();exDates(k.gid,k.ls!=null&&k.k!=null?{ls:k.ls,k:k.k}:null)},
+    exsave:()=>{e.preventDefault();exSave(k)},
+    exdel:()=>{e.preventDefault();const a=exList(k.ls,k.gid),x=a[+k.k];if(!x||!confirm(`Remove “${x.t||"Exam"}” on ${ELWeek.date(x.d)} for ${(GR.find(g=>g.id===k.gid)||{}).name}?`))return;a.splice(+k.k,1);
+      Promise.resolve(exPut(k.ls,k.gid,a)).then(()=>{render();exDates(k.gid)},er=>alert("Not saved: "+(er.code||er.message)))},
     lpdrop:()=>{e.preventDefault();const x=planX(k.ls,k.gid),a=byId(k.a),on=k.v==="1";
       if(on&&!confirm(`Drop “${a.title}” for ${(GR.find(g=>g.id===k.gid)||{}).name}?\n\nIt will not count in their LS grade, it has no due day (no late reminders) and it is marked “not in the exam”. Students can still open it. You can undo it.`))return;
       $("#dlg").open&&$("#dlg").close();quick(api.planEdit(x.ls,x.gid,"drop:"+a.id,on?{drop:true,at:Date.now()}:null))},

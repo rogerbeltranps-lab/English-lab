@@ -78,6 +78,7 @@ window.LP.native = {
     ] },
 
   log: { type: 'step', tab: 'Summary', title: 'Summary and response (C2 Proficiency writing, Part 1 skills)', pill: 'Your teacher sees it',
+    textFrom: 'read', textTitle: '📖 The text',   // the reading above the boxes (Roger, 25 Nov 2026)
     intro: 'Part 1 of the C2 Proficiency Writing paper asks you to summarise and evaluate the key ideas of two texts. Practise the first half here: compress the writer’s argument without copying it.',
     html: '<div class="model"><strong>Strategy · compress, don’t copy.</strong> Find the one sentence each paragraph exists to say. Then write it again with different words: nouns instead of clauses (<em>the persistence of these festivals</em>), and one linker for the turn in the argument (<em>Although purists…, the writer argues…</em>). Examiners penalise “lifting” whole phrases from the text.</div>',
     fields: [

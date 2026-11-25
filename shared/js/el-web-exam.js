@@ -21,7 +21,7 @@
 (function () {
   if (!window.EL_EXAM || window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
   const me = document.currentScript && document.currentScript.src; if (!me) return;
-  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=3', me).href; document.head.appendChild(s);
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=4', me).href; document.head.appendChild(s);
 })();
 (function () {
   const X = window.EL_EXAM; if (!X) return;

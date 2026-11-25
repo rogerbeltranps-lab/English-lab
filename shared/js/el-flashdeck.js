@@ -17,6 +17,7 @@
      ca: () => bool,                // Catalan (Starter)
      load: () => state, save: state => {},   // the student's progress { decks: { lsId: { c: { cardId: [...] }, log: { day: [...] } } } }
      say: x => {}                   // play a text or [word, example]
+     only: 'deckId'                 // optional: open straight on that deck, no list of LSs (Towards Nativeness › 🧠 Preposition flashcards)
    }) → { render(), close() } */
 (function (root) {
   if (root.ELFlashDeck) return;
@@ -60,7 +61,7 @@
 .elfd-ls .elfd-bar{width:100%;margin:8px 0 2px}.elfd-ls .go{align-self:flex-end;margin-top:6px;background:#6d28d9;color:#fff;border-radius:999px;padding:6px 16px;font-weight:800}
 .elfd-mixc{display:flex;align-items:center;gap:16px;width:100%;margin-top:4px;border:0;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,#0f766e,#0369a1);color:#fff;text-align:left;cursor:pointer;font:inherit;box-shadow:0 10px 26px rgba(3,105,161,.18)}.elfd-mixc:hover{filter:brightness(1.08)}.elfd-mixc:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}.elfd-mixc .ic{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.18);font-size:1.9rem}.elfd-mixc .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.elfd-mixc .tx>b{font-size:1.3rem;line-height:1.2}.elfd-mixc small{font-weight:600;font-size:.95rem}.elfd-mixc small span{color:#fff!important}.elfd-mixc .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}.elfd-mixc .chip{background:rgba(255,255,255,.2);border-radius:999px;padding:3px 10px;font-weight:700;font-size:.88rem}.elfd-mixc .chip b{margin-left:2px}.elfd-mixc .go{flex:none;background:#fff;color:#0f766e;border-radius:999px;padding:9px 20px;font-weight:800;font-size:1.05rem}.elfd-mixc:disabled{background:#e2e8f0;color:#334155;box-shadow:none;cursor:default}.elfd-mixc:disabled small span,.elfd-mixc:disabled .chip{color:#334155!important}.elfd-mixc:disabled .chip{background:#fff}@media (max-width:640px){.elfd-mixc{flex-wrap:wrap;gap:12px;padding:16px}.elfd-mixc .ic{width:46px;height:46px;font-size:1.5rem}.elfd-mixc .tx{flex-basis:calc(100% - 62px)}.elfd-mixc .tx>b{font-size:1.15rem}.elfd-mixc .go{width:100%;text-align:center}}
 .elfd-main{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;border:0;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,#6d28d9,#3157d5);color:#fff;text-align:left;cursor:pointer;font:inherit}
-.elfd-main b{font-size:1.3rem}.elfd-main small{font-weight:600;opacity:.95}.elfd-main small span{color:#fff!important}.elfd-main:disabled{background:#e2e8f0;color:#334155;cursor:default}
+.elfd-main b{font-size:1.3rem;color:#fff!important}.elfd-main small{font-weight:600;opacity:.95}.elfd-main small span{color:#fff!important}.elfd-main:disabled{background:#e2e8f0;color:#334155;cursor:default}
 .elfd-deck{border:1px solid #e5e7eb;border-radius:18px;padding:14px 16px;margin:10px 0;background:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .elfd-deck.all{background:linear-gradient(180deg,#f5f3ff,#fff);border-color:#ddd6fe}
 .elfd-deck h3{margin:0;font-size:1.08rem;flex:1 1 220px}.elfd-deck h3 small{display:block;color:#667085;font-weight:600;font-size:.85rem;margin-top:2px}
@@ -72,7 +73,7 @@
 .elfd-acts{display:flex;flex-wrap:wrap;gap:8px}
 .elfd-parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin:10px 0}
 .elfd-part{border:1px solid #e5e7eb;border-radius:16px;padding:12px 14px;background:#fff;text-align:left;cursor:pointer;font:inherit;color:inherit}
-.elfd-part:hover{box-shadow:0 10px 26px rgba(23,32,51,.08)}.elfd-part b{display:block}.elfd-part small{color:#667085}
+.elfd-part:hover{box-shadow:0 10px 26px rgba(23,32,51,.08)}.elfd-part b{display:block;color:#172033!important}.elfd-part small{color:#667085}
 .elfd-bar{height:8px;border-radius:99px;background:#eef2f7;overflow:hidden;display:flex;margin-top:8px}.elfd-bar i{display:block;height:100%}
 .elfd-full{position:fixed;inset:0;z-index:2147480000;display:flex;flex-direction:column;padding:16px clamp(14px,4vw,48px);background:#f5f7fb;overflow:auto;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 .elfd-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.elfd-top .grow{flex:1}.elfd-top .nm{font-weight:800;color:#475569}
@@ -132,7 +133,8 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const sync = () => { P = merge(o.load() || {}, P); P.decks = P.decks || {}; };
     const flush = () => { if (!dirty) return; dirty = false; sync(); o.save(P); };
     const saveSoon = (() => { let tm = null; return now => { clearTimeout(tm); if (now) { flush(); return; } tm = setTimeout(flush, 15e3); }; })();
-    let view = { k: 'list' }, ses = null, layer = null;
+    // o.only: a page with one deck of its own (Towards Nativeness › 🧠 Preposition flashcards) opens straight on that deck, with no LS list
+    let view = o.only ? { k: 'ls', id: o.only } : { k: 'list' }, ses = null, layer = null;
     // Which side comes first on a vocabulary card (Roger, 25 Nov 2026: "I want them to be able to choose whether they see the Catalan first or
     // the English first… it makes more sense to say Fer fotos means take pictures"; "when they are collocations first Catalan as a default"):
     // auto = a word of two or more words (a collocation, an expression) in Catalan first, a single word in English first; or always English /
@@ -252,7 +254,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const icon = k => k === 'g' ? '📘' : k === 'e' ? '💬' : '🃏';
     function lsPage(d) {
       const ps = partsOf(d), now = Date.now(), end = dayStart(now) + DAY, n = todayOf(d);
-      return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${t('Totes les LS', 'All LSs')}</button><button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Statistics')}</button></div>
+      return `<div class="elfd-head">${o.only ? '<span></span>' : `<button class="b g sm" data-fd="back">← ${t('Totes les LS', 'All LSs')}</button>`}<button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Statistics')}</button></div>
         <h3 style="margin:6px 0 10px">🧠 ${esc(d.name)}</h3>
         <button class="elfd-main" data-fd="study" data-v="${esc(d.id)}" ${n.all ? '' : 'disabled'}><b>▶ ${t('Estudia-ho tot barrejat', 'Study everything mixed')}</b>
           <small>${n.all ? `${n.all} ${t('targetes avui', 'cards today')}: ${todayLine(n)}` : t('Fet per avui ✓ Torna demà, o estudia una part aquí sota.', 'Done for today ✓ Come back tomorrow, or study one part below.')}</small></button>
@@ -326,7 +328,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       if (k === 'study' && d) start(d);
       else if (k === 'part' && d) start(d, el.dataset.p);
       else if (k === 'ls' || k === 'stats') { view = { k, id: v }; render(); host.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
-      else if (k === 'back') { view = view.k === 'stats' && view.id !== '*' ? { k: 'ls', id: view.id } : { k: 'list' }; render(); }
+      else if (k === 'back') { view = o.only ? { k: 'ls', id: o.only } : view.k === 'stats' && view.id !== '*' ? { k: 'ls', id: view.id } : { k: 'list' }; render(); }
       else if (k === 'close') close();
       else if (k === 'statsnow') { const id = ses.d.id; close(); view = { k: 'stats', id }; render(); }
       else if (k === 'show') { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }

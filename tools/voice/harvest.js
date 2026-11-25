@@ -28,6 +28,9 @@ for (const ls of ['2eso', '4eso'].flatMap(c => fs.readdirSync(path.join(ROOT, c)
   }
 }
 try { JSON.parse(fs.readFileSync(path.join(ROOT, 'flashcards/cards.json'), 'utf8')).forEach(c => add(c.term, 'flashcards')); } catch (e) {}
+// Towards Nativeness › 🧠 Preposition flashcards (data/my-latest-mistakes.js builds TN_PREP_CARDS from TN_PREPS)
+try { const w = {}; new Function('window', fs.readFileSync(path.join(ROOT, '4eso/towards-nativeness/data/my-latest-mistakes.js'), 'utf8'))(w);
+  (w.TN_PREP_CARDS || []).forEach(c => add(c.say, '4eso/towards-nativeness/my-latest-mistakes')); } catch (e) { console.warn('skip TN prepositions', e.message); }
 
 // pages: headless browser
 const pages = [];
@@ -54,7 +57,8 @@ const srv = http.createServer((q, r) => { const p = path.join(ROOT, decodeURICom
   }
   // 🧠 Flashcards of 🎯 Practise (lab/practice.html): every word, example and grammar / 💬 Expressions sentence, every course and route
   try {
-    const ctx = await b.newContext(); await ctx.addInitScript(() => { window.EL_DEMO_STUDENT = { teacher: true, harvest: true, group: '2ESOA', levels: {}, ls: {} }; });
+    const ctx = await b.newContext(); await ctx.addInitScript(() => { window.EL_DEMO_STUDENT = { teacher: true, harvest: true, group: '2ESOA', levels: {}, ls: {} };
+      try { localStorage.setItem('el_who', JSON.stringify({ role: 'teacher' })); } catch (e) {} });   // the teacher's own Towards Nativeness deck too
     const p2 = await ctx.newPage(); await p2.route(/gstatic|googleapis|firebase|google/, r => r.abort());
     await p2.goto('http://localhost:' + srv.address().port + '/lab/practice.html#deck'); await p2.waitForFunction(() => window.EL_PRACTICE_HARVEST, null, { timeout: 20000 });
     const got = await p2.evaluate(() => window.EL_PRACTICE_HARVEST());

@@ -178,6 +178,8 @@
   let pen = 'y';
   try { const p = localStorage.getItem('el_ul_pen'); if (PENS.concat('x').includes(p)) pen = p; } catch (e) {}
   function setPen(p) { pen = p; try { localStorage.setItem('el_ul_pen', p); } catch (e) {} doc.querySelectorAll('.el-ul-panel .el-ul-pen').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pen === p))); }
+  // the same text twice on a page (a Reading log shows the Reading tab's text again): marks made on one show on the other at once
+  function twins(box, list) { doc.querySelectorAll('.el-ul-box').forEach(b => { if (b !== box && b.__ulHash === box.__ulHash) draw(b, list); }); }
   function onBox(box) {
     let g = null, W = null, raf = 0;
     const list = () => store()[box.__ulHash] || [];
@@ -209,7 +211,7 @@
       else next = add(cur, s, en, pen);
       g = null; W = null;
       if (ok) { o[box.__ulHash] = tidy(next, textMap(box).text); save(); next = o[box.__ulHash]; }
-      draw(box, next);
+      draw(box, next); if (ok) twins(box, next);
     };
     box.addEventListener('pointerup', e => end(e, true));
     box.addEventListener('pointercancel', e => end(e, false));   // the page scrolled instead (an up or down swipe on a phone)
@@ -241,7 +243,7 @@
     clr.onclick = () => {
       if (!sure) { clr.classList.add('sure'); clr.textContent = t('sure'); sure = setTimeout(() => { sure = 0; clr.classList.remove('sure'); clr.textContent = t('clear'); }, 3000); return; }
       clearTimeout(sure); sure = 0; clr.classList.remove('sure'); clr.textContent = t('clear');
-      delete store()[box.__ulHash]; save(); draw(box, []);
+      delete store()[box.__ulHash]; save(); draw(box, []); twins(box, []);
     };
     p.querySelectorAll('button').forEach(guard);
     p.__close = close;

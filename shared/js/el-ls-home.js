@@ -28,7 +28,9 @@
 
   // ---- menus
   const boardHref=()=>who.role==="as"&&who.uid?ROOT+"today.html?student="+encodeURIComponent(who.uid):ROOT+"today.html";
-  const dashHref=()=>ROOT+"teacher.html?course="+COURSE+"&ls="+encodeURIComponent(LS);
+  // a personal LS (Towards Nativeness) is not an LS of its course on the dashboard: it opens its own ✦ page there, never a 4 ESO group
+  // (Roger, 25 Nov 2026: "Why do I only see 4ESO when I press this button")
+  const dashHref=()=>ROOT+(ls.personal?"teacher.html?g=tn":"teacher.html?course="+COURSE+"&ls="+encodeURIComponent(LS));
   const teach=()=>who.role==="teacher";
   function nav(){
     // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css): "🏠 My dashboard" → icon + label
