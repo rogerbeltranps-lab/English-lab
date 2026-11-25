@@ -25,7 +25,7 @@ const MODEL = process.env.EL_MODEL || 'eleven_v3';
 const VOICE = { James: 'Chris', Marc: 'Brian', Sam: 'Brian', Tom: 'Chris', Host: 'Brian', Jordi: 'Chris', Pere: 'Chris', David: 'George', Oriol: 'Brian' };
 const dry = process.argv.includes('--dry');
 const KEY = process.env.ELEVENLABS_API_KEY;
-const api = (p, o = {}) => fetch('https://api.elevenlabs.io' + p, { ...o, headers: { 'xi-api-key': KEY, 'content-type': 'application/json', ...(o.headers || {}) } });
+const api = (p, o = {}) => fetch('https://api.elevenlabs.io' + p, { ...o, headers: { 'xi-api-key': (KEY || '').trim(), 'content-type': 'application/json', ...(o.headers || {}) } });
 const hash = (v, s) => crypto.createHash('sha1').update(MODEL + '|' + v + '|' + s).digest('hex').slice(0, 16);
 const dur = f => +execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim();
 
@@ -47,13 +47,9 @@ if (dry) process.exit(0);
 fs.mkdirSync(CACHE, { recursive: true });
 if (todo.length) {
   if (!KEY) { console.error('Set ELEVENLABS_API_KEY'); process.exit(1); }
-  const r = await (await api('/v1/voices')).json();
-  const ids = {};
-  for (const name of new Set(Object.values(VOICE))) {
-    const v = (r.voices || []).find(x => new RegExp('^' + name + '\\b', 'i').test(x.name));
-    if (!v) { console.error('No voice named', name, 'in this account'); process.exit(1); }
-    ids[name] = v.voice_id; console.log('voice', v.name, v.voice_id);
-  }
+  // ElevenLabs' default voices have fixed ids, so no voice lookup is needed (a key without "Voices: read" permission can still record).
+  const ids = { Chris: 'iP95p4xoKVk53GoZ742B', Brian: 'nPczCjzI2devNBz1zQrb', George: 'JBFqnCBsd6RMkjVDRZzb' };
+  if (!/^sk_/.test(KEY.trim())) console.log('Warning: the key does not start with sk_ (length ' + KEY.trim().length + '). Is it the API key?');
   for (const l of todo) {
     const body = { text: l.text, model_id: MODEL, voice_settings: { stability: 0.5, similarity_boost: 0.75 } };
     const res = await api(`/v1/text-to-speech/${ids[l.voice]}?output_format=mp3_44100_128`, { method: 'POST', body: JSON.stringify(body) });
