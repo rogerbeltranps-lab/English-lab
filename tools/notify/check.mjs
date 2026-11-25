@@ -152,6 +152,8 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   if (SHOTS) { const r = await page.locator('#el-cloud-bar').boundingBox(); if (r) await shot(page, name + '-1b-bar-closeup', { x: Math.max(0, r.x - 30), y: Math.max(0, r.y - 70), width: Math.min(size[0] - Math.max(0, r.x - 30), r.width + 40), height: r.height + 80 }); }
   await bell.click();
   await page.waitForTimeout(500);
+  // the card loads add their items a moment later on a slow machine: give the list up to 4 s to hold the problem answer
+  await page.waitForFunction(() => /answered you/.test(document.getElementById('el-npanel')?.textContent || ''), null, { timeout: 4000 }).catch(() => {});
   const list = await page.locator('#el-npanel li').allTextContents();
   const txt = list.join('\n');
   if (process.env.DEBUG) console.log(name, list);
