@@ -29,6 +29,16 @@
     now(gid){const t=today(),ps=this.plans(gid).sort((a,b)=>span(a.p)[0]<span(b.p)[0]?-1:1);
       return ps.find(x=>span(x.p)[0]<=t&&t<=span(x.p)[1])||ps.find(x=>span(x.p)[0]>t)||ps[ps.length-1]||null},
     exam:(p,gi)=>p&&p.exam&&p.exam[gi]||null,
+    // 📝 The next exam of a group (Roger, 25 Nov 2026: "All the groups should be able to see when their next exam is, and make an option for
+    // the teacher to set exams so that they appear at the top"; "the exam was done already it shouldnt be there"): the earliest exam from today
+    // on, from the time plans (EL_PLAN[ls].exam, moved by the agenda's exam day) and from the exams the teacher sets on a group's dashboard page
+    // (ls/{ls}.exams[group] = [{d: "YYYY-MM-DD", t: title, tc: its Catalan, n: a note, nc: its Catalan}], e.g. the term exam). A past exam never
+    // shows. infos: {ls id: the LS doc as read (ELCloud.lsInfo)}. → {d, ls, n (days from today), t, tc, nt, nc, plan (true: the LS's own exam)} or null.
+    examsOf:(gid,infos)=>{const out=[];
+      Object.entries(window.EL_PLAN||{}).forEach(([ls,p])=>{const gi=col(p,gid),d=gi>=0&&p.exam&&p.exam[gi];if(d)out.push({d,ls,plan:true})});
+      Object.entries(infos||{}).forEach(([ls,i])=>{const l=i&&i.exams&&i.exams[gid];(Array.isArray(l)?l:[]).forEach((x,k)=>{if(x&&/^\d{4}-\d\d-\d\d$/.test(x.d||""))out.push({d:x.d,ls,k,t:x.t||"",tc:x.tc||"",nt:x.n||"",nc:x.nc||""})})});
+      return out.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(a.plan?-1:1))},
+    nextExam(gid,infos){const t=today(),x=this.examsOf(gid,infos).find(e=>e.d>=t);return x?Object.assign(x,{n:Math.round((day(x.d)-day(t))/864e5)}):null},
     // The class going on now by the timetable (EL_TIMETABLE in el-plan.js; Roger, 2 Nov 2026: "when I open the dashboard, the group
     // I have at that hour"): {gid, start "12:00", end "13:00", key} from 5 minutes before it starts until 5 minutes before it ends
     // (so it never overlaps the next one), or null (no class, weekend, a day in `off`). at: a Date, by default now (or EL_NOW).
