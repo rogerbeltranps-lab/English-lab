@@ -923,8 +923,10 @@ window.elMascotRefresh=()=>{const old=document.querySelector(".elcb-mz");if(!old
 // from the reads the cards already make (results copy, students/{uid}, the two card loads): nothing held shows early, no reads of its own.
 let nbellP=null,nbellEl=null,NTM=null;
 const nbFeed=f=>{if(nbellP)nbellP.then(nb=>{if(nb)f(nb)}).catch(e=>console.warn("notifications",e))};
+// Its language is the student's route: on the board the route was not known yet when the 📬 was built, so a Core student's 📬 came
+// out in Catalan (found by the real-use tests, 25 Nov 2026). findHomeLevel reads the levels the board reads anyway (myLevels, once).
 function nbellStart(u){const id=AS?AS.uid:u.uid,ro=!!AS;
-  return import("./el-notify.js").then(m=>{NTM=m;const nb=m.studentBell({uid:id,en:repEn(),ro});nbellEl=nb.el;draw(user);
+  return (myLevel||homeLevel?Promise.resolve():findHomeLevel(AS||u)).then(()=>import("./el-notify.js")).then(m=>{NTM=m;const nb=m.studentBell({uid:id,en:repEn(),ro});nbellEl=nb.el;draw(user);
     loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
       .then(()=>Promise.all([import("./el-corrections.js"),import("./el-exam-notice.js"),myResults(id),myDoc(id)]))
       .then(([C,X,rs,me])=>m.resultItems({rs,me,corr:C.corrList,examSig:X.examSig,course:courseOf(myGroup),root:ROOT,board:BOARD,en:repEn(),
