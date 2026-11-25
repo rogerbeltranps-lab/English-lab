@@ -102,5 +102,5 @@ var learningSupport = {
 (function () {
   if (window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
   const me = document.currentScript && document.currentScript.src; if (!me) return;
-  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=2', me).href; document.head.appendChild(s);
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=3', me).href; document.head.appendChild(s);
 })();

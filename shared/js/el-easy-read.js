@@ -11,6 +11,7 @@
 (function (root) {
   if (root.ELEasyRead) return;
   if (/my-real-routine/.test(location.pathname)) return;
+  const ME = document.currentScript && document.currentScript.src;
   const KEY = 'el_easy_read';
   const OPTS = ['big', 'plain', 'cream', 'ruler', 'letters'];
   const DEF = { on: false, big: true, plain: true, cream: false, ruler: false, letters: false };
@@ -192,5 +193,7 @@
   css(); apply();
   const go = () => { scan(); new MutationObserver(scan).observe(doc.body, { childList: true, subtree: true }); };
   if (doc.body) go(); else doc.addEventListener('DOMContentLoaded', go);
+  // 🖍 Underline (Roger, 25 Nov 2026): its button sits beside this one (shared/js/el-underline.js)
+  if (ME && !root.ELUnderline && !doc.querySelector('script[src*="el-underline.js"]')) { const u = doc.createElement('script'); u.src = new URL('el-underline.js?v=1', ME).href; doc.head.appendChild(u); }
   root.addEventListener('storage', e => { if (e.key === KEY) { try { S = Object.assign({}, DEF, JSON.parse(e.newValue || '{}')); } catch (x) {} apply(); } });
 })(window);
