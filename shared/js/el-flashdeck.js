@@ -18,6 +18,7 @@
      load: () => state, save: state => {},   // the student's progress { decks: { lsId: { c: { cardId: [...] }, log: { day: [...] } } } }
      say: x => {}                   // play a text or [word, example]
      only: 'deckId'                 // optional: open straight on that deck, no list of LSs (Towards Nativeness › 🧠 Preposition flashcards)
+     names: { all, choose, chooseHow, mix, stats }   // optional: the page's own words instead of "LS" (Towards Nativeness › 🧠 My flashcards)
    }) → { render(), close() } */
 (function (root) {
   if (root.ELFlashDeck) return;
@@ -123,6 +124,8 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
   function mount(host, o) {
     css();
     const ca = () => !!(o.ca && o.ca()), t = (c, e) => ca() ? c : e;
+    // o.names: the page's own words for the decks (Towards Nativeness › 🧠 My flashcards has decks, not LSs): all, choose, chooseHow, mix, stats
+    const N = (k, c, e) => (o.names && o.names[k]) || t(c, e);
     const say = x => { try { (o.say || (y => root.ELVoice && root.ELVoice.say(y)))(x); } catch (e) {} };
     let P = o.load() || {}; P.decks = P.decks || {};
     const D = id => (P.decks[id] = P.decks[id] || { c: {}, log: {} });
@@ -173,7 +176,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       n.newToday = Math.max(0, Math.min(n.new, NEW_PER_DAY - today));
       return n;
     }
-    const allDeck = ds => ({ id: '*', name: t('Totes les meves LS', 'All my LSs'), cards: ds.flatMap(d => d.cards.map(c => Object.assign({}, c, { deck: d.id }))), parts: false });
+    const allDeck = ds => ({ id: '*', name: N('all', 'Totes les meves LS', 'All my LSs'), cards: ds.flatMap(d => d.cards.map(c => Object.assign({}, c, { deck: d.id }))), parts: false });
     const deckOfCard = (d, c) => c.deck || d.id;
 
     // ---------- a study session ----------
@@ -231,7 +234,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
           ${n.all ? `<span class="big">${n.all}</span><small>${t('targetes per estudiar avui', 'cards to study today')}</small><small class="ln">${todayLine(n)}</small>` : `<span class="big ok">✓</span><small>${t('Fet per avui', 'Done for today')}</small><small class="ln">&nbsp;</small>`}
           ${bar(s)}<small>${d.cards.length} ${t('targetes', 'cards')} · ${Math.round((s.mat + s.young) / s.n * 100)}% ${t('apreses', 'learnt')}</small><span class="go">${t('Obre', 'Open')} ›</span></button>`; };
       const all = ds.length > 1 ? todayOf({ id: '*' }) : null;
-      return `<div class="elfd-head"><div><h3>${t('Tria una LS', 'Choose an LS')}</h3><p>${t('Cada LS té les seves targetes amb el vocabulari i la gramàtica que heu fet a classe.', 'Each LS has its own cards with the vocabulary and grammar you have done in class.')}</p></div>
+      return `<div class="elfd-head"><div><h3>${N('choose', 'Tria una LS', 'Choose an LS')}</h3><p>${N('chooseHow', 'Cada LS té les seves targetes amb el vocabulari i la gramàtica que heu fet a classe.', 'Each LS has its own cards with the vocabulary and grammar you have done in class.')}</p></div>
         <div class="elfd-side">${mzHead()}<button class="b g" data-fd="stats" data-v="*">📊 ${t('Les meves estadístiques', 'My statistics')}</button></div></div>
         <div class="elfd-lss">${ds.map(card).join('')}</div>
         ${all ? mixCard(ds, all) : ''}`;
@@ -241,7 +244,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     function mixCard(ds, all) {
       const chips = ds.map(d => { const n = todayOf(d).all; return `<span class="chip">${esc(String(d.name).split(' · ')[0])} <b>${n || '✓'}</b></span>`; }).join('');
       return `<button class="elfd-mixc" data-fd="study" data-v="*" ${all.all ? '' : 'disabled'}><span class="ic" aria-hidden="true">🔀</span>
-        <span class="tx"><b>${t('Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}</b>
+        <span class="tx"><b>${N('mix', 'Estudia totes les meves LS barrejades', 'Study all my LSs mixed')}</b>
         <small>${all.all ? `${all.all} ${t('targetes avui', 'cards today')}: ${todayLine(all)}` : t('Fet per avui ✓ Torna demà!', 'Done for today ✓ Come back tomorrow!')}</small>
         <span class="chips">${chips}</span></span>${all.all ? `<span class="go">▶ ${t('Comença', 'Start')}</span>` : ''}</button>`;
     }
@@ -254,7 +257,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const icon = k => k === 'g' ? '📘' : k === 'e' ? '💬' : '🃏';
     function lsPage(d) {
       const ps = partsOf(d), now = Date.now(), end = dayStart(now) + DAY, n = todayOf(d);
-      return `<div class="elfd-head">${o.only ? '<span></span>' : `<button class="b g sm" data-fd="back">← ${t('Totes les LS', 'All LSs')}</button>`}<button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Statistics')}</button></div>
+      return `<div class="elfd-head">${o.only ? '<span></span>' : `<button class="b g sm" data-fd="back">← ${N('all', 'Totes les LS', 'All LSs')}</button>`}<button class="b g" data-fd="stats" data-v="${esc(d.id)}">📊 ${t('Estadístiques', 'Statistics')}</button></div>
         <h3 style="margin:6px 0 10px">🧠 ${esc(d.name)}</h3>
         <button class="elfd-main" data-fd="study" data-v="${esc(d.id)}" ${n.all ? '' : 'disabled'}><b>▶ ${t('Estudia-ho tot barrejat', 'Study everything mixed')}</b>
           <small>${n.all ? `${n.all} ${t('targetes avui', 'cards today')}: ${todayLine(n)}` : t('Fet per avui ✓ Torna demà, o estudia una part aquí sota.', 'Done for today ✓ Come back tomorrow, or study one part below.')}</small></button>
@@ -278,7 +281,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
         cells.push(`<span class="${n ? 'l' + (n < 10 ? 1 : n < 30 ? 2 : n < 60 ? 3 : 4) : ''}${tt === today0 ? ' td' : ''}" title="${new Date(tt).toLocaleDateString()} · ${n}"></span>`); }
       const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '–';
       const ps = d.id === '*' ? [] : partsOf(d);
-      return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${d.id === '*' ? t('Totes les LS', 'All LSs') : esc(d.name)}</button></div><h3 style="margin:6px 0 6px">📊 ${d.id === '*' ? t('Les meves estadístiques · totes les LS', 'My statistics · all my LSs') : esc(d.name)}</h3>
+      return `<div class="elfd-head"><button class="b g sm" data-fd="back">← ${d.id === '*' ? N('all', 'Totes les LS', 'All LSs') : esc(d.name)}</button></div><h3 style="margin:6px 0 6px">📊 ${d.id === '*' ? N('stats', 'Les meves estadístiques · totes les LS', 'My statistics · all my LSs') : esc(d.name)}</h3>
         <h4>${t('Avui', 'Today')}</h4><div class="elfd-stat"><div><b>${td[0]}</b><small>${t('targetes estudiades', 'cards studied')}</small></div><div><b>${Math.round(td[2] / 60)} min</b><small>${t('de temps', 'of study')}</small></div>
           <div><b>${pct(td[1], td[0])}</b><small>${t('encertades', 'right')} (${td[0] - td[1]} ${t('cops “De nou”', '× Again')})</small></div><div><b>${td[3]}</b><small>${t('targetes noves', 'new cards')}</small></div></div>
         <div class="elfd-stat"><div><b>${root.ELMascot ? ELMascot.badge(streak) : '⚡ ' + streak}</b><small>${t(streak === 1 ? 'dia seguit' : 'dies seguits', streak === 1 ? 'day in a row' : 'days in a row')}</small></div><div><b>${pct(rok, rv)}</b><small>${t('record (repassos, 30 dies)', 'remembered (reviews, 30 days)')}</small></div></div>

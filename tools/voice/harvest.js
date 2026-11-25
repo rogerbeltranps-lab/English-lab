@@ -28,9 +28,13 @@ for (const ls of ['2eso', '4eso'].flatMap(c => fs.readdirSync(path.join(ROOT, c)
   }
 }
 try { JSON.parse(fs.readFileSync(path.join(ROOT, 'flashcards/cards.json'), 'utf8')).forEach(c => add(c.term, 'flashcards')); } catch (e) {}
-// Towards Nativeness › 🧠 Preposition flashcards (data/my-latest-mistakes.js builds TN_PREP_CARDS from TN_PREPS)
-try { const w = {}; new Function('window', fs.readFileSync(path.join(ROOT, '4eso/towards-nativeness/data/my-latest-mistakes.js'), 'utf8'))(w);
-  (w.TN_PREP_CARDS || []).forEach(c => add(c.say, '4eso/towards-nativeness/my-latest-mistakes')); } catch (e) { console.warn('skip TN prepositions', e.message); }
+// Towards Nativeness › 🧠 My flashcards and 🧠 Preposition flashcards (data/flashcards.js builds TN_FLASH_DECKS from the learning paths,
+// TN_MISTAKES and TN_PREP_CARDS): the same lines as tools/towards-nativeness/cards-lines.cjs (Chris records them where Roger pays for it)
+try { const D = path.join(ROOT, '4eso/towards-nativeness/data/'), w = { TN_LPS: [] };
+  for (const f of ['talking-to-your-tech', 'getting-things-done', 'telling-the-story', 'writing-like-a-teacher']) { new Function('window', fs.readFileSync(D + f + '.js', 'utf8'))(w); w.TN_LPS.push(w.LP); }
+  for (const f of ['my-latest-mistakes', 'flashcards']) new Function('window', fs.readFileSync(D + f + '.js', 'utf8'))(w);
+  w.TN_FLASH_DECKS().forEach(d => d.cards.forEach(c => { add(c.say, '4eso/towards-nativeness/flashcards'); if (c.kind === 'v' && c.ex) add(c.ex, '4eso/towards-nativeness/flashcards'); }));
+} catch (e) { console.warn('skip TN flashcards', e.message); }
 
 // pages: headless browser
 const pages = [];

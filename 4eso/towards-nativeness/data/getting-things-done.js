@@ -39,7 +39,7 @@ window.LP = {
         { q: 'I’m ___ the document you asked for.', a: ['attaching', 'sending'] },
         { q: 'I’ll ___ them up if they don’t answer by Friday.', a: ['chase'] },
         { q: 'I keep putting it ___. I really need to get it over with.', a: ['off'] },
-        { q: 'I’m not ___ on the new colours, to be honest.', a: ['sold'] },
+        { q: 'I’m not ___ on the new colors, to be honest.', a: ['sold'] },
         { q: 'I finally got around to ___ the old learning paths.', a: ['fixing', 'checking', 'updating', 'deleting'] }
       ] },
 
@@ -75,7 +75,7 @@ window.LP = {
         ['Marc', 'That sounds fair. And the parents who haven’t replied about the trip?'],
         ['Claire', 'I’ll chase them up. I’m sending the reminder as we speak, actually. There, done.'],
         ['Marc', 'Great. Anything else?'],
-        ['Claire', 'Just one. The new website. I’m not sold on the colours. Could you ask the students to vote on two options? Let them choose, it’s their site.'],
+        ['Claire', 'Just one. The new website. I’m not sold on the colors. Could you ask the students to vote on two options? Let them choose, it’s their site.'],
         ['Marc', 'Good idea. I’ll make a quick poll.'],
         ['Claire', 'Lovely. Right, I think that’s everything. Thanks, Marc, you’re doing a great job.']
       ] },
@@ -86,7 +86,7 @@ window.LP = {
         { q: 'What does the head want the reports to be like?', o: ['shorter, with one comment per student', 'longer and more detailed', 'the same as last year'] },
         { q: 'How do they solve the problem of the reports?', o: ['They share them out by year group.', 'Claire does them all.', 'They ask the head for more time.'] },
         { q: 'What is Claire doing while she talks about the parents?', o: ['sending the reminder', 'writing the poll', 'making the exam'] },
-        { q: 'How will they choose the website colours?', o: ['The students will vote on two options.', 'Claire will decide.', 'The head will choose.'] }
+        { q: 'How will they choose the website colors?', o: ['The students will vote on two options.', 'Claire will decide.', 'The head will choose.'] }
       ] },
 
     { id: 'movie', type: 'movie', tab: '🎬 Movie dictation', title: 'Movie dictation: going for it', pill: 'Real films',

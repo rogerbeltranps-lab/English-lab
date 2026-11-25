@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+<meta charset="utf-8"><meta name="google" content="notranslate"><script src="tn-night.js?v=20261121b"></script>
+  <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#315f9f">
+<title>🧠 My flashcards · Towards Nativeness</title>
+<!-- 🧠 My flashcards (Roger, 25 Nov 2026: "I want to have Toward American Nativeness Flashcards too"): Roger's own spaced-repetition
+     decks from the whole course (data/flashcards.js), opened from the Towards Nativeness home. Never linked from a student page. -->
+<link rel="stylesheet" href="../../shared/css/layout.css">
+<link rel="stylesheet" href="../../shared/css/topbar.css">
+<style>
+:root{--accent:#315f9f;--dark:#234777;--soft:#edf4ff;--line:#dbe5f1;--ink:#172033;--muted:#687386}
+body{background:#f7f9fd;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;margin:0}
+html,body{overflow-x:clip}
+.topbar{background:rgba(35,71,119,.97)!important;box-shadow:0 4px 18px rgba(35,71,119,.16)!important}
+.topbar .brand a{color:#fff;font-weight:700;text-decoration:none;margin-right:14px}
+.topbar .brand-title{color:#fff;font-weight:800}.topbar .brand-title small{display:block;color:#d8e8ff!important;font-weight:600}
+.tnf-hero{padding:26px 0 8px}.tnf-hero h1{margin:4px 0 6px;font-size:clamp(1.7rem,4vw,2.4rem)}.tnf-hero p{margin:0;color:var(--muted);max-width:70ch;line-height:1.5}
+.tnf-hero .eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem}
+#tnFlash{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;margin:16px 0 40px;box-shadow:0 14px 38px rgba(49,95,159,.10)}
+#tnFlash,#tnFlash button,.elfd-full,.elfd-full button{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.tnf-hint{display:block;font-size:.95rem;font-weight:700;color:#667085;letter-spacing:0;margin-bottom:6px}
+.elfd-front em{color:#b42318!important;text-decoration:underline wavy #f04438 2px;text-underline-offset:5px}
+@media (max-width:640px){#tnFlash{padding:12px;border-radius:16px}.tnf-hero{padding-top:16px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+  <div class="brand"><a href="index.html">← Towards Nativeness</a><span class="brand-title">🧠 My flashcards<small>Towards Nativeness</small></span></div>
+</div></div>
+<header class="tnf-hero"><div class="wrap">
+  <span class="eyebrow">Towards Nativeness · Spaced repetition</span>
+  <h1>🧠 My flashcards</h1>
+  <p>Your own mistakes, prepositions and expressions from every learning path, as flashcards. Say the answer out loud, turn the card, and tap <b>Again</b>, <b>Hard</b>, <b>Good</b> or <b>Easy</b>: each card comes back just before you forget it. American English. New lists and steps add their cards by themselves.</p>
+</div></header>
+<main class="wrap"><div id="tnFlash"></div></main>
+
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-voice.js"></script>
+<script src="../../shared/js/el-flashdeck.js?v=20261125g"></script>
+<script src="../../shared/js/el-mascot.js?v=20261125"></script>
+<script>window.TN_LPS = [];</script>
+<script src="data/talking-to-your-tech.js?v=20261125"></script><script>TN_LPS.push(window.LP);</script>
+<script src="data/getting-things-done.js?v=20261125"></script><script>TN_LPS.push(window.LP);</script>
+<script src="data/telling-the-story.js?v=20261125"></script><script>TN_LPS.push(window.LP);</script>
+<script src="data/writing-like-a-teacher.js?v=20261125"></script><script>TN_LPS.push(window.LP);</script>
+<script src="data/my-latest-mistakes.js?v=20261125q"></script>
+<script src="audio/cards/index.js?v=20261125"></script>
+<script src="data/flashcards.js?v=20261125"></script>
+<script>
+(function () {
+  const host = document.getElementById('tnFlash'), K = 'tnFlash';
+  try { const old = localStorage.getItem('tnPrepDeck'); if (old && !localStorage.getItem(K)) localStorage.setItem(K, old); } catch (e) {}   // the 🧠 Preposition flashcards step's first copy
+  const load = () => { try { return JSON.parse(localStorage.getItem(K) || '{}'); } catch (e) { return {}; } };
+  const decks = window.TN_FLASH_DECKS();
+  ELFlashDeck.mount(host, { decks: () => decks, ca: () => false, say: x => TN_SAY(x), load, save: x => { try { localStorage.setItem(K, JSON.stringify(x)); } catch (e) {} }, me: () => null,
+    names: { all: 'All my decks', choose: 'Choose a deck', chooseHow: 'Your slips, your prepositions and each learning path, each with its own cards.', mix: 'Study all my decks mixed', stats: 'My statistics · all my decks' } });
+})();
+</script>
+<script type="module" src="../../shared/js/el-cloud.js"></script>
+</body>
+</html>

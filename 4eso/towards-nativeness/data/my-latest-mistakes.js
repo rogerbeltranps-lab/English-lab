@@ -26,7 +26,7 @@ window.TN_MISTAKES = [
     { s: 'To me it’s very difficult to improve.', bad: 'To me', fix: ['For me'], why: 'Difficulty: <strong>for me</strong>. <em>To me</em> = in my opinion.' },
     { s: 'The bonus is for the activities that were due to before the exam.', bad: 'due to before', fix: ['due before'], why: '<strong>due</strong> + a time: due before Monday, due on Friday. <em>Due to</em> = because of.' },
     { s: 'We are at the 2nd term already.', bad: 'at the 2nd term', fix: ['in the 2nd term', 'in the second term'], why: '<strong>in</strong> a term, a week, a year; <em>at</em> is for a point: at the end of the term.' },
-    { s: 'The speaking should count for the diagram.', bad: 'count for', fix: ['count towards', 'count toward'], why: 'Work <strong>counts towards</strong> a mark, a grade or a total.', ca: 'Els primers intents no compten per a la nota.', en: ['First tries don’t count towards the mark', 'First tries do not count towards the mark', 'First tries don’t count toward the mark', 'First tries don’t count towards the grade', 'First tries don’t count toward the grade', 'First attempts don’t count towards the mark', 'First attempts don’t count towards the grade'] },
+    { s: 'The speaking should count for the diagram.', bad: 'count for', fix: ['count toward', 'count towards'], why: 'Work <strong>counts toward</strong> a mark, a grade or a total.', ca: 'Els primers intents no compten per a la nota.', en: ['First tries don’t count toward the mark', 'First tries don’t count toward the grade', 'First tries don’t count towards the mark', 'First tries do not count towards the mark', 'First tries don’t count towards the grade', 'First attempts don’t count towards the mark', 'First attempts don’t count towards the grade'] },
     { s: 'We are not tiquismiquis with the number of words.', bad: 'tiquismiquis with', fix: ['fussy about', 'picky about'], why: '<em>tiquismiquis</em> = <strong>fussy / picky</strong>, and you are fussy <strong>about</strong> something.' },
     { s: 'Are the marks on the table?', bad: 'on the table', fix: ['in the table'], why: 'Marks are <strong>in</strong> a table (inside its cells). <em>On the table</em> = on the furniture.', ca: 'Les notes ja són a la taula?', en: ['Are the marks in the table yet', 'Are the marks already in the table', 'Are the marks in the table already', 'Are the grades in the table yet', 'Are the grades already in the table'] },
     { s: 'Do the reports of all students.', bad: 'reports of all students', fix: ['reports for all students', 'reports for all the students'], why: 'A report is made <strong>for</strong> someone.' },
@@ -140,7 +140,7 @@ window.TN_MISTAKES = [
     { s: 'Again, the text it’s not the same for everyone.', bad: 'the text it’s not', fix: ['the text isn’t', 'the text is not'], why: 'No extra <em>it</em> after the subject.' },
     { s: 'I’d like to explain a little introduction to the concepts.', bad: 'explain a little introduction', fix: ['give a short introduction', 'give a brief introduction'], why: '<strong>give</strong> an introduction; a <strong>short</strong> one.' },
     { s: 'I want to copy it, not moved.', bad: 'not moved', fix: ['not move it'], why: 'Same form on both sides: copy it, not move it.' },
-    { s: 'Do students can add notes wherever they want?', bad: 'Do students can', fix: ['Can students'], why: 'Never <em>do</em> with a modal.', ca: 'Els alumnes poden canviar el color?', en: ['Can students change the colour', 'Can students change the color', 'Can the students change the colour', 'Can the students change the color'] },
+    { s: 'Do students can add notes wherever they want?', bad: 'Do students can', fix: ['Can students'], why: 'Never <em>do</em> with a modal.', ca: 'Els alumnes poden canviar el color?', en: ['Can students change the color', 'Can students change the colour', 'Can the students change the colour', 'Can the students change the color'] },
     { s: 'They are too many activities.', bad: 'They are', fix: ['There are'], why: '<em>hi ha</em> → <strong>there are</strong>.', ca: 'Hi ha massa preguntes en aquesta secció.', en: ['There are too many questions in this section'] },
     { s: 'I need messages to explain them how it works.', bad: 'explain them how', fix: ['explain how', 'explain to them how'], why: 'explain something (to someone), never <em>explain them</em>.', ca: 'Explica’ls com funciona.', en: ['Explain to them how it works', 'Explain how it works to them'] },
     { s: 'The heading should appear on top.', bad: 'on top', fix: ['at the top'], why: '<strong>at the top</strong> of a page.' },
@@ -268,7 +268,7 @@ window.TN_PREPS = [
   { q: 'Starters do an exam that is more difficult ___ them.', a: ['for'], en: 'difficult / easy / hard for someone.' },
   { q: '___ me, it’s very difficult to improve.', a: ['For'], en: 'difficulty: for me (to me = in my opinion).' },
   { q: 'We’re already ___ the 2nd term.', a: ['in'], en: 'in a term / a week / a year.' },
-  { q: 'Speaking should count ___ the diagram.', a: ['towards', 'toward'], en: 'count towards a mark / a total.' },
+  { q: 'Speaking should count ___ the diagram.', a: ['toward', 'towards'], en: 'count toward a mark / a total.' },
   { q: 'We are not fussy ___ the number of words.', a: ['about'], en: 'fussy / picky about something.' },
   { q: 'Are the marks ___ the table?', a: ['in'], en: 'in a table: inside its cells.' },
   { q: 'Do the reports ___ all the students.', a: ['for'], en: 'a report for someone.' },
@@ -379,8 +379,8 @@ window.TN_PREPS = [
   /* 🧠 Preposition flashcards (Roger, 25 Nov 2026: "create a flashcard deck of prepositions with my slips"; "It should only be in Towards
      Nativeness, not for the students"): every TN_PREPS slip is a card (the sentence with a gap → the sentence with the preposition and the
      rule), studied with spaced repetition like 🧠 Flashcards (shared/js/el-flashdeck.js, opened straight on this one deck). Only on this
-     page, never in lab/practice.html. Not a step: nothing to finish. Progress: localStorage tnPrepDeck (a tn… key, so it follows Roger's
-     account). Voice: Kokoro Heart (tools/voice/harvest.js reads TN_PREPS). Right after 📍 in / on / at. */
+     page, never in lab/practice.html. Not a step: nothing to finish. Progress: localStorage tnFlash (a tn… key, so it follows Roger's
+     account), shared with 🧠 My flashcards (flashcards.html), where this is the 📍 My prepositions deck. Voice: Kokoro Heart (tools/voice/harvest.js reads TN_PREPS). Right after 📍 in / on / at. */
   const P = window.TN_PREPS || [], GAPS = /_{2,}/g, esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const filled = (it, mk) => { const n = (it.q.match(GAPS) || []).length, w = String(it.a[0]).split(/\s*\/\s*|\s+/); let k = 0;
     return esc(it.q).replace(GAPS, () => mk(n > 1 ? w[k++] || '' : it.a[0])); };
@@ -391,8 +391,10 @@ window.TN_PREPS = [
     pill: 'Spaced repetition', intro: 'Every preposition slip you’ve made, as a flashcard. Say the missing word aloud, turn the card, then tap how well you knew it: each card comes back when you need it. Up to 15 new cards a day.',
     html: '<style>#tnPrepDeck,#tnPrepDeck button{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}</style><div id="tnPrepDeck"></div>',   // the deck in its own plain font, not the notebook look's
     after() { const host = document.getElementById('tnPrepDeck'); if (!host || !window.ELFlashDeck) return;
-      const load = () => { try { return JSON.parse(localStorage.getItem('tnPrepDeck') || '{}'); } catch (e) { return {}; } };
-      ELFlashDeck.mount(host, { decks: () => [{ id: 'tn-prepositions', name: '📍 My prepositions', cards: window.TN_PREP_CARDS }], only: 'tn-prepositions', ca: () => false,
-        load, save: x => { try { localStorage.setItem('tnPrepDeck', JSON.stringify(x)); } catch (e) {} }, me: () => null }); } });
+      // the cards studied here before 🧠 My flashcards (25 Nov 2026, localStorage tnPrepDeck) move into tnFlash once
+      try { const old = localStorage.getItem('tnPrepDeck'); if (old && !localStorage.getItem('tnFlash')) localStorage.setItem('tnFlash', old); } catch (e) {}
+      const load = () => { try { return JSON.parse(localStorage.getItem('tnFlash') || '{}'); } catch (e) { return {}; } };
+      ELFlashDeck.mount(host, { decks: () => [{ id: 'tn-prepositions', name: '📍 My prepositions', cards: window.TN_PREP_CARDS }], only: 'tn-prepositions', ca: () => false, say: x => (window.TN_SAY ? TN_SAY(x) : window.ELVoice && ELVoice.say(x)),
+        load, save: x => { try { localStorage.setItem('tnFlash', JSON.stringify(x)); } catch (e) {} }, me: () => null }); } });
   window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels };
 })();
