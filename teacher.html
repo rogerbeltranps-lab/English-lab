@@ -109,6 +109,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .spkr{padding:8px 0;border-bottom:1px solid #e2e8f0}#spkstu{font:inherit;padding:5px 10px;border:1px solid #cbd5e1;border-radius:10px;max-width:100%}
 @media (max-width:640px){.spkb{grid-template-columns:minmax(0,120px) minmax(0,1fr) 30px}}
 @media (max-width:1100px){.prgrid{grid-template-columns:minmax(0,1fr)}}@media (max-width:760px){.prstats{grid-template-columns:repeat(2,minmax(0,1fr))}.prradin{grid-template-columns:minmax(0,1fr)}}
+.todoyou{margin:3px 0 2px}.todoyou button{margin-left:4px}.need{margin:8px 0 12px;padding:10px 12px;border-radius:10px;background:#fef3c7;border:1px solid #fcd34d;color:#422006}.need.ok{background:#dcfce7;border-color:#86efac;color:#14532d}.need ul{margin:6px 0 0;padding-left:20px}.need li{margin:4px 0}.need .info{color:#475569;font-size:13px}details.opt{margin-top:10px;border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px}details.opt>summary{cursor:pointer;font-weight:600;color:#475569}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
@@ -311,7 +312,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-flashdeck.js?v=20261125d"></script><script src="shared/js/el-mascot.js?v=20261125"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
-<script src="shared/js/el-marking.js"></script>
+<script src="shared/js/el-marking.js?v=20261125todo"></script>
 <script src="shared/js/el-fix.js?v=1"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-fp-rubrics.js"></script>
@@ -1209,7 +1210,7 @@ const teamOf=(u,id)=>res(u,id).team||"";
 const teamMates=(id,team,g)=>team?Object.values(S.P).filter(s=>!s.away&&!s.tester&&s.group===g&&teamOf(s.uid,id)===team):[];
 // Level rows of an activity's dialog (moments of el-grading.js), and the final product group rows
 function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.moments||[]).filter(m=>m.a===a.id);if(!ms.length)return "";
-  const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
+  const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${redoOf(u,a,m.step)?'<span class="muted">↺ sent back to redo: no level until they hand it in again</span>':lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
   let h=`<label>Levels <small class="muted">(hover a level to read its indicator; click it again to clear)</small></label><table class="lvt"><tbody>${ms.filter(m=>!m.group).flatMap(m=>m.c.map(c=>row(m,c))).join("")}</tbody></table>`;
   const gm=ms.find(m=>m.group);if(!gm)return h;
   const s=S.P[u],team=teamOf(u,a.id),mates=teamMates(a.id,team,s.group),teams=[...new Set(Object.values(S.P).filter(p=>!p.away&&p.group===s.group).map(p=>teamOf(p.uid,a.id)).filter(Boolean))].sort();
@@ -3248,9 +3249,14 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
   return `<div class="box rtbox">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
 function todo(studs,ls,list){   // studs: signed-in students only. Final product items and route requests from the students' boards (Roger, 30 Oct 2026); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
-  // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it in the Friday run, or you do it first
+  // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it himself, or you do it first. Each line says plainly what is left for you
+  // (Roger, 25 Nov 2026: "here it's unclear what I have to do … I'm tired of this"): who · where · the comment, then 👉 You: … with the buttons.
+  // A step sent back to redo is never here (ELMark.open: the Redo note is its answer).
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>{const h=handedIn(s.uid,a)[id],x=(S.D.rs[s.uid]||{})[a.id]||{},k=ELMark.asked(h,x,id)&&x.ask[id];
-    out.push(`${k?"🙋":"✉️"} <b>${name(s)}</b> ${k?"needs you on":"commented on"} <b>${esc(t)}</b> (${esc(a.title)}): “${esc(h.comment)}”${k?` <small class="muted">· Beltran: ${esc(k.why)}</small>`:` <small class="muted" title="Beltran answers a comment a few minutes after the student sends it (Friday 15:00 answers any left)">· Beltran answers it in a few minutes</small>`} <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button> <button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`)})));
+    const head=`${k?"🙋":"✉️"} <b>${name(s)}</b> · ${esc(t)} <small class="muted">(${esc(a.title)})</small> · comment: “${esc(h.comment)}”`,
+      nr=`<button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`;
+    out.push(head+(k?`<div class="todoyou">👉 <b>You:</b> answer the comment, or press <b>No reply needed</b> if there is nothing to say.${/redo/i.test(k.why||"")?" If the work is not a real try, press <b>Answer it</b> and use <b>↺ Redo</b> in the step instead.":""} <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer it</button> ${nr}</div><small class="muted">Beltran left it to you: ${esc(k.why)}</small>`
+      :`<div class="todoyou muted">Nothing for you yet: Beltran answers it himself. <button class="g" data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer it myself</button> ${nr}</div>`))})));
   // from any LS of the course, not only the one on screen: the board's 🎯 My level asks in the student's current LS (Roger, 8 Nov 2026)
   studs.forEach(s=>lvAsks(s.uid).forEach(([id,l])=>
     out.push(`🎯 <b>${name(s)}</b> asks for a level change: ${route(elRouteOf(S.D.lv[s.uid],id).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:' <small class="muted">· no reason given</small>'}${id!==ls?` <small class="muted">· in ${lsName(id)}</small>`:""} <button data-do="acc" data-u="${s.uid}" data-ls="${id}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}" data-ls="${id}">Decline</button>`)));
@@ -3338,6 +3344,7 @@ const REDO=ELMark.REDO;
 function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
   const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
   dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+    <div class="need"><b>👉 What's left for you:</b> decide if it is their own work. Press <b>✔ Accept</b> if it is, or <b>↺ Redo</b> to send it back (at the bottom).</div>
     <p><b>Why:</b> ${esc(f.why)}${f.at?` <small class="muted">(flagged on ${ELWeek.date(ymd(f.at))})</small>`:""}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
     <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
@@ -5285,12 +5292,34 @@ function cmtBox(u,a,id,x,lite){const xr=res(u,a.id),rp=xr.replies||{},wait=waits
       :cmtGone(xr,x,id)?`<p class="muted">🗑 You removed Beltran's answer${cmtGone(xr,x,id).removed?" on "+esc(ymd(tms(cmtGone(xr,x,id).removed))):""}: the student sees no answer.</p>`:"")
     // lite (the correction dialog, wrOpen): what was sent for the step is already above it, so the box to answer shows only when nothing was sent
     +(lite&&rp[id]?(wait?`<div class="row" style="margin-top:4px"><button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button></div>`:""):`<p><b>${fb?((xr.fbWho||{})[id]==="teacher"?"✏️ Your correction of the work":"🤖 Correction of the work (sent by Beltran)"):ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div>`)}
+// 👉 What's left for you, on top of a student's activity window (Roger, 25 Nov 2026: "So it should be clearer"; "here it's unclear what I have to
+// do … I'm tired of this"): the things only Roger can do (a comment Beltran left to him, a possible copy, a final product to mark), each with
+// its button, or ✅ Nothing left for you here; then, in grey, what is moving without him (a step sent back to redo, a comment or a level
+// Beltran is doing). Nothing new is read.
+const redoOf=(u,a,id)=>{const fl=(res(u,a.id).flags||{})[id],h=handedIn(u,a)[id];return fl&&fl.done==="redo"&&!(String((h||{}).date||"")>String(fl.at||""))?fl:null};
+const redoWho=fl=>fl.auto?"Beltran":"you";
+function needBox(u,a){const x=res(u,a.id),H=handedIn(u,a),nm=id=>{const st=(a.steps||[]).find(z=>z[0]===id);return st?st[1]:tabName(a,id)},todo=[],info=[];
+  const nr=id=>`<button class="g mini" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`;
+  (a.steps||[]).forEach(([id])=>{const h=H[id];if(!h)return;const fl=redoOf(u,a,id);
+    if(fl)return info.push(`↺ <b>${esc(nm(id))}</b>: ${redoWho(fl)} sent it back to redo on ${esc(ELWeek.date(ymd(fl.at)))}. Nothing to do until the student hands it in again.`);
+    if(!waits(h,x,id))return;
+    if(ELMark.asked(h,x,id))todo.push(`💬 <b>${esc(nm(id))}</b>: answer the comment “${esc(h.comment)}” in the step below, or press ${nr(id)} if there is nothing to say.`
+      +(/redo/i.test(x.ask[id].why||"")?` If the work itself is not a real try, open <b>↺ Redo</b> in that step instead: it answers the comment too.`:""));
+    else info.push(`✉️ <b>${esc(nm(id))}</b>: Beltran answers the comment “${esc(h.comment)}” himself. ${nr(id)}`)});
+  Object.entries(x.flags||{}).forEach(([id,f])=>{if(f&&f.why&&!f.done)todo.push(`⚠️ <b>${esc(nm(id))}</b>: possible copy. Decide if it is their own work. <button class="mini" data-do="cpopen" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}">Check it</button>`)});
+  if(a.manual&&a.graded&&x.max==null&&Object.keys(H).length)todo.push(`🎬 Give the final product its mark below and press <b>Save</b>.`);
+  const g=G();if(g&&a.ls===S.ls&&!a.manual)(g.moments||[]).filter(m=>m.a===a.id&&!m.group).forEach(m=>{if(!H[m.step]||redoOf(u,a,m.step)||(x.flags||{})[m.step]&&!(x.flags||{})[m.step].done)return;
+    if(!m.c.every(c=>lvOf(u,a.id,m.step,c)))info.push(`📐 <b>${esc(m.name)}</b>: Beltran gives the level in the weekday run.`)});
+  const inf=info.length?`<ul>${info.map(t=>`<li class="info">${t}</li>`).join("")}</ul>`:"";
+  return todo.length?`<div class="need"><b>👉 What's left for you</b><ul>${todo.map(t=>`<li>${t}</li>`).join("")}</ul>${inf}</div>`
+    :`<div class="need ok"><b>✅ Nothing left for you here.</b> <span class="info">Everything below is only to look at, or to change if you want to.</span>${inf}</div>`}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{},cas=xr.answers||{};
   return `<label>Hand-ins and self-assessment</label>`+a.steps.map(([id,title])=>{const x=sp[id];if(!x)return `<details><summary class="muted">${esc(title)} · not handed in</summary></details>`;
     const wait=waits(x,xr,id),ca=cmtCa(xr,x,id);
-    return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Beltran left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Beltran":cmtGone(xr,x,id)?" · Beltran's answer removed":x.comment?" · no reply needed":""}</summary><div class="hand">`
+    const rd=redoOf(u,a,id);
+    return `<details ${wait?"open":""}><summary>${esc(title)} · ${rd?"↺ sent back to redo":"✓"} ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Beltran left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Beltran":cmtGone(xr,x,id)?" · Beltran's answer removed":x.comment&&!rd?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
       +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+(audioBox(x)||noAudio(x,id))
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
@@ -5307,7 +5336,7 @@ const HB_BACK={ca:"Les teves respostes no estan fetes: torna a fer aquest pas am
 function hbBackBox(u,a,id,x,xr){if(a.ls&&/-my-real-routine$/.test(a.ls))return "";
   const fl=(xr.flags||{})[id],lv=level(u,a.ls),L=!lv||lv==="beginners"?"ca":"en";   // Catalan only for Starter and no route (Base reads English since 21 Nov 2026)
   if(fl&&fl.done==="redo"&&fl.reopen&&!(String(x.date||"")>String(fl.at||"")))
-    return `<p class="muted">↺ Redo: you sent it back on ${esc(ELWeek.date(ymd(fl.at)))}: it counts as not done until they hand it in again.</p>`;
+    return `<p class="muted">↺ Redo: ${redoWho(fl)} sent it back on ${esc(ELWeek.date(ymd(fl.at)))}: it counts as not done until they hand it in again.</p>`;
   return `<details style="margin-top:8px"><summary><b>↺ Redo</b> <small class="muted">· send it back to the student</small></summary>
     <p class="muted">They get this message on top of the step (in ${L==="ca"?"Catalan":"English"}, their route's language; you can change it). The step counts as not done until they hand it in again.</p>
     <textarea id="hb-${esc(id)}" style="min-height:60px">${esc(HB_BACK[L])}</textarea>
@@ -6068,16 +6097,20 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
     state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
+    +needBox(u,a)
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===LATE?"✔ late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.checkpoint?cpPanel(u,a):"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
-    +levelRows(u,a)
-    +fpgBox(u,a)
-    +`<div id="fpman">`+(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
-    +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`
-    +(a.manual?fpStuRub(u,a):"")
-    +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`,a.manual&&!!fpRub(a));
+    +(a.manual?levelRows(u,a)+fpgBox(u,a)+`<div id="fpman"><label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`
+        +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`+fpStuRub(u,a)
+        +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`
+      // not a final product: the levels and the general feedback are Beltran's (weekday run), so they wait folded away unless you want them
+      // (Roger, 25 Nov 2026: the empty Levels and Feedback + Save looked like more work to do)
+      :`<details class="opt"><summary>✏️ Change a level or write general feedback <small class="muted">(optional: Beltran gives the levels${x.feedback?" · feedback written":""})</small></summary>`
+        +levelRows(u,a)+fpgBox(u,a)+`<div id="fpman"><label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`
+        +`<div class="row"><button data-do="save" data-u="${u}" data-a="${id}">Save feedback</button></div></details>`
+        +(x.locked?`<div class="row"><button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button></div>`:"")),a.manual&&!!fpRub(a));
 }
 
 // ---- 🎬 Gemini watches the final product video (Roger, 8 Nov 2026: "I give the video to Gemini and Gemini gives me the feedback, then if I
