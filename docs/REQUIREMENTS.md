@@ -74,6 +74,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 **His computers and accounts**
 
 - **Never act in Roger's browser or accounts without asking** (8 Nov 2026). Give him the link instead. **One exception** (Roger, 21 Nov 2026): Claude pastes and deploys new versions of the school Apps Script relay itself, in the browser built into the Claude app, once Roger says **"apply"** for that change. Every other browser or account action stays forbidden.
+- **His to-dos go in Google Tasks** (Roger, 25 Nov 2026: "I need you to run my task app, there I want you to add things to do, for instance the ones who need to do the exam and when"; he chose his **school account**): Claude adds them to the list **English Lab** of roger.beltran@ietramuntana.cat through the school script, with the day as the due date and the steps in the notes, and marks them done when the work is done (never deletes one). Show Roger a new batch before adding it, as for any live write.
 - Setup on his computer: **one step at a time, one paste-ready command**, full paths filled in. Never ask him to paste a secret in the chat; for a key, give one Terminal line that copies `NAME=value` to the clipboard.
 - School Wi-Fi blocks github.com: on school days he needs his phone hotspot for anything that talks to GitHub.
 - Devices: Mac (`/Users/roger/Developer/English-lab-site`) and PC (`C:\Developer\English-lab`). Both fall behind `main`; pull when a device session starts.
