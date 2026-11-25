@@ -63,6 +63,7 @@
     .explain{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 16px;margin:0 0 12px;line-height:1.55}.explain p{margin:.35em 0}
     .slides{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.slides a{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:700}
     .picks{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.picks .w.on{background:var(--accent-soft);border-color:var(--accent)}.picks .w:disabled{text-decoration:line-through;opacity:.5;cursor:default}
+    .tabs .tab.wide{position:relative;padding-right:150px}.tab .fdmz{position:absolute;right:22px;bottom:-6px;display:flex;align-items:flex-end;pointer-events:none}.tab .fdmz .elmz-badge{position:absolute;left:-34px;bottom:8px}
     .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -74,7 +75,9 @@
   <script src="../shared/js/el-shadow.js"></script>
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
-  <script src="../shared/js/el-flashdeck.js"></script>
+  <script src="../shared/js/el-plan.js"></script>
+  <script src="../shared/js/el-flashdeck.js?v=20261125"></script>
+  <script src="../shared/js/el-mascot.js?v=20261125"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
@@ -349,9 +352,10 @@ async function render() {
   $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
   const x = await content(); if (g !== gen) return; X = x;
   const fs = ELFlashDeck.summary(x.decks, fdLoad()), fsN = fs.due + fs.new;
+  fdSum(fdLoad());
   const n = { deck: fsN ? fsN + ' ' + t('per estudiar avui', 'to study today') : fs.total + ' ' + t('targetes', 'cards'), words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
   $('#app').innerHTML = header() + filters(x)
-    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : k === 'deck' ? ' wide' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : k === 'deck' ? ' wide' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small>${k === 'deck' ? fdMz(fsN) : ''}</button>`).join('')}</div><div id="body"></div>`;
   ({ deck, words, grammar, build, listen, shadow })[S.tab]();
 }
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
@@ -411,9 +415,24 @@ const fdAs = () => !DEMO && window.ELCloud && ELCloud.viewing;
 const fdLoad = () => { if (fdAs()) return fdView || {}; try { return JSON.parse(localStorage.getItem(FKEY()) || '{}') } catch (e) { return {} } };
 const fdCloudOn = () => !DEMO && U && !all() && !ELCloud.viewing;
 const fdRef = () => F.doc(ELCloud.db, 'students', U.uid, 'flashcards', 'all');
+// 🧑‍🎨 the streak mascot (shared/js/el-mascot.js; Roger, 24–25 Nov 2026): on the 🧠 Flashcards tile, in the mood of the student's streak
+// with the ⚡ badge. fdSum leaves the counts of today (el_flash_sum_<uid>: reviews due, new cards today, new cards a day) for the board's
+// mascot, so the board knows how many cards are waiting without building the decks.
+function fdMz(left) {
+  const M = window.ELMascot; if (!M || all()) return '';
+  const x = M.data(null, fdLoad()); if (!x) return '';
+  return `<span class="fdmz">${M.img(M.mood({ st: x.st, left }), 84, '')}${M.badge(x.st.n)}</span>`;
+}
+function fdSum(P) {
+  if (fdAs() || !X || all()) return;
+  const s = ELFlashDeck.summary(X.decks, P); let un = 0;
+  (X.decks || []).forEach(d => { const c = ((P.decks || {})[d.id] || {}).c || {}; un += Math.min(15, d.cards.filter(x => !c[x.id]).length); });
+  try { localStorage.setItem('el_flash_sum' + (U ? '_' + U.uid : ''), JSON.stringify({ d: ELFlashDeck.dayKey(Date.now()), due: s.due, nw: s.new, un })) } catch (e) {}
+}
 function fdSave(P) {
   if (fdAs()) { fdView = P; return; }
   try { localStorage.setItem(FKEY(), JSON.stringify(P)) } catch (e) {}
+  fdSum(P);
   if (fdCloudOn()) F.setDoc(fdRef(), { p: JSON.stringify(P), at: F.serverTimestamp() }).catch(e => console.warn('flashcards save', e));
 }
 let fd = null, fdRead = null;
@@ -430,7 +449,7 @@ function fdCloud() {   // once per visit: the account's copy, merged with this b
 }
 function deck() {
   $('#body').innerHTML = '<div id="fdSlot"></div>'; $('#fdSlot').replaceWith(fdHost);
-  if (!fd) fd = ELFlashDeck.mount(fdHost, { decks: () => X.decks, ca: () => !EN, load: fdLoad, save: fdSave, say });
+  if (!fd) fd = ELFlashDeck.mount(fdHost, { decks: () => X.decks, ca: () => !EN, load: fdLoad, save: fdSave, say, me: () => fdAs() || all() ? null : (U ? U.uid : '') });
   else fd.render();
   fdCloud();
 }
