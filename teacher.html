@@ -2440,7 +2440,24 @@ function fpVidBox(src,pid,au){if(pid&&!(pid in FPG.ar)){FPG.ar[pid]=0;const im=n
       document.querySelectorAll(".fpvid[data-ar]").forEach(b=>{if(b.dataset.ar===pid)b.style.cssText=fpArCss(FPG.ar[pid])})};
     im.onerror=()=>{delete FPG.ar[pid]};   // no thumbnail yet (a copy Drive is still processing): 16:9 now, tried again next time
     im.src=`https://drive.google.com/thumbnail?id=${encodeURIComponent(pid)}&sz=w400${au?"&"+au.slice(1):""}`}
-  return `<div class="fpvid"${pid?` data-ar="${esc(pid)}"`:""} style="${fpArCss(pid&&FPG.ar[pid])}"><iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`}
+  const own=pid&&FPV[pid]&&FPV[pid].url;
+  return `<div class="fpvid"${pid?` data-ar="${esc(pid)}"`:""} style="${fpArCss(pid&&FPG.ar[pid])}">${own?fpvTag(FPV[pid].url):`<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`}</div>`
+    +(pid&&!own?`<p class="fpvget" data-fpv="${esc(pid)}" style="margin:4px 0 0;font-size:12px"><button class="g mini" data-fpvget="${esc(pid)}">▶ Not playing? Play it here</button></p>`:"")}
+// ▶ Play it here (Roger, 26 Nov 2026, 2 ESO B final products: "I don't see the video"): Drive's own player showed only the first picture of
+// a Google Slides recording (no ▶), because Drive could not get that file ready to play. The school script (v40, action "video_get", like
+// "audio_get" for recordings) sends the file itself (only a final product video in his Final product videos folder, up to 30 MB) and the
+// browser plays it in a plain video player, Drive or not. Kept per file while the page is open; nothing read from Firestore.
+const FPV={};   // Drive file id → {url} once loaded, {busy} while loading
+const fpvTag=u=>`<video src="${u}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000"></video>`;
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-fpvget]");if(!b)return;const id=b.dataset.fpvget;if(FPV[id])return;FPV[id]={busy:1};
+  const note=t=>document.querySelectorAll(`.fpvget[data-fpv="${CSS.escape(id)}"]`).forEach(p=>p.innerHTML=t);
+  note(`<small class="muted">⏳ Loading the video (a few seconds)…</small>`);
+  try{const j=await fpgCall({action:"video_get",fileId:id}),bin=atob(j.data||""),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+    FPV[id]={url:URL.createObjectURL(new Blob([a],{type:j.mime||"video/mp4"}))};
+    document.querySelectorAll(`.fpvid[data-ar="${CSS.escape(id)}"]`).forEach(x=>{x.innerHTML=fpvTag(FPV[id].url);
+      x.querySelector("video").addEventListener("error",()=>note(`<small class="muted">⚠️ This browser cannot play this video here: open it in Drive.</small>`))});
+    note("")}
+  catch(err){delete FPV[id];note(`<small class="muted">⚠️ The video could not be loaded here (${esc(String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v40"))}): open it in Drive.</small>`)}});
 function fpSideVid(u,a,v){if(!v&&fpMarked(u,a)&&!((FPG.d[a.id]||{})[u]||{}).draft)return {k:"none",h:""};   // marked by hand, no video needed
   if(!v&&FPG_APP)return {k:"none",h:`<p class="muted">No video on the site yet. If it is on Classroom or Drive, attach it to the Roig chat yourself.</p>`};
   if(!v)return {k:"none",h:`<p class="muted">No video found yet. <button class="g mini" data-do="cell" data-u="${u}" data-a="${esc(a.id)}">Open the box</button> to look on Classroom or paste a Drive link.</p>`};
