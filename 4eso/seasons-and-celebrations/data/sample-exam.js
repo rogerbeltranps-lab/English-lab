@@ -1,11 +1,21 @@
-/* LS2 · Sample exam (practice, not graded): the same format and points as the real exam (Google Forms, approved by Roger on 25 Oct 2026),
-   so students know the points of every section. Everything except the email is multiple choice or a short gap and is marked automatically
-   (first try = the exam score); the email gets feedback and a guide mark from ChatGPT with the 5.1 levels (ChatGPT can make mistakes; in the
-   exam the teacher marks it). Each route has its own list of items (same number per route). Out of 100: listening 10 + listening chart 10,
-   reading 10 + reading log 10 (the chart and the log are 5 multiple-choice questions each since Roger's change of 25 Oct 2026), vocabulary 15,
-   grammar 15, writing 30. Numbered 1–43 like the real exam; multiple choice has four options (the first is the right one; the engine shuffles). */
+/* 4 ESO · LS2 · Sample exam 1 (practice, called First exam 19–21 Nov 2026, not graded; the page is still sample-exam.html, key ls2SampleExam4ESO). Roger, 19 Nov 2026: a sample
+   exam "with what we've done so far" (only up to the step of the group that has done less) and "tailored … so that they get good marks". So:
+   - content = LP1 Getting started (autumn words, feelings; the LP1 game: get + comparative, adjective + preposition + -ing), LP2 Celebrations
+     around the world (celebrations, Present Simple for customs, on / in / at, It is celebrated / It takes place) and LP3 vocabulary + Past
+     Simple / used to (4 ESO A has not done the rest of LP3 yet). Nothing from LP4–LP6 (relatives, contrast, future forms, formal email).
+   - format and points = the 2 ESO first web exam: listening 20, reading 20, vocabulary 35, grammar 15, writing 10 (describe a celebration, LP2).
+   - items lean on what the class games and the activities show students do best (Starter/Base mostly multiple choice; the weakest
+     points, such as the passive, "dates back to", prepositions after verbs, typed used to, only as easy choices or not at all).
+   Multiple choice has four options (the first is the right one; the engine shuffles). The text gets a table of mistakes from the
+   student's ChatGPT, no mark (Roger, 20 Nov 2026). */
 (function () {
-const L30 = [8, 15, 23, 30];
+const L10 = [3, 5, 8, 10];   // the 5.1 levels scaled to 10 points (NA 8 · AS 15 · AN 23 · AE 30 of 30)
+const ROW = (a, b) => '<tr><td>' + a + '</td><td style="text-align:right">' + b + '</td></tr>';
+const TABLE = {
+  ca: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)', 20) + ROW('2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)', 20) +
+    ROW('3 Vocabulary: 14 preguntes (2,5 punts cada una)', 35) + ROW('4 Grammar: 10 preguntes (1,5 punts cada una)', 15) + ROW('5 Writing: descriu una celebració', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>',
+  en: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 questions + listening chart, 5 questions (2 points each)', 20) + ROW('2 Reading: 5 questions + reading log, 5 questions (2 points each)', 20) +
+    ROW('3 Vocabulary: 14 questions (2.5 points each)', 35) + ROW('4 Grammar: 10 questions (1.5 points each)', 15) + ROW('5 Writing: describe a celebration', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>' };
 const SHADOW_VIDEO = '<video controls preload="none" playsinline poster="video/shadowing-poster.jpg" src="video/shadowing.mp4" style="width:100%;border-radius:14px;margin:8px 0;background:#000"></video>';
 const SCRIPT = [
   ['Callum', '[cheerful] Hi, I’m Callum, from Edinburgh in Scotland. In Scotland, New Year’s Eve is called Hogmanay, and for us it’s bigger than Christmas! There’s a huge street party in the city centre, with concerts and fireworks over the castle at midnight. It’s usually freezing, so you wear about three jumpers. [laughs]'],
@@ -22,26 +32,24 @@ const TEXTS = {
   daring: '<p>In Catalonia, many families have a Caga Tió at Christmas, a tradition which is thought to date back to old winter celebrations in the countryside. It is a small log with a face, a red hat and a blanket. From 8 December, children “feed” it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks while they sing a traditional song, and the log “gives” them sweets and small presents.</p><p>In the UK and many other countries, children have an Advent calendar, which counts down the days until Christmas. It has 24 small doors, and children open one every day from 1 December. Behind each door there is a picture or a piece of chocolate. Advent calendars used to have only pictures, but today many contain chocolate, small toys or even beauty products for adults. Some people think this shows how commercialised Christmas has become, while others say it simply shows that traditions evolve.</p>'
 };
 const scriptText = SCRIPT.map(l => l[0] + ': ' + l[1].replace(/\[[^\]]+\]\s*/g, '')).join('\n');
-const L51 = ['Unfinished or not understandable; no clear purpose or request, or informal, even with the template.',
-  'Purpose, plan and request present, close to the template or model; future forms mostly correct; errors that do not block meaning; mostly formal.',
-  'Clear paragraphs (purpose, plan, request, closing), formal register, future forms and a relative clause used correctly; adapts the model.',
-  'Clear, well-linked and persuasive beyond the model (varied linkers, polite requests; Daring: the concern answered), few errors.'];
+const L51 = ['Unfinished or not understandable; no clear parts (what, when, customs), even with the frame.',
+  'What, when and customs are there, close to the frame or model; Present Simple and on / in / at mostly correct; errors that do not block meaning.',
+  'Clear parts (what, when, customs, food or symbol, feelings), Present Simple for customs, on / in / at and It is celebrated used correctly; adapts the model.',
+  'Clear, well-linked and personal beyond the model (varied adjectives, used to, a passive; Daring: what it means to people), few errors.'];
 const AUDIO = { audio: 'audio/sample-exam-new-year.mp3', title: 'Two New Years: Callum and Yuki', script: SCRIPT };
 
 window.LP = {
-  key: 'ls2SampleExam4ESO', n: 'E', title: 'Sample exam',
+  key: 'ls2SampleExam4ESO', n: 'E', title: 'Sample exam 1',
   panels: [
     // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
     { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
       html: { ca: '<p>Un repàs de 6 minuts per escoltar i parlar: frases de les escoltes de la unitat. Escolta, repeteix en veu alta i torna-ho a fer sense text. El vídeo t’espera.</p>' + SHADOW_VIDEO,
         en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
-    { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és l’examen', en: 'How the exam works' },
-      html: { ca: '<p>Aquest examen d’exemple té <strong>el mateix format i els mateixos punts que l’examen real</strong> (que faràs amb un Google Forms). 55 minuts, sense apunts.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: un correu formal</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>Totes les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El correu el corregeix <strong>ChatGPT</strong> amb els criteris de l’examen i et dona una nota orientativa. Al final, a <em>La meva nota</em>, veuràs el total.</p><p class="warm-note">⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el correu el corregeix el professorat.</p>',
-        en: '<p>This sample exam has <strong>the same format and the same points as the real exam</strong> (which you will do in a Google Form). 55 minutes, no notes.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 questions + listening chart, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 questions + reading log, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: a formal email</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>All the questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The email is marked by <strong>ChatGPT</strong> with the exam criteria, which gives you a guide mark. At the end, <em>My score</em> shows your total.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the email.</p>' } },
+    { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
+      html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong>. Només surt el que hem fet a classe: <strong>LP1 Getting started</strong>, <strong>LP2 Celebrations around the world</strong> i el vocabulari i la gramàtica (Past Simple / used to) de <strong>LP3 Where traditions come from</strong>. 55 minuts, sense apunts.</p>' + TABLE.ca +
+        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El text no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
+        en: '<p>This practice has <strong>the same format and the same points as the first exam</strong>. Only what we have done in class: <strong>LP1 Getting started</strong>, <strong>LP2 Celebrations around the world</strong> and the vocabulary and grammar (Past Simple / used to) of <strong>LP3 Where traditions come from</strong>. 55 minutes, no notes.</p>' + TABLE.en +
+        '<p>The questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The text has no mark in this practice: the button opens ChatGPT, which makes a table of your mistakes (the correction and why) and gives you your text, corrected. At the end, <em>My score</em> shows your total.</p>' } },
 
     { id: 'listen', type: 'quiz', tab: 'Listening', title: 'Listening: Two New Years', pts: [2, 2], start: 1,
       intro: { ca: 'Escolta dues vegades el Callum i la Yuki, que parlen del seu Cap d’Any, i respon.', en: 'Listen twice to Callum and Yuki talking about their New Year, and answer.' },
@@ -77,36 +85,36 @@ window.LP = {
         ] } },
 
     { id: 'chart', type: 'quiz', tab: 'Listening chart', title: 'Listening chart', pts: [2, 2], start: 6,
-      intro: { ca: 'Torna a escoltar si cal. Què valora cada persona i com ho saps? Pensa en les seves paraules i en el seu to de veu.', en: 'Listen again if you need to. What does each speaker value, and how do you know? Think about their words and their tone of voice.' },
+      intro: { ca: 'Torna a escoltar si cal. Tria la nota correcta sobre cada celebració: quan és, què fa la gent i què mengen.', en: 'Listen again if you need to. Choose the correct note about each celebration: when it is, what people do and what they eat.' },
       media: AUDIO,
       items: {
         beginners: [
-          { q: 'What does Callum love most about Hogmanay?', o: ['being with his neighbours', 'the presents', 'the cold weather', 'the cake'] },
-          { q: 'Which words show it?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing.”', '“Nobody knows all the words!”', '“They gave me a huge slice of cake.”'] },
-          { q: 'What is New Year about for Yuki?', o: ['starting again and her family', 'a big street party', 'money', 'noodles'] },
-          { q: 'Which words show it?', o: ['“For me, New Year is about starting again.”', '“Children get money in small envelopes.”', '“In the evening we eat long noodles.”', '“Schools and many offices close.”'] },
-          { q: 'How does Yuki sound?', o: ['calm', 'angry', 'very excited', 'scared'] }
+          { q: 'Callum · when is Hogmanay?', o: ['on New Year’s Eve', 'on Christmas Day', 'in summer', 'on 6 January'] },
+          { q: 'Callum · what do people do at midnight?', o: ['They hold hands and sing an old song.', 'They clean the house.', 'They eat long noodles.', 'They open presents.'] },
+          { q: 'Callum · what is the weather like?', o: ['It’s freezing.', 'It’s hot.', 'It’s mild.', 'It’s foggy.'] },
+          { q: 'Yuki · what do they eat on the evening of 31 December?', o: ['long noodles', 'cake', 'chestnuts', 'twelve grapes'] },
+          { q: 'Yuki · what do children get?', o: ['money in small envelopes', 'chocolate', 'a costume', 'a cake'] }
         ],
         insecure: [
-          { q: 'What does Callum love most about Hogmanay?', o: ['being together with his neighbours', 'the presents', 'the cold weather', 'the cake'] },
-          { q: 'Which words from the recording show it?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing.”', '“Nobody knows all the words!”', '“They gave me a huge slice of cake.”'] },
-          { q: 'What is New Year about for Yuki?', o: ['starting again and thanking her family', 'a big street party', 'getting money in envelopes', 'eating long noodles'] },
-          { q: 'Which words from the recording show it?', o: ['“For me, New Year is about starting again.”', '“Children get money in small envelopes.”', '“In the evening we eat long noodles.”', '“Schools and many offices close for several days.”'] },
-          { q: 'How does Yuki sound?', o: ['calm', 'angry', 'very excited', 'scared'] }
+          { q: 'Callum · where is the big party?', o: ['in the city centre', 'at his gran’s house', 'at a temple', 'at school'] },
+          { q: 'Callum · what do people do after midnight?', o: ['They visit their neighbours.', 'They go to bed.', 'They clean the house.', 'They watch TV.'] },
+          { q: 'Callum · what does he wear?', o: ['about three jumpers', 'a costume', 'a T-shirt', 'a mask'] },
+          { q: 'Yuki · why do they clean the house on 31 December?', o: ['to start the year fresh', 'because guests come', 'because it’s very dirty', 'for the temple'] },
+          { q: 'Yuki · what do they do on 1 January?', o: ['They eat special food and visit a shrine.', 'They go to a street party.', 'They sing “Auld Lang Syne”.', 'They watch fireworks over the castle.'] }
         ],
         safe: [
-          { q: 'What does Callum value most about Hogmanay?', o: ['the feeling of community with his neighbours', 'the concerts in the city centre', 'the presents he gets', 'the fireworks over the castle'] },
-          { q: 'Which phrase from the recording shows what Callum values?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing, so you wear about three jumpers.”', '“Nobody knows all the words!”', '“There’s a huge street party in the city centre.”'] },
-          { q: 'What does Yuki value most about New Year?', o: ['a fresh start and thanking her family', 'the money children get in envelopes', 'the long noodles', 'sending cards to her teachers'] },
-          { q: 'Which phrase from the recording shows what Yuki values?', o: ['“You leave the problems of the old year behind.”', '“Children get money in small envelopes.”', '“They all arrive on the same morning.”', '“Schools and many offices close for several days.”'] },
-          { q: 'How is Callum’s tone different from Yuki’s?', o: ['Callum sounds cheerful and laughs; Yuki sounds calm and quiet.', 'Callum sounds sad; Yuki sounds excited.', 'Both sound angry.', 'Callum sounds bored; Yuki sounds nervous.'] }
+          { q: 'Which note about Hogmanay is correct?', o: ['When: 31 December · Customs: street party, fireworks, an old song, first-footing · Weather: freezing', 'When: 1 January · Customs: cleaning the house · Weather: mild', 'When: 31 December · Customs: long noodles · Weather: freezing', 'When: 24 December · Customs: presents · Weather: rainy'] },
+          { q: 'Which note about Shōgatsu is correct?', o: ['When: 31 December–1 January · Customs: cleaning, long noodles, temple bells, a shrine, cards · Feeling: quiet', 'When: 31 December · Customs: a street party with fireworks · Feeling: noisy', 'When: 1 January · Customs: first-footing · Feeling: quiet', 'When: summer · Customs: noodles · Feeling: exciting'] },
+          { q: 'What do visitors bring when they go first-footing?', o: ['a small present, like shortbread or coal', 'long noodles', 'money in envelopes', 'flowers'] },
+          { q: 'Why do people in Japan eat long noodles?', o: ['They mean a long life.', 'They are cheap.', 'Children love them.', 'They are easy to cook.'] },
+          { q: 'What happened to Callum last year?', o: ['He was his neighbours’ first visitor and got a big slice of cake.', 'He sang all the words of the song.', 'He visited Japan.', 'He got money in an envelope.'] }
         ],
         daring: [
-          { q: 'Which detail best shows how much neighbours matter at Hogmanay?', o: ['After midnight, people visit their neighbours to be the first visitor of the year.', 'There are fireworks over the castle at midnight.', 'People wear about three jumpers because it is freezing.', 'There are concerts in the city centre.'] },
-          { q: 'Which detail best shows that Yuki values her family?', o: ['She says New Year is a time to thank your family for everything.', 'She says schools close for several days.', 'She says the temple bells ring 108 times.', 'She says the cards all arrive on the same morning.'] },
-          { q: 'How does Callum’s tone support what he says?', o: ['He laughs and sounds cheerful, which matches the party he describes.', 'He sounds calm and serious, which shows Hogmanay is a quiet holiday.', 'He sounds nervous, which shows he is afraid of the cold.', 'He sounds bored, which shows he prefers Christmas.'] },
-          { q: 'What do Callum and Yuki have in common?', o: ['For both, New Year is about the people around them: neighbours for Callum, family for Yuki.', 'Both celebrate with a big street party.', 'Both get money in small envelopes.', 'Both think New Year is less important than Christmas.'] },
-          { q: 'Which detail best supports Yuki’s idea of a fresh start?', o: ['Her family cleans the whole house on 31 December.', 'Children get money in small envelopes.', 'Schools and offices close for several days.', 'Her mother and grandmother cook for days.'] }
+          { q: 'Which note about Hogmanay is the most accurate?', o: ['31 Dec · street party, concerts, fireworks over the castle, “Auld Lang Syne”, first-footing with a small present · freezing · bigger than Christmas', 'Bigger than Christmas · quiet, family only · noodles and temple bells', '1 Jan · first-footing only · mild weather', '31 Dec · fireworks · warm weather · smaller than Christmas'] },
+          { q: 'Which note about Shōgatsu is the most accurate?', o: ['31 Dec–1 Jan · clean the house, long noodles, 108 bells, special food, a shrine, envelopes for children, cards · quiet, with the family', 'A noisy street party with fireworks', '1 Jan only · first-footing · cake', 'A summer festival · noodles · a temple'] },
+          { q: 'Why does Callum’s gran want a friendly neighbour to come first?', o: ['She believes the first visitor brings luck for the year.', 'She wants cake.', 'She doesn’t like strangers at night.', 'It’s a rule in Scotland.'] },
+          { q: 'Why do so many people in Japan travel at New Year?', o: ['They go home to their parents’ houses.', 'They go on holiday abroad.', 'They go to Edinburgh.', 'They visit their offices.'] },
+          { q: 'Which custom happens at the same moment in both places?', o: ['Something special happens at midnight: a song in Scotland, temple bells in Japan.', 'Both families clean the house.', 'Both eat long noodles.', 'Both visit a shrine.'] }
         ]
       } },
 
@@ -177,130 +185,138 @@ window.LP = {
         ]
       } },
 
-    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [1, 2], start: 21,
-      intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la paraula que falta (2 punts).', en: 'Choose the right option (1 point), then write the missing word (2 points).' },
+    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [2.5, 2.5], start: 21,
+      intro: { ca: 'Tria l’opció correcta o escriu la paraula que falta (2,5 punts cada una).', en: 'Choose the right option or write the missing word (2.5 points each).' },
       items: {
         beginners: [
-          { q: 'It’s ___ today: take an umbrella.', o: ['rainy', 'sunny', 'hot', 'dry'] },
-          { q: 'At the Castanyada we eat roasted ___.', o: ['chestnuts', 'oranges', 'flowers', 'candles'] },
-          { q: 'At Christmas we ___ the house with lights.', o: ['decorate', 'dance', 'sing', 'cook'] },
-          { q: 'I feel ___ before a party: I love parties!', o: ['excited', 'cold', 'windy', 'old'] },
-          { q: 'On Christmas Day we have a special ___ with all the family.', o: ['meal', 'mask', 'parade', 'leaf'] },
-          { q: 'Children ___ up as witches at Halloween.', o: ['dress', 'sing', 'cook', 'eat'] },
-          { q: 'Dear Mr Serra, We would ___ to organise a party.', o: ['like', 'enjoy', 'mind', 'make'] },
-          { q: 'At Carnival, people wear a c______ and a mask.', a: ['costume'] },
-          { q: 'At night there are f________ in the sky: boom!', a: ['fireworks'] },
-          { q: 'At Hanukkah, families light c______.', a: ['candles'] },
-          { q: 'At Christmas we give and get p_______.', a: ['presents'] }
+          { q: 'I can’t see the end of the street. It’s ___.', o: ['foggy', 'sunny', 'windy', 'hot'] },
+          { q: 'At the Castanyada we eat roasted ___.', o: ['chestnuts', 'pumpkins', 'grapes', 'candles'] },
+          { q: 'At Halloween people ___ pumpkins to make scary faces.', o: ['carve', 'cook', 'light', 'wear'] },
+          { q: 'In autumn the leaves ___ colour.', o: ['change', 'make', 'do', 'take'] },
+          { q: 'At Carnival, children dress ___ as pirates.', o: ['up', 'on', 'in', 'out'] },
+          { q: 'On 25 December the whole family eats ___.', o: ['together', 'alone', 'outside', 'early'] },
+          { q: 'At the end of the summer, farmers collect the food: it’s the ___.', o: ['harvest', 'parade', 'fireworks', 'costume'] },
+          { q: 'In the USA, autumn is called ___.', o: ['fall', 'spring', 'season', 'harvest'] },
+          { q: 'At Christmas we have a big family ___.', o: ['get-together', 'parade', 'harvest', 'firework'] },
+          { q: 'I feel ___ the night before a big party: I love parties!', o: ['excited', 'scared', 'bored', 'cold'] },
+          { q: 'At night there are f________ in the sky: boom! (focs artificials)', a: ['fireworks'] },
+          { q: 'On Sunday we v____ our grandparents. (visitem)', a: ['visit'] },
+          { q: 'It isn’t hot or cold. It’s m___. (suau)', a: ['mild'] },
+          { q: 'At Christmas we d_______ the house with lights. (decorem)', a: ['decorate'] }
         ],
         insecure: [
-          { q: 'It’s ___ today: take an umbrella.', o: ['rainy', 'sunny', 'mild', 'dry'] },
-          { q: 'At the Castanyada we eat roasted ___.', o: ['chestnuts', 'oranges', 'flowers', 'candles'] },
-          { q: 'At Christmas we ___ the house with lights.', o: ['decorate', 'dance', 'sing', 'cook'] },
-          { q: 'I feel ___ to my family: they help me a lot.', o: ['grateful', 'scared', 'windy', 'boring'] },
-          { q: 'On Christmas Day we have a special ___ with all the family.', o: ['meal', 'mask', 'parade', 'leaf'] },
-          { q: 'Dear Mr Serra, We would ___ to organise a party.', o: ['like', 'enjoy', 'mind', 'make'] },
-          { q: 'I’m going to ___ my friends at the festival.', o: ['meet', 'book', 'buy', 'wear'] },
-          { q: 'At Carnival, people wear a c______ and a mask.', a: ['costume'] },
-          { q: 'In spring there are lots of f______ in the park.', a: ['flowers'] },
-          { q: 'We celebrate New Year o___ a year.', a: ['once'] },
-          { q: 'People walk in the street in a big p_____ with music.', a: ['parade'] }
+          { q: 'It’s ___ outside: wear a jumper.', o: ['chilly', 'hot', 'sunny', 'mild'] },
+          { q: 'At the end of October the clocks go ___ one hour.', o: ['back', 'up', 'down', 'out'] },
+          { q: 'In the USA, autumn is called ___.', o: ['fall', 'spring', 'season', 'harvest'] },
+          { q: 'Children ___ up as witches and ghosts.', o: ['dress', 'wear', 'put', 'make'] },
+          { q: 'At Diwali, people ___ small oil lamps.', o: ['light', 'carve', 'roast', 'wear'] },
+          { q: 'At Christmas we have a big family ___.', o: ['get-together', 'parade', 'harvest', 'firework'] },
+          { q: 'At the end of the summer, farmers collect the food: it’s the ___.', o: ['harvest', 'parade', 'fireworks', 'costume'] },
+          { q: 'I can’t see the road. It’s very ___.', o: ['foggy', 'mild', 'sunny', 'cosy'] },
+          { q: 'At Halloween people ___ pumpkins to make scary faces.', o: ['carve', 'cook', 'light', 'wear'] },
+          { q: 'On 25 December the whole family eats ___.', o: ['together', 'alone', 'outside', 'early'] },
+          { q: 'In autumn the days get ___. (més curts)', a: ['shorter'] },
+          { q: 'People walk through the streets in a big p_____. (desfilada)', a: ['parade'] },
+          { q: 'We ___ our relatives in Girona every summer. (visitem)', a: ['visit'] },
+          { q: 'At the Castanyada we roast ___. (castanyes)', a: ['chestnuts'] }
         ],
         safe: [
-          { q: 'It’s ___ this morning: I can’t see the end of the street.', o: ['foggy', 'sunny', 'cosy', 'warm'] },
-          { q: 'All the students ___ part in the school parade.', o: ['take', 'make', 'get', 'do'] },
-          { q: 'At midnight, families ___ gifts.', o: ['exchange', 'pass', 'gather', 'spend'] },
-          { q: 'Holi is a very ___ festival: people throw coloured powder.', o: ['colourful', 'secular', 'chilly', 'quiet'] },
-          { q: '___ Halloween, the Castanyada is not about scary costumes.', o: ['Unlike', 'Both', 'Whereas', 'However'] },
-          { q: 'I look forward ___ hearing from you.', o: ['to', 'for', 'of', 'at'] },
-          { q: 'We are going to ___ invitations to all the families.', o: ['send', 'set', 'run', 'take'] },
-          { q: 'The fair will take place in the c________ centre.', a: ['community'] },
-          { q: 'Many students t_____ home for the holidays.', a: ['travel'] },
-          { q: 'Please l__ us know if the hall is free.', a: ['let'] },
-          { q: 'We need to s__ up the tables before 9.00.', a: ['set'] }
+          { q: 'There was ___ on the cars this morning, so we scraped the windows.', o: ['frost', 'fog', 'harvest', 'rain'] },
+          { q: 'Chestnuts and mushrooms are ___ food: they grow at this time of year.', o: ['seasonal', 'secular', 'crowded', 'local'] },
+          { q: 'On New Year’s Eve, families ___ for a big dinner.', o: ['get together', 'take part', 'pass down', 'look forward'] },
+          { q: 'Christmas is a ___ holiday for some families and a secular one for others.', o: ['religious', 'crowded', 'seasonal', 'colourful'] },
+          { q: 'In 1621 the Pilgrims had a big harvest ___ that lasted three days.', o: ['feast', 'bonfire', 'parade', 'turnip'] },
+          { q: 'Which word doesn’t belong? foggy · chilly · mild · harvest', o: ['harvest', 'foggy', 'chilly', 'mild'] },
+          { q: 'At midnight we eat twelve grapes and ___ a wish.', o: ['make', 'do', 'take', 'have'] },
+          { q: 'In the USA, autumn is called ___.', o: ['fall', 'spring', 'harvest', 'season'] },
+          { q: 'It isn’t hot and it isn’t cold. It’s ___. (m...)', a: ['mild'] },
+          { q: 'The clocks went back, so now it gets ___ early. (d...)', a: ['dark'] },
+          { q: 'Families ___ gifts at Diwali. (ex...)', a: ['exchange'] },
+          { q: 'At Halloween people ___ pumpkins to make scary faces. (c...)', a: ['carve'] },
+          { q: 'Children ___ up as witches and ghosts at Halloween. (d...)', a: ['dress'] },
+          { q: 'In October the leaves ___ colour. (ch...)', a: ['change'] }
         ],
         daring: [
-          { q: 'Some old traditions might ___ out if young people lose interest.', o: ['die', 'pass', 'go', 'fall'] },
-          { q: 'Halloween is known ___ costumes and pumpkins.', o: ['for', 'by', 'with', 'as'] },
-          { q: 'Many customs ___ from old harvest festivals.', o: ['come', 'belong', 'depend', 'consist'] },
-          { q: 'We should never take our traditions for ___.', o: ['granted', 'given', 'sure', 'real'] },
-          { q: 'Young people can help keep a tradition ___.', o: ['alive', 'living', 'life', 'live'] },
-          { q: 'I would ___ it if you could reply by Friday.', o: ['appreciate', 'ensure', 'propose', 'thank'] },
-          { q: 'Traditions ___ over time: they change and adapt.', o: ['evolve', 'commemorate', 'honour', 'celebrate'] },
-          { q: 'Lighting candles is an old r_____ in many religions.', a: ['ritual'] },
-          { q: 'Every student can contribute ___ the event.', a: ['to'] },
-          { q: 'We would appreciate the o__________ to present our project.', a: ['opportunity'] },
-          { q: 'We need to c_______ the needs of every family.', a: ['consider'] }
+          { q: 'It’s ___ outside: wear a jumper and a scarf.', o: ['chilly', 'cosy', 'mild', 'seasonal'] },
+          { q: 'Celebrations give people a sense of ___ to a community.', o: ['belonging', 'heritage', 'ritual', 'gratitude'] },
+          { q: 'Many families ___ their ancestors on All Saints’ Day.', o: ['honour', 'mark', 'pass', 'wish'] },
+          { q: 'Some people think Christmas is too ___: it’s all about buying things.', o: ['commercialised', 'inclusive', 'ancient', 'sacred'] },
+          { q: 'Schools help to keep the tradition ___.', o: ['alive', 'out', 'back', 'down'] },
+          { q: 'Children dress up and go trick or ___.', o: ['treating', 'treat', 'treats', 'to treat'] },
+          { q: 'The recipe for panellets is passed ___ from grandparents to grandchildren.', o: ['down', 'on', 'up', 'out'] },
+          { q: 'There was ___ on the cars this morning, so we scraped the windows.', o: ['frost', 'fog', 'harvest', 'mist'] },
+          { q: 'In October the leaves ___ colour. (ch...)', a: ['change'] },
+          { q: 'At the Castanyada we ___ chestnuts in a hot pan. (r...)', a: ['roast'] },
+          { q: 'Our living room is warm and comfortable on a cold night. It’s very ___. (c...)', a: ['cosy', 'cozy'] },
+          { q: 'On Sunday we ___ a big family get-together. (h...)', a: ['have'] },
+          { q: 'Chestnuts and mushrooms are ___ food: they grow at this time of year. (s...)', a: ['seasonal'] },
+          { q: 'The clocks go ___ one hour at the end of October.', a: ['back'] }
         ] } },
 
-    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1, 2], start: 32,
-      intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la forma que falta (2 punts). Pots fer servir contraccions.', en: 'Choose the right option (1 point), then write the missing words (2 points). Contractions are accepted.' },
+    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1.5, 1.5], start: 35,
+      intro: { ca: 'Tria l’opció correcta o escriu la forma que falta (1,5 punts cada una). Pots fer servir contraccions.', en: 'Choose the right option or write the missing words (1.5 points each). Contractions are accepted.' },
       items: {
         beginners: [
-          { q: 'People ___ chestnuts at the Castanyada.', o: ['eat', 'eats', 'are eat', 'eating'] },
-          { q: 'My sister ___ TV every day.', o: ['watches', 'watch', 'is watch', 'watching'] },
-          { q: 'Diwali takes place ___ autumn.', o: ['in', 'on', 'at', 'to'] },
-          { q: 'We watch the fireworks ___ night.', o: ['at', 'in', 'on', 'to'] },
-          { q: 'Christmas is ___ 25 December.', o: ['on', 'in', 'at', 'for'] },
-          { q: '“It’s cold in here.” “I ___ close the window.”', o: ['’ll', '’m going', 'am', 'do'] },
-          { q: 'First, we clean the house. ___, we decorate it.', o: ['Then', 'Because', 'But', 'Or'] },
-          { q: 'We ___ ___ ___ (visit) our grandparents at Christmas. It’s our plan.', a: ['are going to visit', '’re going to visit', "'re going to visit"] },
-          { q: 'The Caga Tió ___ (give) children sweets.', a: ['gives'] },
-          { q: 'There ___ ___ music and food at the party.', a: ['will be'] },
-          { q: 'We would ___ to organise a party.', a: ['like'] }
+          { q: 'My grandmother ___ a special meal every year.', o: ['cooks', 'cook', 'cooking', 'is cook'] },
+          { q: 'Christmas is ___ 25 December.', o: ['on', 'in', 'at', 'to'] },
+          { q: 'We watch the fireworks ___ night.', o: ['at', 'on', 'in', 'to'] },
+          { q: '___ your family decorate the house? — Yes, it does.', o: ['Does', 'Do', 'Is', 'Are'] },
+          { q: 'In autumn the days get ___.', o: ['shorter', 'short', 'more short', 'shortest'] },
+          { q: 'Yesterday my mum ___ panellets at the bakery.', o: ['bought', 'buyed', 'buy', 'buys'] },
+          { q: 'Children ___ (dress) up at Halloween.', a: ['dress'] },
+          { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'] },
+          { q: 'Lunar New Year ___ celebrated in January or February.', a: ['is'] },
+          { q: 'Did you ___ (go) trick or treating last Halloween?', a: ['go'] }
         ],
         insecure: [
-          { q: 'People ___ chestnuts at the Castanyada.', o: ['eat', 'eats', 'are eat', 'eating'] },
-          { q: 'My sister ___ like Halloween.', o: ['doesn’t', 'don’t', 'isn’t', 'not'] },
           { q: 'Diwali takes place ___ autumn.', o: ['in', 'on', 'at', 'to'] },
-          { q: 'We watch the fireworks ___ night.', o: ['at', 'in', 'on', 'to'] },
-          { q: 'Christmas is ___ 25 December.', o: ['on', 'in', 'at', 'for'] },
-          { q: '“It’s cold in here.” “I ___ close the window.”', o: ['’ll', '’m going', 'am', 'do'] },
-          { q: 'First, we clean the house. ___, we decorate it.', o: ['Then', 'Because', 'But', 'Or'] },
-          { q: 'We ___ ___ ___ (visit) our grandparents at Christmas. It’s our plan.', a: ['are going to visit', '’re going to visit', "'re going to visit"] },
-          { q: 'The Caga Tió ___ (give) children sweets.', a: ['gives'] },
-          { q: 'It’s cold outside, ___ the house is cosy.', a: ['but'] },
-          { q: '___ you going to come to the fair?', a: ['are'] }
+          { q: 'The parade starts ___ ten o’clock.', o: ['at', 'on', 'in', 'to'] },
+          { q: '___ Diwali last five days?', o: ['Does', 'Do', 'Is', 'Are'] },
+          { q: 'Some children are scared of ___ past the pumpkins.', o: ['walking', 'walk', 'to walk', 'walked'] },
+          { q: 'When I was little, I ___ believe in the Three Kings. Now I don’t!', o: ['used to', 'use to', 'was', 'did'] },
+          { q: 'It’s November: every morning it gets ___.', o: ['colder', 'more cold', 'coldest', 'cold'] },
+          { q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'] },
+          { q: 'We ___ (not / go) to school on 25 December.', a: ["don't go", 'do not go'] },
+          { q: 'Lunar New Year ___ place in late January or February.', a: ['takes'] },
+          { q: 'My mum ___ (buy) panellets at the bakery yesterday.', a: ['bought'] }
         ],
         safe: [
-          { q: 'Advent calendars ___ have only pictures.', o: ['used to', 'use to', 'were', 'using to'] },
-          { q: 'Lincoln ___ Thanksgiving official in 1863.', o: ['made', 'makes', 'has made', 'was made'] },
-          { q: 'Hanukkah is a festival ___ lasts eight days.', o: ['which', 'who', 'where', 'what'] },
-          { q: '31 October is the day ___ we eat panellets.', o: ['when', 'where', 'which', 'who'] },
-          { q: 'We ___ the band on Saturday. It’s all arranged.', o: ['are meeting', 'meets', 'will to meet', 'meeting'] },
-          { q: 'The bus to the fair ___ at 9.15. (timetable)', o: ['leaves', 'is leaving to', 'will leaves', 'leaving'] },
-          { q: '___ it be possible to use the gym?', o: ['Would', 'Could we', 'Do', 'Is'] },
-          { q: 'Children ___ ___ ___ (not / use to) open Advent calendars with toys.', a: ['didn’t use to', 'did not use to', "didn't use to"] },
-          { q: 'The first Thanksgiving ___ (take) place in 1621.', a: ['took'] },
-          { q: 'The town square is the place ___ the fair takes place.', a: ['where'] },
-          { q: 'I’m sure the visitors ___ ___ (enjoy) the stall.', a: ['will enjoy', '’ll enjoy', "'ll enjoy"] }
+          { q: 'Look outside! It ___ dark already.', o: ['is getting', 'gets', 'get', 'getting'] },
+          { q: 'I’m proud ___ making panellets with my grandma.', o: ['of', 'for', 'about', 'at'] },
+          { q: 'Lunar New Year ___ celebrated in late January or February.', o: ['is', 'are', 'does', 'has'] },
+          { q: 'Thirty years ago, children ___ go trick or treating in Catalonia.', o: ['didn’t use to', 'don’t use to', 'didn’t used to', 'weren’t use to'] },
+          { q: 'People light candles ___ night.', o: ['at', 'in', 'on', 'by'] },
+          { q: '___ your town have a parade at Carnival? — Yes, it does.', o: ['Does', 'Do', 'Is', 'Has'] },
+          { q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'] },
+          { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'] },
+          { q: 'We ___ (never / work) on 1 January.', a: ['never work'] },
+          { q: 'Did you ___ (go) to the Castanyada party last year?', a: ['go'] }
         ],
         daring: [
-          { q: 'The Caga Tió, ___ is a Catalan tradition, is popular with children.', o: ['which', 'that', 'who', 'what'] },
-          { q: 'Sweets ___ to children on Christmas Day.', o: ['are given', 'give', 'are giving', 'is given'] },
-          { q: '___ Diwali is a Hindu festival, people of other faiths enjoy it too.', o: ['Although', 'However', 'Unlike', 'Despite'] },
-          { q: 'We look forward to ___ you at the fair.', o: ['seeing', 'see', 'seen', 'to see'] },
-          { q: 'Abraham Lincoln, ___ was president in 1863, made Thanksgiving official.', o: ['who', 'which', 'that', 'whose'] },
-          { q: 'Advent calendars are popular. ___, some people think they are too commercial.', o: ['On the other hand', 'Although', 'Whereas', 'Because'] },
-          { q: 'Diwali, ___ is known as the festival of lights, takes place in autumn.', o: ['which', 'that', 'what', 'who'] },
-          { q: 'Chestnuts ___ ___ (roast) in the streets in autumn. (passive)', a: ['are roasted'] },
-          { q: 'People ___ ___ ___ (not / use to) buy Advent calendars with toys.', a: ['didn’t use to', 'did not use to', "didn't use to"] },
-          { q: 'I would be grateful if you ___ (can) reply soon.', a: ['could'] },
-          { q: 'Hogmanay is the night ___ people go first-footing.', a: ['when'] }
+          { q: '___ Diwali last five days? — Yes, it does.', o: ['Does', 'Do', 'Is', 'Has'] },
+          { q: 'Our town gets ___ at Christmas: lots of people come to the market.', o: ['busier', 'more busy', 'busiest', 'busy'] },
+          { q: 'Which sentence is correct?', o: ['The Castanyada is held on 31 October.', 'The Castanyada is held in 31 October.', 'The Castanyada holds on 31 October.', 'The Castanyada is hold on 31 October.'] },
+          { q: 'People exchange gifts. → Gifts ___.', o: ['are exchanged', 'are exchange', 'is exchanged', 'exchanged'] },
+          { q: 'Look! The leaves ___ from the trees.', o: ['are falling', 'fall', 'falls', 'is falling'] },
+          { q: 'My family ___ Halloween, but we love the Castanyada.', o: ['doesn’t celebrate', 'don’t celebrate', 'isn’t celebrating', 'doesn’t celebrates'] },
+          { q: 'Diwali ___ (take) place in October or November.', a: ['takes'] },
+          { q: 'Josh is grateful for ___ (have) friends in Catalonia.', a: ['having'] },
+          { q: 'When my grandparents were young, they ___ ___ ___ (live) in a small village.', a: ['used to live'] },
+          { q: 'My mum ___ (buy) panellets at the bakery yesterday.', a: ['bought'] }
         ] } },
 
-    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '43. Escriptura: un correu formal', en: '43. Writing: a formal email' }, max: 30, criterion: '5.1 (formal email)', levels: L51, levelPts: L30,
+    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '45. Escriptura: descriu una celebració', en: '45. Writing: describe a celebration' }, max: 10, criterion: '5.1 (describe a celebration)', levels: L51, levelPts: L10,
       intro: { ca: 'Escriu sense apunts, com a l’examen.', en: 'Write without notes, as in the exam.' },
-      source: 'The community centre in the student’s town is preparing an International New Year evening for families on Friday 8 January. The class wants to run an activity about a New Year tradition from another country. The email is to Mr Jordi Serra, the director of the community centre.', sourceLabel: 'Situation',
-      task: { beginners: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Completa la plantilla del correu (40–60 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país: per què escrius, quina tradició, dues coses que hi haurà (There will be…) i una petició (Could we…?).\nBanc de paraules: New Year · Scotland · Japan · a song · a dance · special food · decorations · music · a table · the hall',
-        insecure: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Escriu un correu formal (60–80 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país. Completa la plantilla: per què escrius, quina tradició i quina activitat, dues coses que hi haurà (There will be… / We are going to…) i una petició (Could you…?).\nParaules útils: activity · tradition · New Year · decorations · special food · music · a table · the hall',
-        safe: 'The community centre in your town is preparing an International New Year evening for families on Friday 8 January. Write a formal email (100–130 words) to Mr Jordi Serra, the director, proposing an activity about a New Year tradition from another country. Write it in paragraphs: why you are writing, your plan (which tradition, what families will do, using future forms), one request, and a formal closing. Use at least one relative clause (who / which / where).',
-        daring: 'The community centre in your town is preparing an International New Year evening for families on Friday 8 January. Write a formal email (140–180 words) to Mr Jordi Serra, the director, proposing an activity about a New Year tradition from another country. Write it in paragraphs: why you are writing, your plan (which tradition, what families will do and why it matters), one polite request, and a formal closing. Mr Serra is worried that the hall is small and the evening could be too crowded: answer this concern in your email.' },
-      template: { beginners: 'Dear Mr Serra,\nI am writing to propose an activity about …\nWe would like to …\nThere will be … and …\nCould we use …?\nI look forward to hearing from you.\nYours sincerely,\n…', insecure: 'Dear Mr Serra,\nI am writing to …\nWe would like to …\nThere will be … We are going to …\nCould you …?\nI look forward to hearing from you.\nYours sincerely,\n…', safe: 'Dear Mr Serra,\n\nI am writing to propose…', daring: 'Dear Mr Serra,\n\nI am writing to propose…' },
-      min: { beginners: 40, insecure: 60, safe: 100, daring: 140 } },
+      source: 'The student describes a celebration for a visitor who doesn’t know it (as in LP2): what it is, when it is (It is celebrated on / in…), customs (Present Simple), a food or symbol, and how they feel and why.', sourceLabel: 'Situation',
+      task: { beginners: 'Descriu una celebració (35–50 paraules) per a un visitant amb la pauta: què és, quan és (<em>It is celebrated on / in…</em>), dos costums (<em>People… / Children…</em>), un menjar i com et sents.\nBanc de paraules: celebrate · decorate · dress up · give presents · eat together · fireworks · lights · special meal · happy · excited',
+        insecure: 'Descriu una celebració (50–70 paraules) per a algú que no la coneix: què és, quan és (<em>It is celebrated on / in…</em>), tres costums (<em>People… / Children… / Families…</em>), un menjar o símbol i com et sents i per què.',
+        safe: 'Describe a celebration for a visitor who doesn’t know it (80–110 words): what it is, when it is (It is celebrated / It takes place…), three customs, one food or symbol, two adjectives (traditional, family-friendly, colourful…) and one thing people used to do in the past.',
+        daring: 'Describe a celebration for a visitor who doesn’t know it (110–140 words): what it is, when, customs, food or symbols, what it means to people (belonging, heritage, honour…), one thing people used to do in the past and at least one Present Simple passive (… is eaten, … are decorated).' },
+      template: { beginners: '… is celebrated on / in …\nPeople …\nChildren …\nWe eat …\nI feel … because …', insecure: '… is celebrated on / in …\nPeople … Children … Families …\nWe eat …\nI feel … because …', safe: '… is celebrated…', daring: '… is celebrated…' },
+      min: { beginners: 35, insecure: 50, safe: 80, daring: 110 } },
 
     { id: 'score', type: 'summary', tab: { ca: 'La meva nota', en: 'My score' }, title: { ca: 'La meva nota', en: 'My score' },
-      intro: { ca: 'Primer intent de cada secció i les notes de ChatGPT que has apuntat.', en: 'Your first try in each section and the ChatGPT marks you noted.' } }
+      intro: { ca: 'Primer intent de cada secció. L’escriptura no té nota: en tens la correcció.', en: 'Your first try in each section. The writing has no mark: you get its correction.' } }
   ]
 };
 })();

@@ -76,7 +76,7 @@
   function attach(card) {
     if (card.dataset.elVoice) return; card.dataset.elVoice = '1'; css();
     const row = document.createElement('div'); row.className = 'el-voice-row';
-    const ca = () => /^(insecure|beginners)$/.test(String(root.level || (document.querySelector('.route.active') || {}).dataset?.level || ''));
+    const ca = () => /^beginners$/.test(String(root.level || (document.querySelector('.route.active') || {}).dataset?.level || ''));
     row.innerHTML = '<button type="button" data-v="word"></button><button type="button" data-v="ex" hidden></button>';
     const [bw, be] = row.querySelectorAll('button');
     const label = () => { bw.textContent = '🔊 ' + (ca() ? 'Escolta' : 'Listen'); be.textContent = '🔊 ' + (ca() ? 'Exemple' : 'Example'); };

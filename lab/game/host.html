@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en" class="notranslate" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><script src="../../shared/js/el-nocopy.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#3d1d8f">
 <meta name="robots" content="noindex">
@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="game.css">
+<link rel="stylesheet" href="../../shared/css/el-notebook.css?v=20261114a">
 <style>
 /* The board (projector): sized by the screen, so it fills a projected 16:9 picture. */
 body{font-size:clamp(16px,1.15vw + 6px,30px)}
@@ -22,6 +23,8 @@ h1.logo{font-size:3em;margin:.1em 0;letter-spacing:.01em;text-shadow:0 .08em 0 r
 .picks{display:flex;flex-wrap:wrap;gap:.8em;justify-content:center}
 .deckbtn{display:flex;align-items:center;gap:.5em;font-size:1.1em;padding:.7em 1.2em}
 .deckbtn .e{font-size:1.6em}
+.mixbtn .e{white-space:nowrap;font-size:1.25em;letter-spacing:-.15em}   /* 📚🧩 Vocabulary + Grammar (Roger, 19 Nov 2026) */
+.rp{margin:.9em auto 0;max-width:46em;text-align:center;font-weight:700;color:#fff;font-size:1.05em}.rp .btn{margin-left:.5em;font-size:.85em}
 .pl{font-size:.8em;font-weight:800}.pl span{margin-right:.6em}.pl-y{color:#15803d}.pl-n{color:#b91c1c}.btn.go .pl-y{color:#14532d}.btn.go .pl-n{color:#7f1d1d}
 .courses{width:min(94vw,64em);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24em),1fr));gap:1.2em;align-items:start;margin-bottom:1em}
 .course{background:rgba(0,0,0,.18);border-radius:18px;padding:.6em 1em 1em}
@@ -29,6 +32,31 @@ h1.logo{font-size:3em;margin:.1em 0;letter-spacing:.01em;text-shadow:0 .08em 0 r
 .course h3{margin:.6em 0 .5em;font-size:1.1em;opacity:.9;font-weight:600}
 .course .picks{flex-direction:column;align-items:stretch}
 .course .deckbtn{text-align:left}
+.cbbtn{background:#0b2530;color:#38f28a;border:2px solid #38f28a;box-shadow:0 0 14px rgba(56,242,138,.25)}
+.srbtn{background:#141a46;color:#fde68a;border:2px solid #fbbf24;box-shadow:0 0 14px rgba(251,191,36,.25)}
+/* 🎮 Quiz or 🕵️ Code Breakers (Roger, 16 Nov 2026): the chosen one is lit and outlined, the other dimmed */
+.fmt{display:inline-flex;align-items:center;gap:.5em;flex-wrap:wrap;justify-content:center;background:rgba(0,0,0,.22);border-radius:999px;padding:.35em .5em .35em 1em;margin:.3em 0 .5em;font-weight:600}
+.fsw{display:inline-flex;background:rgba(0,0,0,.25);border-radius:999px;padding:3px;gap:2px}.fsw button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:.35em .8em;background:none;color:#fff;opacity:.6;cursor:pointer}.fsw button.on{background:#fff;color:#2e1470;opacity:1}
+.fmt .btn{padding:.45em 1em}.fmt .btn.on{outline:3px solid #fff;outline-offset:2px}.fmt .btn.off{opacity:.55;box-shadow:none}
+/* 🧩 Which grammar? (Roger, 16 Nov 2026): the grammar points of every grammar game of the course, ticked by the Time plan */
+.tpwrap{align-items:start;padding-top:.4em}.tpwrap h1.logo{font-size:1.9em;margin:0}.tpwrap .sub{font-size:.9em;margin:.2em auto .6em;max-width:60em}
+.tpcols{font-size:.84em;width:min(96vw,84em);margin:0 auto .8em;display:grid;gap:1em;text-align:left}
+.tpls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22em),1fr));gap:.7em;align-items:start}.tpls h3{grid-column:1/-1;margin:.2em 0 0}
+.tplp{background:rgba(255,255,255,.1);border-radius:14px;padding:.45em .7em .55em}.tplp.me{background:rgba(255,255,255,.2);outline:3px solid var(--gold)}
+.tpnow{grid-template-columns:1fr}.tpnow .tplp{padding:.6em .9em .7em}.tpnow .tprows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26em),1fr));gap:0 .8em;align-items:stretch}.tpnow .tpi{font-size:1.05em}
+.tpwrap{padding-bottom:1em}.tpi{scroll-margin-top:9em}.tpwrap .tpbar{margin-bottom:.8em}
+/* ↕ the game list and the ticks scroll inside the board (Roger, 19 Nov 2026) */
+.app.scroll{overflow-y:auto;overscroll-behavior:contain}.app.scroll>.center{flex:none;min-height:100%;box-sizing:border-box}
+.tph{display:flex;align-items:center;gap:.5em;margin-bottom:.3em}.tph .sp{flex:1}.tpme{white-space:nowrap;background:var(--gold);color:var(--ink);border-radius:999px;padding:.05em .6em;font-size:.75em;font-weight:700}
+.tpa{background:none;border:1.5px solid rgba(255,255,255,.6);color:#fff;border-radius:999px;font:inherit;font-size:.72em;padding:.1em .7em;cursor:pointer}.tpa:hover{background:rgba(255,255,255,.15)}
+.tpi{display:flex;align-items:center;flex-wrap:wrap;gap:.1em .55em;background:#fff;color:var(--ink);border-radius:10px;padding:.35em .6em;margin:.3em 0;cursor:pointer;opacity:.6;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.tpi.on{opacity:1}.tpi input{width:1.25em;height:1.25em;flex:none;accent-color:#16a34a;cursor:pointer}.tpi .tpt{flex:1 1 10em;font-weight:600}.tpi small{font-size:.75em;white-space:nowrap;margin-left:auto}
+.tpy{color:#15803d;font-weight:700}.tpn{color:#64748b}
+/* 📊 the class's % on a point last time (Roger, 16 Nov 2026) */
+.tpp{flex:none;min-width:3.4em;text-align:center;border-radius:8px;padding:.15em .3em;font-size:.85em;font-weight:800;white-space:nowrap;color:#fff;font-variant-numeric:tabular-nums}
+.tpp.lo{background:#dc2626}.tpp.mid{background:#d97706}.tpp.hi{background:#16a34a}.tpp.none{background:#e2e8f0;color:#64748b}.tpd{color:#475569}
+.tpbar{position:sticky;top:.4em;z-index:5;display:flex;align-items:center;justify-content:center;gap:.6em;flex-wrap:wrap;background:#2e1470;box-shadow:0 6px 20px rgba(0,0,0,.35);border-radius:16px;padding:.5em 1em;width:min(96vw,80em);margin:0 auto}
+.tpbar{font-size:.88em}.tpbar .btn{padding:.4em .9em}.tptot{font-size:1.1em;margin:0 .4em}.tpbar .btn[disabled]{opacity:.5;cursor:not-allowed}
 .join{display:flex;align-items:center;justify-content:center;gap:1em;flex-wrap:wrap}
 .join .card{padding:.5em 1.2em;font-size:1.1em}
 .count{font-size:1.4em;font-weight:700}
@@ -66,8 +94,8 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
 /* ⛶ 📴 who left full screen / is not connected (Roger, 6 Nov 2026): counts in the top bar, names when the teacher taps them */
 .top{position:relative}.top button.pill{border:0;color:#fff;font:inherit;cursor:pointer}.top .pill.warn{background:#c2410c}.top .pill.warn.off{background:#b3261e}
 .whobox{position:absolute;top:100%;left:1em;z-index:20;max-width:min(560px,90vw);max-height:60vh;overflow:auto;background:#fff;color:var(--ink);border-radius:14px;padding:.4em 1em;font-size:16px;font-weight:500;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.top{flex-wrap:wrap}.wholeft{flex:1 1 100%;order:9;display:flex;flex-wrap:wrap;gap:.25em 1em;background:#fff;color:var(--ink);border-radius:12px;padding:.3em .9em;font-size:17px;font-weight:500;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.25)}.wholeft .o{color:#b3261e}.wholeft .b{color:#c2410c}.wholeft small{font-size:.8em}
-.whobox p{margin:.5em 0}.top .pill.who{background:#166534}.top .pill.who.warn{background:#c2410c}.whobox .o{color:#b3261e}.whobox .nv{color:#475569}.whobox .i{color:#166534}
+.top .pill{font-variant-numeric:tabular-nums}
+.whobox p{margin:.5em 0}.top .pill.who{background:#166534}.top .pill.who.warn{background:#c2410c}.whobox .o{color:#b3261e}.whobox .nv{color:#475569}.whobox .i{color:#166534}.whobox .bk{color:#c2410c}.whobox small{font-size:.8em}
 /* 📝 Take your notes (Roger, 6 Nov 2026): the theory again, small, while the students write their notes on their devices */
 .notes{flex:1;min-height:0;display:flex;flex-direction:column;gap:.6em;padding:1em 1.4em;max-width:80em;width:100%;align-self:center}
 .notes .nhead{display:flex;align-items:center;gap:1em}.notes .nemo{font-size:4em;line-height:1}
@@ -78,6 +106,32 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
 .notes .recap p{margin:.3em 0}.notes .recap .watch{background:#fff4d6;border-left:.3em solid var(--gold);border-radius:10px;padding:.3em .6em}
 .notes .recap table.tt{border-collapse:collapse;width:100%;margin:.3em 0}.notes .recap .tt th{background:#ede4ff;color:#4c1d95;text-align:left;padding:.2em .5em;border:2px solid #d9c8ff}
 .notes .recap .tt td{padding:.2em .5em;border:2px solid #e6dcff;vertical-align:top}
+/* 📓 the theory and 📝 notes slides drawn like the student's notebook (Roger, 14 Nov 2026: "when doing the grammar, the vocab, and the
+   reading together, and I present information, I want the slide have this style"; el-notebook.css: .nb-postit, .nb-h3, .nb-slip):
+   lined paper with the red margin, a 📚 Vocabulary / 🧩 Grammar post-it, the title in pencil, the explanation on a taped slip in the
+   teacher's handwriting (Kalam), the key words in blue ink, tables drawn in pen, ⚠️ on a yellow sticky band */
+.card.nbk{background:linear-gradient(90deg,transparent 3.2em,var(--nb-margin) 3.2em calc(3.2em + 2px),transparent calc(3.2em + 2px)),repeating-linear-gradient(transparent 0 1.6em,var(--nb-line) 1.6em calc(1.6em + 1px)) var(--nb-paper);background-attachment:local;border-radius:6px;color:var(--nb-black)}
+.theory.nbk{grid-template-columns:auto 1fr;grid-template-areas:"top top" "pic tx";grid-template-rows:auto 1fr;align-items:start;row-gap:.1em;column-gap:.8em;padding:.4em 1.4em 1em 4em;align-self:center;max-width:none}
+.theory.nbk.wide{max-width:none}.theory.nbk{min-height:0;overflow:auto}.theory.nbk .tx{max-height:none;overflow:visible}
+.nbk .nbtop{grid-area:top}.theory.nbk .pic{grid-area:pic;font-size:4em;align-self:center}.theory.nbk.wide .pic{font-size:3em}.theory.nbk .tx{grid-area:tx}
+.nbk .nb-postit{font-size:1.25em;line-height:1.35;margin:.3em 0 .1em -.4em}.nbk .nb-postit small{font-size:.75em}
+.theory.nbk h2.nb-h3{font:700 2.1em/1.2 var(--nb-hand);color:var(--nb-pencil);margin:.1em 0 .1em}
+.nbk .nb-slip{margin:.9em .2em .6em;padding:.7em 1.1em .6em;font:400 1em/1.5 var(--nb-teacher);color:#222}
+.theory.nbk .nb-slip p{font-size:1.5em;margin:.3em 0}.theory.nbk table.tt{font-size:1.2em}.theory.nbk .ca p{font-size:1.3em}
+.nbk b.k{color:var(--nb-ink);font-weight:700}
+.nbk s.no{color:var(--nb-red)}
+.nbk .gap{border-bottom-color:#222}
+.nbk table.tt{border-collapse:collapse}.nbk .tt th,.nbk .tt td,.notes.nbk .recap .tt th,.notes.nbk .recap .tt td{border:1.5px solid #333;background:transparent;color:#222;font-weight:400}
+.nbk .tt th,.notes.nbk .recap .tt th{background:#f3f4f6;font-weight:700}
+.nbk .tt tr:nth-child(even) td{background:transparent}
+.nbk .watch,.notes.nbk .recap .watch{background:#fff8dc;border:0;border-left:.22em solid #f5b400;border-radius:0}
+.theory.nbk .ca{background:#eef6ff;border-radius:0;color:#1e3a8a}.theory.nbk .ca b{font-family:var(--nb-sans)}
+.notes.nbk{padding:.8em 1.4em 1em 4.4em}
+.notes.nbk .nhead h2{font:700 2em/1.2 var(--nb-hand);color:var(--nb-pencil)}.notes.nbk .nhead p{font-family:var(--nb-sans)}
+.notes.nbk .stat{font-family:var(--nb-sans)}
+.notes.nbk .recap{border-top:0;font-size:1.05em;columns:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24em),1fr));column-gap:1.2em;align-items:start;align-content:start}.notes.nbk .recap section.nb-slip{margin:.9em .3em 1.1em;padding:.5em .9em .4em;display:block}
+.notes.nbk .recap h3{font:700 1.15em/1.3 var(--nb-teacher);color:#222}
+@media (max-width:700px){.theory.nbk{grid-template-areas:"top" "pic" "tx";grid-template-columns:1fr;padding-left:1.4em}.card.nbk{background:var(--nb-paper)}.notes.nbk{padding-left:1.2em}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:1em;height:46vh;margin-top:1em}
 .podium div{height:100%;width:11em;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
 .podium .nm{font-weight:700;font-size:1.2em;margin-bottom:.3em;text-align:center}
@@ -101,4 +155,5 @@ s.no{color:var(--no);text-decoration-thickness:.12em}
 <script src="game.js"></script>
 <script src="decks/index.js"></script>
 <script type="module" src="host.js"></script>
+<script type="module" src="../../shared/js/el-report-btn.js"></script>
 </body></html>

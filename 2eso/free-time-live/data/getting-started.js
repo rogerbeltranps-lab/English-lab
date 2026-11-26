@@ -37,9 +37,9 @@ window.LP = {
         { q: 'I ___ football with my friends on Saturdays. (jugar)', a: ['play'] },
         { q: 'We go ___ in the sea in August. (nedar)', a: ['swimming'] },
         { r: 'insecure', q: 'My brother ___ karate twice a week. (fer)', a: ['does'] },
-        { r: 'insecure', q: 'She plays ___ guitar in her room. (article)', a: ['the'] },
+        { r: 'insecure', q: 'She plays ___ guitar in her room. (a, an or the?)', a: ['the'] },
         { q: 'I like to ___ comics at night. (llegir)', a: ['read'] },
-        { q: 'We ___ friends in the square after school. (quedar amb)', a: ['meet'] },
+        { q: 'We ___ friends in the square after school. (quedar amb)', a: ['meet', 'meet up with', 'hang out with'] },
         { q: 'They go ___ at the skate park. (patinar)', a: ['skating'] },
         { q: 'I ___ to music on the bus. (escoltar)', a: ['listen'] },
         { r: 'insecure', q: 'My sister ___ pictures of animals. (dibuixar)', a: ['draws'] },
@@ -48,6 +48,82 @@ window.LP = {
         { r: 'safe', q: 'I don’t play football during the week, only ___ the weekend.', a: ['at'] },
         { r: 'daring', q: 'He is very good ___ basketball.', a: ['at'] },
         { r: 'daring', q: 'I ___ a lot of time drawing. (passar)', a: ['spend'] }
+      ] },
+    /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
+       put it on the agenda"; "expressions must have the option like the grammar to correct together where I explain, then 4 examples and then
+       time to do their own questions according to their level"): the Expressions boxes moved here from the Vocabulary step, with 6 compulsory
+       questions per level (req: 6; Starter and Base their own list with choices and Catalan hints) and ➕ extra practice for every level, which
+       📘 Expressions together (shared/correct/, elIsGrammar) takes its 🙌 4 questions from. No listening. Until 💬 Expressions is on a class day
+       of the Time plan, students see the tab 🏫 for class: never To do or homework (elLaterTabs in el-catalog.js). */
+    { id: 'vocabEx', req: 6, type: 'typed', tab: { ca: '💬 Expressions', en: '💬 Expressions' }, title: { ca: 'Expressions: play, go o do?', en: 'Expressions: play, go or do?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Mira les expressions: són paraules que van juntes i s’aprenen en bloc. Hi ha 6 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després ve ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Look at the expressions: words that go together, learnt as one block. There are 6 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. Then comes ➕ extra practice, optional. After two wrong tries you will see the answer.' },
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('⚽🏊🥋', '<em>play</em>, <em>go</em> o <em>do</em>?', 'En català sempre diem “fer” o “jugar”, però en anglès depèn de l’activitat.') +
+              row(card('blue', '⚽ play + esports amb pilota i jocs', ex('<b>play</b> football · basketball') + ex('<b>play</b> video games') + small('🎸 Instruments: <b>play the</b> guitar · <b>play the</b> piano'), 200),
+                card('green', '🏊 go + verb-ing', ex('<b>go</b> swimming · skating · cycling') + small('📍 Llocs: <b>go to</b> the park'), 200),
+                card('purple', '🥋 do + activitats sense pilota', ex('<b>do</b> karate') + ex('<b>do</b> gymnastics') + ex('<b>do</b> yoga'), 200)) +
+              row(card('slate', '🎵 Altres', ex('<b>listen to</b> music', 'amb to!') + ex('<b>meet</b> friends') + ex('<b>read</b> comics · <b>draw</b> · <b>dance</b>'))) +
+              mistakes('Compte!', bad('I do football.', 'I <b>play</b> football.'), bad('I go to swim.', 'I <b>go swimming</b>.'), bad('He plays karate.', 'He <b>does</b> karate.'), bad('I listen music.', 'I listen <b>to</b> music.')),
+            en: head('⚽🏊🥋', '<em>play</em>, <em>go</em> or <em>do</em>?', 'It depends on the activity.') +
+              row(card('blue', '⚽ play + ball sports and games', ex('<b>play</b> football · basketball') + ex('<b>play</b> video games') + small('🎸 Instruments: <b>play the</b> guitar · <b>play the</b> piano'), 200),
+                card('green', '🏊 go + verb-ing', ex('<b>go</b> swimming · skating · cycling') + small('📍 Places: <b>go to</b> the park'), 200),
+                card('purple', '🥋 do + activities without a ball', ex('<b>do</b> karate') + ex('<b>do</b> gymnastics') + ex('<b>do</b> yoga'), 200)) +
+              row(card('slate', '🎵 Others', ex('<b>listen to</b> music', 'with to!') + ex('<b>meet</b> friends') + ex('<b>read</b> comics · <b>draw</b> · <b>dance</b>'))) +
+              mistakes('Watch out', bad('I do football.', 'I <b>play</b> football.'), bad('I go to swim.', 'I <b>go swimming</b>.'), bad('He plays karate.', 'He <b>does</b> karate.'), bad('I listen music.', 'I listen <b>to</b> music.')) },
+          { r: 'safe', en: head('📅', 'How often?', 'Put these at the <b>end</b> of the sentence.') +
+              scale([['green', '1️⃣', 'once a week'], ['teal', '2️⃣', 'twice a week'], ['blue', '3️⃣', 'three times a week'], ['purple', '📅', 'every day']]) +
+              row(card('blue', 'Examples', ex('I go swimming <b>once a week</b>.') + ex('We train <b>twice a week</b>.') + ex('He practises <b>every day</b>.') + ex('I meet friends <b>at the weekend</b>.') + ex('I read comics <b>in my free time</b>.'))) +
+              mistakes('Watch out', bad('two times a week', '<b>twice</b> a week'), bad('every days', 'every <b>day</b>'), bad('in the weekend', '<b>at</b> the weekend')) },
+          { r: 'daring', en: head('⭐', 'Talking about hobbies', 'These take <b>-ing</b> after them.') +
+              row(card('blue', 'be good at + -ing / noun', ex('She is <b>good at drawing</b>.') + ex('I’m <b>good at</b> maths.')),
+                card('purple', 'spend time + -ing', ex('I <b>spend</b> a lot of <b>time playing</b> the piano.')),
+                card('green', 'join a club · practise', ex('He wants to <b>join</b> a chess <b>club</b>.') + ex('They <b>practise</b> after school.', 'verb: practi<b>s</b>e'))) +
+              mistakes('Watch out', bad('good in drawing', 'good <b>at</b> drawing'), bad('I spend time to play.', 'I spend time <b>playing</b>.')) }
+        ];
+      })(),
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>play</b> + esports amb pilota i jocs · <b>play the</b> + instrument · <b>go</b> + -ing · <b>do</b> + karate, ioga… · <b>listen to</b> music', en: '<b>play</b> + ball sports and games · <b>play the</b> + instrument · <b>go</b> + -ing · <b>do</b> + karate, yoga… · <b>listen to</b> music' } }],
+      items: [
+        // Starter and Base
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['play', 'do', 'go'], q: 'I ___ football with my friends on Saturdays.', a: ['play'], ca: 'Esport amb pilota → play.', en: 'Ball sport → play.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['swimming', 'swim', 'to swim'], q: 'We go ___ in the sea in summer.', a: ['swimming'], ca: 'go + -ing: go swimming.', en: 'go + -ing.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['does', 'plays', 'goes'], q: 'My brother ___ karate after school.', a: ['does'], ca: 'Sense pilota → do (he → does).', en: 'No ball → do (he → does).' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['the', 'a', 'to'], q: 'She plays ___ guitar in a band.', a: ['the'], ca: 'Instrument → play the.', en: 'Instrument → play the.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['to', 'at', 'for'], q: 'I listen ___ music on the bus.', a: ['to'], ca: 'escoltar = listen to.', en: 'listen to.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['go', 'do', 'play'], q: 'They ___ skating at the skate park.', a: ['go'], ca: 'go + -ing: go skating.', en: 'go + -ing.' },
+        // Core and Plus
+        { p: 'ex', r: 'safe', q: 'My sister ___ gymnastics at a club.', a: ['does'], en: 'do + activities without a ball (she → does).' },
+        { p: 'ex', r: 'safe', q: 'We usually go ___ on Sundays. (cycle)', a: ['cycling'], en: 'go + -ing: go cycling.' },
+        { p: 'ex', r: 'safe', q: 'He ___ the piano really well.', a: ['plays'], en: 'play the + instrument.' },
+        { p: 'ex', r: 'safe', k: 'fix', q: '“I go to swim every Saturday.” → I go ___ every Saturday.', a: ['swimming'], en: 'go + -ing (not go to + verb).' },
+        { p: 'ex', only: ['safe'], q: 'We train on Mondays and Thursdays: we train ___ a week.', a: ['twice'], en: 'Two times → twice.' },
+        { p: 'ex', only: ['safe'], q: 'I go swimming ___ a week: only on Saturdays.', a: ['once'], en: 'One time → once.' },
+        { p: 'ex', r: 'daring', q: 'She is really good ___ drawing.', a: ['at'], en: 'be good at + -ing.' },
+        { p: 'ex', r: 'daring', q: 'I spend a lot of time ___ video games. (play)', a: ['playing'], en: 'spend time + -ing.' },
+        // ➕ for every level (📘 Expressions together takes its 4 questions from these)
+        { p: 'ex', opts: ['plays', 'does', 'goes'], q: 'Pau ___ basketball after school.', a: ['plays'], ca: 'Esport amb pilota → play (he → plays).', en: 'Ball sport → play (he → plays).' },
+        { p: 'ex', opts: ['to', 'at', 'in'], q: 'Let’s go ___ the park!', a: ['to'], ca: 'Lloc → go to.', en: 'A place → go to.' },
+        { p: 'ex', opts: ['does', 'plays', 'goes'], q: 'My mum ___ yoga in the morning.', a: ['does'], ca: 'ioga → do (she → does).', en: 'yoga → do (she → does).' },
+        { p: 'ex', opts: ['read', 'play', 'do'], q: 'I ___ comics in bed at night.', a: ['read'], ca: 'llegir còmics = read comics.', en: 'read comics.' }
       ] },
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Two posts from Saturday', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix dos missatges d’un grup de classe. Fixa’t en què fan normalment i en què fan avui.', en: 'Read two posts from a class group chat. Notice what people usually do and what they are doing today.' },
@@ -58,12 +134,12 @@ window.LP = {
         daring: '<p><strong>Post 1 · Marta, 10:30</strong><br>Good morning from the skate park! ☀️ It’s sunny and a bit windy today, perfect for skating. I’m here with Pol and Aina. Pol is skating on the big ramp and Aina is taking photos for our club channel, because we’re uploading a video tonight. I usually come here on Saturday mornings to practise, but today is special: there is a competition at 12 o’clock and lots of people are already watching. Come and support us, we need fans!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi everyone! I’m at home, and I’m not happy. It’s raining now, so there is no football today. ☔ I usually play football on Saturday afternoons and then I meet my friends in the square. Right now I’m playing video games with my brother and we’re listening to music, which is fine, but I prefer the football pitch. What are you doing? Send photos, I need ideas!</p>'
       } },
       items: [
-        { q: 'Where is Marta?', o: ['at the skate park', 'at home', 'at school'], h: 'Mira la primera frase del post 1.' },
-        { q: 'What is Pol doing?', o: ['skating', 'taking photos', 'playing video games'], h: 'Busca “Pol is…”.' },
-        { q: 'What is the weather like at the skate park?', o: ['sunny', 'rainy', 'cold'], h: 'Busca el sol ☀️.' },
-        { q: 'When does Marta usually go to the skate park?', o: ['on Saturdays', 'on Sundays', 'every day'], h: 'Busca “usually”.' },
-        { q: 'What is Hugo doing now?', o: ['playing video games', 'playing football', 'meeting his friends'], h: 'Busca “Now I’m…”.' },
-        { r: 'insecure', q: 'Why is there no football today?', o: ['It’s raining.', 'It’s sunny.', 'Hugo is tired.'], h: 'Mira el ☔.' },
+        { q: 'Where is Marta?', o: ['at the skate park', 'at home', 'at school'], h: 'Mira la primera frase del post 1.', he: 'Look at the first sentence of post 1.' },
+        { q: 'What is Pol doing?', o: ['skating', 'taking photos', 'playing video games'], h: 'Busca “Pol is…”.', he: 'Find “Pol is…”.' },
+        { q: 'What is the weather like at the skate park?', o: ['sunny', 'rainy', 'cold'], h: 'Busca el sol ☀️.', he: 'Find the sun ☀️.' },
+        { q: 'When does Marta usually go to the skate park?', o: ['on Saturdays', 'on Sundays', 'every day'], h: 'Busca “usually”.', he: 'Find “usually”.' },
+        { q: 'What is Hugo doing now?', o: ['playing video games', 'playing football', 'meeting his friends'], h: 'Busca “Now I’m…”.', he: 'Find “Now I’m…”.' },
+        { r: 'insecure', q: 'Why is there no football today?', o: ['It’s raining.', 'It’s sunny.', 'Hugo is tired.'], h: 'Mira el ☔.', he: 'Look at the ☔.' },
         { r: 'safe', q: 'Why is Aina taking photos?', o: ['for the club channel', 'for her family', 'for the school'] },
         { r: 'safe', q: 'What does Hugo usually do after football?', o: ['He meets his friends in the square.', 'He plays video games.', 'He goes to the skate park.'] },
         { r: 'daring', q: 'Why does Marta say “we need fans”?', o: ['She wants people to come and support them at the competition.', 'The skate park is empty.', 'She is selling tickets.'] },
@@ -82,12 +158,12 @@ window.LP = {
         ['Omar', 'See you!']] },
       chunks: ['My sister is playing basketball', 'I usually go swimming', 'I’m drawing a comic'],
       items: [
-        { q: 'Where is Omar?', o: ['at the sports centre', 'at the swimming pool', 'at home'], h: 'Escolta la primera resposta de l’Omar.' },
-        { q: 'What is his sister doing?', o: ['playing basketball', 'swimming', 'drawing'], h: 'Escolta “My sister is…”.' },
-        { q: 'What does Omar usually do on Saturday mornings?', o: ['He goes swimming.', 'He plays basketball.', 'He draws comics.'], h: 'Escolta “I usually…”.' },
-        { q: 'Why isn’t he swimming today?', o: ['The pool is closed.', 'It’s raining.', 'He is tired.'], h: 'Escolta “today the pool…”.' },
-        { q: 'What is Laia doing?', o: ['drawing a comic', 'playing the guitar', 'walking in the park'], h: 'Escolta “I’m at home. I’m…”.' },
-        { r: 'insecure', q: 'What time do they meet?', o: ['at half past twelve', 'at twelve', 'at half past one'], h: 'Escolta “half past…”.' },
+        { q: 'Where is Omar?', o: ['at the sports centre', 'at the swimming pool', 'at home'], h: 'Escolta la primera resposta de l’Omar.', he: 'Listen to Omar’s first answer.' },
+        { q: 'What is his sister doing?', o: ['playing basketball', 'swimming', 'drawing'], h: 'Escolta “My sister is…”.', he: 'Listen for “My sister is…”.' },
+        { q: 'What does Omar usually do on Saturday mornings?', o: ['He goes swimming.', 'He plays basketball.', 'He draws comics.'], h: 'Escolta “I usually…”.', he: 'Listen for “I usually…”.' },
+        { q: 'Why isn’t he swimming today?', o: ['The pool is closed.', 'It’s raining.', 'He is tired.'], h: 'Escolta “today the pool…”.', he: 'Listen for “today the pool…”.' },
+        { q: 'What is Laia doing?', o: ['drawing a comic', 'playing the guitar', 'walking in the park'], h: 'Escolta “I’m at home. I’m…”.', he: 'Listen for “I’m at home. I’m…”.' },
+        { r: 'insecure', q: 'What time do they meet?', o: ['at half past twelve', 'at twelve', 'at half past one'], h: 'Escolta “half past…”.', he: 'Listen for “half past…”.' },
         { r: 'safe', q: 'Why isn’t Laia going to the park?', o: ['It’s raining.', 'She has homework.', 'The park is closed.'] },
         { r: 'safe', q: 'What is the comic about?', o: ['a cat who plays the guitar', 'a dog who plays basketball', 'a cat who swims'] },
         { r: 'daring', q: 'Why does Laia ask “Where are you?” at the start?', o: ['because it is very noisy', 'because Omar is late', 'because she can’t find the square'] },

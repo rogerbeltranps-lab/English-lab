@@ -10,11 +10,15 @@ import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "../../shared/js/el-firebase.js";
 import {signIn} from "../../shared/js/el-signin.js";
+import {cbPlayer} from "./cb-play.js";
+import {report,wakeFixer} from "../../shared/js/el-report.js";
+import {awayWatch,awayCount} from "../../shared/js/el-away.js";   // 🎓 leaving the game for other windows, tabs, apps
 
 const G=window.ELGame,{esc,md,pic}=G;
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=document.getElementById("app");G.bg();
 const P=new URLSearchParams(location.search),FROM=(P.get("from")||"").startsWith("/")?P.get("from"):new URL("../../today.html",location.href).pathname;
+let joined=null,CBP=null;   // 🕵️ Code Breakers (cb-play.js): what this game's answers doc held when the student joined (a reload goes on from there)
 let user=null,group=(P.get("g")||"").replace(/[^\w-]/g,""),x=null,ref=null,mySid=0,mine={},tester=false,stop=null,shown="",draft={k:"",v:""};
 
 const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.now()-ms<10*60e3};
@@ -22,15 +26,41 @@ const gameOn=()=>!!(x&&x.game&&x.on&&fresh(x.at));
 const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>Array.isArray(ok)?G.right(mine[i],ok):mine[i]===ok).length;
 const first=()=>((user&&user.displayName)||"").split(" ")[0]||(user&&user.email||"").split("@")[0];
 
-const top=()=>`<div class="top">${!gameOn()||x.phase==="end"?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
-  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
+// 🎓 Back to the class only when the teacher says so (Roger, 9 Nov 2026: "students when they get out of the game [...] should only be able
+// to go to the class where they had been pulled up and when I say so"). While the group is in class mode (live/{group}.go, el-cloud.js
+// cmTeacher) the player has no ← Back: at the end of the game they stay here, in full screen, with "Your teacher will take you back to
+// the class", until the teacher's 🎓 Back to class mode on the board (live/{group}.cmBack, host.js) or the class tab moving on after
+// the game (go.at): then they go to the class page by themselves. The student pages send a student who was in the game and left it
+// before that back here (el-cloud.js gamePush, localStorage el_game_in). It ends with the class mode (⏹ Stop or the end of the class).
+const cmOn=()=>{const g=x&&x.go;return !!(g&&g.cm&&g.u&&g.at&&g.lock&&Date.now()<(g.until||g.at+70*60e3))};
+const playing=()=>gameOn()&&x.phase!=="end";
+// Also when the game is switched off without that (■ End or Finish on an older board, the board closed: on:false, or no beat for
+// 10 minutes) for 10 s (a reload of the board puts it back on at once): nobody stays stuck in a game that is over (Roger, 16 Nov 2026:
+// "students couldn't leave the game once finished").
+let offAt=0;
+const offNow=()=>!!(x&&x.game&&(!x.on||!fresh(x.at)));
+const offLong=()=>{if(!offNow()){offAt=0;return false}if(!offAt)offAt=Date.now();return Date.now()-offAt>=10e3};
+const cmFree=()=>cmOn()&&(+x.cmBack||0)>(+x.sid||0)||cmOn()&&!playing()&&+x.go.at>(+x.sid||0)||cmOn()&&offLong();
+let cmGone=false;
+function cmBack(){if(cmGone||!cmFree())return;cmGone=true;try{localStorage.removeItem("el_game_in")}catch(e){}
+  const u=new URL("../../"+x.go.u,location.href);u.hash=x.go.p||"";
+  bye=true;Promise.resolve(saveNotes()).finally(()=>location.replace(u.href))}
+const top=()=>`<div class="top">${(!gameOn()||x.phase==="end")&&!cmOn()?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
+  ${repBtn()}<button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
 const page=(h,cls)=>{app$.innerHTML=top()+`<div class="main"><div class="center ${cls||""}"><div>${h}</div></div></div>`};
 
 function draw(){
   if(!user)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>Sign in with your school email and password to join the game.<br><span class="note">Entra amb el correu de l'institut i la contrasenya.</span></p><p><button class="btn go" data-do="signin">Sign in · Entra</button></p></div>`);
   if(TEACHERS.includes((user.email||"").toLowerCase()))return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>This is the students' screen. The game starts from the board.</p><p><a class="btn go" href="host.html">Open the board</a></p></div>`);
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
-  if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p><p class="mid">The game opens here by itself.</p>`);
+  if(cmFree()){cmBack();return page(`<div class="emo pop">🎓</div><p class="big">${esc(T("Back to the class…","Tornem a la classe…"))}</p>`)}
+  const cmWait=cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"";
+  const sr=!!(x&&gameOn()&&x.mode==="cb"&&x.cb&&x.cb.th==="sr");   // 🚀 Space rescue = Code Breakers with another story (sr.js)
+  document.body.classList.toggle("cb",!!(x&&gameOn()&&x.mode==="cb"));document.body.classList.toggle("sr",sr);
+  if(gameOn()&&x.mode==="cb"){if(mySid!==x.sid)return page(sr?`<div class="emo pop">🚀</div><p class="big">Space rescue</p>`:`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p>`);return cb().draw()}
+  // 🏁 the teacher ended the class from the board (cm-after.js: ce, no class mode, no full screen)
+  if(!gameOn()&&x&&+x.ce>=(+x.sid||0)&&!cmOn())return page(`<div class="emo pop">🏁</div><p class="big">${esc(T("The class is over. See you next time!","S'ha acabat la classe. Fins a la propera!"))}</p>`);
+  if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p>${cmWait||'<p class="mid">The game opens here by itself.</p>'}`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
   if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved
   if(ph==="notes")return notesView();
@@ -38,7 +68,7 @@ function draw(){
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
-    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>`)}
+    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>${typeof x.cp==="number"?G.ring(x.cp,"👥 "+T("The class got right","La classe ha encertat"),"min(26vh,190px)"):""}${cmWait}`)}
   if(ph==="q"&&q.write&&mine[i]==null){const k=x.sid+":"+i,v=draft.k===k?draft.v:"";
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <form class="wform slidein" data-k="${esc(k)}"><label for="wa">✏️ Write the missing words <span class="note">Escriu només les paraules que falten</span></label>
@@ -73,6 +103,14 @@ function draw(){
 // them after they do them in the formative games"). The same game played again brings back what they wrote (one read per game). The text
 // also goes to the game's answers doc (a:{slide: text}): the board counts who is writing and saves it with the results for the teacher.
 const NT={k:"",pk:"",i:"",meta:null,v:"",dirty:false,t:0,docs:{},sent:{},st:""};
+// what to write (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever they
+// need to remember better the theory explained"): vocabulary or grammar by the game's kind (live nt.kind; older boards: the end of the deck id)
+function noteAsk(nt){   // English, and the Catalan help smaller below it (ca=0: English only, ca=1: Catalan only)
+  const kind=nt.kind||(/-vocab$/.test(nt.deck||"")?"vocab":/-grammar$/.test(nt.deck||"")?"grammar":"");
+  const en=`Write <b>2 sentences</b> of your own using ${kind==="vocab"?"the new words":kind==="grammar"?"the grammar structures you have learnt":"the new words or grammar"}, and <b>anything that helps you remember</b> the theory.`;
+  const ca=`Escriu <b>2 frases</b> teves amb ${kind==="vocab"?"el vocabulari nou":kind==="grammar"?"les estructures gramaticals que has après":"el vocabulari o la gramàtica nous"}, i <b>tot el que t'ajudi a recordar</b> la teoria.`;
+  return CA==="1"?ca:CA==="0"?en:`${en}<small>${ca}</small>`;
+}
 const noteRef=deck=>S.doc(db,"students",user.uid,"notes",deck);
 async function notesLoad(deck){
   if(NT.docs[deck]!==undefined||!user)return;NT.docs[deck]=null;
@@ -105,8 +143,9 @@ function notesView(){
     :l&&l.watch?`<p class="w">⚠️ ${md(l.watch)}</p>`:`<p>${md(l)}</p>`;
   const thHtml=th?`<div class="nth">${th.slides.map(s=>`<h4>${md(s.theory)}</h4>${(s.lines||[]).map(bl).join("")}`).join("")}</div>`:"";
   app$.innerHTML=top()+`<div class="main"><form class="nform slidein${th?" two":""}" data-k="${esc(k)}"><div class="nhead"><span class="nemo">📝</span><div><label for="nt" class="nlab">${esc(T("Take your notes:","Pren apunts:"))}</label>
+      <p class="nask">${noteAsk(nt)}</p>
       ${tp.length?`<div class="ntop">${tp.map(t=>`<span>${md(t)}</span>`).join("")}</div>`:""}</div></div>${thHtml}
-      <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(T("In your own words: the rule, two examples and the mistake to avoid. Look at the board.","Amb les teves paraules: la regla, dos exemples i l'error que has d'evitar. Mira la pissarra."))}">${esc(NT.v)}</textarea>
+      <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(CA==="1"?"1. …\n2. …\nPer recordar: …":"1. …\n2. …\nTo remember: …")}">${esc(NT.v)}</textarea>
       <p class="nst" id="ntst"></p></form></div>`;
   noteState(null);
   const t=document.getElementById("nt");t.focus();t.setSelectionRange(t.value.length,t.value.length);
@@ -132,17 +171,38 @@ app$.addEventListener("click",async e=>{
     return}
   const b=e.target.closest("[data-do]");if(!b)return;
   if(b.dataset.do==="mute"){G.sound(!G.sound());draw()}
+  if(b.dataset.do==="report")reportIt(b.dataset.kind);
   if(b.dataset.do==="signin"){try{await signIn({auth,A,domain:DOMAINS[0]})}catch(err){console.warn("sign in",err)}}
 });
 
+// ⚠️ Report a problem inside the game (Roger, 17 Nov 2026: "in a game students must be able to report problems"): the same Problem
+// window as the bottom bar of the other pages (el-report.js; this page has no bottom bar), saved the same way (problems/{id}, a screenshot
+// in problemShots/{id}) and starting the same instant task (wakeFixer). It also says which game and, in Code Breakers / Space rescue, the
+// question on screen and the student's last answer (cb-play.js where()), so "a correct answer is marked wrong" can be checked.
+const repBtn=()=>user&&group&&!isT()?`<button class="btn ghost rep" data-do="report" title="${esc(T("Report a problem","Avisa d'un problema"))}" aria-label="${esc(T("Report a problem","Avisa d'un problema"))}">⚠️</button>`:"";
+function reportIt(kind){if(!user||!group||isT())return;
+  const title=(x&&x.title)||"Class game",w=x&&x.mode==="cb"&&CBP?CBP.where():(x&&x.q&&x.q.text?"Q: "+x.q.text:"");
+  report({en:CA!=="1",where:("🎮 "+title+(w?" › "+w:"")).slice(0,120),save:o=>{
+    const {shot,shotFrom}=o,r=S.doc(S.collection(db,"problems")),b=S.writeBatch(db);delete o.shot;delete o.shotFrom;
+    if(w)o.text=(o.text+"\n\n["+w+"]").slice(0,1000);
+    b.set(r,Object.assign(o,{uid:user.uid,email:(user.email||"").toLowerCase(),name:user.displayName||"",group,ls:null,activity:("game "+((x&&x.cb&&x.cb.decks)||[]).join("+")).slice(0,120),route:null,shot:shot?shotFrom:null,created:S.serverTimestamp()}));
+    if(shot)b.set(S.doc(db,"problemShots",r.id),{uid:user.uid,img:shot,created:S.serverTimestamp()});
+    return b.commit().then(res=>{wakeFixer(user);return res})}});
+  // from the ✗ screen's "⚠️ I think my answer was right": that kind is already ticked
+  const k=kind&&document.querySelector('dialog[open] input[name="el-rep"][value="'+kind+'"]');if(k)k.click()}
+
+// 🕵️ Code Breakers (Roger, 11 Nov 2026): live/{group}.mode "cb" = each student at their own pace; cb-play.js draws the screen
+function cb(){if(!CBP)CBP=cbPlayer({S,G,esc,md,pic,T,lang:()=>CA,app$,user:()=>user,x:()=>x,ref:()=>ref,mySid:()=>mySid,saved:()=>joined,first,
+  cmWait:()=>cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"",
+  active:()=>gameOn()&&mySid===x.sid,repBtn});return CBP}
 // A new game: start with no answers; the same game again (a reload): keep mine.
 async function join(){
   if(!ref||!gameOn()||x.sid===mySid||join.busy===x.sid)return;const sid=join.busy=x.sid;
   try{const d=await S.getDoc(ref);
-    if(d.exists()&&d.data().sid===sid)mine=Object.assign({},d.data().a);
-    else{mine={};await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
+    if(d.exists()&&d.data().sid===sid){mine=Object.assign({},d.data().a);joined=d.data()}
+    else{mine={};joined=null;await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
   }catch(e){console.warn("join",e);mine={}}
-  if(join.busy===sid){mySid=sid;draw()}
+  if(join.busy===sid){mySid=sid;try{localStorage.setItem("el_game_in",String(sid))}catch(e){}draw()}
 }
 
 A.onAuthStateChanged(auth,async u=>{
@@ -163,7 +223,9 @@ let wasOn=false;setInterval(()=>{if(x&&gameOn()!==wasOn)draw();wasOn=gameOn()},3
 // writes live/{group}/fsLeft/{email} = {name, at, pull, n} (pull = the group's full screen fs.at when it is on, else this game's sid),
 // the same list as the dashboard's; the board shows it too. Not for the teacher, not on iPhones (no full screen for pages there).
 // Catalan only for Starter and Base: ?ca=1 (el-cloud.js knows the level), ?ca=0 English, none (another page brought them here) both.
-const FD=document,FE=FD.documentElement,CA=P.get("ca");
+// 🖥 inside class.html (el-cloud.js shellEnter: the class full screen stays on from page to page) the full screen is class.html's: FW
+const FW=(()=>{try{return window.parent!==window&&window.frameElement&&window.frameElement.id==="el-shell"&&window.parent.EL_SHELL===true?window.parent:window}catch(e){return window}})();
+const FD=FW.document,FE=FD.documentElement,CA=P.get("ca");
 const T=(en,ca)=>CA==="1"?ca:CA==="0"?en:en+" · "+ca;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
 const isT=()=>!!user&&TEACHERS.includes((user.email||"").toLowerCase());
@@ -171,13 +233,14 @@ const fsOnG=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
 const pullKey=()=>fsOnG(x&&x.fs)?x.fs.at:x&&x.sid;
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
 let fsWas=false,bye=false;addEventListener("beforeunload",()=>{bye=true});addEventListener("pagehide",()=>{bye=true});   // ← Back: not leaving
-const fsWanted=()=>!!(user&&group&&!isT()&&gameOn()&&x.phase!=="end"&&fsCan());
-function fsLeft(){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+1;ss(k,String(n));
-  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n},{merge:true}).catch(e=>console.warn("full screen",e))}
-function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
+const fsWanted=()=>!!(user&&group&&!isT()&&fsCan()&&(gameOn()&&x.phase!=="end"||cmOn()));   // in class mode it stays on after the game too
+// fsLeft(false): a leave of the page (el-away.js below), not of the full screen; every write carries both counts (n, aw/awMs)
+function fsLeft(fs=true){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+(fs?1:0);if(fs)ss(k,String(n));const c=awayCount(pk);
+  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n,aw:c.aw,awMs:c.awMs},{merge:true}).catch(e=>console.warn("full screen",e))}
+function fsGo(){try{const K=FW.navigator.keyboard,lk=()=>{try{if(K&&K.lock)K.lock(["Escape"]).catch(()=>{})}catch(e){}},
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
-  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
+  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{const K=FW.navigator.keyboard;if(K&&K.unlock)K.unlock()}catch(e){}
     try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
   if(fsIs()){if(c)c.remove();fsWas=true;return}
   const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!bye)fsLeft()},500)}
@@ -189,16 +252,24 @@ function fsCheck(){let c=document.getElementById("el-fs");
     +"|"+(again?T("Tap to go back to the game","Toca per tornar al joc"):T("Tap to join the game","Toca per entrar al joc"));
   if(c.dataset.h!==h){c.dataset.h=h;const [a,b]=h.split("|");c.innerHTML='<div class="emo pop">'+(again?"⛶":"🎮")+'</div><p class="big" style="max-width:760px"></p><span class="btn go"></span>';
     c.children[1].textContent=a;c.children[2].textContent=b+" →"}}
-FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
+const FSEV=["fullscreenchange","webkitfullscreenchange"],fsOnCh=f=>{FSEV.forEach(t=>FD.addEventListener(t,f));if(FW!==window)addEventListener("pagehide",()=>FSEV.forEach(t=>FD.removeEventListener(t,f)))};
+fsOnCh(()=>fsCheck());
 // 📴 Connected (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): during a game the player beats
 // live/{group}/here/{email} = {name, seen, off} once a minute, and off:true at once when the page is hidden (lid closed, another window).
 // The board and the dashboard list who stopped beating (elClassWatch in el-catalog.js, host.js).
 let beatAt=0,beatSid=0;
 function beat(off){if(!user||!group||isT())return;beatAt=Date.now();
   S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off,fs:!fsWanted()||fsIs()}).catch(e=>console.warn("here",e))}
+// 🎓 Other windows, tabs and apps during the game (Roger, 17 Nov 2026; el-away.js, as on the other pages of the class in el-cloud.js): the
+// player is covered ("Come back to the class!"), coming back needs a tap, and each leave is counted in live/{group}/fsLeft/{email}.aw/.awMs.
+let awOff=false;
+awayWatch({FD,ca:()=>CA==="1",z:60,key:pullKey,
+  on:()=>!!(user&&group&&!isT()&&(gameOn()&&x.phase!=="end"||cmOn())),
+  off:y=>{if(!gameOn()||x.phase==="end")return;if(y){if(!awOff&&FD.visibilityState==="visible"){awOff=true;beat(true)}}else if(awOff){awOff=false;beat(false)}},
+  back:()=>fsLeft(false),fsNeed:()=>fsWanted()&&!fsIs(),fsGo});
 let okWas=null;   // in or out of full screen: sent at once when it changes
 document.addEventListener("visibilitychange",()=>{if(!gameOn()||x.phase==="end")return;if(document.visibilityState==="hidden"){if(!bye)beat(true)}else beat(false)});
 function hereTick(){if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
   const ok=!fsWanted()||fsIs(),ch=okWas!==null&&ok!==okWas;okWas=ok;
   if(ch||x.sid!==beatSid||Date.now()-beatAt>=60e3){beatSid=x.sid;beat(false)}}
-setInterval(()=>{fsCheck();hereTick()},1000);FD.addEventListener("fullscreenchange",hereTick);FD.addEventListener("webkitfullscreenchange",hereTick);
+setInterval(()=>{fsCheck();hereTick();if(!cmGone&&cmOn()&&offNow()&&cmFree())draw()},1000);fsOnCh(hereTick);

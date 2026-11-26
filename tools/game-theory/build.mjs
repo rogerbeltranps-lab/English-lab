@@ -9,10 +9,14 @@ const out={};
 for(const f of fs.readdirSync(DIR).filter(f=>f.endsWith(".js")&&f!=="index.js"&&f!=="theory.js").sort()){
   let deck=null;vm.runInNewContext(fs.readFileSync(path.join(DIR,f),"utf8"),{ELGameDeck:d=>{deck=d},window:{}});
   if(!deck||deck.notes===false)continue;
-  const parts=[];let run=[];
-  const flush=()=>{if(run.length){parts.push({k:"p"+(parts.length+1),slides:run});run=[]}};
+  // each part also has its grammar or vocabulary point (point / pointCa on its first theory slide; Roger, 9 Nov 2026: "shouldnt we put the
+  // kind of grammar and performace like present simple") and n = how many questions practise it (never the questions themselves), so
+  // 🎓 My progress shows the student's % per point (today.html gvBox) from their myGames misses (miss[].p)
+  const parts=[];let run=[],pt=null;
+  const flush=()=>{if(run.length){parts.push({k:"p"+(parts.length+1),...(pt?{name:pt[0],nameCa:pt[1]}:{}),n:0,slides:run});run=[];pt=null}};
   for(const s of deck.slides){
-    if(s.q){flush();continue}
+    if(s.q){flush();if(parts.length)parts[parts.length-1].n++;continue}
+    if(s.point&&!run.length)pt=[s.point,s.pointCa||s.point];
     if(s.notes===false)continue;
     run.push({theory:s.theory||"",img:/^[\w./-]+\.(png|jpe?g|svg|webp)$/i.test(s.img||"")?"":s.img||"",lines:s.lines||[],...(s.ca?{ca:[].concat(s.ca)}:{})});
   }

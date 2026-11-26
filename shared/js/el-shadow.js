@@ -3,8 +3,11 @@
    the other option shadowing all as you listen").
    Used by the class shadowing page (shared/shadow/), the LS2 Learning Path Shadowing step (ls2-engine.js R.shadow) and Practise (lab/).
    clip.marks = per script line, its sentences in the shadowing video's format (tools/shadowing-video): **stressed** underlined,
-   ‿ linked words, ↗ before a comma or a pause and at the end of yes/no questions, ↘ at the end of statements and wh- questions.
-   clip.cues = [[from, to, slowFrom, slowTo], …] per sentence (tools/shadowing-marks/apply.py, pocketsphinx alignment).
+   ‿ linked words, {{words|ipa}} assimilation (the words with a dotted line and only the changed sounds in IPA after them, e.g.
+   {{can’t‿you|tʃ}} → can’t‿you /tʃ/; Roger, 22 Nov 2026: "Indicate assimilation and the ipa transcription of only the assimilation";
+   its key line shows only on a page that has one), ↗ before a comma or a pause and at the end of yes/no questions, ↘ at the end of statements and wh- questions.
+   clip.cues = [[from, to, slowFrom, slowTo], …] per sentence (tools/shadowing-marks/apply.py, pocketsphinx alignment). Every
+   sentence and clip starts through lead() (a quiet run-up, see below) so its first word is heard.
    Marks on/off and the mode are remembered on the device (localStorage), never saved anywhere else. Clips without marks show the
    plain script and only the Shadowing mode. Every button here carries data-vs: el-cloud.js keeps [data-vs] working in the read-only
    student view and in locked sections, where listening is still allowed. */
@@ -18,6 +21,8 @@
 
   const css = document.createElement('style');
   css.textContent = '.shm-s{text-decoration:underline;text-decoration-thickness:.12em;text-underline-offset:.2em;text-decoration-color:var(--accent,#1f5f8b);font-weight:700}'
+    + '.shm-a{text-decoration:underline dotted #0f766e;text-decoration-thickness:.1em;text-underline-offset:.32em}.shm-ipa{font:600 .72em/1 "Charis SIL","Doulos SIL","Gentium Plus","Lucida Sans Unicode","Segoe UI",Arial,sans-serif;color:#0f766e;margin-left:.2em;white-space:nowrap;font-style:normal}'
+    + '.shm-key .shm-ka{display:none}:root:has(.shm-a) .shm-key .shm-ka{display:inline}.shm-off .shm-ipa{display:none}.shm-off .shm-a{text-decoration:none}'
     + '.shm-l{color:var(--accent,#1f5f8b);font-weight:800}'
     + '.shm-t{font-weight:800;margin-left:.08em;font-size:.95em}.shm-t.up{color:#c2410c}.shm-t.dn{color:#1d4ed8}'
     + '.shm-off .shm-s{text-decoration:none;font-weight:inherit}.shm-off .shm-l>span,.shm-off .shm-t{display:none}.shm-off .shm-l::before{content:"\\0020"}'
@@ -38,7 +43,7 @@
 
   // one marked sentence → HTML (the arrow sits right after the word, before the comma or full stop, as in the video)
   function sent(m) {
-    return esc(m).replace(/-/g, '\u2011').replace(/\*\*(.+?)\*\*/g, '<span class="shm-s">$1</span>').replace(/==(.+?)==/g, '$1')
+    return esc(m).replace(/-/g, '\u2011').replace(/\{\{(.+?)\|(.+?)\}\}/g, '<span class="shm-a">$1</span><span class="shm-ipa">/$2/</span>').replace(/\*\*(.+?)\*\*/g, '<span class="shm-s">$1</span>').replace(/==(.+?)==/g, '$1')
       .replace(/‿/g, '<span class="shm-l"><span>‿</span></span>')
       .replace(/([,.?!:;…])\s*([↗↘])/g, '$2$1')
       .replace(/\s*↗/g, '<span class="shm-t up" aria-hidden="true">↗</span>').replace(/\s*↘/g, '<span class="shm-t dn" aria-hidden="true">↘</span>');
@@ -55,8 +60,8 @@
   }
   function key(ca) {
     return ca
-      ? '<div class="shm-key"><span><span class="shm-s">subratllat</span> = síl·laba forta: més fort i més llarg</span><span><b class="shm-l">‿</b> = uneix les paraules</span><span><b class="shm-t up">↗</b> la veu puja (abans d’una coma i a les preguntes de sí o no)</span><span><b class="shm-t dn">↘</b> la veu baixa (al final i a les preguntes amb who, what, where…)</span></div>'
-      : '<div class="shm-key"><span><span class="shm-s">underlined</span> = stressed: say it louder and longer</span><span><b class="shm-l">‿</b> = join the words</span><span><b class="shm-t up">↗</b> voice goes up (before a comma, yes/no questions)</span><span><b class="shm-t dn">↘</b> voice goes down (at the end, who/what/where questions)</span></div>';
+      ? '<div class="shm-key"><span><span class="shm-s">subratllat</span> = síl·laba forta: més fort i més llarg</span><span><b class="shm-l">‿</b> = uneix les paraules</span><span class="shm-ka"><span class="shm-a">puntejat</span> <span class="shm-ipa">/tʃ/</span> = els sons canvien: digues-ho així</span><span><b class="shm-t up">↗</b> la veu puja (abans d’una coma i a les preguntes de sí o no)</span><span><b class="shm-t dn">↘</b> la veu baixa (al final i a les preguntes amb who, what, where…)</span></div>'
+      : '<div class="shm-key"><span><span class="shm-s">underlined</span> = stressed: say it louder and longer</span><span><b class="shm-l">‿</b> = join the words</span><span class="shm-ka"><span class="shm-a">dotted</span> <span class="shm-ipa">/tʃ/</span> = the sounds change: say it like this</span><span><b class="shm-t up">↗</b> voice goes up (before a comma, yes/no questions)</span><span><b class="shm-t dn">↘</b> voice goes down (at the end, who/what/where questions)</span></div>';
   }
   const label = (ca, on) => on ? (ca ? '🎵 Amaga les marques' : '🎵 Hide the marks') : (ca ? '🎵 Mostra les marques' : '🎵 Show the marks');
   const marksOn = () => !html.classList.contains('shm-off');
@@ -80,6 +85,51 @@
   }
   const turnBox = ca => '<div class="shm-turn" role="status"><span class="msg"></span><span class="bar"><i></i></span>'
     + '<span class="btns"><button type="button" data-vs data-shm-again>↺ ' + (ca ? 'Una altra vegada' : 'Again') + '</button> <button type="button" data-vs data-shm-next>' + (ca ? 'Següent' : 'Next') + ' ⏭</button></span></div>';
+
+  /* The first words got lost (Roger, 12 Nov 2026: "the sentences of the shadowing activities … the first words don't come out").
+     The site jumps to the right place (checked in Chrome), but sentences began only ~0.1 s before their first word, and speakers
+     that rest in the pauses (Chromebooks, Bluetooth, the projector's HDMI sound) take 0.2–0.5 s to wake up and ate that word.
+     awake(): while shadowing plays (and 30 s after) Web Audio plays a noise 80 dB down: nobody hears it, but it is not digital
+       silence, so the sound output never goes to sleep.
+     lead(m, from, floor): seeks RUN s before `from` almost silent (volume 0.01, not 0: Chrome may switch a muted player's sound off)
+       and turns the volume back up at `from`, so whatever wakes up late is the run-up, not the word. Where the volume can't be set
+       (iPhone, iPad) the run-up only goes back to `floor`, the quiet after the sentence before (or none). Returns the start time. */
+  const RUN = 0.4, hooked = new Set();
+  let actx = null, noise = null, idle = null;
+  function sleep() {
+    if ([...hooked].some(m => !m.paused)) { idle = setTimeout(sleep, 30000); return; }
+    try { if (noise) { noise.stop(); noise.disconnect(); } noise = null; if (actx) actx.suspend(); } catch (e) {}
+  }
+  function awake() {
+    clearTimeout(idle); idle = setTimeout(sleep, 30000);
+    try {
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+      if (!actx) actx = new C();
+      if (actx.state !== 'running') actx.resume().catch(() => {});
+      if (!noise) {
+        const b = actx.createBuffer(1, actx.sampleRate, actx.sampleRate), d = b.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * 1e-4;
+        noise = actx.createBufferSource(); noise.buffer = b; noise.loop = true; noise.connect(actx.destination); noise.start();
+      }
+    } catch (e) {}
+  }
+  const loud = m => { if (m.__elOn != null) { m.volume = m.__elVol; m.__elOn = null; } };
+  function lead(m, from, floor) {
+    awake(); loud(m);
+    if (!hooked.has(m)) { hooked.add(m); m.addEventListener('playing', awake); ['pause', 'ended', 'emptied'].forEach(ev => m.addEventListener(ev, () => loud(m))); }
+    let s = Math.max(0, from - RUN);
+    if (from - s > 0.02) {
+      const vol = m.volume; m.volume = 0.01;
+      if (Math.abs(m.volume - 0.01) > 0.001) { m.volume = vol; s = floor == null ? from : Math.min(from, Math.max(s, floor)); }
+      else {
+        m.__elVol = vol; m.__elOn = from;
+        const up = () => { if (m.__elOn !== from) return; if (m.paused || m.currentTime >= from) loud(m); else requestAnimationFrame(up); };
+        requestAnimationFrame(up);
+      }
+    }
+    m.currentTime = s;
+    return s;
+  }
 
   /* Listen and repeat: plays one sentence, stops, lights it up and gives time to say it (the sentence's length × 1.3 + 1.2 s,
      2.5–12 s), then plays the next. Also lights up the sentence being heard in Shadowing mode.
@@ -105,7 +155,7 @@
     function say(i) {
       clear(); k = i; light(i);
       turn((o.ca ? '🎧 Escolta… ' : '🎧 Listen… ') + (i + 1) + ' / ' + n);
-      load(() => { const [a, b] = cue(i); m.currentTime = a; endAt = b; m.play().then(tick).catch(() => {}); });
+      load(() => { const [a, b] = cue(i); lead(m, a, i ? cue(i - 1)[1] : null); endAt = b; m.play().then(tick).catch(() => {}); });
     }
     // stop right at the end of the sentence (timeupdate alone comes only every ~250 ms and could catch the next word)
     function tick() { if (!run || !endAt) return; if (m.currentTime >= endAt) { endAt = 0; m.pause(); gap(); return; } requestAnimationFrame(tick); }
@@ -133,5 +183,5 @@
     return { start, stop, sync, running: () => run, again: () => run && say(k), next: () => run && (k + 1 < n ? say(k + 1) : finish()), has: n > 0 };
   }
 
-  window.elShadow = { has, sent, script, key, bar, bindBar, mode, player, turnBox, marksOn };
+  window.elShadow = { has, sent, script, key, bar, bindBar, mode, player, turnBox, marksOn, lead };
 })();

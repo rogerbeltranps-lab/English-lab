@@ -7,7 +7,10 @@
      browser and used from the next recording on), a warning when the mic gives no sound or is muted, and a clear message when
      the browser or the computer blocks it (address bar permission, Mac system settings, another app using it, no mic).
    - SpeechRecognition: when the automatic transcript cannot work (permission, no network to the speech service, no mic) it says
-     why and tells the student to type what they said; after such an error the recognisers stop retrying.
+     why and that the recording is enough (Gemini writes the transcript from it); after such an error the recognisers stop retrying.
+     Nothing is ever typed into a transcript box (Roger, 14 Nov 2026: "let's take the transcript option off since Gemini can
+     understand well what they say").
+   - 🎙️ I can't record (cant below): a button on every LS2 Speaking and Talk step; the teacher sees who pressed it when class mode starts.
    - AudioContext: resumed if the browser created it suspended.
    Wording follows the route: window.elMicCa() if a page sets it (LS2 engines), else the page's global `level`. */
 (function () {
@@ -15,7 +18,7 @@
   const KEY = 'elMicId';
   const saved = { get() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }, set(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} } };
   const ca = () => {
-    try { if (typeof window.elMicCa === 'function') return !!window.elMicCa(); return typeof level !== 'undefined' && (level === 'insecure' || level === 'beginners'); }   // eslint-disable-line no-undef
+    try { if (typeof window.elMicCa === 'function') return !!window.elMicCa(); return typeof level !== 'undefined' && level === 'beginners'; }   // eslint-disable-line no-undef
     catch (e) { return false; }
   };
   const T = (c, e) => ca() ? c : e;
@@ -118,7 +121,8 @@
   }
   function fixSteps() {
     return T('Comprova que el micròfon està connectat i no silenciat (mira la configuració de sota), tria’l a la llista i torna a gravar. Si acabes de donar permís, prem Recarrega (Ctrl+R).',
-      'Check the microphone is plugged in and not muted (see the settings below), choose it in the list and record again. If you just allowed the mic, press Reload (Ctrl+R).');
+      'Check the microphone is plugged in and not muted (see the settings below), choose it in the list and record again. If you just allowed the mic, press Reload (Ctrl+R).') +
+      (document.querySelector('.el-cant') ? ' ' + T('Si no hi ha manera, prem 🎙️ No puc gravar.', 'If nothing works, press 🎙️ I can’t record.') : '');
   }
   async function blocked(err) {
     const n = err && err.name || '', msg = String(err && err.message || '');
@@ -140,7 +144,7 @@
      button that started it. A Speaking or Talk hand-in then calls elMic.upload({btn, step, title}): the school Apps Script
      (tools/notify/school-mail.gs, action "audio") checks the student's sign-in, saves it in the teacher's Drive (Teacher Studio ›
      04_Students › Speaking recordings › group) and answers {ok, id, secs, tr}: tr = a transcript made from the audio by Gemini when the
-     script has a key. Nothing is uploaded unless the student hands in; one recording is uploaded once. ---------- */
+     script has a key (meta.coach 'c2', Towards Nativeness only: also {fixes, next}, the instant C2 correction and the next task). Nothing is uploaded unless the student hands in; one recording is uploaded once. ---------- */
   let clip = null;
   const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
   const MAX_BYTES = 6e6;
@@ -167,10 +171,10 @@
     if (c.res) return c.res;                                         // handed in again with the same recording
     if (c.blob.size > MAX_BYTES) return { ok: false, error: 'too long' };
     const body = { idToken: await u.getIdToken(), action: 'audio', mime: c.mime, secs: c.secs, data: await b64(c.blob),
-      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', task: String(meta.task || '').replace(/\s+/g, ' ').trim().slice(0, 1500), group: (C.group && C.group()) || '', at: c.at } };
+      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', task: String(meta.task || '').replace(/\s+/g, ' ').trim().slice(0, 1500), coach: meta.coach || '', group: (C.group && C.group()) || '', at: c.at } };
     const r = await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) });
     const j = await r.json();
-    if (j && j.ok) c.res = j;
+    if (j && j.ok) { c.res = j; cantDone(); }   // a recording reached the teacher: the microphone works now
     return j;
   }
 
@@ -202,21 +206,61 @@
 
   /* ---------- SpeechRecognition: say why the transcript fails ---------- */
   let srDead = '';
+  // the recording is enough: it goes to the teacher with the hand-in and Gemini writes what was said (school Apps Script, upload above)
+  const recOk = () => T(' No passa res: la gravació sí que funciona. Grava’t, escolta’t i entrega-la; el professor rebrà la gravació.', ' That’s fine: the recording still works. Record yourself, listen and hand it in; your teacher gets the recording.');
   const srText = code => code === 'network'
-    ? T('La transcripció automàtica no funciona en aquesta xarxa o en aquest navegador (necessita el servei de veu de Google, a Chrome). La gravació sí que funciona: escriu tu el que has dit.', 'The automatic transcript doesn’t work on this network or in this browser (it needs Google’s speech service, in Chrome). The recording still works: type what you said.')
-    : code === 'audio-capture' ? T('La transcripció automàtica no troba el micròfon. Escriu tu el que has dit.', 'The automatic transcript can’t reach the microphone. Type what you said.')
-    : code === 'language-not-supported' ? T('Aquest navegador no fa transcripcions en anglès. Escriu tu el que has dit.', 'This browser can’t transcribe English. Type what you said.')
-    : T('El navegador no deixa fer la transcripció automàtica. Permet el micròfon (icona de l’esquerra de la barra d’adreces) i prem Recarrega. Mentrestant, escriu tu el que has dit.', 'The browser is not allowing the automatic transcript. Allow the microphone (icon at the left of the address bar) and press Reload. Meanwhile, type what you said.');
-  /* Typing instead (Roger, 8 Nov 2026, Aina 2ESO B could not hand in her speaking): transcript boxes are read-only (textarea[data-sr-box]),
-     so when the automatic transcript can't work they open for typing, with a note above them. Pages call typeInstead(box) when there is
-     no speech recognition or a recording ends with no transcript; a hard error opens every box on the page. */
-  const typeNote = () => T('La transcripció automàtica no ha funcionat en aquest ordinador. Escolta la teva gravació i escriu aquí el que has dit. Després, entrega-ho.', 'The automatic transcript didn’t work on this computer. Listen to your recording and type here what you said. Then hand it in.');
-  function typeInstead(ta) {
-    if (!ta || !ta.readOnly) return false;
-    ta.readOnly = false; ta.dataset.typed = '1'; ta.style.background = '';
-    let n = ta.previousElementSibling;
-    if (!n || !n.classList.contains('sr-type-note')) { n = document.createElement('p'); n.className = 'feedback no sr-type-note'; ta.insertAdjacentElement('beforebegin', n); }
-    n.textContent = typeNote(); return true;
+    ? T('La transcripció automàtica no funciona en aquesta xarxa o en aquest navegador (necessita el servei de veu de Google, a Chrome).', 'The automatic transcript doesn’t work on this network or in this browser (it needs Google’s speech service, in Chrome).') + recOk()
+    : code === 'audio-capture' ? T('La transcripció automàtica no troba el micròfon.', 'The automatic transcript can’t reach the microphone.') + recOk()
+    : code === 'language-not-supported' ? T('Aquest navegador no fa transcripcions en anglès.', 'This browser can’t transcribe English.') + recOk()
+    : T('El navegador no deixa fer la transcripció automàtica. Permet el micròfon (icona de l’esquerra de la barra d’adreces) i prem Recarrega.', 'The browser is not allowing the automatic transcript. Allow the microphone (icon at the left of the address bar) and press Reload.') + recOk();
+  /* No typing instead any more (Roger, 14 Nov 2026: "let's take the transcript option off since Gemini can understand well what they say";
+     it came in on 8 Nov 2026 for Aina 2ESO B, who could not hand in her speaking): the transcript boxes always stay read-only, and a
+     Speaking or Talk step with no automatic transcript hands in the recording itself (recSecs; the page waits for upload). typeInstead
+     is kept for pages that still call it and does nothing. */
+  function typeInstead() { return false; }
+  const recSecs = btn => clip && (!btn || !clip.btn || clip.btn === btn) ? clip.secs : 0;
+
+  /* ---------- 🎙️ I can't record (Roger, 14 Nov 2026: "If they can't record, ask them to notify it so that, when I start a class with
+     that group I get a message on the screen to help them out"). cant({step, title}) gives a small row for the recorder card: the button
+     writes live/{group}/micHelp/{email} (el-cloud.js ELCloud.micHelp; one document per student, the latest step), and the teacher's class
+     tab lists them when class mode starts with that group (shared/js/el-mic-help.js). This browser keeps that it was sent (el_mic_cant),
+     so the row shows it without reading anything; a recording that reaches the teacher later (upload) or "It works now" takes it away. */
+  const CK = 'el_mic_cant';
+  const me = () => { const C = window.ELCloud, u = C && C.user; return u && u.uid || ''; };
+  const cantGet = () => { try { const o = JSON.parse(localStorage.getItem(CK) || 'null'); return o && o.uid === me() ? o : null; } catch (e) { return null; } };
+  const cantPut = o => { try { o ? localStorage.setItem(CK, JSON.stringify(o)) : localStorage.removeItem(CK); } catch (e) {} };
+  const rows = new Set();
+  function cantDone() {
+    const had = cantGet(); cantPut(null); rows.forEach(f => f());
+    const C = window.ELCloud; if (had && C && C.micHelpDone) C.micHelpDone().catch(() => {});
+  }
+  let cantCss = false;
+  function cant(meta) {
+    meta = meta || {};
+    if (!cantCss) { cantCss = true; const st = document.createElement('style');
+      st.textContent = '.el-cant{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 0;font-size:14px;color:#5d6b75}.el-cant button{font:600 13px system-ui,sans-serif;padding:5px 12px;border:1px solid #c9d3da;border-radius:999px;background:#fff;color:#14232e;cursor:pointer}.el-cant button:hover{background:#f1f5f9}.el-cant.sent{color:#1d6b4f;font-weight:600}.el-cant .err{color:#9a3412;font-weight:600}';
+      document.head.appendChild(st); }
+    const row = document.createElement('div'); row.className = 'el-cant';
+    const draw = (err) => {
+      const o = cantGet();
+      row.classList.toggle('sent', !!o);
+      row.innerHTML = o
+        ? '<span>✓ ' + T('El professor sap que no pots gravar i t’ajudarà a la propera classe.', 'Your teacher knows you can’t record and will help you in the next class.') + '</span><button type="button" data-k="ok">' + T('Ja funciona', 'It works now') + '</button>'
+        : '<span>' + T('El micròfon no funciona?', 'Microphone not working?') + '</span><button type="button" data-k="cant">🎙️ ' + T('No puc gravar', 'I can’t record') + '</button>' + (err ? '<span class="err">' + err + '</span>' : '');
+    };
+    row.onclick = async e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.k === 'ok') return cantDone();
+      const C = window.ELCloud;
+      if (!C || !C.micHelp || !me()) return draw(T('Entra amb el teu compte de l’escola primer.', 'Sign in with your school account first.'));
+      b.disabled = true; b.textContent = '…';
+      try {
+        await C.micHelp({ page: location.pathname, step: meta.step || '', title: meta.title || '' });
+        cantPut({ uid: me(), step: meta.step || '', at: Date.now() }); rows.forEach(f => f());
+      } catch (err) { draw(T('✗ No s’ha enviat. Torna-ho a provar.', '✗ Not sent. Try again.')); }
+    };
+    const f = () => draw(); rows.add(f); draw();
+    return row;
   }
   ['SpeechRecognition', 'webkitSpeechRecognition'].forEach(n => {
     const O = window[n]; if (!O) return;
@@ -226,7 +270,7 @@
           super();
           this.addEventListener('error', e => {
             const code = e && e.error;
-            if (['not-allowed', 'service-not-allowed', 'network', 'audio-capture', 'language-not-supported'].includes(code)) { srDead = code; say(srText(code), 'sr'); document.querySelectorAll('textarea[data-sr-box]').forEach(typeInstead); }
+            if (['not-allowed', 'service-not-allowed', 'network', 'audio-capture', 'language-not-supported'].includes(code)) { srDead = code; say(srText(code), 'sr'); }
           });
         }
         start() { if (srDead) { say(srText(srDead), 'sr'); return; } return super.start(); }   // no endless retries after a hard error
@@ -235,5 +279,5 @@
     } catch (e) {}
   });
 
-  window.elMic = { srBroken: () => srDead, text: srText, show, say, typeInstead, upload, clip: () => clip };
+  window.elMic = { srBroken: () => srDead, text: srText, show, say, typeInstead, upload, clip: () => clip, recSecs, cant, cantDone };
 })();

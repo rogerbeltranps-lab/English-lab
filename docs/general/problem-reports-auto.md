@@ -1,11 +1,29 @@
 # Problem reports handled automatically
 
+**The rules for every answer and draft (timing, no names, both languages, built on what the website really has) are in [REQUIREMENTS.md › 9](../REQUIREMENTS.md#9-answering-students).** This file only has the steps of the routine; if the two ever differ, REQUIREMENTS.md wins.
+
 Roger, 8 Nov 2026: "When somebody reports a problem I want you to read it straightaway and, if it's a real problem, fix it and answer the
 student that it is fixed straightaway. Merge, but it must be a technical problem, not a design or pedagogical thing." Then: "I must be
 informed though via mail, with an important subject."
 
 This file is the routine of the scheduled task **"English Lab: problem reports"** (a fresh Claude session in the English Lab cloud
 environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool is `tools/problems/auto.mjs`.
+
+**Never straight away, never by name (Roger, 17 Nov 2026):** "please don't answer straight away; always answer from 8-18 and after 2 hours
+since u receive the message o report, don't use their names or surnames since sometimes it feels like AI". The run still works at once,
+but the student does not see the answer at once (Roger, 24 Nov 2026). `auto.mjs fixed` saves the ✅ card held until Roger presses
+📨 Send it on the report ("Reports are done immediately but we don't send an answers until I press the button"); `marks.mjs answer`
+saves a comment answer with a later time (`tools/problems/reply-time.mjs`: at least 2 hours after the comment, Monday to Friday
+17:00-21:00 Madrid time, else the next weekday from 17:00, replacing 08:00-18:00). The tool prints when. Never
+pass `--now` (only Roger can ask for it, in a thread). Never write the student's first name or surnames in `--msg`, `--reply` or an
+answer, not even "Hola …", and no classmate's name either: start with "Hola!" / "Hi!" or the answer itself (Roger again, 21 Nov 2026:
+"I said never use their names or surnames please"). The tools refuse a text that uses them, or any greeting followed by a name; write it again without them.
+
+**Always both languages (Roger, 20 Nov 2026: "It should also have the catalan version"):** every `--msg` comes with `--msg2` and every
+`--reply` with `--reply2`: the same words in the other language (Catalan when the report is in English, English when it is in Catalan),
+just as natural and in Roger's voice. The student's card shows both, their language first. The tool refuses one without the other.
+
+On the site and in anything Roger reads (`--note`, `--todo`, emails), call yourself **Beltran**, never Claude, and call Gemini **Roig** (Roger, 16 Nov 2026; AGENTS.md).
 
 ## When it runs
 
@@ -18,25 +36,28 @@ hourly task "English Lab: problem reports" is switched off.
 
 ## Each run
 
-1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" → stop at once (no email, no PR, nothing else read).
+1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" (no open report and no new comment) → stop at once (no email, no PR,
+   nothing else read). A line "NEW COMMENTS" → also do "Students' comments, answered at once" below (after the reports, if any).
 2. For each report: read everything it holds, look at the screenshot file it prints (shots from before 6 Nov 2026 can show the folded
-   Study guide over the page; the section "Com estudiar / How to study" then means nothing), open the page's code and data, and look at the
+   Study guide over the page; the section "Com estudiar / How to study" then means nothing; a section starting "📓 Notebook / Llibreta" was
+   sent from the ⚠️ in the notebook's top bar: the page is the LS page #notes, the section names the notebook section and page, and the code
+   is shared/js/el-notebook.js + el-pad.js), open the page's code and data, and look at the
    student's own documents only if needed (`students/{uid}/progress`, `results`). Decide:
    - **Technical bug** (the site does not work as it was built to: a button, audio or video, saving or showing the student's work, a page
      that looks broken, a card or word missing, a step that cannot be done or is counted wrong, an answer key that refuses an answer that is
      plainly correct for that item, a marking run that missed a hand-in) → fix it.
    - **Not technical** (design wishes, what to teach or practise, how hard something is, a mark or correction the student disagrees with,
      routes and levels, deadlines, personal matters), **unclear** (you cannot find or reproduce a bug), or a fix that would change LS1
-     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --note "…" --apply`: one or two sentences for
-     Roger, saying what the student means and why it is his call. Nothing is sent to the student.
+     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --status … --note "…" --reply "…" --reply2 "…" [--todo "…"]
+     --apply`. Nothing is sent to the student: Roger sends it with one click (see "Status and suggested reply" below).
    - Already fixed by an earlier change → no PR; answer it as fixed (step 4), naming the PR or date in the note.
 3. Fix: a branch `claude/problem-<short id>` from `main`, the smallest change that fixes it, following `AGENTS.md`, plus a line in
    `AGENTS.md` if it sets a rule ("(problem report, <group>, <date>)"). Run the repo's checks that apply (`node tools/vocab-cards/check.mjs`,
    `node --check` on changed JS, a Playwright look at the page at 1366×768 when it is visual). Open the PR (attribution block, assignee and
    reviewer `rogerbeltranps-lab`), wait for its checks, **squash-merge it without asking** (Roger's standing approval for technical fixes
    from problem reports). Never put student names or emails in the PR, commits or code: say "problem report, 2ESOA, 8 Nov".
-4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank
-   you…" in the report's language (Catalan for Beginners, Insecure and no route, English for Safe and Daring; the tool says which). `--msg`
+4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --msg2 "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank
+   you…" in the report's language (Catalan for Starter and no route, English for Base, Core, Plus and Pro since 21 Nov 2026; the tool says which). `--msg`
    adds one or two plain sentences in that language, in Roger's voice: what was wrong and what they see now ("Tenies raó: …", "You were
    right: …"). Never mention AI, Claude, PRs or code. If they must reload, say so ("Recarrega la pàgina").
 5. Roger's email: `auto.mjs fixed` saves `problems/{id}.auto.at`; the GitHub Action **"English Lab emails"** (`tools/notify/notify.mjs
@@ -47,10 +68,102 @@ hourly task "English Lab: problem reports" is switched off.
    schedule is only the backup (GitHub often runs it late). Reports left for Roger get no extra email: the 15-minute alert already told him
    about each new report, and the dashboard shows the note.
 
+## Status and suggested reply (Roger, 10 Nov 2026)
+
+"I need you to tell me if the problems are fixed and a suggested message to send with a button." Every report left for Roger gets:
+
+- `--status`: **`fixed`** (it is right now: a mark Roger already recalculated, a redo he already gave, a change already merged),
+  **`nobug`** (the site works as it was built to; an explanation is all the student needs), or **`you`** (Roger must do something first:
+  a redo, 📣 Show answers, a roster name, a decision). The dashboard shows it as ✅ Fixed / 👍 Not a bug / ✋ Needs you.
+- `--note`: one or two sentences for Roger (what the student means, what you checked, the numbers).
+- `--todo` (only with `you`): what Roger must do first, one short line ("Press ↺ Let them do it again on her checkpoint 1 score").
+- `--reply`: the answer to the student, in the report's language (the tool says which), Roger's voice, first person, plain and kind,
+  two or three short sentences; never AI, Claude, PRs or code. Write it so it is true once the todo is done.
+- `--reply2`: the same answer in the other language (the tool says which). Both go to the student with one click.
+- **Every reply and draft is built on what the website really has** (Roger, 20 Nov 2026: "always suggest replies according to the web
+  info"): check the pages and data first and point the student to the real thing, with the names they see (sample exam, 🎯 Practise,
+  Games, the learning paths, a step's title), instead of general advice or a promise of something new.
+
+In ⚠️ Problem reports the reply has **📨 Send…** (fixed → the ✅ fixed card with it; nobug → the message card and the report closes;
+you → the message card, the report stays open) and **✏️ Edit first** (opens 💬 Answer with the text). Run `leave` again on the same
+report to change it (`open --all` shows the current one).
+
+## The teacher's own reports (Roger, 13 Nov 2026)
+
+"I need a problem button available for the teacher." Roger has the same ⚠️ Problem button in the bottom bar of the dashboard, the class
+tab and every page he opens signed in (and in the ⋯ menu of a learning path on a phone). His reports are `problems/{id}` with
+`teacher: true` (firestore.rules lets only his account set it), in English, with `group` = the class mode's group when he sends it from the
+class tab. They start this same task. `auto.mjs open` prints them as "FROM ROGER, THE TEACHER". They are Roger's own requests.
+
+Roger, same day: "little tweaks merge, big changes start a thread" + "I want a dropdown button where I say merge or don't merge yet".
+His window has a dropdown, saved as `merge` (`auto.mjs open` prints "✅ MERGE STRAIGHT AWAY" or "⏸ DON'T MERGE YET"):
+
+- **✅ Merge straight away** (`merge: true`, the default; on any page, LS1 included) → do it and squash-merge exactly as in "Each run"
+  step 3, no preview to wait for. Then `node tools/problems/auto.mjs fixed <id> --note "what changed, PR #n" --apply` (no `--msg`: there is
+  no student card) and start the email Action (step 5): the ⚠️ IMPORTANT email tells him what changed, with "hard reload the page"; he checks
+  it on the site. Only if it is plainly a big change (a new feature or screen, many pages or LSs, student marks, answers or other data,
+  firestore.rules, how a routine works) do not merge: treat it as ⏸ and say why in the note.
+- **⏸ Don't merge yet** (`merge: false`) → small and clear: make it on a branch `claude/problem-<short id>`, open the PR with a clickable
+  preview (screenshots in the PR) and do not merge. Big or unclear: build nothing, write the plan. Then `auto.mjs leave <id> --status you
+  --note "PR #n with its preview, or the plan in two or three lines and your questions" --todo "Start a thread: 🤖 Fix with Beltran" --apply`
+  (no `--reply`) and start the email Action: he gets "English Lab: your report not merged yet" with the note and the link to the report,
+  where 🤖 Fix with Beltran copies everything (your note too) into a new thread of the English Lab project, where he says "merge" or asks for
+  changes (a task cannot open a project thread by itself).
+- **Unclear**, whatever he chose → as ⏸, with the one question you need answered in the note.
+
+Roger gets no 15-minute "new report" email for his own reports (notify.mjs skips `teacher`); the dashboard shows them as 👨‍🏫 You, with no
+💬 Answer and no suggested reply.
+
+## Students' comments, answered at once (Roger, 9 Nov 2026)
+
+"I want you to answer straight away but I want to see what you said and be able to edit … or remove it if I want to." The same task
+answers students' comments on their hand-ins as soon as they send them. When a student's page saves a new comment (not only "no
+problem": `elNoComment`), `shared/js/el-cloud.js` sets `students/{uid}.commented` and starts this task the same way as a report
+(action `problem`, so the same 3-minute and 30-a-day limits, and no new token).
+
+`auto.mjs open` says so with a line "NEW COMMENTS: n student(s)…" (one query; then it does not say "Nothing new"). Each run with that
+line, after the reports (or alone, when there is no open report):
+
+1. `node tools/marking/marks.mjs comments --new`. "No new comments." → nothing else to do for comments.
+2. Otherwise answer the sheet exactly as the Friday task does (`/mnt/project-files/claude-answers-preview/daily-answers-task-prompt.md`):
+   read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter and no route (Base reads English since 21 Nov 2026),
+   English for Core, Plus and Pro, FORYOU for anything that needs Roger. Write the EL-ANSWERS v1 file in the scratchpad and run
+   `node tools/marking/marks.mjs answer <file> --new --apply` (it saves `settings/marking.cmtRun`, so the next run skips them).
+   **A hand-in that is not a real try** (filler letters such as "rfr", "no" for an answer, the same word in every box), seen while
+   reading a comment or a report: send it back at once, without asking (Roger, 25 Nov 2026: "always when you detect that they've done
+   sth like this, you must ask them to redo it"): `node tools/marking/marks.mjs redo <S-code> <activity> <step> --why "…" --apply`
+   (as the dashboard's ↺ Redo; English note, Catalan for Starter). The comment itself still gets its ANSWER or FORYOU line.
+3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
+   tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
+   comment again). The Friday 15:00 task still answers any comment left.
+
+## Drafts for ideas and private answers (Roger, 20 Nov 2026)
+
+"Pq no tens un draft preparat per contestar?" (on a 💡 idea whose 💬 Answer box was empty). The same task now also starts when a student
+sends a 💡 Idea (`suggestions/{id}`) or answers one of Roger's private messages (`announcements/{id}`, a thread item by "s"): the student's
+page calls `wakeFixer` after saving, like a report. `auto.mjs open` lists, after the reports, every idea with no draft and no answer yet and
+every private conversation whose last word is the student's with no draft for it (last 14 days), with a line "NEW IDEAS / PRIVATE ANSWERS
+WITHOUT A DRAFT". For each one, **write a draft only; nothing is ever sent to the student by the task**:
+
+- An idea: `node tools/problems/auto.mjs idea <id> --note "…" --en "…" --ca "…" --apply` → `suggestions/{id}.auto = {en, ca, note, at}`.
+- A private answer: `node tools/problems/auto.mjs msg <id> --note "…" --en "…" --ca "…" --apply` → `msgDrafts/{id} = {en, ca, note, n, at}`
+  (teacher-only collection: the student can read the announcement itself; `n` = the thread length it answers, so a newer answer from the
+  student gets a new draft).
+
+How to write it: Roger's voice, first person, warm and short (two or three sentences), at the student's level (simple English for 2 ESO);
+`--ca` and `--en` say the same thing, both natural. Never the student's name or surnames (the tool refuses them), never AI, Claude, Gemini,
+PRs or code. Read what the student means and check the site first. **Favour what already exists** (Roger, 20 Nov 2026, on a draft for "alguna
+activitat per estudiar l'examen": "Però si té un examen d'exemple i a Practice un munt d'exercicis…"): most ideas ask for something the site
+has, so the draft tells them where it is, with the names they see (the "Examen de mostra / Sample exam" on the LS page, "🎯 Practica /
+Practise" on the board, Games, the learning paths) and how to use it. Only when nothing like it exists: thank them and say you will think
+about it, **never promise a change Roger has not decided**. A question that needs Roger's decision or
+information you don't have: a short honest draft he can complete, and the note says what is missing. `--note` = one line for Roger (what
+you checked). The dashboard puts the draft in the 💬 Answer box (ideas: both boxes, the language Roger writes in first; private messages:
+Catalan for Starter and no route (Base reads English since 21 Nov 2026), English otherwise), with "Reply ready" on the idea in the list. Roger changes it and presses Send.
+
 ## Costs and limits
 
 - Firestore: one list of `problems` (a few dozen documents) per run, plus a screenshot per new report. Never list students or results
   for a report unless the bug needs it, then only that student's documents.
 - Runs only when a student reports something. A run with nothing new ends after one command.
-- The dashboard shows each report's note in ⚠️ Problem reports ("🤖 Fixed automatically" / "🤖 Left for you"); Reopen and Delete work as
-  before.
+- The dashboard shows each report's status, note and suggested reply in ⚠️ Problem reports; Reopen and Delete work as before.

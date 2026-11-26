@@ -1,0 +1,8 @@
+{
+ "2eso-safe": {"Arnau": "am_michael"},
+ "2eso-insecure": {"Júlia": "af_bella"},
+ "2eso-daring": {"Lia": "af_heart"},
+ "4eso-safe": {"Marc": "am_michael", "Aya": "af_bella", "Júlia": "af_heart", "Biel": "am_puck", "All together": ["am_michael", "af_bella", "af_heart", "am_puck"]},
+ "4eso-insecure": {"Laia": "af_bella", "Pau": "am_michael", "Nora": "af_heart", "Tot el grup": ["af_bella", "am_michael", "af_heart"]},
+ "4eso-daring": {"Ona": "af_heart", "Adam": "am_michael", "Iker": "am_puck", "Mariam": "af_bella", "All together": ["af_heart", "am_michael", "am_puck", "af_bella"]}
+}

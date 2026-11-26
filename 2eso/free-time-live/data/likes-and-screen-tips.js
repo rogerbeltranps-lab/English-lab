@@ -1,6 +1,6 @@
-/* 2 ESO · LS2 Free Time, Live! · Learning Path 5 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
+/* 2 ESO · LS2 Free Time, Live! · Learning Path 4 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
 window.LP = {
-  key: 'ls2Tips2ESO', n: 5, starter: true, title: 'Likes and screen tips',
+  key: 'ls2Tips2ESO', n: 4, starter: true, title: 'Likes and screen tips',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -23,23 +23,23 @@ window.LP = {
       core: { beginners: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'my favourite', 'take a break', 'switch off your phone', 'go outside'], insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
       groups: [
         { g: 'Likes and dislikes (+ -ing)', items: [['I love + -ing', 'm’encanta', 'I love skating.'], ['I like + -ing', 'm’agrada', 'I like drawing comics.'], ['I don’t like + -ing', 'no m’agrada', 'I don’t like getting up early.'], ['I hate + -ing', 'odio', 'I hate losing!'], ['I don’t mind + -ing', 'no m’importa', 'I don’t mind training in the rain.'], ['my favourite', 'el meu preferit', 'Skating is my favourite hobby.']] },
-        { g: 'Screen tips (imperatives)', items: [['take a break', 'fes una pausa', 'Take a break every 30 minutes.'], ['switch off your phone', 'apaga el mòbil', 'Switch off your phone at night.'], ['put your phone away', 'guarda el mòbil', 'Put your phone away at dinner.'], ['don’t use your phone in bed', 'no facis servir el mòbil al llit', 'Don’t use your phone in bed.'], ['go outside', 'surt a fora', 'Go outside and play!']] },
+        { g: 'Screen tips', items: [['take a break', 'fes una pausa', 'Take a break every 30 minutes.'], ['switch off your phone', 'apaga el mòbil', 'Switch off your phone at night.'], ['put your phone away', 'guarda el mòbil', 'Put your phone away at dinner.'], ['don’t use your phone in bed', 'no facis servir el mòbil al llit', 'Don’t use your phone in bed.'], ['go outside', 'surt a fora', 'Go outside and play!']] },
         { r: 'safe', g: 'Healthy habits (Safe)', items: [['set a time limit', 'posa un límit de temps', 'Set a time limit of one hour.'], ['turn off notifications', 'desactiva les notificacions', 'Turn off notifications when you study.'], ['keep your phone out of your bedroom', 'deixa el mòbil fora de l’habitació', 'Keep your phone out of your bedroom at night.'], ['screen time', 'temps de pantalla', 'Check your screen time every week.'], ['sleep well', 'dormir bé', 'Sleep well before a match.']] },
         { r: 'daring', g: 'Why it matters (Daring)', items: [['addictive', 'addictiu', 'Some games are very addictive.'], ['concentrate', 'concentrar-se', 'I can’t concentrate with notifications.'], ['instead of', 'en lloc de', 'Go outside instead of watching videos.'], ['a habit', 'un hàbit', 'Checking your phone every minute is a bad habit.'], ['healthy / unhealthy', 'saludable / poc saludable', 'Two hours of screen time a day is not healthy for sleep.']] }
       ],
       review: [
-        { g: 'Learning Path 4', items: [['watch videos', 'mirar vídeos', 'I watch videos at night.'], ['play online', 'jugar en línia', 'He plays online every day.'], ['send a message', 'enviar un missatge', 'Send me a message.']] },
-        { r: 'safe', g: 'Learning Path 4', items: [['social media', 'xarxes socials', 'The club is on social media.'], ['download an app', 'descarregar una app', 'Download the app.']] }
+        { g: 'Learning Path 6', items: [['watch videos', 'mirar vídeos', 'I watch videos at night.'], ['play online', 'jugar en línia', 'He plays online every day.'], ['send a message', 'enviar un missatge', 'Send me a message.']] },
+        { r: 'safe', g: 'Learning Path 6', items: [['social media', 'xarxes socials', 'The club is on social media.'], ['download an app', 'descarregar una app', 'Download the app.']] }
       ],
       practice: [
         { q: 'I ___ skating: it’s my favourite hobby! (m’encanta)', a: ['love'] },
         { q: 'I ___ getting up early on Sundays. (odio)', a: ['hate'] },
-        { q: 'She likes ___ comics in bed. (llegir)', a: ['reading'] },
-        { q: '___ a break every 30 minutes. (fes)', a: ['take'] },
+        { q: 'She likes ___ comics in bed. (llegir)', a: ['reading', 'to read'] },
+        { q: '___ a break every 30 minutes. (fes)', a: ['take', 'have'] },
         { q: 'Switch ___ your phone at night. (apaga)', a: ['off'] },
         { r: 'insecure', q: 'Put your phone ___ at dinner. (guarda)', a: ['away'] },
         { r: 'insecure', q: '___ use your phone in bed. (negatiu)', a: ["don't", 'do not'] },
-        { q: 'Go ___ and play with your friends! (a fora)', a: ['outside'] },
+        { q: 'Go ___ and play with your friends! (a fora)', a: ['outside', 'out'] },
         { r: 'safe', q: 'Set a time ___ of one hour for games.', a: ['limit'] },
         { r: 'safe', q: 'Turn off ___ when you do your homework.', a: ['notifications'] },
         { r: 'safe', q: 'Keep your phone ___ of your bedroom at night.', a: ['out'] },
@@ -59,13 +59,13 @@ window.LP = {
         ['Presenter', '[cheerful] Choose one tip and try it this week. Next week, tell us how it went. This was Screen Smart. Now, put your phone away and enjoy the afternoon!']] },
       chunks: ['I love playing online', 'take a break', 'switch off your phone'],
       items: [
-        { q: 'What is the average screen time of the students?', o: ['three and a half hours a day', 'one hour a day', 'five hours a day'], h: 'Escolta “the average is…”.' },
-        { r: 'insecure', q: 'What do many students hate?', o: ['feeling tired in the morning', 'playing online', 'watching videos'], h: 'Escolta “I hate…”.' },
-        { q: 'Who gives the four tips?', o: ['the school nurse', 'a famous player', 'the head teacher'], h: 'Escolta “four tips from…”.' },
-        { q: 'What is tip number one?', o: ['take a break after 30 minutes', 'go outside', 'buy a new phone'], h: 'Escolta “Tip number one”.' },
-        { r: 'insecure', q: 'How can you set a time limit?', o: ['Use the timer on your phone.', 'Ask your parents.', 'Switch off the wifi.'], h: 'Escolta “Tip number two”.' },
-        { q: 'When should you switch off your phone?', o: ['one hour before you go to sleep', 'at dinner', 'at school'], h: 'Escolta “Tip number three”.' },
-        { q: 'What is the presenter’s favourite tip?', o: ['go outside', 'take a break', 'set a time limit'], h: 'Escolta “my favourite”.' },
+        { q: 'What is the average screen time of the students?', o: ['three and a half hours a day', 'one hour a day', 'five hours a day'], h: 'Escolta “the average is…”.', he: 'Listen for “the average is…”.' },
+        { r: 'insecure', q: 'What do many students hate?', o: ['feeling tired in the morning', 'playing online', 'watching videos'], h: 'Escolta “I hate…”.', he: 'Listen for “I hate…”.' },
+        { q: 'Who gives the four tips?', o: ['the school nurse', 'a famous player', 'the head teacher'], h: 'Escolta “four tips from…”.', he: 'Listen for “four tips from…”.' },
+        { q: 'What is tip number one?', o: ['take a break after 30 minutes', 'go outside', 'buy a new phone'], h: 'Escolta “Tip number one”.', he: 'Listen for “Tip number one”.' },
+        { r: 'insecure', q: 'How can you set a time limit?', o: ['Use the timer on your phone.', 'Ask your parents.', 'Switch off the wifi.'], h: 'Escolta “Tip number two”.', he: 'Listen for “Tip number two”.' },
+        { q: 'When should you switch off your phone?', o: ['one hour before you go to sleep', 'at dinner', 'at school'], h: 'Escolta “Tip number three”.', he: 'Listen for “Tip number three”.' },
+        { q: 'What is the presenter’s favourite tip?', o: ['go outside', 'take a break', 'set a time limit'], h: 'Escolta “my favourite”.', he: 'Listen for “my favourite”.' },
         { r: 'safe', q: 'Why don’t you sleep well with a phone in your bedroom?', o: ['The light from the screen tells your brain it is still daytime.', 'The phone is too noisy.', 'The bedroom is too hot.'] },
         { r: 'safe', q: 'What does the presenter ask you to do next week?', o: ['tell the programme how the tip went', 'send a video', 'buy a timer'] },
         { r: 'daring', q: 'Why does the presenter say “That’s more than twenty-four hours a week”?', o: ['to show that three and a half hours a day is a lot', 'to say that a week has 24 hours', 'to explain the timer'] },
@@ -76,12 +76,12 @@ window.LP = {
       media: { videos: [{ base: 'video/noah-bike-park', title: 'Noah: Saturday at the bike park' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
       chunks: ['it’s perfect for riding', 'I’m holding the camera'],
       items: [
-        { q: 'Where is Noah?', o: ['at the bike park', 'at the ice rink', 'at the sports hall'], h: 'Escolta “today I’m at the…”.' },
-        { q: 'Who is he with?', o: ['his friends', 'his dad', 'his sister'], h: 'Escolta “with my…”.' },
-        { q: 'What’s the weather like?', o: ['sunny and windy', 'cold and cloudy', 'rainy'], h: 'Escolta “it’s sunny and…”.' },
-        { q: 'Who does Noah usually ride with on Sunday mornings?', o: ['his dad', 'Leo', 'Sara'], h: 'Escolta “I usually ride here with…”.' },
-        { q: 'What is Noah doing today?', o: ['He’s filming a race.', 'He’s racing.', 'He’s fixing his bike.'], h: 'Escolta “But this weekend I’m…”.' },
-        { r: 'insecure', q: 'Why is he wearing his old tracksuit?', o: ['The park is full of mud.', 'It’s very cold.', 'It’s his club’s uniform.'], h: 'Escolta “because the park is…”.' },
+        { q: 'Where is Noah?', o: ['at the bike park', 'at the ice rink', 'at the sports hall'], h: 'Escolta “today I’m at the…”.', he: 'Listen for “today I’m at the…”.' },
+        { q: 'Who is he with?', o: ['his friends', 'his dad', 'his sister'], h: 'Escolta “with my…”.', he: 'Listen for “with my…”.' },
+        { q: 'What’s the weather like?', o: ['sunny and windy', 'cold and cloudy', 'rainy'], h: 'Escolta “it’s sunny and…”.', he: 'Listen for “it’s sunny and…”.' },
+        { q: 'Who does Noah usually ride with on Sunday mornings?', o: ['his dad', 'Leo', 'Sara'], h: 'Escolta “I usually ride here with…”.', he: 'Listen for “I usually ride here with…”.' },
+        { q: 'What is Noah doing today?', o: ['He’s filming a race.', 'He’s racing.', 'He’s fixing his bike.'], h: 'Escolta “But this weekend I’m…”.', he: 'Listen for “But this weekend I’m…”.' },
+        { r: 'insecure', q: 'Why is he wearing his old tracksuit?', o: ['The park is full of mud.', 'It’s very cold.', 'It’s his club’s uniform.'], h: 'Escolta “because the park is…”.', he: 'Listen for “because the park is…”.' },
         { r: 'safe', q: 'Who is the video for?', o: ['the club channel', 'his teacher', 'his grandparents'] },
         { r: 'safe', q: '“It’s perfect for riding.” How does Noah feel about the weather?', o: ['He likes it.', 'He hates it.', 'He doesn’t mind it.'] },
         { r: 'daring', q: 'Noah uses a screen today. How is it different from watching videos alone?', o: ['He films outside with his friends.', 'He watches races on his phone.', 'He plays a racing game at home.'] },
@@ -93,48 +93,104 @@ window.LP = {
         ['Presenter', 'Tip number one: take a break. After thirty minutes on a screen, stop for five minutes. Stand up, look out of the window, drink some water.'],
         ['Presenter', 'Tip number two: set a time limit. Decide how long you want to play, for example one hour, and use the timer on your phone. When it rings, stop.'],
         ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']], marks: [["**Tip** **num**ber **one**: **take**‿a **break**. ↘", "**Af**ter **thir**ty **min**utes‿on a **screen**, ↗ **stop** for **five** **min**utes. ↘", "**Stand**‿**up**, ↗ **look**‿**out** of the **win**dow, ↗ **drink** some **wa**ter. ↘"], ["**Tip** **num**ber **two**: **set**‿a **time** **lim**it. ↘", "De**cide** how **long** you **want** to **play**, ↗ for ex**am**ple **one** **hour**, ↗ and **use** the **tim**er‿on your **phone**. ↘", "**When**‿it **rings**, ↗ **stop**. ↘"], ["**Tip** **num**ber **three**: **switch**‿**off** your **phone** **one** **hour** be**fore** you **go** to **sleep**, ↗ and **keep**‿it‿**out** of your **bed**room. ↘", "The **light** from the **screen** **tells** your **brain** that‿it is **still** **day**time, ↗ so you **don’t** **sleep** **well**. ↘"]], cues: [[27.08, 29.83, 32.49, 35.64], [30.26, 33.89, 36.16, 40.43], [34.11, 37.5, 40.75, 44.69], [37.69, 40.52, 45.34, 48.61], [40.66, 46.22, 48.83, 55.33], [46.37, 48.29, 55.52, 57.8], [48.46, 55.37, 58.35, 66.4], [55.88, 61.29, 67.07, 73.36]] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Pregunta: <em>Do you like playing online?</em> La mateixa ortografia de -ing que al Present Continuous (<em>swimming, dancing</em>).', en: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Question: <em>Do you like playing online?</em> Same -ing spelling as the Present Continuous (<em>swimming, dancing</em>).' },
-        { ca: '<strong>Imperatius</strong> per a consells i instruccions: verb sense subjecte. <em>Take a break. Go outside. Switch off your phone.</em> Negatiu: <em>Don’t + verb: Don’t use your phone in bed.</em>', en: '<strong>Imperatives</strong> for tips and instructions: the verb with no subject. <em>Take a break. Go outside. Switch off your phone.</em> Negative: <em>Don’t + verb: Don’t use your phone in bed.</em>' },
-        { r: 'safe', en: '<strong>Giving a reason for a tip:</strong> imperative + <em>because</em> / <em>so</em>: <em>Switch off your phone at night, because the light keeps you awake. Set a time limit, so you have time for other things.</em>' },
-        { r: 'daring', en: '<strong>Instead of + -ing</strong> and <strong>enough</strong>: <em>Go outside instead of watching videos. One hour is enough.</em> · After <em>like</em>, British English also accepts <em>to + verb</em> for habits (<em>I like to swim in the morning</em>), but use <em>-ing</em> in this LS.' }
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { p: 'like', ca: head('❤️', 'love / like / don’t mind / hate + verb-ing', 'Després d’aquests verbs, l’acció va amb <b>-ing</b>.') +
+              scale([['green', '😍', 'love'], ['teal', '🙂', 'like'], ['slate', '😐', 'don’t mind'], ['orange', '🙁', 'don’t like'], ['red', '😖', 'hate']]) +
+              row(card('blue', '➕ ➖ ❓', ex('I <b>love skating</b>.') + ex('She <b>hates losing</b>.') + ex('We <b>don’t like getting</b> up early.') + ex('<b>Do</b> you <b>like playing</b> online? — Yes, I do.') + small('La -ing s’escriu igual que al Present Continuous: <em>swimming, dancing</em>.'))) +
+              mistakes('Compte!', bad('I like play video games.', 'I like <b>playing</b> video games.'), bad('She hate losing.', 'She <b>hates</b> losing.', '(she → -s)')),
+            en: head('❤️', 'love / like / don’t mind / hate + verb-ing', 'After these verbs, the action takes <b>-ing</b>.') +
+              scale([['green', '😍', 'love'], ['teal', '🙂', 'like'], ['slate', '😐', 'don’t mind'], ['orange', '🙁', 'don’t like'], ['red', '😖', 'hate']]) +
+              row(card('blue', '➕ ➖ ❓', ex('I <b>love skating</b>.') + ex('She <b>hates losing</b>.') + ex('We <b>don’t like getting</b> up early.') + ex('<b>Do</b> you <b>like playing</b> online? — Yes, I do.') + small('Same -ing spelling as the Present Continuous: <em>swimming, dancing</em>.'))) +
+              mistakes('Watch out', bad('I like play video games.', 'I like <b>playing</b> video games.'), bad('She hate losing.', 'She <b>hates</b> losing.', '(she → -s)')) },
+          { p: 'imp', ca: head('📢', 'Imperatius: consells i instruccions', 'El verb sol, <b>sense subjecte</b> (sense <em>you</em>).') +
+              row(card('green', '✅ Fes-ho: verb', ex('<b>Take</b> a break every 30 minutes.') + ex('<b>Go</b> outside and <b>play</b> with your friends.') + ex('<b>Switch off</b> your phone at night.')),
+                card('red', '🚫 No ho facis: Don’t + verb', ex('<b>Don’t use</b> your phone in bed.') + ex('<b>Don’t check</b> your phone every five minutes.'))) +
+              mistakes('Compte!', bad('You put your phone away.', '<b>Put</b> your phone away.', '(sense you)'), bad('Don’t to use your phone.', 'Don’t <b>use</b> your phone.'), bad('No use your phone.', '<b>Don’t</b> use your phone.')),
+            en: head('📢', 'Imperatives: tips and instructions', 'The verb alone, <b>no subject</b> (no <em>you</em>).') +
+              row(card('green', '✅ Do it: verb', ex('<b>Take</b> a break every 30 minutes.') + ex('<b>Go</b> outside and <b>play</b> with your friends.') + ex('<b>Switch off</b> your phone at night.')),
+                card('red', '🚫 Don’t do it: Don’t + verb', ex('<b>Don’t use</b> your phone in bed.') + ex('<b>Don’t check</b> your phone every five minutes.'))) +
+              mistakes('Watch out', bad('You put your phone away.', '<b>Put</b> your phone away.', '(no you)'), bad('Don’t to use your phone.', 'Don’t <b>use</b> your phone.'), bad('No use your phone.', '<b>Don’t</b> use your phone.')) },
+          { p: 'why', r: 'safe', en: head('💬', 'A tip with a reason', 'A tip is stronger when you say why.') +
+              table([['Tip (imperative)', 'because → the reason', 'so → the result'], ['Switch off your phone at night,', '<b>because</b> the light keeps you awake.', ''], ['Set a time limit,', '', '<b>so</b> you have time for other things.'], ['Keep your phone out of your bedroom,', '<b>because</b> you sleep better.', ''], ['Turn off notifications,', '', '<b>so</b> you can concentrate.']]) +
+              mistakes('Watch out', bad('Set a time limit, because you have time for other things.', 'Set a time limit, <b>so</b> you have time…', '(result → so)')) },
+          { p: 'instead', r: 'daring', en: head('🔄', '<em>instead of</em> + -ing and <em>enough</em>') +
+              row(card('blue', 'instead of + -ing', ex('Go outside <b>instead of watching</b> videos.') + ex('Read a book <b>instead of scrolling</b>.')),
+                card('purple', 'enough = as much as you need', ex('One hour a day is <b>enough</b>.') + ex('I don’t have <b>enough</b> time.', 'enough + noun'))) +
+              tip('like + to?', 'British English also says <em>I like to swim in the morning</em> for habits, but use <em>-ing</em> in this LS.') +
+              mistakes('Watch out', bad('instead of watch', 'instead of <b>watching</b>'), bad('It isn’t enough big.', 'It isn’t big <b>enough</b>.', '(adjective + enough)')) }
+        ];
+      })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'like', title: { ca: 'love / like / hate + -ing', en: 'love / like / hate + -ing' }, note: { ca: '<em>I love skat<b>ing</b>. Do you like play<b>ing</b>…?</em>', en: '<em>I love skat<b>ing</b>. Do you like play<b>ing</b>…?</em>' } },
+        { id: 'imp', title: { ca: 'Imperatius', en: 'Imperatives' }, note: { ca: 'Verb sense subjecte · <em>Don’t</em> + verb', en: 'Verb with no subject · <em>Don’t</em> + verb' } },
+        { id: 'why', title: { en: 'A tip with a reason' }, note: { en: '<em>because</em> → reason · <em>so</em> → result' } },
+        { id: 'instead', title: { en: 'instead of + -ing · enough' }, note: { en: '<em>Go outside instead of watching videos.</em>' } }
       ],
       items: [
-        { q: 'I love ___ (skate) at the park.', a: ['skating'], ca: 'love + -ing.', en: 'love + -ing.' },
-        { q: 'She hates ___ (lose) a match.', a: ['losing'], ca: 'lose → losing (sense -e).', en: 'lose → losing (drop the -e).' },
-        { q: 'We don’t like ___ (get) up early.', a: ['getting'], ca: 'get → getting (dobla la t).', en: 'get → getting (double t).' },
-        { r: 'insecure', q: '___ you like ___ (play) online? — Yes, I do.', a: ['do playing'], ca: 'Do you like playing…?', en: 'Do you like playing…?' },
-        { r: 'insecure', q: 'My brother ___ (not / like) swimming.', a: ["doesn't like", 'does not like'], ca: 'Negativa 3a persona: doesn’t like.', en: 'Third person negative: doesn’t like.' },
-        { r: 'insecure', q: 'I don’t ___ training in the rain. (no m’importa)', a: ['mind'], ca: 'don’t mind + -ing.', en: 'don’t mind + -ing.' },
-        { q: 'Tip: ___ a break every 30 minutes. (fer)', a: ['take'], ca: 'Imperatiu: Take…', en: 'Imperative: Take…' },
-        { q: 'Tip: ___ off your phone at night. (apagar)', a: ['switch', 'turn'], ca: 'Imperatiu: Switch off…', en: 'Imperative: Switch off…' },
-        { q: 'Tip: ___ use your phone in bed. (negatiu)', a: ["don't", 'do not'], ca: 'Imperatiu negatiu: Don’t + verb.', en: 'Negative imperative: Don’t + verb.' },
-        { r: 'insecure', q: 'Tip: ___ outside and ___ with your friends. (anar / jugar)', a: ['go play'], ca: 'Dos imperatius: Go… and play…', en: 'Two imperatives: Go… and play…' },
-        { r: 'insecure', q: 'Correct the mistake: “You put your phone away at dinner.” (make it a tip) → ___ your phone away at dinner.', a: ['put'], ca: 'L’imperatiu no porta subjecte.', en: 'Imperatives have no subject.' },
-        { q: 'Correct the mistake: “I like play video games.” → I like ___ video games.', a: ['playing'], ca: 'like + -ing.', en: 'like + -ing.' },
-        { r: 'safe', q: 'Switch off your phone at night, ___ the light keeps you awake. (raó)', a: ['because'], en: 'because gives the reason.' },
-        { r: 'safe', q: 'Set a time limit, ___ you have time for other things. (resultat)', a: ['so'], en: 'so gives the result.' },
-        { r: 'safe', q: '___ your phone out of your bedroom. (mantenir)', a: ['keep'], en: 'Imperative: Keep…' },
-        { r: 'safe', q: 'Tip: ___ check your phone every five minutes. (negatiu)', a: ["don't", 'do not'], en: 'Don’t + verb.' },
-        { r: 'safe', q: 'They love ___ (watch) highlights after the match.', a: ['watching'], en: 'love + -ing.' },
-        { r: 'daring', q: 'Go outside ___ ___ watching videos all afternoon. (en lloc de)', a: ['instead of'], en: 'instead of + -ing.' },
-        { r: 'daring', q: 'Turn off notifications when you study, ___ you can concentrate.', a: ['so', 'so that'], en: 'so (that) = result / purpose.' },
-        { r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' },
-        { r: 'daring', q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'], en: 'Don’t + base verb, no “to”.' }
+        { p: 'like', q: 'I love ___ (skate) at the park.', a: ['skating', 'to skate'], ca: 'love + -ing.', en: 'love + -ing.' },
+        { p: 'like', q: 'She hates ___ (lose) a match.', a: ['losing', 'to lose'], ca: 'lose → losing (sense -e).', en: 'lose → losing (drop the -e).' },
+        { p: 'like', q: 'We don’t like ___ (get) up early.', a: ['getting', 'to get'], ca: 'get → getting (dobla la t).', en: 'get → getting (double t).' },
+        { p: 'like', q: 'Correct the mistake: “I like play video games.” → I like ___ video games.', a: ['playing', 'to play'], ca: 'like + -ing.', en: 'like + -ing.' },
+        { p: 'like', r: 'insecure', q: '___ you like ___ (play) online? — Yes, I do.', a: ['do playing', 'do to play'], ca: 'Do you like playing…?', en: 'Do you like playing…?' },
+        { p: 'like', r: 'insecure', q: 'My brother ___ (not / like) swimming.', a: ["doesn't like", 'does not like'], ca: 'Negativa 3a persona: doesn’t like.', en: 'Third person negative: doesn’t like.' },
+        { p: 'like', r: 'insecure', q: 'I don’t ___ training in the rain. (no m’importa)', a: ['mind'], ca: 'don’t mind + -ing.', en: 'don’t mind + -ing.' },
+        { p: 'like', r: 'safe', q: 'They love ___ (watch) highlights after the match.', a: ['watching', 'to watch'], en: 'love + -ing.' },
+        { p: 'like', a: [], own: { must: ["\\b(love|like|enjoy)s?\\s+\\w+ing\\b", "\\bmind\\s+\\w+ing\\b", "\\bhate\\s+\\w+ing\\b"], min: 10 }, q: "Your turn: one thing you <b>love</b> doing, one you <b>don’t mind</b> and one you <b>hate</b>, with -ing. <span class=\"tiny\">(Una cosa que t’encanta fer, una que no t’importa i una que odies, amb -ing.)</span>", show: "I love skating, I don’t mind cooking and I hate getting up early.", ca: "love / don’t mind / hate + verb-ing.", en: "love / don’t mind / hate + verb-ing." },
+        { p: 'imp', q: 'Tip: ___ a break every 30 minutes. (fer)', a: ['take', 'have'], ca: 'Imperatiu: Take…', en: 'Imperative: Take…' },
+        { p: 'imp', q: 'Tip: ___ off your phone at night. (apagar)', a: ['switch', 'turn'], ca: 'Imperatiu: Switch off…', en: 'Imperative: Switch off…' },
+        { p: 'imp', q: 'Tip: ___ use your phone in bed. (negatiu)', a: ["don't", 'do not'], ca: 'Imperatiu negatiu: Don’t + verb.', en: 'Negative imperative: Don’t + verb.' },
+        { p: 'imp', r: 'insecure', q: 'Tip: ___ outside and ___ with your friends. (anar / jugar)', a: ['go play'], ca: 'Dos imperatius: Go… and play…', en: 'Two imperatives: Go… and play…' },
+        { p: 'imp', r: 'insecure', q: 'Correct the mistake: “You put your phone away at dinner.” (make it a tip) → ___ your phone away at dinner.', a: ['put'], ca: 'L’imperatiu no porta subjecte.', en: 'Imperatives have no subject.' },
+        { p: 'imp', r: 'safe', q: '___ your phone out of your bedroom. (mantenir)', a: ['keep'], en: 'Imperative: Keep…' },
+        { p: 'imp', r: 'safe', q: 'Tip: ___ check your phone every five minutes. (negatiu)', a: ["don't", 'do not'], en: 'Don’t + verb.' },
+        { p: 'imp', r: 'daring', q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'], en: 'Don’t + base verb, no “to”.' },
+        { p: 'imp', a: [], own: { must: ["\\b(don['’]t|do not)\\s+\\w+"], min: 8 }, q: "Your turn: three tips for a friend who uses the phone too much: two do’s and one <b>don’t</b>. <span class=\"tiny\">(Tres consells per a un amic que fa servir massa el mòbil: dos de fer i un de no fer.)</span>", show: "Turn off your phone at night. Go for a walk. Don’t use your phone in bed.", ca: "Verb sol, sense you · Don’t + verb.", en: "The verb alone, no you · Don’t + verb." },
+        { p: 'why', r: 'safe', q: 'Switch off your phone at night, ___ the light keeps you awake. (raó)', a: ['because'], en: 'because gives the reason.' },
+        { p: 'why', r: 'safe', q: 'Set a time limit, ___ you have time for other things. (resultat)', a: ['so'], en: 'so gives the result.' },
+        { p: 'why', r: 'daring', q: 'Turn off notifications when you study, ___ you can concentrate.', a: ['so', 'so that'], en: 'so (that) = result / purpose.' },
+        { p: 'why', r: 'safe', a: [], own: { must: ["\\bbecause\\b", "\\bso\\b"], min: 10 }, q: "Your turn: two tips, one with <b>because</b> and one with <b>so</b>.", show: "Don’t play at night because you need to sleep. Turn off notifications, so you can concentrate.", en: "because = the reason · so = the result." },
+        { p: 'instead', r: 'daring', q: 'Go outside ___ ___ watching videos all afternoon. (en lloc de)', a: ['instead of'], en: 'instead of + -ing.' },
+        { p: 'instead', r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' },
+        { p: 'instead', r: 'daring', a: [], own: { must: ["\\binstead of\\b", "\\benough\\b"], min: 10 }, q: "Your turn: one tip with <b>instead of</b> and one sentence with <b>enough</b>.", show: "Read a book instead of watching videos. One hour a day is enough.", en: "instead of + -ing · enough." }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: -ing després de like, Present Continuous, Present Simple o imperatiu?', en: 'Mixed forms: -ing after like, Present Continuous, Present Simple or imperative?' },
       items: [
         { q: 'I love dancing, and right now I ___ (dance) in my room!', a: ['am dancing', "'m dancing"], ca: 'right now → am dancing.', en: 'right now → am dancing.' },
         { q: 'She usually ___ (play) online in the evening.', a: ['plays'] },
-        { q: 'Tip: ___ a break and drink some water. (fer)', a: ['take'] },
-        { q: 'Do you like ___ (read) comics?', a: ['reading'] },
+        { q: 'Tip: ___ a break and drink some water. (fer)', a: ['take', 'have'] },
+        { q: 'Do you like ___ (read) comics?', a: ['reading', 'to read'] },
         { q: 'Look! Noah ___ (film) the race.', a: ['is filming', "'s filming"] },
         { r: 'insecure', q: 'I ___ (not / like) getting up early.', a: ["don't like", 'do not like'] },
         { r: 'safe', q: '___ use your phone at dinner: talk to your family. (negatiu)', a: ["don't", 'do not'] },
-        { r: 'safe', q: 'My sister hates ___ (lose), so she practises every day.', a: ['losing'] },
+        { r: 'safe', q: 'My sister hates ___ (lose), so she practises every day.', a: ['losing', 'to lose'] },
         { r: 'daring', q: 'Go outside ___ of playing online all afternoon.', a: ['instead'] },
         { r: 'daring', q: 'I ___ (think) this tip is the best one. (opinion)', a: ['think'] }
       ] },

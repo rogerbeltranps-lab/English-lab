@@ -14,7 +14,7 @@
   // sections for those who don't have a Chromebook": shared/print/today.html puts several of these on one sheet)
   const tabs = (q.get('tabs') || '').split(',').filter(Boolean), bare = q.get('bare') === '1';
   const base = '../../' + ls + '/';
-  const ca = level === 'insecure' || level === 'beginners';
+  const ca = level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
   // the same as ls2-engine.js: beginners → insecure, native (Pro, 4 ESO) → daring
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);
@@ -53,7 +53,7 @@
     const ingQ = String(it.q).match(/-ing form: ([a-z]+)/); if (ingQ) { const v = ingQ[1]; [v + 'ing', v.replace(/e$/, '') + v.slice(-1) + 'ing', s3(v)].forEach(add); }
     const a0 = norm(it.a[0]), set = SETS.find(g => g.includes(a0)); if (set) set.filter(x => x !== a0).sort((x, y) => hash(salt + x) - hash(salt + y)).forEach(add);
     const wc = words(it.a[0]);
-    items.map(x => x.a[0]).filter(x => x !== it.a[0]).sort((x, y) => ((words(y) === wc) - (words(x) === wc)) || (hash(salt + x) - hash(salt + y))).forEach(add);
+    items.filter(x => !x.own).map(x => x.a[0]).filter(x => x !== it.a[0]).sort((x, y) => ((words(y) === wc) - (words(x) === wc)) || (hash(salt + x) - hash(salt + y))).forEach(add);
     return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
   }
 
@@ -70,7 +70,8 @@
   // A gap ___ becomes a writing space; a question without a gap gets a line below. The key fills a single gap, or adds the answer after.
   // pick: the Starter options for this item (starterChoices), printed as a / b / c under the sentence; the key circles the right one.
   function gapped(it, pick) {
-    const a = it.a ? it.a[0] : '', n = (it.q.match(/_{2,}/g) || []).length;
+    const a = it.own ? (it.show || '') : it.a && it.a[0] != null ? it.a[0] : '', n = (it.q.match(/_{2,}/g) || []).length;
+    if (it.own) return '<li><span class="q">' + it.q + '</span>' + (key ? '<div class="key-line">' + esc(a) + '</div>' : lines(2)) + '</li>';   // ✏️ own example: lines to write
     if (pick) return '<li><span class="q">' + it.q.replace(/_{2,}/g, '<span class="gap"></span>') + '</span><div class="opts">' +
       pick.map((o, k) => '<span class="opt' + (key && o === a ? ' right' : '') + '"><b>' + 'abc'[k] + ')</b> ' + esc(o) + '</span>').join('') + '</div></li>';
     if (!n) return '<li><span class="q">' + it.q + '</span>' + (key ? '<div class="key-line">' + esc(a) + '</div>' : lines(1)) + '</li>';
@@ -81,7 +82,7 @@
   const gaps = (items, prefix) => {
     const on = starter() && prefix != null && items.length;
     return (on ? '<p class="tiny">Tria la resposta correcta entre les tres opcions i escriu-la al buit (o encercla la lletra).</p>' : '') +
-      '<ol class="items">' + items.map((it, i) => gapped(it, on ? starterChoices(it, items, LP.key + prefix + i) : null)).join('') + '</ol>';
+      '<ol class="items">' + items.map((it, i) => gapped(it, on && !it.own ? starterChoices(it, items, LP.key + prefix + i) : null)).join('') + '</ol>';
   };
   function choices(items, pts) {
     return '<ol class="items">' + items.map(it => {

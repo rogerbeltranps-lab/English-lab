@@ -5,13 +5,13 @@ window.LP = {
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Getting started', en: 'Recall: Getting started' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res. Intentar recordar és el que t’ajuda a aprendre.', en: 'Type the answers without looking. Trying to remember is what helps you learn.' },
       items: [
-        { q: 'In winter the days get ___.', a: ['shorter'], ca: 'Contrari de longer.', en: 'The opposite of longer.' },
+        { q: 'In winter the days get ___.', a: ['shorter', 'colder', 'darker'], ca: 'Contrari de longer.', en: 'The opposite of longer.' },
         { q: 'The Catalan sweets with almonds and pine nuts: ___', a: ['panellets'] },
         { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
         { r: 'insecure', q: 'The US word for autumn: ___', a: ['fall'] },
         { r: 'insecure', q: 'In autumn, leaves ___ colour.', a: ['change'] },
         { q: 'How do you feel before a party you love? I feel ___.', a: ['excited', 'happy'] },
-        { r: 'safe', q: 'The clocks go ___ in October.', a: ['back'] },
+        { r: 'safe', q: 'The clocks go ___ in October.', a: ['back', 'back an hour', 'back one hour'] },
         { r: 'safe', q: 'It’s ___ today. Wear a jumper.', a: ['chilly', 'cold', 'cool'] }
       ] },
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari de celebracions', en: 'Celebration vocabulary' },
@@ -30,16 +30,89 @@ window.LP = {
         { r: 'safe', g: 'Getting started', items: [['the clocks go back', 'es retarda el rellotge', 'The clocks go back in October.'], ['cosy', 'acollidor', 'Our living room is cosy.']] }
       ],
       practice: [
-        { q: 'At Diwali people ___ small oil lamps.', a: ['light'] },
+        { q: 'At Diwali people ___ small oil lamps.', a: ['light', 'light up'] },
         { q: 'Children ___ up as witches and ghosts.', a: ['dress'] },
-        { q: 'There are ___ in the sky at midnight.', a: ['fireworks'] },
-        { q: 'On Sunday we ___ our relatives in Girona.', a: ['visit'] },
-        { q: 'People walk through the streets in a big ___.', a: ['parade'] },
-        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange'] },
+        { q: 'On New Year’s Eve there are ___ in the sky at midnight.', a: ['fireworks'] },
+        { q: 'On Sunday we ___ our relatives in Girona.', a: ['visit', 'see', 'meet'] },
+        { q: 'People walk through the streets in a big ___.', a: ['parade', 'procession'] },
+        { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange', 'give', 'swap'] },
         { r: 'safe', q: 'I always look ___ to the holidays.', a: ['forward'] },
-        { r: 'safe', q: 'Christmas is a ___ holiday for some families and a secular one for others.', a: ['religious'] },
-        { r: 'daring', q: 'Many families ___ their ancestors on All Saints’ Day.', a: ['honour', 'honor'] },
+        { r: 'safe', q: 'Christmas is a ___ holiday for some families and a secular one for others.', a: ['religious', 'sacred'] },
+        { r: 'daring', q: 'Many families ___ their ancestors on All Saints’ Day.', a: ['honour', 'honor', 'remember', 'commemorate'] },
         { r: 'daring', q: 'Celebrations give people a sense of ___ to a community.', a: ['belonging'] }
+      ] },
+    /* 💬 Expressions (Roger, 16 Nov 2026: "We need to add 6 activities for each Expression section … they won't see it as homework until I
+       put it on the agenda"; "expressions must have the option like the grammar to correct together where I explain, then 4 examples and then
+       time to do their own questions according to their level"): the Expressions boxes moved here from the Vocabulary step, with 6 compulsory
+       questions per level (req: 6; Starter and Base their own list with choices and Catalan hints) and ➕ extra practice for every level, which
+       📘 Expressions together (shared/correct/, elIsGrammar) takes its 🙌 4 questions from. No listening. Until 💬 Expressions is on a class day
+       of the Time plan, students see the tab 🏫 for class: never To do or homework (elLaterTabs in el-catalog.js). */
+    { id: 'vocabEx', req: 6, type: 'typed', tab: { ca: '💬 Expressions', en: '💬 Expressions' }, title: { ca: 'Expressions: paraules que van juntes', en: 'Expressions: words that go together' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+      intro: { ca: 'Mira les expressions: són paraules que van juntes i s’aprenen en bloc. Hi ha 6 preguntes obligatòries (el comptador te les va contant): quan les tinguis, prem Comprova i l’activitat queda feta. Després ve ➕ pràctica extra, opcional. Si falles dues vegades, veuràs la resposta.', en: 'Look at the expressions: words that go together, learnt as one block. There are 6 compulsory questions (the counter keeps track): when you have them all, press Check and the activity is done. Then comes ➕ extra practice, optional. After two wrong tries you will see the answer.' },
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { ca: head('🧩', 'Paraules que van juntes', 'Alguns verbs porten una paraula petita al darrere. Aprèn-los junts, com una sola paraula.') +
+              row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.', 'disfressar-se de')),
+                card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.', 'donar a') + ex('I <b>get presents from</b> my grandparents.', 'rebre de')),
+                card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'sense to!') + ex('We <b>eat together</b> on 25 December.'))) +
+              row(card('teal', '🏠 have a get-together', ex('We <b>have a get-together</b> at my grandparents’ house.', 'fem una trobada') + ex('There’s a big family <b>get-together</b> at Christmas.') +
+                small('<b>a get-together</b> (amb guionet) = una trobada de família o d’amics. El verb és <b>get together</b> (sense guionet): <em>We get together at Christmas.</em>'), 480)) +
+              mistakes('Compte!', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.'), bad('We make a get-together.', 'We <b>have</b> a get-together.', '(fer → have)')),
+            en: head('🧩', 'Words that go together', 'Some verbs take a little word after them. Learn them together, like one word.') +
+              row(card('purple', '🎭 dress up (as…)', ex('Children <b>dress up</b> at Halloween.') + ex('I <b>dressed up as</b> a witch.')),
+                card('green', '🎁 give / get presents', ex('We <b>give presents to</b> our cousins.') + ex('I <b>get presents from</b> my grandparents.')),
+                card('orange', '👵 visit relatives · eat together', ex('We <b>visit</b> our relatives at Christmas.', 'no to!') + ex('We <b>eat together</b> on 25 December.'))) +
+              row(card('teal', '🏠 have a get-together', ex('We <b>have a get-together</b> at my grandparents’ house.') + ex('There’s a big family <b>get-together</b> at Christmas.') +
+                small('<b>a get-together</b> (with a hyphen) = a meeting of family or friends. The verb is <b>get together</b> (no hyphen): <em>We get together at Christmas.</em>'), 480)) +
+              mistakes('Watch out', bad('We visit to our grandparents.', 'We <b>visit</b> our grandparents.'), bad('I dress up of a witch.', 'I dress up <b>as</b> a witch.'), bad('We make a get-together.', 'We <b>have</b> a get-together.')) },
+          { r: 'safe', en: head('🔗', 'Verbs + little words (Safe words)', 'The little word is part of the verb: don’t change it.') +
+              table([['Verb', 'What comes after', 'Example'], ['<b>take part in</b>', 'a noun', 'I <b>take part in</b> the parade.'], ['<b>look forward to</b>', 'a noun or <b>-ing</b>', 'I <b>look forward to</b> the holidays. · I <b>look forward to seeing</b> you.'], ['<b>get together</b> (with)', 'people', 'Families <b>get together</b> at Christmas.'], ['<b>pass down</b>', 'a tradition', 'Recipes are <b>passed down</b> from grandparents.'], ['<b>wish someone</b> a happy…', 'a person + a happy…', 'We <b>wish everyone a happy</b> new year.']]) +
+              mistakes('Watch out', bad('take part on the parade', 'take part <b>in</b> the parade'), bad('I look forward to see you.', 'I look forward to <b>seeing</b> you.', '(to + -ing)')) }
+        ];
+      })(),
+      parts: [{ id: 'ex', title: { ca: 'Expressions', en: 'Expressions' }, note: { ca: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (sense to) · <b>have a get-together</b> · <b>take part in</b> · <b>look forward to</b> + -ing', en: '<b>dress up as</b> · <b>give</b> presents <b>to</b> · <b>get</b> presents <b>from</b> · <b>visit</b> (no to) · <b>have a get-together</b> · <b>take part in</b> · <b>look forward to</b> + -ing' } }],
+      items: [
+        // Starter and Base
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['as', 'of', 'like'], q: 'I dressed up ___ a pirate.', a: ['as'], ca: 'disfressar-se de = dress up as.', en: 'dress up as.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['our grandparents', 'to our grandparents', 'at our grandparents'], q: 'We visit ___ at Christmas.', a: ['our grandparents'], ca: 'visit sense to.', en: 'visit: no to.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['to', 'from', 'at'], q: 'We give presents ___ our cousins.', a: ['to'], ca: 'donar a = give to.', en: 'give to.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['from', 'to', 'at'], q: 'I get presents ___ my grandparents.', a: ['from'], ca: 'rebre de = get from.', en: 'get from.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['together', 'with', 'all'], q: 'On 25 December the whole family eats ___.', a: ['together'], ca: 'menjar junts = eat together.', en: 'eat together.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['get-together', 'together', 'get'], q: 'At Christmas we have a big family ___.', a: ['get-together', 'get together'], ca: 'una trobada = a get-together.', en: 'a get-together = a family meeting.' },
+        { p: 'ex', only: ['beginners', 'insecure'], opts: ['up', 'on', 'in'], q: 'At Carnival children dress ___.', a: ['up'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
+        // Core and Plus
+        { p: 'ex', r: 'safe', q: 'Hundreds of people take part ___ the parade.', a: ['in'], en: 'take part in.' },
+        { p: 'ex', r: 'safe', q: 'I’m really looking forward ___ the holidays.', a: ['to'], en: 'look forward to.' },
+        { p: 'ex', r: 'safe', q: 'I look forward to ___ you at the festival. (see)', a: ['seeing'], en: 'look forward to + -ing.' },
+        { p: 'ex', r: 'safe', q: 'Families get ___ for a big meal at New Year.', a: ['together'], en: 'get together = meet as a group.' },
+        { p: 'ex', r: 'safe', q: 'Every summer we have a big family ___ at my grandparents’ house. (get / together)', a: ['get-together', 'get together'], en: 'a get-together (noun) = a meeting of family or friends.' },
+        { p: 'ex', r: 'safe', k: 'fix', q: '“We visit to our relatives.” → We ___ our relatives.', a: ['visit'], en: 'visit: no to.' },
+        { p: 'ex', r: 'safe', q: 'This recipe is passed ___ from grandparents to grandchildren.', a: ['down', 'on'], en: 'pass down = give to the next generation.' },
+        // ➕ for every level (📘 Expressions together takes its 4 questions from these)
+        { p: 'ex', opts: ['dress', 'wear', 'put'], q: 'Children ___ up as witches at Halloween.', a: ['dress'], ca: 'disfressar-se = dress up.', en: 'dress up.' },
+        { p: 'ex', opts: ['have', 'make', 'do'], q: 'On Sunday we ___ a get-together with our cousins.', a: ['have'], ca: 'fer una trobada = have a get-together.', en: 'have a get-together.' },
+        { p: 'ex', opts: ['wish', 'want', 'hope'], q: 'We ___ everyone a happy new year.', a: ['wish'], ca: 'desitjar = wish.', en: 'wish someone a happy…' },
+        { p: 'ex', opts: ['in', 'on', 'at'], q: 'Do you take part ___ the Carnival parade?', a: ['in'], ca: 'participar en = take part in.', en: 'take part in.' },
+        { p: 'ex', opts: ['visit', 'visit to', 'go'], q: 'We ___ our relatives in Girona every summer.', a: ['visit'], ca: 'visitar = visit (sense to).', en: 'visit: no to.' }
       ] },
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Four celebrations, four seasons', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix una vegada per saber de quines festes parla. Després busca a cada paràgraf la frase que respon cada pregunta.', en: 'Read once to see which celebrations it describes. Then find the sentence that answers each question.' },
@@ -50,12 +123,12 @@ window.LP = {
         daring: '<p><strong>Diwali.</strong> Diwali, which is known as the festival of lights, is celebrated by Hindus, Sikhs and Jains in October or November, and it lasts five days. Its date depends on the moon, so it changes every year. Before the festival, homes are cleaned and decorated, small oil lamps called diyas are lit, and colourful patterns called rangoli are made on the floor. Families visit relatives, exchange gifts and share sweets, and in many cities the night sky is filled with fireworks. For many people, the lights represent the victory of good over evil and of light over darkness. Today Diwali is also celebrated far from India: in Leicester, in the UK, tens of thousands of people join the street celebrations every year.</p><p><strong>Hanukkah.</strong> Hanukkah, which is a Jewish festival, usually takes place in December and lasts eight nights. According to Jewish tradition, it remembers an old story in which a small amount of oil burned for eight days in the Temple in Jerusalem. That is why one more candle is lit on the menorah every night, until eight candles are burning on the last night, and why food cooked in oil, such as potato pancakes (latkes) and doughnuts, is eaten. Children play with a dreidel, a spinning top with Hebrew letters on it.</p><p><strong>Lunar New Year.</strong> Lunar New Year is celebrated in China, Vietnam, Korea and many other places in late January or February, when a new year begins in the lunar calendar. Before the festival, houses are cleaned to sweep away bad luck. On New Year’s Eve, families get together for a big reunion dinner, and millions of people travel home, which makes it one of the busiest travel periods in the world. The streets are decorated with red lanterns, because red is associated with good luck, and there are parades with dragon and lion dances. Children are given red envelopes with money.</p><p><strong>Castanyada.</strong> In Catalonia, the Castanyada is held on 31 October, the night before All Saints’ Day. Families and friends get together to roast chestnuts and sweet potatoes and eat panellets, which are small sweets made with almonds and pine nuts. In some schools, a student dresses up as a castanyera, an old woman who sells chestnuts in the street. Although Halloween has become popular among young people, many families keep the tradition alive.</p>'
       } },
       items: [
-        { q: 'How long does Hanukkah last?', o: ['eight nights', 'five days', 'one week'], h: 'Busca al paràgraf de Hanukkah la paraula “lasts”.' },
-        { q: 'What are diyas?', o: ['small oil lamps', 'sweets', 'patterns on the floor'], h: 'Busca “called diyas” al paràgraf de Diwali.' },
-        { q: 'When is Lunar New Year celebrated?', o: ['in late January or February', 'in December', 'in October or November'], h: 'Busca els mesos al paràgraf de Lunar New Year.' },
-        { r: 'insecure', q: 'Why do people clean their houses before Lunar New Year?', o: ['to sweep away bad luck', 'because guests are coming', 'because it’s spring'], h: 'Busca “clean their houses to…”.' },
-        { q: 'What do people eat at the Castanyada?', o: ['chestnuts, sweet potatoes and panellets', 'potato pancakes and doughnuts', 'red envelopes'], h: 'Llegeix l’últim paràgraf.' },
-        { q: 'Which celebration has a game with a spinning top?', o: ['Hanukkah', 'Diwali', 'Castanyada'], h: 'Busca “spinning top”.' },
+        { q: 'How long does Hanukkah last?', o: ['eight nights', 'five days', 'one week'], h: 'Busca al paràgraf de Hanukkah la paraula “lasts”.', he: 'Find the word “lasts” in the Hanukkah paragraph.' },
+        { q: 'What are diyas?', o: ['small oil lamps', 'sweets', 'patterns on the floor'], h: 'Busca “called diyas” al paràgraf de Diwali.', he: 'Find “called diyas” in the Diwali paragraph.' },
+        { q: 'When is Lunar New Year celebrated?', o: ['in late January or February', 'in December', 'in October or November'], h: 'Busca els mesos al paràgraf de Lunar New Year.', he: 'Find the months in the Lunar New Year paragraph.' },
+        { r: 'insecure', q: 'Why do people clean their houses before Lunar New Year?', o: ['to sweep away bad luck', 'because guests are coming', 'because it’s spring'], h: 'Busca “clean their houses to…”.', he: 'Find “clean their houses to…”.' },
+        { q: 'What do people eat at the Castanyada?', o: ['chestnuts, sweet potatoes and panellets', 'potato pancakes and doughnuts', 'red envelopes'], h: 'Llegeix l’últim paràgraf.', he: 'Read the last paragraph.' },
+        { q: 'Which celebration has a game with a spinning top?', o: ['Hanukkah', 'Diwali', 'Castanyada'], h: 'Busca “spinning top”.', he: 'Find “spinning top”.' },
         { r: 'safe', q: 'Which two celebrations use lights or candles as a main symbol?', o: ['Diwali and Hanukkah', 'Lunar New Year and Castanyada', 'Hanukkah and Castanyada'] },
         { r: 'safe', q: 'In the text, “get together” means…', o: ['meet as a group', 'become friends', 'travel abroad'] },
         { r: 'daring', q: 'For many people, what do the lights of Diwali represent?', o: ['good winning over evil', 'the start of winter', 'a family’s wealth'] },
@@ -64,60 +137,132 @@ window.LP = {
       ] },
     // LS criterion 4.1: a reading log on two of the four texts (what, when, where, main customs, two words inferred from context). The teacher sees it on the dashboard.
     { id: 'log', type: 'step', tab: { ca: 'Registre de lectura', en: 'Reading log' }, title: { ca: 'Registre de lectura: dues celebracions', en: 'Reading log: two celebrations' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
-      intro: { ca: 'Torna a llegir el text i omple el registre de <strong>Diwali</strong> i de <strong>Lunar New Year</strong>. Escriu notes curtes amb les teves paraules, no frases copiades.', en: 'Read the text again and log <strong>two of the four celebrations</strong> (you choose). Write short notes in your own words, not copied sentences.' },
-      html: { ca: '<div class="model"><strong>Exemple (Hanukkah):</strong> festa jueva · desembre · 8 nits · a casa, amb la família<br><strong>Costums:</strong> encenen una espelma més cada nit · mengen menjar fet amb oli<br><strong>Paraula:</strong> <em>menorah</em> = un canelobre per a espelmes. Pista: el text diu “a special candle holder”.</div>',
+      textFrom: 'read', textTitle: { ca: '📖 El text', en: '📖 The text' },   // the reading above the boxes (Roger, 25 Nov 2026)
+      intro: { ca: 'Torna a llegir el text i omple el registre de <strong>Diwali</strong> i de <strong>Lunar New Year</strong>. Escriu notes curtes <strong>en anglès</strong>, amb les teves paraules, no frases copiades. Les preguntes estan en català per ajudar-te, però <strong>escriu les respostes en anglès</strong>.', en: 'Read the text again and log <strong>two of the four celebrations</strong> (you choose). Write short notes <strong>in English</strong>, in your own words, not copied sentences.' },
+      html: { ca: '<div class="model"><strong>Exemple de notes en anglès (Hanukkah):</strong> Jewish festival · December · eight nights · at home, with the family<br><strong>Costums:</strong> one more candle every night · food cooked in oil<br><strong>Paraula:</strong> <em>menorah</em> = a candle holder. Pista: “families light one more candle on a menorah”.</div>',
         en: '<div class="model"><strong>Model (Hanukkah):</strong> Jewish festival · December · eight nights · at home, with the family<br><strong>Customs:</strong> one more candle every night · food cooked in oil<br><strong>Word:</strong> <em>menorah</em> = a candle holder. Clue: “families light one more candle on a menorah”.</div>' },
       fields: [
-        { id: 'w1', label: { ca: 'Diwali: què és, quan i on', en: 'Text 1: which celebration? What is it, when and where?' }, rows: 2 },
-        { id: 'c1', label: { ca: 'Diwali: els costums principals (2–3)', en: 'Text 1: the main customs (2–3)' }, rows: 2 },
-        { r: 'insecure', id: 'w2', label: { ca: 'Lunar New Year: què és, quan i on', en: 'Text 2: which celebration? What is it, when and where?' }, rows: 2 },
-        { r: 'insecure', id: 'c2', label: { ca: 'Lunar New Year: els costums principals (2–3)', en: 'Text 2: the main customs (2–3)' }, rows: 2 },
-        { id: 'v1', label: { ca: 'Paraula 1 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 1 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
-        { r: 'insecure', id: 'v2', label: { ca: 'Paraula 2 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 2 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
-        { r: 'daring', id: 'why', label: 'Why does one of these customs matter to the people who celebrate it? (The text does not say it directly: explain how you know.)', rows: 2 }
+        { id: 'w1', label: { ca: 'Diwali: què és, quan i on', en: 'Text 1: which celebration? What is it, when and where?' }, ph: 'A … festival · in … · in …', rows: 2 },
+        { id: 'c1', label: { ca: 'Diwali: els costums principals (2–3)', en: 'Text 1: the main customs (2–3)' }, ph: 'People … · They …', rows: 2 },
+        { r: 'insecure', id: 'w2', label: { ca: 'Lunar New Year: què és, quan i on', en: 'Text 2: which celebration? What is it, when and where?' }, ph: 'A … festival · in … · in …', rows: 2 },
+        { r: 'insecure', id: 'c2', label: { ca: 'Lunar New Year: els costums principals (2–3)', en: 'Text 2: the main customs (2–3)' }, ph: 'People … · They …', rows: 2 },
+        { id: 'v1', label: { ca: 'Paraula 1 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 1 you worked out from context: the word, what it means and the clue in the text' }, ph: '… = … · Clue: “…”', rows: 2 },
+        { r: 'insecure', id: 'v2', label: { ca: 'Paraula 2 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 2 you worked out from context: the word, what it means and the clue in the text' }, ph: '… = … · Clue: “…”', rows: 2 },
+        { r: 'daring', id: 'why', label: 'Why does one of these customs matter to the people who celebrate it? (The text does not say it directly: explain how you know.)', ph: 'It matters because … · I know because the text says …', rows: 2 }
       ],
       rate: {
-        beginners: ['He escrit notes curtes amb les meves paraules', 'He triat els costums principals de Diwali', 'He entès una paraula pel context'],
-        insecure: ['He escrit notes curtes amb les meves paraules', 'He triat els costums principals, no detalls petits', 'He entès dues paraules pel context'],
-        safe: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context'],
-        daring: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context and can explain the clue']
+        beginners: ['He escrit notes curtes en anglès, amb les meves paraules', 'He triat els costums principals de Diwali', 'He entès una paraula pel context'],
+        insecure: ['He escrit notes curtes en anglès, amb les meves paraules', 'He triat els costums principals, no detalls petits', 'He entès dues paraules pel context'],
+        safe: ['My notes are short, in English and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context'],
+        daring: ['My notes are short, in English and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context and can explain the clue']
       } },
     { id: 'listen', type: 'mc', tab: 'Listening', title: { ca: 'Listening real: Happy Diwali', en: 'Real listening: Happy Diwali' }, pill: { ca: 'Vídeo real · BBC', en: 'Real video · BBC' },
       intro: { ca: 'Vídeo real de la BBC (British Council). Mira’l una vegada per la idea general i una altra per als detalls. No cal entendre totes les paraules.', en: 'A real BBC video (British Council). Watch once for the general idea and again for the details. You don’t need every word.' },
       media: { youtube: 'kjIPGD_WcEY', title: 'Happy Diwali', credit: 'Video: “Happy Diwali”, BBC / British Council LearnEnglish Kids.' },
       items: [
-        { q: 'How long is Diwali?', o: ['five days', 'one day', 'eight nights'], h: 'Escolta quants dies dura.' },
-        { q: 'Who celebrates Diwali?', o: ['Hindus, Sikhs and Jains', 'only people in the UK', 'only children'], h: 'Escolta quins grups de persones l’any celebren.' },
-        { q: 'Diwali is a festival of…', o: ['lights', 'flowers', 'water'], h: 'Fixa’t en el nom de la festa: el festival de les…' },
-        { q: 'Which UK city has very big Diwali celebrations?', o: ['Leicester', 'Manchester', 'Edinburgh'], h: 'Escolta el nom de la ciutat anglesa.' },
-        { q: 'Which of these do people do at Diwali?', o: ['light lamps and watch fireworks', 'carve pumpkins', 'go trick or treating'], h: 'Pensa en llums i focs.' },
+        { q: 'How long is Diwali?', o: ['five days', 'one day', 'eight nights'], h: 'Escolta quants dies dura.', he: 'Listen for how many days it lasts.' },
+        { q: 'Who celebrates Diwali?', o: ['Hindus, Sikhs and Jains', 'only people in the UK', 'only children'], h: 'Escolta quins grups de persones l’any celebren.', he: 'Listen for which groups of people celebrate the new year.' },
+        { q: 'Diwali is a festival of…', o: ['lights', 'flowers', 'water'], h: 'Fixa’t en el nom de la festa: el festival de les…', he: 'Look at the name of the festival: the festival of…' },
+        { q: 'Which UK city has very big Diwali celebrations?', o: ['Leicester', 'Manchester', 'Edinburgh'], h: 'Escolta el nom de la ciutat anglesa.', he: 'Listen for the name of the English city.' },
+        { q: 'Which of these do people do at Diwali?', o: ['light lamps and watch fireworks', 'carve pumpkins', 'go trick or treating'], h: 'Pensa en llums i focs.', he: 'Think of lights and fires.' },
         { r: 'safe', q: 'What does Diwali celebrate, according to the video?', o: ['good over evil and light over darkness', 'the end of the school year', 'the harvest of apples'] },
         { r: 'daring', q: 'Which idea from the video also appears in the reading text?', o: ['Families share food and exchange gifts.', 'Children get red envelopes.', 'People play with a dreidel.'] }
       ] },
     { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa les frases. Si falles dues vegades, et mostrarem la resposta.', en: 'Read how it works and complete the sentences. After two wrong tries you will see the answer.' },
-      explain: [
-        { ca: 'Fem servir el <strong>Present Simple</strong> per parlar de costums que es repeteixen cada any: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>', en: 'We use the <strong>Present Simple</strong> for customs that happen every year: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>' },
-        { ca: 'Aprèn aquestes frases tal qual: <em>It is celebrated on… · It takes place in… · It is held in…</em>', en: 'Useful chunks: <em>It is celebrated on… · It takes place in… · It is held in…</em>' },
-        { ca: '<strong>on</strong> + data o dia (<em>on 31 October, on New Year’s Eve</em>) · <strong>in</strong> + mes o estació (<em>in November, in winter</em>) · <strong>at</strong> + període de festa o la nit (<em>at Christmas, at night</em>).', en: '<strong>on</strong> + date or day (<em>on 31 October, on New Year’s Eve</em>) · <strong>in</strong> + month or season (<em>in November, in winter</em>) · <strong>at</strong> + festival time or night (<em>at Christmas, at night</em>).' },
-        { r: 'daring', en: '<strong>Present Simple passive</strong> (am / is / are + past participle) to focus on the custom, not the people: <em>Pumpkins are carved. Gifts are exchanged at midnight.</em>' }
+      /* How it works, visual (Roger, 13 Nov 2026: "grammar should always be explained this way so that students understand better"):
+         coloured cards, tables, ✗ → ✓ mistakes and a green ✏️ Your turn, as in LP3. Only the explanation changed: the questions are the
+         same, so students keep the answers they already gave. The helpers live inside this function, so nothing goes global. */
+      explain: (function () {
+        const C = { blue: ['#93c5fd', '#eff6ff', '#1d4ed8'], purple: ['#c4b5fd', '#f5f3ff', '#6d28d9'], green: ['#86efac', '#f0fdf4', '#15803d'], orange: ['#fdba74', '#fff7ed', '#c2410c'],
+          teal: ['#5eead4', '#f0fdfa', '#0f766e'], amber: ['#fcd34d', '#fffbeb', '#b45309'], pink: ['#f9a8d4', '#fdf2f8', '#be185d'], slate: ['#cbd5e1', '#f8fafc', '#334155'], red: ['#fca5a5', '#fef2f2', '#b91c1c'] };
+        const head = (icon, t, sub) => '<div style="font-size:1.18em;font-weight:800;margin-bottom:2px">' + icon + ' ' + t + '</div>' + (sub ? '<div style="color:#475569;margin:0 0 8px">' + sub + '</div>' : '');
+        const card = (c, title, body, w) => '<div style="flex:1 1 ' + (w || 240) + 'px;min-width:0;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:14px;padding:10px 12px"><div style="font-weight:800;color:' + C[c][2] + ';margin-bottom:4px">' + title + '</div>' + body + '</div>';
+        const row = (...cs) => '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0">' + cs.join('') + '</div>';
+        const ex = (s, note) => '<div style="margin:3px 0">▸ <em>' + s + '</em>' + (note ? ' <span style="color:#64748b;font-size:.9em">(' + note + ')</span>' : '') + '</div>';
+        const small = t => '<div style="font-size:.9em;color:#475569;margin-top:4px">' + t + '</div>';
+        const bad = (w, r, note) => '<div style="margin:4px 0"><span style="color:#b91c1c;font-weight:700">✗ <del>' + w + '</del></span> → <span style="color:#15803d;font-weight:700">✓ ' + r + '</span>' + (note ? ' <span style="color:#64748b;font-size:.9em">' + note + '</span>' : '') + '</div>';
+        const mistakes = (title, ...b) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fef2f2;border:1px solid #fca5a5"><div style="font-weight:800;color:#b91c1c;margin-bottom:2px">⚠ ' + title + '</div>' + b.join('') + '</div>';
+        const tip = (title, t) => '<div style="margin:10px 0;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d">💡 <b>' + title + '</b> ' + t + '</div>';
+        const table = rows => '<table style="border-collapse:collapse;width:100%;margin:6px 0;font-size:.95em">' + rows.map((r, i) => '<tr>' + r.map(c => '<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top;' + (i === 0 ? 'background:#e2e8f0;font-weight:800' : 'background:#fff') + '">' + c + '</td>').join('') + '</tr>').join('') + '</table>';
+        const pill = (c, t) => '<span style="display:inline-block;margin:2px 3px;padding:2px 10px;border-radius:999px;background:' + C[c][1] + ';border:1px solid ' + C[c][0] + ';color:' + C[c][2] + ';font-weight:800">' + t + '</span>';
+        const hi = t => '<span style="background:#fde68a;padding:0 4px;border-radius:4px">' + t + '</span>';
+        // a row of small tiles (a scale, a formula, steps): [colour, big top line, label]
+        const scale = list => '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">' + list.map(([c, top, bottom]) => '<div style="flex:1 1 90px;text-align:center;border:2px solid ' + C[c][0] + ';background:' + C[c][1] + ';border-radius:12px;padding:6px 4px"><div style="font-size:1.3em">' + top + '</div><div style="font-weight:800;color:' + C[c][2] + '">' + bottom + '</div></div>').join('') + '</div>';
+        // a timeline from the past to now, with dots where things happen (x in %, 100 = now) and an optional ✗ at "now"
+        const timeline = (dots, notNow, label) => '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;font-size:.8em;font-weight:800;color:#475569">PAST<div style="flex:1;position:relative;height:26px"><div style="position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:#94a3b8"></div>' +
+          dots.map(([x, t]) => '<span style="position:absolute;left:calc(' + x + '% - 8px);top:6px;width:16px;height:16px;border-radius:50%;background:#1d4ed8;border:2px solid #fff"></span>' + (t ? '<span style="position:absolute;left:' + x + '%;top:-10px;transform:translateX(-50%);font-size:.95em;color:#1d4ed8;white-space:nowrap">' + t + '</span>' : '')).join('') +
+          (notNow ? '<span style="position:absolute;right:-4px;top:0;font-size:1.3em;color:#b91c1c">✗</span>' : '') + '</div>NOW</div>' + (label ? '<div style="font-size:.85em;color:#475569;text-align:center;margin-bottom:4px">' + label + '</div>' : '');
+        return [
+          { p: 'ps', ca: head('📅', 'Present Simple per als costums', 'Per a coses que passen <b>cada any</b>, sempre igual: el que la gent fa en una festa.') +
+              row(card('blue', '➕ Què fem', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
+                card('orange', '➖ Què no fem', ex('We <b>don’t work</b> on 25 December.') + ex('My dad <b>doesn’t eat</b> turkey.', 'he / she / it → doesn’t') + small('Després de <b>don’t / doesn’t</b>: verb sense -s.')),
+                card('purple', '❓ Preguntes', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.') + '<div style="margin-top:8px;padding-top:6px;border-top:2px dashed #c4b5fd;font-weight:800;color:#6d28d9">➖❓ Preguntes negatives</div>' + ex('<b>Don’t</b> you <b>celebrate</b> Diwali? — No, we don’t.') + ex('<b>Doesn’t</b> she <b>cook</b> on Christmas Day? — Yes, she does.') + small('Quan t’estranya o creus que la resposta és sí (<em>No celebreu…?</em>). <b>Don’t / Doesn’t</b> + subjecte + verb sense -s.'))) +
+              table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?'], ['➖❓', '<b>Don’t</b> they celebrate?', '<b>Doesn’t</b> she celebrate?']]) +
+              mistakes('Compte!', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?'), bad('Don’t she cook on Christmas Day?', '<b>Doesn’t</b> she <b>cook</b> on Christmas Day?')),
+            en: head('📅', 'Present Simple for customs', 'For things that happen <b>every year</b>, always the same: what people do at a celebration.') +
+              row(card('blue', '➕ What we do', ex('People <b>decorate</b> their houses.') + ex('Children <b>dress</b> up.') + ex('My grandma <b>cooks</b> a special meal.', 'he / she / it → <b>-s</b>')),
+                card('orange', '➖ What we don’t do', ex('We <b>don’t work</b> on 25 December.') + ex('My dad <b>doesn’t eat</b> turkey.', 'he / she / it → doesn’t') + small('After <b>don’t / doesn’t</b>: no -s on the verb.')),
+                card('purple', '❓ Questions', ex('<b>Do</b> you <b>celebrate</b> Diwali? — Yes, we do.') + ex('<b>Does</b> your family <b>decorate</b> the house? — Yes, it does.') + '<div style="margin-top:8px;padding-top:6px;border-top:2px dashed #c4b5fd;font-weight:800;color:#6d28d9">➖❓ Negative questions</div>' + ex('<b>Don’t</b> you <b>celebrate</b> Diwali? — No, we don’t.') + ex('<b>Doesn’t</b> she <b>cook</b> on Christmas Day? — Yes, she does.') + small('When you are surprised, or you think the answer is yes. <b>Don’t / Doesn’t</b> + subject + verb with no -s.'))) +
+              table([['', 'I / you / we / they', 'he / she / it'], ['➕', 'We <b>celebrate</b>', 'She <b>celebrates</b> · he <b>watches</b> · it <b>goes</b>'], ['➖', 'We <b>don’t</b> celebrate', 'She <b>doesn’t</b> celebrate'], ['❓', '<b>Do</b> they celebrate?', '<b>Does</b> she celebrate?'], ['➖❓', '<b>Don’t</b> they celebrate?', '<b>Doesn’t</b> she celebrate?']]) +
+              mistakes('Watch out', bad('My grandmother cook a meal.', 'My grandmother <b>cooks</b> a meal.'), bad('We don’t goes to school.', 'We don’t <b>go</b> to school.'), bad('Does your family decorates…?', 'Does your family <b>decorate</b>…?'), bad('Don’t she cook on Christmas Day?', '<b>Doesn’t</b> she <b>cook</b> on Christmas Day?')) },
+          { p: 'chunk', ca: head('🧩', 'Frases fetes per dir QUAN és una festa', 'Aprèn-les senceres: només canvies la data.') +
+              row(card('teal', 'It <b>is celebrated</b> … · se celebra', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
+                card('teal', 'It <b>takes place</b> … · té lloc', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
+                card('teal', 'It <b>is held</b> … · es fa', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
+              mistakes('Compte!', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(la festa no celebra: és celebrada)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')),
+            en: head('🧩', 'Ready-made chunks to say WHEN a celebration is', 'Learn them whole: you only change the date.') +
+              row(card('teal', 'It <b>is celebrated</b> …', ex('Diwali <b>is celebrated</b> in autumn.') + ex('The Castanyada <b>is celebrated</b> on 31 October.')),
+                card('teal', 'It <b>takes place</b> …', ex('Lunar New Year <b>takes place</b> in January or February.') + ex('The parade <b>takes place</b> at night.')),
+                card('teal', 'It <b>is held</b> …', ex('The festival <b>is held</b> in the town square.') + ex('The Castanyada <b>is held</b> on 31 October.'))) +
+              mistakes('Watch out', bad('It celebrates on 31 October.', 'It <b>is celebrated</b> on 31 October.', '(the festival doesn’t celebrate: people celebrate it)'), bad('It takes place on November.', 'It takes place <b>in</b> November.')) },
+          { p: 'prep', ca: head('🔍', '<em>in</em>, <em>on</em> o <em>at</em>?', 'Pensa en un zoom: de molt de temps (<b>in</b>) a un dia (<b>on</b>) a un moment o una festa (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'mes · estació · any'], ['purple', '📆 ON', 'dia · data'], ['orange', '⏰ AT', 'hora · nit · període de festa']]) +
+              row(card('blue', 'IN', ex('<b>in</b> November') + ex('<b>in</b> winter') + ex('<b>in</b> 2025') + ex('<b>in</b> the morning'), 180),
+                card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
+                card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
+              mistakes('Compte!', bad('in 31 October', '<b>on</b> 31 October', '(una data → on)'), bad('on Christmas', '<b>at</b> Christmas', '(però <b>on</b> Christmas Day: un dia)'), bad('in night', '<b>at</b> night')),
+            en: head('🔍', '<em>in</em>, <em>on</em> or <em>at</em>?', 'Think of a zoom: from a long time (<b>in</b>) to one day (<b>on</b>) to a moment or a holiday (<b>at</b>).') +
+              scale([['blue', '🗓 IN', 'month · season · year'], ['purple', '📆 ON', 'day · date'], ['orange', '⏰ AT', 'clock time · night · holiday time']]) +
+              row(card('blue', 'IN', ex('<b>in</b> November') + ex('<b>in</b> winter') + ex('<b>in</b> 2025') + ex('<b>in</b> the morning'), 180),
+                card('purple', 'ON', ex('<b>on</b> 31 October') + ex('<b>on</b> New Year’s Eve') + ex('<b>on</b> Friday') + ex('<b>on</b> Christmas Day'), 180),
+                card('orange', 'AT', ex('<b>at</b> Christmas') + ex('<b>at</b> Easter') + ex('<b>at</b> night') + ex('<b>at</b> 8 o’clock'), 180)) +
+              mistakes('Watch out', bad('in 31 October', '<b>on</b> 31 October', '(a date → on)'), bad('on Christmas', '<b>at</b> Christmas', '(but <b>on</b> Christmas Day: one day)'), bad('in night', '<b>at</b> night')) },
+          { p: 'pass', r: 'daring', en: head('🔄', 'Present Simple passive', 'Use it when the <b>custom</b> matters, not who does it.') +
+              scale([['slate', '📦', 'thing'], ['blue', 'am / is / are', ''], ['purple', 'past participle', 'carved · given · sold']]) +
+              table([['Active (who does it)', '→ Passive (the custom)'], ['People <b>carve</b> pumpkins.', 'Pumpkins <b>are carved</b>.'], ['People <b>exchange</b> gifts at midnight.', 'Gifts <b>are exchanged</b> at midnight.'], ['They <b>don’t sell</b> chestnuts in summer.', 'Chestnuts <b>aren’t sold</b> in summer.'], ['People <b>light</b> a candle every night.', 'A candle <b>is lit</b> every night.']]) +
+              mistakes('Watch out', bad('Pumpkins are carve.', 'Pumpkins are <b>carved</b>.'), bad('Gifts is exchanged.', 'Gifts <b>are</b> exchanged.', '(plural → are)')) }
+        ];
+      })(),
+      // blocks, 4 compulsory each (3 + … or 4 questions), the rest ➕ extra practice (Roger, 13 Nov 2026: "not about volume but quality")
+      req: 4,
+      parts: [
+        { id: 'ps', title: { ca: 'Present Simple: costums', en: 'Present Simple: customs' }, note: { ca: 'he / she / it → <b>-s</b> · <b>don’t / doesn’t</b> + verb sense -s · <b>Do / Does</b> …?', en: 'he / she / it → <b>-s</b> · <b>don’t / doesn’t</b> + verb with no -s · <b>Do / Does</b> …?' } },
+        { id: 'chunk', title: { ca: 'Frases fetes', en: 'Ready-made chunks' }, note: { ca: '<em>It is celebrated… · It takes place… · It is held…</em>', en: '<em>It is celebrated… · It takes place… · It is held…</em>' } },
+        { id: 'prep', title: { ca: 'in, on o at?', en: 'in, on or at?' }, note: { ca: '<b>in</b> mes / estació · <b>on</b> dia / data · <b>at</b> nit / festa', en: '<b>in</b> month / season · <b>on</b> day / date · <b>at</b> night / holiday' } },
+        { id: 'pass', title: { en: 'Present Simple passive' }, note: { en: 'am / is / are + past participle: <em>Pumpkins <b>are carved</b>.</em>' } }
       ],
       items: [
-        { q: 'Children ___ (dress) up at Halloween.', a: ['dress'], ca: 'Children és plural: sense -s.', en: 'Children is plural: no -s.' },
-        { q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'], ca: 'She → verb + -s.', en: 'She → verb + -s.' },
-        { r: 'insecure', q: 'We ___ (not / go) to school on 25 December.', a: ["don't go", 'do not go'], ca: 'Negativa amb we: don’t + verb.', en: 'Negative with we: don’t + verb.' },
-        { q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data concreta → on.', en: 'A date → on.' },
-        { q: 'Diwali takes place ___ autumn.', a: ['in'], ca: 'Estació → in.', en: 'A season → in.' },
-        { q: 'We visit our relatives ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'A festival period → at.' },
-        { q: 'People light candles ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
-        { q: 'Lunar New Year ___ celebrated in late January or February.', a: ['is'], ca: 'It is celebrated…', en: 'It is celebrated…' },
-        { r: 'insecure', q: '___ your family decorate the house? — Yes, it does.', a: ['does'], ca: 'Pregunta amb your family (it): Does…?', en: 'Question with your family (it): Does…?' },
-        { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'], ca: 'It → verb + -s.', en: 'It → verb + -s.' },
-        { r: 'safe', q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'], en: 'Families is plural: no -s.' },
-        { r: 'safe', q: 'Lunar New Year ___ place in late January or February.', a: ['takes'], en: 'It takes place…' },
-        { r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'], en: 'are + past participle.' },
-        { r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
-        { r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
+        { p: 'ps', q: 'Children ___ (dress) up at Halloween.', a: ['dress'], ca: 'Children és plural: sense -s.', en: 'Children is plural: no -s.' },
+        { p: 'ps', q: 'My grandmother ___ (cook) a special meal every year.', a: ['cooks'], ca: 'She → verb + -s.', en: 'She → verb + -s.' },
+        { p: 'ps', r: 'insecure', q: 'We ___ (not / go) to school on 25 December.', a: ["don't go", 'do not go'], ca: 'Negativa amb we: don’t + verb.', en: 'Negative with we: don’t + verb.' },
+        { p: 'ps', q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'], ca: 'It → verb + -s.', en: 'It → verb + -s.' },
+        { p: 'ps', r: 'insecure', q: '___ your family decorate the house? — Yes, it does.', a: ['does'], ca: 'Pregunta amb your family (it): Does…?', en: 'Question with your family (it): Does…?' },
+        { p: 'ps', r: 'safe', q: 'Families ___ (exchange) gifts at Diwali.', a: ['exchange'], en: 'Families is plural: no -s.' },
+        // ✏️ the box's "Your turn", written here so the teacher can read it and it shows in the notebook (Roger, 13 Nov 2026: "Why in your turn the student didn't write anything here?")
+        { p: 'ps', a: [], own: { must: ['\\b(doesn[’\']t|does not|don[’\']t|do not)\\b'], min: 8 }, q: 'Your turn: write two things your family <b>does</b> at Christmas and one thing it <b>doesn’t</b> do. <span class="tiny">(Dues coses que fa la teva família per Nadal i una que no fa.)</span>', show: 'My family decorates the house and eats a big meal, but it doesn’t go to church.', ca: 'Fes servir doesn’t + verb sense -s.', en: 'Use doesn’t + verb with no -s.' },
+        { p: 'chunk', q: 'Lunar New Year ___ celebrated in late January or February.', a: ['is'], ca: 'It is celebrated…', en: 'It is celebrated…' },
+        { p: 'chunk', r: 'safe', q: 'Lunar New Year ___ place in late January or February.', a: ['takes'], en: 'It takes place…' },
+        { p: 'chunk', a: [], own: { must: ['\\b(takes place|is held|is celebrated)\\b'], min: 6 }, q: 'Your turn: say when and where your town’s festa is with <em>It takes place…</em> or <em>It is held…</em> <span class="tiny">(Quan i on es fa la festa major del teu poble.)</span>', show: 'Our festa takes place in August. It is held in the main square.', ca: 'Fes servir It takes place… o It is held…', en: 'Use It takes place… or It is held…' },
+        { p: 'prep', q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data concreta → on.', en: 'A date → on.' },
+        { p: 'prep', q: 'Diwali takes place ___ autumn.', a: ['in'], ca: 'Estació → in.', en: 'A season → in.' },
+        { p: 'prep', q: 'We visit our relatives ___ Christmas.', a: ['at'], ca: 'Període de festa → at.', en: 'A festival period → at.' },
+        { p: 'prep', q: 'People light candles ___ night.', a: ['at'], ca: 'at night.', en: 'at night.' },
+        { p: 'prep', a: [], own: { must: ['\\bin\\b', '\\bon\\b', '\\bat\\b'], min: 8 }, q: 'Your turn: when is your birthday? Say the month (<b>in</b>), the day (<b>on</b>) and the time of your party (<b>at</b>). <span class="tiny">(El mes, el dia i l’hora de la teva festa.)</span>', show: 'My birthday is in May, on 12 May. My party is at five o’clock.', ca: 'Fes servir in, on i at.', en: 'Use in, on and at.' },
+        { p: 'pass', r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'], en: 'are + past participle.' },
+        { p: 'pass', r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
+        { p: 'pass', r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' },
+        { p: 'pass', r: 'daring', a: [], own: { must: ['\\b(is|are)\\s+\\w+(ed|en|t|wn|ng)\\b'], min: 6 }, q: 'Your turn: two customs of your favourite celebration in the passive (<em>… is eaten, … are decorated</em>).', show: 'Panellets are eaten and the houses are decorated.', en: 'Use is / are + past participle.' }
       ] },
     { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquí es barregen coses noves i de la LS1: primer pensa quina forma necessites.', en: 'New and LS1 language mixed: first decide which form you need.' },

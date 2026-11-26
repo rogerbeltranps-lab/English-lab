@@ -1,11 +1,22 @@
-/* 2 ESO · LS2 · Sample exam (practice, not graded): the same format and points as the real exam (the 4 ESO LS2 format approved by Roger on 25 Oct 2026,
-   applied to 2 ESO), so students know the points of every section. Everything except the writing is multiple choice or a short gap and is marked
-   automatically (first try = the exam score); the vlog script gets feedback and a guide mark from ChatGPT with the 5.1 levels (ChatGPT can make
-   mistakes; in the exam the teacher marks it). Each route has its own list of items (same number per route). Out of 100: listening 10 + listening
-   chart 10, reading 10 + reading log 10, vocabulary 15, grammar 15, writing 30. Numbered 1–43 like the real exam; multiple choice has four options
-   (the first is the right one; the engine shuffles). */
+/* 2 ESO · LS2 · Sample exam 1 (practice, called First exam 19–21 Nov 2026, not graded; the page is still sample-exam.html, key ls2SampleExam2ESO). Roger, 19 Nov 2026: "Adapt
+   the sample exam (let's label it first exam) with only everything we've done … only up to the step of the group that has done less", and
+   "tailor … so that students have an exam easy … more related to what they know best". So:
+   - content = LP1 Getting started + LP2 What are they doing? only (what both 2 ESO groups have done; 2 ESO A does the LP2 grammar the same
+     day): play / go / do, free-time activities, how often, Present Simple; clothes and kit, weather, events; Present Continuous. Nothing
+     from LP3–LP6 (state verbs, temporary "this month", likes + -ing, screen tips and imperatives, sources, so / because).
+   - format and points = Friday's web exam (data/exam.js): listening 20, reading 20, vocabulary 35, grammar 15, writing 10 (a short post).
+   - items lean on what the class games and the LP1/LP2 activities show students do best (Starter/Base mostly multiple choice; no adverb
+     position, no "take part", "tournament", "warm up"); different sentences from the real exam, so nothing is given away.
+   Multiple choice has four options (the first is the right one; the engine shuffles). The post gets a table of mistakes from the
+   student's ChatGPT, no mark (Roger, 20 Nov 2026). */
 (function () {
-const L30 = [8, 15, 23, 30];
+const L10 = [3, 5, 8, 10];   // the 5.1 levels scaled to 10 points, as in the web exam (NA 8 · AS 15 · AN 23 · AE 30 of 30)
+const ROW = (a, b) => '<tr><td>' + a + '</td><td style="text-align:right">' + b + '</td></tr>';
+const TABLE = {
+  ca: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)', 20) + ROW('2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)', 20) +
+    ROW('3 Vocabulary: 14 preguntes (2,5 punts cada una)', 35) + ROW('4 Grammar: 10 preguntes (1,5 punts cada una)', 15) + ROW('5 Writing: un post per al blog de la classe', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>',
+  en: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 questions + listening chart, 5 questions (2 points each)', 20) + ROW('2 Reading: 5 questions + reading log, 5 questions (2 points each)', 20) +
+    ROW('3 Vocabulary: 14 questions (2.5 points each)', 35) + ROW('4 Grammar: 10 questions (1.5 points each)', 15) + ROW('5 Writing: a post for the class blog', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>' };
 const SHADOW_VIDEO = '<video controls preload="none" playsinline poster="video/shadowing-poster.jpg" src="video/shadowing.mp4" style="width:100%;border-radius:14px;margin:8px 0;background:#000"></video>';
 const SCRIPT = [
   ['Ellie', '[cheerful] Hi everyone, I’m Ellie and welcome to my vlog! Today I’m at the town theatre, because my dance group is in a competition. It’s Saturday afternoon and it’s raining outside, but in here it’s hot and really noisy. I’m wearing my black costume and white trainers, and I’m very nervous!'],
@@ -21,26 +32,24 @@ const TEXTS = {
   daring: '<p><strong>Text A · Post · Carla, Saturday 11:20</strong><br>Hello from the beach! It’s sunny and warm, 22 degrees in November, which is crazy! I’m here with my family. My brother is swimming, my mum is reading under the umbrella and I’m playing volleyball with my cousins, and losing, as usual. We usually come to this beach in summer, so today is a special day: a beach day in November. Come and join us, we’re here until five!</p><p><strong>Text B · Web page · Skate Fest</strong><br><strong>Sunday 29 November · 16:00 · Skate Park Nord</strong><br>Watch the best young skaters in town! There is a competition, live music and free lemonade for everyone. Tickets: 3 euros (children under 8: free). All the money goes to the new skate ramp, so you are helping the park. Buy your ticket online now: there are only 150 places, and last year they sold out in two days!</p>'
 };
 const scriptText = SCRIPT.map(l => l[0] + ': ' + l[1].replace(/\[[^\]]+\]\s*/g, '')).join('\n');
-const L51 = ['Unfinished or not understandable; no clear parts, even with the template; no time expressions or tips.',
-  'The parts are there, close to the template or model; Present Continuous and Present Simple mostly correct; errors that do not block meaning; the tips are imperatives.',
-  'Clear parts (now, usually, likes, tips), time expressions, likes with -ing and imperatives used correctly; adapts the model.',
-  'Clear, well-linked and personal beyond the model (and, but, because, so; Daring: a temporary situation and an opinion), few errors.'];
+const L51 = ['Unfinished or not understandable; no clear parts, even with the frame.',
+  'The parts are there, close to the frame; Present Continuous and Present Simple mostly correct; errors that do not block meaning.',
+  'Clear parts (where and who with, weather, what people are doing, clothes, what you usually do and how often), both tenses used correctly.',
+  'Clear, well-linked and personal (and, but), varied verbs and time expressions (right now, usually, twice a week), few errors.'];
 const AUDIO = { audio: 'audio/sample-exam-two-vlogs.mp3', title: 'Two vlogs: Ellie and Jack', script: SCRIPT };
 
 window.LP = {
-  key: 'ls2SampleExam2ESO', n: 'E', title: 'Sample exam',
+  key: 'ls2SampleExam2ESO', n: 'E', title: 'Sample exam 1',
   panels: [
     // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
     { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
       html: { ca: '<p>Un repàs de 6 minuts per escoltar i parlar: frases de les escoltes de la unitat. Escolta, repeteix en veu alta i torna-ho a fer sense text. El vídeo t’espera.</p>' + SHADOW_VIDEO,
         en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
-    { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és l’examen', en: 'How the exam works' },
-      html: { ca: '<p>Aquest examen d’exemple té <strong>el mateix format i els mateixos punts que l’examen real</strong> (que faràs amb un Google Forms). 55 minuts, sense apunts.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: el guió d’un vlog</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>Totes les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El guió el corregeix <strong>ChatGPT</strong> amb els criteris de l’examen i et dona una nota orientativa. Al final, a <em>La meva nota</em>, veuràs el total.</p><p class="warm-note">⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el guió el corregeix el professorat.</p>',
-        en: '<p>This sample exam has <strong>the same format and the same points as the real exam</strong> (which you will do in a Google Form). 55 minutes, no notes.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 questions + listening chart, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 questions + reading log, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: a vlog script</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>All the questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The script is marked by <strong>ChatGPT</strong> with the exam criteria, which gives you a guide mark. At the end, <em>My score</em> shows your total.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the script.</p>' } },
+    { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
+      html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong> (el faràs al web, en mode examen). Només surt el que hem fet a classe: <strong>LP1 Getting started</strong> i <strong>LP2 What are they doing?</strong> 55 minuts, sense apunts.</p>' + TABLE.ca +
+        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El post no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
+        en: '<p>This practice has <strong>the same format and the same points as the first exam</strong> (which you will do on the website, in exam mode). Only what we have done in class: <strong>LP1 Getting started</strong> and <strong>LP2 What are they doing?</strong> 55 minutes, no notes.</p>' + TABLE.en +
+        '<p>The questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The post has no mark in this practice: the button opens ChatGPT, which makes a table of your mistakes (the correction and why) and gives you your text, corrected. At the end, <em>My score</em> shows your total.</p>' } },
 
     { id: 'listen', type: 'quiz', tab: 'Listening', title: 'Listening: Two vlogs', pts: [2, 2], start: 1,
       intro: { ca: 'Escolta dues vegades l’Ellie i el Jack, que graven el seu vlog, i respon.', en: 'Listen twice to Ellie and Jack recording their vlogs, and answer.' },
@@ -68,11 +77,11 @@ window.LP = {
           { q: 'Why isn’t Jack playing today?', o: ['His leg hurts.', 'He is late.', 'He doesn’t like football.', 'His team is losing.'] }
         ],
         daring: [
-          { q: 'Why is Ellie’s group training every day this month?', o: ['because they want to win the competition', 'because the dance school is closed', 'because it is raining', 'because Ellie is nervous'] },
+          { q: 'Why is Ellie nervous?', o: ['Her group is dancing next in the competition.', 'She is late for the competition.', 'She doesn’t like dancing.', 'It’s raining outside.'] },
           { q: 'Why does Jack say “this is amazing”?', o: ['His team usually loses, but now they are winning.', 'The weather is amazing.', 'He is playing very well.', 'The sports centre is new.'] },
           { q: 'What is Jack doing instead of playing?', o: ['filming the match for the class channel', 'watching videos in bed', 'warming up', 'talking to the coach'] },
           { q: 'Which sentence from Ellie describes a habit?', o: ['“I usually practise on Tuesdays and Thursdays.”', '“Today I’m at the town theatre.”', '“The group from Girona is dancing.”', '“The music is starting.”'] },
-          { q: 'Who gives Jack the screen tip?', o: ['his coach', 'his friend Tom', 'his teacher', 'his mum'] }
+          { q: 'What is the score after Tom’s goal?', o: ['one–nil', 'two–nil', 'one–one', 'two–one'] }
         ] } },
 
     { id: 'chart', type: 'quiz', tab: 'Listening chart', title: 'Listening chart', pts: [2, 2], start: 6,
@@ -96,16 +105,16 @@ window.LP = {
         safe: [
           { q: 'Which note about Ellie is correct?', o: ['Now: waiting to dance · Usually: practises Tue and Thu · Details: town theatre, black costume, raining', 'Now: dancing on stage · Usually: trains every day · Details: town theatre, raining', 'Now: waiting to dance · Usually: practises Tue and Thu · Details: sports centre, tracksuit, sunny', 'Now: practising at the dance school · Usually: competitions · Details: hot, white costume'] },
           { q: 'Which note about Jack is correct?', o: ['Now: filming the match · Usually: his team loses · Details: sports centre, cold and windy, tracksuit', 'Now: playing football · Usually: his team wins · Details: sports centre, cold and windy', 'Now: filming the match · Usually: his team loses · Details: town theatre, raining, costume', 'Now: scoring a goal · Usually: films matches · Details: hot, six degrees'] },
-          { q: 'What is temporary (this month) for Ellie?', o: ['training every day', 'practising on Tuesdays and Thursdays', 'wearing white trainers', 'loving dance'] },
+          { q: 'What is the weather like outside the theatre, and how is it inside?', o: ['raining outside · hot and noisy inside', 'sunny outside · cold inside', 'raining outside · cold and quiet inside', 'windy outside · hot and quiet inside'] },
           { q: 'Which two details does Jack give about the weather?', o: ['cold and windy, about six degrees', 'hot and noisy', 'raining and warm', 'sunny, about twenty degrees'] },
           { q: 'Which words tell you that Ellie is talking about now?', o: ['“Right now the group from Girona is dancing.”', '“I usually practise on Tuesdays.”', '“I love it.”', '“We want to win.”'] }
         ],
         daring: [
-          { q: 'Which note about Ellie is the most accurate?', o: ['Now: waiting, nervous, Girona group on stage · Usually: Tue and Thu at the dance school · This month: training every day · Details: theatre, hot inside, raining outside, black costume', 'Now: dancing · Usually: every day · Details: theatre, sunny, white costume', 'Now: waiting · Usually: Tue and Thu · This month: no training · Details: sports centre, cold', 'Now: practising · Usually: competitions · Details: theatre, raining, trainers only'] },
+          { q: 'Which note about Ellie is the most accurate?', o: ['Now: waiting, nervous, Girona group on stage · Usually: Tue and Thu at the dance school · Details: theatre, hot inside, raining outside, black costume and white trainers', 'Now: dancing · Usually: every day · Details: theatre, sunny, white costume', 'Now: waiting · Usually: Tue and Thu · Details: sports centre, cold, tracksuit', 'Now: practising · Usually: competitions · Details: theatre, raining, trainers only'] },
           { q: 'Which note about Jack is the most accurate?', o: ['Now: filming for the class channel, not playing (leg hurts) · Usually: his team loses · Details: sports centre, Sunday, cold and windy, 6 °C, tracksuit and woolly hat', 'Now: playing and scoring · Usually: wins · Details: sports centre, hot, tracksuit', 'Now: filming · Usually: plays on Tuesdays · Details: theatre, raining', 'Now: watching videos in bed · Usually: films matches · Details: cold, 16 °C'] },
           { q: 'How do you know Ellie is nervous?', o: ['She says it and she asks for luck before she dances.', 'She is wearing a black costume.', 'She practises on Tuesdays.', 'The theatre is noisy.'] },
           { q: 'What do Ellie and Jack have in common today?', o: ['Both are at an event that is different from their usual routine.', 'Both are playing in a match.', 'Both are at home.', 'Both are dancing.'] },
-          { q: 'Why does Jack mention his coach at the end?', o: ['The screen tip comes from his coach.', 'His coach is filming.', 'His coach scored a goal.', 'His coach is angry.'] }
+          { q: 'Which sentence from Jack describes a habit, not now?', o: ['“We usually lose.”', '“My team is playing right now.”', '“He’s running.”', '“I’m filming the match.”'] }
         ]
       } },
 
@@ -176,130 +185,138 @@ window.LP = {
         ]
       } },
 
-    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [1, 2], start: 21,
-      intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la paraula que falta (2 punts).', en: 'Choose the right option (1 point), then write the missing word (2 points).' },
+    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [2.5, 2.5], start: 21,
+      intro: { ca: 'Tria l’opció correcta o escriu la paraula que falta (2,5 punts cada una).', en: 'Choose the right option or write the missing word (2.5 points each).' },
       items: {
         beginners: [
-          { q: 'I ___ football on Saturdays.', o: ['play', 'do', 'go', 'make'] },
-          { q: 'We go ___ in the sea.', o: ['swimming', 'swim', 'to swim', 'swam'] },
-          { q: 'It’s ___: look at the sun!', o: ['sunny', 'raining', 'cold', 'cloudy'] },
-          { q: 'On your bike, wear a ___.', o: ['helmet', 'cap', 'T-shirt', 'costume'] },
-          { q: 'I ___ photos of my dog.', o: ['take', 'do', 'make', 'play'] },
-          { q: 'I ___ skating: it’s my favourite hobby!', o: ['love', 'hate', 'mind', 'want'] },
-          { q: '___ a break every 30 minutes.', o: ['Take', 'Make', 'Do', 'Go'] },
-          { q: 'It’s very c___ today: 2 degrees! (fred)', a: ['cold'] },
-          { q: 'I l_____ to music on the bus. (escoltar)', a: ['listen'] },
-          { q: 'I’m wearing a T-s____ and shorts. (samarreta)', a: ['t-shirt', 'tshirt', 't shirt'] },
-          { q: 'I play football on S________. (dissabtes)', a: ['saturdays', 'saturday'] }
+          { q: 'Pau ___ football with his dad.', o: ['plays', 'does', 'goes', 'makes'] },
+          { q: 'My cousin ___ gymnastics on Mondays.', o: ['does', 'plays', 'goes', 'makes'] },
+          { q: 'In summer we go ___ every day.', o: ['swimming', 'swim', 'to swim', 'swam'] },
+          { q: 'Ona plays ___ piano at school.', o: ['the', 'a', 'to', 'at'] },
+          { q: 'Look at the sun! It’s ___.', o: ['sunny', 'raining', 'snowing', 'cloudy'] },
+          { q: 'Wear a ___ on your skateboard: it’s safe.', o: ['helmet', 'cap', 'T-shirt', 'costume'] },
+          { q: 'It’s very sunny. Wear a ___!', o: ['cap', 'helmet', 'uniform', 'tracksuit'] },
+          { q: 'The trees are moving. It’s ___.', o: ['windy', 'sunny', 'snowing', 'hot'] },
+          { q: 'She’s wearing ___.', o: ['a yellow T-shirt', 'a T-shirt yellow', 'yellow a T-shirt', 'a yellow T-shirts'] },
+          { q: 'We l_____ to the radio in the car. (escoltar)', a: ['listen'] },
+          { q: 'My dad r____ comics on Sundays. (llegeix)', a: ['reads'] },
+          { q: 'It’s r______. Take an umbrella! (plou)', a: ['raining'] },
+          { q: 'The sky is grey. It’s c_____. (ennuvolat)', a: ['cloudy'] },
+          { q: 'We go s______ at the ice rink. (patinar)', a: ['skating'] }
         ],
         insecure: [
-          { q: 'I ___ karate on Tuesdays.', o: ['do', 'play', 'go', 'make'] },
-          { q: 'We go ___ at the skate park.', o: ['skating', 'skate', 'to skate', 'skated'] },
-          { q: 'It’s ___: take an umbrella.', o: ['raining', 'sunny', 'hot', 'windy'] },
-          { q: 'On your bike, wear a ___.', o: ['helmet', 'cap', 'T-shirt', 'costume'] },
-          { q: 'I ___ photos of my dog for my vlog.', o: ['take', 'do', 'make', 'play'] },
-          { q: 'I ___ skating: it’s my favourite hobby!', o: ['love', 'hate', 'mind', 'want'] },
-          { q: '___ a break every 30 minutes.', o: ['Take', 'Make', 'Do', 'Go'] },
-          { q: 'I run in my new t_______. (bambes)', a: ['trainers'] },
-          { q: 'It’s very c___ today: 2 degrees! (fred)', a: ['cold'] },
-          { q: 'I l_____ to music on the bus. (escoltar)', a: ['listen'] },
-          { q: 'R____ now I’m at home. (ara mateix)', a: ['right'] }
+          { q: 'My friends ___ basketball after school.', o: ['play', 'do', 'go', 'make'] },
+          { q: 'Joan ___ karate on Fridays.', o: ['does', 'plays', 'goes', 'makes'] },
+          { q: 'We go ___ in the mountains.', o: ['cycling', 'cycle', 'to cycle', 'cycled'] },
+          { q: 'We go ___ the beach in summer.', o: ['to', 'at', 'in', 'for'] },
+          { q: 'I swim on Mondays and Fridays. I swim ___.', o: ['twice a week', 'once a week', 'every day', 'at the weekend'] },
+          { q: 'The players wear a blue ___.', o: ['uniform', 'costume', 'helmet', 'cap'] },
+          { q: 'At carnival, I wear a funny ___.', o: ['costume', 'helmet', 'trainers', 'uniform'] },
+          { q: 'It’s summer and it’s hot. I’m wearing a T-shirt and ___.', o: ['shorts', 'a tracksuit', 'a helmet', 'a jacket'] },
+          { q: '___ windy today. Let’s fly a kite!', o: ['It’s', 'Is', 'It makes', 'Makes'] },
+          { q: 'I ___ video games with my brother. (jugar)', a: ['play'] },
+          { q: 'Do you listen ___ music in the car?', a: ['to'] },
+          { q: 'I run in my new ___. (bambes)', a: ['trainers'] },
+          { q: 'It’s ___ in the mountains: everything is white! (neva)', a: ['snowing'] },
+          { q: 'I do yoga ___ a week: only on Tuesdays. (una vegada)', a: ['once'] }
         ],
         safe: [
-          { q: 'Our team is in a ___ with 12 teams this weekend.', o: ['tournament', 'show', 'fair', 'concert'] },
-          { q: 'It’s ___: I can’t see the end of the street.', o: ['foggy', 'freezing', 'stormy', 'sunny'] },
-          { q: 'Marc is a great player: he ___ a goal in every match.', o: ['scores', 'wins', 'loses', 'practises'] },
-          { q: 'We ___ a video to the club channel every Sunday.', o: ['upload', 'download', 'follow', 'search'] },
-          { q: 'My ___ time is three hours a day. Too much!', o: ['screen', 'phone', 'social', 'online'] },
-          { q: '___ your phone away at dinner.', o: ['Put', 'Switch', 'Take', 'Set'] },
-          { q: 'I’m getting ___ at skating: I don’t fall now.', o: ['better', 'good', 'well', 'best'] },
-          { q: 'Set a time l____ of one hour for games.', a: ['limit'] },
-          { q: 'I f_____ a climbing channel with two million subscribers.', a: ['follow'] },
-          { q: 'What’s the w______ like today? — It’s sunny.', a: ['weather'] },
-          { q: 'I want to j___ a dance club.', a: ['join'] }
+          { q: 'It’s ___: I can’t see the mountains.', o: ['foggy', 'freezing', 'stormy', 'sunny'] },
+          { q: 'There’s thunder and lightning. It’s ___.', o: ['stormy', 'foggy', 'windy', 'sunny'] },
+          { q: 'Which word doesn’t belong? swimming · skating · cycling · piano', o: ['piano', 'swimming', 'skating', 'cycling'] },
+          { q: 'Choose the right sentence.', o: ['Pol is wearing a black cap and red shorts.', 'Pol is wearing a cap black and shorts red.', 'Pol is carrying a black cap and red shorts.', 'Pol wearing a black cap and red shorts.'] },
+          { q: 'Our best player always ___ a goal.', o: ['scores', 'wins', 'does', 'makes'] },
+          { q: 'My dad ___ yoga every evening. (do)', a: ['does'] },
+          { q: 'They go ___ at the skate park. (skate)', a: ['skating'] },
+          { q: 'My sister ___ the guitar in a band. (p...)', a: ['plays'] },
+          { q: 'How ___ do you go to the cinema? — Once a month.', a: ['often'] },
+          { q: 'We train on Tuesdays and Fridays: we train ___ a week.', a: ['twice'] },
+          { q: 'I draw comics in my ___ time. (fr...)', a: ['free'] },
+          { q: 'It’s very ___ today: perfect for my kite! (w...)', a: ['windy'] },
+          { q: 'What’s the weather ___ in Girona? — It’s cloudy.', a: ['like'] },
+          { q: 'Our team wears a green ___ for every match. (u...)', a: ['uniform'] }
         ],
         daring: [
-          { q: 'The ___ is cheering: five hundred people!', o: ['crowd', 'team', 'coach', 'channel'] },
-          { q: 'Some games are very ___: you can’t stop playing.', o: ['addictive', 'healthy', 'reliable', 'boring'] },
-          { q: 'Go outside ___ of watching videos all afternoon.', o: ['instead', 'because', 'so', 'but'] },
-          { q: 'A museum website is a ___ source.', o: ['reliable', 'addictive', 'temporary', 'free'] },
-          { q: 'I can’t ___ with notifications on.', o: ['concentrate', 'cheer', 'upload', 'score'] },
-          { q: 'Before the match, the players ___ up.', o: ['warm', 'take', 'turn', 'put'] },
-          { q: 'I ___ the park to the sports hall.', o: ['prefer', 'believe', 'mean', 'need'] },
-          { q: 'Is this page up to d___? It says 2019.', a: ['date'] },
-          { q: 'For me, climbing m____ freedom.', a: ['means'] },
-          { q: 'This page is not information: it’s an a_____ for trainers.', a: ['advert', 'advertisement'] },
-          { q: 'Twenty teams are taking p___ in the tournament.', a: ['part'] }
+          { q: 'Which word doesn’t belong? football · basketball · yoga · video games', o: ['yoga', 'football', 'basketball', 'video games'] },
+          { q: 'Anna is really good ___ drawing.', o: ['at', 'in', 'on', 'for'] },
+          { q: 'Our team needs ___ at the final! Come and support us!', o: ['fans', 'players', 'coaches', 'teams'] },
+          { q: 'It’s minus five degrees! It’s ___!', o: ['freezing', 'foggy', 'stormy', 'cloudy'] },
+          { q: 'Choose the right sentence.', o: ['It’s cold, so I’m wearing a warm red tracksuit.', 'It’s cold, so I’m wearing a tracksuit red warm.', 'Is cold, so I’m wearing a warm red tracksuit.', 'It’s cold, so I’m carrying a red warm tracksuit.'] },
+          { q: 'Correct the mistake: “We play gymnastics.” → We ___ gymnastics.', a: ['do'] },
+          { q: 'Correct the mistake: “She goes to skate on Sundays.” → She goes ___ on Sundays.', a: ['skating'] },
+          { q: 'My brother ___ a lot of time playing video games. (sp...)', a: ['spends'] },
+          { q: 'You need to ___ every day to get better at skating. (pr...)', a: ['practise', 'practice'] },
+          { q: 'I want to ___ a dance club at school. (j...)', a: ['join'] },
+          { q: 'Correct the mistake: “It’s cloud today.” → It’s ___ today.', a: ['cloudy'] },
+          { q: 'Correct the mistake: “How is the weather like?” → What’s the weather ___?', a: ['like'] },
+          { q: 'Our team never ___ at home: we always win! (l...)', a: ['loses'] },
+          { q: 'The players are resting and drinking water: it’s ___. (h...)', a: ['half-time', 'half time', 'halftime'] }
         ] } },
 
-    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1, 2], start: 32,
-      intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la forma que falta (2 punts). Pots fer servir contraccions.', en: 'Choose the right option (1 point), then write the missing words (2 points). Contractions are accepted.' },
+    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1.5, 1.5], start: 35,
+      intro: { ca: 'Tria l’opció correcta o escriu la forma que falta (1,5 punts cada una). Pots fer servir contraccions.', en: 'Choose the right option or write the missing words (1.5 points each). Contractions are accepted.' },
       items: {
         beginners: [
-          { q: 'Look! Pol ___ on the ramp.', o: ['is skating', 'skate', 'skating', 'skates'] },
-          { q: 'I ___ a video now.', o: ['am recording', 'record', 'recording', 'records'] },
-          { q: 'They ___ T-shirts today.', o: ['are wearing', 'is wearing', 'wear', 'wearing'] },
-          { q: 'The -ing form of “swim” is…', o: ['swimming', 'swiming', 'swimning', 'swime'] },
-          { q: 'I usually ___ football on Saturdays.', o: ['play', 'am playing', 'playing', 'plays'] },
-          { q: 'I love ___ comics.', o: ['reading', 'read', 'to reading', 'reads'] },
-          { q: '___ use your phone in bed.', o: ['Don’t', 'Not', 'No', 'Doesn’t'] },
-          { q: 'She ___ (dance) now.', a: ['is dancing', "'s dancing"] },
-          { q: 'We ___ (play) basketball today.', a: ['are playing', "'re playing"] },
-          { q: 'I usually ___ (go) to the park on Sundays.', a: ['go'] },
-          { q: '___ a break and drink some water. (fer, imperatiu)', a: ['take'] }
+          { q: 'My brother ___ football every Sunday.', o: ['plays', 'play', 'playing', 'is play'] },
+          { q: 'Ona ___ video games at night.', o: ['doesn’t play', 'don’t play', 'doesn’t plays', 'not play'] },
+          { q: '___ your sister play the piano? — Yes, she does.', o: ['Does', 'Do', 'Is', 'Are'] },
+          { q: '___ often do you go cycling? — Every Saturday.', o: ['How', 'What', 'Who', 'Where'] },
+          { q: 'Look! Ana ___ on the ice.', o: ['is skating', 'skate', 'skating', 'skates'] },
+          { q: 'I ___ a comic now.', o: ['am reading', 'read', 'reading', 'reads'] },
+          { q: 'We ___ shorts today.', o: ['are wearing', 'is wearing', 'wear', 'wearing'] },
+          { q: 'Is Pau swimming? — No, he ___.', o: ['isn’t', 'doesn’t', 'not', 'don’t'] },
+          { q: 'My dad ___ (get) up at six every day.', a: ['gets'] },
+          { q: 'Write the -ing form: read → ___', a: ['reading'] }
         ],
         insecure: [
-          { q: 'Look! Pol ___ on the ramp.', o: ['is skating', 'skate', 'skating', 'skates'] },
-          { q: 'They ___ football today: it’s raining.', o: ['aren’t playing', 'don’t playing', 'isn’t playing', 'not play'] },
-          { q: '___ you listening to music? — Yes, I am.', o: ['Are', 'Do', 'Is', 'Does'] },
-          { q: 'The -ing form of “swim” is…', o: ['swimming', 'swiming', 'swimning', 'swime'] },
-          { q: 'I usually ___ football on Saturdays.', o: ['play', 'am playing', 'playing', 'plays'] },
-          { q: 'I love ___ comics.', o: ['reading', 'read', 'to reading', 'reads'] },
-          { q: '___ use your phone in bed.', o: ['Don’t', 'Not', 'No', 'Doesn’t'] },
-          { q: 'She ___ (dance) right now.', a: ['is dancing', "'s dancing"] },
-          { q: 'What ___ Marta doing? — She’s taking photos.', a: ['is'] },
-          { q: 'My brother ___ (not / like) swimming.', a: ["doesn't like", 'does not like'] },
-          { q: '___ a break and drink some water. (fer, imperatiu)', a: ['take'] }
+          { q: 'Biel ___ the piano on Mondays.', o: ['plays', 'play', 'is play', 'playing'] },
+          { q: 'They ___ go swimming in winter.', o: ['don’t', 'doesn’t', 'aren’t', 'not'] },
+          { q: '___ you go skating at the weekend? — Yes, I do.', a: ['do'] },
+          { q: '___ often do you do yoga? — Twice a week.', o: ['How', 'What', 'Where', 'Who'] },
+          { q: 'Look! My friends ___ in the park.', o: ['are running', 'is running', 'running', 'run'] },
+          { q: 'It ___ now. Let’s go to the park!', o: ['isn’t raining', 'doesn’t rain', 'not raining', 'isn’t rain'] },
+          { q: '___ they watching the match? — Yes, they are.', o: ['Are', 'Do', 'Is', 'Does'] },
+          { q: 'What ___ your friends doing? — They’re dancing.', o: ['are', 'is', 'does', 'do'] },
+          { q: 'We ___ (wear) our new trainers today.', a: ['are wearing', "'re wearing"] },
+          { q: 'Write the -ing form: eat → ___', a: ['eating'] }
         ],
         safe: [
-          { q: 'Marc usually plays as a defender, but today he ___ as a forward.', o: ['is playing', 'plays', 'play', 'playing'] },
-          { q: 'I ___ a new helmet. Mine is too small.', o: ['want', 'am wanting', 'wanting', 'wants'] },
-          { q: 'Is she playing well? — Yes, she ___.', o: ['is', 'does', 'plays', '’s'] },
-          { q: 'Who ___ the race today? — Noah is.', o: ['is filming', 'films', 'film', 'does film'] },
-          { q: 'Set a time limit, ___ you have time for other things.', o: ['so', 'because', 'but', 'or'] },
-          { q: 'Do you like ___ online?', o: ['playing', 'play', 'to playing', 'played'] },
-          { q: 'The -ing form of “get” is…', o: ['getting', 'geting', 'gettin', 'gets'] },
-          { q: 'Leo usually wins, and he ___ (win) again today!', a: ['is winning', "'s winning"] },
-          { q: 'I ___ (not / understand) the rules. Can you help me?', a: ["don't understand", 'do not understand'] },
-          { q: 'She hates ___ (lose) a match.', a: ['losing'] },
-          { q: 'Switch off your phone at night, ___ the light keeps you awake.', a: ['because'] }
+          { q: 'My cousin ___ (watch) cartoons every morning.', a: ['watches'] },
+          { q: 'Our coach ___ (get) up at six every day.', a: ['gets'] },
+          { q: '___ your dad cook at the weekend? — Yes, he does.', a: ['does'] },
+          { q: 'I ___ eat sweets before training. (never / 0 %)', a: ['never'] },
+          { q: 'Look! Laia ___ (ride) her bike in the rain.', a: ['is riding', "'s riding"] },
+          { q: 'We ___ (listen) to the radio right now.', a: ['are listening', "'re listening"] },
+          { q: 'Are they playing tennis? — No, they ___.', a: ["aren't", 'are not'] },
+          { q: 'Write the -ing form: dance → ___', a: ['dancing'] },
+          { q: 'Choose the right sentence.', o: ['Right now my brother is drawing a comic.', 'Right now my brother draws a comic.', 'Right now my brother is draw a comic.', 'Right now my brother drawing a comic.'] },
+          { q: 'Pol usually goes cycling on Sundays, but today he ___ football.', o: ['is playing', 'plays', 'play', 'playing'] }
         ],
         daring: [
-          { q: 'This month I ___ for a race, so I ride every day.', o: ['am training', 'train', 'trains', 'training'] },
-          { q: 'I ___ skating is the best sport. (opinion)', o: ['think', 'am thinking', 'thinks', 'thinking'] },
-          { q: 'Be quiet! I ___ about my next video.', o: ['am thinking', 'think', 'thinks', 'thought'] },
-          { q: 'Go outside instead of ___ videos.', o: ['watching', 'watch', 'to watch', 'watched'] },
-          { q: 'Leo ___ all the routes in the park.', o: ['knows', 'is knowing', 'know', 'knowing'] },
-          { q: 'Why ___ cheering?', o: ['are the fans', 'the fans are', 'do the fans', 'the fans'] },
-          { q: 'One hour of games a day is ___.', o: ['enough', 'instead', 'addictive enough', 'too'] },
-          { q: 'My cousin ___ (stay) with us this week, so we skate every afternoon.', a: ['is staying', "'s staying"] },
-          { q: 'Correct the mistake: “She’s studing for the exam.” → She’s ___ for the exam.', a: ['studying'] },
-          { q: 'I prefer the park ___ the sports hall.', a: ['to'] },
-          { q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'] }
+          { q: 'My sister ___ (try) a new sport every summer.', a: ['tries'] },
+          { q: 'Our teacher ___ (teach) yoga at the weekend.', a: ['teaches'] },
+          { q: 'Where ___ you usually meet your friends?', a: ['do'] },
+          { q: 'How ___ do you go to the gym? — Three times a week.', a: ['often'] },
+          { q: 'Listen! The baby ___ (cry).', a: ['is crying', "'s crying"] },
+          { q: 'We ___ (have) lunch in the park today.', a: ['are having', "'re having"] },
+          { q: 'The fans ___ (sing) at the moment.', a: ['are singing', "'re singing"] },
+          { q: 'Correct the mistake: “He’s runing to school.” → He’s ___ to school.', a: ['running'] },
+          { q: 'Ona usually plays the piano, but today she ___ (play) the guitar.', a: ['is playing', "'s playing"] },
+          { q: 'Choose the right sentence.', o: ['On Saturdays Marta goes skating.', 'On Saturdays Marta is go skating.', 'On Saturdays Marta going skating.', 'On Saturdays Marta go skating.'] }
         ] } },
 
-    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '43. Escriptura: el guió d’un vlog', en: '43. Writing: a vlog script' }, max: 30, criterion: '5.1 (vlog script)', levels: L51, levelPts: L30,
+    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '45. Escriptura: un post per al blog de la classe', en: '45. Writing: a post for the class blog' }, max: 10, criterion: '5.1 (blog post)', levels: L51, levelPts: L10,
       intro: { ca: 'Escriu sense apunts, com a l’examen.', en: 'Write without notes, as in the exam.' },
-      source: 'The student is recording a short vlog at a free-time event or hobby of their choice (a match, a skate park, a dance class, a concert, the beach…). The script has these parts: greeting; now (where they are, the weather, what people are doing, clothes or kit); usually; likes and dislikes; screen tips; goodbye.', sourceLabel: 'Situation',
-      task: { beginners: 'Estàs gravant un vlog curt en un lloc de temps lliure (el parc, la platja, un partit…). Escriu el guió (40–60 paraules) omplint la plantilla: salutació · on ets, quin temps fa i què està fent una persona (<em>is + -ing</em>) · què fas normalment allà (<em>usually</em>) · una cosa que t’agrada (<em>I love + -ing</em>) · un consell de pantalla · comiat.\nParaules: the park · the beach · sunny · cold · raining · playing · swimming · on Saturdays · take a break · don’t use your phone in bed',
-        insecure: 'Estàs gravant un vlog curt en un lloc de temps lliure (un partit, el parc de skate, una classe de dansa, la platja…). Escriu el guió (60–80 paraules) amb la plantilla: salutació · on ets, quin temps fa i què està fent la gent (Present Continuous) · què fas normalment allà (Present Simple) · una cosa que t’agrada (<em>I love / like + -ing</em>) · dos consells de pantalla amb imperatius · comiat.\nParaules útils: today · right now · usually · on Saturdays · sunny · cold · wearing · take a break · don’t',
-        safe: 'You are recording a short vlog at a free-time event or hobby of your choice (a match, a skate park, a dance class, a concert, the beach…). Write the script (90–120 words) with these parts: greeting · live now (where you are, the weather, what people are doing and wearing: Present Continuous) · what you usually do there (Present Simple) · likes and dislikes (love / like / hate + -ing) · three screen tips with imperatives · goodbye. Use time expressions.',
-        daring: 'You are recording a short vlog at a free-time event or hobby of your choice. Write the script (120–160 words) with these parts: greeting · live now (Present Continuous) · what you usually do there, plus a temporary situation this month · likes, dislikes and one opinion with a state verb (<em>I think / I prefer</em>) · three screen tips with a reason each (<em>because / so</em>) · goodbye. Link your sentences with <em>and, but, because, so</em>.' },
-      template: { beginners: 'Hi everyone! I’m … and this is my vlog about …\nToday I’m at … It’s … (sunny / cold / raining). My friend is …-ing.\nI usually … on …\nI love …-ing.\nOne tip: …\nThanks for watching!', insecure: 'Hi everyone! I’m … and this is my vlog about …\nToday I’m at … It’s … (weather). … is …-ing and … are …-ing. I’m wearing …\nI usually … on …\nI love …-ing because …\nTwo tips: … Don’t …\nThanks for watching! See you next time!', safe: 'Hi everyone! I’m … and welcome to my vlog about …\nToday I’m at…', daring: 'Hi everyone! I’m … and welcome to my vlog about …\nToday I’m at…' },
-      min: { beginners: 40, insecure: 60, safe: 90, daring: 120 } },
+      source: 'The student is at a free-time place or event of their choice (a park, a match, the beach, a dance class, the ice rink…) and writes a post for the class blog with these parts: where they are and who with; the weather; what people are doing right now (Present Continuous); what they are wearing; what they usually do there and how often (Present Simple + how often).', sourceLabel: 'Situation',
+      task: { beginners: 'Ets en un lloc de temps lliure (el parc, la platja, un partit…). Escriu un post curt per al blog de la classe (30–50 paraules) omplint la plantilla: on ets i amb qui · quin temps fa · què està fent la gent ara (<em>is / are + -ing</em>) · què portes posat · què fas normalment allà i quan (<em>usually / on Saturdays</em>).\nParaules: the park · the beach · sunny · cold · raining · playing · swimming · wearing · on Saturdays · twice a week',
+        insecure: 'Ets en un lloc de temps lliure (un partit, el parc de skate, la pista de gel, la platja…). Escriu un post per al blog de la classe (40–60 paraules): on ets i amb qui · quin temps fa · què està fent la gent ara mateix (2 o 3 frases amb <em>is / are + -ing</em>) · què portes posat · què fas normalment allà i amb quina freqüència (<em>usually / every… / twice a week</em>).\nParaules útils: today · right now · usually · on Saturdays · sunny · cold · wearing',
+        safe: 'You are at a free-time place or event of your choice (a match, the ice rink, the beach, a concert…). Write a post for the class blog (60–80 words): where you are and who with, the weather, what people are doing right now (three or four Present Continuous sentences), what you are wearing or using, and what you usually do there and how often (Present Simple + how often).',
+        daring: 'You are at a free-time place or event of your choice. Write a post for the class blog (70–100 words): where you are and who with, the weather, what people are doing right now (Present Continuous, with a question like “What are they doing?”), what you are wearing or using, and what you usually do there and how often (Present Simple + how often). Link your sentences with <em>and, but</em>.' },
+      template: { beginners: 'Hi! I’m at … with …\nIt’s … (sunny / cold / raining).\nMy friend is …-ing. People are …-ing.\nI’m wearing …\nI usually … on …', insecure: 'Hi everyone! Today I’m at … with …\nIt’s … (weather). … is …-ing and … are …-ing.\nI’m wearing …\nI usually … here … (how often).', safe: 'Hi everyone! Today I’m at…', daring: 'Hi everyone! Today I’m at…' },
+      min: { beginners: 30, insecure: 40, safe: 60, daring: 70 } },
 
     { id: 'score', type: 'summary', tab: { ca: 'La meva nota', en: 'My score' }, title: { ca: 'La meva nota', en: 'My score' },
-      intro: { ca: 'Primer intent de cada secció i les notes de ChatGPT que has apuntat.', en: 'Your first try in each section and the ChatGPT marks you noted.' } }
+      intro: { ca: 'Primer intent de cada secció. L’escriptura no té nota: en tens la correcció.', en: 'Your first try in each section. The writing has no mark: you get its correction.' } }
   ]
 };
 })();

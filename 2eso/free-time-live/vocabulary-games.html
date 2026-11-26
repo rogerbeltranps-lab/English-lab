@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="ca" class="elgate">
+<html lang="ca" class="notranslate elgate" translate="no">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="google" content="notranslate"><script src="../../shared/js/el-nocopy.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="description" content="Six offline vocabulary games for LS2 · Free Time, Live! (2 ESO). Four routes (Starter, Base, Core, Plus), individual practice and classroom team play.">
@@ -2016,7 +2016,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
    "scramble": [
     {
      "sentence": "Look! They are playing basketball.",
-     "prompt": "Construeix la frase. Comença per «Look!».",
+     "prompt": "Build the sentence. Begin with \"Look!\".",
      "hint": "",
      "chunks": [
       "Look!",
@@ -2030,7 +2030,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "I don't mind wearing a uniform.",
-     "prompt": "Construeix la frase. Comença per «I».",
+     "prompt": "Build the sentence. Begin with \"I\".",
      "hint": "",
      "chunks": [
       "I",
@@ -2045,7 +2045,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "My sister plays the piano every weekend.",
-     "prompt": "Construeix la frase. Comença per «My».",
+     "prompt": "Build the sentence. Begin with \"My\".",
      "hint": "",
      "chunks": [
       "My",
@@ -2063,7 +2063,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "Put your phone away at dinner.",
-     "prompt": "Construeix la frase. Comença per «Put».",
+     "prompt": "Build the sentence. Begin with \"Put\".",
      "hint": "",
      "chunks": [
       "Put",
@@ -2080,7 +2080,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "It's snowing at the moment.",
-     "prompt": "Construeix la frase. Comença per «It's».",
+     "prompt": "Build the sentence. Begin with \"It's\".",
      "hint": "",
      "chunks": [
       "It's",
@@ -2096,7 +2096,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "Do you go skating on Saturdays?",
-     "prompt": "Construeix la frase. Comença per «Do».",
+     "prompt": "Build the sentence. Begin with \"Do\".",
      "hint": "",
      "chunks": [
       "Do",
@@ -2111,7 +2111,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "I hate doing homework on Sundays.",
-     "prompt": "Construeix la frase. Comença per «I».",
+     "prompt": "Build the sentence. Begin with \"I\".",
      "hint": "",
      "chunks": [
       "I",
@@ -2128,7 +2128,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     },
     {
      "sentence": "He is recording a video for his vlog.",
-     "prompt": "Construeix la frase. Comença per «He».",
+     "prompt": "Build the sentence. Begin with \"He\".",
      "hint": "",
      "chunks": [
       "He",
@@ -3091,7 +3091,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
  },
  "routeDetail": {
   "beginners": "Les paraules bàsiques de la LS (temps lliure, roba, temps, pantalles), amb una pista en català i sempre amb opcions per triar. Frases en blocs.",
-  "insecure": "Totes les paraules de la LS. Al Rosco escrius la resposta (pots demanar pista de lletres); a la resta tries entre 3 o 4 opcions i ordenes paraules soltes.",
+  "insecure": "All the LS words. In the Alphabet Challenge you type the answer (you can ask for a letter hint); in the other games you choose from 3 or 4 options and put single words in order.",
   "safe": "English definitions and written answers: events, sport, online life and healthy screen habits. Present Simple or Continuous in context.",
   "daring": "Infer words from situations, fix state-verb mistakes (know, need, prefer) and build sentences with extra words."
  },
@@ -3155,9 +3155,10 @@ const $=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const STORE='english-lab-vocabulary-v1-'+DATA.course+'-'+DATA.ls;
 const ROUTES=["beginners", "insecure", "safe", "daring"];
-const CA=r=>['beginners','insecure'].includes(r);   // Starter and Base read Catalan instructions
+const CA=r=>r==='beginners';   // the language of instructions and help: Catalan for Starter only (Roger, 21 Nov 2026: "base is also in English")
+const CAM=r=>['beginners','insecure'].includes(r);   // the game itself (Catalan meanings, options to choose): Starter and Base, as before
 const ROUTE_NAMES={"beginners": "Starter", "insecure": "Base", "safe": "Core", "daring": "Plus"};
-const ROUTE_INFO={"beginners": {"short": "A1", "detail": "Les paraules bàsiques de la LS (temps lliure, roba, temps, pantalles), amb una pista en català i sempre amb opcions per triar. Frases en blocs."}, "insecure": {"short": "A1+", "detail": "Totes les paraules de la LS. Al Rosco escrius la resposta (pots demanar pista de lletres); a la resta tries entre 3 o 4 opcions i ordenes paraules soltes."}, "safe": {"short": "A2", "detail": "English definitions and written answers: events, sport, online life and healthy screen habits. Present Simple or Continuous in context."}, "daring": {"short": "A2+", "detail": "Infer words from situations, fix state-verb mistakes (know, need, prefer) and build sentences with extra words."}};
+const ROUTE_INFO={"beginners": {"short": "A1", "detail": "Les paraules bàsiques de la LS (temps lliure, roba, temps, pantalles), amb una pista en català i sempre amb opcions per triar. Frases en blocs."}, "insecure": {"short": "A1+", "detail": "All the LS words. In the Alphabet Challenge you type the answer (you can ask for a letter hint); in the other games you choose from 3 or 4 options and put single words in order."}, "safe": {"short": "A2", "detail": "English definitions and written answers: events, sport, online life and healthy screen habits. Present Simple or Continuous in context."}, "daring": {"short": "A2+", "detail": "Infer words from situations, fix state-verb mistakes (know, need, prefer) and build sentences with extra words."}};
 const GAMES={"rosco": {"name": "Alphabet Challenge", "icon": "rosco", "tag": "A word wheel from A to Z", "desc": "A wheel of studied expressions. Read the clue, find the answer or pass and return.", "badges": ["3 choices + a Catalan clue", "Write the answer · letter hints", "English clues + typed answers", "Infer the expression from context"]}, "jeopardy": {"name": "Vocabulary Jeopardy", "icon": "jeopardy", "tag": "4 categories · 100–500 points", "desc": "Choose a category. Take a chance. Build your score one question at a time.", "badges": ["Two choices · easy questions", "Three choices · Catalan instructions", "Gaps + guided written answers", "Precision, correction + nuance"]}, "memory": {"name": "Memory Match", "icon": "memory", "tag": "Find the pairs", "desc": "Turn two cards. Connect the language, not just the position.", "badges": ["5 pairs: word ↔ Catalan", "6 pairs: word ↔ Catalan", "Expression ↔ English definition", "Expression ↔ contextual gap"]}, "scramble": {"name": "Sentence Scramble", "icon": "scramble", "tag": "8 sentences", "desc": "Make the pieces work together. Build a sentence you can actually use.", "badges": ["Chunk tiles + the Catalan sentence", "Word tiles + 3 tries", "Word tiles + grammar in context", "Word tiles + 2 distractors"]}, "rush": {"name": "Word Rush", "icon": "rush", "tag": "12 quick decisions", "desc": "Think fast, choose carefully. Find the meaning before the clock runs out.", "badges": ["3 Catalan meanings · more time", "4 Catalan meanings", "4 expressions from a definition", "4 close choices in context"]}, "mystery": {"name": "Mystery Picture", "icon": "mystery", "tag": "9 hidden tiles · 4 scenes", "desc": "Earn a glimpse with each answer. Name the scene behind the picture.", "badges": ["Catalan clue + 3 choices", "Definitions + 4 choices", "Context gaps + a written guess", "Infer, write + explain aloud"]}};
 let storageOK=true;
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(STORE+key))??fallback;}catch(e){storageOK=false;return fallback;}}
@@ -3184,7 +3185,7 @@ function chosenPool(){return [...new Set(DATA.routes[game.route].rosco.map(x=>x.
 function makeOptions(answer,candidates,count,key){const clean=[...new Set(candidates)].filter(x=>x!==answer);return mix([answer,...mix(clean,key+'-distractors').slice(0,count-1)],key+'-options');}
 function makeVocabTask(entry,purpose,index,letter=''){
  const r=game.route,key=purpose+'-'+index,bank=chosenPool();let prompt,answer=entry.term,options=[],support='',aliases=entry.aliases||[];
- if(purpose==='rush'&&CA(r)){
+ if(purpose==='rush'&&CAM(r)){
   // Starter and Base: the English expression and its meaning in Catalan (3 or 4 options).
   prompt='What does “'+entry.term+'” mean?';answer=entry.ca;aliases=[];
   options=makeOptions(answer,[...entry.distractors.filter(t=>bank.some(e=>e.term===t)).map(t=>DATA.bank[t].ca),...bank.map(t=>t.ca)],r==='beginners'?3:4,key);
@@ -3331,12 +3332,12 @@ function beginGame(id){
   game.letters=DATA.routes[game.route].rosco.map((x,i)=>({...x,status:'pending',task:makeVocabTask(DATA.bank[x.term],'rosco',i,x.letter)}));game.index=0;
   setClock([540,480,420,360][ri]);
  }else if(id==='jeopardy'){
-  game.cells=DATA.routes[game.route].jeopardy.map((x,i)=>({...x,key:'jeopardy-'+i,typed:!CA(game.route),options:CA(game.route)?mix(x.options,'j-'+i):[],value:(i%5+1)*100,category:Math.floor(i/5)}));
+  game.cells=DATA.routes[game.route].jeopardy.map((x,i)=>({...x,key:'jeopardy-'+i,typed:!CAM(game.route),options:CAM(game.route)?mix(x.options,'j-'+i):[],value:(i%5+1)*100,category:Math.floor(i/5)}));
   game.used={};game.cell=null;
  }else if(id==='memory'){
   game.pairCount=game.route==='beginners'?5:game.route==='insecure'?6:8;
   game.entries=memorySelection(game.pairCount);
-  const cards=game.entries.flatMap((e,i)=>[{id:i*2,pair:i,text:e.term,type:'expression',lang:'en'},{id:i*2+1,pair:i,text:CA(game.route)?e.ca:game.route==='safe'?e.definition:e.gap,type:CA(game.route)?'meaning':game.route==='safe'?'definition':'context',lang:CA(game.route)?'ca':'en'}]);
+  const cards=game.entries.flatMap((e,i)=>[{id:i*2,pair:i,text:e.term,type:'expression',lang:'en'},{id:i*2+1,pair:i,text:CAM(game.route)?e.ca:game.route==='safe'?e.definition:e.gap,type:CAM(game.route)?'meaning':game.route==='safe'?'definition':'context',lang:CAM(game.route)?'ca':'en'}]);
   game.cards=mix(cards,'memory-board');game.flipped=[];game.matched=new Set();game.memoryAttempts=0;setClock([270,240,240,300][ri]);
  }else if(id==='scramble'){
   game.questions=mix(DATA.routes[game.route].scramble,'sentences').map((x,i)=>({...x,key:'scramble-'+i,answer:x.sentence,aliases:x.alternatives,typed:true,options:[],tokens:mix([...(game.route==='beginners'&&x.chunks?.length?x.chunks:x.sentence.split(' ')),...x.extra].map((text,j)=>({text,id:j})),'tokens-'+i)}));game.selected=[];game.tries=0;setQuestionClock();
@@ -3397,7 +3398,7 @@ function feedbackHTML(label='Continue \u2192'){
 }
 function answerHTML(task){
  const frozen=!!game.feedback;
- if(task.options?.length){return '<div class="choices">'+task.options.map((o,i)=>'<button type="button" class="choice-button '+(frozen&&correctFor(o,task)?'correct':frozen&&norm(o)===norm(game.feedback.answer)?'incorrect':'')+'" data-choice="'+i+'" '+(frozen?'disabled':'')+'><span class="choice-index" aria-hidden="true">'+(i+1)+'</span><span'+(game.id==='rush'&&CA(game.route)?' lang="ca"':' lang="en"')+'>'+esc(o)+'</span></button>').join('')+'</div>';}
+ if(task.options?.length){return '<div class="choices">'+task.options.map((o,i)=>'<button type="button" class="choice-button '+(frozen&&correctFor(o,task)?'correct':frozen&&norm(o)===norm(game.feedback.answer)?'incorrect':'')+'" data-choice="'+i+'" '+(frozen?'disabled':'')+'><span class="choice-index" aria-hidden="true">'+(i+1)+'</span><span'+(game.id==='rush'&&CAM(game.route)?' lang="ca"':' lang="en"')+'>'+esc(o)+'</span></button>').join('')+'</div>';}
  let val=frozen?game.feedback.answer:(game.drafts[task.key]||'');
  return '<form class="answer-form" id="answer-form"><label for="written-answer">La teva resposta (en anglès)</label><div class="row"><input id="written-answer" aria-describedby="current-question" name="answer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" value="'+esc(val)+'" placeholder="Escriu la paraula o expressió" '+(frozen?'disabled':'')+'><button class="primary" type="submit" '+(frozen?'disabled':'')+'>Comprova</button></div><p class="answer-help">Les majúscules i la puntuació no afecten la correcció. Fes servir la forma demanada.</p></form>'+
  ((game.route==='safe'||game.route==='insecure')&&!frozen?'<div class="arena-actions"><button class="quiet" type="button" data-action="hint" '+(hasHint()?'disabled':'')+'>Pista de lletres \u00b7 meitat de punts</button></div>':'')+
@@ -3408,19 +3409,19 @@ function renderJeopardy(){
  const t=currentTask();return '<section class="play-panel jeopardy-question"><p class="question-label">'+esc(DATA.categories[t.category])+' \u00b7 '+t.value+' points</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+''+answerHTML(t)+feedbackHTML('Torna al tauler \u2192')+'</section>';
 }
 function renderMemory(){
- const r=game.route;const intro=CA(r)?'Busca l\u2019expressi\u00f3 en angl\u00e8s i el seu significat en catal\u00e0.':r==='safe'?'Match each expression with its English definition.':'Match the expression with the sentence it completes.';
+ const r=game.route;const intro=CA(r)?'Busca l\u2019expressi\u00f3 en angl\u00e8s i el seu significat en catal\u00e0.':CAM(r)?'Match each English expression with its Catalan meaning.':r==='safe'?'Match each expression with its English definition.':'Match the expression with the sentence it completes.';
  return '<section class="play-panel"><p class="memory-intro">'+intro+(CA(r)?' Dues targetes per torn. En mode projector, canvieu d\u2019equip despr\u00e9s de cada intent.':' Turn two cards per turn. In projector mode, teams take turns after each attempt.')+'</p><div class="memory-grid">'+game.cards.map((c,i)=>{const matched=game.matched.has(c.pair),flipped=game.flipped.includes(i),visible=matched||flipped;
  return '<button class="memory-card '+(matched?'matched':flipped?'flipped':'')+'" type="button" data-card="'+i+'" '+(visible||game.feedback?'disabled':'')+' aria-label="'+esc(visible?c.text+(matched?', matched':''):'Hidden card '+(i+1))+'">'+(visible?'<span class="pair-type">'+c.type+'</span><span lang="'+c.lang+'">'+esc(c.text)+'</span>'+(matched?'<span class="match-mark" aria-hidden="true">\u2713</span>':''):'<span class="card-back" aria-hidden="true">EL<small>FIND THE PAIR</small></span>')+'</button>';}).join('')+'</div>'+feedbackHTML('Seg\u00fcent torn \u2192')+'</section>';
 }
 function renderScramble(){
  const t=currentTask(),selected=game.selected,available=t.tokens.filter(x=>!selected.includes(x.id));
- return '<section class="play-panel scramble-panel"><p class="question-label">Build the sentence \u00b7 '+ROUTE_NAMES[game.route]+'</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+''+'<div class="scramble-meta"><span>Toca una peça per afegir-la. Toca-la de nou per retirar-la.</span><span>'+(game.route==='daring'?'Hi ha 2 peces que sobren.':(CA(game.route)?'Tens fins a 3 intents.':'Tens fins a 2 intents.'))+'</span></div><div class="sentence-tray" aria-label="Your sentence">'+(selected.length?selected.map(id=>{const token=t.tokens.find(x=>x.id===id);return '<button type="button" class="word-token selected" data-remove-token="'+id+'" '+(game.feedback?'disabled':'')+' aria-label="Remove '+esc(token.text)+'">'+esc(token.text)+'</button>';}).join(''):'<span class="sentence-placeholder">Fes clic a les peces per construir la frase...</span>')+'</div><div class="token-pool" aria-label="Available words">'+available.map(x=>'<button class="word-token" type="button" data-token="'+x.id+'" '+(game.feedback?'disabled':'')+'>'+esc(x.text)+'</button>').join('')+'</div>'+(!game.feedback?'<div class="arena-actions"><button class="primary" data-action="check-scramble" type="button" '+(!selected.length?'disabled':'')+'>Comprova la frase</button><button class="quiet" data-action="undo-token" type="button" '+(!selected.length?'disabled':'')+'>Desfés</button><button class="quiet" data-action="clear-tokens" type="button" '+(!selected.length?'disabled':'')+'>Buida</button></div>':'')+feedbackHTML('Seg\u00fcent frase \u2192')+'</section>';
+ return '<section class="play-panel scramble-panel"><p class="question-label">Build the sentence \u00b7 '+ROUTE_NAMES[game.route]+'</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+''+'<div class="scramble-meta"><span>Toca una peça per afegir-la. Toca-la de nou per retirar-la.</span><span>'+(game.route==='daring'?'Hi ha 2 peces que sobren.':(CAM(game.route)?'Tens fins a 3 intents.':'Tens fins a 2 intents.'))+'</span></div><div class="sentence-tray" aria-label="Your sentence">'+(selected.length?selected.map(id=>{const token=t.tokens.find(x=>x.id===id);return '<button type="button" class="word-token selected" data-remove-token="'+id+'" '+(game.feedback?'disabled':'')+' aria-label="Remove '+esc(token.text)+'">'+esc(token.text)+'</button>';}).join(''):'<span class="sentence-placeholder">Fes clic a les peces per construir la frase...</span>')+'</div><div class="token-pool" aria-label="Available words">'+available.map(x=>'<button class="word-token" type="button" data-token="'+x.id+'" '+(game.feedback?'disabled':'')+'>'+esc(x.text)+'</button>').join('')+'</div>'+(!game.feedback?'<div class="arena-actions"><button class="primary" data-action="check-scramble" type="button" '+(!selected.length?'disabled':'')+'>Comprova la frase</button><button class="quiet" data-action="undo-token" type="button" '+(!selected.length?'disabled':'')+'>Desfés</button><button class="quiet" data-action="clear-tokens" type="button" '+(!selected.length?'disabled':'')+'>Buida</button></div>':'')+feedbackHTML('Seg\u00fcent frase \u2192')+'</section>';
 }
 function renderRush(){const t=currentTask();return '<section class="play-panel rush-panel"><div class="rush-strip" aria-hidden="true"><span id="rush-time-bar" style="width:'+(game.timed?Math.max(0,game.remaining/game.limit*100):100)+'%"></span></div><span class="streak-badge">'+game.streaks[game.turn]+' in a row \u00b7 '+esc(game.teams[game.turn].name)+'</span><p class="question-label">'+(game.route==='daring'?'Meaning in context':'Find the meaning')+'</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(t.support?'<p class="support-box" lang="ca">'+esc(t.support)+'</p>':'')+answerHTML(t)+feedbackHTML('Seg\u00fcent expressi\u00f3 \u2192')+'</section>';}
 function renderMystery(){
  const t=currentTask(),p=game.picture,shown=game.coverOrder.slice(0,game.revealed);let clue='Answer a question correctly to reveal a tile and unlock a picture guess.';
  if(game.revealed){const n=Math.min(3,Math.ceil(game.revealed/3));clue=p.clues.slice(0,n).join(' ');}
- let guess='';if(game.canGuess){guess='<form class="guess-box" id="guess-form"><h3>Quina escena s’amaga?</h3><p class="guess-bonus">Solve it now: +'+(20+(9-game.revealed)*10)+' bonus points</p>'+(CA(game.route)?'<label class="small" for="picture-guess">Tria l’escena / Choose the scene</label><select id="picture-guess" required><option value="">Choose a scene...</option>'+mix(DATA.pictures,'picture-options').map(x=>'<option value="'+esc(x.answer)+'">'+esc(x.answer)+'</option>').join('')+'</select>':'<label class="small" for="picture-guess">Escriu l’escena en anglès</label><input id="picture-guess" autocomplete="off" spellcheck="false" maxlength="100" placeholder="Una paraula o expressió en anglès">')+(game.route==='safe'?'<p class="small muted">Picture hint: '+esc(p.hint)+'</p>':'')+'<button class="primary" type="submit">Endevina la imatge</button><p class="answer-help">Pots endevinar la imatge una vegada per encert al qüestionari. Si falles, cal un altre encert per tornar-hi.</p></form>';}
+ let guess='';if(game.canGuess){guess='<form class="guess-box" id="guess-form"><h3>Quina escena s’amaga?</h3><p class="guess-bonus">Solve it now: +'+(20+(9-game.revealed)*10)+' bonus points</p>'+(CAM(game.route)?'<label class="small" for="picture-guess">Tria l’escena / Choose the scene</label><select id="picture-guess" required><option value="">Choose a scene...</option>'+mix(DATA.pictures,'picture-options').map(x=>'<option value="'+esc(x.answer)+'">'+esc(x.answer)+'</option>').join('')+'</select>':'<label class="small" for="picture-guess">Escriu l’escena en anglès</label><input id="picture-guess" autocomplete="off" spellcheck="false" maxlength="100" placeholder="Una paraula o expressió en anglès">')+(game.route==='safe'?'<p class="small muted">Picture hint: '+esc(p.hint)+'</p>':'')+'<button class="primary" type="submit">Endevina la imatge</button><p class="answer-help">Pots endevinar la imatge una vegada per encert al qüestionari. Si falles, cal un altre encert per tornar-hi.</p></form>';}
  return '<div class="split-game"><div class="picture-panel"><div class="mystery-canvas">'+sceneSVG(p.id)+'<div class="picture-covers" aria-hidden="true">'+[0,1,2,3,4,5,6,7,8].map(i=>'<div class="picture-cover '+(shown.includes(i)?'revealed':'')+'">'+(i+1)+'</div>').join('')+'</div></div><p class="picture-caption">'+game.revealed+' / 9 tiles revealed. Guess earlier for a bigger bonus.</p><div class="picture-clues" role="status"><strong>Revealed clues:</strong> '+esc(clue)+'</div></div><section class="play-panel"><p class="question-label">Earn a tile</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(t.support?'<p class="support-box" lang="ca">'+esc(t.support)+'</p>':'')+answerHTML(t)+feedbackHTML('Seg\u00fcent pregunta (sense endevinar) \u2192')+guess+(game.guessMessage?'<div class="support-box" role="status"><p>'+esc(game.guessMessage)+'</p>'+(game.mode==='class'&&game.pendingPictureGuess?'<button type="button" class="quiet" data-action="accept-picture">Teacher: accept this picture answer</button>':'')+'</div>':'')+'</section></div>';
 }
 function focusFeedback(){const f=$('arena').querySelector('.feedback');if(f)f.focus({preventScroll:true});}
@@ -3443,7 +3444,7 @@ function turnMemoryCard(i){
  game.flipped.push(i);
  if(game.flipped.length===2){
   game.memoryAttempts++;const first=game.cards[game.flipped[0]],second=card,good=first.pair===second.pair,entry=game.entries[first.pair];
-  const meaning=CA(game.route)?entry.ca:game.route==='safe'?entry.definition:entry.gap;
+  const meaning=CAM(game.route)?entry.ca:game.route==='safe'?entry.definition:entry.gap;
   const expected=entry.term+' \u2194 '+meaning;
   if(good)game.matched.add(first.pair);
   addAttempt('Match: '+first.text,second.text,expected,good,good?20:0,good?entry.example:'Remember the meaning as well as the position.','memory');
@@ -3533,7 +3534,7 @@ function exportResults(items){
  const blob=new Blob(['\uFEFF'+rows.map(row=>row.map(csvCell).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='english-lab-'+DATA.course+'eso-results-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);showToast('Results exported. Nicknames stay in your file.');
 }
 function guideHTML(){
- return "<div class=\"guide-content\" lang=\"ca\"><p><strong>LS2 · Free Time, Live! · 2 ESO.</strong> Sis jocs de pràctica formativa amb el vocabulari de la LS. Les quatre rutes (Starter, Base, Core, Plus) canvien el suport, el tipus de resposta i les paraules; no només el nombre de preguntes. Starter i Base tenen les instruccions en català. Un alumne amb sessió iniciada només veu la seva ruta, la que li ha posat el docent (Pro juga a Plus).</p><h3>Com organitzar la classe</h3><p><strong>Individual:</strong> cada alumne juga al seu dispositiu. <strong>Un equip / un Chromebook:</strong> els membres consensuen respostes i alternen lector, portaveu i teclat. <strong>Projector:</strong> el docent controla la partida per a 2–6 equips; el marcador i els torns es gestionen en aquest dispositiu.</p><h3>Diferenciació</h3><div class=\"table-scroll\"><table class=\"guide-table\"><thead><tr><th>Joc</th><th>Starter</th><th>Base</th><th>Core</th><th>Plus</th></tr></thead><tbody><tr><th>Rosco</th><td>Pista en anglès + català; 3 opcions.</td><td>Definició en anglès; resposta escrita; pista de lletres opcional.</td><td>Definició en anglès; resposta escrita; pista de lletres opcional.</td><td>Situació o inferència; resposta escrita sense banc.</td></tr><tr><th>Jeopardy</th><td>2 opcions; preguntes fàcils.</td><td>3 opcions.</td><td>Buits i respostes escrites guiades.</td><td>Inferència i correcció d’errors.</td></tr><tr><th>Memory</th><td>5 parelles: paraula / català.</td><td>6 parelles: paraula / català.</td><td>8 parelles: expressió / definició.</td><td>8 parelles: expressió / frase amb buit.</td></tr><tr><th>Scramble</th><td>Blocs + frase en català; 3 intents.</td><td>Paraules soltes; 3 intents.</td><td>Paraules soltes; 2 intents.</td><td>2 paraules sobrants; 1 intent.</td></tr><tr><th>Word Rush</th><td>Paraula / 3 significats en català; 25 s.</td><td>Paraula / 4 significats en català; 22 s.</td><td>Definició / 4 expressions; 18 s.</td><td>Buit / 4 opcions properes; 18 s.</td></tr><tr><th>Mystery</th><td>Pista en català + 3 opcions; tria l’escena.</td><td>Definició + 4 opcions; tria l’escena.</td><td>Buits amb opcions; escriu l’escena amb pista.</td><td>Inferències escrites; escena sense banc.</td></tr></tbody></table></div><h3>Torns i puntuació</h3><p>Una resposta correcta suma <strong>10 punts</strong>. Memory: <strong>20 per parella</strong>. Jeopardy: el valor de la casella, de <strong>100 a 500</strong>. No hi ha punts negatius. Amb la pista de lletres (Base i Core), l’encert val la meitat. A Scramble, l’encert després de reintentar val 5 punts. A Mystery, encertar la imatge suma <strong>20 + 10 per cada casella encara tapada</strong>.</p><h3>Correcció transparent</h3><p>No hi ha intel·ligència artificial: es comparen les respostes previstes i les alternatives programades, sense tenir en compte majúscules ni puntuació. En mode projector, <strong>Teacher: accept a valid alternative</strong> permet validar una resposta correcta que el comprovador no hagi reconegut. La tasca oral final <strong>Take it into real life</strong> no es corregeix automàticament.</p><h3>Fitxer i privacitat</h3><p>Els jocs funcionen sense xarxa i no envien res: la configuració i fins a 30 resultats es desen només en aquest navegador. Utilitzeu sobrenoms. Es pot esborrar l’historial i exportar un CSV. No compten per a la nota. Les paraules surten dels panells de vocabulari de la LS; es generen amb <code>tools/vocab-games/build.py</code>.</p><p><a href=\"index.html\">Learning Situation LS2 · Free Time, Live! ↗</a></p></div>";
+ return "<div class=\"guide-content\" lang=\"ca\"><p><strong>LS2 · Free Time, Live! · 2 ESO.</strong> Sis jocs de pràctica formativa amb el vocabulari de la LS. Les quatre rutes (Starter, Base, Core, Plus) canvien el suport, el tipus de resposta i les paraules; no només el nombre de preguntes. Starter té les instruccions en català; Base, en anglès (des del 21 de novembre de 2026). Un alumne amb sessió iniciada només veu la seva ruta, la que li ha posat el docent (Pro juga a Plus).</p><h3>Com organitzar la classe</h3><p><strong>Individual:</strong> cada alumne juga al seu dispositiu. <strong>Un equip / un Chromebook:</strong> els membres consensuen respostes i alternen lector, portaveu i teclat. <strong>Projector:</strong> el docent controla la partida per a 2–6 equips; el marcador i els torns es gestionen en aquest dispositiu.</p><h3>Diferenciació</h3><div class=\"table-scroll\"><table class=\"guide-table\"><thead><tr><th>Joc</th><th>Starter</th><th>Base</th><th>Core</th><th>Plus</th></tr></thead><tbody><tr><th>Rosco</th><td>Pista en anglès + català; 3 opcions.</td><td>Definició en anglès; resposta escrita; pista de lletres opcional.</td><td>Definició en anglès; resposta escrita; pista de lletres opcional.</td><td>Situació o inferència; resposta escrita sense banc.</td></tr><tr><th>Jeopardy</th><td>2 opcions; preguntes fàcils.</td><td>3 opcions.</td><td>Buits i respostes escrites guiades.</td><td>Inferència i correcció d’errors.</td></tr><tr><th>Memory</th><td>5 parelles: paraula / català.</td><td>6 parelles: paraula / català.</td><td>8 parelles: expressió / definició.</td><td>8 parelles: expressió / frase amb buit.</td></tr><tr><th>Scramble</th><td>Blocs + frase en català; 3 intents.</td><td>Paraules soltes; 3 intents.</td><td>Paraules soltes; 2 intents.</td><td>2 paraules sobrants; 1 intent.</td></tr><tr><th>Word Rush</th><td>Paraula / 3 significats en català; 25 s.</td><td>Paraula / 4 significats en català; 22 s.</td><td>Definició / 4 expressions; 18 s.</td><td>Buit / 4 opcions properes; 18 s.</td></tr><tr><th>Mystery</th><td>Pista en català + 3 opcions; tria l’escena.</td><td>Definició + 4 opcions; tria l’escena.</td><td>Buits amb opcions; escriu l’escena amb pista.</td><td>Inferències escrites; escena sense banc.</td></tr></tbody></table></div><h3>Torns i puntuació</h3><p>Una resposta correcta suma <strong>10 punts</strong>. Memory: <strong>20 per parella</strong>. Jeopardy: el valor de la casella, de <strong>100 a 500</strong>. No hi ha punts negatius. Amb la pista de lletres (Base i Core), l’encert val la meitat. A Scramble, l’encert després de reintentar val 5 punts. A Mystery, encertar la imatge suma <strong>20 + 10 per cada casella encara tapada</strong>.</p><h3>Correcció transparent</h3><p>No hi ha intel·ligència artificial: es comparen les respostes previstes i les alternatives programades, sense tenir en compte majúscules ni puntuació. En mode projector, <strong>Teacher: accept a valid alternative</strong> permet validar una resposta correcta que el comprovador no hagi reconegut. La tasca oral final <strong>Take it into real life</strong> no es corregeix automàticament.</p><h3>Fitxer i privacitat</h3><p>Els jocs funcionen sense xarxa i no envien res: la configuració i fins a 30 resultats es desen només en aquest navegador. Utilitzeu sobrenoms. Es pot esborrar l’historial i exportar un CSV. No compten per a la nota. Les paraules surten dels panells de vocabulari de la LS; es generen amb <code>tools/vocab-games/build.py</code>.</p><p><a href=\"index.html\">Learning Situation LS2 · Free Time, Live! ↗</a></p></div>";
 }
 function scoreControls(){
  if(!game||game.ended||game.mode!=='class')return;
@@ -3608,7 +3609,7 @@ function gameHelpHTML(id,launch=false){
   const steps={
    rosco:['Read the English clue.','Type the matching expression or pass.','You can return to passed letters later.'],
    jeopardy:['Pick a category and point value.','Read the question and give your answer.','Earn points for a correct answer.'],
-   memory:['Turn over two cards.','Find each expression and its matching English meaning or context.','Remember the card positions and find all pairs.'],
+   memory:['Turn over two cards.','Find each expression and its matching meaning or context.','Remember the card positions and find all pairs.'],
    scramble:['Read the task and arrange the words.','Tap words to add or remove them.','Check the word order and use only the words you need.'],
    rush:['Read the definition or context.','Choose the best expression before time runs out.','Build a streak with correct answers.'],
    mystery:['Answer questions to uncover parts of the picture.','Use the revealed clues to identify the scene.','Guess the picture to earn bonus points.']

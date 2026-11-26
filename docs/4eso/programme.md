@@ -619,7 +619,7 @@ Beginners and Insecure retain Catalan guidance at every step, with English examp
 
 - Dates & time: on 31 October; in November; at Christmas; at night; every year
 
-- Feelings: happy; excited
+- Feelings: happy; excited; -ed / -ing: excited / exciting; bored / boring; tired / tiring
 
 - Plans & email: invite people; buy tickets; music; food; games; Dear…; We would like to…; Yours sincerely
 
@@ -635,7 +635,7 @@ Beginners and Insecure retain Catalan guidance at every step, with English examp
 
 - Dates & time: on 31 October; in November; at Christmas; at night; every year; once a year; the night before; ordinal dates (the first, the twenty-fifth)
 
-- Feelings: excited; happy; grateful; proud; scared; relaxed
+- Feelings: excited; happy; grateful; proud; scared; relaxed; -ed / -ing: excited / exciting; bored / boring; tired / tiring; interested / interesting; amazed / amazing; disappointed / disappointing
 
 - Plans: go to a festival; meet friends; book a room; buy tickets; invite people
 
@@ -654,6 +654,8 @@ Beginners and Insecure retain Catalan guidance at every step, with English examp
 - Formal email: Dear Mr / Ms…; I am writing to propose…; We would like to…; Our plan includes…; Could we use…?; Please let us know if…; I look forward to hearing from you; Yours sincerely / Kind regards
 
 - Comparing cultures: both… and…; similar to; different from; whereas; in the same way; unlike
+
+- Feelings (-ed / -ing): surprised / surprising
 
 **Daring — additions**
 
@@ -1925,7 +1927,7 @@ Aquesta taula coincideix amb la columna de 4t del mapa vertical de lèxic, actua
 | Casa, poble / ciutat i llocs                                            | A1       | —       | R (S/D: places) | —               | —              | —            | —                  |
 | Menjar i begudes (seasonal food)                                        | A1       | —       | R               | —               | —              | —            | —                  |
 | Temps atmosfèric (weather)                                              | A1–A2    | —       | R               | —               | —              | —            | —                  |
-| Sentiments i emocions (-ed / -ing)                                      | A1–A2    | —       | R (I: festes)   | R               | —              | —            | —                  |
+| Sentiments i emocions (-ed / -ing)                                      | A1–A2    | —       | R (festes; -ed/-ing LP3) | R               | —              | —            | —                  |
 | Animals, natura i paisatge                                              | A1–A2    | —       | R               | —               | —              | —            | —                  |
 | **El món: viatges, experiències, societat**                             |          |         |                 |                 |                |              |                    |
 | Vacances, records i experiències                                        | A1–A2    | —       | —               | R               | —              | —            | —                  |
@@ -2042,7 +2044,7 @@ Descripció d'una celebració en 4–5 frases, dues activitats planificades i un
 
 - Dates & time: on 31 October; in November; at Christmas; at night; every year
 
-- Feelings: happy; excited
+- Feelings: happy; excited; -ed / -ing: excited / exciting; bored / boring; tired / tiring
 
 - Plans & email: invite people; buy tickets; music; food; games; Dear…; We would like to…; Yours sincerely
 

@@ -4,7 +4,8 @@
 //   shuffle(n,seed) the order of n options for one question of one game (the same on every reload)
 //   norm(text)      a written answer made comparable: lower case, straight apostrophes, single spaces, no full stop at the end
 //   right(text,ok)  whether a written answer is one of the accepted answers ok (already normalised, as the board publishes them)
-//   music(name)     background music, made with the Web Audio API (no files): "lobby", "think" or "" (stop); only the board plays it
+//   music(name)     background music, made with the Web Audio API (no files): "lobby", "think", "spaceLobby", "spaceThink" (🚀 Space rescue)
+//                   or "" (stop); only the board plays it
 //   fx(name)        a sound effect: join, tap, next, reveal, right, wrong, fanfare, drum
 //   sound(on)       sound on or off in this browser (kept as el_game_sound); sound() says which
 //   confetti()      a burst of confetti
@@ -64,7 +65,27 @@ const SONGS={
       if(s%2===0)tone(t,hz(r-24),d*.9,"triangle",.26,m);
       if(s%4===1)tone(t,hz(tn[(s>>2)%3]+12),d*1.2,"sine",.09,m);
       if(s===0)tn.forEach(n=>tone(t,hz(n),d*15,"triangle",.025,m));}},
+  // 🚀 Space rescue (Roger, 17 Nov 2026: "a space version of the music", he listens first): slow pads, a twinkling arpeggio with echoes,
+  // a sonar ping, a soft deep pulse
+  spaceLobby:{bpm:84,chords:[[50,1],[58,0],[53,0],[60,0]],
+    step(t,s,ch,d,m){const [r,mi]=ch,tn=[r,r+(mi?3:4),r+7,r+12,r+(mi?15:16),r+19];
+      if(s===0)tn.slice(0,3).forEach(n=>pad(t,hz(n),d*16,.035,m));
+      if(s===0||s===10)tone(t,hz(r-24),d*5,"sine",.3,m);
+      if(s%2===0){const n=hz(tn[[0,2,4,3,5,3,2,1][s/2]]+12);tone(t,n,d*2.5,"sine",.06,m);tone(t+d*3,n,d*2.5,"sine",.022,m)}
+      if(s===12)tone(t,hz(r+36),d*6,"sine",.025,m);
+      if(s===8)hiss(t,d*6,.04,600,m,.4);}},
+  spaceThink:{bpm:100,chords:[[57,1],[53,0],[50,1],[52,0]],
+    step(t,s,ch,d,m){const [r,mi]=ch,tn=[r,r+(mi?3:4),r+7,r+12];
+      if(s%8===0)kick(t,m);
+      if(s%2===0)tone(t,hz(r-24),d*1.4,"triangle",.24,m);
+      if(s%4===2)hiss(t,.04,.07,9000,m);
+      if(s%2===1)tone(t,hz(tn[(s>>1)%4]+12),d*.9,"sine",.055,m);
+      if(s===0)tn.slice(0,3).forEach(n=>pad(t,hz(n),d*16,.022,m));
+      if(s===4){tone(t,1568,d*8,"sine",.05,m);tone(t+d*3,1568,d*6,"sine",.018,m)}}},
 };
+// a soft pad: a slow swell and a slow fade (two detuned sines)
+function pad(t,f,d,v,dest){[0,4].forEach(c=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=f;o.detune.value=c;
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+d*.35);g.gain.linearRampToValueAtTime(.0001,t+d);o.connect(g).connect(dest||out);o.start(t);o.stop(t+d+.05)})}
 let song=null,mGain=null,timer=null,next=0,step=0;
 function music(name){
   const a=ac();if(!a)return;
@@ -83,6 +104,7 @@ const FX={
   right:t=>[523,659,784,1047].forEach((f,i)=>tone(t+i*.09,f,i===3?.7:.18,"triangle",.3)),
   wrong:t=>{tone(t,330,.3,"sawtooth",.12,null,294);tone(t+.3,247,.6,"sawtooth",.12,null,185)},
   fanfare:t=>{[[523,0],[659,.14],[784,.28],[1047,.42]].forEach(([f,s])=>tone(t+s,f,.2,"square",.08));[523,659,784,1047].forEach(f=>tone(t+.6,f,1.4,"triangle",.14));hiss(t+.6,1.2,.15,6000)},
+  meteor:t=>{hiss(t,.5,.3,700,null,.8);kick(t+.08);tone(t+.08,180,.35,"triangle",.2,null,110)},   // ☄️ Space rescue: a thud, not the wrong buzzer
   drum:t=>{for(let i=0;i<22;i++)hiss(t+i*.07,.06,.08+i*.012,900,null,.6);kick(t+1.6);hiss(t+1.6,1.4,.3,6000)},
 };
 function fx(n){if(!on()||!FX[n])return;const a=ac();if(!a)return;try{FX[n](a.currentTime+.02)}catch(e){}}
@@ -94,18 +116,24 @@ function sound(v){
 }
 
 /* ---------- confetti ---------- */
+// 💻 on the students' Chromebooks (body.play, 17 Nov 2026: two shut down during a game) a lighter shower: fewer pieces, shorter, never two at once
 function confetti(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const lite=document.body.classList.contains("play");if(lite&&document.querySelector("canvas.confetti"))return;
   const c=document.createElement("canvas");c.className="confetti";document.body.append(c);
-  const x=c.getContext("2d"),W=c.width=innerWidth,H=c.height=innerHeight,col=["#e8384f","#2f7de1","#ffc83d","#2ea84a","#ffffff","#b67cff"];
-  const P=Array.from({length:160},()=>({x:Math.random()*W,y:-20-Math.random()*H*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:col[Math.floor(Math.random()*col.length)]}));
+  const x=c.getContext("2d"),W=c.width=innerWidth,H=c.height=innerHeight,col=["#e8384f","#2f7de1","#ffc83d","#2ea84a","#ffffff","#b67cff"],T=lite?2600:4200;
+  const P=Array.from({length:lite?60:160},()=>({x:Math.random()*W,y:-20-Math.random()*H*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:col[Math.floor(Math.random()*col.length)]}));
   const t0=performance.now();
   (function f(t){x.clearRect(0,0,W,H);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
-    t-t0<4200?requestAnimationFrame(f):c.remove()})(t0);
+    t-t0<T?requestAnimationFrame(f):c.remove()})(t0);
 }
 function bg(){const d=document.createElement("div");d.className="bgfx";d.setAttribute("aria-hidden","true");
   d.innerHTML=Array.from({length:14},(_,i)=>`<i style="left:${(i*7.3+3)%100}%;width:${40+(i*17)%70}px;height:${40+(i*17)%70}px;animation-duration:${14+(i*5)%16}s;animation-delay:-${(i*3.7)%18}s"></i>`).join("");
   document.body.prepend(d)}
 
-window.ELGame={esc,md,pic,norm,right,shuffle,music,fx,sound,confetti,bg};
+// 👥 The class's % right as a big ring (Roger, 9 Nov 2026: "with a big circle that changes colours according to the proximity to the 100"):
+// the ring fills to the % and its colour goes from red (0) through orange and yellow to green (100). Board and player end screens.
+function ring(pct,label,size){const p=Math.max(0,Math.min(100,Math.round(+pct||0))),c=`hsl(${Math.round(p<50?p*.6:30+(p-50)*2)} 85% 50%)`;
+  return `<div class="cring pop" style="--p:${p};--c:${c};--s:${size||"200px"}"><div class="in"><b>${p}<small>%</small></b>${label?`<span>${esc(label)}</span>`:""}</div></div>`}
+window.ELGame={esc,md,pic,norm,right,shuffle,music,fx,sound,confetti,bg,ring};
 })();

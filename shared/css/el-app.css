@@ -1,4 +1,6 @@
 @import url("el-phone.css");   /* the phone look (≤640 px only): tab bar, Me place, touch sizes; el-phone.css */
+/* a mark el-app.js reads to know this file reached the page: if a load failed (the site was being updated), it loads it again */
+:root{--el-app-css:1}
 /* English Lab as an app (Roger, 6 Nov 2026: "I want everything to look like an app for them even though they connect through a
    Chromebook most of the time"; "these things should look like buttons"; "it's not my activities but my dashboard").
    1. The side menu of the board (today.html), the LS home (ls-home.css) and English Lab: every item is a button with an icon.
@@ -106,6 +108,10 @@ body.elapp.ellp .topbar .brand>a:hover{border-color:var(--accent,#315f9f);backgr
 body.elapp.ellp .topbar .brand>a.lp-home-link{display:none!important}   /* the strip on the left has My dashboard */
 body.elapp.ellp .topbar .brand>a.elback::before{content:"‹ ";font-size:1.15em}
 body.elapp.ellp .topbar .toprow:has(.session-jump) .brand>:is(.logo,.lp-title){display:none!important}   /* LS1 learning paths: the path's number and name are in the column (as LS2) */
+/* the "Learning Path" menu at the top right goes (Roger, 12 Nov 2026: "this dropdown menu is not necessary any more"): the column,
+   the LS page and Continue already lead to each path. It stays in the page, hidden: el-app.js reads the path's number from it and
+   section-next.js the next path. LS1 keeps it (leave LS1 alone): its learning paths are the pages that load ls1-lp.js */
+body.elapp:not(:has(script[src*="ls1-lp.js"])) .topbar .session-jump{display:none!important}
 body.elapp.ellp .topbar .session-jump label{color:#64748b!important}
 body.elapp.ellp .topbar .session-jump select{background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;border-radius:12px!important;font-weight:700}
 body.elapp.ellp .topbar .progress-label,body.elapp.ellp .topbar .progress-row{color:#475569!important}
@@ -145,7 +151,14 @@ body.ellp2 main#lp{max-width:none!important;width:auto!important;margin:0!import
 body.ellp2 #el-cloud-bar-space{display:none}
 body.ellp2 main#lp{padding-bottom:var(--el-bar-space,0px)!important}
 body.ellp2 .lp-body{display:block!important}
-.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
+/* no overscroll-behavior:contain on the steps column: with it, a finger (iPad) or the wheel on the column, once the column was at its
+   top, could not bring the page back up, so the top of the step stayed hidden under the top bar (Roger, iPad, 16 Nov 2026: "the screen
+   doesn't go up to the top"); now the page moves on when the column has nothing more to scroll */
+.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-x:hidden;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin;scrollbar-gutter:stable}
+/* the class tab on the projector: no scrollbar on the steps column (the wheel still scrolls it), so nothing moves beside the lesson
+   (teacher's report, 4ESOA, 13 Nov 2026: "the bar is moving … like flickering" = this scrollbar). Everywhere else its place is kept
+   (scrollbar-gutter:stable), so the column no longer flickers when its height is right at the edge: scrollbar on, text wraps, scrollbar off… */
+html.elcmtab .ellpside{scrollbar-width:none;overflow-anchor:none}html.elcmtab .ellpside::-webkit-scrollbar{display:none}
 .ellp-head{display:flex;flex-direction:column;gap:6px}
 .ellp-head .eyebrow{align-self:flex-start;font-size:11px!important;padding:4px 10px!important;margin:0!important}
 .ellp-head h1{font-size:1.6rem!important;line-height:1.15!important;margin:0!important;letter-spacing:-.01em;text-wrap:balance}
@@ -178,6 +191,39 @@ body.ellp2 .lp-body{display:block!important}
 .ellpside .pill{white-space:normal;max-width:100%;box-sizing:border-box}
 .ellpside .panel-head{flex-wrap:wrap}
 .ellpside img,.ellpside video,.ellpside audio,.ellpside table{max-width:100%}
+/* a narrower, more compact column so the step on the right gets more room on a Chromebook (Roger, 10 Nov 2026: "can you make this
+   smaller like this?"): 320 -> 250 px, smaller title, steps and cards */
+.ellpgrid{grid-template-columns:250px minmax(0,1fr);gap:20px}
+.ellpside{gap:9px}
+.ellp-head{gap:4px}
+.ellp-head .eyebrow{font-size:10px!important;padding:3px 8px!important}
+.ellp-head h1{font-size:1.25rem!important}
+.ellp-head .lead{font-size:.82rem!important;line-height:1.4!important}
+.ellp-prog{padding:8px 10px;border-radius:12px}
+.ellp-prog .ellp-pl{font-size:10px;margin-bottom:2px}
+.ellp-prog .progress-label{font-size:13px}
+.ellp-prog .progress-track{height:7px;margin-top:4px}
+.ellp-steps nav.tabs{gap:4px!important}
+.ellp-steps .tab{gap:8px;padding:6px 10px!important;border-radius:10px!important;font-size:14px!important;line-height:1.25}
+.ellp-steps .tab .tn{min-width:20px!important;height:20px!important}
+.ellp-steps .tab:not(.done) .tn{font-size:.75rem!important}
+.ellp-steps .tab.done .tn::after{font-size:.75rem!important}
+.ellp-steps .tab.next:not(.active)::after{font-size:.62rem}
+.ellp-more{gap:8px}
+.ellpside .lp-how{padding:0 10px!important;border-radius:12px!important}
+.ellpside .lp-how>summary{padding:7px 0!important;font-size:13px}
+.ellpside .study-card{padding:10px 12px!important;border-radius:12px!important}
+.ellpside .study-card summary{font-size:.88rem!important;gap:4px 8px!important}
+.ellpside .study-card summary small{font-size:.78rem}
+.ellp-more .plan-card{padding:10px 12px!important;border-radius:12px!important}
+.ellp-more .plan-card h3{font-size:.88rem!important}
+.ellp-more .plan-card .instruction{font-size:.8rem!important;line-height:1.4}
+.ellp-more .plan-card input{font-size:.85rem!important;padding:7px 9px!important}
+.ellp-teach{padding:10px;gap:8px}
+.ellp-teach .routes .route{padding:5px 2px!important}
+.ellp-teach .routes{gap:2px;padding:3px}
+.ellp-teach .routes .route strong{font-size:11.5px!important}
+.ellp-teach .routes .route span{font-size:10px!important}
 
 /* the teacher's part of the column: class game, the level to look at, open sections, pull up, full screen */
 .ellp-teach{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;box-shadow:0 1px 0 #e2e8f0}
@@ -290,3 +336,88 @@ body.elapp.elcourse .elcrumb{max-width:980px}
   body.elmini :is(.elrail,aside.side):hover :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.27s}
   body.elmini :is(.elrail,aside.side):hover .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:.15s}
 }
+
+/* ---- ⛶ one step (an "SLP") full screen (Roger, 12 Nov 2026, whiteboard: "Fullscreen SLP"; el-app.js slpFs): a ⛶ button in each
+   step's heading; body.elslpfs shows only the step, wide, under a slim bar (the path, the step, ‹ Previous · Next › · ✕ Exit).
+   For the projector in class and for students on a Chromebook (1366×768 first). Not on a phone: it is one screen there already. */
+.elslpgo{flex:0 0 auto;align-self:flex-start;margin-left:auto;border:1px solid var(--line,#dbe5f1);background:#fff;color:var(--dark,#234777);border-radius:999px;
+  padding:7px 13px;font:700 13px/1.1 system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;white-space:nowrap;box-shadow:0 1px 0 var(--line,#dbe5f1)}
+.elslpgo:hover{border-color:var(--accent,#315f9f);background:var(--soft,#edf4ff)}
+.panel-head:has(>.elslpgo){display:flex;align-items:flex-start;gap:10px}
+.panel-head:has(>.elslpgo)>.pill{order:2}
+.panel-head>.elslpgo{order:3}
+@media (max-width:640px){.elslpgo,.elslpbar{display:none!important}}
+body.elslpfs .elslpgo{display:none}
+/* the view: everything around the step goes */
+body.elslpfs :is(.elrail,.elbar,.topbar,header.hero,.ellpside,.lp-top,.plan-card,.elplh,.elptabs,#el-banner,body>footer,#el-todo-btn,.lp-body>nav.tabs,.lp-body>.el-tsec){display:none!important}
+body.elapp.elslpfs.elhas-rail{padding-left:0!important}
+body.elslpfs{padding-top:58px!important;background:var(--cream,#f7f9fd)}
+body.elslpfs .ellpgrid{display:block!important;padding:14px 24px 40px!important;max-width:none}
+body.elslpfs main#lp{max-width:1180px!important;margin:0 auto!important;padding:0!important}
+body.elslpfs .lp-body{display:block!important}
+body.elslpfs .lp-panels{max-width:1180px;margin:0 auto}
+body.elslpfs .panel.active{font-size:1.06rem}
+body.elslpfs .panel-head h2{font-size:clamp(1.9rem,2.8vw,2.5rem)!important}
+.elslpbar{position:fixed;left:0;right:0;top:0;z-index:9500;height:58px;box-sizing:border-box;display:flex;align-items:center;gap:16px;padding:8px 24px;background:rgba(255,255,255,.97);
+  border-bottom:1px solid #e2e8f0;box-shadow:0 4px 14px rgba(15,23,42,.06);font:13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}
+.elslpbar[hidden]{display:none}
+.elslpbar .tt{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.elslpbar .tt small{font-size:12px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.elslpbar .tt b{font-size:16px;font-weight:800;color:var(--dark,#234777);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.elslpbar .go{flex:0 0 auto;display:flex;gap:8px}
+.elslpbar button{border:1px solid #cbd5e1;background:#fff;color:var(--dark,#234777);border-radius:12px;padding:9px 15px;font:800 14px/1 system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+.elslpbar button:hover:not(:disabled){border-color:var(--accent,#315f9f);background:var(--soft,#edf4ff)}
+.elslpbar button:disabled{opacity:.4;cursor:default}
+.elslpbar button.nx{background:var(--accent,#315f9f);border-color:var(--accent,#315f9f);color:#fff}
+.elslpbar button.nx:hover:not(:disabled){background:var(--dark,#234777);color:#fff}
+
+/* iPad (Roger, 17-18 Nov 2026: "I can't scroll up to the very top" / "if I leave it it moves down"): on a tablet the page no longer
+   bounces past its top or bottom, so a pull down at the top stops there instead of showing an empty grey gap and springing back; and the
+   sticky columns (the steps column above, the LS home's side menu) are measured on the screen that is really visible (dvh: Safari's
+   100vh is the height with its toolbar hidden, so with the toolbar showing their last part sat below the screen). Phones and computers
+   are unchanged. */
+@media (min-width:641px) and (hover:none) and (pointer:coarse){html{overscroll-behavior-y:none}}
+
+/* ---- 11. The teacher's side menu on every teacher page (Roger, 25 Nov 2026: "this menu should always be the same"): elTeacherMenu
+   (el-catalog.js) draws the dashboard's list in .eltm (el-app.js .elrail and Games / Practise / Flashcards .sidebar, el-ls-home.js
+   aside.side .nvs), in the dashboard's look (teacher.html .tside): plain rows, dark when on, the group's course colour, small numbers on the
+   right. .nv.tm beats the students' button look (.side .nv, .elside .nv). A narrow window keeps the strip of icons (.eln); on an LS's
+   learning paths the strip opens on hover (section 3). */
+.eltm,.nvs.eltm{display:flex;flex-direction:column;gap:4px}
+.eltm .nv.tm{text-decoration:none;display:flex;justify-content:flex-start;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;
+  font:700 15px/1.25 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:left;margin:0;box-shadow:none;transform:none;width:auto;box-sizing:border-box;cursor:pointer}
+.eltm .nv.tm::after{content:none}
+.eltm .nv.tm .ic{flex:0 0 auto;width:auto;height:auto;background:none;border-radius:0;font-size:inherit;line-height:inherit;display:inline}
+.eltm .nv.tm .lb{flex:0 1 auto;margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eltm .nv.tm .gi{display:none}
+.eltm .nv.tm:hover{background:#eaf0ff;color:#3157d5;border:0;box-shadow:none;transform:none}
+.eltm .nv.tm.on{background:#0f172a;color:#fff;box-shadow:none}.eltm .nv.tm.c2eso.on{background:#16a34a}.eltm .nv.tm.c4eso.on{background:#2563eb}
+.eltm .nv.tm small{font-weight:600;font-size:12px;opacity:.75;white-space:nowrap}
+.eltm .nv.tm small.late{opacity:1;color:#b91c1c;font-weight:800}
+.eltm .nv.tm small.ask{opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800;margin-left:-2px}
+.eltm .sep{height:1px;background:#e2e8f0;margin:8px 8px}
+.eltm .lab{font:700 12px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
+.eltm .nv.tm.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.eltm .nv.tm.ann:hover{background:#ffedd5}
+.eltm .nv.tm.mton{background:#dc2626;color:#fff}.eltm .nv.tm.mton:hover{background:#b91c1c;color:#fff}
+.eltm .nv.tm small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
+/* the menu is longer than a Chromebook's screen: the column scrolls (as the dashboard's); the brand stays the dashboard's name */
+.app>.sidebar:has(>.eltm),.app>aside.side:has(.eltm){gap:12px}
+.elrail:has(>.eltm){gap:12px!important}
+/* the LS home's top row of pills (641–980 px): the items only */
+.mtabs.eltm{flex-direction:row}.mtabs.eltm .lab,.mtabs.eltm .sep{display:none}.mtabs.eltm .nv.tm{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs.eltm .nv.tm.on{background:#0f172a}
+/* on an LS's learning paths (body.elmini, ≥981 px): icons while closed, the group as "2A"; the names, headings and numbers when open */
+@media (min-width:981px){
+  body.elmini .elrail .eltm .nv.tm{padding:8px 10px;gap:10px;white-space:nowrap;overflow:hidden}
+  body.elmini .elrail .eltm .nv.tm .ic{display:inline-grid;place-items:center;width:28px;height:28px;font-size:17px;line-height:1}
+  body.elmini .elrail .eltm .nv.tm .gi{display:inline;font-size:13px;font-weight:800}
+  body.elmini .elrail .eltm :is(.lab,small){opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .eltm .lab{height:0;padding:0;overflow:hidden}
+  body.elmini .elrail:is(.elopen,:has(:focus-visible)) .eltm :is(.lab,small){opacity:1;transition-delay:.12s}
+  body.elmini .elrail:is(.elopen,:has(:focus-visible)) .eltm .lab{height:auto;padding:6px 12px 2px}
+}
+@media (min-width:981px) and (hover:hover){
+  body.elmini .elrail:hover .eltm :is(.lab,small){opacity:1;transition-delay:.27s}
+  body.elmini .elrail:hover .eltm .lab{height:auto;padding:6px 12px 2px}
+}
+/* a phone: the teacher has the dashboard's tab bar at the bottom (elTeacherTabs), so no row of menu pills at the top */
+@media (max-width:640px){body.elptab .mtabs.eltm{display:none!important}}

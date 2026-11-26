@@ -1,6 +1,6 @@
-/* LS2 · Learning Path 6 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others are the Daring version. */
+/* LS2 · Learning Path 5 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others are the Daring version. */
 window.LP.native = {
-  recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 3–5', pill: 'No notes',
+  recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 3, 4 and 6', pill: 'No notes',
     intro: 'Type the answers without looking.',
     items: [
       { q: '___ it rain, we will use the gym. (1 word)', a: ['should'], en: 'Inverted conditional.' },
@@ -8,7 +8,7 @@ window.LP.native = {
       { q: 'We still need to iron ___ a few details.', a: ['out'] },
       { q: 'If the band falls ___, we have a playlist.', a: ['through'] },
       { q: 'Organising it was no mean ___.', a: ['feat'] },
-      { q: 'The custom ___ from a harvest ritual. (comes from)', a: ['stems'] },
+      { q: 'The custom ___ from a harvest ritual. (comes from)', a: ['stems', 'derives', 'originates'] },
       { q: 'We need to strike a ___ between fun and learning.', a: ['balance'] },
       { q: 'A plan for when things go wrong: a ___ plan', a: ['contingency'] }
     ] },
@@ -40,10 +40,10 @@ window.LP.native = {
     core: ['with a view to', 'we would welcome the opportunity to', 'grant permission', 'at no cost to', 'feasible', 'in light of', 'allay (concerns / fears)', 'mindful of', 'minimal disruption', 'address (an issue)', 'foster', 'enhance', 'tangible', 'a case in point'],
     practice: [
       { q: 'We are writing with a ___ to organising a celebration day.', a: ['view'] },
-      { q: 'We hope this will ___ any concerns about supervision. (make less strong)', a: ['allay'] },
-      { q: 'We are ___ of the time the event takes from lessons. (aware of)', a: ['mindful'] },
+      { q: 'We hope this will ___ any concerns about supervision. (make less strong)', a: ['allay', 'ease', 'alleviate'] },
+      { q: 'We are ___ of the time the event takes from lessons. (aware of)', a: ['mindful', 'aware', 'conscious'] },
       { q: 'The lanterns will be made at no ___ to the school.', a: ['cost'] },
-      { q: 'Such an event would ___ respect between communities. (help develop)', a: ['foster'] },
+      { q: 'Such an event would ___ respect between communities. (help develop)', a: ['foster', 'promote', 'encourage'] },
       { q: 'Last year’s book week is a case in ___.', a: ['point'] },
       { q: 'The event will cause minimal ___ (DISRUPT) to lessons.', a: ['disruption'] },
       { q: 'We believe the plan is entirely ___ (FEASIBILITY).', a: ['feasible'] },
@@ -81,7 +81,7 @@ window.LP.native = {
       '<strong>Passive for diplomacy:</strong> <em>It has been suggested that… · Concerns have been raised about…</em>'
     ],
     items: [
-      { q: 'Please could you reply by Friday? GRATEFUL → We ___ reply by Friday.', a: ['would be grateful if you could', 'would be grateful if you would'], en: 'would be grateful if you could.' },
+      { q: 'Please could you reply by Friday? GRATEFUL → We ___ reply by Friday.', a: ['would be grateful if you could', 'would be grateful if you would', 'would be very grateful if you could'], en: 'would be grateful if you could.' },
       { q: 'If you have any questions, please contact us. SHOULD → ___ any questions, please contact us.', a: ['should you have'], en: 'Should you have…' },
       { q: 'If you agreed, we would start preparations at once. WERE → ___ agree, we would start preparations at once.', a: ['were you to'], en: 'Were you to + infinitive.' },
       { q: 'Can we use the hall? WONDERING → We ___ use the hall.', a: ['were wondering if we could', 'were wondering whether we could', 'were wondering if we might'], en: 'Distancing past continuous.' },

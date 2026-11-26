@@ -18,7 +18,7 @@ import os from "node:os";
 import path from "node:path";
 import {E,ARGS,DRY,SITE,SCHOOL,TEACHER_TO,ROOT,sendMail,site,firestore} from "./lib.mjs";
 
-const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat",CA_ROUTES=["beginners","insecure"];
+const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat",CA_ROUTES=["beginners"];
 if(!SCHOOL.ok&&!DRY){console.log("No SCHOOL_MAIL_URL: students' emails are off, nothing to do.");process.exit(0)}
 const STATE=E.NEWS_STATE||path.join(os.tmpdir(),"news-state.json"),now=new Date(Date.now()-60000).toISOString();
 // What each student was last told about, as small signatures (the dashboard rewrites results docs often, so "updated" alone is not news):
@@ -35,7 +35,8 @@ const roster=Object.fromEntries(await db.list("roster"));
 const studs=(await db.list("students")).map(([uid,s])=>{const em=String(s.email||"").toLowerCase(),r=roster[em]||{};return {uid,email:em,group:r.group||s.group,first:r.first||String(s.name||"").split(/[ ,]/).filter(Boolean).pop()||""}})
   .filter(s=>s.email.endsWith(DOMAIN)&&!TESTERS.includes(s.email)&&W.EL_GROUPS.some(g=>g.id===s.group));
 const lsDoc={},hidden=async ls=>{if(!(ls in lsDoc))lsDoc[ls]=await db.get("ls/"+encodeURIComponent(ls))||{};return lsDoc[ls].status==="hidden"};
-const pReplies=(await db.since("problemReplies",last)).filter(x=>isNew(x.created));
+// a card held until later (at: the 🌙 7:30 hold, or Beltran's answers and corrections: weekdays from 17:00, fbGo / answers.at, tools/problems/reply-time.mjs) is news when it shows
+const pReplies=(await db.since("problemReplies",new Date(t(last)-3*864e5).toISOString())).filter(x=>isNew(x.at||x.created));
 const act=id=>W.EL_CATALOG.find(a=>a.id===id)||null,stepName=(a,k)=>(((a&&a.steps)||[]).find(([s])=>s===k)||((W.EL_SECTIONS||{})[a&&a.id]||[]).find(([s])=>s===k)||[,k])[1];   // the page's own tab name
 const lsName=ls=>{const l=W.EL_LS.find(x=>x.id===ls);if(!l)return ls;return "LS"+(W.EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)+" · "+l.title.replace(/^\S+ · /,"")};
 const fpOf=Object.fromEntries(Object.entries(G).filter(([,g])=>g.fp&&g.fp.a).map(([ls,g])=>[g.fp.a,ls]));
@@ -56,15 +57,15 @@ for(const s of studs){
       if(r.progress&&r.progress.fp!=null&&fp[r.ls]==null)fp[r.ls]=Math.round(r.progress.fp*10)/10;
       continue}
     if(fpOf[r.activity]&&r.score!=null&&r.max){fp[fpOf[r.activity]]=Math.round(r.score/r.max*100)/10;continue}
-    Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.at)note("a:"+r.activity+":"+k,String(x.at),["💬",T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k),""])});
-    Object.entries(r.replies||{}).forEach(([k,x])=>{if(String(x||"").trim())note("r:"+r.activity+":"+k,hash(x),["✏️",T("Correcció: ","Correction: ")+title+" · "+stepName(a,k),""])});
+    Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.t&&x.at&&t(x.at)<=t(now))note("a:"+r.activity+":"+k,String(x.at),["💬",T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k),""])});
+    Object.entries(r.replies||{}).forEach(([k,x])=>{if(String(x||"").trim()&&!(t((r.fbGo||{})[k]||0)>t(now)))note("r:"+r.activity+":"+k,hash(x),["✏️",T("Correcció: ","Correction: ")+title+" · "+stepName(a,k),""])});
   }
   Object.entries(fp).forEach(([ls,m])=>note("f:"+ls,String(m),["🎬",T("Nota del producte final: ","Final product mark: ")+lsName(ls),"?ls="+encodeURIComponent(ls)]));
   if(BASE)continue;
   const pr=pReplies.filter(x=>x.uid===s.uid);if(pr.length)news.push(["🛠",T("Resposta al problema que em vas enviar","Answer to the problem you sent me")+(pr.length>1?" ("+pr.length+")":""),""]);
   const seen=new Set(),list=news.filter(([,x])=>!seen.has(x)&&seen.add(x));
   if(!list.length){none++;continue}
-  const out=[T("Hola ","Hi ")+s.first+",","",T("Tens coses noves al teu tauler d'English Lab:","There is something new on your English Lab board:"),"",
+  const out=[T("Hola!","Hi!"),"",T("Tens coses noves al teu tauler d'English Lab:","There is something new on your English Lab board:"),"",
     ...list.map(([i,x,q])=>i+" "+x+(q?"\n   "+SITE+"today.html"+q:"")),"",
     T("Entra amb el teu correu de l'institut: ","Sign in with your school email: ")+SITE+"today.html","","Roger"];
   const subject=list.some(([i])=>i==="📝")?T("English Lab: ja tens els resultats de l'examen","English Lab: your exam results are ready")

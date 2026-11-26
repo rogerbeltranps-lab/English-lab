@@ -1,0 +1,44 @@
+<!doctype html><html lang="en" class="notranslate" translate="no"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>English Lab</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png">
+<!-- 🖥 Class full screen that stays on from page to page (Roger, 16 Nov 2026: "whenever they change from one page of the website to another
+     they exit fullscreen"). A browser leaves full screen when the whole tab goes to another page, but not when a frame inside it does. While
+     the group's class full screen is on, a student's page opens itself here (shared/js/el-cloud.js shellEnter, ?u= the page) and this frame
+     is what moves from page to page; the page in it asks for full screen on this document, so one tap lasts the whole class. This page has
+     no sign-in and reads nothing: it only keeps the address (?u=, so a reload reopens the same page), the tab title and the keyboard focus
+     in step with the frame. The page in the frame takes the tab back (one reload) when the full screen ends (el-cloud.js shellLeave). -->
+<script>window.EL_SHELL=true</script>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#f8fafc}#el-shell{position:fixed;inset:0;width:100%;height:100%;border:0;display:block;background:#f8fafc}</style>
+</head><body>
+<iframe id="el-shell" title="English Lab" allow="fullscreen; microphone; camera; autoplay; clipboard-read; clipboard-write; screen-wake-lock; speaker-selection" allowfullscreen></iframe>
+<script>
+(function(){
+  var f=document.getElementById("el-shell"),home=new URL("today.html",location.href),base=new URL("./",location.href).pathname,to=home;
+  try{var u=new URLSearchParams(location.search).get("u")||"";if(u.charAt(0)==="/"){var t=new URL(u,location.href);
+    if(t.origin===location.origin&&t.pathname.indexOf(base)===0&&!/\/class\.html$/.test(t.pathname))to=t}}catch(e){}
+  f.src=to.href;
+  // ↩ Back at the first page of the class (Roger, 24 Nov 2026: "sometimes when they go back they exit fullscreen, but not on purpose"): the
+  // pages before it are outside this frame, so the browser's back (the ← key, Alt+←, a swipe) went to one of them as a new page, and a new
+  // page ends the full screen. Once the full screen is on, this page keeps one entry of its own on top of them (history.pushState, first
+  // on the tap that starts the full screen). Going back below it lands here instead: the entry is put back at once and the page the student
+  // came from (?b=, el-cloud.js shellEnter) opens inside the frame, once; after that, back at the first page stays where it is. Back between
+  // pages of the class is the frame's own history and keeps the full screen by itself.
+  var back=null;try{var b=new URLSearchParams(location.search).get("b")||"";if(b.charAt(0)==="/"){var bt=new URL(b,location.href);
+    if(bt.origin===location.origin&&bt.pathname.indexOf(base)===0&&!/\/class\.html$/.test(bt.pathname)&&bt.href!==to.href)back=bt.href}}catch(e){}
+  var fsNow=function(){return !!(document.fullscreenElement||document.webkitFullscreenElement)};
+  function guard(){try{if(fsNow()&&!(history.state&&history.state.elShell))history.pushState({elShell:1},"",location.href)}catch(e){}}
+  document.addEventListener("fullscreenchange",guard);document.addEventListener("webkitfullscreenchange",guard);
+  addEventListener("popstate",function(e){if(e.state&&e.state.elShell||!fsNow())return;guard();
+    if(back){var u=back;back=null;try{f.contentWindow.location.href=u}catch(x){}}});
+  // a tap or a key in the page puts the entry back too, if it is missing
+  f.addEventListener("load",function(){try{var d=f.contentWindow.document;d.addEventListener("pointerdown",guard,true);d.addEventListener("keydown",guard,true)}catch(e){}});
+  var last="";
+  function sync(){try{var w=f.contentWindow,l=w.location;if(l.origin!==location.origin)return;
+    var rel=l.pathname+l.search+l.hash;if(/\/class\.html$/.test(l.pathname)){location.replace(l.href);return}   // never a frame in a frame
+    if(rel!==last){last=rel;history.replaceState(history.state,"",location.pathname+"?u="+encodeURIComponent(rel))}
+    var ti=w.document&&w.document.title;if(ti&&document.title!==ti)document.title=ti}catch(e){}}
+  f.addEventListener("load",function(){sync();try{f.contentWindow.focus()}catch(e){}});
+  setInterval(sync,800);
+})();
+</script>
+</body></html>

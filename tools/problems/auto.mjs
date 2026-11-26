@@ -12,9 +12,21 @@
 //        problems/{id}.auto = {verdict:"fixed", note, at (timestamp)} (note = what was fixed + PR, for Roger; the dashboard shows it). The
 //        GitHub Action "English Lab emails" (notify.mjs --instant) then sends Roger the "⚠️ IMPORTANT" email: run it at once with
 //        workflow_dispatch, send = "new reports and ideas to me" (its 15-minute schedule is only the backup).
-//   node tools/problems/auto.mjs leave <id> --note "..." [--apply]
-//        not a technical bug (design, pedagogy, marking, a route, unclear…): nothing is sent to the student and the report stays open for
-//        Roger with problems/{id}.auto = {verdict:"roger", note, at}, so later runs skip it.
+//   node tools/problems/auto.mjs leave <id> --status nobug|you|fixed --note "..." --reply "..." [--todo "..."] [--apply]
+//        not fixed by Claude (design, pedagogy, marking, a route, unclear…): nothing is sent to the student and the report stays open for
+//        Roger with problems/{id}.auto = {verdict:"roger", status, note, reply, todo, at}, so later runs skip it. Roger, 10 Nov 2026: "I need
+//        you to tell me if the problems are fixed and a suggested message to send with a button". status: "fixed" (it is right now, e.g. a
+//        mark Roger already recalculated), "nobug" (the site works as it should: the answer explains it), "you" (Roger must do something:
+//        --todo says what, in one short line). --reply = the suggested answer to the student (≤1000 characters, Roger's voice, the report's
+//        language, never AI): the dashboard shows it with a one-click send button. Run it again on the same report to change it.
+// Never straight away, never by name (Roger, 17 Nov 2026: "don't use their names or surnames since sometimes it feels like AI"). Since
+// 24 Nov 2026 the answer waits for Roger ("Reports are done immediately but we don't send an answers until I press the button"):
+// `fixed` saves the card held (WAIT below)
+// (problemReplies.at, the msgs entry's go and auto.go: el-cloud.js shows the card only from then, the dashboard says when); --now sends at
+// once, only when Roger asks for it. --msg and --reply are refused if they use the student's name or surnames.
+// Both languages (Roger, 20 Nov 2026: "It should also have the catalan version"): --msg and --reply come with --msg2 / --reply2, the same
+// words in the other language (Catalan when the report is in English, English when it is in Catalan), also in Roger's voice. The card
+// shows both (problemReplies msgEn + msgCa, shared/js/el-reply.js); the dashboard's one-click send uses auto.reply + auto.reply2.
 // Without --apply it only prints what it would write. Sign-in: FIREBASE_SERVICE_ACCOUNT (the cloud environment's secret, can write).
 // Reads: one list of problems (a few dozen documents) + one screenshot per new report. Personal data stays in Firestore and the session.
 import fs from "node:fs";
@@ -23,6 +35,7 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
+import {namesIn} from "./reply-time.mjs";
 
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../.."),PROJECT="english-lab-ietm",MSG_MAX=1000;
 const [cmd,id,...rest]=process.argv.slice(2),flag=f=>rest.includes(f)||process.argv.includes(f),opt=f=>{const i=rest.indexOf(f);return i>=0?rest[i+1]:null};
@@ -52,20 +65,67 @@ const fsv=x=>x==null?{nullValue:null}:typeof x==="string"?{stringValue:x}:typeof
   :typeof x==="boolean"?{booleanValue:x}:x instanceof Date?{timestampValue:x.toISOString()}:Array.isArray(x)?{arrayValue:{values:x.map(fsv)}}:{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,fsv(v)]))}};
 async function list(coll){const out=[];let t="";do{const j=await api("GET",DOCS+coll+"?pageSize=300"+(t?"&pageToken="+t:""));(j?.documents||[]).forEach(d=>out.push(Object.assign({id:d.name.split("/").pop()},doc(d))));t=j?.nextPageToken||""}while(t);return out}
 const when=x=>Date.parse(x.created||"")||0;
+// private messages (announcements to "one") whose last word is the student's, still not dealt with (tDone) and with no draft for it yet:
+// one query on sAt (the student's page sets it with each answer, firestore.rules), the last 14 days only, + one msgDrafts read per hit
+async function waitingPms(){
+  const since=new Date(Date.now()-14*864e5).toISOString();
+  const r=(await api("POST",DOCS.replace(/\/$/,"")+":runQuery",{structuredQuery:{from:[{collectionId:"announcements"}],where:{fieldFilter:{field:{fieldPath:"sAt"},op:"GREATER_THAN",value:{timestampValue:since}}}}}))||[];
+  const out=[];
+  for(const a of r.filter(x=>x.document).map(x=>Object.assign({id:x.document.name.split("/").pop()},doc(x.document)))){const th=a.thread||[],n=th.length;
+    if(a.to!=="one"||!n||th[n-1].by!=="s"||(a.tDone||0)>=n)continue;
+    const d=doc(await api("GET",DOCS+"msgDrafts/"+a.id));if(!(d&&d.n===n))out.push(a)}
+  return out}
 
 if(cmd==="open"){
   const L=(await list("problems")).filter(x=>!x.fixed&&(flag("--all")||!x.auto)).sort((a,b)=>when(a)-when(b));
-  console.log(L.length?L.length+" open report(s)"+(flag("--all")?"":" not looked at yet")+".":"Nothing new: no open report to look at.");
+  // students' new comments (Roger, 9 Nov 2026: "I want you to answer straight away"): the same task answers them. One query: students whose
+  // page saved a comment after settings/marking.cmtRun (el-cloud.js sets students/{uid}.commented; marks.mjs comments --new reads them).
+  const since=(doc(await api("GET",DOCS+"settings/marking"))||{}).cmtRun||"1970-01-01T00:00:00Z";
+  const nc=((await api("POST",DOCS.replace(/\/$/,"")+":runQuery",{structuredQuery:{from:[{collectionId:"students"}],where:{fieldFilter:{field:{fieldPath:"commented"},op:"GREATER_THAN",value:{timestampValue:since}}}}}))||[]).filter(x=>x.document).length;
+  // ideas and answers to private messages with no draft yet (Roger, 20 Nov 2026: "Pq no tens un draft preparat per contestar?"): the same
+  // task writes a draft for each (idea / msg below); Roger finds it in 💬 Answer, ready to change and send. Nothing goes to the student.
+  const ideas=(await list("suggestions")).filter(x=>x.uid&&!x.auto&&!(x.msgs||[]).length).sort((a,b)=>when(a)-when(b));
+  const pms=await waitingPms();
+  const more=ideas.length||pms.length;
+  console.log(L.length?L.length+" open report(s)"+(flag("--all")?"":" not looked at yet")+".":nc||more?"No open report to look at.":"Nothing new: no open report to look at, no new comment, no idea or private answer without a draft.");
+  if(more)console.log(`NEW IDEAS / PRIVATE ANSWERS WITHOUT A DRAFT: ${ideas.length} idea(s), ${pms.length} answer(s) to private messages. Write a draft for each: docs/general/problem-reports-auto.md, section "Drafts for ideas and private answers" (they are listed at the end).`);
+  if(nc)console.log(`NEW COMMENTS: ${nc} student(s) wrote a comment since the last run. Answer them: docs/general/problem-reports-auto.md, section "Students' comments, answered at once" (node tools/marking/marks.mjs comments --new).`);
   for(const x of L){
     const en=!!x.route&&!elCa(x.route);
-    console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
+    if(x.teacher)console.log("\n=== "+x.id+" · "+(x.created||"?")+" · FROM ROGER, THE TEACHER"+(x.group?" (in class with "+x.group+")":"")+(x.merge===false?" · ⏸ DON'T MERGE YET":" · ✅ MERGE STRAIGHT AWAY")+": no student to answer; see \"The teacher's own reports\" in docs/general/problem-reports-auto.md");
+    else console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
     console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(x.text):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
     if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>typeof e==="string"?e:JSON.stringify(e)).join("\n  "));
     if((x.msgs||[]).length)console.log("already answered: "+x.msgs.map(m=>JSON.stringify(m.text)).join(" | "));
-    if(x.auto)console.log("looked at: "+x.auto.verdict+" · "+x.auto.note);
+    if(x.auto)console.log("looked at: "+(x.auto.status||x.auto.verdict)+" · "+x.auto.note+(x.auto.todo?" · first: "+x.auto.todo:"")+(x.auto.reply?" · suggested reply: "+JSON.stringify(x.auto.reply):""));
     if(x.shot){const s=doc(await api("GET",DOCS+"problemShots/"+x.id));if(s&&s.img){const f=path.join(os.tmpdir(),"problem-"+x.id+".jpg");fs.writeFileSync(f,Buffer.from(s.img.split(",")[1],"base64"));console.log("screenshot: "+f+" (careful: shots taken before 6 Nov 2026 can show the folded Study guide over the page)")}}
     console.log("live page: https://rogerbeltranps-lab.github.io/English-lab/"+String(x.page||"").replace(/^\//,""));
   }
+  for(const x of ideas)console.log("\n=== IDEA "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+")\nwords: "+JSON.stringify(x.text||"")
+    +"\nsent from: "+(x.page||"?")+"\n→ node tools/problems/auto.mjs idea "+x.id+" --note \"…\" --en \"…\" --ca \"…\" --apply");
+  for(const a of pms){const th=a.thread||[];console.log("\n=== PRIVATE ANSWER "+a.id+" · to "+(a.label||"?")+" · the whole conversation, oldest first:\n  Roger: "+JSON.stringify(a.text||"")
+    +th.map(t=>"\n  "+(t.by==="t"?"Roger":"Student")+": "+JSON.stringify(t.text||"")).join("")+"\n→ node tools/problems/auto.mjs msg "+a.id+" --note \"…\" --en \"…\" --ca \"…\" --apply")}
+  process.exit(0);
+}
+
+// A draft for an idea (suggestions/{id}.auto) or for an answer to a private message (msgDrafts/{announcement id}, teacher only, n = the thread length it
+// answers, so a newer answer from the student needs a new draft). Both languages: the dashboard puts the one Roger writes in (I write in)
+// in the box, and the other one under it for an idea (a private message goes in one language: Catalan for Starter and no route; Base reads English since 21 Nov 2026).
+if(cmd==="idea"||cmd==="msg"){
+  if(!id)throw new Error("Which one? node tools/problems/auto.mjs "+cmd+" <id> --note \"…\" --en \"…\" --ca \"…\" [--apply]");
+  const coll=cmd==="idea"?"suggestions":"announcements",x=doc(await api("GET",DOCS+coll+"/"+id));if(!x)throw new Error("No "+coll+"/"+id);
+  const c=f=>String(opt(f)||"").trim().slice(0,MSG_MAX),en=c("--en"),ca=c("--ca"),note=String(opt("--note")||"").trim().slice(0,500);
+  if(!en||!ca)throw new Error("A draft needs both --en and --ca (Roger, 20 Nov 2026: students get both languages).");
+  const named=namesIn(en+" "+ca,[x.name||x.label||""]);
+  if(named.length)throw new Error("Don't use the student's name or surnames in the draft (Roger, 17 Nov 2026: it feels like AI). Found: "+named.join(", ")+". Write it again without them.");
+  const d={en,ca,at:new Date()};if(note)d.note=note;
+  if(cmd==="msg"){const th=x.thread||[];if(!th.length||th[th.length-1].by!=="s")throw new Error("The last word in "+id+" is not the student's: nothing to answer.");d.n=th.length}
+
+  console.log((cmd==="idea"?"Idea":"Private answer")+" "+id+(note?" · note: "+note:"")+"\nDraft (English): "+JSON.stringify(en)+"\n      (Catalan): "+JSON.stringify(ca));
+  if(!flag("--apply")){console.log("(dry run: add --apply to save)");process.exit(0)}
+  await api("POST","https://firestore.googleapis.com/v1/"+BASE+":commit",{writes:[cmd==="idea"?{update:{name:BASE+"/suggestions/"+id,fields:{auto:fsv(d)}},updateMask:{fieldPaths:["auto"]}}
+    :{update:{name:BASE+"/msgDrafts/"+id,fields:Object.fromEntries(Object.entries(d).map(([k,v])=>[k,fsv(v)]))}}]});
+  console.log("Saved ✓ (a draft only: Roger sends it from 💬 Answer)");
   process.exit(0);
 }
 
@@ -75,19 +135,34 @@ if(cmd==="fixed"||cmd==="leave"){
   if(x.fixed)throw new Error("Report "+id+" is already marked as fixed: nothing to do.");
   const note=String(opt("--note")||"").trim().slice(0,500),now=new Date().toISOString();
   if(cmd==="leave"&&!note)throw new Error("leave needs --note \"why Roger should look at it\"");
-  const writes=[];
+  // The student's ✅ answer waits for Roger (Roger, 24 Nov 2026: "Reports are done immediately but we don't send an answers until I press
+  // the button"): the card is saved with at = WAIT (far in the future, so el-cloud.js never shows it) and auto.wait = true; the dashboard's
+  // 📨 Send it (pbNow) sets at = now. --now (only when Roger asks in a thread) shows it at once.
+  const WAIT=Date.UTC(2100,0,1),writes=[],NOW=flag("--now"),go=NOW?0:WAIT;
+  const named=namesIn([opt("--msg"),opt("--reply"),opt("--msg2"),opt("--reply2")].filter(Boolean).join(" "),[x.name||""]);
+  const EN=!!x.route&&!elCa(x.route),other=EN?"Catalan":"English",two=(f,f2)=>{const a=String(opt(f)||"").trim().slice(0,MSG_MAX),b=String(opt(f2)||"").trim().slice(0,MSG_MAX);
+    if(a&&!b&&!x.teacher)throw new Error(f+" needs "+f2+": the same words in "+other+" (Roger, 20 Nov 2026: students get both languages).");return [a,b]};
+  if(named.length&&!x.teacher)throw new Error("Don't use the student's name or surnames in --msg / --reply (Roger, 17 Nov 2026: it feels like AI). Found: "+named.join(", ")+". Write it again without them.");
   if(cmd==="leave"){
-    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv({verdict:"roger",note,at:new Date(now)})}},updateMask:{fieldPaths:["auto"]}});
+    const status=opt("--status")||"you",[reply,reply2]=two("--reply","--reply2"),todo=String(opt("--todo")||"").trim().slice(0,200);
+    if(!["fixed","nobug","you"].includes(status))throw new Error("--status must be fixed, nobug or you");
+    if(!reply)console.log("(no --reply: Roger gets no suggested answer to send; add one unless there is nothing to tell the student)");
+    const a={verdict:"roger",status,note,at:new Date(now)};if(reply)a.reply=reply;if(reply2)a.reply2=reply2;if(todo)a.todo=todo;
+    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv(a)}},updateMask:{fieldPaths:["auto"]}});
+    console.log("Status: "+status+(todo?" · first: "+todo:"")+(reply?"\nSuggested reply ("+(EN?"English":"Catalan")+"): "+JSON.stringify(reply)+"\n               ("+other+"): "+JSON.stringify(reply2):""));
+  }else if(x.teacher){   // Roger's own report (Roger, 13 Nov 2026): no card for anyone; auto.at still brings the ⚠️ IMPORTANT email
+    writes.push({update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",status:"fixed",note,at:new Date(now)})}},updateMask:{fieldPaths:["fixed","auto"]}});
+    console.log("Teacher's own report: marked fixed, no card (--msg is not used)");
   }else{
-    const msg=String(opt("--msg")||"").trim().slice(0,MSG_MAX),en=!!x.route&&!elCa(x.route);
+    const [msg,msg2]=two("--msg","--msg2"),en=EN;
     const reply={uid:x.uid,kind:"fixed",what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String((/^(com estudiar|how to study)$/i.test(x.section||"")?"":x.section)||x.title||"").slice(0,200),en};   // "How to study" = the folded Study guide (reports before PR #290), not where they were
-    if(msg)reply.msg=msg;
+    if(msg){reply.msg=msg;reply.msgEn=en?msg:msg2;reply.msgCa=en?msg2:msg}if(go)reply.at=go;   // at: the student's page shows the card only from then (el-cloud.js)
     writes.push({update:{name:BASE+"/problemReplies/"+id,fields:Object.fromEntries(Object.entries(reply).map(([k,v])=>[k,fsv(v)]))},
       updateTransforms:[{fieldPath:"created",setToServerValue:"REQUEST_TIME"}]});
-    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",note,at:new Date(now)})}},updateMask:{fieldPaths:["fixed","auto"]}};
-    if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv({text:msg,at:now,rid:id,fix:true})]}}];
+    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg,reply2:msg2}:{},go?{go,wait:true}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
+    if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv(Object.assign({text:msg,at:now,rid:id,fix:true,en:en?msg:msg2,ca:en?msg2:msg},go?{go}:{}))]}}];
     writes.push(w);
-    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg):""));
+    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg)+"\n  ("+other+"): "+JSON.stringify(msg2):"")+"\nThe student sees it "+(go?"when Roger presses 📨 Send it on the dashboard":"straight away (--now)"));
   }
   console.log("Report "+id+" ("+(x.name||"?")+", "+(x.group||"")+"): "+(cmd==="fixed"?"marked fixed":"left for Roger")+(note?" · note: "+note:""));
   if(!flag("--apply")){console.log("(dry run: add --apply to save)");process.exit(0)}
@@ -96,5 +171,5 @@ if(cmd==="fixed"||cmd==="leave"){
   process.exit(0);
 }
 
-console.log("Usage: node tools/problems/auto.mjs open [--all] | fixed <id> [--msg \"...\"] [--note \"...\"] [--apply] | leave <id> --note \"...\" [--apply]");
+console.log("Usage: node tools/problems/auto.mjs open [--all] | idea <id> --note \"...\" --en \"...\" --ca \"...\" [--apply] | msg <id> --note \"...\" --en \"...\" --ca \"...\" [--apply] | fixed <id> [--msg \"...\" --msg2 \"...\"] [--note \"...\"] [--now] [--apply] | leave <id> --status nobug|you|fixed --note \"...\" --reply \"...\" --reply2 \"...\" [--todo \"...\"] [--apply]");
 process.exit(1);

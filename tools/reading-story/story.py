@@ -2,6 +2,13 @@
 import re
 
 LEVELS = [("beginners", "Starter"), ("insecure", "Base"), ("safe", "Core"), ("daring", "Plus")]
+# Pro (4 ESO's native route, C2; Roger, 12 Nov 2026: "make sure there's a book adapted for the pro student, C2 level"): only in a book
+# whose every chapter has a "## Pro" section; elsewhere Pro reads Plus.
+PRO = ("native", "Pro")
+
+
+def levels_of(chapters):
+    return LEVELS + ([PRO] if chapters and all("Pro" in c["levels"] for c in chapters) else [])
 
 
 def _q(line, label):

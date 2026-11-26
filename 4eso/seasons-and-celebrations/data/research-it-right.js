@@ -1,18 +1,18 @@
-/* LS2 · Learning Path 4 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
+/* LS2 · Learning Path 6 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Research4ESO', n: 4, starter: true, title: 'Research it right',
+  key: 'ls2Research4ESO', n: 6, starter: true, title: 'Research it right',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
       items: [
         { r: 'insecure', q: '25 December = the twenty-___ of December', a: ['fifth'] },
         { q: 'I like it ___ we eat together.', a: ['because'] },
-        { q: '___, we clean the house. Then we decorate it.', a: ['first'] },
+        { q: '___, we clean the house. Then we decorate it.', a: ['first', 'firstly'] },
         { q: 'Hanukkah ___ (last) eight nights.', a: ['lasts'] },
         { q: 'We visit relatives ___ Christmas.', a: ['at'] },
         { r: 'insecure', q: 'Children get red ___ with money at Lunar New Year.', a: ['envelopes'] },
         { r: 'safe', q: 'People in Ireland ___ ___ carve turnips.', a: ['used to'] },
-        { r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about family.', a: ['whereas', 'while'] },
+        { r: 'safe', q: 'Halloween is about costumes, ___ the Castanyada is about family.', a: ['whereas', 'while', 'but'] },
         { r: 'daring', q: 'Diwali, ___ is celebrated in autumn, is the festival of lights.', a: ['which'] },
         { r: 'daring', q: '___ it started in Europe, Halloween is popular in the USA.', a: ['although', 'even though'] }
       ] },
@@ -25,10 +25,10 @@ window.LP = {
         daring: '<p>Before any information goes on your slides, it should be checked. Good researchers ask four questions.</p><p><strong>1. Who wrote it?</strong> Look for an author or an organisation whose job is to inform, such as a museum, a university, an encyclopedia or an official tourism website. If no author or organisation is given, be careful: anyone can publish online.</p><p><strong>2. When was it written or updated?</strong> The dates of festivals that follow the moon, such as Diwali, Hanukkah and Lunar New Year, change every year, so information that was correct last year may be wrong now. Check that it has been updated for this year.</p><p><strong>3. Why was it written?</strong> Some pages are written to inform; others are written to sell costumes or trips, or simply to get as many views as possible. A shop may describe a tradition as “ancient” because it sounds good and helps it sell, even if the tradition only dates back a few decades.</p><p><strong>4. Do other sources say the same?</strong> Never rely on a single source. Each fact should be confirmed by at least two reliable sources. If they disagree, choose the more reliable one, or say clearly that the sources disagree.</p><p>Be careful with your wording, too. A religious celebration should be presented as information, not as belief: “Hindus believe that…”, “For many Jewish families, the candles mean…”. Avoid stereotypes and generalisations such as “all Chinese people…”, and remember that a sacred symbol is not a costume.</p><p>Finally, credit your sources: the title of the page, the website or author, and the year. Images need credits too. Never copy whole sentences: take notes with key words and then write your own sentences.</p>'
       } },
       items: [
-        { q: 'What should you look for first?', o: ['who wrote it', 'how many pictures it has', 'how long it is'], h: 'Mira la pregunta 1 del text.' },
-        { q: 'Why must you check the date of Diwali or Hanukkah?', o: ['It changes every year.', 'It is always the same.', 'Nobody knows it.'], h: 'Mira la pregunta 2 del text.' },
-        { q: 'How many sources do you need for each fact?', o: ['at least two', 'one', 'five'], h: 'Mira la pregunta 4 del text.' },
-        { r: 'insecure', only: ['insecure'], q: 'Which of these is a good place to look for facts?', o: ['an official tourism website', 'a costume shop', 'a video with no name'], h: 'Mira la pregunta 1 del text.' },
+        { q: 'What should you look for first?', o: ['who wrote it', 'how many pictures it has', 'how long it is'], h: 'Mira la pregunta 1 del text.', he: 'Look at question 1 of the text.' },
+        { q: 'Why must you check the date of Diwali or Hanukkah?', o: ['It changes every year.', 'It is always the same.', 'Nobody knows it.'], h: 'Mira la pregunta 2 del text.', he: 'Look at question 2 of the text.' },
+        { q: 'How many sources do you need for each fact?', o: ['at least two', 'one', 'five'], h: 'Mira la pregunta 4 del text.', he: 'Look at question 4 of the text.' },
+        { r: 'insecure', only: ['insecure'], q: 'Which of these is a good place to look for facts?', o: ['an official tourism website', 'a costume shop', 'a video with no name'], h: 'Mira la pregunta 1 del text.', he: 'Look at question 1 of the text.' },
         { r: 'safe', q: 'Why might a shop say a tradition is “ancient”?', o: ['because it sounds good and helps it sell', 'because it is always true', 'because shops are experts'] },
         { r: 'daring', q: 'What should you do if two reliable sources disagree?', o: ['choose the more reliable one or say that they disagree', 'use the first one you found', 'invent the answer'] },
         { r: 'daring', q: 'Which sentence avoids a stereotype?', o: ['Many families in China celebrate with a reunion dinner.', 'All Chinese people eat dumplings at New Year.', 'Chinese people always wear red.'] }
@@ -86,12 +86,12 @@ window.LP = {
         ['Emma', 'That’s all for today. Happy holidays!']] },
       chunks: ['It lasted three days', 'not everybody sees the story in the same way'],
       items: [
-        { q: 'What kind of source is Culture Bites?', o: ['a podcast', 'a newspaper', 'an encyclopedia'], h: 'Escolta el principi: “Welcome back to…”.' },
-        { q: 'Which of these is a fact you can check?', o: ['Thanksgiving became a national holiday in 1863.', 'Thanksgiving is the best celebration.', 'Pumpkins are more fun than turnips.'], h: 'Un fet té dades que es poden comprovar.' },
-        { q: 'How long did the 1621 harvest feast last?', o: ['three days', 'one day', 'a week'], h: 'Escolta “It lasted…”.' },
-        { q: 'Who made Thanksgiving a national holiday?', o: ['President Abraham Lincoln', 'the Pilgrims', 'the Wampanoag people'], h: 'Escolta l’any 1863.' },
-        { q: 'For some Native Americans, Thanksgiving is…', o: ['a day of mourning', 'a day of shopping', 'a harvest festival'], h: 'Escolta “For some Native Americans…”.' },
-        { r: 'insecure', q: 'What did people use to carve before pumpkins?', o: ['turnips', 'potatoes', 'apples'], h: 'Escolta “they didn’t use pumpkins”.' },
+        { q: 'What kind of source is Culture Bites?', o: ['a podcast', 'a newspaper', 'an encyclopedia'], h: 'Escolta el principi: “Welcome back to…”.', he: 'Listen to the beginning: “Welcome back to…”.' },
+        { q: 'Which of these is a fact you can check?', o: ['Thanksgiving became a national holiday in 1863.', 'Thanksgiving is the best celebration.', 'Pumpkins are more fun than turnips.'], h: 'Un fet té dades que es poden comprovar.', he: 'A fact has data you can check.' },
+        { q: 'How long did the 1621 harvest feast last?', o: ['three days', 'one day', 'a week'], h: 'Escolta “It lasted…”.', he: 'Listen for “It lasted…”.' },
+        { q: 'Who made Thanksgiving a national holiday?', o: ['President Abraham Lincoln', 'the Pilgrims', 'the Wampanoag people'], h: 'Escolta l’any 1863.', he: 'Listen for the year 1863.' },
+        { q: 'For some Native Americans, Thanksgiving is…', o: ['a day of mourning', 'a day of shopping', 'a harvest festival'], h: 'Escolta “For some Native Americans…”.', he: 'Listen for “For some Native Americans…”.' },
+        { r: 'insecure', q: 'What did people use to carve before pumpkins?', o: ['turnips', 'potatoes', 'apples'], h: 'Escolta “they didn’t use pumpkins”.', he: 'Listen for “they didn’t use pumpkins”.' },
         { r: 'safe', q: 'How does Emma talk about the Thanksgiving story?', o: ['She says not everybody sees it in the same way.', 'She says only one version is true.', 'She says the story is not important.'] },
         { r: 'safe', q: 'You want to write “Samhain took place more than two thousand years ago” on your card. What should you do?', o: ['Check it in a second reliable source.', 'Copy it: a podcast is always right.', 'Leave it out: old facts can’t be checked.'] },
         { r: 'daring', q: 'Which words show that the speaker is reporting a belief, not a fact?', o: ['“people believed that…”', '“It took place in Ireland…”', '“It lasted three days.”'] },
@@ -103,7 +103,7 @@ window.LP = {
         ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
         ['Sam', 'Halloween comes from an old Celtic festival called Samhain. It took place in Ireland and Scotland more than two thousand years ago, at the end of the harvest and the start of winter.'],
         ['Emma', 'And people believed that on that night, the spirits of the dead came back.'],
-        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!']], marks: [["**Wel**come **back** to **Cul**ture **Bites**. ↘", "To**day**: **where** do **two** **fa**mous **au**tumn cele**bra**tions **come** from? ↘", "Let’s **start** with Hallo**ween**. ↘"], ["Hallo**ween** **comes** from‿an **old** **Cel**tic **fes**tival called **Sam**hain. ↘", "It **took** **place**‿in **Ire**land and **Scot**land **more** than **two** **thou**sand **years** a**go**, ↗ at the **end**‿of the **har**vest and the **start** of **win**ter. ↘"], ["And **peo**ple be**lieved** that‿on that **night**, ↗ the **spir**its‿of the **dead** came **back**. ↘"], ["Ex**act**ly. ↘ So **peo**ple used to **light** **bon**fires‿and wear **masks** to **hide** from the **spir**its. ↘", "And **here’s**‿a sur**prise**: they **did**n’t **use** **pump**kins. ↘", "They **used**‿to **carve** **tur**nips! ↘"]], cues: [[0, 2.05, 0, 2.41], [2.07, 6.48, 2.45, 7.56], [6.9, 8.72, 8.11, 10.28], [8.88, 13.06, 10.85, 15.72], [13.25, 20.37, 15.95, 24.27], [20.6, 25.55, 24.97, 30.58], [25.7, 31.48, 31.3, 38.02], [31.71, 35.39, 38.38, 42.69], [35.54, 37.77, 42.88, 45.42]] } },
+        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!']], marks: [["**Wel**come **back** to **Cul**ture **Bites**. ↘", "To**day**: **where** do **two** **fa**mous **au**tumn cele**bra**tions **come** from? ↘", "Let’s **start** with Hallo**ween**. ↘"], ["Hallo**ween** **comes** from‿an **old** **Cel**tic **fes**tival called **Sam**hain. ↘", "It **took** **place**‿in **Ire**land and **Scot**land **more** than **two** **thou**sand **years** a**go**, ↗ at the **end**‿of the **har**vest and the **start** of **win**ter. ↘"], ["And **peo**ple be**lieved** that‿on that **night**, ↗ the **spir**its‿of the **dead** came **back**. ↘"], ["Ex**act**ly. ↘ So **peo**ple used to **light** **bon**fires‿and wear **masks** to **hide** from the **spir**its. ↘", "And **here’s**‿a sur**prise**: they **did**n’t **use** **pump**kins. ↘", "They **used**‿to **carve** **tur**nips! ↘"]], cues: [[0, 2.05, 0, 2.41], [2.07, 6.48, 2.45, 7.56], [6.9, 8.72, 8.11, 10.28], [8.88, 13.06, 10.85, 15.72], [13.25, 20.37, 15.95, 24.27], [20.53, 25.55, 24.87, 30.58], [25.7, 31.48, 31.3, 38.02], [31.71, 35.39, 38.38, 42.69], [35.54, 37.77, 42.88, 45.42]] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: és fiable?', en: 'Talk: can we trust it?' },
       intro: { ca: 'Un company et pregunta per la font que has trobat per a la fitxa de recerca.', en: 'A teammate asks you about the source you found for your research card.' },
       task: { beginners: 'Respon amb frases curtes: on l’has trobat, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: on és, qui l’ha escrit, de quan és i si és fiable.', safe: 'Answer each question about your real source. Give reasons: who wrote it, when, and how you checked the facts.', daring: 'Answer about your real source with reasons and evidence, and explain what you do when two sources disagree.' },

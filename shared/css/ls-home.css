@@ -14,7 +14,7 @@ body.lsh{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;ba
 
 /* side menu: the board's (today.html .side / .nv) */
 .app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
-.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
+.side{position:sticky;top:0;height:100vh;height:100dvh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
 .side .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px;text-decoration:none}
 .nvs{display:flex;flex-direction:column;gap:8px}
 .nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}
@@ -300,3 +300,68 @@ a.lsab .abgo{background:var(--c);color:#fff;font-weight:800;font-size:14.5px;pad
 .tp{margin:0 0 16px}.tp h2{margin:0 0 6px}.tp-wrap{overflow-x:auto}.tp-t{width:100%;min-width:560px}.tp-t td,.tp-t th{white-space:nowrap}
 .tp-t td:nth-child(2){white-space:normal}.tp-yes{color:#166534;font-weight:700}.tp-no{color:#991b1b;font-weight:700;background:#fef2f2}
 .tp-play{padding:4px 10px;font-size:13px;text-decoration:none}
+
+/* ---- the simple LS home (Roger, 20 Nov 2026: "similar to the new format and simple"): aims, challenge, criteria, grammar and vocabulary
+   and a % per skill, in the voyage board's look (parchment cards with a brown frame, Georgia titles; el-voyage.js .vy-steps). el-ls-home.js
+   simpleHome draws #lsSimple under the LS heading and hides the old home. */
+body.lss .hgrid,body.lss .lshead .gmt,body.lss #lsAbout{display:none!important}
+body.lss .lshead.gmh{display:block}
+body.lss .lshead{margin-bottom:12px}
+body.lss .lshead h1{font:700 2.1rem/1.15 Georgia,serif;color:#4a2f0e;letter-spacing:0}
+.lss-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.lss-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.lss-card{background:#fffaf0;border:3px solid #b08a52;border-radius:20px;padding:0 0 12px;overflow:hidden;color:#1f2937}
+.lss-card h2{margin:0 0 8px;padding:10px 16px 8px;font:700 18px Georgia,serif;color:#4a2f0e;background:#f6ead0}
+.lss-lead{margin:0 16px 8px;font-size:13.5px;color:#8a5a1f}
+/* 🏆 the challenge: the voyage's destination picture beside it */
+a.lss-chal{display:flex;gap:14px;align-items:center;padding:14px 16px;text-decoration:none;border-color:#c2410c;background:linear-gradient(135deg,#fff7ed,#fffaf0)}
+a.lss-chal:hover{box-shadow:0 6px 18px #c2410c33}
+a.lss-chal img{width:120px;height:120px;object-fit:contain;flex:none}
+.lss-cb{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lss-k{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a3412}
+.lss-chal b{font:700 21px/1.2 Georgia,serif;color:#4a2f0e}
+.lss-d{font-size:14.5px;color:#374151}
+.lss-go{font-weight:800;color:#c2410c}
+/* 🎯 aims */
+.lss-aims ol{list-style:none;margin:0;padding:0 14px;display:flex;flex-direction:column;gap:8px}
+.lss-aims li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}
+.lss-ai{width:34px;height:34px;flex:none;display:grid;place-items:center;background:#f6ead0;border-radius:10px;font-size:18px}
+.lss-aims li b{color:#4a2f0e}
+.lss-aims li small{display:block;color:#8a5a1f;font-size:13px}
+/* 📏 criteria: one line each, the official wording on tap */
+.lss-cr{margin:0 12px 6px;border:1px solid #ead9b5;border-radius:12px;background:#fff}
+.lss-cr summary{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;cursor:pointer;list-style:none;font-size:14px;line-height:1.35}
+.lss-cr summary::-webkit-details-marker{display:none}
+.lss-cr .ab-chip{flex:none;margin-top:1px}
+.lss-crt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lss-cr[open] .lss-crt{display:block}
+.lss-cr p{margin:0;padding:0 12px 9px;font-size:13px;color:#64748b}
+/* 📊 the skills */
+.sk-row{display:grid;grid-template-columns:30px 92px minmax(0,1fr) minmax(0,1fr);gap:4px 10px;align-items:center;padding:6px 16px}
+.sk-ic{font-size:20px;text-align:center}
+.sk-n{font-weight:800;color:var(--k);font-size:14.5px}
+.sk-b{display:grid;grid-template-columns:auto minmax(30px,1fr) 46px;gap:6px;align-items:center;font-size:12.5px}
+.sk-b em{font-style:normal;color:#8a5a1f;font-weight:700}
+.sk-bar{height:9px;background:#ead9b5;border-radius:9px;overflow:hidden}.sk-bar i{display:block;height:100%;border-radius:9px}
+.sk-b strong{text-align:right;font-size:14px;color:#1f2937}.sk-b strong.na{color:#a8a29e;font-weight:600;font-size:12px}
+.sk-sep{height:1px;background:#ead9b5;margin:4px 16px}
+.lss-held{margin:8px 16px 0;font-size:13px;font-weight:700;color:#9a3412}
+/* 🔤 grammar and vocabulary */
+.lss-gvc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 14px}
+.lss-gvc h3{margin:0 0 4px;font-size:14.5px;color:#4a2f0e}
+.lss-gvc ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.4}
+.lss-gvc li{margin:0 0 4px}
+/* 🧭 Your steps: the board's voyage list (el-voyage.js .vy-steps) */
+.lss-steps h2{display:flex;justify-content:space-between;align-items:baseline;gap:6px}.lss-steps h2 small{font:600 12.5px system-ui,sans-serif;color:#8a5a1f;white-space:nowrap}
+.lss-steps .bar{height:8px;background:#ead9b5;margin:0 16px 6px;border-radius:9px;overflow:hidden}.lss-steps .bar i{display:block;height:100%;background:#15803d;border-radius:9px}
+.lss-steps ol{position:relative;list-style:none;margin:0;padding:0 10px;max-height:540px;overflow:auto;scrollbar-width:thin}
+.lss-steps .pt{display:flex;align-items:center;gap:6px;font:700 14px system-ui,sans-serif;color:#4a2f0e;padding:10px 6px 4px;border-bottom:1px dashed #d9c294}.lss-steps .pt .tk{margin-left:auto}
+.lss-steps li.s a{display:flex;align-items:center;gap:9px;padding:6px;border-radius:10px;font-size:14px;line-height:1.25;color:#1f2937;text-decoration:none}.lss-steps li.s a:hover{background:#f3e7cc}
+.lss-steps li.s small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.lss-steps .tk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;border:2px solid #c9b07a;color:transparent}
+.lss-steps .ok .tk,.lss-steps .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.lss-steps li.ok .n{color:#6b7280}
+.lss-steps li.now a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.lss-steps li.now .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}
+.lss-steps li.fp a{margin-top:8px;background:#fdf2d6;font-weight:700}.lss-steps li.fp .tk{border:0;font-size:18px;color:inherit}
+@media (max-width:1100px){.lss-gvc{grid-template-columns:1fr}}
+@media (max-width:900px){.lss-grid{grid-template-columns:1fr}.lss-steps ol{max-height:60vh}}
+@media (max-width:640px){.sk-row{grid-template-columns:28px minmax(0,1fr)}.sk-row .sk-b{grid-column:1/-1}a.lss-chal img{width:80px;height:80px}}

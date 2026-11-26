@@ -16,13 +16,13 @@
 export const PDFS = {
   "2eso": { ls: "2eso/free-time-live", name: "LS2 Free Time, Live!", items: [
     ["getting-started", "LP1 · Getting started"], ["what-are-they-doing", "LP2 · What are they doing?"], ["now-or-usually", "LP3 · Now or usually?"],
-    ["check-the-source", "LP4 · Check the source"], ["likes-and-screen-tips", "LP5 · Likes and screen tips"],
-    ["write-your-vlog-script", "LP6 · Write your vlog script"], ["sample-exam", "Sample exam"],
+    ["likes-and-screen-tips", "LP4 · Likes and screen tips"],
+    ["write-your-vlog-script", "LP5 · Write your vlog script"], ["check-the-source", "LP6 · Check the source"], ["sample-exam", "Sample exam"],
     ["summary", "Vocabulary and grammar summary", "Resum de vocabulari i gramàtica"], ["story", "Reading story · Maya Live!", "Història per llegir · Maya Live!"]] },
   "4eso": { ls: "4eso/seasons-and-celebrations", name: "LS2 Seasons & Celebrations", items: [
     ["getting-started", "LP1 · Getting started"], ["celebrations-around-the-world", "LP2 · Celebrations around the world"],
-    ["where-traditions-come-from", "LP3 · Where traditions come from"], ["research-it-right", "LP4 · Research it right"],
-    ["plan-the-day", "LP5 · Plan the day"], ["write-to-the-head-teacher", "LP6 · Write to the head teacher"], ["sample-exam", "Sample exam"],
+    ["where-traditions-come-from", "LP3 · Where traditions come from"],
+    ["plan-the-day", "LP4 · Plan the day"], ["write-to-the-head-teacher", "LP5 · Write to the head teacher"], ["research-it-right", "LP6 · Research it right"], ["sample-exam", "Sample exam"],
     ["summary", "Vocabulary and grammar summary", "Resum de vocabulari i gramàtica"], ["story", "Reading story · Lantern Night", "Història per llegir · Lantern Night"]] }
 };
 export const DEFAULT = { "2eso": ["getting-started", "what-are-they-doing"], "4eso": ["getting-started", "celebrations-around-the-world"] };
@@ -32,7 +32,7 @@ export const worksheets = course => PDFS[course].items.filter(x => x[0] !== "sum
 export const pdfPath = (course, item, route) => {
   const ls = PDFS[course].ls;
   if (item === "summary") return `${ls}/downloads/ls2-vocabulary-grammar-${route}.pdf`;
-  if (item === "story") return `${ls}/downloads/ls2-story-${route === "native" ? "daring" : route}.pdf`;   // Pro reads Plus
+  if (item === "story") return `${ls}/downloads/ls2-story-${route}.pdf`;   // 4 ESO Pro has its own C2 book (ls2-story-native.pdf, 12 Nov 2026)
   return `${ls}/downloads/worksheets/${item}-${route}.pdf`;
 };
 // the items a course shows to one level: the teacher's choice (in the catalogue's order), or DEFAULT when nothing was saved.

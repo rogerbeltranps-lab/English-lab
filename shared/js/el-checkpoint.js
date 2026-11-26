@@ -30,11 +30,20 @@ window.ELCheckpoint = (function () {
   const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
   const goFull = () => { try { if (!fsOk()) return;
     // Esc does not leave full screen (Chrome and Chromebooks: Keyboard Lock); only holding Esc down does, and that sends the checkpoint
-    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
-    if (isFull()) { lock(); return; }   // already in full screen (e.g. the class full screen of el-cloud.js): Esc is still locked
+    // ALL keys locked, as in web exams (Roger, 20 Nov 2026): 🔍 Search / Launcher, Alt+Tab and the top-row keys reach the page, and
+    // keyGuard (below) makes them do nothing
+    const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock().catch(() => {}); } catch (e) {} };
+    if (isFull()) { lock(); return; }   // already in full screen (e.g. the class full screen of el-cloud.js): the keys are still locked
     const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E);
     if (r && r.then) r.then(lock, () => {}); else lock(); } catch (e) {} };
   const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
+  // while a checkpoint runs in full screen, the keys that would take a student out do nothing (same list as el-web-exam.js)
+  const keyGuard = e => { if (!isFull()) return;
+    const k = e.key || '', c = e.code || '', ctl = e.ctrlKey || e.metaKey;
+    const bad = /^(Meta|OS|Super|Hyper)/.test(k) || /^(Meta|OS)(Left|Right)$/.test(c) || /^Browser|^Launch|^ZoomToggle$|^(F5|F11)$/.test(k) || /^Browser|^Launch/.test(c)
+      || (e.altKey && /^(Tab|ArrowLeft|ArrowRight|Home|F4)$/.test(k)) || (ctl && /^(Tab|PageUp|PageDown)$/.test(k)) || (ctl && /^[wtnrlqWTNRLQ]$/.test(k));
+    if (bad) { e.preventDefault(); e.stopPropagation(); } };
+  D.addEventListener('keydown', keyGuard, true); D.addEventListener('keyup', keyGuard, true);
   const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };
 
   /* api (from ls2-engine.js): LP, level(), ca(), state, save(), complete(id), forLevel(items) */
@@ -184,25 +193,61 @@ window.ELCheckpoint = (function () {
         console.warn('checkpoint', e);
         // already in the cloud (sent from another device or before a reload): that copy counts
         try { const F = await fsLib(), d = cloud() && await F.getDoc(ref(F, key)); if (d && d.exists() && !d.data().redo) { c.ok = true; api.save(); api.complete(p.id); return sent(d.data()); } } catch (x) {}
+        if (await isClosed()) return closed();
         box().innerHTML = '<p class="feedback no">' + t('No s’ha pogut enviar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be sent. Check your connection and try again.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Retry">' + t('Torna-ho a enviar', 'Send again') + '</button></div>';
         document.getElementById(p.id + 'Retry').onclick = () => send(null);
       }
     }
 
+    const scHtml = m => '<strong style="font-size:1.3rem">' + m.score + ' / ' + m.max + t(' correctes', ' correct') + '</strong>';
     function sent(d) {
       stop(); const c = st(), fb = d && d.fb;
       if (!fb) {
         box().innerHTML = '<h3>✓ ' + t('Enviat', 'Sent') + '</h3>' + (c.auto === 'left' || (d && d.auto === 'left') ? '<p class="instruction">' + t('S’ha enviat quan has sortit de la pàgina.', 'It was sent when you left the page.') + '</p>' : '') +
-          '<p>' + t('Ja pots fer el següent Learning Path. Veuràs la correcció quan el professor la publiqui.', 'You can go on to the next Learning Path. You will see the corrections when your teacher shares them.') + '</p>' + testerBtn();
-        return bindTester();
+          // the score first (Roger, 9 Nov 2026): sc is written by the dashboard; the questions and corrections come later (fb)
+          '<p class="cp-sc" id="' + p.id + 'Sc">' + (d && d.sc ? scHtml(d.sc) : '') + '</p>' +
+          '<p>' + t('Ja pots fer el següent Learning Path. Veuràs les preguntes i la correcció quan el professor la publiqui.', 'You can go on to the next Learning Path. You will see the questions and the corrections when your teacher shares them.') + '</p>' + testerBtn();
+        bindTester();
+        // the score at once (Roger, 10 Nov 2026): the student's answers against the hashes of the accepted ones (elCpScore, el-catalog.js)
+        if (!(d && d.sc) && window.elCpScore) (async () => { try {
+          const ids = (d && d.ids) || c.ids, ans = (d && d.answers) || c.answers, F = await fsLib(); if (!cloud() || !ids) return;
+          const h = await F.getDoc(F.doc(window.ELCloud.db, 'cpHash', key)), m = h.exists() && await window.elCpScore(h.data(), key, ids, ans);
+          const el = document.getElementById(p.id + 'Sc'); if (m && el) el.innerHTML = scHtml(m);
+        } catch (e) { console.warn('checkpoint score', e); } })();
+        return;
       }
       // released: the student's answers with the corrections; the first try is kept for Reflect and the board (the dashboard marks from the key)
       const s = api.state; s.first = s.first || {}; s.first[d.level] = { score: fb.score, max: fb.max, date: fb.at || c.sentAt }; api.save();
       box().innerHTML = '<h3>' + fb.score + ' / ' + fb.max + t(' correctes', ' correct') + '</h3><p class="instruction">' + t('Llegeix la correcció i repassa el que has fallat.', 'Read the corrections and review what you missed.') + '</p>' +
         d.ids.map((id, i) => { const it = byId(id) || {}, ok = fb.ok[i], w = (fb.why || [])[i] || {}, why = ca() ? (w.ca || w.en || '') : (w.en || w.ca || '');
           return '<div class="cp-fb"><p class="q-title">' + (i + 1) + '. ' + (it.q || '') + '</p><p>' + t('La teva resposta: ', 'Your answer: ') + '<strong>' + esc(d.answers[i] || '–') + '</strong> <span class="' + (ok ? 'ok">✓' : 'no">✗') + '</span></p>' +
-            (ok ? '' : '<p>' + t('Resposta: ', 'Answer: ') + '<strong>' + esc((fb.right || [])[i] || '') + '</strong>' + (why ? ' · ' + esc(why) : '') + '</p>') + '</div>'; }).join('') + testerBtn();
+            (ok ? '' : '<p>' + t('Resposta: ', 'Answer: ') + '<strong>' + esc((fb.right || [])[i] || '') + '</strong>' + (why ? ' · ' + esc(why) : '') + '</p>') + '</div>'; }).join('') +
+        '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Prac">🔁 ' + t('Torna a practicar', 'Practise again') + '</button></div>' + testerBtn();
+      document.getElementById(p.id + 'Prac').onclick = () => practise(d);
       bindTester();
+    }
+    // practice after the released feedback (Roger, 9 Nov 2026: "can they do the checkpoint again without it counting?"): the student's own
+    // questions in a new order, checked on the page against the answers the feedback already showed; nothing is saved or sent, the first try stays
+    const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+    function practise(d) {
+      stop(); const fb = d.fb, right = {}; d.ids.forEach((id, i) => { right[id] = (fb.right || [])[i] || ''; });
+      const ids = shuffle(d.ids.filter(id => right[id] && byId(id)));
+      box().innerHTML = '<h3>🔁 ' + t('Practica', 'Practice') + '</h3><p class="instruction">' + t('Les mateixes preguntes en un altre ordre. Escriu i prem Comprova.', 'The same questions in a new order. Type your answers and press Check.') + '</p>' +
+        ids.map((id, i) => { const it = byId(id), picks = d.level === 'beginners' && Array.isArray(it.o) && it.o.length > 1 ? it.o : null;
+          return '<div class="cp-fb" data-pid="' + esc(id) + '"><p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' +
+            (picks ? '<div class="actions pick-row" style="justify-content:flex-start">' + picks.map(o => '<button class="btn secondary" type="button" data-pp="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>' : '') +
+            '<input type="text" class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"' + (picks ? ' readonly placeholder="' + t('Tria una opció', 'Choose an option') + '"' : '') + ' aria-label="' + t('La teva resposta', 'Your answer') + '"> <span class="pr"></span><p class="pa" hidden></p></div>'; }).join('') +
+        '<div class="actions"><button class="btn" type="button" id="' + p.id + 'PCheck">' + t('Comprova', 'Check') + '</button> <button class="btn secondary" type="button" id="' + p.id + 'PBack">← ' + t('Torna a la correcció', 'Back to my corrections') + '</button></div><p class="instruction" id="' + p.id + 'PScore"></p>';
+      const b = box();
+      b.querySelectorAll('[data-pp]').forEach(x => x.onclick = () => { const row = x.closest('[data-pid]'); row.querySelector('input').value = x.dataset.pp;
+        row.querySelectorAll('[data-pp]').forEach(y => { const on2 = y === x; y.style.setProperty('background', on2 ? 'var(--accent)' : '', on2 ? 'important' : ''); y.style.setProperty('color', on2 ? '#fff' : '', on2 ? 'important' : ''); }); });
+      document.getElementById(p.id + 'PCheck').onclick = () => { let n = 0;
+        b.querySelectorAll('[data-pid]').forEach(row => { const id = row.dataset.pid, v = row.querySelector('input').value, ok = !!norm(v) && norm(v) === norm(right[id]); if (ok) n++;
+          const r = row.querySelector('.pr'), a = row.querySelector('.pa'); r.className = 'pr ' + (ok ? 'ok' : 'no'); r.textContent = ok ? '✓' : '✗';
+          a.hidden = ok; a.innerHTML = ok ? '' : t('Resposta: ', 'Answer: ') + '<strong>' + esc(right[id]) + '</strong>'; });
+        document.getElementById(p.id + 'PScore').textContent = n + ' / ' + ids.length + t(' correctes', ' correct'); };
+      document.getElementById(p.id + 'PBack').onclick = () => sent(d);
+      setTimeout(() => { const f = b.querySelector('input:not([readonly])'); if (f) f.focus(); }, 50);
     }
     // done the old way (before 31 Oct 2026, answers checked on the page): that try stays, nothing to do again
     function legacy() {
@@ -219,6 +264,15 @@ window.ELCheckpoint = (function () {
         const s = api.state; s.cp = {}; if (s.first) delete s.first[api.level()]; if (s.done) delete s.done[p.id]; api.save(); intro(); };
     }
 
+    // closed by the teacher (🔒 Close or 📣 Show answers: ls/{id}.cpClosed / cpShown, elCpClosed): it can't be started or sent any more
+    // (firestore.rules refuse it), so the page says so instead of "couldn't be sent" (problem report, 4ESOB, 11 Nov 2026)
+    async function isClosed() { try { const A = act(key), C = window.ELCloud; if (!A || !C || !C.lsNow || !window.elCpClosed || C.viewing) return false;
+      if (!window.elCpClosed(A, await C.lsNow(A.ls), C.group())) return false;
+      // ↺ the teacher let this student do it (redo: true): open for them alone (firestore.rules cpOk letMe; Roger, 11 Nov 2026)
+      const F = await fsLib(), d = cloud() && await F.getDoc(ref(F, key)); return !(d && d.exists() && d.data().redo); } catch (e) { return false; } }
+    function closed() { stop(); exitFull();
+      box().innerHTML = '<h3>🔒 ' + t('Aquest checkpoint ja està tancat', 'This checkpoint is closed') + '</h3><p>' + t('El professor l’ha tancat per al teu grup, així que ja no es pot fer ni enviar. No et bloqueja: pots continuar amb el següent Learning Path.', 'Your teacher has closed it for your group, so it can’t be done or sent any more. It doesn’t block you: you can go on to the next Learning Path.') + '</p>'; }
+
     function waitCloud(f) { let n = 0, done = false; const once = () => { if (!done) { done = true; f(); } };
       const go = () => { if (cloud()) return once(); if (window.ELCloud && window.ELCloud.onUser) window.ELCloud.onUser(u => u && once()); else if (n++ < 120) setTimeout(go, 500); }; go(); }
 
@@ -230,16 +284,17 @@ window.ELCheckpoint = (function () {
         // except a reload in the first seconds with nothing answered (the page reloads itself once after sign-in): it goes on
         if (!c.i && !c.draft && !(c.leaves || []).length && Date.now() - Date.parse(c.started) < 15000) { delete c.away; api.save(); return run(); }
         box().innerHTML = '<p>' + t('Enviant…', 'Sending…') + '</p>';
-        return waitCloud(() => send('left'));
+        return waitCloud(async () => (await isClosed()) ? closed() : send('left'));
       }
       box().innerHTML = '<p class="tiny">' + t('Carregant…', 'Loading…') + '</p>';
       waitCloud(async () => {
         try {
           const F = await fsLib(), s = await F.getDoc(ref(F, key)), d = s.exists() ? s.data() : null;
-          if (d && d.redo) { if (c.sentAt) { api.state.cp = {}; if (api.state.done) delete api.state.done[p.id]; api.save(); } return intro(t('El professor t’ha deixat tornar a fer aquest checkpoint.', 'Your teacher has let you do this checkpoint again.')); }
+          if (d && d.redo) { if (c.sentAt) { api.state.cp = {}; if (api.state.done) delete api.state.done[p.id]; api.save(); } return intro(d.answers ? t('El professor t’ha deixat tornar a fer aquest checkpoint.', 'Your teacher has let you do this checkpoint again.') : t('El professor t’ha obert aquest checkpoint: ja el pots fer.', 'Your teacher has opened this checkpoint for you: you can do it now.')); }
           if (d) { if (!c.ok) { Object.assign(c, { ok: true, sentAt: c.sentAt || new Date().toISOString(), level: d.level, ids: d.ids }); api.save(); } if (!(api.state.done || {})[p.id]) api.complete(p.id); return sent(d); }
           if (c.sentAt) return send(c.auto || null);   // sent here but never reached the cloud: try again
           if (!c.ids && ((api.state.done || {})[p.id] || Object.keys(api.state.first || {}).length)) return legacy();   // done before it was secure: it stays done
+          if (await isClosed()) return closed();   // no answers in the cloud and closed: nothing to start
           intro();
         } catch (e) { console.warn('checkpoint', e); if (c.sentAt) sent(); else intro(); }
       });

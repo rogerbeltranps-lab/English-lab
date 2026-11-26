@@ -41,13 +41,13 @@ window.LP.native = {
     ],
     core: ['stem from', 'be rooted in', 'give rise to', 'folklore', 'an invented tradition', 'evolve into', 'morph into', 'supplant', 'fall into disuse', 'revive', 'dwindle', 'sanitise', 'nostalgic', 'sceptical', 'contested', 'irreverent'],
     practice: [
-      { q: 'The Halloween lantern ___ from an Irish custom of carving turnips.', a: ['stems'] },
-      { q: 'In America, pumpkins soon ___ turnips because they were easier to carve.', a: ['supplanted'] },
+      { q: 'The Halloween lantern ___ from an Irish custom of carving turnips.', a: ['stems', 'comes', 'derives', 'originates'] },
+      { q: 'In America, pumpkins soon ___ turnips because they were easier to carve.', a: ['supplanted', 'replaced', 'superseded'] },
       { q: 'The old dance fell into ___ but was revived in the 1980s.', a: ['disuse'] },
       { q: 'Irish emigration gave ___ to the Halloween we know today.', a: ['rise'] },
-      { q: 'The number of families who observe the full ritual has ___ to a handful. (became smaller)', a: ['dwindled'] },
+      { q: 'The number of families who observe the full ritual has ___ to a handful. (became smaller)', a: ['dwindled', 'fallen', 'dropped', 'shrunk'] },
       { q: 'Many school plays ___ the story of the first Thanksgiving. (make it less unpleasant)', a: ['sanitise', 'sanitize'] },
-      { q: 'The meaning of the holiday is ___: not everyone agrees on it.', a: ['contested'] },
+      { q: 'The meaning of the holiday is ___: not everyone agrees on it.', a: ['contested', 'disputed', 'debated'] },
       { q: 'Historians are ___ (SCEPTIC) about the popular version of the story.', a: ['sceptical', 'skeptical'] },
       { q: 'A custom that looks ancient but is actually recent is an ___ tradition.', a: ['invented'] },
       { q: 'Halloween is rooted ___ the Celtic festival of Samhain.', a: ['in'] }
@@ -66,6 +66,23 @@ window.LP.native = {
       { q: 'How would you describe the register of the podcast?', o: ['informal but informative, aimed at a general audience', 'academic, aimed at specialists', 'formal and official', 'casual, with no factual content'] }
     ] },
 
+  // The Reading after the podcast (16 Nov 2026): a C2 Proficiency Part 5-style text on the same two November traditions as the class reading.
+  read: { type: 'mc', tab: 'Reading', title: 'Reading: Old fires, new stories', pill: 'Answer all',
+    intro: 'A C2 Proficiency-style text (Reading and Use of English, Part 5) on the two November traditions your class reads about. Read it all once for the writer’s argument, then answer. The questions test attitude, implication and reference.',
+    media: { text: '<p><strong>Old fires, new stories</strong></p>' +
+      '<p>Every November, two very different communities perform rituals they believe to be ancient. In Catalonia, families gather on the eve of All Saints to roast chestnuts and eat panellets; in Britain, towns build bonfires and fill the sky with fireworks on the fifth of the month. Ask almost anyone why, and you will be offered an origin story, delivered with the confidence of settled fact.</p>' +
+      '<p>The Catalan story is a touching one. Bell ringers, it is said, tolled the church bells through the night to honour the dead, and neighbours kept them going with roasted chestnuts and sweet wine. It may well be true; it may equally be the kind of explanation that gets attached to a custom after the event, to lend it dignity. Chestnuts were, after all, the staple of the autumn harvest, and a seasonal food hardly needs a legend to justify its place on the table.</p>' +
+      '<p>Bonfire Night, by contrast, has an origin that can be dated almost to the hour. Shortly after midnight on 5 November 1605, Guy Fawkes was discovered beneath the House of Lords with thirty-six barrels of gunpowder, and Londoners lit bonfires in relief that King James had survived. Yet the precision of the date conceals how thoroughly the festival has since been reshaped. For two and a half centuries an Act of Parliament made the day an occasion of official thanksgiving, with a pointedly anti-Catholic tone; once the law was repealed in 1859, the celebration did not wither but drifted, shedding its sectarian edge and becoming a largely secular excuse for a party.</p>' +
+      '<p>What both cases suggest is that the authority of a tradition rests less on the accuracy of its origin story than on its usefulness to the present. Whether the bell ringers ever existed matters far less than the fact that the story gives a family meal a sense of continuity. And as Halloween encroaches on both nights, it is not historical truth that will decide which customs survive, but whether people still find in them something worth repeating.</p>' },
+    items: [
+      { q: 'In the first paragraph, the writer implies that the origin stories people tell are…', o: ['told with more certainty than the evidence allows', 'usually invented for tourists', 'more reliable in Britain than in Catalonia', 'rarely known by ordinary people'] },
+      { q: 'What is the writer’s attitude to the story of the bell ringers?', o: ['open-minded but sceptical', 'mocking and dismissive', 'completely convinced', 'indifferent'] },
+      { q: 'The phrase “after the event” suggests that such legends may be…', o: ['created later to give an existing custom more prestige', 'told only once the festival is over', 'based on events that happened after 1605', 'invented by the bell ringers themselves'] },
+      { q: 'What point does the writer make with “the precision of the date conceals…”?', o: ['A precise origin does not mean the festival has stayed the same.', 'Historians disagree about the date of the plot.', 'The festival was more popular before 1859.', 'The government still decides how it is celebrated.'] },
+      { q: 'In the third paragraph, “shedding its sectarian edge” means…', o: ['losing its hostility towards a religious group', 'becoming less dangerous', 'losing its connection with London', 'becoming more expensive'] },
+      { q: 'Which statement best sums up the final paragraph?', o: ['A tradition survives because it means something now, not because its story is true.', 'Halloween will soon replace both traditions.', 'Historians should correct false origin stories.', 'Families no longer care about continuity.'] }
+    ] },
+
   chart: { type: 'step', tab: 'Listening chart', title: 'Listening chart: how speakers show what matters', pill: 'Your teacher sees it',
     intro: 'Watch both videos. At C2 you are expected to notice not just what speakers value, but how they show it: stories, contrasts, humour, a change of tone.',
     media: { videos: [{ base: 'video/mei-lunar-new-year', title: 'Video 1 · Mei: Lunar New Year' }, { base: 'video/noah-hanukkah', title: 'Video 2 · Noah: Hanukkah' }], videoCredit: 'Illustrated videos made for English Lab. Voices generated with ElevenLabs.' },
@@ -77,11 +94,17 @@ window.LP.native = {
     ],
     rate: ['I went beyond what the speakers say directly', 'I named a technique, with a quote', 'My comparison is about meaning, not just facts'] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
+  grammar: { type: 'typed', tab: 'Grammar · The past at C2', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4). Complete the second sentence with 3–8 words, including the word in CAPITALS.',
     explain: [
       '<strong>Impersonal reporting</strong> for uncertain history: <em>It is believed that… · Halloween is thought to have originated in… · The custom is said to date back to…</em> (perfect infinitive for the past).',
       '<strong>would</strong> for repeated past actions (not states): <em>On that night, people would light bonfires.</em> <strong>used to</strong> for both.',
+      /* would or used to? (Roger, 14 Nov 2026: a native student asked about "Every year they would have a feast"; 4 ESO only) */
+      '<strong>would or used to? When <em>would</em> doesn’t work.</strong> You are right: <em>Every year they would have a feast</em> is perfectly correct, and natives use <em>would</em> for repeated past habits all the time, especially in stories. The real question is when you <u>can’t</u> use it:<br>' +
+        '1. <strong>States, not actions.</strong> <em>would</em> only works for repeated actions. With states (<em>be, have</em> = own, <em>live, like, know, believe</em>) you need <em>used to</em>: <em>They used to live in tents</em> ✅ · <em>They would live in tents</em> ❌ · <em>She used to have long hair</em> ✅ · <em>She would have long hair</em> ❌.<br>' +
+        '2. <strong>It needs a time frame first.</strong> Out of the blue, <em>would</em> sounds like a conditional. Natives usually open with <em>used to</em> (or a time phrase) and then switch to <em>would</em>: <em>When I was a kid, we used to go to my grandma’s every summer. We’d swim all day and she’d make us pancakes.</em><br>' +
+        '3. <strong>The “not true now” meaning is weaker.</strong> <em>used to</em> clearly says the habit has stopped; <em>would</em> just describes the habit and doesn’t stress the contrast with now.<br>' +
+        '💡 In 4 ESO we learn <em>used to</em> first because it always works; <em>would</em> is your extension.',
       '<strong>Participle clauses</strong> to compress: <em>Having moved to America, Irish families… · Carved from turnips, the first lanterns…</em>',
       '<strong>Exam tip:</strong> reporting transformations almost always need the perfect infinitive (<em>to have + past participle</em>) when the action is in the past.'
     ],
@@ -91,7 +114,7 @@ window.LP.native = {
       { q: 'It is reported that the first feast lasted three days. REPORTED → The first feast ___ three days.', a: ['is reported to have lasted'], en: 'is reported to have lasted.' },
       { q: 'Every year my grandfather lit the first bonfire. WOULD → Every year my grandfather ___ the first bonfire.', a: ['would light'], en: 'would + infinitive for a repeated past action.' },
       { q: 'After they had moved to America, Irish families started carving pumpkins. HAVING → ___ to America, Irish families started carving pumpkins.', a: ['having moved'], en: 'Having + past participle = after they had…' },
-      { q: 'Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that'], en: 'Cleft: It was only in… that…' },
+      { q: 'Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that', 'only in 1863 when'], en: 'Cleft: It was only in… that…' },
       { q: 'The tradition has almost disappeared. VERGE → The tradition is ___ disappearing.', a: ['on the verge of'], en: 'on the verge of + -ing.' },
       { q: 'It is possible that the custom came from Scotland. MAY → The custom ___ from Scotland.', a: ['may have come'], en: 'may have + past participle = past possibility.' },
       { q: 'People no longer carve turnips. LONGER → Turnips ___ carved.', a: ['are no longer'], en: 'Passive + no longer.' },
@@ -104,14 +127,14 @@ window.LP.native = {
       '<div class="reading" style="font-weight:400">Many customs we think of as ancient are, in fact, (1) ___ (SURPRISE) recent. The historian Eric Hobsbawm called them “invented traditions”: practices that claim (2) ___ (CONTINUE) with the past but were created to give a group a sense of (3) ___ (BELONG). The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any (4) ___ (ANCESTOR) clan custom. None of this makes such traditions (5) ___ (MEANING). Their (6) ___ (ATTRACT) lies precisely in the fact that they feel old, and the (7) ___ (WILLING) of people to embrace them says a great deal about our need for roots. Critics who dismiss them as mere (8) ___ (FABRICATE) miss the point.</div>'
     ],
     items: [
-      { q: '(1) SURPRISE', a: ['surprisingly'], en: 'Adverb before an adjective.' },
-      { q: '(2) CONTINUE', a: ['continuity'], en: 'Noun: claim continuity with.' },
-      { q: '(3) BELONG', a: ['belonging'], en: 'a sense of belonging.' },
-      { q: '(4) ANCESTOR', a: ['ancestral'], en: 'Adjective before a noun: ancestral.' },
-      { q: '(5) MEANING', a: ['meaningless'], en: 'Negative: none of this makes them meaningless.' },
-      { q: '(6) ATTRACT', a: ['attraction', 'attractiveness', 'appeal'], en: 'Noun after “Their”.' },
-      { q: '(7) WILLING', a: ['willingness'], en: 'Noun after “the”.' },
-      { q: '(8) FABRICATE', a: ['fabrications', 'fabrication'], en: 'Noun after “mere”.' }
+      { q: '(1) SURPRISE', fq: 'Many customs we think of as ancient are, in fact, ___ (SURPRISE) recent.', a: ['surprisingly'], en: 'Adverb before an adjective.' },
+      { q: '(2) CONTINUE', fq: 'The historian Eric Hobsbawm called such customs “invented traditions”: practices that claim ___ (CONTINUE) with the past.', a: ['continuity'], en: 'Noun: claim continuity with.' },
+      { q: '(3) BELONG', fq: 'Invented traditions were created to give a group a sense of ___ (BELONG).', a: ['belonging'], en: 'a sense of belonging.' },
+      { q: '(4) ANCESTOR', fq: 'The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any ___ (ANCESTOR) clan custom.', a: ['ancestral'], en: 'Adjective before a noun: ancestral.' },
+      { q: '(5) MEANING', fq: 'None of this makes such traditions ___ (MEANING).', a: ['meaningless'], en: 'Negative: none of this makes them meaningless.' },
+      { q: '(6) ATTRACT', fq: 'Their ___ (ATTRACT) lies precisely in the fact that they feel old.', a: ['attraction', 'attractiveness', 'appeal'], en: 'Noun after “Their”.' },
+      { q: '(7) WILLING', fq: 'The ___ (WILLING) of people to embrace them says a great deal about our need for roots.', a: ['willingness'], en: 'Noun after “the”.' },
+      { q: '(8) FABRICATE', fq: 'Critics who dismiss them as mere ___ (FABRICATE) miss the point.', a: ['fabrications', 'fabrication'], en: 'Noun after “mere”.' }
     ] },
 
   write: { type: 'writing', product: 2, tab: 'Writing', title: 'Piece 2: essay (C2 Proficiency Writing, Part 1)',

@@ -25,6 +25,11 @@ function marked(orig,rows){const rs=[];for(const l of rows){const w=(ROW.exec(l)
   for(const [a,b] of rs){h+=esc(orig.slice(at,a))+'<span style="color:#b91c1c;text-decoration:underline wavy #ef4444;text-underline-offset:3px">'+esc(orig.slice(a,b))+'</span>';at=b}
   return h+esc(orig.slice(at))}
 export function writing(el,text,T,orig){const ls=String(text).split("\n"),rows=ls.filter(l=>l.startsWith("✗ ")),fixed=ls.find(l=>l.startsWith("✅ "));
+  const tips=ls.filter(l=>l.startsWith("➜ "));
+  // 🎲 Surprise questions (el-marking.js sqText): the sentence, then "➜ Things to improve" as a list; never a mark or a level
+  if(tips.length&&!rows.length&&!fixed){const note=ls.filter(l=>!l.startsWith("➜ ")).join("\n").trim();el.style.whiteSpace="normal";
+    el.innerHTML=(note?'<p style="margin:0 0 8px;white-space:pre-wrap">👍 '+esc(note)+'</p>':"")+'<b style="display:block;margin-bottom:4px">'+T("➜ Coses per millorar","➜ Things to improve")+'</b><ul style="margin:0;padding-left:20px">'
+      +tips.map(l=>'<li style="margin:2px 0">'+esc(l.slice(2))+'</li>').join("")+'</ul>';return}
   if(!rows.length&&!fixed){el.textContent=text;return}
   const note=ls.filter(l=>!l.startsWith("✗ ")&&!l.startsWith("✅ ")).join("\n").trim(),td="padding:6px 8px;border-top:1px solid #bbf7d0;vertical-align:top;text-align:left";
   el.style.whiteSpace="normal";
@@ -38,15 +43,29 @@ export function writing(el,text,T,orig){const ls=String(text).split("\n"),rows=l
     +(fixed?'<b style="display:block;margin-bottom:4px">'+T("✅ El teu text corregit","✅ Your text, corrected")+'</b><p style="margin:0;padding:10px 12px;background:#fff;border-radius:10px;white-space:pre-wrap">'
       +esc(fixed.slice(2)).replace(/\*([^*\n]+)\*/g,'<b style="color:#15803d;text-decoration:underline">$1</b>')+'</p>':"")}
 
+// 📐 Term 2 (Roger, 24 Nov 2026: "feedback will have NA to AE"): a correction given on or after EL_LV_FROM (el-points.js) shows its degree
+// first, in a coloured box: the English criteria's levels of that step (results.levels[step]), averaged; transversal criteria left out.
+// English names carry the Catalan in brackets; Catalan only for Starter. Corrections before that day keep no level, as before.
+const LVM={NA:2.5,AS:5,AN:7.5,AE:10},LVN={NA:["No assoliment","Not satisfactory"],AS:["Assoliment satisfactori","Satisfactory"],AN:["Assoliment notable","Very good"],AE:["Assoliment excel·lent","Excellent"]},
+  LVC={NA:"#fee2e2;color:#991b1b",AS:"#dcfce7;color:#166534",AN:"#dbeafe;color:#1e40af",AE:"#ede9fe;color:#5b21b6"};
+function lvOf(r,step){const from=window.EL_LV_FROM||"2026-11-30",at=String(((r.marked||{})[step])||((r.fbAt||{})[step])||"").slice(0,10);if(!at||at<from)return null;
+  const ls=Object.entries((r.levels||{})[step]||{}).filter(([c,l])=>!/^(CC|CD|CPSAA|CE)\s?\d/.test(c)&&LVM[l]).map(([,l])=>LVM[l]);if(!ls.length)return null;
+  const m=ls.reduce((a,b)=>a+b,0)/ls.length;return m<5?"NA":m<7?"AS":m<9?"AN":"AE"}
+export const lvBox=(lv,en)=>lv?'<span class="el-lv" style="display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:10px;font-weight:800;font-size:14px;background:'+LVC[lv]+'">'+(en?LVN[lv][1]+" ("+LVN[lv][0]+")":LVN[lv][0])+'</span>':"";
+// Every answer and correction in the student's results: [{a (catalogue activity), r (the result), step, text, lv, k ("activity|step"), v (the
+// text's signature, as fbSeen keeps it), corr (a correction, not only an answer)}]. Also the 📬 list (el-notify.js).
+export function corrList(rs,cat){const items=[];
+  for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
+    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work.
+    // An answer whose at is still to come is not shown yet (Roger, 17 Nov 2026: answers go out from 8:00 to 18:00, 2 hours after the comment).
+    for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
+      const an=(r.answers||{})[step]||{},text=[!(Date.parse(an.at)>Date.now())&&an.t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
+      if(text)items.push({a,r,step,text,lv:lvOf(r,step),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
+  return items}
 export async function corrections({list,seen,save,here,root,en,name}){
   let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
-  const items=[];
-  for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
-    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work
-    for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
-      const text=[((r.answers||{})[step]||{}).t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
-      if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
+  const items=corrList(rs,cat);
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
@@ -56,12 +75,12 @@ export async function corrections({list,seen,save,here,root,en,name}){
     const put=()=>{const p=document.querySelector("section.panel#"+css(it.step))||document.getElementById(it.step);if(!p)return false;
       let b=p.querySelector(":scope>.el-correction");if(!b){b=document.createElement("div");b.className="el-correction";const h=p.querySelector(":scope>.panel-head");h?h.after(b):p.prepend(b)}
       b.style.cssText="margin:0 0 14px;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif";
-      b.innerHTML='<b style="display:block;margin-bottom:4px"></b><div style="white-space:pre-wrap"></div>';
+      b.innerHTML='<b style="display:block;margin-bottom:4px"></b>'+lvBox(it.lv,en)+'<div style="white-space:pre-wrap"></div>';
       b.querySelector("b").textContent=it.corr?T("✏️ La correcció del professor","✏️ Your teacher’s correction"):T("💬 La resposta del professor","💬 Your teacher’s answer");
       writing(b.querySelector("div"),it.text,T,window.elHandedText&&window.elHandedText(it.step));return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
   }
-  if(Object.keys(shown).length)Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));
+  if(Object.keys(shown).length){Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));dispatchEvent(new CustomEvent("el-fb-seen",{detail:shown}))}   // the 📬 (el-notify.js) too
   let later={};try{later=JSON.parse(sessionStorage.getItem("el_corr_later")||"{}")}catch(e){}
   const todo=items.filter(x=>!shown[x.k]&&was[x.k]!==x.v&&later[x.k]!==x.v);
   if(!todo.length)return;

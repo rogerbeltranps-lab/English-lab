@@ -194,7 +194,7 @@ PICTURES = [
 
 ROUTE_DETAIL = {
  'beginners': "Les paraules bàsiques de la LS (temps lliure, roba, temps, pantalles), amb una pista en català i sempre amb opcions per triar. Frases en blocs.",
- 'insecure': "Totes les paraules de la LS. Al Rosco escrius la resposta (pots demanar pista de lletres); a la resta tries entre 3 o 4 opcions i ordenes paraules soltes.",
+ 'insecure': "All the LS words. In the Alphabet Challenge you type the answer (you can ask for a letter hint); in the other games you choose from 3 or 4 options and put single words in order.",
  'safe': 'English definitions and written answers: events, sport, online life and healthy screen habits. Present Simple or Continuous in context.',
  'daring': 'Infer words from situations, fix state-verb mistakes (know, need, prefer) and build sentences with extra words.',
 }

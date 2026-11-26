@@ -29,6 +29,16 @@
     now(gid){const t=today(),ps=this.plans(gid).sort((a,b)=>span(a.p)[0]<span(b.p)[0]?-1:1);
       return ps.find(x=>span(x.p)[0]<=t&&t<=span(x.p)[1])||ps.find(x=>span(x.p)[0]>t)||ps[ps.length-1]||null},
     exam:(p,gi)=>p&&p.exam&&p.exam[gi]||null,
+    // 📝 The next exam of a group (Roger, 25 Nov 2026: "All the groups should be able to see when their next exam is, and make an option for
+    // the teacher to set exams so that they appear at the top"; "the exam was done already it shouldnt be there"): the earliest exam from today
+    // on, from the time plans (EL_PLAN[ls].exam, moved by the agenda's exam day) and from the exams the teacher sets on a group's dashboard page
+    // (ls/{ls}.exams[group] = [{d: "YYYY-MM-DD", t: title, tc: its Catalan, n: a note, nc: its Catalan}], e.g. the term exam). A past exam never
+    // shows. infos: {ls id: the LS doc as read (ELCloud.lsInfo)}. → {d, ls, n (days from today), t, tc, nt, nc, plan (true: the LS's own exam)} or null.
+    examsOf:(gid,infos)=>{const out=[];
+      Object.entries(window.EL_PLAN||{}).forEach(([ls,p])=>{const gi=col(p,gid),d=gi>=0&&p.exam&&p.exam[gi];if(d)out.push({d,ls,plan:true})});
+      Object.entries(infos||{}).forEach(([ls,i])=>{const l=i&&i.exams&&i.exams[gid];(Array.isArray(l)?l:[]).forEach((x,k)=>{if(x&&/^\d{4}-\d\d-\d\d$/.test(x.d||""))out.push({d:x.d,ls,k,t:x.t||"",tc:x.tc||"",nt:x.n||"",nc:x.nc||""})})});
+      return out.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(a.plan?-1:1))},
+    nextExam(gid,infos){const t=today(),x=this.examsOf(gid,infos).find(e=>e.d>=t);return x?Object.assign(x,{n:Math.round((day(x.d)-day(t))/864e5)}):null},
     // The class going on now by the timetable (EL_TIMETABLE in el-plan.js; Roger, 2 Nov 2026: "when I open the dashboard, the group
     // I have at that hour"): {gid, start "12:00", end "13:00", key} from 5 minutes before it starts until 5 minutes before it ends
     // (so it never overlaps the next one), or null (no class, weekend, a day in `off`). at: a Date, by default now (or EL_NOW).
@@ -71,10 +81,10 @@
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
       return {ics,google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent(ics.replace(/^https?:/,"webcal:"))}},
-    // a Google Calendar link that adds one homework (for the ones the teacher set from the dashboard)
-    gcalLink(x,lang){const ca=L(lang)==="ca",d=s=>s.replace(/-/g,""),start=x.set&&x.set<x.date?x.set:add(x.date,-1);
-      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent((ca?"🏠 Deures d'anglès: ":"🏠 English homework: ")+x.text)
-        +"&dates="+d(start)+"/"+d(x.date)+"&details="+encodeURIComponent((ca?"Per a la classe del ":"For the class on ")+this.date(x.date,lang))},
+    // "📅 Add to my calendar" (Roger, 9 Nov 2026: only on the homework, the exam and a final product deadline, from the students' Class agenda):
+    // a Google Calendar link that adds one all-day event on day `date` (YYYY-MM-DD) with that title; Google asks the student to save it
+    gcalDay(title,date,details){const d=s=>s.replace(/-/g,"");
+      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(title)+"&dates="+d(date)+"/"+d(add(date,1))+(details?"&details="+encodeURIComponent(details):"")},
     // one homework or self-study item as text for students ("by Tue 10 Nov · …", Catalan for Starter and Base)
     taskText(x,lang){const ca=L(lang)==="ca";
       return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
@@ -119,7 +129,7 @@
         if(ag&&ag.days){p._ag[gi]=ag;p.rows.forEach(r=>set(r,gi,[]));const lb=ag.lab||{},last={};
           const ds=Object.keys(ag.days).filter(ok);if(ok(ag.exam)&&!ds.includes(ag.exam))ds.push(ag.exam);ds.sort();
           ds.forEach(d=>{const its=(ag.days[d]||[]).filter(Boolean),segs=[],seen=new Set(),tabs=[];
-            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];last[id]=d;
+            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];if(!/#game:/.test(it))last[id]=d;   // a class game of a path played later is not that path's day (Roger, 9 Nov 2026: Biel's LP1 and LP2 were not late)
               if(/#./.test(it))tabs.push(it);if(!seen.has(id)){seen.add(id);segs.push(lb[id]||id)}});
             if(ag.exam===d)segs.push("EXAM");if(!segs.length)return;
             const nl=lab(d)+" · "+segs.join(" · ")+(its.includes("self")?" · self-study":"");place(gi,d,nl);ad[nl]={key:"@"+d,from:null};tb["@"+d]=tabs});
@@ -127,6 +137,18 @@
           const mv1=(id,v)=>v&&ag.base&&ag.base[id]&&last[id]&&last[id]!==ag.base[id]?this.shiftClass(gid,ag.base[id],v,last[id]):v;
           [["due","due0"],["optional","opt0"]].forEach(([f,f0])=>Object.entries(ag[f0]||{}).forEach(([id,v])=>{if(dr.includes(id))return;if(!p[f])p[f]={};if(!p[f][id])p[f][id]=p.groups.map(()=>null);p[f][id][gi]=mv1(id,v)}));
           Object.entries(ag.step0||{}).forEach(([id,o])=>{if(dr.includes(id)||!p.stepDue||!p.stepDue[id])return;Object.entries(o||{}).forEach(([st,v])=>{const a=p.stepDue[id][st];if(a)a[gi]=mv1(id,v)})});
+          // 📖 Book (Roger, 12 Nov 2026: "a Book LP with a section per chapter, and we allocate time on the agenda"): a path with agendaDue in
+          // EL_CATALOG has no dates in the plan, so each of its tabs is due on the day it sits on this group's agenda (stepDue) and the path on
+          // its last day (due); a tab not on the agenda has no deadline and never counts as missing.
+          // One Book tab (Roger, 13 Nov 2026: "only one SLP for the book"; then, asked when a chapter is on time: "One chapter per Book day"):
+          // the n-th day "📖 The book" (path#book) is on this group's agenda, chapter n is due; chapters past the last Book day have no
+          // deadline. A chapter planned on its own before then (path#ch2) keeps its own day.
+          const tday={},bday={};ds.forEach(d=>(ag.days[d]||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.+)$/.exec(it||"");if(!m)return;
+            if(m[2]==="book"){const l=bday[m[1]]=bday[m[1]]||[];if(!l.includes(d))l.push(d);return}(tday[m[1]]=tday[m[1]]||{})[m[2]]=d}));
+          Object.entries(bday).forEach(([id,l])=>{const o=tday[id]=tday[id]||{};(((typeof window!=="undefined"&&window.EL_ACTIONS)||{})[id]||[]).forEach((k,j)=>{if(j<l.length&&!o[k])o[k]=l[j]})});
+          ((typeof window!=="undefined"&&window.EL_CATALOG)||[]).filter(a=>a.agendaDue&&a.ls===ls&&!dr.includes(a.id)&&tday[a.id]).forEach(a=>{const o=tday[a.id];
+            if(!p.due)p.due={};if(!p.due[a.id])p.due[a.id]=p.groups.map(()=>null);p.due[a.id][gi]=Object.values(o).sort().pop();
+            if(!p.stepDue)p.stepDue={};const sd=p.stepDue[a.id]=p.stepDue[a.id]||{};Object.entries(o).forEach(([k,d])=>{if(!sd[k])sd[k]=p.groups.map(()=>null);sd[k][gi]=d})});
           return}
         es.filter(([k,e])=>!e.add&&!/^(drop|noself|nohw):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;

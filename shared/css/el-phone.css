@@ -185,6 +185,11 @@
   #tpmore .tpl i{font-style:normal;font-size:20px;width:26px;text-align:center;flex:none}
   #tpmore .tpl span{flex:1;min-width:0}
   #tpmore .tpl small{display:block;color:#586174;font-size:12.5px;font-weight:500;margin:1px 0 0}
+  /* 👁 the student list sheet (svSheet): the four groups as the group switch */
+  #tpmore .tpsvg{display:flex;gap:4px;margin:8px 0 4px;padding:4px;background:#e8ecf3;border-radius:14px}
+  body.tph #tpmore .tpsvg a{flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#475569;font-weight:700;font-size:15px;text-decoration:none}
+  body.tph #tpmore .tpsvg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  #tpmore .tpl a[data-sv]>:not(:first-child){flex:none;font-size:13px}
   #tpmore .tpl a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
   /* the wide tables (Students, Marks…): the sticky name column narrow, the name on two lines, so the columns next to it show (it took
      260 px of a 390 px screen: only Student and Route were visible) */
@@ -274,4 +279,59 @@
   #tpmore .pbar i{grid-column:1/-1;width:auto;height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden}
   #tpmore .pbar em{display:block;height:100%;border-radius:99px}
   #tpmore .tpl+.tpl{margin-top:10px}
+}
+
+/* ⛵ Class voyage full screens on a phone (Roger, 21 Nov 2026, iPhone: "I can't see the full screen map well"): the map, the page and the
+   table really fill the screen. The tab bar goes away while they are on, the header is one short line (no Order by or counts on the map
+   full screen: the map shows them), and the notch and the home bar keep their room. */
+@media (max-width:640px){
+  body.hfs .elptabs,body.vfs .elptabs,body.hfs #fsctl,body.vfs #fsctl{display:none!important}
+  body.hfs .vyrank,body.vfs .vyrank{z-index:9100;padding-top:env(safe-area-inset-top,0px)!important;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))!important}
+  body.hfs .vyrank{padding-left:6px!important;padding-right:6px!important}
+  body.hfs .vyrank h2{font-size:15px;line-height:1.25;margin:4px 0!important;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+  body.hfs .vyrank .vyhd{padding:0 0 4px!important}
+  body.hfs .vyrank .vyhd .bar>.muted,body.hfs .vyrank .vyhd [data-do=vysort]{display:none}
+  body.hfs .vyrank .vyhd .bar{display:flex;flex-wrap:nowrap;gap:6px;margin:0;overflow-x:auto;scrollbar-width:none}
+  body.hfs .vyrank .vyfsb,body.hfs .vyrank h2 .chip{flex:none;font-size:12px;padding:4px 8px;min-height:0;white-space:nowrap;margin:0}
+  body.hfs .vyrank .vy-sea{border-width:2px;border-radius:14px}
+  body.hfs .vyrank .vy-top{padding:6px 12px}
+}
+
+/* 🧑‍🎨 the streak mascot on the board (today.html mzHome, el-mascot.js): on a phone it sits at the top right of the greeting, above 🎯 My level,
+   so the level box keeps its own line (Roger, 24 Nov 2026: "Can you put the mascot next to level and always visible the strike?") */
+@media (max-width:640px){
+  .phead:has(#elmz){position:relative}
+  .phead #elmz{position:absolute;top:2px;right:0;z-index:2;margin-top:0}
+  .phead #elmz .elmz-img{width:64px!important;height:64px!important}
+  .phead #elmz .elmz-badge{left:auto;right:-4px;bottom:-12px;font-size:16px;border-width:2px;border-radius:12px}
+  .phead:has(#elmz) .pht{padding-right:72px}
+  .elmz-say{max-width:min(280px,calc(100vw - 32px))}
+}
+/* 🧑‍🎨 the teacher's own mascot with his ⚡ streak on the dashboard (teacher.html, el-cloud.js mzBar): on a phone the account bar goes
+   to the end of the page (section 8), so the mascot leaves it for the top right of the screen, as on the students' board (Roger,
+   25 Nov 2026: "On my cellphone I want this to be at the top right!", "On the teachers view"); it stays there while the page scrolls
+   (Roger, 25 Nov 2026: "I want it to stay always there"); the page header keeps room for it */
+@media (max-width:640px){
+  body.tph #el-cloud-bar .elcb-mz{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:12px;margin:0;z-index:30}
+  body.tph #el-cloud-bar .elcb-mz .elmz-img{width:60px!important;height:60px!important}
+  body.tph #el-cloud-bar .elcb-mz .elmz-badge{position:absolute;right:-6px;bottom:-10px;font-size:15px;z-index:1}
+  body.tph:has(#el-cloud-bar .elcb-mz) :is(#msg,#loadbar,#main>.ph){padding-right:68px}
+}
+@media (max-width:640px){
+  .elfd-mz{margin-left:0;width:100%;justify-content:flex-end}.elfd-mz .elmz-img{width:60px!important;height:60px!important}.elfd-say{font-size:.88rem}
+}
+/* 📄 Term report criteria cards: a long degree name ("Very good (Assoliment notable)") wraps instead of pushing the card past the screen */
+@media (max-width:640px){
+  .trep .cpc{min-width:0}.trep .cph .cpm{white-space:normal;align-items:flex-start;margin-left:0}.trep .cpm .dg{white-space:normal}
+}
+/* 📄 Why this level on a phone: the whole card's width, the piece on one line and its mark and degree under it */
+@media (max-width:640px){
+  .trep .cpwhy{margin-left:0!important}.trep .cpwhy .cpwr{grid-template-columns:auto 1fr}.trep .cpwhy .cpwl{grid-column:1/-1}.trep .cpwhy .dg{justify-self:start}.trep .cpcr>.cpm{margin-left:auto}
+}
+
+/* 📝 The next exam at the top of the board (today.html nextExamPill; Roger, 25 Nov 2026): on a phone one line each, without the dots */
+@media (max-width:640px){
+  #sub .nxex{flex-direction:column;align-items:flex-start;gap:2px;font-size:14px;padding:8px 12px;text-align:left}
+  #sub .nxex>*{align-self:flex-start;text-align:left}
+  #sub .nxex span::before{display:none}
 }

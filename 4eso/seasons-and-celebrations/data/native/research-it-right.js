@@ -1,10 +1,10 @@
-/* LS2 · Learning Path 4 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others (credit, card) are the Daring version. */
+/* LS2 · Learning Path 6 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others (credit, card) are the Daring version. */
 window.LP.native = {
   recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 2 and 3', pill: 'No notes',
     intro: 'Type the answers without looking.',
     items: [
       { q: 'Halloween is thought to ___ originated in Ireland. (1 word)', a: ['have'], en: 'Perfect infinitive: to have originated.' },
-      { q: 'Pumpkins soon ___ turnips. (took the place of)', a: ['supplanted'] },
+      { q: 'Pumpkins soon ___ turnips. (took the place of)', a: ['supplanted', 'replaced', 'superseded'] },
       { q: 'The custom fell into ___ after the war.', a: ['disuse'] },
       { q: 'A custom presented as ancient but actually recent: an ___ tradition.', a: ['invented'] },
       { q: 'It was ___ in 1863 that Thanksgiving became official. (1 word)', a: ['only', 'not until'], en: 'It was only in… that…' },

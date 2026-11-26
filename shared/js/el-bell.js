@@ -26,9 +26,11 @@ export function bell({watch,dash,onDash,me}){
   w.append(b,p);
   let open=[],first=true;
   const draw=()=>{
-    const n=open.length;
+    // the number counts the open reports not marked as read yet (problems/{id}.seen: ✓ Mark all as read in 💬 Messages, Roger 19 Nov 2026);
+    // the list still shows every open one, new ones first
+    const n=open.filter(x=>!x.seen).length;
     b.innerHTML='🔔'+(n?'<b style="background:#dc2626;color:#fff;border-radius:999px;min-width:18px;padding:0 5px;font-size:12px;line-height:18px;text-align:center">'+n+"</b>":"");
-    b.title=n?n+" open problem report"+(n>1?"s":"")+" from students (all groups)":"No open problem reports";b.setAttribute("aria-label",b.title);
+    b.title=n?n+" new problem report"+(n>1?"s":"")+" from students (all groups)":open.length?open.length+" open problem report"+(open.length>1?"s":"")+", none new":"No open problem reports";b.setAttribute("aria-label",b.title);
     // each report opens it in the dashboard's ⚠️ Problem reports (with Answer, Fix with Claude…; Roger, 8 Nov 2026: "vull poder anar a
     // problemes des d'aquí"); its 📍 opens the page as that student sees it. "All reports" stays at the top, also when the list scrolls.
     const root=new URL(".",dash).href,uid=me&&me();
@@ -39,7 +41,7 @@ export function bell({watch,dash,onDash,me}){
         +(where?"<br>📍 "+(h?'<a data-as href="'+esc(h)+'" target="_blank" rel="noopener" title="Open this page as the student sees it (read-only student view)" style="color:#1d4ed8">'+esc(where)+"</a>":esc(where)):"")+"</small></li>"};
     const all='<a data-all href="'+dash+'#probs" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:4px 12px;text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap">All reports →</a>';
     p.innerHTML='<div style="position:sticky;top:-10px;margin:-10px -12px 0;padding:10px 12px 8px;background:#fff;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;gap:8px;z-index:1"><span><b>⚠️ Problem reports</b> <small style="color:#64748b">all groups</small></span>'+all+'</div>'
-      +(n?'<ul style="list-style:none;padding:0;margin:6px 0">'+open.slice(0,MAX).map(li).join("")+"</ul>"+(n>MAX?'<p style="margin:4px 0;color:#64748b">… and '+(n-MAX)+' more: <a href="'+dash+'#probs" data-all>see them all</a>.</p>':"")
+      +(open.length?'<ul style="list-style:none;padding:0;margin:6px 0">'+open.slice(0,MAX).map(li).join("")+"</ul>"+(open.length>MAX?'<p style="margin:4px 0;color:#64748b">… and '+(open.length-MAX)+' more: <a href="'+dash+'#probs" data-all>see them all</a>.</p>':"")
         :'<p style="color:#64748b;margin:8px 0">No open problem reports. 🎉</p>');
     const go=id=>{if(!onDash){location.href=dash+(id?"#pb-"+encodeURIComponent(id):"#probs");return}p.hidden=true;window.dispatchEvent(new CustomEvent("el-probs",{detail:id||null}))};
     p.querySelectorAll("a[data-all]").forEach(a=>a.onclick=e=>{if(!onDash)return;e.preventDefault();go(null)});
@@ -51,7 +53,7 @@ export function bell({watch,dash,onDash,me}){
   document.addEventListener("keydown",e=>{if(e.key==="Escape")p.hidden=true});
   watch(all=>{
     const before=new Set(open.map(x=>x.id));
-    open=all.filter(x=>!x.fixed).sort((a,c)=>(when(c)||0)-(when(a)||0));
+    open=all.filter(x=>!x.fixed).sort((a,c)=>(!!a.seen-!!c.seen)||(when(c)||0)-(when(a)||0));
     draw();
     if(!first&&open.some(x=>!before.has(x.id))&&b.animate)b.animate([{transform:"rotate(0)"},{transform:"rotate(-18deg)"},{transform:"rotate(18deg)"},{transform:"rotate(0)"}],{duration:500,iterations:3});   // a new report came in
     first=false});

@@ -11,7 +11,8 @@
 //            teacher's and the test account's Courses and Learning Situations lists (#courses, #learning) stay, with this menu
 // It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
 // board's bottom bar (a phone):
-// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
+// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: the dashboard's own menu,
+// elTeacherMenu in el-catalog.js, Roger 25 Nov 2026).
 // Games replaced English Lab (Roger, 7 Nov 2026: "I want games on the left and vocabulary and grammar in practice, English Lab is not
 // needed anymore"): lab/ is now the Games page, and Practise has the vocabulary and grammar at the student's level.
 // LS1 pages keep their design (Roger's rule: leave LS1 alone). No Firestore reads: who is signed in, the group and the language
@@ -44,7 +45,16 @@
     if (mode === "home") known = true;   // the home page is the same for a signed-out visitor: it shows at once
     h.classList.add(known ? "elready" : "elwait"); };
   if (!mode) { ready(); return; }
-  if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
+  // el-app.css did not reach the page (Roger, 14 Nov 2026: a learning path with no side column and its notebook page squashed to a narrow
+  // strip, the old top bar back: the file failed while the site was being updated, so the page kept only its old layout). A page's own
+  // <link> has loaded or failed by the time this script runs; without the file's mark (--el-app-css) it is loaded once more, fresh.
+  const appCss = document.querySelector('link[href*="shared/css/el-app.css"]');
+  const cssOk = () => !!getComputedStyle(document.documentElement).getPropertyValue("--el-app-css").trim();
+  if (!appCss || !cssOk()) {
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css" + (appCss ? "?r=" + Date.now() : "");
+    if (!appCss) css.addEventListener("error", () => { if (cssOk()) return; const c2 = document.createElement("link"); c2.rel = "stylesheet"; c2.href = ROOT + "shared/css/el-app.css?r=" + Date.now(); document.head.append(c2); }, { once: true });
+    document.head.append(css);
+  }
   const course0 = (path.match(/\/((?:2|4)eso)\//) || [])[1] || null;
 
   // Who is signed in is known only once Firebase has loaded: until then the menu is drawn for who was signed in on this browser last
@@ -78,9 +88,9 @@
     const c = who.course || course0 || (curLs || "").split("-")[0];
     const dash = ROOT + "teacher.html" + (c ? "?course=" + c + (curLs ? "&ls=" + encodeURIComponent(curLs) : "") : "");
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
-    const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return i >= 0 ? "LS" + (i + 1) : "LS"; })();
+    const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return (cl[i] || {}).personal ? "✦" : i >= 0 ? "LS" + (i + 1) : "LS"; })();   // a personal LS (Towards Nativeness) has no number
     const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "")
-      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "games";
+      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : "games";
     const L = [];
     if (who.role === "none") {
       L.push(["home", "⌂", "Home", "Home", ROOT + "index.html"]);
@@ -92,6 +102,7 @@
       if (c) L.push(["all", "🗂", t("Totes les Learning Situations", "All Learning Situations"), t("Totes les LS", "All LS"), ROOT + c + "/index.html"]);
       L.push(["games", "🎲", t("Jocs", "Games"), t("Jocs", "Games"), ROOT + "lab/"]);
       if (teach) L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
+      if (teach) L.push(["flashcards", "🧠", "Flashcards", "Flashcards", ROOT + "lab/practice.html#deck"]);   // 🧠 Flashcards apart from Practise (Roger, 25 Nov 2026)
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
@@ -108,27 +119,48 @@
     const c = who.course || course0 || (curLs || "").split("-")[0];
     if (!c) return null;
     const ML = elMenuLs([c], who.group), lss = !curLs || ML.some(l => l.id === curLs) ? ML : [...ML, ...(window.EL_LS || []).filter(l => l.id === curLs)];
-    const here = /practice\.html$/.test(path) ? "practise" : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
+    const here = /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
     let app = false; try { app = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) {}
     const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
     return elStudentMenu({ root: ROOT, courses: [c], lss, group: who.group, ca: CA, board, here, app });
   }
+  // the teacher's menu (not the student view, not the test account): the item that is on here (🧠 Flashcards, 🎯 Practise, 🎲 Games)
+  const tmUse = () => who.role === "teacher" && !who.as && !!window.elTeacherMenu;
+  const tmHere = () => /practice\.html$/.test(path) ? (location.hash === "#deck" ? "fd" : "practise") : mode === "lab" ? "games" : "";
+  const tmItems = () => tmUse() ? elTeacherMenu({ root: ROOT, on: tmHere(), list: true }) : null;
   function rail(L) {
     let r = $(".elrail");
     if (!r) { r = document.createElement("nav"); r.className = "elrail"; r.setAttribute("aria-label", "Menu"); document.body.prepend(r); }
     // a computer (Chromebook): the LS home's side menu, brand + wide buttons with labels and › (Roger, 7 Nov 2026: "the format should be
     // the same (buttons)"); a narrow window (641–980 px): the strip of icon buttons; a phone: the bottom bar (bar below)
     // a student on an LS (its learning paths, its vocabulary games): the menu is a strip of icons that opens when the mouse is on it
-    // (Roger, 8 Nov 2026: "to see better the screen"; elMiniRail in el-catalog.js, el-app.css section 3)
-    const sm = stuMenu(), mini = !!sm && !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail;
+    // (Roger, 8 Nov 2026: "to see better the screen"; elMiniRail in el-catalog.js, el-app.css section 3); the teacher's menu too
+    // (Roger, iPad, 16 Nov 2026: "when I'm here I want the buttons to shrink to a square to have more space for the SLP")
+    // Not the teacher's class tab (html.elcmtab, el-catalog.js): there the column is the place of 📋 Today (el-cm-agenda.js docks it
+    // in a menu ≥200 px wide), so a strip left it empty and white (Roger, 16 Nov 2026: "look! There's a bug")
+    const cmTab = document.documentElement.classList.contains("elcmtab");
+    const sm = stuMenu(), mini = !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail && (!!sm || !cmTab);
     document.body.classList.toggle("elmini", mini);
+    // the teacher: the dashboard's side menu, the same list and look as on teacher.html (elTeacherMenu in el-catalog.js; Roger, 25 Nov
+    // 2026: "this menu should always be the same"); the narrow strip shows the same items as icons
+    const TM = tmItems();
+    if (TM) {
+      r.innerHTML = `<a class="elr-brand" href="${ROOT}teacher.html">Teacher dashboard</a><div class="eltm elw">${elTeacherMenu({ root: ROOT, on: tmHere() })}</div>`
+        + `<div class="eln">${TM.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.lb)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.ic}</i><span>${esc(x.lb)}</span></a>`).join("")}</div>`;
+      document.body.classList.add("elhas-rail");
+      if (mini) elMiniRail(r); else r.classList.remove("elopen");
+      return;
+    }
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
       + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
+    if (window.elWhoPlace) elWhoPlace();   // the student's name under "English with Roger" (el-cloud.js, Roger 25 Nov 2026)
     if (mini) elMiniRail(r); else r.classList.remove("elopen");
   }
   function bar(L) {
+    // the teacher on a phone: the dashboard's tab bar (Home · Groups · Corrections · Messages · More; elTeacherTabs in el-catalog.js)
+    if (tmUse() && window.elTeacherTabs) { const o = $(".elbar"); if (o) o.remove(); document.body.classList.remove("elhas-bar"); elTeacherTabs({ root: ROOT }); return; }
     let b = $(".elbar");
     if (!b) { b = document.createElement("nav"); b.className = "elbar"; b.setAttribute("aria-label", "Menu"); document.body.append(b); }
     const sh = x => x.k === "board" ? t("Inici", "Home") : x.short;   // the board's bottom bar says Home
@@ -138,8 +170,10 @@
     // and Practise and Games as the two halves of its Practise tab
     if (who.role === "student" && window.elPhoneTabs) {
       const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
-      elPhoneTabs({ root: ROOT, board, ls: curLs, here: mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
-      if (mode === "lab") {
+      // 🧠 Flashcards (lab/practice.html#deck) sits under 🎓 My progress, so on a phone it belongs to the Me tab, without the Practise / Games halves
+      const fc = /practice\.html$/.test(path) && location.hash === "#deck";
+      elPhoneTabs({ root: ROOT, board, ls: curLs, here: fc ? "me" : mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
+      if (mode === "lab" && !fc) {
         const main = $("main.content");
         let sg = $(".elpseg");
         if (main && !sg) { sg = document.createElement("nav"); sg.className = "elpseg"; main.before(sg); }
@@ -152,8 +186,14 @@
   function side(L) {   // Games and Practise: their side menu, as the board's buttons
     const tabs = $(".sidebar .nav-tabs");
     if (!tabs) return;
-    let s = $(".elside");
-    if (!s) { s = document.createElement("nav"); s.className = "elside"; s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    let s = $(".sidebar>nav.elside,.sidebar>nav.eltm");
+    if (!s) { s = document.createElement("nav"); s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    // the teacher: the dashboard's menu (elTeacherMenu), under the dashboard's name
+    const tm = tmUse(), br = $(".sidebar>.brand");
+    s.className = tm ? "eltm" : "elside";
+    if (br) { if (br.dataset.en == null) { br.dataset.en = br.textContent; br.dataset.h = br.getAttribute("href") || ""; }
+      br.textContent = tm ? "Teacher dashboard" : br.dataset.en; br.setAttribute("href", tm ? ROOT + "teacher.html" : br.dataset.h); }
+    if (tm) { s.innerHTML = elTeacherMenu({ root: ROOT, on: tmHere() }); return; }
     s.innerHTML = stuMenu() || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
@@ -197,9 +237,9 @@
     box.hidden = false; if (main) main.hidden = true; if (foot) foot.hidden = true;
     const CN = { "2eso": "2 ESO", "4eso": "4 ESO" };
     const row = l => {
-      const n = list.indexOf(l) + 1, k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
+      const n = l.personal ? "✦" : "LS" + (list.filter(x => !x.personal).indexOf(l) + 1), k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
       const chip = !known && !cur ? "" : cur ? `<span class="ch now">${t("Ara", "Now")}</span>` : s === "closed" ? `<span class="ch cl">${t("Tancada · per repassar", "Closed · to review")}</span>` : s === "hidden" ? `<span class="ch hd">Hidden</span>` : `<span class="ch op">${t("Oberta", "Open")}</span>`;
-      return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">LS${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
+      return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
     };
     const order = vis.slice().sort((a, b) => (b.id === now) - (a.id === now));
     box.innerHTML = `<div class="elall-in"><h1>${t("Les meves Learning Situations", "My Learning Situations")}</h1>`
@@ -250,6 +290,7 @@
     const steps = col.querySelector(".ellp-steps"), more = col.querySelector(".ellp-more");
     const nav = lp.querySelector(".lp-body>nav.tabs");
     if (nav) { steps.textContent = ""; steps.append(nav); }
+    voyDraw();
     // .lp-top (how it works, the study guide) and the goal card right after it; the review card at the end of the path stays there
     const top = lp.querySelector(":scope>.lp-top"), plan = top && top.nextElementSibling && top.nextElementSibling.classList.contains("plan-card") ? top.nextElementSibling : null;
     if (top) { more.textContent = ""; more.append(top); if (plan) more.append(plan); }
@@ -347,16 +388,220 @@
     const inf = h.querySelector(".inf"), on = document.body.classList.contains("elpinfo");
     inf.setAttribute("aria-expanded", on ? "true" : "false");
     inf.setAttribute("aria-label", on ? t("Torna al pas", "Back to the step") : t("Sobre aquest learning path: com funciona, guia d'estudi, el meu objectiu", "About this learning path: how it works, study guide, my goal"));
-    // ⋯ only for a signed-in student: Problem and Idea are the buttons of their account bar (el-cloud.js)
-    const mo = h.querySelector(".mo");
-    mo.hidden = !(who.role === "student" && !who.as); mo.setAttribute("aria-label", t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
-    h.querySelector(".mm").innerHTML = `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
+    // ⋯ only for a signed-in student (Problem and Idea) or the teacher (Problem only; Roger, 13 Nov 2026): the buttons of their account bar (el-cloud.js)
+    const mo = h.querySelector(".mo"), tch = who.role === "teacher";
+    mo.hidden = !((who.role === "student" || tch) && !who.as); mo.setAttribute("aria-label", tch ? "More: report a problem" : t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
+    h.querySelector(".mm").innerHTML = tch ? `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>Report a problem</button>`
+      : `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
   }
+  // ---- ⛶ one step (an "SLP") full screen (Roger, 12 Nov 2026, whiteboard: "Fullscreen SLP"): a ⛶ button in each step's heading
+  // shows only that step, wide, with the browser in full screen: no menu, no top bar, no left column. A slim bar on top keeps the
+  // path's name and the step, ‹ Previous / Next › (the step buttons of the column, so locked and hidden steps stay as they are) and
+  // ✕ Exit. Esc leaves too. It stays on while the student moves between steps (the engine redraws #lp: only the buttons are added
+  // again). For the projector in class and for students on a Chromebook. LS2 on (LS1 stays as it is); not on a phone (one screen already).
+  // When class mode had the browser in full screen already, ✕ leaves only this view: the browser stays in full screen. Not on a
+  // recall checkpoint or the sample exam (they have their own full screen, and leaving it hands them in).
+  const FSOK = mode === "lp" && !/\/my-real-routine\//.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(path);   // not a recall checkpoint or the sample exam: they have their own full screen (leaving it hands them in)
+  let fsMine = false;
+  const fsDoc = () => document.fullscreenElement || document.webkitFullscreenElement;
+  // in class mode only the steps the teacher opened (window.elCmTabOk, el-cloud.js)
+  function slpTabs() { const ok = window.elCmTabOk; return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.classList.contains("el-cm-hide") && !b.hidden && b.style.display !== "none" && (!ok || ok(b.dataset.panel))); }
+  // under the class mode bars at the top of a student's screen (🎓 #el-lock, 🌟 #el-cmcheer, el-cloud.js), not behind them
+  function slpTop() { let y = 0; ["el-lock", "el-cmcheer"].forEach(id => { const x = document.getElementById(id); if (x && x.offsetHeight) y = Math.max(y, x.getBoundingClientRect().bottom); }); return Math.round(y); }
+  let slpT = 0;
+  function slpPlace() { const bar = $(".elslpbar"), on = document.body.classList.contains("elslpfs");
+    if (!on) { clearInterval(slpT); slpT = 0; document.body.style.removeProperty("padding-top"); if (bar) bar.style.top = ""; return; }
+    const y = slpTop(); if (bar) bar.style.top = y + "px"; document.body.style.setProperty("padding-top", (y + 58) + "px", "important");
+    if (!slpT) slpT = setInterval(slpPlace, 1000); }
+  function slpFs(on) {
+    const B = document.body, was = B.classList.contains("elslpfs");
+    if (on === undefined) on = was;
+    if (on && !was) {
+      // not on an iPad (Roger, 17 Nov 2026): Safari there leaves a page's full screen on any downward swipe, and this view with it;
+      // the view alone already hides the menu, the top bar and the left column, and a swipe never closes it
+      const ios = /iP(ad|hone|od)/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+      if (!fsDoc() && !ios) { const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
+        try { const r = rq && rq.call(E); fsMine = !!rq; if (r && r.catch) r.catch(() => { fsMine = false; }); } catch (e) { fsMine = false; } }
+    }
+    if (!on && was) {
+      if (fsMine && fsDoc()) { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {} }
+      fsMine = false;
+    }
+    B.classList.toggle("elslpfs", !!on);
+    slpDraw(); slpPlace();
+    if (on !== was) scrollTo(0, 0);
+  }
+  function slpDraw() {
+    if (!FSOK) return;
+    const on = document.body.classList.contains("elslpfs");
+    // the ⛶ button in every step's heading (the engine draws them again on each redraw)
+    $$(".lp-panels>.panel>.panel-head").forEach(h => {
+      let b = h.querySelector(":scope>.elslpgo");
+      if (!b) { b = document.createElement("button"); b.type = "button"; b.className = "elslpgo"; b.addEventListener("click", () => slpFs(true)); h.append(b); }
+      const lab = t("⛶ Pantalla completa", "⛶ Full screen");
+      if (b.textContent !== lab) { b.textContent = lab; b.title = t("Mostra només aquest pas, a pantalla completa", "Show only this step, full screen"); }
+    });
+    let bar = $(".elslpbar");
+    if (!on) { if (bar) bar.hidden = true; return; }
+    if (!bar) {
+      bar = document.createElement("div"); bar.className = "elslpbar"; bar.setAttribute("role", "toolbar");
+      bar.innerHTML = '<div class="tt"><small></small><b></b></div><div class="go"><button type="button" class="pv"></button><button type="button" class="nx"></button><button type="button" class="ex"></button></div>';
+      bar.addEventListener("click", e => {
+        if (e.target.closest(".ex")) return slpFs(false);
+        const d = e.target.closest(".pv") ? -1 : e.target.closest(".nx") ? 1 : 0; if (!d) return;
+        const L = slpTabs(), i = L.findIndex(x => x.classList.contains("active")), n = L[i + d];
+        if (n) { n.click(); scrollTo(0, 0); slpDraw(); }
+      });
+      document.body.append(bar);
+    }
+    bar.hidden = false;
+    const L = slpTabs(), i = L.findIndex(x => x.classList.contains("active")), a = L[i];
+    const h1 = $(".ellp-head h1") || $("header.hero h1"), sj = $("#sessionJump"), op = sj && sj.selectedOptions && sj.selectedOptions[0];
+    const n = op && (op.textContent.match(/^\s*(\d+)\s*·/) || [])[1];
+    bar.querySelector(".tt small").textContent = (n ? "LP" + n + " · " : "") + (h1 ? h1.textContent.trim() : "");
+    bar.querySelector(".tt b").textContent = a ? (i + 1) + " / " + L.length + " · " + ((a.querySelector(".tl") || a).textContent.trim()) : "";
+    const pv = bar.querySelector(".pv"), nx = bar.querySelector(".nx"), ex = bar.querySelector(".ex");
+    pv.textContent = t("‹ Anterior", "‹ Previous"); nx.textContent = t("Següent ›", "Next ›"); ex.textContent = t("✕ Surt", "✕ Exit");
+    ex.title = t("Surt de la pantalla completa (Esc)", "Leave full screen (Esc)");
+    pv.disabled = i <= 0; nx.disabled = i < 0 || i >= L.length - 1;
+  }
+  if (FSOK) {
+    // the browser left full screen (Esc, or F11 on a Chromebook): leave this view too, unless class mode keeps the browser in full screen
+    const fc = () => { if (!fsDoc() && fsMine && document.body.classList.contains("elslpfs")) { fsMine = false; slpFs(false); } };
+    document.addEventListener("fullscreenchange", fc); document.addEventListener("webkitfullscreenchange", fc);
+    // Esc while the browser stays in full screen (class mode): leave this view
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !fsMine && document.body.classList.contains("elslpfs") && !e.defaultPrevented) slpFs(false); });
+    // a step chosen any other way (the engine's Next step button, the teacher's class tab): the bar follows
+    document.addEventListener("click", e => { if (e.target.closest(".tab[data-panel],.section-next button") && document.body.classList.contains("elslpfs")) setTimeout(() => { slpDraw(); scrollTo(0, 0); }, 0); });
+  }
+  // ---- ⛵ 🧭 Your steps of the voyage on a 4 ESO learning path (Roger, 19 Nov 2026, mockup v14: "on the left they see 'your steps'"):
+  // for a student, the left column lists every open step of the LS as on the board's voyage map (ports as headings, ✓ when done, ▶ on
+  // the step on screen, 🏆 final product last) with ⛵ Back to the map, instead of this path's own tab list (kept, hidden: the engine and
+  // class mode use it). The list is the board's copy in this browser (el_voyage_steps, today.html voyageKeep): no reads; this page's own
+  // ticks come from its tabs. Without a copy that has this page (the board not opened yet), the path's own tabs stay. In class mode
+  // (html.elcmtab, only today's steps) the path's own tabs show, as before. The 📓 button (el-cloud.js) stays at the bottom left and the
+  // 🔍 dictionary (el-dict.js) at the bottom right. No music here: the music plays on the board's map only.
+  const VOYC = mode === "lp" && /\/[24]eso\/(?!towards-nativeness\/)[^/]+\/[^/]+\.html$/.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam|book)\.html$/.test(path);
+  function voyOn() { return VOYC && who.role === "student"; }
+  const voyPage = h => decodeURIComponent(String(h).split("#")[0]), voyHere = h => decodeURIComponent(path).endsWith("/" + voyPage(h));
+  function voyData() {
+    let o = null; try { o = JSON.parse(localStorage.getItem("el_voyage_steps") || "null"); } catch (e) {}
+    if (!o || !Array.isArray(o.items) || (W && W.uid && o.u && o.u !== (who.as || W.uid) && o.u !== "demo")) return null;
+    return o.items.some(x => x.h && voyHere(x.h)) ? o : null;
+  }
+  function voyCss() {
+    if (document.getElementById("el-voy-css")) return; const st = document.createElement("style"); st.id = "el-voy-css";
+    st.textContent = ".ellp-voy{background:#fffaf0;border:3px solid #b08a52;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;flex:none}"
+      + ".ellp-voy .vb{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 12px 4px;padding:8px 10px;border-radius:12px;background:#1f6b52;color:#fff;font-weight:800;font-size:14px;text-decoration:none;box-shadow:0 3px 0 #174d3d}.ellp-voy .vb:hover{filter:brightness(1.08)}"
+      + ".ellp-voy h2{margin:0;padding:8px 12px 6px;font:700 16px Georgia,serif;color:#4a2f0e;display:flex;justify-content:space-between;align-items:baseline;gap:6px}.ellp-voy h2 small{font:600 12px system-ui,sans-serif;color:#8a5a1f;white-space:nowrap}"
+      + ".ellp-voy .bar{height:8px;background:#ead9b5;margin:0 12px 6px;border-radius:9px;overflow:hidden}.ellp-voy .bar i{display:block;height:100%;background:#15803d;border-radius:9px}"
+      + ".ellp-voy ol{list-style:none;margin:0;padding:0 6px 10px}.ellp-voy .pt{display:flex;align-items:center;gap:6px;font:700 13px system-ui,sans-serif;color:#4a2f0e;padding:9px 6px 3px;border-bottom:1px dashed #d9c294}.ellp-voy .pt .tk{margin-left:auto}"
+      + ".ellp-voy li.s a{display:flex;align-items:center;gap:8px;padding:6px;border-radius:10px;font-size:13px;line-height:1.25;color:#1f2937;text-decoration:none}.ellp-voy li.s a:hover{background:#f3e7cc}"
+      + ".ellp-voy li.s small{display:block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}"
+      + ".ellp-voy .tk{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;border:2px solid #c9b07a;color:transparent}"
+      + ".ellp-voy .ok .tk,.ellp-voy .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.ellp-voy li.ok .n{color:#6b7280}"
+      + ".ellp-voy li.here a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.ellp-voy li.here .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}"
+      + ".ellp-voy li.fp a{margin-top:6px;background:#fdf2d6;font-weight:700}.ellp-voy li.fp .tk{border:0;font-size:17px;color:inherit}"
+      + ".ellp-voyback{margin-bottom:10px;padding-bottom:6px}.ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}"
+      + "html.el-voy #el-nbfab b{max-width:140px;margin-left:8px}";
+    document.head.append(st);
+  }
+  function voyDraw() {
+    const side = $(".ellpside"); if (!side) return;
+    const o = voyOn() ? voyData() : null; let box = side.querySelector(".ellp-voy:not(.ellp-voyback)");
+    side.classList.toggle("ellp-isvoy", !!o);
+    const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
+    // no copy of the steps yet (the board not opened in this browser): still a button back to the map, over the path's own tabs
+    if (!o) { if (box) box.hidden = true; let b = side.querySelector(".ellp-voyback");
+      if (voyOn()) { voyCss(); if (!b) { b = document.createElement("nav"); b.className = "ellp-voy ellp-voyback"; side.querySelector(".ellp-steps")?.before(b); }
+        const v = /\/2eso\//.test(path) ? ["🚌", "Torna al mapa", "Back to the map"] : ["⛵", "Torna al mapa", "Back to the map"];
+        b.innerHTML = `<a class="vb" href="${board}">${esc(v[0])} ${esc(t(v[1], v[2]))}</a>`; b.hidden = false; }
+      return; }
+    { const b = side.querySelector(".ellp-voyback"); if (b) b.hidden = true; }
+    voyCss();
+    if (!box) {
+      box = document.createElement("nav"); box.className = "ellp-voy"; box.setAttribute("aria-label", t("Els teus passos", "Your steps"));
+      side.querySelector(".ellp-steps").before(box);
+      // a step of this page: its own tab (the engine shows it); another page: the link
+      box.addEventListener("click", e => { const a = e.target.closest("a[data-p]"); if (!a) return; const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]');
+        if (tb) { e.preventDefault(); tb.click(); scrollTo(0, 0); voyTicks(); } });
+    }
+    box.hidden = false;
+    const nav = $(".ellp-steps nav.tabs");
+    if (nav && box._nav !== nav) { box._nav = nav; new MutationObserver(() => voyTicks()).observe(nav, { subtree: true, attributes: true, attributeFilter: ["class"] }); }
+    const key = JSON.stringify([o.at, CA]); if (box._key === key) return voyTicks(); box._key = key;
+    const vb = Array.isArray(o.vb) && o.vb.length === 3 ? o.vb : ["⛵", "Torna al mapa", "Back to the map"];   // the skin's words (el-voyage.js)
+    let h = `<a class="vb" href="${board}">${esc(vb[0])} ${esc(t(vb[1], vb[2]))}</a><h2>🧭 ${t("Els teus passos", "Your steps")} <small></small></h2><div class="bar"><i></i></div><ol>`;
+    o.items.forEach(x => {
+      if (x.p) { h += `<li class="pt" data-port><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${x.ok ? " ok" : ""}">✓</span></li>`; return; }
+      const here = voyHere(x.h), pid = here ? (String(x.h).split("#")[1] || "") : "";
+      h += `<li class="s${x.d ? " ok" : ""}" data-k="${esc(x.k)}"><a href="${ROOT}${esc(x.h)}"${here && pid ? ` data-p="${esc(decodeURIComponent(pid))}"` : ""}><span class="tk">✓</span><span class="n"><small style="color:${esc(x.c || "#8a5a1f")}">${esc(x.s || "")}</small>${esc(x.t)}</span></a></li>`;
+    });
+    if (o.fp && o.fp.title) h += `<li class="s fp${o.fp.done ? " ok" : ""}"><a href="${ROOT}${esc(o.fp.href || "")}"><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final", "Final product")}</small>${esc(o.fp.title)}</span></a></li>`;
+    box.innerHTML = h + "</ol>";
+    voyTicks(true);
+  }
+  // a step of another page done in this browser since the board made its copy (problem report, 4ESOB, 24 Nov 2026: "when I change task
+  // it says I haven't done the others"): its ✓ comes from this browser's own progress of that page (EL_CATALOG keys, no reads). Only adds
+  // ticks, never removes one; not in the teacher's student view (this browser holds the teacher's own progress there).
+  function voyLocalDone(k) {
+    const i = String(k || "").lastIndexOf("#"); if (i < 0 || who.as || !window.elDoneSet || !window.elSecSteps) return false;
+    const id = k.slice(0, i), a = (window.EL_CATALOG || []).find(x => x.id === id); if (!a || !a.keys) return false;
+    const s = new Set(); a.keys.forEach(kk => { let v = null; try { v = localStorage.getItem(kk); } catch (e) {} if (v) elDoneSet(v).forEach(d => s.add(d)); });
+    const st = elSecSteps(a, k.slice(i + 1)); return st.length > 0 && st.every(d => s.has(d));
+  }
+  // this page's ticks from its own tabs (done, the one on screen), the count and the ports
+  function voyTicks(first) {
+    const box = $(".ellp-voy:not(.ellp-voyback)"); if (!box || box.hidden) return;
+    box.querySelectorAll("li.s:not(.fp):not(.ok)").forEach(li => { if (!li.querySelector("a[data-p]") && voyLocalDone(li.dataset.k)) li.classList.add("ok"); });
+    box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
+      li.classList.toggle("ok", tb.classList.contains("done"));
+      const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
+    const all = [...box.querySelectorAll("li.s:not(.fp)")], ok = all.filter(l => l.classList.contains("ok")).length;
+    box.querySelector("h2 small").textContent = t(`${ok} de ${all.length} fets`, `${ok} of ${all.length} done`);
+    box.querySelector(".bar i").style.width = (all.length ? Math.round(ok / all.length * 100) : 0) + "%";
+    let port = null, pd = true; const close = () => { if (port) port.querySelector(".tk").classList.toggle("ok", pd); };
+    [...box.querySelectorAll("ol>li")].forEach(li => { if (li.hasAttribute("data-port")) { close(); port = li; pd = true; } else if (!li.classList.contains("fp")) pd = pd && li.classList.contains("ok"); });
+    close();
+    const here = box.querySelector("li.here"), sd = $(".ellpside");
+    if (first && here && sd) { const y = here.getBoundingClientRect().top - sd.getBoundingClientRect().top + sd.scrollTop; if (y > sd.clientHeight * .6) sd.scrollTop = y - sd.clientHeight * .4; }
+  }
+  // ---- 📓 the step drawn like the student's notebook (Roger, 14 Nov 2026: "when doing a LP, or a SLP I want students to have a button
+  // to go notebook-like, meaning they have a feeling they are working on their notebook"): lined paper with the red margin, the step's
+  // title in pencil, its boxes as taped slips in the teacher's handwriting and the student's answers in blue pen (shared/css/el-lpnb.css,
+  // html.el-lpnb). On by default; the 📓 button in each step's heading switches it off and on, remembered on this device (el_lpnb).
+  // A checked activity keeps its first try in the notebook; ↺ Practise again moves to the laptop look, where the new try and its results stay.
+  // LS2 on, the same pages as ⛶ Full screen (not a recall checkpoint or the sample exam), and not the 📖 Book (it has its own pages).
+  const NBOK = FSOK && !/\/book\.html$/.test(path), NBKEY = "el_lpnb", NBDEF = true;
+  const nbOn = () => { let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
+  function nbSet(on) { try { localStorage.setItem(NBKEY, on ? "1" : "0"); } catch (e) {} nbDraw(); }
+  if (NBOK) window.elLpNb = on => nbSet(!!on);   // ↺ Practise again in the notebook look takes the page back to the laptop look (ls2-engine.js)
+  function nbDraw() {
+    if (!NBOK) return;
+    const on = nbOn(), H = document.documentElement;
+    if (on && !document.getElementById("el-lpnb-css") && !document.querySelector('link[href*="shared/css/el-lpnb.css"]')) {
+      const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114b"; document.head.append(l); }
+    // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
+    if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
+    // Students open in the notebook look and can switch again (Roger, 25 Nov 2026: "I want student to be able to change from notebook-like
+    // or computer like again when doing the activities"; it replaces the notebook-only look of 19 Nov). Their own choice is kept:
+    // ↺ Practise again starts a fresh notebook page and coming back from a game keeps the look (window.elNbOnly, ls2-engine.js);
+    // only the teacher's page goes back to the laptop look then.
+    window.elNbOnly = voyOn(); H.classList.toggle("el-voy", voyOn());
+    const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
+    const tip = on ? t("Torna a veure aquest pas com una pàgina web normal", "Show this step as a normal web page again") : t("Mostra aquest pas com la teva llibreta", "Show this step like your notebook");
+    $$(".lp-panels>.panel>.panel-head").forEach(h => {
+      let b = h.querySelector(":scope>.ellpnb");
+      if (!b) { b = document.createElement("button"); b.type = "button"; b.className = "ellpnb"; b.addEventListener("click", () => nbSet(!nbOn())); h.append(b); }
+      if (b.textContent !== lab) { b.textContent = lab; b.title = tip; b.setAttribute("aria-pressed", on ? "true" : "false"); }
+    });
+  }
+  nbDraw();
   if (mode === "home") addEventListener("hashchange", () => draw());   // Home · Courses · Learning Situations: the button that is on
   if (mode === "lp") {
     WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
     let busy = false;
-    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); } finally { busy = false; } })
+    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); slpDraw(); nbDraw(); } finally { busy = false; } })
       .observe(document.getElementById("lp") || document.body, { childList: true });
   }
 
@@ -372,6 +617,8 @@
     tsecEarly();
     curLs = pickLs();
     lpPhone();
+    slpDraw();
+    nbDraw();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
     bar(L);
@@ -387,6 +634,7 @@
     if (who.group) Promise.all([load("shared/js/el-plan.js", () => window.EL_PLAN), load("shared/js/el-week.js", () => window.ELWeek)]).then(() => draw());
     // the course's LSs and the time plan: static files, no reads
     load("shared/js/el-catalog.js", () => window.EL_LS).then(() => draw());
+    if (mode === "lp") load("shared/js/el-dict.js?v=3", () => window.ELDict);   // 🔍 Dictionary on LS2 learning paths (Roger, 12 Nov 2026)
     let tries = 0;
     (function wait() {
       const C = window.ELCloud;

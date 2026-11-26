@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="en" class="elgate">
+<html lang="en" class="notranslate elgate" translate="no">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="google" content="notranslate"><script src="../../shared/js/el-nocopy.js"></script>
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
   <link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -121,6 +121,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
   <div class="section-card"><h3 data-support-ca="Mira i revisa el vídeo complet" data-support-en="Review the full video">Review the full video</h3><div class="checklist" id="finalChecklist"></div><div class="actions"><button class="btn" type="button" id="finishReview" data-support-ca="He revisat el vídeo ✓" data-support-en="Video reviewed ✓">Video reviewed ✓</button></div><div class="result" id="reviewResult" aria-live="polite"></div></div></section>
 
 <section class="panel" id="submit"><div class="panel-head"><div><h2 data-support-ca="7 · Lliura el vídeo" data-support-en="7 · Submit the final video">7 · Submit the final video</h2><p class="instruction" data-support-ca="Lliura o comparteix el vídeo revisat amb la cara, les diapositives i la veu. No lliuris només diapositives o un fitxer d’àudio." data-support-en="Submit/share the reviewed video presentation, not only slides or an audio file.">Submit/share the reviewed video presentation, not only slides or an audio file.</p></div></div>
+  <div id="fpVideo"></div><!-- 🎬 upload the video here (el-video.js) when the Classroom link doesn't work (Roger, 14 Nov 2026) -->
   <div class="section-card"><h3 data-support-ca="Comparteix la presentació gravada" data-support-en="Share the recorded presentation">Share the recorded presentation</h3><p class="instruction" data-support-ca="Puja el vídeo final o comparteix-ne l’enllaç al lloc indicat pel professorat. Comprova els permisos i que es pugui reproduir. Si et demanen l’enllaç de Google Slides, afegeix-lo també; les diapositives soles no substitueixen el vídeo." data-support-en="Upload the final video or share its link in the place indicated by your teacher. Check viewing permissions and playback. Share the Google Slides link too if your teacher asks for it; the slides alone do not replace the video.">Upload the final video or share its link in the place indicated by your teacher. Check viewing permissions and playback. Share the Google Slides link too if your teacher asks for it; the slides alone do not replace the video.</p><div class="checklist">
     <label class="checkitem"><input type="checkbox" data-submit-check><span data-support-ca="He lliurat o compartit el vídeo final amb càmera i diapositives al lloc indicat pel professorat." data-support-en="I have submitted/shared the final camera-and-slides video in the place indicated by my teacher.">I have submitted/shared the final camera-and-slides video in the place indicated by my teacher.</span></label>
     <label class="checkitem"><input type="checkbox" data-submit-check><span data-support-ca="He comprovat que el professorat pot obrir i reproduir el vídeo." data-support-en="I have checked that my teacher can open and play the video.">I have checked that my teacher can open and play the video.</span></label></div><div class="actions"><button class="btn" type="button" id="finishFinal" data-support-ca="He confirmat el lliurament ✓" data-support-en="Submission confirmed ✓">Submission confirmed ✓</button><button class="btn" type="button" id="resetProgress" data-support-ca="Reinicia aquesta ruta" data-support-en="Reset this route">Reset this route</button></div><div class="result" id="finalResult" aria-live="polite"></div></div>
@@ -128,6 +129,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 <p class="footer-note" data-support-ca="Les notes i el progrés de cada ruta es desen per separat en aquest dispositiu." data-support-en="Your notes and progress are saved separately for each route on this device.">Your notes and progress are saved separately for each route on this device.</p></main>
 <script src="../../shared/js/learning-path-support.js"></script>
 <script src="../../shared/js/final-rubric.js"></script>
+<script src="../../shared/js/el-video.js"></script>
 <script src="final-rubric-data.js?v=20261031-ce92"></script>
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -303,6 +305,16 @@ $('#finishFinal').onclick=()=>{const missing=steps.slice(0,-1).filter(key=>!stat
 $('#interviewNotes').oninput=()=>{if(!$('#interviewNotes').value.trim()){delete state.done.notes}save()};$('#speakingPlan').oninput=()=>{if(!$('#speakingPlan').value.trim()){delete state.done.prepare}save()};
 $('#resetProgress').onclick=()=>{if(confirm(level==='insecure'?'Vols reiniciar les notes, el pla i les comprovacions només d’aquesta ruta?':'Reset notes, plan and checks for this route only?')){delete allState[level];state=routeState();render();save()}};
 $('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};render();save();
+/* 🎬 Upload your video (Roger, 14 Nov 2026: "all the links that didn't work … I want students to receive a mail and hand it through the app"):
+   the LS2 upload card (shared/js/el-video.js) in 7 Submit. The video goes to the teacher's Drive, is saved with this page's work
+   (allState.steps.video, as LS2 saves state.steps.video) so the dashboard plays it, and the teacher's draft is ready by itself (meta.activity).
+   The email link opens this tab: final-product.html#submit. One card per page, drawn once the sign-in is known (its language). */
+(function(){const box=$('#fpVideo');if(!box||!window.elVideo)return;let on=false;
+  const go=()=>{if(on)return;on=true;const C=window.ELCloud,ca=C&&C.ca!=null?C.ca:level==='insecure';
+    elVideo.mount(box,{ca,saved:((allState.steps||{}).video||{}).video,meta:{activity:'2eso/final-product',level,title:ca?'Producte final':'Final product'},
+      onDone:v=>{allState.steps=Object.assign({},allState.steps,{video:{level,title:ca?'El meu vídeo':'My video',video:v,date:v.at}});save()}})};
+  const t=setInterval(()=>{if(window.ELCloud&&ELCloud.onUser){clearInterval(t);ELCloud.onUser(u=>{if(u)go()})}},300);
+  setTimeout(()=>{clearInterval(t);go()},8000)})();
 
 </script>
 <script src="../../shared/js/section-next.js"></script>

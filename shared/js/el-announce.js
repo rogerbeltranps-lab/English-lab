@@ -7,6 +7,13 @@
 // The card's own words follow the student's route (Catalan for Starter and Base, en false); so does the teacher's text when it has two
 // versions (ca, en: annText), otherwise it goes as written.
 export const ANN_MAX=1000,CARD_DAYS=14,ANN_COLOR="#ea580c";
+// Late messages (Roger, 14 Nov 2026: "que els alumnes no vegin la hora en que els envio els missatges"): the app shows students only the
+// date, but a message sent at 23:13 popped up at once and its email showed 23:13 in Gmail. So anything the teacher sends between 21:00
+// and 7:30 (dashboard, this browser's clock) waits until 7:30 unless the teacher chooses "Send now anyway" (teacher.html lateAsk): cards carry
+// at = that 7:30 and students get them only from then; the school mail script (v29) holds the emails until 7:30 too.
+export const LATE_FROM=21*60,LATE_TO=7*60+30;
+export const lateHold=(now=Date.now())=>{const d=new Date(now),m=d.getHours()*60+d.getMinutes();if(m<LATE_FROM&&m>=LATE_TO)return 0;
+  const t=new Date(d);if(m>=LATE_FROM)t.setDate(t.getDate()+1);t.setHours(7,30,0,0);return +t};
 export const annMs=x=>!x?0:x.toMillis?x.toMillis():x.toDate?+x.toDate():typeof x==="number"?x:+new Date(x)||0;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 // The teacher's text as safe HTML: escaped, line breaks kept (white-space:pre-wrap on its box), web links clickable.

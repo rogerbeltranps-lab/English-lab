@@ -258,12 +258,25 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 
 ### Vocabulary
 
-- [I] **Dates & time:** on 31 October; in November; at Christmas; at night; every year; once a year; the night before; ordinal dates (the first, the twenty-fifth)
-- [S] **Comparing cultures:** both… and…; similar to; different from; whereas; in the same way; unlike
+*14 Nov 2026 (Roger: "a lot of vocab-grammar stuff and not real vocabulary"): Dates & time and Verb + preposition moved to their own step, **Prepositions + vocab** (below); Comparing cultures is taught in Grammar · Comparing. The Vocabulary step now starts with the podcast's words.*
+
+- [B] **Where traditions come from:** harvest; feast; bonfire; mask; carve; turnip; pumpkin; roasted chestnuts
+- [I] **More from the stories:** spirits; settlers; cemetery; grateful; turkey
+- [S] **History words:** ancient; national holiday; make something official; a day of mourning
 - [S] **Places & travel:** travel home for the holidays; the town square; the community centre; the school hall; crowded streets
 - [D] **Change & debate:** commercialised; consumerism; keep a tradition alive; die out; evolve; adapt; reinvent; date back to; cultural appropriation; stereotype; inclusive; take something for granted
 - [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with (Safe since 31 Oct 2026: the programme gives verb + preposition to Safe and Daring)
-- Receptive: pilgrims; feast; harvest festival
+- [B] **Feelings, -ed = how you feel · -ing = what it is like** (all routes, 9 Nov 2026: the lexicon map plans "Sentiments i emocions (-ed / -ing)" in LS2): excited / exciting; bored / boring; tired / tiring
+- [I] **More feelings, -ed or -ing?:** interested (in) / interesting; amazed / amazing; disappointed / disappointing
+- [S] **Surprised or surprising?:** surprised / surprising
+- Receptive: pilgrims; Wampanoag; Samhain; bell ringers
+
+### Prepositions + vocab (own step, 14 Nov 2026)
+
+7 compulsory (6 + ✏️ own example) and 7 ➕ extra per level, no listening, like the grammar steps.
+- [B] **Dates & time:** on 31 October; in November; at Christmas; at night; every year; once a year; the night before; ordinal dates (the first, the twenty-fifth)
+- [B] **Words + preposition (Starter, Base):** come from; be famous for; be interested in; wait for
+- [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with · **adjective + preposition:** interested in; famous for; grateful for; excited about; proud of
 
 ### Practice (80 %)
 
@@ -304,6 +317,31 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 8. [S] What do the two celebrations have in common? **Both started as harvest festivals.** / Both come from Ireland. / Both are religious.
 9. [D] Why does Emma mention a "day of mourning"? **to show that not everybody sees the story in the same way** / to say Thanksgiving is sad for everyone / to explain the turkey
 10. [D] Complete from the podcast: People ___ ___ light bonfires and wear masks. → *used to*
+
+### Reading: *Chestnuts and bonfires* (added 16 Nov 2026, after the Listening)
+
+*Roger, 16 Nov 2026: "add a reading after the Listening … to correct together as always? no reading log this time".* One text that grows by level (Starter with a Catalan word list, Base, Core, Plus; Core and Plus add sentences, so ✅ Correct together marks their extras), auto-corrected, ✓ Check per question, corrected with 📖 Read together. No reading log. Pro reads its own C2 Part 5 text, *Old fires, new stories*. Not on the Time plan until Roger adds it. Core text:
+
+> **The Castanyada.** In Catalonia, the Castanyada is held on 31 October, the night before All Saints' Day. It is a very old tradition, and nobody knows exactly how it started, but there is a popular story. A long time ago, on the night of All Saints, bell ringers rang the church bells all night to remember the dead. It was hard work, so their families and neighbours brought them roasted chestnuts and sweet wine, which gave them energy to keep going.
+>
+> Chestnuts were also an important food of the autumn harvest, when families got ready for winter. In the past, women called castanyeres, who wore a headscarf and a shawl, used to sell hot chestnuts in the streets. Today families and friends get together to eat chestnuts, sweet potatoes and panellets, small sweets made with almonds and pine nuts. On 1 November, many people visit the cemetery with flowers to remember the members of their family who have died.
+>
+> **Bonfire Night.** In the UK, Bonfire Night, which is also called Guy Fawkes Night, is celebrated on 5 November. It comes from a story from 1605. Catholics were treated badly in England at that time, so a group of angry Catholic men, including Guy Fawkes, planned to blow up the Houses of Parliament in London and kill King James I. But on the night of 4 November, guards found Guy Fawkes under the building with 36 barrels of gunpowder. People in London lit bonfires to celebrate that the king was safe, and the next year a law made 5 November a day of thanksgiving.
+>
+> Children used to make a "guy", a figure made of old clothes and newspaper, and they took it into the streets to ask for "a penny for the guy". Today towns organise big fireworks displays, and people eat toffee apples and baked potatoes next to the bonfire. Bonfire Night is not a holiday: children go to school as usual on 5 November, whereas in Catalonia 1 November, All Saints' Day, is a holiday.
+
+1. [B] When do people celebrate the Castanyada? **on 31 October** / on 5 November / on 1 November
+2. [B] What did families bring to the bell ringers? **roasted chestnuts** / fireworks / flowers
+3. [B] What do many people do on 1 November? **visit the cemetery with flowers** / watch fireworks / sell chestnuts in the streets
+4. [B] What did Guy Fawkes want to do? **blow up the Parliament in London** / kill a guard / light a big bonfire
+5. [B] Why did people light bonfires in 1605? **because the king was safe** / because it was cold / to remember the dead
+6. [B] What did children use to make? **a figure with old clothes** / a pumpkin lantern / panellets
+7. [I] Who were the castanyeres? **women who sold hot chestnuts in the streets** / the bell ringers' families / women who made panellets at home
+8. [I] What did the guards find under the building? **36 barrels of gunpowder** / a guy made of old clothes / a group of children
+9. [S] Why did Guy Fawkes and his group want to kill the king? **Catholics were treated badly in England.** / The king wanted to close Parliament. / They wanted a holiday in November.
+10. [S] What happened the year after 1605? **A law made 5 November a day of thanksgiving.** / Bonfires became illegal in London. / Guy Fawkes became a hero.
+11. [D] Why does the text mention the Celtic Samhain? **to suggest the Castanyada may come from older autumn festivals for the dead** / to say that the Castanyada comes from Ireland / to explain why people carve pumpkins
+12. [D] What does the last paragraph say about Halloween? **It competes with both traditions, but neither of them has died out.** / It has replaced the Castanyada in most Catalan families. / It is the reason why fireworks frighten pets.
 
 ### Listening chart (LS criterion 2.2, hand-in the teacher sees)
 
@@ -346,6 +384,17 @@ Two illustrated videos made for English Lab ("How I celebrate"), each with a slo
 20. ___ Halloween started in Europe, it is now very popular in the USA. → *Although / Even though*
 21. Many families love the feast. ___, some Native Americans see it as a day of mourning. → *On the other hand / However*
 22. Correct the mistake: *Diwali, that is celebrated in autumn, is known as the festival of lights.* → *which*
+
+**[B] Feelings: -ed or -ing?** (all routes, 9 Nov 2026; in Grammar because many students had already done the Vocabulary sentences; Grammar checked before 9 Nov 21:00 UTC is quietly cleared: to do again, old work does not count, redoBefore) *-ed* = how you feel (*I'm bored.*) · *-ing* = what the thing is like (*The speech is boring.*)
+
+23. [B] The children can't sleep: they are very ___ about the party. → *excited*
+24. [B] The speech was very long and ___. → *boring*
+25. [B] After dancing all night, we were very ___. → *tired*
+26. [I] The story behind Halloween is really ___. → *interesting*
+27. [I] We were ___ by the Diwali lights: we had never seen anything like them. → *amazed*
+28. [I] It rained all day, so the parade was ___. → *disappointing*
+29. [S] Many people are ___ to learn that the first jack-o'-lanterns were turnips. → *surprised*
+30. [S] I'm not very ___ in costumes, but I love the food. → *interested*
 
 ### Mixed practice (choose the form)
 

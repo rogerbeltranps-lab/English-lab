@@ -1,6 +1,7 @@
 /* Collects every English text a flashcard can say (word + example), for every route, into tools/voice/lines.json.
    Sources: LS2 data files (vocab groups + review, Pro panels), the pages with a #flashcard (LS1 and Getting started, read in a
-   headless browser for every route and both card directions), LS1 vocabMap/examples (lab/practice.html word cards) and flashcards/cards.json.
+   headless browser for every route and both card directions), LS1 vocabMap/examples (lab/practice.html word cards), flashcards/cards.json and every card of the 🧠 Flashcards of Practise
+   (lab/practice.html#deck: words, examples and grammar / 💬 Expressions sentences, every course and route).
    Run from the repo root: node tools/voice/harvest.js  (then python tools/voice/generate.py). */
 const fs = require('fs'), path = require('path'), http = require('http');
 const V = require('../../shared/js/el-voice.js');
@@ -17,7 +18,7 @@ function walk(o, src) {
   })));
   Object.values(o).forEach(x => walk(x, src));
 }
-for (const ls of ['2eso/free-time-live', '4eso/seasons-and-celebrations']) {
+for (const ls of ['2eso', '4eso'].flatMap(c => fs.readdirSync(path.join(ROOT, c)).map(d => c + '/' + d)).filter(d => fs.existsSync(path.join(ROOT, d, 'data')))) {
   for (const sub of ['data', 'data/native']) {
     const dir = path.join(ROOT, ls, sub); if (!fs.existsSync(dir)) continue;
     for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.js'))) {
@@ -27,6 +28,13 @@ for (const ls of ['2eso/free-time-live', '4eso/seasons-and-celebrations']) {
   }
 }
 try { JSON.parse(fs.readFileSync(path.join(ROOT, 'flashcards/cards.json'), 'utf8')).forEach(c => add(c.term, 'flashcards')); } catch (e) {}
+// Towards Nativeness › 🧠 My flashcards and 🧠 Preposition flashcards (data/flashcards.js builds TN_FLASH_DECKS from the learning paths,
+// TN_MISTAKES and TN_PREP_CARDS): the same lines as tools/towards-nativeness/cards-lines.cjs (Chris records them where Roger pays for it)
+try { const D = path.join(ROOT, '4eso/towards-nativeness/data/'), w = { TN_LPS: [] };
+  for (const f of ['talking-to-your-tech', 'getting-things-done', 'telling-the-story', 'writing-like-a-teacher']) { new Function('window', fs.readFileSync(D + f + '.js', 'utf8'))(w); w.TN_LPS.push(w.LP); }
+  for (const f of ['my-latest-mistakes', 'flashcards']) new Function('window', fs.readFileSync(D + f + '.js', 'utf8'))(w);
+  w.TN_FLASH_DECKS().forEach(d => d.cards.forEach(c => { add(c.say, '4eso/towards-nativeness/flashcards'); if (c.kind === 'v' && c.ex) add(c.ex, '4eso/towards-nativeness/flashcards'); }));
+} catch (e) { console.warn('skip TN flashcards', e.message); }
 
 // pages: headless browser
 const pages = [];
@@ -51,6 +59,16 @@ const srv = http.createServer((q, r) => { const p = path.join(ROOT, decodeURICom
       return r; })()`);
     const before = out.size; got.forEach(t => add(t, u)); console.log(u, got.length, '+' + (out.size - before));
   }
+  // 🧠 Flashcards of 🎯 Practise (lab/practice.html): every word, example and grammar / 💬 Expressions sentence, every course and route
+  try {
+    const ctx = await b.newContext(); await ctx.addInitScript(() => { window.EL_DEMO_STUDENT = { teacher: true, harvest: true, group: '2ESOA', levels: {}, ls: {} };
+      try { localStorage.setItem('el_who', JSON.stringify({ role: 'teacher' })); } catch (e) {} });   // the teacher's own Towards Nativeness deck too
+    const p2 = await ctx.newPage(); await p2.route(/gstatic|googleapis|firebase|google/, r => r.abort());
+    await p2.goto('http://localhost:' + srv.address().port + '/lab/practice.html#deck'); await p2.waitForFunction(() => window.EL_PRACTICE_HARVEST, null, { timeout: 20000 });
+    const got = await p2.evaluate(() => window.EL_PRACTICE_HARVEST());
+    const before = out.size; got.forEach(t => add(t, 'lab/practice.html#deck')); console.log('lab/practice.html#deck', got.length, '+' + (out.size - before));
+    await ctx.close();
+  } catch (e) { console.warn('fail lab/practice.html#deck', e.message); }
   await b.close(); srv.close();
   const list = [...out.values()];
   fs.writeFileSync(path.join(__dirname, 'lines.json'), JSON.stringify(list, null, 1));

@@ -113,7 +113,7 @@ def build_data(m):
             sentence, more = row[0], list(row[1])
             first = sentence.split(' ')[0]
             if r == 'insecure':
-                prompt, hint = 'Construeix la frase. Comença per «%s».' % first, ''
+                prompt, hint = 'Build the sentence. Begin with "%s".' % first, ''   # Base reads English since 21 Nov 2026
             elif r == 'safe':
                 prompt, hint = 'Build the sentence. Begin with "%s".' % first, 'Check the word order: subject, verb and then the rest.'
             else:
@@ -130,7 +130,7 @@ def build_data(m):
 
 # ---------------------------------------------------------------- texts for the engine
 def route_info(m):
-    short = {'beginners': 'Instruccions en català i opcions', 'insecure': 'Instruccions en català',
+    short = {'beginners': 'Instruccions en català i opcions', 'insecure': 'Instructions in English',
              'safe': 'More independence, optional hints', 'daring': 'Inference and less support'}
     return {r: {'short': short[r], 'detail': m.ROUTE_DETAIL[r]} for r in ROUTES}
 
@@ -181,7 +181,7 @@ def guide_html(m):
     table = ''.join('<tr><th>%s</th>%s</tr>' % (r[0], ''.join('<td>%s</td>' % c for c in r[1:])) for r in rows)
     return ('<div class="guide-content" lang="ca"><p><strong>%s · %d ESO.</strong> Sis jocs de pràctica formativa amb el vocabulari de la LS. '
             'Les quatre rutes (Starter, Base, Core, Plus) canvien el suport, el tipus de resposta i les paraules; no només el nombre de preguntes. '
-            'Starter i Base tenen les instruccions en català. Un alumne amb sessió iniciada només veu la seva ruta, la que li ha posat el docent (Pro juga a Plus).</p>'
+            'Starter té les instruccions en català; Base, en anglès (des del 21 de novembre de 2026). Un alumne amb sessió iniciada només veu la seva ruta, la que li ha posat el docent (Pro juga a Plus).</p>'
             '<h3>Com organitzar la classe</h3><p><strong>Individual:</strong> cada alumne juga al seu dispositiu. <strong>Un equip / un Chromebook:</strong> els membres consensuen respostes i alternen lector, portaveu i teclat. '
             '<strong>Projector:</strong> el docent controla la partida per a 2–6 equips; el marcador i els torns es gestionen en aquest dispositiu.</p>'
             '<h3>Diferenciació</h3><div class="table-scroll"><table class="guide-table"><thead><tr><th>Joc</th><th>Starter</th><th>Base</th><th>Core</th><th>Plus</th></tr></thead><tbody>%s</tbody></table></div>'
@@ -253,6 +253,8 @@ def build_page(m, out):
     e = rep(e, 'aria-label="Routine illustration; use', 'aria-label="Scene illustration; use')
     e = rep(e, '/* Original inline SVG icons and routine illustrations.', '/* Original inline SVG icons and scene illustrations.')
     # Routes, route texts and games.
+    # NOTE (21 Nov 2026): the LS2 pages were edited by hand after this build. Since Roger's "base is also in English", the pages have
+    # CA = instruction language (Starter only) and CAM = the Catalan game content (Starter and Base). A rebuild must keep that split.
     i, j = e.index('const ROUTE_NAMES='), e.index('let storageOK=true;')
     e = e[:i] + ('const ROUTES=%s;\nconst CA=r=>[\'beginners\',\'insecure\'].includes(r);   // Starter and Base read Catalan instructions\n'
                  'const ROUTE_NAMES=%s;\nconst ROUTE_INFO=%s;\nconst GAMES=%s;\n') % (

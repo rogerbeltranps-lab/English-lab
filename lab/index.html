@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="elgate elhold">
+<html lang="en" class="notranslate elgate elhold" translate="no">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8" /><meta name="google" content="notranslate"><script src="../shared/js/el-nocopy.js"></script>
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Games · English with Roger</title>
@@ -63,6 +63,7 @@
     .level-note{margin:-8px 0 18px;color:var(--muted)}
 
     /* English Lab cards, as on the home page before they moved here */
+    #examGames{margin-top:22px;scroll-margin-top:calc(var(--el-lock-h,0px) + 12px)}
     .lab-card{border:1px solid var(--line);border-radius:20px;padding:22px;background:#fff;transition:.2s ease}
     .lab-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
     .lab-card h3{margin:0 0 8px;font-size:1.25rem}
@@ -170,7 +171,23 @@
             <p data-ca="Estacions, festes, tradicions i correus formals.">Play with seasons, celebrations, traditions and formal emails.</p>
             <span class="arrow" data-ca="Juga →">Play →</span>
           </a>
+          <!-- 🏗 Exam games (Roger, 21 Nov 2026: fast finishers in class "go to games (include the ones of the exam)"): the web exam's
+               Hangman and Quick quiz (shared/js/el-exam-games.js), from <ls>/data/exam-games.js (LS words, never exam items). They open here,
+               under the cards; the points are the same as after the exam (this browser only). -->
+          <a class="lab-card" data-level="2eso" data-ls="2eso-free-time-live" data-eg="2eso/free-time-live" href="#exam-games">
+            <span class="badge">2 ESO · LS2 · Free Time, Live!</span>
+            <h3 data-ca="🏗 Jocs de l'examen">🏗 Exam games</h3>
+            <p data-ca="Penjat i preguntes ràpides: cada punt puja un pis de la bastida.">Hangman and a quick quiz: every point builds the scaffolding one level higher.</p>
+            <span class="arrow" data-ca="Juga →">Play →</span>
+          </a>
+          <a class="lab-card" data-level="4eso" data-ls="4eso-seasons-and-celebrations" data-eg="4eso/seasons-and-celebrations" href="#exam-games">
+            <span class="badge">4 ESO · LS2 · Seasons &amp; Celebrations</span>
+            <h3 data-ca="🏗 Jocs de l'examen">🏗 Exam games</h3>
+            <p data-ca="Penjat i preguntes ràpides: cada punt puja un pis de la bastida.">Hangman and a quick quiz: every point builds the scaffolding one level higher.</p>
+            <span class="arrow" data-ca="Juga →">Play →</span>
+          </a>
         </div>
+        <div id="examGames" hidden></div>
         <p class="lab-section-lead" id="noGames" hidden></p>
       </div>
     </section>
@@ -180,6 +197,7 @@
 <!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
 <script src="../shared/js/el-catalog.js"></script>
 <script src="../shared/js/el-app.js"></script>
+<script src="../shared/js/el-exam-games.js"></script>
   <script type="module">
     // Games: a signed-out visitor signs in here (el-cloud keeps students on this page after sign-in). A student sees the vocabulary
     // games of their level (the LSs their group can open, plus the other course's open LSs at the same CEFR step); the teacher and the
@@ -231,6 +249,7 @@
       $('signin').hidden = inside;
       $('lab').hidden = !inside || (!canSwitch && !mine);   // a student: once their level is known
       const ca = inside && !canSwitch && mine && window.elCa && elCa(mine.route), t = (c, e) => ca ? c : e;
+      labCa = !!ca;
       document.documentElement.lang = ca ? 'ca' : 'en';
       $('title').textContent = t('Jocs', 'Games');
       document.title = t('Jocs', 'Games') + ' · English with Roger';
@@ -251,6 +270,15 @@
       $('noGames').textContent = t('Encara no hi ha jocs: apareixeran quan el professor obri una Learning Situation.', 'No games yet: they will appear when your teacher opens a Learning Situation.');
     }
 
+    // 🏗 Exam games: the LS's games file once, then the games under the cards (the same points as after the exam: the store key)
+    let labCa = false;
+    const egLoad = f => (window.EL_EXAM_GAMES || {})[f.replace('/', '-')] ? Promise.resolve() : new Promise(r => { const s = document.createElement('script'); s.src = '../' + f + '/data/exam-games.js'; s.onload = r; s.onerror = r; document.head.append(s); });
+    $('games').addEventListener('click', async e => { const c = e.target.closest('[data-eg]'); if (!c) return; e.preventDefault();
+      const f = c.dataset.eg; await egLoad(f); const G = (window.EL_EXAM_GAMES || {})[f.replace('/', '-')], box = $('examGames');
+      if (!G || !window.ELExamGames) return;
+      const uid = DEMO ? 'preview' : (user && user.uid) || 'preview', t = (x, y) => labCa ? x : y, ls = c.querySelector('.badge').textContent.replace(/^\d\s*ESO\s*·\s*/, '');
+      box.hidden = false; ELExamGames.mount(box, { words: G.words, quiz: G.quiz, ca: labCa, store: 'el_examgames_' + G.key + '_' + uid, title: '🏗 ' + t("Jocs de l'examen", 'Exam games') + ' · ' + ls });
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     $('levelPick').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if (!b) return;
       step = b.dataset.step; try { localStorage.setItem(KEY, step) } catch (e) {} render(); });
     $('signinBtn').addEventListener('click', login);

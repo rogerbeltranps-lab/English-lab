@@ -7,9 +7,9 @@
 //     1. the class sessions not ticked, per group: the same list as the dashboard's "⚠ Weekend check" (pending() in teacher.html: sessions before
 //        today, not ticked in teacherPlan/{group}.ticks, not set as homework, not "Homework by …", "moved to" or self-study lines). Left
 //        alone they move to next week's list (↪), so the email suggests ticking them or 🏠 Set as homework.
-//     2. the problem reports not marked as fixed and the ideas of the last 7 days.
-// Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) or else Gmail (GMAIL_APP_PASSWORD) to ALERT_EMAIL_TO (default
-// roger.beltranps@gmail.com); no password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
+//     2. the problem reports and ideas of the last 7 days that are not fixed, closed or answered yet.
+// Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) to Roger's school inbox roger.beltran@ietramuntana.cat
+// (TEACHER_TO; never his personal Gmail, Roger 19 Nov 2026); no school relay or password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
 // The Action log is public (the repo is public): counts only, never names or text.
 //   node tools/notify/notify.mjs [--instant] [--dry]    --dry: nothing sent, the email goes to notify-dry.eml in the temp folder
 //   node tools/notify/notify.mjs --test                  a short test email now (nothing read)
@@ -17,10 +17,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {E,ARGS,DRY,SITE,TZ,SCHOOL,GMAIL,TEACHER_TO,sendMail as send,site,firestore} from "./lib.mjs";
+import {E,ARGS,DRY,SITE,TZ,SCHOOL,TEACHER_TO,sendMail as send,site,firestore} from "./lib.mjs";
 
-const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.ok?SCHOOL:GMAIL.pass?GMAIL:null;
-if(!FROM&&!DRY){console.log("No SCHOOL_MAIL_URL, SCHOOL_APP_PASSWORD or GMAIL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
+const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.ok?SCHOOL:null;
+if(!FROM&&!DRY){console.log("No SCHOOL_MAIL_URL or SCHOOL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
 const sendMail=async(subject,text)=>{await send(FROM||SCHOOL,TEACHER_TO,subject,text);console.log(DRY?"Dry run: email written.":"Email sent.")};
 if(TEST){await sendMail("English Lab: test email ✅","This is a test. You will get an email when a student sends a ⚠️ Problem report or a 💡 Idea, and every Saturday morning one email with the sessions you did not tick and the week's open reports and ideas (no email when there is nothing).\n\nDashboard: "+SITE+"teacher.html\n");process.exit(0)}
 
@@ -46,17 +46,27 @@ if(INSTANT){
   let last;try{last=JSON.parse(fs.readFileSync(STATE,"utf8")).lastAt}catch(e){}
   if(!last){last=new Date(Date.now()-20*60000).toISOString();console.log("No saved last check: looking back 20 minutes.")}
   const t=d=>new Date(d).getTime(),inWin=x=>t(x.created)>t(last)&&t(x.created)<=t(now);
-  const [probs,ideas]=(await Promise.all([since("problems",last),since("suggestions",last)])).map(l=>l.filter(inWin));
+  const [probs,ideas]=(await Promise.all([since("problems",last),since("suggestions",last)])).map(l=>l.filter(inWin).filter(x=>!x.teacher));   // not Roger's own reports: he wrote them
   // answers to private messages: sAt (server time) is the student's last reply; the email quotes their answers since your last one (at most 3)
   const tail=th=>{const i=th.map(x=>x.by).lastIndexOf("t");return th.slice(i+1).filter(x=>x.by==="s").slice(-3)};
   const answers=(await since("announcements",last,"sAt")).filter(a=>t(a.sAt)>t(last)&&t(a.sAt)<=t(now)).map(a=>Object.assign(a,{newOnes:tail(a.thread||[])})).filter(a=>a.newOnes.length);
   // reports Claude fixed by itself (Roger, 8 Nov 2026: "I must be informed though via mail, with an important subject"): problems/{id}.auto
   // written by tools/problems/auto.mjs (verdict "fixed", at = when). Their own email, an ⚠️ IMPORTANT subject, sent first.
-  const autoFixed=(await since("problems",last,"auto.at")).filter(x=>x.auto&&x.auto.verdict==="fixed"&&t(x.auto.at)>t(last)&&t(x.auto.at)<=t(now));
+  const looked=(await since("problems",last,"auto.at")).filter(x=>x.auto&&t(x.auto.at)>t(last)&&t(x.auto.at)<=t(now));
+  const autoFixed=looked.filter(x=>x.auto.verdict==="fixed");
+  // the teacher's own report not merged (Roger, 13 Nov 2026: "little tweaks merge, big changes start a thread" + ⏸ Don't merge yet): his
+  // email has the PR with its preview or the plan, and the report's link, where 🤖 Fix with Claude starts the thread
+  const bigOnes=looked.filter(x=>x.teacher&&x.auto.verdict!=="fixed");
+  if(bigOnes.length){
+    const out=["Beltran looked at "+n(bigOnes.length,"report","reports")+" you sent. Nothing is merged yet: check the preview or the plan, then start a thread.",""];
+    bigOnes.forEach(x=>out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🧭 "+String(x.auto.note||"").trim().replace(/\bClaude\b/g,"Beltran"),"   👉 Start the thread: "+SITE+"teacher.html#pb-"+x.id+" (🤖 Fix with Beltran)",""));
+    out.push("—","Reports sent with ✅ Merge straight away (little tweaks and bugs) come in the ⚠️ IMPORTANT email instead.");
+    await sendMail("English Lab: your report"+(bigOnes.length>1?"s":"")+" not merged yet: "+n(bigOnes.length,"preview or plan","previews or plans")+" to check",out.join("\n"))}
   if(autoFixed.length){
-    const out=["Claude fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself and answered the student"+(autoFixed.length>1?"s":"")+" for you:",""];
+    const ns=autoFixed.filter(x=>!x.teacher).length,out=["Beltran fixed "+n(autoFixed.length,"problem report","problem reports")+" by itself"+(ns?" and answered the student"+(ns>1?"s":"")+" for you":"")+":",""];
     autoFixed.forEach(x=>{out.push(block(x,"• "+(KIND[x.kind]||x.kind||"Problem"),[x.title||x.page,x.section].filter(Boolean).join(" › ")),"   🔧 "+String(x.auto.note||"").trim());
-      const m=(x.msgs||[]).filter(y=>y.fix).pop();out.push("   💬 The student got: ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
+      const m=(x.msgs||[]).filter(y=>y.fix).pop();const go=x.auto.go>Date.now()?new Date(x.auto.go).toLocaleString("en-GB",{timeZone:"Europe/Madrid",weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";   // held until Roger presses 📨 Send it (auto.wait, Roger 24 Nov 2026)
+      out.push(x.teacher?"   👨‍🏫 Your own report: hard reload the page (Ctrl+Shift+R) to see it fixed.":"   💬 The student "+(x.auto.wait&&!x.auto.shown?"gets, when you press 📨 Send it on the report:":go?"gets, on "+go+":":"got:")+" ✅ Fixed!"+(m?" + “"+String(m.text).trim()+"”":""),"")});
     out.push("Check them or reopen one: "+SITE+"teacher.html#probs","","—","Only technical problems are fixed automatically; everything else stays in ⚠️ Problem reports for you. Students do not see this email.");
     await sendMail("⚠️ IMPORTANT · English Lab: "+n(autoFixed.length,"problem report","problem reports")+" fixed automatically",out.join("\n"))}
   console.log("New since the last check: "+probs.length+" problem report(s), "+ideas.length+" idea(s), "+answers.length+" answer(s), "+autoFixed.length+" fixed automatically.");   // counts only: the log is public
@@ -93,8 +103,11 @@ const nBehind=behind.reduce((a,[,ps])=>a+ps.length,0);
 
 // ---- 2. problem reports and ideas of the last 7 days
 const weekAgo=new Date(Date.now()-7*864e5).toISOString();
-const [allProbs,ideas]=await Promise.all([since("problems",weekAgo),since("suggestions",weekAgo)]);
-const probs=allProbs.filter(x=>!x.fixed),nFixed=allProbs.length-probs.length;   // the ones already marked as fixed need nothing
+const [allProbs,allIdeas]=await Promise.all([since("problems",weekAgo),since("suggestions",weekAgo)]);
+// the ones already fixed, closed or answered need nothing (Roger, 21 Nov 2026, on this email listing reports he had already answered:
+// "he rebut aquest mail amb problemes que ja he solucionat"). Answered = an answer sent and not taken back (msgs[].back), as on the dashboard.
+const answered=x=>(x.msgs||[]).some(m=>!m.back);
+const [probs,ideas]=[allProbs.filter(x=>!x.fixed&&!answered(x)),allIdeas.filter(x=>!answered(x)&&!x.done)],nFixed=allProbs.length-probs.length,nIdeasDone=allIdeas.length-ideas.length;
 // ---- 3. website problems found by the weekly site check (Roger, 1 Nov 2026: "send me a mail if theres any prob"). The check runs on Saturday
 // at 5:45 Madrid time, before this email, and opens a GitHub issue labelled site-check for each problem it finds; Roger closes it when it is fixed.
 let siteIssues=[];
@@ -109,8 +122,8 @@ if(!nBehind&&!probs.length&&!ideas.length&&!siteIssues.length){console.log("Noth
 const out=["Good morning! Here is your English Lab week.",""];
 if(nBehind)out.push("⚠ SESSIONS NOT TICKED ("+nBehind+")","Tick the ones you did. For the others, 🏠 Set as homework so students do them at home, or leave them: they move to next week's list.","",
   ...behind.flatMap(([x,ps])=>[x.name+":",...ps.map(y=>"   ☐ "+y.line),""]),"Open the Time plan: "+SITE+"teacher.html","");
-if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already marked as fixed.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
-if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
+if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already fixed or answered.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
+if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),(nIdeasDone?"("+n(nIdeasDone,"more idea","more ideas")+" this week already answered or archived.)\n":"")+"Open them: "+SITE+"teacher.html","");
 if(siteIssues.length)out.push("🛠️ WEBSITE PROBLEMS FOUND BY THE WEEKLY CHECK ("+siteIssues.length+")","",...siteIssues.map(x=>"• "+x.title+"\n   "+x.html_url+"\n"),"Close each one on GitHub when it is fixed.","");
 out.push("—","English Lab sends this every Saturday morning, only when there is something. Students do not see it.");
 const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):"",siteIssues.length?n(siteIssues.length,"website problem","website problems"):""].filter(Boolean);

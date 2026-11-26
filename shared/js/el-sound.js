@@ -5,6 +5,7 @@
 //   open  the buzzers open            first  a team buzzed first (buzzer + bell)   right  ✓ Right · +1     wrong  ✗ Wrong
 //   point a team gets +1 on the strip  press  a student presses the buzzer          win    my team was first
 //   tick  3 · 2 · 1                    go     Show!                                 pick   a random number   time  the timer ends
+//   birds / chirp  the garden's birds   bloom  new flowers in the garden
 (function(){
   let ctx=null;
   const on=()=>{try{return localStorage.getItem("el_sound")!=="off"}catch(e){return true}};
@@ -35,6 +36,23 @@
     go:a=>{note(a,0,1319,.4,"sine",.25);note(a,0,1760,.4,"sine",.08)},
     pick:a=>{[0,1,2,3,4,5].forEach(i=>note(a,i*.045,500+i*90,.05,"square",.035));note(a,.3,1175,.3,"triangle",.2)},
     time:a=>[0,.28,.56].forEach(t=>note(a,t,660,.22,"sine",.22)),
+    // 🐦 the garden's birds whistle when they fly in (Roger, 17 Nov 2026: "when birds appear I want them to whistle"): tweet-tweet, a trill,
+    // a two-note whistle and tweet-tweet again; chirp = one bird when it is clicked
+    birds:a=>{const c=(t,f,to,d,v)=>note(a,t,f,d,"sine",(v||.11)*2,to);c(0,2600,4200,.08);c(.14,2600,4200,.08);
+      [0,1,2,3,4,5,6].forEach(i=>c(.42+i*.045,i%2?3300:3900,i%2?3500:3600,.035,.07));
+      c(.95,3100,3000,.26,.09);c(1.26,2400,2350,.34,.09);c(1.85,2200,3600,.07);c(1.97,2300,3800,.07);c(2.09,2400,4000,.09)},
+    // 🔔 new flowers in the garden (Roger, 22 Nov 2026: "When I open the garden again and there's a new flower I should hear a nice
+    // sound"): a soft rising bell arpeggio (G C E G C) with a quiet sparkle on top, about a second
+    bloom:a=>{[784,1047,1319,1568,2093].forEach((f,i)=>{note(a,i*.075,f,1.1-i*.08,"sine",.12);note(a,i*.075,f*2,.35,"sine",.02)});note(a,.42,3136,.7,"sine",.025)},
+    chirp:a=>{const c=(t,f,to,d)=>note(a,t,f,d,"sine",.22,to);c(0,2800,4400,.07);c(.12,3000,4600,.07);c(.24,3200,4800,.08)},
   };
-  window.ELSound={play(n){if(!on()||!FX[n])return;const a=ac();if(!a)return;try{FX[n](a)}catch(e){}},on,set};
+  // play as soon as the browser allows sound: now if it already does (or lets a paused sound go on, e.g. a page brought back by Back),
+  // else at the first tap or key on the page (once). cb() runs when it plays.
+  const soon=(n,cb)=>{if(!on())return;const a=ac();let done=false;
+    const go=()=>{if(done)return;done=true;removeEventListener("pointerdown",tap,true);removeEventListener("keydown",tap,true);window.ELSound.play(n);if(cb)try{cb()}catch(e){}};
+    const tap=()=>setTimeout(go,30);
+    if(a&&a.state==="running")return go();
+    addEventListener("pointerdown",tap,true);addEventListener("keydown",tap,true);
+    if(a&&a.resume)a.resume().then(()=>{if(a.state==="running")go()}).catch(()=>{})};
+  window.ELSound={play(n){if(!on()||!FX[n])return;const a=ac();if(!a)return;try{FX[n](a)}catch(e){}},soon,on,set};
 })();

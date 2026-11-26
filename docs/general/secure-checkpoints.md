@@ -1,5 +1,7 @@
 # Secure recall checkpoints
 
+**The rules** (one try, released marks, keys never in the repo, the ⚠️ warning) are in [REQUIREMENTS.md › 8, Recall checkpoints](../REQUIREMENTS.md#8-marking-and-feedback). This note says how the feature is built.
+
 Roger, 31 Oct 2026: "make sure they don't cheat" in the recall checkpoints. He first thought of Google Forms (one Form per route);
 we chose to do it on the site so the checkpoint still opens the next learning path and feeds the grade and the Question analysis
 without any sync script, and students do not see it as an exam (proposal: https://claude.ai/artifact/2rbzSbMfFCJtsy34Jrc87y).
