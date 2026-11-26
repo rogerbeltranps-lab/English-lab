@@ -1,7 +1,9 @@
 // The web exam writings, corrected like the LS1 exam (Roger, 17 Nov 2026: "when students finish their exams, you correct them, the writing
 // too, the same way we did in the last exam, explaining the criteria and their level of assoliment and the number").
 //   node tools/web-exam/writing.mjs export <exam key> <out.json>
-//       every student's writing (students/{uid}/exams/{key}): name, email, group, paper, the task, the final text, the text at the first exit
+//       every student's writing (students/{uid}/exams/{key}), keyed by uid: code (S-…), group, paper, the task, the final text, the text at
+//       the first exit. 🕶 No name and no email (Roger, 26 Nov 2026: "even if you correct student's work you never read their names"):
+//       every student's first name and surname in the texts is [Name n] (tools/anon/anon.mjs); `import` puts them back in what it saves.
 //   node tools/web-exam/writing.mjs import <exam key> <ls id> <marked.json> [--apply]
 //       marked.json = {uid: {rubric: [["C1 · Task achievement", 6, 8], ["C2 · Grammar", 3, 4], ["C3 · Vocabulary", 3, 4],
 //       ["C4 · Organisation and cohesion", 3, 4]], corrected: "the whole text corrected", feedback: "…", errors: [{type, orig, fix, why}],
@@ -28,6 +30,7 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { nameWords, mask, maskDeep, unmask, unmaskDeep, codeOf } from "../anon/anon.mjs";
 
 const PROJECT = "english-lab-ietm", ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const args = process.argv.slice(2), draft = args.includes("--draft"), apply = args.includes("--apply") || draft, [cmd, key, a3, a4] = args.filter(a => !a.startsWith("--"));
@@ -77,6 +80,15 @@ async function exams() {
   }
 }
 const wid = d => ((d.order || {}).writing || [])[0];
+// 🕶 every student's name words (roster + students), so the texts reach the marker with [Name n] instead (two lists, read once)
+let NAMES = null;
+async function names() {
+  if (NAMES) return NAMES; const out = [];
+  for (const coll of ["roster", "students"]) { let tok = "";
+    do { const j = await api("GET", BASE + "/" + coll + "?pageSize=300" + (coll === "students" ? "&mask.fieldPaths=name" : "") + (tok ? "&pageToken=" + tok : ""));
+      (j.documents || []).forEach(x => out.push(dec({ mapValue: { fields: x.fields || {} } }) || {})); tok = j.nextPageToken; } while (tok); }
+  return NAMES = nameWords(out);
+}
 
 // the exam page's data file of this key (the tasks): every <course>/<ls>/data/exam.js
 function examData(k) {
@@ -87,11 +99,11 @@ function examData(k) {
 }
 async function exportOne(uid, d, X) {
   const id = wid(d); if (!id) return null;
-  const st = await api("GET", DOCS + "students/" + uid, null, true), s = st ? dec({ mapValue: { fields: st.fields } }) : {};
   const it = X ? (X.papers[d.paper]?.sections.writing || []).find(x => x.id === id) : null, sn = (d.snaps || [])[0];
   const text = String((d.answers || {})[id] || "").trim(), first = sn ? String((sn.answers || {})[id] || "").trim() : null;
-  return { name: s.name || "", email: s.email || "", group: d.group, paper: d.paper, lang: d.level === "beginners" ? "ca" : "en", status: d.status,
-    task: it ? it.q : "", min: it ? it.min : null, words: words(text), text, firstText: first != null && first !== text ? first : undefined };
+  const N = await names(), map = {};
+  return { code: codeOf(uid), group: d.group, paper: d.paper, lang: d.level === "beginners" ? "ca" : "en", status: d.status,
+    task: it ? it.q : "", min: it ? it.min : null, words: words(text), text: mask(text, N, map), firstText: first != null && first !== text ? mask(first, N, map) : undefined, _map: map };
 }
 if (cmd === "redo") {
   const m = await api("GET", DOCS + "settings/marking", null, true), R = m && m.fields && m.fields.examRedo ? dec(m.fields.examRedo) : {}, out = {};
@@ -100,7 +112,8 @@ if (cmd === "redo") {
     const x = await api("GET", DOCS + "students/" + r.uid + "/exams/" + r.key, null, true); if (!x || !x.fields) { console.log("✗ " + r.uid + ": no exam " + r.key); continue; }
     const one = await exportOne(r.uid, dec({ mapValue: { fields: x.fields } }), examData(r.key)); if (!one) continue;
     const cur = await api("GET", DOCS + "students/" + r.uid + "/results/" + encodeURIComponent(r.ls + "__assessment"), null, true);
-    out[r.uid] = Object.assign(one, { key: r.key, ls: r.ls, note: r.note || "", asked: r.at, before: cur && cur.fields && cur.fields.report ? (dec(cur.fields.report) || {}).writing || null : null });
+    const map = one._map; delete one._map;
+    out[r.uid] = Object.assign(one, { key: r.key, ls: r.ls, note: maskDeep(r.note || "", await names(), map), asked: r.at, before: maskDeep(cur && cur.fields && cur.fields.report ? (dec(cur.fields.report) || {}).writing || null : null, await names(), map) });
   }
   const n = Object.keys(out).length; if (!n) { console.log("No writings to correct again."); process.exit(0); }
   fs.writeFileSync(key, JSON.stringify(out, null, 1));
@@ -110,7 +123,7 @@ if (cmd === "redo") {
 if (cmd === "export") {
   const X = examData(key), out = {};
   for (const { uid, d } of await exams()) {
-    const one = await exportOne(uid, d, X); if (one) out[uid] = one;
+    const one = await exportOne(uid, d, X); if (one) { delete one._map; out[uid] = one; }
   }
   fs.writeFileSync(a3, JSON.stringify(out, null, 1));
   const v = Object.values(out); console.log("✓ " + a3 + ": " + v.length + " writings (" + v.filter(x => x.status === "done").length + " turned in, " + v.filter(x => !x.words).length + " blank)");
@@ -130,11 +143,13 @@ if (cmd === "export") {
   for (const [uid, w] of Object.entries(marked)) {
     const d = docs[uid]; if (!d) { console.log("✗ " + uid + ": no exam"); continue; }
     const id = wid(d), orig = String((d.answers || {})[id] || "").trim(), rub = w.rubric || [];
+    // 🕶 the names the marker saw as [Name n] go back to the student's own words (the same numbering as `export`: the final text first)
+    const map = {}; mask(orig, await names(), map); w.corrected = unmask(w.corrected, map); w.feedback = unmask(w.feedback, map); w.errors = unmaskDeep(w.errors, map);
     const got = rub.reduce((t, r) => t + (+r[1] || 0), 0), of = rub.reduce((t, r) => t + (+r[2] || 0), 0);
     const score = orig ? (of ? Math.round(got / of * MAX * 10) / 10 : 0) : 0, lv = deg(score / MAX * 10);
     const writing = Object.assign({ original: orig || "(blank)", rubric: rub.map(([name, s, m]) => ({ name, score: +s || 0, max: +m })) },
       w.corrected && orig ? { corrected: mark(orig, String(w.corrected).trim()) } : {}, w.feedback ? { feedback: w.feedback } : {}, { errors: w.errors || [] }, w.copied ? { copied: w.copied } : {});
-    console.log((draft ? "≈ " : apply ? "✓ " : "→ ") + (w.name || uid) + ": " + got + "/" + of + " → " + score + "/" + MAX + " " + lv + " · " + (w.errors || []).length + " mistakes");
+    console.log((draft ? "≈ " : apply ? "✓ " : "→ ") + codeOf(uid) + ": " + got + "/" + of + " → " + score + "/" + MAX + " " + lv + " · " + (w.errors || []).length + " mistakes");
     if (!apply) continue; n++;
     const rid = DOCS + "students/" + uid + "/results/" + encodeURIComponent(ls + "__assessment");
     // `updated` too: the dashboard only fetches results whose `updated` is newer than its copy (Roger, 23 Nov 2026: the saved marks didn't show)

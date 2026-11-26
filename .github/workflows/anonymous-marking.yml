@@ -1,0 +1,17 @@
+name: Anonymous marking
+# Marking never sees who the student is (Roger, 26 Nov 2026; docs/REQUIREMENTS.md § 8). tools/anon/check.mjs
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/anon/check.mjs

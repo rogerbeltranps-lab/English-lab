@@ -36,6 +36,7 @@ import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {namesIn} from "./reply-time.mjs";
+import {nameWords,mask,codeOf} from "../anon/anon.mjs";
 
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../.."),PROJECT="english-lab-ietm",MSG_MAX=1000;
 const [cmd,id,...rest]=process.argv.slice(2),flag=f=>rest.includes(f)||process.argv.includes(f),opt=f=>{const i=rest.indexOf(f);return i>=0?rest[i+1]:null};
@@ -87,24 +88,28 @@ if(cmd==="open"){
   const ideas=(await list("suggestions")).filter(x=>x.uid&&!x.auto&&!(x.msgs||[]).length).sort((a,b)=>when(a)-when(b));
   const pms=await waitingPms();
   const more=ideas.length||pms.length;
+  // 🕶 never who wrote it (Roger, 26 Nov 2026: "you never read their names so that you don't know who they are"; REQUIREMENTS § 8): the
+  // student is a code (S-…), and every student's first name and surname in their words is [Name n] (tools/anon/anon.mjs). The drafts
+  // are still checked against the real name (namesIn) when they are saved. Screenshots can show the name in the menu: never repeat it.
+  const NW=L.length||more?nameWords([...(await list("roster")),...L,...ideas]):new Set(),M=t=>mask(t,NW,{}),who=x=>codeOf(x.uid||x.id);
   console.log(L.length?L.length+" open report(s)"+(flag("--all")?"":" not looked at yet")+".":nc||more?"No open report to look at.":"Nothing new: no open report to look at, no new comment, no idea or private answer without a draft.");
   if(more)console.log(`NEW IDEAS / PRIVATE ANSWERS WITHOUT A DRAFT: ${ideas.length} idea(s), ${pms.length} answer(s) to private messages. Write a draft for each: docs/general/problem-reports-auto.md, section "Drafts for ideas and private answers" (they are listed at the end).`);
   if(nc)console.log(`NEW COMMENTS: ${nc} student(s) wrote a comment since the last run. Answer them: docs/general/problem-reports-auto.md, section "Students' comments, answered at once" (node tools/marking/marks.mjs comments --new).`);
   for(const x of L){
     const en=!!x.route&&!elCa(x.route);
     if(x.teacher)console.log("\n=== "+x.id+" · "+(x.created||"?")+" · FROM ROGER, THE TEACHER"+(x.group?" (in class with "+x.group+")":"")+(x.merge===false?" · ⏸ DON'T MERGE YET":" · ✅ MERGE STRAIGHT AWAY")+": no student to answer; see \"The teacher's own reports\" in docs/general/problem-reports-auto.md");
-    else console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
-    console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(x.text):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
-    if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>typeof e==="string"?e:JSON.stringify(e)).join("\n  "));
-    if((x.msgs||[]).length)console.log("already answered: "+x.msgs.map(m=>JSON.stringify(m.text)).join(" | "));
-    if(x.auto)console.log("looked at: "+(x.auto.status||x.auto.verdict)+" · "+x.auto.note+(x.auto.todo?" · first: "+x.auto.todo:"")+(x.auto.reply?" · suggested reply: "+JSON.stringify(x.auto.reply):""));
+    else console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+who(x)+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
+    console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(M(x.text)):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
+    if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>M(typeof e==="string"?e:JSON.stringify(e))).join("\n  "));
+    if((x.msgs||[]).length)console.log("already answered: "+x.msgs.map(m=>JSON.stringify(M(m.text))).join(" | "));
+    if(x.auto)console.log("looked at: "+(x.auto.status||x.auto.verdict)+" · "+x.auto.note+(x.auto.todo?" · first: "+x.auto.todo:"")+(x.auto.reply?" · suggested reply: "+JSON.stringify(M(x.auto.reply)):""));
     if(x.shot){const s=doc(await api("GET",DOCS+"problemShots/"+x.id));if(s&&s.img){const f=path.join(os.tmpdir(),"problem-"+x.id+".jpg");fs.writeFileSync(f,Buffer.from(s.img.split(",")[1],"base64"));console.log("screenshot: "+f+" (careful: shots taken before 6 Nov 2026 can show the folded Study guide over the page)")}}
     console.log("live page: https://rogerbeltranps-lab.github.io/English-lab/"+String(x.page||"").replace(/^\//,""));
   }
-  for(const x of ideas)console.log("\n=== IDEA "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+")\nwords: "+JSON.stringify(x.text||"")
+  for(const x of ideas)console.log("\n=== IDEA "+x.id+" · "+(x.created||"?")+" · "+who(x)+" ("+(x.group||"no group")+")\nwords: "+JSON.stringify(M(x.text||""))
     +"\nsent from: "+(x.page||"?")+"\n→ node tools/problems/auto.mjs idea "+x.id+" --note \"…\" --en \"…\" --ca \"…\" --apply");
-  for(const a of pms){const th=a.thread||[];console.log("\n=== PRIVATE ANSWER "+a.id+" · to "+(a.label||"?")+" · the whole conversation, oldest first:\n  Roger: "+JSON.stringify(a.text||"")
-    +th.map(t=>"\n  "+(t.by==="t"?"Roger":"Student")+": "+JSON.stringify(t.text||"")).join("")+"\n→ node tools/problems/auto.mjs msg "+a.id+" --note \"…\" --en \"…\" --ca \"…\" --apply")}
+  for(const a of pms){const th=a.thread||[];console.log("\n=== PRIVATE ANSWER "+a.id+" · to "+codeOf(a.uid||a.id)+" · the whole conversation, oldest first:\n  Roger: "+JSON.stringify(M(a.text||""))
+    +th.map(t=>"\n  "+(t.by==="t"?"Roger":"Student")+": "+JSON.stringify(M(t.text||""))).join("")+"\n→ node tools/problems/auto.mjs msg "+a.id+" --note \"…\" --en \"…\" --ca \"…\" --apply")}
   process.exit(0);
 }
 
@@ -164,7 +169,7 @@ if(cmd==="fixed"||cmd==="leave"){
     writes.push(w);
     console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg)+"\n  ("+other+"): "+JSON.stringify(msg2):"")+"\nThe student sees it "+(go?"when Roger presses 📨 Send it on the dashboard":"straight away (--now)"));
   }
-  console.log("Report "+id+" ("+(x.name||"?")+", "+(x.group||"")+"): "+(cmd==="fixed"?"marked fixed":"left for Roger")+(note?" · note: "+note:""));
+  console.log("Report "+id+" ("+codeOf(x.uid||id)+", "+(x.group||"")+"): "+(cmd==="fixed"?"marked fixed":"left for Roger")+(note?" · note: "+note:""));
   if(!flag("--apply")){console.log("(dry run: add --apply to save)");process.exit(0)}
   await api("POST","https://firestore.googleapis.com/v1/"+BASE+":commit",{writes});
   console.log("Saved ✓");

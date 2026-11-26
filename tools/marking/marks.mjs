@@ -38,6 +38,7 @@ import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import {replyAt,corrAt,whenText,namesIn} from "../problems/reply-time.mjs";
+import {nameWords,maskDeep,unmask} from "../anon/anon.mjs";
 // Corrections reach students on weekdays from 17:00 (Roger, 24 Nov 2026: "the same for all the corrections during weekdays at 17h"):
 // fb-apply and apply --feedback save results/{activity}.fbGo[step] = corrAt() with the correction (also a writing sent back to redo);
 // el-cloud.js held() keeps replies[step] (and its flag) from the student until then. --now (only when Roger asks) shows it at once.
@@ -46,7 +47,7 @@ const GO=process.argv.includes("--now")?new Date().toISOString():new Date(corrAt
 const PROJECT="english-lab-ietm",ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
 const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.env.EL_TODAY;   // a date for tests
 vm.createContext(ctx);
-for(const f of ["el-catalog.js","el-criteria.js","el-plan.js","el-week.js","el-grading.js","el-marking.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js",f),"utf8"),ctx,{filename:f});
+for(const f of ["el-catalog.js","el-sections.js","el-criteria.js","el-plan.js","el-week.js","el-grading.js","el-marking.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js",f),"utf8"),ctx,{filename:f});
 const W=ctx.window,CA_RT=["beginners"];
 // A possible copy that was clearly pasted (ELMark.pasted: most of the text pasted, little typed) is sent back at once instead of waiting
 // in the teacher's To do (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): the flag
@@ -96,6 +97,11 @@ const cmtDone=async()=>{const t=NEWS.map(([,s])=>s.commented).sort().pop();if(t)
 // students of a group: the student list's group decides (as on the dashboard), testers left out
 const roster=NEW?Object.fromEntries(await Promise.all(NEWS.map(async([,s])=>{const e=(s.email||"").toLowerCase();return [e,e?doc(await api("GET",DOCS+"roster/"+encodeURIComponent(e)))||{}:{}]})))
   :Object.fromEntries(await list("roster")),studs=(NEW?NEWS:await list("students")).map(([uid,s])=>({uid,...s,group:(roster[(s.email||"").toLowerCase()]||{}).group||s.group}));
+// 🕶 Anonymous marking (Roger, 26 Nov 2026: "even if you correct student's work you never read their names"; REQUIREMENTS § 8): students are
+// codes on every sheet, and their own words go through mask() (every student's first name and surnames → [Name n], tools/anon/anon.mjs);
+// unmk() puts the real words back in what is saved (a correction, a feedback, an answer), so nothing the student sees changes.
+const NAMES=nameWords([...Object.values(NEW?Object.fromEntries(await list("roster")):roster),...studs]),MAPS={};
+const mk=(uid,v)=>maskDeep(v,NAMES,MAPS[uid]=MAPS[uid]||{}),unmk=(uid,t)=>t==null?t:unmask(t,MAPS[uid]);
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]),isTester=s=>TESTERS.includes((s.email||"").toLowerCase());   // as ELCloud.isTester
 const cache={};
 const once=(k,f)=>cache[k]||(cache[k]=f());   // each document read once per run
@@ -114,7 +120,7 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
     const lv=((st.res.levels||{})[m.step])||{},f=((st.res.flags||{})[m.step]);
     const waits=!!f&&!(f.done==="redo"&&h&&h.date>f.at);   // a possible copy waiting for the teacher (as mkWaits in teacher.html)
     const again=!!h&&!!(st.res.marked||{})[m.step]&&h.date>st.res.marked[m.step];   // handed in again after the sheet marked it (as mkAgain)
-    if(h&&(!m.c.every(c=>lv[c])||again)&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
+    if(h&&(!m.c.every(c=>lv[c])||again)&&!waits&&taught(a,grp.id,m.step))out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
   return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,atOnce:m.atOnce})}
@@ -122,7 +128,7 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
     crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:g.ind,
-    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
+    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:mk(u,by[u].h.f)}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
 
 // ---- Corrections without a level (Roger, 31 Oct 2026: "the idea is that if they work more, they can have all the corrections"): every
@@ -137,7 +143,8 @@ const REFLECT=a=>/reflect$/.test(a.id)?"reflect":null;   // the Reflect page: it
 async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.id).map(m=>m.step)),out={};
   for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);let state={};try{state=JSON.parse(st.data[a.keys[0]]||"{}")}catch(e){}
     const items=W.ELMark.fbItems(state,skip,REFLECT(a)),res=st.res;
-    for(const [step,it] of Object.entries(items)){const v=sigOf(JSON.stringify(it.fields));
+    for(const [step,it] of Object.entries(items)){if(!taught(a,grp.id,step))continue;   // 🗓 not on the agenda yet: corrected after its class
+      const v=sigOf(JSON.stringify(it.fields));
       if((res.fbSig||{})[step]===v)continue;                               // this version is corrected
       if((res.replies||{})[step]&&!(res.fbSig||{})[step])continue;          // the teacher answered it by hand
       const fl=(res.flags||{})[step];if(fl&&!fl.done||fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))continue;   // a possible copy waiting for the teacher, or redone in class and not handed in again
@@ -161,7 +168,7 @@ const lvOpts=(a,mode,step)=>{const L=wCrits(a,mode,step),course=a.ls.split("-")[
 function fbSheetOf(grp,a,step,rows){const course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name])),lo=rows[0].mode!=="reply"?lvOpts(a,rows[0].mode,step):{lvc:[],crit:{},ind:{}};
   const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],...lo,mode:rows[0].mode,
-    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
+    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:mk(u,by[u].h.f)}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]])),lvc:lo.lvc}}
 
 // Writings and speakings corrected before they got a level (Roger, 21 Nov 2026 for writings, 24 Nov 2026 for speakings): lv-sheet / lv-apply
@@ -193,11 +200,20 @@ async function comments(){const out=[],names=Object.fromEntries((W.EL_LEVELS||[]
         const st={route:W.elRouteOf(lvs,a.ls).level,res:doc(await api("GET",DOCS+`students/${s.uid}/results/${a.id.replace("/","__")}`))||{}};
       for(const [step,name] of a.steps){const h=sp[step];if(!W.ELMark.open(h,st.res,step)||W.ELMark.asked(h,st.res,step))continue;
         out.push({id:"Q"+(out.length+1),uid:s.uid,code:code[s.uid],route:names[st.route]||st.route,ca:!st.route||CA_RT.includes(st.route),ls:(W.EL_LS.find(l=>l.id===a.ls)||{}).title||a.ls,lsId:a.ls,
-          aid:a.id,title:a.title,step,stepName:name,content:content(a),fields:h.f,comment:W.ELMark.q(h)})}}}}
+          aid:a.id,title:a.title,step,stepName:name,content:content(a),fields:mk(s.uid,h.f),comment:mk(s.uid,W.ELMark.q(h))})}}}}
   return out}
 
 // sessions the teacher moved to another day on the dashboard (ls/{id}.planEdits): due days and session lines follow, as on the dashboard
-const PE={};for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};PE[ls]=d.planEdits||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+const PE={},LSDOC={};for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};LSDOC[ls]=d;PE[ls]=d.planEdits||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+// 🗓 Only what Roger put on the agenda is corrected (Roger, 26 Nov 2026: "when I plan a LS, only the SLP that I upload on the agenda are
+// corrected"; REQUIREMENTS § 8): a hand-in is corrected or levelled only when its tab is taught for the student's group: on a class day of
+// the group's Time plan agenda up to today, ticked as done in class, or set as homework (elDueBefore, the same test as ✅ To do, ⏰ late and
+// the daily work mark, elDueWork). A tab done ahead (a fast finisher) waits, and is corrected in the first run after its class.
+// A group with no agenda, a path planned whole and the optional sample exam stay as before (everything handed in is corrected).
+const TOMORROW=W.ELWeek.add(W.ELWeek.today(),1),DBS={};
+function taught(a,gid,step){if(a.optional)return true;const k=a.ls+"|"+gid;if(!(k in DBS))DBS[k]=W.elDueBefore(LSDOC[a.ls]||{},gid,TOMORROW);const db=DBS[k];
+  if(!db||db.acts.has(a.id))return true;const all=W.elTabsOf(a);if(!all||!all.some(x=>x.includes(step)))return true;   // a step outside the tabs: not held back
+  const ps=db.tabs[a.id];if(!ps||!ps.size)return false;const g=W.elTabsOf(a,new Set([...ps].map(x=>W.elTabOf(a.id,x))));return !!g&&g.some(x=>x.includes(step))}
 // a group's ticks, with the past class days of its agendas counted as done (ELWeek.autoTicks, as on the dashboard)
 async function ticksOf(grp){const t=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
   for(const [ls,pe] of Object.entries(PE)){const a=(pe[grp.id]||{}).agenda;if(!a)continue;let ag=null;try{ag=typeof a==="string"?JSON.parse(a):a}catch(e){}W.ELWeek.autoTicks(ls,ag,t)}return t}
@@ -300,7 +316,7 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
   const sh=fbSheetOf(grp,a,step,rows),r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:a.id,step,crits:sh.lvc,codes:sh.codes});if(r.err)throw new Error(r.err);
   const LV=sh.lvc.length>0;   // a writing: its 5.1 level is saved with the correction; a speaking: its 3.2 level
   const rk=a.id.replace("/","__");
-  for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
+  for(const x of r.rows){const row=sh.codes.get(x.code);x.fb=unmk(row.s.uid,x.fb);x.flag=unmk(row.s.uid,x.flag);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
     if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);
     else if(row.mode==="surprise"||row.mode==="shadow")x.fb=W.ELMark.sqText(x.fb);   // 🎲 one sentence + "➜ " things to improve (el-corrections.js)   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
@@ -331,7 +347,7 @@ else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,s
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
   const r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:m.a,step:m.step,crits:m.c,codes:sh.codes});if(r.err)throw new Error(r.err);
   const a=W.EL_CATALOG.find(x=>x.id===m.a),rk=a.id.replace("/","__");
-  for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s,fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
+  for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s;x.fb=unmk(s.uid,x.fb);x.flag=unmk(s.uid,x.flag);x.redo=unmk(s.uid,x.redo);const fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     if(x.redo){console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ↺ NOT A REAL TRY: sent back to redo ("+x.redo+")");if(!flags.has("--apply"))continue;
       // 📐 Roger, 24 Nov 2026 ("Gaming the system"): its NA is saved, and it goes back as the dashboard's ↺ Redo does (hbBack): the step counts
       // as not done until it is handed in again, within a week of today (elHandInBy), and the new hand-in is marked again
@@ -357,7 +373,8 @@ else if(cmd==="comments"||cmd==="answer"){const its=await comments();
   // sometimes it feels like AI"; 24 Nov 2026: "These answers must be in the afternoon from 17h"): an ANSWER is saved now with
   // at = replyAt(now) (≥ 2 hours after the comment, Monday to Friday 17:00-21:00 Madrid), and el-corrections.js shows it to the student only from then; --now (only when Roger asks) sends at once. An answer
   // with the student's name or surnames stops the whole file before anything is saved.
-  else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString(),NOW=process.argv.includes("--now");
+  else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);
+    r.rows.forEach(x=>{const i=its.find(y=>y.id===x.id);if(i)x.text=unmk(i.uid,x.text)});const now=new Date().toISOString(),NOW=process.argv.includes("--now");
     const who=uid=>{const s=studs.find(y=>y.uid===uid)||{},ro=roster[(s.email||"").toLowerCase()]||{};return [s.name,ro.first,ro.surname1,ro.surname2,ro.name].filter(Boolean)};
     const named=r.rows.filter(x=>x.kind==="ANSWER").map(x=>[x.id,namesIn(x.text,who(its.find(y=>y.id===x.id).uid))]).filter(([,w])=>w.length);
     if(named.length)throw new Error("Don't use the student's name or surnames in an answer (Roger, 17 Nov 2026: it feels like AI). Write these again without them: "+named.map(([id,w])=>id+" ("+w.join(", ")+")").join(" · ")+". Nothing was saved.");
