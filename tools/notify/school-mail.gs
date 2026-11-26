@@ -112,7 +112,7 @@
 //      students' sign-in passwords live only here, in this script's private Script Properties ("pw:" + school email), never in the repo,
 //      Firestore or the dashboard page. {key, action: "logins_set", list: [{email, password}]} saves them (tools/student-accounts/
 //      logins-upload.mjs, from the private student-passwords.csv) → {ok, n}; it never sends a password back. {idToken (teacher), action:
-//      "login_mail", to, subject, body, at|now} emails ONE student their login: the dashboard's 🔑 Email their login sends the text with
+//      "login_mail", student, subject, body, at|now} emails ONE student their login: the dashboard's 🔑 Email their login sends the text with
 //      {{PASSWORD}} in it and this script puts the saved password there, so the password never passes through the page. {key or idToken,
 //      action: "logins_count"} → {ok, n}. The 🌙 21:00 to 7:30 hold works as for every other email.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
@@ -230,7 +230,7 @@ function loginsSet(m) {
 }
 // 🔑 Email their login: one school address, the saved password put where the text says {{PASSWORD}}
 function loginMail(m) {
-  const to = String(m.to || "").trim().toLowerCase();
+  const to = String(m.student || "").trim().toLowerCase();   // "student", never "to": an older script would send the raw text
   if (!ALLOWED.test(to)) return {ok: false, error: "not a school address"};
   const pw = PropertiesService.getScriptProperties().getProperty("pw:" + to);
   if (!pw) return {ok: false, error: "no password saved"};
