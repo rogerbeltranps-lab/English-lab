@@ -58,13 +58,16 @@ for (const f of files) {
     const t0 = Date.now();
     try { await L.reset(); await t.run(ctx); }
     catch (e) { const m = String(e && e.message || e), w = (m.match(/waiting for (.*)/) || [])[1];
-      fails.push('the test could not finish: ' + m.split('\n')[0] + (w ? ' (waiting for ' + w.slice(0, 160) + ')' : '')); }
+      const log = m.split('\n').map((l) => l.trim()).filter((l) => /^- /.test(l) && !/^- waiting for/.test(l)).slice(-3).join(' · ');   // Playwright's call log: what stopped the click
+      fails.push('the test could not finish: ' + m.split('\n')[0] + (w ? ' (waiting for ' + w.slice(0, 160) + ')' : '') + (log ? ' [' + log.slice(0, 400) + ']' : '')); }
     const stuck = fails.length;   // the test stopped or a check failed: say where each device was and what it showed
     for (const [n, d] of devices.entries()) {
       const last = d.pages[d.pages.length - 1];
       if (stuck && last) { const txt = await last.evaluate(() => { const nav = document.querySelector('nav, aside, .el-side, #el-side'), all = (document.body.innerText || '').replace(/\s+/g, ' ').trim(), n = nav ? (nav.innerText || '').replace(/\s+/g, ' ').trim() : '';
           const tabs = [...document.querySelectorAll('.tab')], vis = tabs.filter((e) => e.offsetParent).length;
-          return (n && all.startsWith(n) ? all.slice(n.length) : all).trim().slice(0, 600) + (tabs.length ? ' [' + vis + ' of ' + tabs.length + ' tabs visible]' : ''); }).catch(() => '?');
+          const t1 = tabs.find((e) => e.offsetParent), r = t1 && t1.getBoundingClientRect(), top = r && document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          const on = top && t1 && !t1.contains(top) ? ', on top of the first tab: <' + top.tagName.toLowerCase() + (top.id ? '#' + top.id : '') + (top.className && typeof top.className === 'string' ? '.' + top.className.trim().split(/\s+/).join('.') : '') + '>' : '';
+          return (n && all.startsWith(n) ? all.slice(n.length) : all).trim().slice(0, 600) + (tabs.length ? ' [' + vis + ' of ' + tabs.length + ' tabs visible, panels ' + tabs.slice(0, 6).map((e) => e.dataset.panel || '-').join(',') + (r ? ', first at ' + Math.round(r.x) + ',' + Math.round(r.y) : '') + on + ']' : ''); }).catch(() => '?');
         fails.push('device ' + (n + 1) + ' was on ' + last.url().replace(/^https?:\/\/[^/]+\//, '') + ': "' + txt + '"'); }
       for (const e of new Set(d.errors)) fails.push('JavaScript error on ' + e);
       if (d.real.length) fails.push('tried to reach the REAL database: ' + [...new Set(d.real)].join(', '));
