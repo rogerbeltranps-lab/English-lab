@@ -292,22 +292,38 @@
       tabs.forEach(({tab,g})=>{const bk=tab==="book",grp=groupOf(a,bk?"ch1":g[0]);if(!grp)return;
         const sn=noIc((secs(a).find(y=>y[0]===tab)||[])[1]||(bk?"Book":tab)),tt=bk?null:(TT(a.id,tab)||TT(a.id,g[0]));
         let ti=tt?((CA&&tt[2])||tt[1]||""):"",su=tt?((CA&&tt[4])||tt[3]||""):"";if(/^Learning Path \d/.test(ti))ti="";
-        if(bk){ti=noIc(lp);su=t("Llegeix la història capítol a capítol i respon les preguntes de cada capítol.","Read the story chapter by chapter and answer the questions on each one.")}
+        if(bk){ti=t("el llibre ","the book ")+noIc(lp).replace(/^(Book|Llibre)\s*[:·]\s*/i,"");su=t("Llegeix la història capítol a capítol i respon les preguntes de cada capítol.","Read the story chapter by chapter and answer the questions on each one.")}
         const sc=g.map(k=>stepScore(a,k)).filter(v=>v!=null),n=g.filter(k=>ds.has(k)).length;
-        out.push({a,lp,grp,sn,t:ti||sn,s:su,m:bk?"":lp+" · "+sn,h:href+"#"+encodeURIComponent(tab),
+        out.push({a,lp,grp,sn,t:ti||sn,s:su,m:bk?"":lp,h:href+"#"+encodeURIComponent(tab),
           v:sc.length?sc.reduce((x,y)=>x+y,0)/sc.length:null,done:n===g.length,part:g.length>1&&bk?[n,g.length]:null})})});
     return out}
+  // a summary for the steps whose page has no intro (Roger, 26 Nov 2026: "Amb un resum del que hi ha a l'activitat")
+  function fbSum(x){const n=String(x.sn||"").toLowerCase(),T=(ca,en)=>t(ca,en);
+    if(/talk|conversa/.test(n))return T("Parla amb un company i grava la conversa.","Talk to a partner and record the conversation.");
+    if(/shadow/.test(n))return T("Repeteix l'escolta just darrere de la veu, com una ombra.","Repeat the listening just behind the speaker, like a shadow.");
+    if(/log|registre/.test(n))return T("Torna a llegir el text i omple el registre amb notes curtes.","Read the text again and fill in the log with short notes.");
+    if(/chart/.test(n))return T("Escolta i omple la taula amb el que diuen.","Listen and fill in the chart with what they say.");
+    if(/expression/.test(n))return T("Aprèn paraules que van juntes i completa les frases.","Learn words that go together and complete the sentences.");
+    return ({Reading:T("Llegeix el text i respon les preguntes.","Read the text and answer the questions."),Listening:T("Escolta i respon les preguntes.","Listen and answer the questions."),
+      Speaking:T("Prepara't i grava't parlant.","Get ready and record yourself speaking."),Writing:T("Escriu el teu text i entrega'l.","Write your text and hand it in."),
+      Grammar:T("Llegeix com funciona i completa les frases.","Read how it works and complete the sentences."),Vocabulary:T("Aprèn les paraules i practica-les.","Learn the words and practise them."),
+      Research:T("Busca la informació i omple la fitxa.","Find the information and fill in the card."),Recall:T("Respon sense mirar els apunts: recordar t'ajuda a aprendre.","Answer without looking at your notes: remembering helps you learn.")})[x.grp]||""}
+  // the title starts with its skill (Roger, 26 Nov 2026: "que comenci amb el títol: reading/listening/Writing/Speaking/vocabulary/grammar")
+  function actTitle(x){const g=GRP.find(y=>y[0]===x.grp),k=g?(CA?g[1]:g[0]):"";if(!k)return String(x.t||"").trim();
+    const tt=String(x.t||"").trim().replace(new RegExp("^[^:]*\\b"+k+"\\b[^:]*:\\s*","i"),"");   // "Real listening: Happy Diwali" → "Happy Diwali"
+    if(!tt||tt.toLowerCase()===k.toLowerCase()||tt.toLowerCase()===String(x.sn||"").toLowerCase())return k;
+    return new RegExp("^"+k+"\\b","i").test(tt)?tt:k+": "+tt}
   let ACT_S=null,ACT_N=0,AV="skill";try{AV=localStorage.getItem("el_ls_actview")==="order"?"order":"skill"}catch(e){}
   const actCols=()=>innerWidth<=640?1:innerWidth<=1100?2:3;
   function actsBody(S){const I=actItems(S),T=teach(),ic=k=>(GRP.find(g=>g[0]===k)||[])[2]||"",gn=k=>{const g=GRP.find(x=>x[0]===k);return g?(CA?g[1]:g[0]):k};
     const res=x=>T?"":x.v!=null&&!x.cp?`<span class="lsn-r" style="--rc:${pcCol(x.v*100)}">${(Math.round(x.v*100)/10).toLocaleString(CA?"ca":"en")} / 10</span>`
       :x.done?`<span class="lsn-r ok">✓ ${t("Fet","Done")}</span>`:x.part&&x.part[0]?`<span class="lsn-r">${x.part[0]} / ${x.part[1]}</span>`:`<span class="lsn-r todo">${t("Per fer","To do")}</span>`;
-    const row=(x,meta)=>`<li><a href="${esc(x.h)}"><span class="lsn-at"><b>${esc(x.t)}</b>${x.s?`<small>${esc(x.s)}</small>`:""}${meta?`<em>${esc(meta)}</em>`:""}</span>${res(x)}<span class="lsn-open">${t("Obre","Open")} ›</span></a></li>`;
+    const row=(x,meta)=>`<li><a href="${esc(x.h)}"><span class="lsn-at"><b>${esc(actTitle(x))}</b>${(x.s||fbSum(x))?`<small>${esc(x.s||fbSum(x))}</small>`:""}${meta?`<em>${esc(meta)}</em>`:""}</span>${res(x)}<span class="lsn-open">${t("Obre","Open")} ›</span></a></li>`;
     const avg=L=>{const vs=L.filter(x=>x.v!=null&&!x.cp).map(x=>x.v);return vs.length?vs.reduce((x,y)=>x+y,0)/vs.length*100:null};
     const card=(head,L,meta)=>{const av=avg(L);return {n:L.length,h:`<section class="lsn-card lsn-sk"><h3><span>${head}</span>${!T&&av!=null?`<span class="lsn-av" style="--rc:${pcCol(av)}">${Math.round(av)} %</span>`:""}</h3><ul>${L.map(x=>row(x,meta(x))).join("")}</ul></section>`}};
     let cards;
     if(AV==="order"){const by=[];I.forEach(x=>{let c=by.find(y=>y.a===x.a);if(!c)by.push(c={a:x.a,L:[]});c.L.push(x)});
-      cards=by.map(c=>card(esc(c.L[0].lp),c.L,x=>x.cp?"":ic(x.grp)+" "+(x.sn||gn(x.grp))))}
+      cards=by.map(c=>card(esc(c.L[0].lp),c.L,()=>""))}
     else cards=GRP.map(([k,ca,i])=>{const L=I.filter(x=>x.grp===k);return L.length?card(i+" "+esc(CA?ca:k),L,x=>x.m):null}).filter(Boolean);
     if(!cards.length)return `<p class="lsn-none">${t("El professor obrirà les activitats a classe, quan toqui.","Your teacher will open the activities in class, when it is time.")}</p>`;
     // no gaps (Roger, 26 Nov 2026: "I dont want the blank spaces here"): each card goes under the shortest column so far, in reading order
