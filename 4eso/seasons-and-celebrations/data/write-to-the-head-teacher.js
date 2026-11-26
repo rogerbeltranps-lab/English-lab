@@ -185,7 +185,7 @@ window.LP = {
         { p: 'polite', r: 'safe', q: '___ we put up posters in the corridor?', a: ['could', 'can', 'may'], en: 'Could we…?' },
         { p: 'polite', r: 'safe', a: [], own: { must: ["\\bcould we\\b", "\\bwould it be possible to\\b"], min: 10 }, q: "Your turn: two requests for your email: one with <b>Could we…?</b> and one with <b>Would it be possible to…?</b>", show: "Could we use the school hall? Would it be possible to start at 10?", en: "Use Could we…? and Would it be possible to…?" },
         { p: 'formal', r: 'daring', q: 'We look forward to ___ (welcome) families.', a: ['welcoming'], en: 'look forward to + -ing.' },
-        { p: 'formal', r: 'daring', q: 'Correct the word: “I look forward to hear from you.” → ___', a: ['hearing'], en: 'look forward to + -ing.' },
+        { p: 'formal', r: 'daring', q: 'Correct the word: “I look forward to hear from you.” → ___', fc: 'I look forward to hearing from you.', a: ['hearing'], en: 'look forward to + -ing.' },
         { p: 'formal', r: 'daring', q: '___ the hall is small, we can also use the gym.', a: ['although', 'even though'], en: 'Concession.' },
         { p: 'formal', r: 'daring', a: [], own: { must: ["\\balthough\\b"], min: 8 }, q: "Your turn: think of one worry the head teacher could have and answer it with <b>Although…</b>", show: "Although the hall is small, we can also use the gym.", en: "Use Although + a full sentence." }
       ] },

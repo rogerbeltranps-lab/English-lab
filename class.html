@@ -17,10 +17,25 @@
   try{var u=new URLSearchParams(location.search).get("u")||"";if(u.charAt(0)==="/"){var t=new URL(u,location.href);
     if(t.origin===location.origin&&t.pathname.indexOf(base)===0&&!/\/class\.html$/.test(t.pathname))to=t}}catch(e){}
   f.src=to.href;
+  // ↩ Back at the first page of the class (Roger, 24 Nov 2026: "sometimes when they go back they exit fullscreen, but not on purpose"): the
+  // pages before it are outside this frame, so the browser's back (the ← key, Alt+←, a swipe) went to one of them as a new page, and a new
+  // page ends the full screen. Once the full screen is on, this page keeps one entry of its own on top of them (history.pushState, first
+  // on the tap that starts the full screen). Going back below it lands here instead: the entry is put back at once and the page the student
+  // came from (?b=, el-cloud.js shellEnter) opens inside the frame, once; after that, back at the first page stays where it is. Back between
+  // pages of the class is the frame's own history and keeps the full screen by itself.
+  var back=null;try{var b=new URLSearchParams(location.search).get("b")||"";if(b.charAt(0)==="/"){var bt=new URL(b,location.href);
+    if(bt.origin===location.origin&&bt.pathname.indexOf(base)===0&&!/\/class\.html$/.test(bt.pathname)&&bt.href!==to.href)back=bt.href}}catch(e){}
+  var fsNow=function(){return !!(document.fullscreenElement||document.webkitFullscreenElement)};
+  function guard(){try{if(fsNow()&&!(history.state&&history.state.elShell))history.pushState({elShell:1},"",location.href)}catch(e){}}
+  document.addEventListener("fullscreenchange",guard);document.addEventListener("webkitfullscreenchange",guard);
+  addEventListener("popstate",function(e){if(e.state&&e.state.elShell||!fsNow())return;guard();
+    if(back){var u=back;back=null;try{f.contentWindow.location.href=u}catch(x){}}});
+  // a tap or a key in the page puts the entry back too, if it is missing
+  f.addEventListener("load",function(){try{var d=f.contentWindow.document;d.addEventListener("pointerdown",guard,true);d.addEventListener("keydown",guard,true)}catch(e){}});
   var last="";
   function sync(){try{var w=f.contentWindow,l=w.location;if(l.origin!==location.origin)return;
     var rel=l.pathname+l.search+l.hash;if(/\/class\.html$/.test(l.pathname)){location.replace(l.href);return}   // never a frame in a frame
-    if(rel!==last){last=rel;history.replaceState(null,"",location.pathname+"?u="+encodeURIComponent(rel))}
+    if(rel!==last){last=rel;history.replaceState(history.state,"",location.pathname+"?u="+encodeURIComponent(rel))}
     var ti=w.document&&w.document.title;if(ti&&document.title!==ti)document.title=ti}catch(e){}}
   f.addEventListener("load",function(){sync();try{f.contentWindow.focus()}catch(e){}});
   setInterval(sync,800);

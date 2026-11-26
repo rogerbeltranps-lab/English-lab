@@ -69,9 +69,13 @@ export async function firestore(){
   const plain=v=>v==null?null:"stringValue" in v?v.stringValue:"integerValue" in v?+v.integerValue:"doubleValue" in v?v.doubleValue:"booleanValue" in v?v.booleanValue
     :"timestampValue" in v?v.timestampValue:"nullValue" in v?null:"mapValue" in v?Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,x])=>[k,plain(x)]))
     :"arrayValue" in v?(v.arrayValue.values||[]).map(plain):null;
+  const enc=x=>x==null?{nullValue:null}:Array.isArray(x)?{arrayValue:{values:x.map(enc)}}:typeof x==="object"?{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,enc(v)]))}}
+    :typeof x==="boolean"?{booleanValue:x}:typeof x==="number"?(Number.isInteger(x)?{integerValue:String(x)}:{doubleValue:x}):{stringValue:String(x)};
   const doc=d=>d?Object.fromEntries(Object.entries(d.fields||{}).map(([k,x])=>[k,plain(x)])):null;
   return {
     get:async p=>doc(await api("GET",BASE+"/"+p)),
+    // the whole document replaced by data (plain values: strings, numbers, booleans, arrays, maps)
+    set:async(p,data)=>doc(await api("PATCH",BASE+"/"+p,{fields:Object.fromEntries(Object.entries(data).map(([k,v])=>[k,enc(v)]))})),
     // every document of a collection (or subcollection path): [[id, data]]
     list:async p=>{const out=[];let tok="";do{const j=await api("GET",BASE+"/"+p+"?pageSize=300"+(tok?"&pageToken="+tok:""));(j?.documents||[]).forEach(d=>out.push([d.name.split("/").pop(),doc(d)]));tok=j?.nextPageToken||""}while(tok);return out},
     // documents of a top-level collection with created (or another timestamp field) >= from

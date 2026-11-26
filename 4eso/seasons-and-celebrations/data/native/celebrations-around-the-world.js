@@ -78,6 +78,7 @@ window.LP.native = {
     ] },
 
   log: { type: 'step', tab: 'Summary', title: 'Summary and response (C2 Proficiency writing, Part 1 skills)', pill: 'Your teacher sees it',
+    textFrom: 'read', textTitle: '📖 The text',   // the reading above the boxes (Roger, 25 Nov 2026)
     intro: 'Part 1 of the C2 Proficiency Writing paper asks you to summarise and evaluate the key ideas of two texts. Practise the first half here: compress the writer’s argument without copying it.',
     html: '<div class="model"><strong>Strategy · compress, don’t copy.</strong> Find the one sentence each paragraph exists to say. Then write it again with different words: nouns instead of clauses (<em>the persistence of these festivals</em>), and one linker for the turn in the argument (<em>Although purists…, the writer argues…</em>). Examiners penalise “lifting” whole phrases from the text.</div>',
     fields: [
@@ -118,7 +119,7 @@ window.LP.native = {
       { q: 'As soon as the clock struck twelve, everyone started singing. SOONER → No ___ twelve than everyone started singing.', a: ['sooner had the clock struck', 'sooner did the clock strike'], en: 'No sooner had + subject + past participle + than.' },
       { q: 'They had no idea that the party was for them. LITTLE → ___ that the party was for them.', a: ['little did they know', 'little did they realise', 'little did they realize'], en: 'Little did + subject + verb.' },
       { q: 'I love the atmosphere of Sant Joan most. WHAT → ___ the atmosphere.', a: ['what i love most about sant joan is', 'what i love about sant joan most is'], en: 'What + clause + is…' },
-      { q: 'Lincoln made Thanksgiving a national holiday in 1863. IT → ___ Lincoln made Thanksgiving a national holiday.', a: ['it was in 1863 that'], en: 'It was + focus + that…' },
+      { q: 'Lincoln made Thanksgiving a national holiday in 1863. IT → ___ Lincoln made Thanksgiving a national holiday.', a: ['it was in 1863 that', 'it was in 1863 when'], en: 'It was + focus + that…' },
       { q: 'You must not light fireworks indoors under any circumstances. CIRCUMSTANCES → Under ___ light fireworks indoors.', a: ['no circumstances must you', 'no circumstances should you'], en: 'Under no circumstances + inverted modal.' },
       { q: 'The only thing I want this New Year is some peace and quiet. ALL → ___ this New Year is some peace and quiet.', a: ['all i want'], en: 'All I want is…' },
       { q: 'The organisers did not apologise at any point. TIME → At ___ apologise.', a: ['no time did the organisers', 'no time did they'], en: 'At no time + did + subject + verb.' }
@@ -131,14 +132,14 @@ window.LP.native = {
       '<strong>Tip:</strong> look at what comes after each gap as well as before it: (5) and (6) are parts of two-part structures.'
     ],
     items: [
-      { q: '(1) supposedly devoted ___ joy', a: ['to'], en: 'devoted to.' },
-      { q: '(2) ___ the endless lists… (= because of all)', a: ['with', 'between', 'what with'], en: 'With / What with = because of all these things.' },
-      { q: '(3) feeling ___ though they need a holiday', a: ['as'], en: 'as though = as if.' },
-      { q: '(4) it is not the celebrations ___ that wear us down', a: ['themselves'], en: 'Emphatic pronoun: the celebrations themselves.' },
-      { q: '(5) not the celebrations…, ___ rather the pressure', a: ['but'], en: 'not X but rather Y.' },
-      { q: '(6) ___ more we expect to feel, the more we notice…', a: ['the'], en: 'The more…, the more…' },
-      { q: '(7) the answer lies ___ lowering our expectations', a: ['in'], en: 'lie in = consist of, be found in.' },
-      { q: '(8) …, ___ is easier said than done', a: ['which'], en: 'Sentence relative clause: which refers to the whole idea.' }
+      { q: '(1) supposedly devoted ___ joy', fq: 'For a season supposedly devoted ___ joy, December can be strangely exhausting.', a: ['to'], en: 'devoted to.' },
+      { q: '(2) ___ the endless lists… (= because of all)', fq: '___ the endless lists, the crowded shops and the obligatory gatherings, many people reach January feeling as though they need a holiday from their holidays.', a: ['with', 'between', 'what with'], en: 'With / What with = because of all these things.' },
+      { q: '(3) feeling ___ though they need a holiday', fq: 'Many people reach January feeling ___ though they need a holiday from their holidays.', a: ['as'], en: 'as though = as if.' },
+      { q: '(4) it is not the celebrations ___ that wear us down', fq: 'Psychologists point out that it is not the celebrations ___ that wear us down.', a: ['themselves'], en: 'Emphatic pronoun: the celebrations themselves.' },
+      { q: '(5) not the celebrations…, ___ rather the pressure', fq: 'It is not the celebrations that wear us down, ___ rather the pressure to enjoy them.', a: ['but'], en: 'not X but rather Y.' },
+      { q: '(6) ___ more we expect to feel, the more we notice…', fq: '___ more we expect to feel, the more we notice what we are not feeling.', a: ['the'], en: 'The more…, the more…' },
+      { q: '(7) the answer lies ___ lowering our expectations', fq: 'Perhaps the answer lies ___ lowering our expectations.', a: ['in'], en: 'lie in = consist of, be found in.' },
+      { q: '(8) …, ___ is easier said than done', fq: 'Perhaps the answer lies in lowering our expectations, ___ is easier said than done.', a: ['which'], en: 'Sentence relative clause: which refers to the whole idea.' }
     ] },
 
   write: { type: 'writing', product: 1, tab: 'Writing', title: 'Piece 1: an article (C2 Proficiency Writing, Part 2)',

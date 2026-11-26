@@ -4,16 +4,18 @@
 // been told about are saved as students/{uid}.examSeen[ls] = the marks in one string, so new marks (for example corrected ones) bring
 // the card back as "updated". "Later" hides it until the browser is closed. Nothing is shown for an LS the student's board does not list
 // (hidden, or not assigned to the group), nor for an exam with a section still empty (the teacher may be typing the marks).
-const sig=(e,sc)=>e.sections.map(([k,,mx])=>{const s=sc[k];return s&&s.score!=null&&s.score!==""?k+":"+s.score+"/"+(s.max||mx||e.max):s&&s.excused?k+":-":null});   // excused = a part the student could not do (late exam without the listening): left out, so it does not hold the card back
+// From LS2 on too (Roger, 25 Nov 2026: "will students see notifications, like you have the exam corrected"): results held until 📣 Publish
+// reach this card without sections (el-cloud.js held), so the card and the 📬 (el-notify.js) come only once they are published.
+export const examSig=(e,sc)=>e.sections.map(([k,,mx])=>{const s=sc[k];return s&&s.score!=null&&s.score!==""?k+":"+s.score+"/"+(s.max||mx||e.max):s&&s.excused?k+":-":null});   // excused = a part the student could not do (late exam without the listening): left out, so it does not hold the card back
 
 // get(ls) → the assessment record or null, seen() → students/{uid}.examSeen or {}, save(ls,sig), visible(ls) → the board lists the LS.
 export async function examNotice({get,seen,save,visible,course,en,board}){
-  const G=window.EL_GRADING||{},L=(window.EL_LS||[]).filter(l=>l.course===course&&G[l.id]&&G[l.id].exam&&G[l.id].only);   // only LSs whose board shows the exam (onlyView in today.html)if(!L.length)return;
+  const G=window.EL_GRADING||{},L=(window.EL_LS||[]).filter(l=>l.course===course&&G[l.id]&&G[l.id].exam);   // every LS with an exam: LS1 (onlyView) and, from LS2, the web exams once 📣 published (held ones have no sections here)if(!L.length)return;
   let was;try{was=await seen()||{}}catch(e){console.warn("exam notice",e);return}
   const todo=[];
   for(const l of L){
     let r;try{r=await get(l.id)}catch(e){continue}
-    const s=sig(G[l.id].exam,(r&&r.sections)||{});if(s.includes(null))continue;   // no exam yet, or not every section entered
+    const s=examSig(G[l.id].exam,(r&&r.sections)||{});if(s.includes(null))continue;   // no exam yet, or not every section entered
     const v=s.join(",");if(was[l.id]===v)continue;
     let later=null;try{later=sessionStorage.getItem("el_exam_later_"+l.id)}catch(e){}
     if(later===v||!(await visible(l.id).catch(()=>false)))continue;

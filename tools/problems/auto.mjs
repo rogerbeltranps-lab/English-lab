@@ -19,8 +19,9 @@
 //        mark Roger already recalculated), "nobug" (the site works as it should: the answer explains it), "you" (Roger must do something:
 //        --todo says what, in one short line). --reply = the suggested answer to the student (≤1000 characters, Roger's voice, the report's
 //        language, never AI): the dashboard shows it with a one-click send button. Run it again on the same report to change it.
-// Never straight away (Roger, 17 Nov 2026: "always answer from 8-18 and after 2 hours since u receive the message o report, don't use their
-// names or surnames since sometimes it feels like AI"): `fixed` saves the card with at = tools/problems/reply-time.mjs replyAt(report time)
+// Never straight away, never by name (Roger, 17 Nov 2026: "don't use their names or surnames since sometimes it feels like AI"). Since
+// 24 Nov 2026 the answer waits for Roger ("Reports are done immediately but we don't send an answers until I press the button"):
+// `fixed` saves the card held (WAIT below)
 // (problemReplies.at, the msgs entry's go and auto.go: el-cloud.js shows the card only from then, the dashboard says when); --now sends at
 // once, only when Roger asks for it. --msg and --reply are refused if they use the student's name or surnames.
 // Both languages (Roger, 20 Nov 2026: "It should also have the catalan version"): --msg and --reply come with --msg2 / --reply2, the same
@@ -34,7 +35,7 @@ import path from "node:path";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
-import {replyAt,whenText,namesIn} from "./reply-time.mjs";
+import {namesIn} from "./reply-time.mjs";
 
 const ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../.."),PROJECT="english-lab-ietm",MSG_MAX=1000;
 const [cmd,id,...rest]=process.argv.slice(2),flag=f=>rest.includes(f)||process.argv.includes(f),opt=f=>{const i=rest.indexOf(f);return i>=0?rest[i+1]:null};
@@ -134,7 +135,10 @@ if(cmd==="fixed"||cmd==="leave"){
   if(x.fixed)throw new Error("Report "+id+" is already marked as fixed: nothing to do.");
   const note=String(opt("--note")||"").trim().slice(0,500),now=new Date().toISOString();
   if(cmd==="leave"&&!note)throw new Error("leave needs --note \"why Roger should look at it\"");
-  const writes=[],NOW=flag("--now"),go=NOW?0:replyAt(Date.parse(x.created||"")||Date.now());
+  // The student's ✅ answer waits for Roger (Roger, 24 Nov 2026: "Reports are done immediately but we don't send an answers until I press
+  // the button"): the card is saved with at = WAIT (far in the future, so el-cloud.js never shows it) and auto.wait = true; the dashboard's
+  // 📨 Send it (pbNow) sets at = now. --now (only when Roger asks in a thread) shows it at once.
+  const WAIT=Date.UTC(2100,0,1),writes=[],NOW=flag("--now"),go=NOW?0:WAIT;
   const named=namesIn([opt("--msg"),opt("--reply"),opt("--msg2"),opt("--reply2")].filter(Boolean).join(" "),[x.name||""]);
   const EN=!!x.route&&!elCa(x.route),other=EN?"Catalan":"English",two=(f,f2)=>{const a=String(opt(f)||"").trim().slice(0,MSG_MAX),b=String(opt(f2)||"").trim().slice(0,MSG_MAX);
     if(a&&!b&&!x.teacher)throw new Error(f+" needs "+f2+": the same words in "+other+" (Roger, 20 Nov 2026: students get both languages).");return [a,b]};
@@ -155,10 +159,10 @@ if(cmd==="fixed"||cmd==="leave"){
     if(msg){reply.msg=msg;reply.msgEn=en?msg:msg2;reply.msgCa=en?msg2:msg}if(go)reply.at=go;   // at: the student's page shows the card only from then (el-cloud.js)
     writes.push({update:{name:BASE+"/problemReplies/"+id,fields:Object.fromEntries(Object.entries(reply).map(([k,v])=>[k,fsv(v)]))},
       updateTransforms:[{fieldPath:"created",setToServerValue:"REQUEST_TIME"}]});
-    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg,reply2:msg2}:{},go?{go}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
+    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg,reply2:msg2}:{},go?{go,wait:true}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
     if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv(Object.assign({text:msg,at:now,rid:id,fix:true,en:en?msg:msg2,ca:en?msg2:msg},go?{go}:{}))]}}];
     writes.push(w);
-    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg)+"\n  ("+other+"): "+JSON.stringify(msg2):"")+"\nThe student sees it "+(go?"from "+whenText(go)+" (Madrid time)":"straight away (--now)"));
+    console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg)+"\n  ("+other+"): "+JSON.stringify(msg2):"")+"\nThe student sees it "+(go?"when Roger presses 📨 Send it on the dashboard":"straight away (--now)"));
   }
   console.log("Report "+id+" ("+(x.name||"?")+", "+(x.group||"")+"): "+(cmd==="fixed"?"marked fixed":"left for Roger")+(note?" · note: "+note:""));
   if(!flag("--apply")){console.log("(dry run: add --apply to save)");process.exit(0)}

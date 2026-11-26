@@ -377,3 +377,47 @@ body.elslpfs .panel-head h2{font-size:clamp(1.9rem,2.8vw,2.5rem)!important}
    100vh is the height with its toolbar hidden, so with the toolbar showing their last part sat below the screen). Phones and computers
    are unchanged. */
 @media (min-width:641px) and (hover:none) and (pointer:coarse){html{overscroll-behavior-y:none}}
+
+/* ---- 11. The teacher's side menu on every teacher page (Roger, 25 Nov 2026: "this menu should always be the same"): elTeacherMenu
+   (el-catalog.js) draws the dashboard's list in .eltm (el-app.js .elrail and Games / Practise / Flashcards .sidebar, el-ls-home.js
+   aside.side .nvs), in the dashboard's look (teacher.html .tside): plain rows, dark when on, the group's course colour, small numbers on the
+   right. .nv.tm beats the students' button look (.side .nv, .elside .nv). A narrow window keeps the strip of icons (.eln); on an LS's
+   learning paths the strip opens on hover (section 3). */
+.eltm,.nvs.eltm{display:flex;flex-direction:column;gap:4px}
+.eltm .nv.tm{text-decoration:none;display:flex;justify-content:flex-start;align-items:center;gap:6px;background:none;color:#475569;border:0;border-radius:12px;padding:10px 12px;
+  font:700 15px/1.25 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:left;margin:0;box-shadow:none;transform:none;width:auto;box-sizing:border-box;cursor:pointer}
+.eltm .nv.tm::after{content:none}
+.eltm .nv.tm .ic{flex:0 0 auto;width:auto;height:auto;background:none;border-radius:0;font-size:inherit;line-height:inherit;display:inline}
+.eltm .nv.tm .lb{flex:0 1 auto;margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eltm .nv.tm .gi{display:none}
+.eltm .nv.tm:hover{background:#eaf0ff;color:#3157d5;border:0;box-shadow:none;transform:none}
+.eltm .nv.tm.on{background:#0f172a;color:#fff;box-shadow:none}.eltm .nv.tm.c2eso.on{background:#16a34a}.eltm .nv.tm.c4eso.on{background:#2563eb}
+.eltm .nv.tm small{font-weight:600;font-size:12px;opacity:.75;white-space:nowrap}
+.eltm .nv.tm small.late{opacity:1;color:#b91c1c;font-weight:800}
+.eltm .nv.tm small.ask{opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800;margin-left:-2px}
+.eltm .sep{height:1px;background:#e2e8f0;margin:8px 8px}
+.eltm .lab{font:700 12px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
+.eltm .nv.tm.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.eltm .nv.tm.ann:hover{background:#ffedd5}
+.eltm .nv.tm.mton{background:#dc2626;color:#fff}.eltm .nv.tm.mton:hover{background:#b91c1c;color:#fff}
+.eltm .nv.tm small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
+/* the menu is longer than a Chromebook's screen: the column scrolls (as the dashboard's); the brand stays the dashboard's name */
+.app>.sidebar:has(>.eltm),.app>aside.side:has(.eltm){gap:12px}
+.elrail:has(>.eltm){gap:12px!important}
+/* the LS home's top row of pills (641–980 px): the items only */
+.mtabs.eltm{flex-direction:row}.mtabs.eltm .lab,.mtabs.eltm .sep{display:none}.mtabs.eltm .nv.tm{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs.eltm .nv.tm.on{background:#0f172a}
+/* on an LS's learning paths (body.elmini, ≥981 px): icons while closed, the group as "2A"; the names, headings and numbers when open */
+@media (min-width:981px){
+  body.elmini .elrail .eltm .nv.tm{padding:8px 10px;gap:10px;white-space:nowrap;overflow:hidden}
+  body.elmini .elrail .eltm .nv.tm .ic{display:inline-grid;place-items:center;width:28px;height:28px;font-size:17px;line-height:1}
+  body.elmini .elrail .eltm .nv.tm .gi{display:inline;font-size:13px;font-weight:800}
+  body.elmini .elrail .eltm :is(.lab,small){opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .eltm .lab{height:0;padding:0;overflow:hidden}
+  body.elmini .elrail:is(.elopen,:has(:focus-visible)) .eltm :is(.lab,small){opacity:1;transition-delay:.12s}
+  body.elmini .elrail:is(.elopen,:has(:focus-visible)) .eltm .lab{height:auto;padding:6px 12px 2px}
+}
+@media (min-width:981px) and (hover:hover){
+  body.elmini .elrail:hover .eltm :is(.lab,small){opacity:1;transition-delay:.27s}
+  body.elmini .elrail:hover .eltm .lab{height:auto;padding:6px 12px 2px}
+}
+/* a phone: the teacher has the dashboard's tab bar at the bottom (elTeacherTabs), so no row of menu pills at the top */
+@media (max-width:640px){body.elptab .mtabs.eltm{display:none!important}}

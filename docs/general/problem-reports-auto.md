@@ -11,8 +11,10 @@ environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool i
 
 **Never straight away, never by name (Roger, 17 Nov 2026):** "please don't answer straight away; always answer from 8-18 and after 2 hours
 since u receive the message o report, don't use their names or surnames since sometimes it feels like AI". The run still works at once,
-but `auto.mjs fixed` and `marks.mjs answer` save the student's card or answer with a later time (`tools/problems/reply-time.mjs`: at least
-2 hours after the report or comment, inside 08:00-18:00 Madrid time); the student sees it only from then and the tool prints when. Never
+but the student does not see the answer at once (Roger, 24 Nov 2026). `auto.mjs fixed` saves the ✅ card held until Roger presses
+📨 Send it on the report ("Reports are done immediately but we don't send an answers until I press the button"); `marks.mjs answer`
+saves a comment answer with a later time (`tools/problems/reply-time.mjs`: at least 2 hours after the comment, Monday to Friday
+17:00-21:00 Madrid time, else the next weekday from 17:00, replacing 08:00-18:00). The tool prints when. Never
 pass `--now` (only Roger can ask for it, in a thread). Never write the student's first name or surnames in `--msg`, `--reply` or an
 answer, not even "Hola …", and no classmate's name either: start with "Hola!" / "Hi!" or the answer itself (Roger again, 21 Nov 2026:
 "I said never use their names or surnames please"). The tools refuse a text that uses them, or any greeting followed by a name; write it again without them.
@@ -127,6 +129,10 @@ line, after the reports (or alone, when there is no open report):
    read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter and no route (Base reads English since 21 Nov 2026),
    English for Core, Plus and Pro, FORYOU for anything that needs Roger. Write the EL-ANSWERS v1 file in the scratchpad and run
    `node tools/marking/marks.mjs answer <file> --new --apply` (it saves `settings/marking.cmtRun`, so the next run skips them).
+   **A hand-in that is not a real try** (filler letters such as "rfr", "no" for an answer, the same word in every box), seen while
+   reading a comment or a report: send it back at once, without asking (Roger, 25 Nov 2026: "always when you detect that they've done
+   sth like this, you must ask them to redo it"): `node tools/marking/marks.mjs redo <S-code> <activity> <step> --why "…" --apply`
+   (as the dashboard's ↺ Redo; English note, Catalan for Starter). The comment itself still gets its ANSWER or FORYOU line.
 3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
    tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
    comment again). The Friday 15:00 task still answers any comment left.

@@ -28,7 +28,9 @@
 
   // ---- menus
   const boardHref=()=>who.role==="as"&&who.uid?ROOT+"today.html?student="+encodeURIComponent(who.uid):ROOT+"today.html";
-  const dashHref=()=>ROOT+"teacher.html?course="+COURSE+"&ls="+encodeURIComponent(LS);
+  // a personal LS (Towards Nativeness) is not an LS of its course on the dashboard: it opens its own ✦ page there, never a 4 ESO group
+  // (Roger, 25 Nov 2026: "Why do I only see 4ESO when I press this button")
+  const dashHref=()=>ROOT+(ls.personal?"teacher.html?g=tn":"teacher.html?course="+COURSE+"&ls="+encodeURIComponent(LS));
   const teach=()=>who.role==="teacher";
   function nav(){
     // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css): "🏠 My dashboard" → icon + label
@@ -36,8 +38,16 @@
     const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u)||String(txt).match(/^(LS\d+) · (.*)$/),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:"🗂");
       return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
     let html;
-    if(teach()||who.role==="tester"){
-      const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
+    // the teacher: the dashboard's side menu, the same on every teacher page (elTeacherMenu in el-catalog.js; Roger, 25 Nov 2026: "this
+    // menu should always be the same"), under the dashboard's name
+    const tm=teach()&&!!window.elTeacherMenu,br=$("aside.side .brand");
+    if(br){if(br.dataset.en==null){br.dataset.en=br.textContent;br.dataset.h=br.getAttribute("href")||""}
+      br.textContent=tm?"Teacher dashboard":br.dataset.en;br.setAttribute("href",tm?ROOT+"teacher.html":br.dataset.h)}
+    $$(".nvs,.nvs-m").forEach(n=>n.classList.toggle("eltm",tm));
+    if(tm){
+      html=elTeacherMenu({root:ROOT});
+    }else if(who.role==="tester"){
+      const first=a(boardHref(),"🏠 My dashboard");
       html=first+`<div class="nvsep"></div>`+["2eso","4eso"].map(c=>`<div class="nvh">${CN[c]}</div>`+a(ROOT+c+"/index.html",CN[c]+" · Learning Situations","sub")
         +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
@@ -57,10 +67,14 @@
     // collapse in every LS"; only the menu, LS1's content stays as it is)
     const mini=stu&&!!window.elMiniRail;document.body.classList.toggle("elmini",mini);
     if(mini)elMiniRail($("aside.side"));
+    else{const top=$("aside.side>.elmtop");if(top){const b=top.querySelector(".brand");if(b)top.before(b);top.remove()}}   // drawn first for a student (the strip), then the teacher: the brand comes back out of the ☰ row
     const b=$("#bnav");if(b)b.innerHTML=stu?[["","🏠",t("Inici","Home")],["#todo","✅",t("Per fer","To do")],["#homework","📝",t("Deures","Homework")],["#marks","📊",t("Notes","Marks")],[null,"📚","LS"],["#help","❓",t("Ajuda","Help")]]
       .map(([h,i,l])=>h===null?`<a class="on" aria-current="page" href="#"><i>${i}</i>${l}</a>`:`<a href="${boardHref()}${h}"><i>${i}</i>${l}</a>`).join(""):"";
     // a phone (≤640 px): the students' tab bar of every page instead (elPhoneTabs in el-catalog.js, shared/css/el-phone.css; Roger, 8 Nov 2026)
     if(stu&&window.elPhoneTabs)elPhoneTabs({root:ROOT,board:boardHref(),ls:LS,here:"ls",ca:CA});
+    // the teacher on a phone: the dashboard's tab bar (elTeacherTabs); nobody else keeps a students' bar drawn before sign-in was known
+    else if(tm&&window.elTeacherTabs)elTeacherTabs({root:ROOT});
+    else{const p=$("nav.elptabs");if(p)p.remove();document.body.classList.remove("elptab")}
   }
   // ---- places (#study, #about, #final): the board's rule, little on the menu and the details inside each place
   const PLACES=["study","about","final","notes"];   // notes: 📝 Your notes from the class games (el-notes.js)
@@ -230,7 +244,7 @@
   function skillsCard(){
     const D=skillData(),T=teach();
     const bar=(lab,p,k,note)=>`<div class="sk-b"><em>${lab}</em><span class="sk-bar"><i style="width:${p||0}%;background:${SKL[k][2]}"></i></span><strong${p==null?' class="na"':""}>${p==null?(note||"–"):p+" %"}</strong></div>`;
-    const heldTx=D.held?(()=>{const d=new Date(D.held);return t("Resultats de l'examen: ","Exam results: ")+d.toLocaleDateString(CA?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})})():"";
+    const heldTx=D.held?(()=>{const d=window.elHeldDay?elHeldDay(D.held):new Date(D.held);if(!d)return t("Resultats de l'examen: aviat","Exam results: soon");return t("Resultats de l'examen: ","Exam results: ")+d.toLocaleDateString(CA?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})})():"";
     const row=k=>{const a=D.act[k],e=D.ex[k],pa=a?pc(a.s,a.n):null,pe=e&&e.m?Math.round(e.s/e.m*100):null;
       return `<div class="sk-row" style="--k:${SKL[k][2]}"><span class="sk-ic" aria-hidden="true">${SKL[k][1]}</span><b class="sk-n">${esc(skName(k))}</b>`
         +bar(t("Activitats","Activities"),pa,k)+bar(t("Examen","Exam"),pe,k)+`</div>`};
@@ -255,6 +269,35 @@
     const lv=m?[m[1]]:tg?tg[1].split(/,\s*/):[];if(lv.length&&me<Math.min(...lv.map(v=>RK[RN[v]])))return "";
     let s=x;if(!all){if(m)s=s.slice(m[0].length);if(tg)s=s.replace(tg[0],"")}else s=s.replace(re,nm);
     return `<li>${esc(s)}</li>`}
+  // ---- 🧭 Your steps on the LS page too (Roger, 25 Nov 2026: "here I want this too", on the empty space under 🔤 Grammar and vocabulary):
+  // the same list as the board's voyage (ports as headings, ✓ when done, ▶ on the next step, 🏆 final product last), each step a link.
+  // It is the board's copy in this browser (today.html voyageKeep: el_voyage_steps_<ls>, or el_voyage_steps when it is this LS): no reads.
+  // A step done in this browser since the board made its copy gets its ✓ from this page's progress (only adds ticks; not in the teacher's
+  // student view, where this browser holds the teacher's own progress). Only the student (and the teacher's 👁 student view); nothing
+  // until the board has been opened on this LS in this browser.
+  function stepsData(){if(who.role!=="student"&&who.role!=="as")return null;
+    const J=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
+    let o=J("el_voyage_steps_"+LS);if(!o||o.ls!==LS){o=J("el_voyage_steps");if(o&&o.ls!==LS)o=null}
+    if(!o||!Array.isArray(o.items)||!o.items.length)return null;
+    if(o.u!=="demo"&&(!who.uid||o.u!==who.uid))return null;
+    return o}
+  function localDone(k){const i=String(k||"").lastIndexOf("#");if(i<0||!ST||who.role!=="student"||!window.elSecSteps)return false;
+    const a=acts().find(x=>x.id===k.slice(0,i));if(!a||!a.keys)return false;
+    const s=doneOf(a),st=elSecSteps(a,k.slice(i+1));return st.length>0&&st.every(d=>s.has(d))}
+  function stepsCard(){const o=stepsData();if(!o)return "";
+    let h="",n=0,ok=0,port=null,pd=true;const ports=[];
+    const items=o.items.map(x=>x.p?x:Object.assign({},x,{d:!!x.d||localDone(x.k)}));
+    items.forEach(x=>{if(x.p){port={x,ok:true};ports.push(port);return}n++;if(x.d)ok++;else if(port)port.ok=false});
+    const pOk=new Map(ports.map(p=>[p.x,p.ok]));
+    const now=items.find(x=>!x.p&&x.k===o.now&&!x.d)||null;
+    items.forEach(x=>{
+      if(x.p){h+=`<li class="pt"><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${pOk.get(x)?" ok":""}">✓</span></li>`;return}
+      const nw=now===x;
+      h+=`<li class="s${x.d?" ok":""}${nw?" now":""}"><a href="${esc(ROOT+x.h)}"><span class="tk">${nw?"▶":"✓"}</span><span class="n"><small style="color:${esc(x.c||"#8a5a1f")}">${esc(x.s||"")}</small>${esc(x.t)}</span></a></li>`});
+    const fp=o.fp||{};
+    if(fp.title)h+=`<li class="s fp${fp.done?" ok":""}${!now&&!fp.done?" now":""}"><a href="${esc(ROOT+(fp.href||""))}"><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final","Final product")}</small>${esc(fp.title)}</span></a></li>`;
+    return `<section class="lss-card lss-steps" aria-label="${esc(t("Els teus passos","Your steps"))}"><h2>🧭 ${t("Els teus passos","Your steps")} <small>${t(`${ok} de ${n} fets`,`${ok} of ${n} done`)}</small></h2>`
+      +`<div class="bar"><i style="width:${n?Math.round(ok/n*100):0}%"></i></div><ol>${h}</ol></section>`}
   function destImg(){try{if(!window.elVoyage||!elVoyage.SKINS[LS])return "";const S=elVoyage.skin({skin:LS});return S.I+S.dest.img+".webp"}catch(e){return ""}}
   function simpleHome(){if(!SIMPLE)return;
     const home=$('[data-place="home"]'),head=home&&home.querySelector(".lshead");if(!head)return;
@@ -266,8 +309,10 @@
     const crit=S.crit.length?`<section class="lss-card lss-crit"><h2>📏 ${t("Com t'avaluarem","How you are assessed")}</h2><p class="lss-lead">${t("Els criteris d'avaluació d'aquesta LS. Toca'n un per veure el text oficial.","The assessment criteria of this LS. Tap one to see its official wording.")}</p>`
       +S.crit.map(c=>`<details class="lss-cr ${esc(c.k)}"><summary>${c.chip}<span class="lss-crt"><b>${esc(c.sk)}</b> ${esc(c.d)}</span></summary><p>${esc(c.off)}</p></details>`).join("")+`</section>`:"";
     const lists=S.lists.length?`<section class="lss-card lss-gv"><h2>🔤 ${t("Gramàtica i vocabulari","Grammar and vocabulary")}</h2><div class="lss-gvc">${S.lists.map(c=>`<div><h3>${esc(c.h)}</h3><ul>${c.li.map(listLine).join("")}</ul></div>`).join("")}</div></section>`:"";
-    w.innerHTML=`<div class="lss-col">${chal}${aims}${crit}</div><div class="lss-col">${skillsCard()}${lists}</div>`;
+    w.innerHTML=`<div class="lss-col">${chal}${aims}${crit}</div><div class="lss-col">${skillsCard()}${lists}${stepsCard()}</div>`;
     if(window.elRouteFix)try{elRouteFix(w)}catch(e){}
+    // 🧭 the list scrolls inside its card: the next step in view, a little below the top
+    const sl=w.querySelector(".lss-steps ol"),nw=sl&&sl.querySelector("li.now");if(nw)sl.scrollTop=Math.max(0,nw.offsetTop-sl.offsetTop-80);
   }
   function draw(){
     lang();nav();place();aboutBanner();simpleHome();
@@ -286,7 +331,7 @@
     const C=window.ELCloud;
     if(!u){who={role:"none"};CA=false;ST=null;draw();return}
     const AS=C.viewing;
-    who=AS?{role:"as",uid:AS.uid}:C.isTeacher(u)?{role:"teacher"}:C.isTester(u)&&!C.viewGroup()?{role:"tester"}:{role:"student"};
+    who=AS?{role:"as",uid:AS.uid}:C.isTeacher(u)?{role:"teacher"}:C.isTester(u)&&!C.viewGroup()?{role:"tester"}:{role:"student",uid:u.uid};
     let lvs={};try{lvs=await C.levels()}catch(e){}
     const lv=window.elRouteOf?elRouteOf(lvs,LS).level:null;
     CA=(who.role==="student"||who.role==="as")&&(!lv||elCa(lv));
@@ -313,7 +358,7 @@
     const J=(st,k)=>{try{return JSON.parse(st.getItem(k)||"null")}catch(e){return null}};
     const W=J(localStorage,"el_who");if(!W||!W.role)return;
     const A=W.role==="teacher"?J(sessionStorage,"el_as"):null;
-    who=A&&A.uid?{role:"as",uid:A.uid}:{role:W.role};
+    who=A&&A.uid?{role:"as",uid:A.uid}:{role:W.role,uid:W.uid};
     // the teacher's student view: the student's language, kept with el_as by the page before (el-cloud.js remember, the board, fromCloud below)
     CA=who.role==="student"?W.ca!==false:who.role==="as"?A.ca!==false:false;
     const info=J(localStorage,"el_ls_"+LS),rc=who.role==="student"&&W.uid?J(localStorage,"el_rc_"+W.uid):null,rs={};

@@ -11,7 +11,8 @@
 //            teacher's and the test account's Courses and Learning Situations lists (#courses, #learning) stay, with this menu
 // It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
 // board's bottom bar (a phone):
-// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
+// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: the dashboard's own menu,
+// elTeacherMenu in el-catalog.js, Roger 25 Nov 2026).
 // Games replaced English Lab (Roger, 7 Nov 2026: "I want games on the left and vocabulary and grammar in practice, English Lab is not
 // needed anymore"): lab/ is now the Games page, and Practise has the vocabulary and grammar at the student's level.
 // LS1 pages keep their design (Roger's rule: leave LS1 alone). No Firestore reads: who is signed in, the group and the language
@@ -89,7 +90,7 @@
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
     const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return (cl[i] || {}).personal ? "✦" : i >= 0 ? "LS" + (i + 1) : "LS"; })();   // a personal LS (Towards Nativeness) has no number
     const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "")
-      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "games";
+      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : "games";
     const L = [];
     if (who.role === "none") {
       L.push(["home", "⌂", "Home", "Home", ROOT + "index.html"]);
@@ -101,6 +102,7 @@
       if (c) L.push(["all", "🗂", t("Totes les Learning Situations", "All Learning Situations"), t("Totes les LS", "All LS"), ROOT + c + "/index.html"]);
       L.push(["games", "🎲", t("Jocs", "Games"), t("Jocs", "Games"), ROOT + "lab/"]);
       if (teach) L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
+      if (teach) L.push(["flashcards", "🧠", "Flashcards", "Flashcards", ROOT + "lab/practice.html#deck"]);   // 🧠 Flashcards apart from Practise (Roger, 25 Nov 2026)
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
@@ -117,11 +119,15 @@
     const c = who.course || course0 || (curLs || "").split("-")[0];
     if (!c) return null;
     const ML = elMenuLs([c], who.group), lss = !curLs || ML.some(l => l.id === curLs) ? ML : [...ML, ...(window.EL_LS || []).filter(l => l.id === curLs)];
-    const here = /practice\.html$/.test(path) ? "practise" : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
+    const here = /practice\.html$/.test(path) ? (location.hash === "#deck" ? "flashcards" : "practise") : mode === "lab" ? "games" : mode === "course" ? "course:" + c : curLs && (mode === "lp" || mode === "games") ? "ls:" + curLs : "";
     let app = false; try { app = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) {}
     const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
     return elStudentMenu({ root: ROOT, courses: [c], lss, group: who.group, ca: CA, board, here, app });
   }
+  // the teacher's menu (not the student view, not the test account): the item that is on here (🧠 Flashcards, 🎯 Practise, 🎲 Games)
+  const tmUse = () => who.role === "teacher" && !who.as && !!window.elTeacherMenu;
+  const tmHere = () => /practice\.html$/.test(path) ? (location.hash === "#deck" ? "fd" : "practise") : mode === "lab" ? "games" : "";
+  const tmItems = () => tmUse() ? elTeacherMenu({ root: ROOT, on: tmHere(), list: true }) : null;
   function rail(L) {
     let r = $(".elrail");
     if (!r) { r = document.createElement("nav"); r.className = "elrail"; r.setAttribute("aria-label", "Menu"); document.body.prepend(r); }
@@ -135,13 +141,26 @@
     const cmTab = document.documentElement.classList.contains("elcmtab");
     const sm = stuMenu(), mini = !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail && (!!sm || !cmTab);
     document.body.classList.toggle("elmini", mini);
+    // the teacher: the dashboard's side menu, the same list and look as on teacher.html (elTeacherMenu in el-catalog.js; Roger, 25 Nov
+    // 2026: "this menu should always be the same"); the narrow strip shows the same items as icons
+    const TM = tmItems();
+    if (TM) {
+      r.innerHTML = `<a class="elr-brand" href="${ROOT}teacher.html">Teacher dashboard</a><div class="eltm elw">${elTeacherMenu({ root: ROOT, on: tmHere() })}</div>`
+        + `<div class="eln">${TM.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.lb)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.ic}</i><span>${esc(x.lb)}</span></a>`).join("")}</div>`;
+      document.body.classList.add("elhas-rail");
+      if (mini) elMiniRail(r); else r.classList.remove("elopen");
+      return;
+    }
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
       + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
+    if (window.elWhoPlace) elWhoPlace();   // the student's name under "English with Roger" (el-cloud.js, Roger 25 Nov 2026)
     if (mini) elMiniRail(r); else r.classList.remove("elopen");
   }
   function bar(L) {
+    // the teacher on a phone: the dashboard's tab bar (Home · Groups · Corrections · Messages · More; elTeacherTabs in el-catalog.js)
+    if (tmUse() && window.elTeacherTabs) { const o = $(".elbar"); if (o) o.remove(); document.body.classList.remove("elhas-bar"); elTeacherTabs({ root: ROOT }); return; }
     let b = $(".elbar");
     if (!b) { b = document.createElement("nav"); b.className = "elbar"; b.setAttribute("aria-label", "Menu"); document.body.append(b); }
     const sh = x => x.k === "board" ? t("Inici", "Home") : x.short;   // the board's bottom bar says Home
@@ -151,8 +170,10 @@
     // and Practise and Games as the two halves of its Practise tab
     if (who.role === "student" && window.elPhoneTabs) {
       const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
-      elPhoneTabs({ root: ROOT, board, ls: curLs, here: mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
-      if (mode === "lab") {
+      // 🧠 Flashcards (lab/practice.html#deck) sits under 🎓 My progress, so on a phone it belongs to the Me tab, without the Practise / Games halves
+      const fc = /practice\.html$/.test(path) && location.hash === "#deck";
+      elPhoneTabs({ root: ROOT, board, ls: curLs, here: fc ? "me" : mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
+      if (mode === "lab" && !fc) {
         const main = $("main.content");
         let sg = $(".elpseg");
         if (main && !sg) { sg = document.createElement("nav"); sg.className = "elpseg"; main.before(sg); }
@@ -165,8 +186,14 @@
   function side(L) {   // Games and Practise: their side menu, as the board's buttons
     const tabs = $(".sidebar .nav-tabs");
     if (!tabs) return;
-    let s = $(".elside");
-    if (!s) { s = document.createElement("nav"); s.className = "elside"; s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    let s = $(".sidebar>nav.elside,.sidebar>nav.eltm");
+    if (!s) { s = document.createElement("nav"); s.setAttribute("aria-label", "Menu"); tabs.after(s); }
+    // the teacher: the dashboard's menu (elTeacherMenu), under the dashboard's name
+    const tm = tmUse(), br = $(".sidebar>.brand");
+    s.className = tm ? "eltm" : "elside";
+    if (br) { if (br.dataset.en == null) { br.dataset.en = br.textContent; br.dataset.h = br.getAttribute("href") || ""; }
+      br.textContent = tm ? "Teacher dashboard" : br.dataset.en; br.setAttribute("href", tm ? ROOT + "teacher.html" : br.dataset.h); }
+    if (tm) { s.innerHTML = elTeacherMenu({ root: ROOT, on: tmHere() }); return; }
     s.innerHTML = stuMenu() || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
@@ -514,9 +541,19 @@
     box.innerHTML = h + "</ol>";
     voyTicks(true);
   }
+  // a step of another page done in this browser since the board made its copy (problem report, 4ESOB, 24 Nov 2026: "when I change task
+  // it says I haven't done the others"): its ✓ comes from this browser's own progress of that page (EL_CATALOG keys, no reads). Only adds
+  // ticks, never removes one; not in the teacher's student view (this browser holds the teacher's own progress there).
+  function voyLocalDone(k) {
+    const i = String(k || "").lastIndexOf("#"); if (i < 0 || who.as || !window.elDoneSet || !window.elSecSteps) return false;
+    const id = k.slice(0, i), a = (window.EL_CATALOG || []).find(x => x.id === id); if (!a || !a.keys) return false;
+    const s = new Set(); a.keys.forEach(kk => { let v = null; try { v = localStorage.getItem(kk); } catch (e) {} if (v) elDoneSet(v).forEach(d => s.add(d)); });
+    const st = elSecSteps(a, k.slice(i + 1)); return st.length > 0 && st.every(d => s.has(d));
+  }
   // this page's ticks from its own tabs (done, the one on screen), the count and the ports
   function voyTicks(first) {
     const box = $(".ellp-voy:not(.ellp-voyback)"); if (!box || box.hidden) return;
+    box.querySelectorAll("li.s:not(.fp):not(.ok)").forEach(li => { if (!li.querySelector("a[data-p]") && voyLocalDone(li.dataset.k)) li.classList.add("ok"); });
     box.querySelectorAll("li.s a[data-p]").forEach(a => { const tb = $('.tab[data-panel="' + CSS.escape(a.dataset.p) + '"]'), li = a.parentElement; if (!tb) return;
       li.classList.toggle("ok", tb.classList.contains("done"));
       const on = tb.classList.contains("active"); li.classList.toggle("here", on); a.querySelector(".tk").textContent = on ? "▶" : "✓"; });
@@ -536,7 +573,7 @@
   // A checked activity keeps its first try in the notebook; ↺ Practise again moves to the laptop look, where the new try and its results stay.
   // LS2 on, the same pages as ⛶ Full screen (not a recall checkpoint or the sample exam), and not the 📖 Book (it has its own pages).
   const NBOK = FSOK && !/\/book\.html$/.test(path), NBKEY = "el_lpnb", NBDEF = true;
-  const nbOn = () => { if (voyOn()) return true; let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
+  const nbOn = () => { let v = null; try { v = localStorage.getItem(NBKEY); } catch (e) {} return v === null ? NBDEF : v === "1"; };
   function nbSet(on) { try { localStorage.setItem(NBKEY, on ? "1" : "0"); } catch (e) {} nbDraw(); }
   if (NBOK) window.elLpNb = on => nbSet(!!on);   // ↺ Practise again in the notebook look takes the page back to the laptop look (ls2-engine.js)
   function nbDraw() {
@@ -546,10 +583,11 @@
       const l = document.createElement("link"); l.id = "el-lpnb-css"; l.rel = "stylesheet"; l.href = ROOT + "shared/css/el-lpnb.css?v=20261114b"; document.head.append(l); }
     // the engine shows each checked activity's first try in the notebook look and the latest in the laptop look (ls2-engine.js nbShow)
     if (H.classList.contains("el-lpnb") !== on) { H.classList.toggle("el-lpnb", on); if (window.elNbRefresh) try { window.elNbRefresh(); } catch (e) {} }
-    // ⛵ 4 ESO students see only the notebook look (Roger, 19 Nov 2026: "I want students to only see the notebook style in the activities"):
-    // no 🖥 Normal page button; ↺ Practise again then starts a fresh notebook page (window.elNbOnly, ls2-engine.js). The teacher keeps the switch.
+    // Students open in the notebook look and can switch again (Roger, 25 Nov 2026: "I want student to be able to change from notebook-like
+    // or computer like again when doing the activities"; it replaces the notebook-only look of 19 Nov). Their own choice is kept:
+    // ↺ Practise again starts a fresh notebook page and coming back from a game keeps the look (window.elNbOnly, ls2-engine.js);
+    // only the teacher's page goes back to the laptop look then.
     window.elNbOnly = voyOn(); H.classList.toggle("el-voy", voyOn());
-    if (voyOn()) { $$(".lp-panels>.panel>.panel-head>.ellpnb").forEach(b => b.remove()); return; }
     const lab = on ? t("🖥 Pàgina normal", "🖥 Normal page") : t("📓 Llibreta", "📓 Notebook");
     const tip = on ? t("Torna a veure aquest pas com una pàgina web normal", "Show this step as a normal web page again") : t("Mostra aquest pas com la teva llibreta", "Show this step like your notebook");
     $$(".lp-panels>.panel>.panel-head").forEach(h => {

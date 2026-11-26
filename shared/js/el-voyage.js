@@ -215,7 +215,7 @@
 .vy-sea.narrow .vy-b.big{width:64px;height:64px}.vy-sea.narrow .vy-boat .vy-b{width:46px;height:46px}.vy-sea.narrow .vy-boat b{font-size:10px;padding:1px 5px}.vy-sea.narrow .vy-boat{min-width:40px}
 .vy-dest.ok b::after{content:" ✓";color:#15803d}
 .vy-btn{position:absolute;bottom:12px;z-index:7;height:42px;border-radius:12px;background:#ffffffe6;display:flex;align-items:center;gap:6px;padding:0 12px;font:700 14px system-ui,sans-serif;box-shadow:0 1px 4px #0003;color:#1d3557;border:0;cursor:pointer}
-.vy-btn.off{opacity:.65}.vy-btn.wait{animation:vywait 1.6s ease-in-out infinite}@keyframes vywait{50%{box-shadow:0 0 0 6px #fbbf2466}}.vy-snd{right:66px}.vy-down{right:14px;width:42px;justify-content:center;padding:0;font-size:19px}
+.vy-btn.off{opacity:.65}.vy-btn.wait{animation:vywait 1.6s ease-in-out infinite}@keyframes vywait{50%{box-shadow:0 0 0 6px #fbbf2466}}.vy-snd{right:104px}.vy-down{right:14px;min-width:80px;justify-content:center;gap:5px;padding:0 12px}.vy-down i{font-style:normal;font-size:19px;line-height:1}
 .vy-toast{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:9;width:min(440px,90%);background:#fbf3df;border:3px solid #b08a52;border-radius:18px;padding:14px 22px;text-align:center;box-shadow:0 6px 0 #8a6a3a,0 10px 30px #0004;transition:all .35s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
 .vy-toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}.vy-toast .big{font-size:42px;line-height:1}.vy-toast b{display:block;font:700 23px Georgia,serif;color:#4a2f0e;margin-top:4px}.vy-toast small{display:block;font-size:13.5px;color:#8a5a1f;margin-top:3px}.vy-toast small.ce{color:#9a3412;font-weight:700}
 .vy-ovl{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(#0b1f3acc,#0b1f3af2);opacity:0;pointer-events:none;transition:opacity .5s}.vy-ovl.on{opacity:1;pointer-events:auto}
@@ -282,7 +282,7 @@
       :`<a class="all" href="lab/practice.html">✓ ${t("Ho tens tot fet! Practica pel teu compte","You're all done! Practise on your own")} →</a>`;
     return `<section class="vy" aria-label="${esc(wd("title"))}"><div class="vy-row"><div class="vy-sea${S.bg.drift===false?" still":""}${S.veh.drive?" drive":""}" style="${esc(cssVars(S))}"><div class="vy-sc"><div class="vy-map"></div></div>`
       +`<div class="vy-top"><div><small>${esc(V.ls||"")} · ${esc(wd("title"))}</small><b>🏆 ${esc(fp.title||"")}</b></div></div>`
-      +`<button type="button" class="vy-btn vy-snd" data-vy="snd"></button><button type="button" class="vy-btn vy-down" data-vy="me" title="${esc(wd("back"))}" aria-label="${esc(wd("back"))}">${S.veh.icon}</button>`
+      +`<button type="button" class="vy-btn vy-snd" data-vy="snd"></button><button type="button" class="vy-btn vy-down" data-vy="me" title="${esc(wd("back"))}" aria-label="${esc(wd("back"))}"><i>${S.veh.icon}</i>${t("Tu","You")}</button>`
       +`<div class="vy-toast" role="status"></div><div class="vy-ovl"></div></div><aside class="vy-steps">${col}</aside></div><div class="vy-go">${go}</div></section>`}
 
   // ---- the map ----
@@ -366,7 +366,8 @@
     // the rows of a stop are centred on it; yours is the first row; at the destination the rows start at the left edge
     const y0=s=>s.y-s.ex/2,YO=wide?78:74;
     const XY=i=>i<n?(s=>[s.x+(s.right?-YO:YO),y0(s)+48])(M.stops[i]):[8+YW/2,finY+36],meXY=XY(meI);M.xy=XY;M.meI=meI;M.spot=spot;
-    const row=r=>r.map(m=>`<div class="vy-boat" title="${esc(m.n)}">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
+    // no title on a classmate's vehicle: the name is already on its label (Roger, 25 Nov 2026: "the names twice when hovering over the boats don't make sense")
+    const row=r=>r.map(m=>`<div class="vy-boat">${BOAT(S,col(m.n),0,m.n)}<b style="background:${col(m.n)}">${esc(m.n)}</b></div>`).join("");
     M.stops.forEach((s,i)=>(s.rows||[]).forEach((r,k)=>{if(!r.length)return;const off=k===0&&i===meI&&V.me?YW:0,wB=r.reduce((a,m)=>a+bw(m),0);
       h+=`<div class="vy-mates" style="left:${s.right?s.x-40-wB-off:s.x+40+off}px;top:${y0(s)+k*RH}px">${row(r)}</div>`}));
     finRows.forEach((r,k)=>{if(!r.length)return;const off=k===0&&meI===n&&V.me?YW:0;h+=`<div class="vy-mates" style="left:${8+off}px;top:${finY+k*RH}px">${row(r)}</div>`});

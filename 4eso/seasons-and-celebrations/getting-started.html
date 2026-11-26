@@ -120,7 +120,7 @@ html,body{overflow-x:clip}
   <div class="section-card" id="caCards"></div>
   <div class="section-card"><h3 data-support-ca="Completa les frases" data-support-en="Complete the sentences">Complete the sentences</h3>
     <div id="practiceList"></div>
-    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
+    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova-ho tot" data-support-en="Check all">Check all</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="practiceResult"></div></div>
 </section>
 
@@ -129,7 +129,7 @@ html,body{overflow-x:clip}
   <div class="section-card">
     <div class="chat" id="readText"></div>
     <form id="readForm"></form>
-    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
+    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova-ho tot" data-support-en="Check all">Check all</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="readResult"></div>
   </div>
 </section>
@@ -146,7 +146,7 @@ html,body{overflow-x:clip}
     <p class="tiny" style="color:var(--muted)">Illustrated video made for English Lab. Voices generated with ElevenLabs.</p>
     <div id="gsGist"></div>
     <form id="listenForm"></form>
-    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
+    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova-ho tot" data-support-en="Check all">Check all</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="listenResult"></div>
     <div id="gsDict"></div>
     <div id="gsRealVideo"></div>
@@ -283,7 +283,7 @@ const allIn=(prefix,n)=>{for(let i=0;i<n;i++){const r=document.querySelector('in
 // answers saved at another route used to disappear. Each answer now goes back on the same question (q: the questions' text, saved with
 // the answers; older saves rebuild that list from their route); the route's new questions stay empty. done and the first try never change.
 const qid=it=>String(it&&(it.id||it.q)||"");
-function keepAns(k,v,items){delete fresh[k];state.ans=state.ans||{};state.ans[k]={l:level,v,q:(items||[]).map(qid)};if(state.typing)delete state.typing[k];save()}
+function keepAns(k,v,items){delete fresh[k];if(state.one)delete state.one[k];state.ans=state.ans||{};state.ans[k]={l:level,v,q:(items||[]).map(qid)};if(state.typing)delete state.typing[k];save()}
 // a = {l, v, q?}; items = this route's questions; name/base = the list (nat(name, base)) for rebuilding an older save's questions
 function moveAns(a,items,name,base){
   if(!a)return null;if(!items)return a.l===level?a.v:null;
@@ -305,7 +305,7 @@ function movedNote(sel,step,fresh){const el=$(sel);if(!el)return;const done=stat
     :"🔁 Your level has changed. The answers you had already given are here"+(done?" and this step stays done ✓."+(fresh?" The empty questions are new at your level: you can do them to practise.":""):"."+(fresh?" Answer the empty questions too to complete the step.":""));
   el.appendChild(p);el.classList.add("show")}
 // ↺ Practise again (Roger, 6 Nov 2026): empty boxes for a new try; the last checked answers stay saved until the new try is checked
-const fresh={};function again(k,render){fresh[k]=1;if(state.typing)delete state.typing[k];save();render()}
+const fresh={};function again(k,render){fresh[k]=1;if(state.one)delete state.one[k];if(state.typing)delete state.typing[k];save();render()}
 const typedVals=(items,prefix)=>items.map((_,i)=>$("#"+prefix+i).value);
 const radioVals=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return c?c.value:null});
 function fillTyped(items,prefix,v){items.forEach((_,i)=>{$("#"+prefix+i).value=v[i]||""})}
@@ -339,6 +339,7 @@ function renderWords(){
   $("#vocabGroups").innerHTML=forLevel(nat("vocab",vocab),level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
   practiceItems=forLevel(nat("practice",practice),level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
   delete movedFrom.practice;const v=kept("words",practiceItems,"practice",practice),t=v?null:typing("words",practiceItems,"practice",practice);if(v){fillTyped(practiceItems,"pr",v);doPractice(false);if(movedFrom.practice)movedNote("#practiceResult","words",movedFrom.practice===2)}else if(t)fillTyped(practiceItems,"pr",t);
+  oneAdd("words");
 }
 $("#practiceList").oninput=()=>keepTyping("words",typedVals(practiceItems,"pr"));
 function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(allIn("pr",practiceItems.length))complete("words")}else if(allIn("pr",practiceItems.length))doneFrom("words")}
@@ -358,6 +359,7 @@ function renderRead(){
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
   $("#readResult").classList.remove("show");
   delete movedFrom.readingQs;const v=kept("read",readItems,"readingQs",readingQs),t=v?null:typing("read",readItems,"readingQs",readingQs);if(v){fillRadio(readItems,"rd",v);doRead(false);if(movedFrom.readingQs)movedNote("#readResult","read",movedFrom.readingQs===2)}else if(t)fillRadio(readItems,"rd",t);
+  oneAdd("read");
 }
 $("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
 function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:level==="insecure"?q.he:null,false);f.className="feedback "+(ok?"ok":"no")});
@@ -371,6 +373,7 @@ function renderListen(){
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="l'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="lf'+i+'"></div>';f.appendChild(box)});
   $("#listenResult").classList.remove("show");
   delete movedFrom.listening;const v=kept("listen",listenItems,"listening",listening),t=v?null:typing("listen",listenItems,"listening",listening);if(v){fillRadio(listenItems,"l",v);doListen(false);if(movedFrom.listening)movedNote("#listenResult","listen",movedFrom.listening===2)}else if(t)fillRadio(listenItems,"l",t);
+  oneAdd("listen");
 }
 $("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
 function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:level==="insecure"?q.he:null,true);f.className="feedback "+(ok?"ok":"no")});
@@ -499,6 +502,49 @@ function renderCycle(){
   pr.onchange=()=>{c.predict=pr.value.trim();save()};g.onchange=()=>{c.gist=g.value.trim();save()};
   hb.forEach(b=>b.onclick=()=>{c.heard=b.dataset.heard;save();mark()});
 }
+/* ✓ Check one question at a time (Roger, 24 Nov 2026, on a 4ESOA problem report about this page: "I want them to check the questions one
+   by one, too"), as in the LS2 engine pages (ls2-engine.js oneBtn / stays, 16 Nov 2026): every question of Autumn words (the sentences),
+   Reading and Listening has its own small ✓ Check (Enter in a box does the same); the step's button is "Check all". A question checked on
+   its own shows its feedback and is remembered (state.one[step]: its positions) until the step's full check. Once every question has an
+   answer, the step is checked as a whole (the same full check as Check all), so it ends with Step complete ✓; until then the result names
+   the questions still to answer. The recall warm-up keeps one Check for the set (as in ls2-engine.js). */
+const ONE={
+  words:{list:"#practiceList",prefix:"pr",items:()=>practiceItems,typed:1,res:"#practiceResult",run:()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"),practiceItems)}},
+  read:{list:"#readForm",prefix:"rd",items:()=>readItems,res:"#readResult",run:()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"),readItems)}},
+  listen:{list:"#listenForm",prefix:"l",items:()=>listenItems,listen:1,res:"#listenResult",run:()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"),listenItems)}}};
+function oneCss(){if($("#el-one-css"))return;const st=document.createElement("style");st.id="el-one-css";
+  st.textContent=".el-onerow{display:flex;gap:8px;align-items:center;max-width:540px}.el-onerow>input{flex:1 1 auto;min-width:0}"
+    +".el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}.question>.el-one{display:inline-block;margin-top:8px}";
+  document.head.appendChild(st)}
+const oneFilled=(k,i)=>{const O=ONE[k];if(O.typed){const t=$("#"+O.prefix+i);return !!t&&String(t.value).trim()!==""}return !!document.querySelector('input[name="'+O.prefix+i+'"]:checked')};
+// one question's feedback, the same words as the step's full check (checkTyped / doRead / doListen)
+function oneShow(k,i){const O=ONE[k],it=O.items()[i],f=$("#"+(O.typed?O.prefix+"f":O.prefix==="rd"?"rdf":"lf")+i);if(!it||!f)return;
+  if(O.typed){const raw=$("#"+O.prefix+i).value,v=norm(raw),ok=fits(it.q,it.a,raw);
+    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(v===""?(ca()?"Escriu una resposta.":"Type an answer."):(ca()?"Encara no. Revisa la paraula al vocabulari de dalt i torna-ho a provar.":"Not yet. Check the word list above and try again."));
+    f.className="feedback "+(ok?"ok":"no");return}
+  const c=document.querySelector('input[name="'+O.prefix+i+'"]:checked');
+  if(!c){f.textContent=ca()?"Tria una resposta.":"Choose an answer.";f.className="feedback no";return}
+  const ok=+c.value===0;f.textContent=learningSupport.evidence(level,ok,c,it.o[0],ca()?it.h:level==="insecure"?it.he:null,!!O.listen);f.className="feedback "+(ok?"ok":"no")}
+function oneLeft(k){const O=ONE[k],n=O.items().length,left=[];for(let i=0;i<n;i++)if(!oneFilled(k,i))left.push(i+1);
+  const r=$(O.res);if(!r||state.ans&&state.ans[k]&&!fresh[k])return;
+  r.textContent=left.length?(ca()?"Per completar el pas, respon i comprova "+(left.length>1?"les preguntes ":"la pregunta ")+left.join(", ")+" (✓ Comprova).":"To complete the step, answer and check question"+(left.length>1?"s ":" ")+left.join(", ")+" (✓ Check)."):"";
+  r.classList.toggle("show",!!left.length)}
+function oneGo(k,i){const O=ONE[k],n=O.items().length;if(!(i>=0&&i<n))return;
+  if(!oneFilled(k,i))return oneShow(k,i);   // "Type an answer" / "Choose an answer": nothing is saved
+  state.one=state.one||{};const s=state.one[k]=(state.one[k]||[]).filter(x=>x!==i).concat(i);
+  for(let j=0;j<n;j++)if(!oneFilled(k,j)){save();s.forEach(x=>oneShow(k,x));return oneLeft(k)}
+  O.run()}   // every question has an answer: the whole step is checked, as with Check all
+function oneAdd(k){const O=ONE[k],L=$(O.list);if(!L)return;oneCss();
+  const lab=ca()?"Comprova":"Check",tip=ca()?"Comprova només aquesta pregunta":"Check only this question";
+  L.querySelectorAll(":scope>.question").forEach((q,i)=>{if(q.querySelector(".el-one"))return;
+    const b='<button class="btn secondary el-one" type="button" data-one="'+k+'" data-i="'+i+'" title="'+tip+'">✓ '+lab+'</button>';
+    if(O.typed){const t=$("#"+O.prefix+i);if(!t)return;const row=document.createElement("div");row.className="el-onerow";t.before(row);row.append(t);row.insertAdjacentHTML("beforeend",b)}
+    else{const o=q.querySelector(".options");if(o)o.insertAdjacentHTML("afterend",b)}});
+  if(!L.dataset.one){L.dataset.one=1;
+    L.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button[data-one]");if(b&&b.dataset.one===k){e.preventDefault();oneGo(k,+b.dataset.i)}});
+    if(O.typed)L.addEventListener("keydown",e=>{const t=e.target;if(e.key!=="Enter"||!t.id||t.id.indexOf(O.prefix)!==0)return;const i=t.id.slice(O.prefix.length);if(!/^\d+$/.test(i))return;e.preventDefault();oneGo(k,+i)})}
+  // questions checked one by one before leaving the page show their feedback again (the step's full check shows everything itself)
+  if(!(state.ans&&state.ans[k])||fresh[k]){const s=(state.one&&state.one[k])||[];if(s.length){s.forEach(x=>oneShow(k,x));oneLeft(k)}}}
 function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);speakHanded();if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));

@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -160,6 +160,12 @@ D.fpg = {};
   }
 }
 
+// 📐 Levels NA–AE (EL_DEMO_LV=1; Roger, 24 Nov 2026): term 1 of the demo counts levels from 1 Nov, so the Learning paths table shows the chips
+if (process.env.EL_DEMO_LV) Object.values(D.tm).forEach((t) => { t.formative = { t1: 'levels', from: '2026-11-01' }; });
+// …and every tab of 4 ESO LS2's first three paths was done in class on 5 Nov in 4 ESO A (Time plan ticks), so their two weeks are over
+if (process.env.EL_DEMO_LV) { const ls = '4eso-seasons-and-celebrations', its = [];
+  CAT.filter((a) => a.ls === ls && /getting-started|celebrations-around|where-traditions/.test(a.id)).forEach((a) => ((global.EL_SECTIONS || {})[a.id] || []).forEach(([t]) => its.push(a.id + '#' + t)));
+  D.ls[ls].planEdits = Object.assign({}, D.ls[ls].planEdits, { '4ESOA': { agenda: JSON.stringify({ days: { '2026-11-05': its } }) } }); }
 // 🗣 Speaking analyses (EL_DEMO_SPEAK=1): Roig's analysis of the 2 ESO A Getting started recordings (all but the last two), teacher only
 if (process.env.EL_DEMO_SPEAK) {
   const c = '2eso', ls = LS2[c], gs = CAT.find((a) => a.id === c + '/ls2-getting-started'), doc = D.spk = {}, d = doc['spk_' + ls + '_2ESOA'] = {};
@@ -183,7 +189,33 @@ if (process.env.EL_DEMO_SPEAK) {
       voc: { topic: TOP.slice(i % 4, i % 4 + 4), conn: CON.slice(0, 2 + (sk + i) % 4), rep: i % 2 ? ['like'] : ['very'], l1: i === 1 ? ['pues'] : [], note: ['Basic but enough for the task.', 'Basic: mostly "like" and "play".', 'Varied, with chunks like "hang out" and "twice a week".', 'Basic, repeats "very".', 'Good range for A2.'][i], level: lv(2 + (i === 2)) },
       gram: { good: ['present simple: "I play"', 'like + -ing: "I like swimming"', 'frequency: "twice a week"'].slice(0, 1 + i % 3), errors: ERR.filter((x, j) => (j + i) % 2 === 0).slice(0, 2 + i % 3).map(([said, correct, rule]) => ({ said, correct, rule })), note: 'Mostly present simple; no past.', level: lv(2) },
       str: { opening: i !== 1, ending: i % 2 === 0, sentences: SEN[i], order: ['A list of hobbies, then when and with whom.', 'Jumps between ideas.', 'First, then, after that: a clear sequence with reasons.', 'A list.', 'Introduction, three hobbies with reasons, a short ending.'][i], note: '', level: lv(2 + (i % 2)) },
-      pron: { note: 'Understandable; the main problem is the vowel before s + consonant.', level: lv(3) }, task: { done: i === 1 ? 'partly' : 'yes', note: i === 1 ? 'Does not say how often.' : 'Covers what, when and with whom.' } } } };
+      pron: { note: 'Understandable; the main problem is the vowel before s + consonant.', level: lv(3) }, task: { done: i === 1 ? 'partly' : 'yes', note: i === 1 ? 'Does not say how often.' : 'Covers what, when and with whom.' },
+      n: { words: 70 + i * 9, clear: 46 + i * 7, sentences: 8 + (i % 3), correct: 3 + (i % 4), conn: 2 + (sk + i) % 4, secs: 40 + i * 4 } } } };
+    // 📈 two later recordings (What are they doing? Speaking, then Talk), each a little better, for the 📈 Over time chart
+    const wd = CAT.find((a) => a.id === c + '/ls2-what-are-they-doing'), wk = wd.keys[0], ws = JSON.parse(pg[wk] || '{"steps":{}}'); ws.steps = ws.steps || {};
+    [['speak', '2026-11-11T09:20:00Z', 1], ['talk', '2026-11-18T09:40:00Z', 2]].forEach(([k, at, g]) => {
+      const fid = 'demo-' + k + '-' + s.uid; ws.steps[k] = { title: k === 'talk' ? 'Talk: what are they doing?' : 'Speaking: a photo', date: at, audio: { id: fid, s: 45 + i * 5 + g * 6 } };
+      d[s.uid][fid] = { a: wd.id, k, at, model: 'gemini-flash-latest', eur: 0.0055, done: at, an: { summary: 'Clearer than last time.', fluency: g === 2 || i % 2 === 0 ? 'free' : 'hesitant',
+        good: [], sounds: SND.slice(0, Math.max(1, 3 - g)).map(([word, heard, tip]) => ({ word, heard, tip })), voc: { topic: TOP.slice(0, 3), conn: CON.slice(0, 2 + g + (i % 2)), rep: [], l1: [] },
+        gram: { good: [], errors: ERR.slice(0, Math.max(1, 3 - g)).map(([said, correct, rule]) => ({ said, correct, rule })) }, str: { opening: true, ending: g === 2, sentences: g === 2 ? 'complex' : 'joined', level: Math.min(4, lv(2) + g - 1) },
+        pron: { level: Math.min(4, lv(3) + (g === 2 ? 1 : 0)) },
+        n: { words: 80 + i * 9 + g * 12, clear: 58 + i * 7 + g * 10, sentences: 9 + g, correct: 4 + (i % 4) + g * 2, conn: 2 + g + (i % 2), secs: 45 + i * 5 + g * 6 } } };
+    });
+    pg[wk] = JSON.stringify(ws);
+  });
+}
+
+// 🧠 Practise flashcards (students/{uid}/flashcards/all): most students of each group studied some days of the last two weeks, a few never
+{
+  const day = (t) => { const d = new Date(t - 4 * 36e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  D.flash = {};
+  for (const g of global.EL_GROUPS) Object.values(D.st).filter((s) => s.group === g.id).forEach((s, i) => {
+    if (i % 5 === 4) return;   // never used them
+    const ls = LS2[g.course], log = {}, c = {}, keen = rnd();
+    for (let k = 0; k < 14; k++) if (rnd() < keen) { const n = 5 + Math.floor(rnd() * 30), r = Math.floor(n * (0.4 + rnd() * 0.3)); log[day(Date.now() - k * 864e5)] = [n, Math.floor(n * (0.7 + rnd() * 0.25)), n * (6 + Math.floor(rnd() * 8)), Math.min(15, n - r), r, Math.floor(r * (0.65 + rnd() * 0.3))]; }
+    const seen = Object.values(log).reduce((a, x) => a + x[3], 0);
+    for (let k = 0; k < seen; k++) { const ivl = rnd() < 0.7 ? 1 + Math.floor(rnd() * (k % 7 ? 8 : 30)) : 0; c['v:demo' + k] = ivl ? [2, Date.now() + ivl * 864e5, ivl, 2500, 0, 3, 0, Date.now()] : [1, Date.now(), 0, 2500, 1, 1, 0, Date.now()]; }
+    if (Object.keys(log).length) D.flash[s.uid] = { decks: { [ls]: { c, log } } };
   });
 }
 
@@ -204,7 +236,10 @@ const body = (rel) => {
   if (rel === 'teacher.html') { const s = b.toString(), i = s.indexOf('<script src="shared/js/el-catalog.js">'); b = s.slice(0, i) + `<script>window.EL_DEMO_DATA=${JSON.stringify(D)}</script>\n` + s.slice(i); }
   return b;
 };
-if (process.argv.includes('--serve')) {
+// tools/smoke/check.mjs imports the data (and the page with it injected) without serving or taking pictures
+export { D, body };
+const MAIN = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+if (!MAIN) { /* imported */ } else if (process.argv.includes('--serve')) {
   http.createServer((q, r) => { const rel = decodeURIComponent(new URL(q.url, 'http://x').pathname).replace(/^\/+/, '') || 'teacher.html', b = body(rel);
     if (b == null) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[path.extname(rel)] || 'application/octet-stream' }); r.end(b); }).listen(8765);
   console.log('http://127.0.0.1:8765/teacher.html');

@@ -229,7 +229,7 @@ window.LP = (function () {
         { r: 'insecure', q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get', 'gather', 'come'] },
         { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
         { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange', 'give', 'swap'] },
-        { r: 'safe', q: 'The opposite of religious: ___', a: ['secular'] },
+        { r: 'safe', q: 'The opposite of religious: ___', a: ['secular', 'non-religious', 'nonreligious', 'non religious', 'irreligious', 'not religious'] },
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
       ] },
@@ -388,7 +388,8 @@ window.LP = (function () {
         safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
         daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
       } },
-    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
+    { id: 'shadow', type: 'shadow', hand: false, // opened before 24 Nov 2026: not handed in (ls2-engine.js R.shadow)
+      tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
       intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
       clip: { title: 'Culture Bites: the story behind two autumn celebrations', src: 'audio/culture-bites-origins.mp3', slow: 'audio/culture-bites-origins-slow.mp3', t: [53.08, 92.01], ts: [64.6, 111.38], lines: [
         ['Emma', 'Now, Thanksgiving. It takes place on the fourth Thursday of November, and this year that’s the twenty-sixth.'],
@@ -481,7 +482,7 @@ window.LP = (function () {
         { p: 'rel', only: ['daring', 'native'], k: 'fix', q: '“The Castanyada, that takes place on 31 October, is a Catalan tradition.” → The Castanyada, ___ takes place on 31 October, is a Catalan tradition.', a: ['which'], en: 'Non-defining relatives never use that.' },
         { p: 'rel', r: 'daring', k: 'join', q: 'Thanksgiving became official in 1863. It takes place in November. → Thanksgiving, ___ ___ ___ ___ ___, became official in 1863.', a: ['which takes place in november'], en: 'Non-defining relative with which, between commas.' },
         { p: 'rel', r: 'daring', k: 'join', q: 'Abraham Lincoln made it official. He was president in 1863. → Abraham Lincoln, ___ ___ ___ ___ ___, made it official.', a: ['who was president in 1863'], en: 'Non-defining relative with who.' },
-        { p: 'rel', r: 'daring', k: 'fix', q: '“Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' },
+        { p: 'rel', r: 'daring', k: 'fix', q: '“Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], fc: 'Diwali, which is celebrated in autumn, is known as the festival of lights.', en: 'Non-defining relatives never use that.' },
         /* ➕ extra: Starter and Base */
         { p: 'rel', only: ['beginners', 'insecure'], opts: ['where', 'which', 'who'], q: 'The square is the place ___ the parade ends.', a: ['where'], ca: 'Lloc → where.', en: 'A place → where.' },
         { p: 'rel', only: ['beginners', 'insecure'], q: 'Halloween is a festival ___ started in Ireland.', a: ['which', 'that'], d: ['who', 'where'], ca: 'Cosa → which.', en: 'A thing → which.' },

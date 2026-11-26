@@ -17,6 +17,12 @@
    - Page text can't be copied, and nothing from outside can be pasted; students can copy and paste their own text inside their boxes (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
      saves them (dashboard → results/{ls}__assessment, as every exam).
    The teacher (and window.EL_EXAM_PREVIEW) sees a preview with every paper and the audio, and nothing is saved. */
+// Aa Easy reading on the exam's reading text (Roger, 25 Nov 2026: exams too; shared/js/el-easy-read.js, .wx-text).
+(function () {
+  if (!window.EL_EXAM || window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=4', me).href; document.head.appendChild(s);
+})();
 (function () {
   const X = window.EL_EXAM; if (!X) return;
   const FS = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
@@ -132,7 +138,7 @@
 
   // ---------- start ----------
   function boot() {
-    if (PV) { me = { uid: PV.uid || 'preview-uid' }; mode = PV.teacher ? 'teacher' : 'student'; return PV.teacher ? teacherPick() : student(PV.level || 'insecure', PV.group || '2ESOA'); }
+    if (PV) { me = { uid: PV.uid || 'preview-uid', email: PV.email || null }; mode = PV.teacher ? 'teacher' : 'student'; return PV.teacher ? teacherPick() : student(PV.level || 'insecure', PV.group || '2ESOA'); }
     root.innerHTML = '<div class="wx-card"><p>' + t('Carregant…', 'Loading…') + '</p></div>';
     const go = u => { if (!u) return; me = u; const c = C();
       if (c.isTeacher(u) && !c.viewing) { mode = 'teacher'; return teacherPick(); }
@@ -148,7 +154,14 @@
   async function readLs() { if (PV) return PV.ls || { webExam: { [S && S.group || '2ESOA']: { open: true } } };
     const F = await fsLib(), s = await F.getDoc(F.doc(C().db, 'ls', X.ls)); return s.exists() ? s.data() : {}; }
   // open for the group; with .only (a make-up exam, Roger 17 Nov 2026: Elunei's LS1 exam) only for the students listed by email
-  const isOpen = (l, g) => { const w = (((l || {}).webExam || {})[g] || {}); return !!w.open && (!Array.isArray(w.only) || !!(me && me.email && w.only.includes(String(me.email).toLowerCase()))); };
+  // A make-up (the student is on .only) is done alone, with headphones: the student plays the audio herself or himself, twice at most,
+  // and gets the next version of the level, never the one the account would get in class (Roger, 23 Nov 2026: a student who did the
+  // exam from home redoes it "different from the ones [he] did (but the same as others prepared)" and plays the audio "twice like the
+  // last time with Elunei")
+  let MU = false;
+  const isOpen = (l, g) => { const w = (((l || {}).webExam || {})[g] || {}), mine = !!(me && me.email && Array.isArray(w.only) && w.only.includes(String(me.email).toLowerCase()));
+    MU = mine; return !!w.open && (!Array.isArray(w.only) || mine); };
+  const auMax = () => (X.audio && X.audio.plays) || (MU ? 2 : 0);
   const payload = F => ({ ls: X.ls, key: X.key, paper: S.paper, level: S.level, group: S.group || null, order: S.order, answers: S.answers, started: S.started,
     listenDone: S.listenDone || null, status: S.status, exits: S.exits.slice(0, 30), glances: S.glances.slice(-60), changes: S.changes.slice(-300),
     snaps: S.snaps.slice(0, 30), tries: S.tries || 0, plays: S.plays || 0, done: S.done || null, updated: F.serverTimestamp() });
@@ -170,7 +183,12 @@
     ca = level === 'beginners';   // Catalan for Starter only (Roger, 21 Nov 2026: Base reads English)
     let d = null, l = null;
     try { [d, l] = await Promise.all([readDoc(), readLs()]); } catch (e) { console.warn('exam read', e); }
-    lsDoc = l; const loc = local.get();
+    lsDoc = l; let loc = local.get();
+    // a student who redoes the exam (a make-up after a try that cannot count, Roger 25 Nov 2026: a student saw the exam done at home):
+    // the teacher keeps a copy and clears it, and ls/{ls}.webExam[group].reset[uid] holds that old try's start, so neither the copy in
+    // this browser nor a cloud copy with that start comes back; the student begins a new paper
+    const rs = mode !== 'view' && me && ((((l || {}).webExam || {})[group] || {}).reset || {})[me.uid];
+    if (rs) { if (loc && loc.started === rs) { local.del(); loc = null; } if (d && d.started === rs) d = null; }
     if (mode === 'view') return viewOnly(d);
     if (d && d.status === 'done') { S = Object.assign({}, d); return handedIn(); }
     // started here or on another device: the cloud copy, unless this browser has newer answers that never reached it
@@ -204,8 +222,8 @@
     if (tPaper) { S.level = tPaper.startsWith('core') ? 'safe' : 'insecure'; ca = false; }
     const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pick(pl, 'A')].sections[s].length, 0);
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · ' + (X.lsShort || 'LS2') + ' · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
-      '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (tots junts, al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (all together, at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
-      '<ul class="wx-rules"><li>' + t('El <b>Listening</b> es fa primer: el professor posa l’àudio dues vegades. Quan acabi, prem <b>Listening acabat</b>: després ja no pots canviar aquestes respostes.', '<b>Listening</b> comes first: your teacher plays the audio twice. When it ends, press <b>Listening finished</b>: after that you can’t change those answers.') + '</li>' +
+      '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (' + (selfAu() ? 'amb auriculars' : 'tots junts') + ', al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (' + (selfAu() ? 'with headphones' : 'all together') + ', at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
+      '<ul class="wx-rules"><li>' + (selfAu() ? t('El <b>Listening</b> es fa primer: amb els auriculars, poses l’àudio tu mateix (' + auMax() + ' vegades com a màxim, sense pausa). Quan acabi, prem <b>Listening acabat</b>: després ja no pots canviar aquestes respostes.', '<b>Listening</b> comes first: with your headphones, you play the audio yourself (' + auMax() + ' times at most, no pause). When it ends, press <b>Listening finished</b>: after that you can’t change those answers.') : t('El <b>Listening</b> es fa primer: el professor posa l’àudio dues vegades. Quan acabi, prem <b>Listening acabat</b>: després ja no pots canviar aquestes respostes.', '<b>Listening</b> comes first: your teacher plays the audio twice. When it ends, press <b>Listening finished</b>: after that you can’t change those answers.')) + '</li>' +
       '<li>' + t('Després pots anar d’una part a l’altra i canviar les respostes tantes vegades com vulguis.', 'Then you can move between the parts and change your answers as often as you like.') + '</li>' +
       '<li>' + t('Al final, a <b>✅ Revisa i entrega</b>, veuràs totes les respostes i les que tens en blanc. Llavors prem <b>🏁 Entrega</b>.', 'At the end, in <b>✅ Review and turn in</b>, you see all your answers and any blanks. Then press <b>🏁 Turn in</b>.') + '</li></ul>' +
       '<div class="wx-warn"><b>⚠️ ' + t('Important', 'Important') + '</b><ul class="wx-rules">' +
@@ -264,7 +282,7 @@
   D.addEventListener('webkitfullscreenchange', () => { if ($('#wxWait') && !goNow) waiting(); });
   async function begin() {
       if (S && S.started) return;
-      const pl = paperOf(S.level), vs = ['A', 'B', 'C', 'D'].filter(x => X.papers[pl + '-' + x]), v = vs.length ? vs[hash32(String(me.uid) + X.key) % vs.length] : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);   // as many versions as the exam has (4ESO LS2: A, B, C; Roger 19 Nov 2026 "so that students can't copy")
+      const pl = paperOf(S.level), vs = ['A', 'B', 'C', 'D'].filter(x => X.papers[pl + '-' + x]), v = vs.length ? vs[(hash32(String(me.uid) + X.key) + (MU ? 1 : 0)) % vs.length] : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);   // as many versions as the exam has (4ESO LS2: A, B, C; Roger 19 Nov 2026 "so that students can't copy")
       const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
       S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
@@ -345,7 +363,7 @@
     if (s === 'review') return review(b);
     const ids = S.order[s], list = ids.map(id => items(s).find(x => x.id === id)).filter(Boolean), lockL = s === 'listening' && !!S.listenDone && mode !== 'teacher';
     const ro = mode === 'view' || lockL;
-    const lead = { listening: selfAu() ? t('Posa l’àudio tu mateix (el pots escoltar ' + X.audio.plays + ' vegades) i tria la resposta correcta.', 'Play the audio yourself (you can listen to it ' + X.audio.plays + ' times) and choose the right answer.')
+    const lead = { listening: selfAu() ? t('Posa l’àudio tu mateix (el pots escoltar ' + auMax() + ' vegades) i tria la resposta correcta.', 'Play the audio yourself (you can listen to it ' + auMax() + ' times) and choose the right answer.')
         : t('Escolta l’àudio (el professor el posa dues vegades) i tria la resposta correcta.', 'Listen to the audio (your teacher plays it twice) and choose the right answer.'),
       reading: t('Llegeix els dos textos i tria la resposta correcta.', 'Read the two texts and choose the right answer.'),
       vocabulary: t('Tria o escriu la paraula que falta. Entre parèntesis tens una pista.', 'Choose or type the missing word. The brackets give you a clue.'),
@@ -388,16 +406,16 @@
   // make-up exam, alone, with no projector). A play counts as soon as it starts (S.plays, saved, never goes down: firestore.rules);
   // leaving the exam while it plays stops it and that play is used. Only when the exam data has audio.plays and an audio.src.
   let AU = null;
-  const selfAu = () => !!(X.audio && X.audio.src && X.audio.plays > 0);
+  const selfAu = () => !!(X.audio && X.audio.src && auMax() > 0);
   function auStop() { if (!AU) return; const a = AU; AU = null; try { a.pause(); } catch (e) {} }
-  function auHtml() { const max = X.audio.plays, n = S.plays || 0, left = Math.max(0, max - n);
+  function auHtml() { const max = auMax(), n = S.plays || 0, left = Math.max(0, max - n);
     return '<div class="wx-teacher wx-au" id="wxAu">⚠️ <b>' + t('Només pots posar l’àudio ' + max + ' vegades. Quan comença, no el pots aturar ni tornar enrere.', 'You can only play the audio ' + max + ' times. Once it starts, you can’t pause it or rewind it.') + '</b><br>' +
       '<button class="wx-btn" id="wxAuGo"' + (AU || !left ? ' disabled' : '') + '>' + (AU ? '🔊 ' + t('Sonant… (' + n + ' de ' + max + ')', 'Playing… (' + n + ' of ' + max + ')')
         : left ? '▶ ' + t('Posa l’àudio (' + (n + 1) + ' de ' + max + ')', 'Play the audio (' + (n + 1) + ' of ' + max + ')') : '🔇 ' + t('Ja l’has escoltat ' + max + ' vegades', 'You have listened to it ' + max + ' times')) + '</button>' +
       '<span class="wx-aubar"><i id="wxAuBar"></i></span><span id="wxAuTime"></span></div>'; }
   function auBox() { const b = $('#wxAu'); if (!b) return; const x = D.createElement('div'); x.innerHTML = auHtml(); b.replaceWith(x.firstChild); const g = $('#wxAuGo'); if (g) g.onclick = auPlay; }
   function auPlay() {
-    if (AU || (S.plays || 0) >= X.audio.plays || S.status !== 'in' || S.listenDone || mode !== 'student') return;
+    if (AU || (S.plays || 0) >= auMax() || S.status !== 'in' || S.listenDone || mode !== 'student') return;
     const a = new Audio(X.audio.src); a.preload = 'auto'; AU = a;
     S.plays = (S.plays || 0) + 1; touch(); save();
     const mm = x => Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0');
@@ -591,7 +609,7 @@
       if (!(await start())) return;
     }
     function draw(msg) {   // a declaration: the ▶ button above uses it too
-      const started = !!w.go, au = X.audio && X.audio.src && !X.audio.plays;
+      const started = !!w.go, au = X.audio && X.audio.src && !X.audio.plays && !w.only;   // a make-up: the students play it themselves
       box.innerHTML = '<h2>🎓 ' + esc(gn) + ' · 📝 Exam mode' + (w.only ? ' · ' + w.only.length + ' student' + (w.only.length === 1 ? '' : 's') : '') + '</h2>' +
         (started ? '<p class="wx-done">▶ The exam has started (' + new Date(w.go).toTimeString().slice(0, 5) + '). Students who arrive now press Start themselves.</p>'
           : '<p>Every student of ' + esc(gn) + (w.only ? ' on the list' : '') + ' with the site open is taken to the exam: they read the rules and wait in full screen. Explain the rules, then press <b>▶ Start</b>: it starts for everyone at once.</p>') +
