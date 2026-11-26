@@ -302,67 +302,75 @@ a.lsab .abgo{background:var(--c);color:#fff;font-weight:800;font-size:14.5px;pad
 .tp-t td:nth-child(2){white-space:normal}.tp-yes{color:#166534;font-weight:700}.tp-no{color:#991b1b;font-weight:700;background:#fef2f2}
 .tp-play{padding:4px 10px;font-size:13px;text-decoration:none}
 
-/* ---- the simple LS home (Roger, 20 Nov 2026: "similar to the new format and simple"): aims, challenge, criteria, grammar and vocabulary
-   and a % per skill, in the voyage board's look (parchment cards with a brown frame, Georgia titles; el-voyage.js .vy-steps). el-ls-home.js
-   simpleHome draws #lsSimple under the LS heading and hides the old home. */
-body.lss .hgrid,body.lss .lshead .gmt,body.lss #lsAbout{display:none!important}
-body.lss .lshead.gmh{display:block}
-body.lss .lshead{margin-bottom:12px}
-body.lss .lshead h1{font:700 2.1rem/1.15 Georgia,serif;color:#4a2f0e;letter-spacing:0}
-.lss-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
-.lss-col{display:flex;flex-direction:column;gap:16px;min-width:0}
-.lss-card{background:#fffaf0;border:3px solid #b08a52;border-radius:20px;padding:0 0 12px;overflow:hidden;color:#1f2937}
-.lss-card h2{margin:0 0 8px;padding:10px 16px 8px;font:700 18px Georgia,serif;color:#4a2f0e;background:#f6ead0}
-.lss-lead{margin:0 16px 8px;font-size:13.5px;color:#8a5a1f}
-/* 🏆 the challenge: the voyage's destination picture beside it */
-a.lss-chal{display:flex;gap:14px;align-items:center;padding:14px 16px;text-decoration:none;border-color:#c2410c;background:linear-gradient(135deg,#fff7ed,#fffaf0)}
-a.lss-chal:hover{box-shadow:0 6px 18px #c2410c33}
-a.lss-chal img{width:120px;height:120px;object-fit:contain;flex:none}
-.lss-cb{display:flex;flex-direction:column;gap:4px;min-width:0}
-.lss-k{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a3412}
-.lss-chal b{font:700 21px/1.2 Georgia,serif;color:#4a2f0e}
-.lss-d{font-size:14.5px;color:#374151}
-.lss-go{font-weight:800;color:#c2410c}
+/* ---- the LS page (Roger, 26 Nov 2026, his sketch: "Easy to read. Format (all LS all course same color"): el-ls-home.js simpleHome draws
+   #lsSimple (.lsn) under the crumb and hides the old home. Every LS of a course has the same colour (--c, --c-dark, --c-soft on the page:
+   2 ESO green, 4 ESO blue). White cards, titles in the course colour. */
+body.lss .hgrid,body.lss .lshead,body.lss #lsAbout{display:none!important}
+.lsn{display:flex;flex-direction:column;gap:16px;color:#1f2937}
+.lsn-band{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 26px;border-radius:22px;color:#fff;
+  background:linear-gradient(135deg,var(--c-dark),var(--c))}
+.lsn-bt{min-width:0}
+.lsn-eye{display:block;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;opacity:.92}
+.lsn-band h1{margin:4px 0 6px;font:800 2.1rem/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;letter-spacing:-.01em}
+.lsn-band p{margin:0;font-size:15.5px;line-height:1.45;color:#fff;opacity:.95;max-width:62ch}
+a.lsn-fp{flex:none;display:flex;flex-direction:column;gap:3px;min-width:230px;max-width:330px;background:#fff;border-radius:16px;padding:14px 18px;text-decoration:none;box-shadow:0 6px 18px #0002}
+a.lsn-fp:hover{box-shadow:0 8px 24px #0003}
+.lsn-k{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#b45309}
+a.lsn-fp b{font-size:19px;line-height:1.25;color:var(--c-dark)}
+.lsn-go{font-weight:800;font-size:15px;color:var(--c)}
+.lsn-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.lsn-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:16px 18px;box-shadow:0 1px 3px #0f172a0d;min-width:0}
+.lsn-card h2{margin:0 0 12px;font:800 19px system-ui,sans-serif;color:var(--c-dark)}
 /* 🎯 aims */
-.lss-aims ol{list-style:none;margin:0;padding:0 14px;display:flex;flex-direction:column;gap:8px}
-.lss-aims li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}
-.lss-ai{width:34px;height:34px;flex:none;display:grid;place-items:center;background:#f6ead0;border-radius:10px;font-size:18px}
-.lss-aims li b{color:#4a2f0e}
-.lss-aims li small{display:block;color:#8a5a1f;font-size:13px}
-/* 📏 criteria: one line each, the official wording on tap */
-.lss-cr{margin:0 12px 6px;border:1px solid #ead9b5;border-radius:12px;background:#fff}
-.lss-cr summary{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;cursor:pointer;list-style:none;font-size:14px;line-height:1.35}
-.lss-cr summary::-webkit-details-marker{display:none}
-.lss-cr .ab-chip{flex:none;margin-top:1px}
-.lss-crt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.lss-cr[open] .lss-crt{display:block}
-.lss-cr p{margin:0;padding:0 12px 9px;font-size:13px;color:#64748b}
-/* 📊 the skills */
-.sk-row{display:grid;grid-template-columns:30px 92px minmax(0,1fr) minmax(0,1fr);gap:4px 10px;align-items:center;padding:6px 16px}
-.sk-ic{font-size:20px;text-align:center}
-.sk-n{font-weight:800;color:var(--k);font-size:14.5px}
-.sk-b{display:grid;grid-template-columns:auto minmax(30px,1fr) 46px;gap:6px;align-items:center;font-size:12.5px}
-.sk-b em{font-style:normal;color:#8a5a1f;font-weight:700}
-.sk-bar{height:9px;background:#ead9b5;border-radius:9px;overflow:hidden}.sk-bar i{display:block;height:100%;border-radius:9px}
-.sk-b strong{text-align:right;font-size:14px;color:#1f2937}.sk-b strong.na{color:#a8a29e;font-weight:600;font-size:12px}
-.sk-sep{height:1px;background:#ead9b5;margin:4px 16px}
-.lss-held{margin:8px 16px 0;font-size:13px;font-weight:700;color:#9a3412}
-/* 🔤 grammar and vocabulary */
-.lss-gvc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 14px}
-.lss-gvc h3{margin:0 0 4px;font-size:14.5px;color:#4a2f0e}
-.lss-gvc ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.4}
-.lss-gvc li{margin:0 0 4px}
-/* 🧭 Your steps: the board's voyage list (el-voyage.js .vy-steps) */
-.lss-steps h2{display:flex;justify-content:space-between;align-items:baseline;gap:6px}.lss-steps h2 small{font:600 12.5px system-ui,sans-serif;color:#8a5a1f;white-space:nowrap}
-.lss-steps .bar{height:8px;background:#ead9b5;margin:0 16px 6px;border-radius:9px;overflow:hidden}.lss-steps .bar i{display:block;height:100%;background:#15803d;border-radius:9px}
-.lss-steps ol{position:relative;list-style:none;margin:0;padding:0 10px;max-height:540px;overflow:auto;scrollbar-width:thin}
-.lss-steps .pt{display:flex;align-items:center;gap:6px;font:700 14px system-ui,sans-serif;color:#4a2f0e;padding:10px 6px 4px;border-bottom:1px dashed #d9c294}.lss-steps .pt .tk{margin-left:auto}
-.lss-steps li.s a{display:flex;align-items:center;gap:9px;padding:6px;border-radius:10px;font-size:14px;line-height:1.25;color:#1f2937;text-decoration:none}.lss-steps li.s a:hover{background:#f3e7cc}
-.lss-steps li.s small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
-.lss-steps .tk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;border:2px solid #c9b07a;color:transparent}
-.lss-steps .ok .tk,.lss-steps .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.lss-steps li.ok .n{color:#6b7280}
-.lss-steps li.now a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.lss-steps li.now .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}
-.lss-steps li.fp a{margin-top:8px;background:#fdf2d6;font-weight:700}.lss-steps li.fp .tk{border:0;font-size:18px;color:inherit}
-@media (max-width:1100px){.lss-gvc{grid-template-columns:1fr}}
-@media (max-width:900px){.lss-grid{grid-template-columns:1fr}.lss-steps ol{max-height:60vh}}
-@media (max-width:640px){.sk-row{grid-template-columns:28px minmax(0,1fr)}.sk-row .sk-b{grid-column:1/-1}a.lss-chal img{width:80px;height:80px}}
+.lsn-aims ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.lsn-aims li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.45}
+.lsn-ai{width:34px;height:34px;flex:none;display:grid;place-items:center;background:var(--c-soft);border-radius:10px;font-size:17px}
+/* 📏 criteria: one line each, the whole text and the official wording on tap */
+.lsn-cr{border-bottom:1px dashed #e2e8f0}
+.lsn-cr summary{display:flex;gap:10px;align-items:center;padding:8px 0;cursor:pointer;list-style:none;font-size:15px;line-height:1.4}
+.lsn-cr summary::-webkit-details-marker{display:none}
+.lsn-cr .ab-chip{flex:none}
+.lsn-crt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsn-cr[open] .lsn-crt{white-space:normal}
+.lsn-cr p{margin:0 0 10px;font-size:13.5px;color:#64748b}
+.lsn-tip{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--c)}
+/* 🧩 grammar · 🔤 vocabulary */
+.lsn-topics{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lsn-topics li{display:grid;grid-template-columns:minmax(0,1fr) 56px auto;gap:10px;align-items:center;border:1px solid #e2e8f0;border-radius:12px;padding:9px 10px 9px 14px}
+.lsn-tt{min-width:0}.lsn-tt b{display:block;font-size:15px;font-weight:600}.lsn-tt small{display:block;font-size:12.5px;color:#64748b;line-height:1.35;margin-top:2px}
+.lsn-pc{font-weight:800;font-size:14.5px;text-align:right}
+.lsn-btn{display:inline-flex;align-items:center;gap:4px;border:0;border-radius:999px;background:var(--c);color:#fff;font:700 14px system-ui,sans-serif;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+a.lsn-btn,a.lsn-btn:visited{color:#fff}
+.lsn-btn:hover{background:var(--c-dark)}
+.lsn-ul{margin:0;padding-left:20px;font-size:14.5px;line-height:1.45}.lsn-ul li{margin:0 0 5px}
+/* 📋 activities by skill */
+.lsn-ah{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-top:4px}
+.lsn-ah h2{margin:0;padding:9px 18px;border-radius:14px;background:var(--c);color:#fff;font:800 19px system-ui,sans-serif}
+.lsn-ah span{font-size:14px;color:#64748b}
+.lsn-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+.lsn-sk h3{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font:800 17px system-ui,sans-serif;color:var(--c-dark)}
+.lsn-av,.lsn-r{flex:none;font-size:13px;font-weight:800;border-radius:999px;padding:2px 9px;color:var(--rc,#475569);background:color-mix(in srgb,var(--rc,#94a3b8) 13%,#fff);white-space:nowrap}
+.lsn-r.ok{--rc:#15803d}.lsn-r.todo{--rc:#64748b}
+.lsn-sk ul{list-style:none;margin:0;padding:0}
+.lsn-sk li+li{border-top:1px solid #eef2f6}
+.lsn-sk a{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:9px 0;text-decoration:none;color:inherit}
+.lsn-sk a:hover .lsn-at b{color:var(--c)}
+.lsn-at b{display:block;font-size:14.5px;font-weight:700;line-height:1.3}.lsn-at small{display:block;font-size:13px;color:#64748b;line-height:1.35;margin-top:2px}
+.lsn-open{font-weight:800;font-size:14px;color:var(--c);white-space:nowrap}
+.lsn-none{margin:0;color:#64748b}
+/* 📖 Study window */
+dialog.lsn-dlg{width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 40px);border:0;border-radius:18px;padding:0 20px 18px;color:#1f2937}
+dialog.lsn-dlg::backdrop{background:#0f172a99}
+.lsn-dh{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;padding:14px 0 10px;border-bottom:1px solid #e2e8f0;z-index:1}
+.lsn-dh h3{margin:0;font-size:19px;color:var(--c-dark)}
+.lsn-x{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:6px 12px;font:700 14px system-ui,sans-serif;cursor:pointer;color:#1f2937}
+.lsn-ph{margin:16px 0 6px;font-size:16px;color:var(--c)}
+.lsn-sl{background:var(--c-soft);border-radius:12px;padding:10px 14px;margin:0 0 10px;font-size:15px;line-height:1.5}
+.lsn-sl h4{margin:0 0 6px;font-size:15.5px}.lsn-sl p{margin:4px 0}.lsn-sl ul{margin:4px 0;padding-left:20px}
+.lsn-tw{overflow-x:auto}.lsn-sl table{border-collapse:collapse;margin:6px 0;background:#fff;font-size:14px}.lsn-sl th,.lsn-sl td{border:1px solid #cbd5e1;padding:5px 9px;text-align:left}.lsn-sl th{background:#f1f5f9}
+.lsn-watch{background:#fff7ed;border-radius:8px;padding:6px 10px}
+@media (max-width:1100px){.lsn-acts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.lsn-two{grid-template-columns:1fr}.lsn-band{flex-direction:column;align-items:stretch}a.lsn-fp{max-width:none;min-width:0}}
+@media (max-width:640px){.lsn-acts{grid-template-columns:1fr}.lsn-band{padding:18px;border-radius:18px}.lsn-band h1{font-size:1.65rem}.lsn-card{padding:14px}
+  .lsn-topics li{grid-template-columns:minmax(0,1fr) auto;padding:9px 10px}.lsn-topics .lsn-btn{grid-column:1/-1;justify-self:start}
+  .lsn-crt{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.lsn-cr[open] .lsn-crt{display:block}}
