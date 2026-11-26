@@ -648,11 +648,13 @@ const MAIL_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k
 const mailTo=list=>[...new Set(list.filter(s=>s&&!s.tester).map(s=>String(s.email||"").trim().toLowerCase()).filter(e=>/^[^@\s,]+@ietramuntana\.cat$/.test(e)))];
 const mailFoot=ca=>"\n\n"+(ca===true?"Entra amb el teu correu de l'institut: ":ca===false?"Sign in with your school email: ":"Sign in with your school email / Entra amb el teu correu de l'institut: ")+new URL("today.html",location.href).href+"\n\nRoger";
 // o = {hold, now} (lateAsk): hold = 7:30 in ms, the school script keeps the email until then (v29); now = "Send now anyway". Neither (a
-// scheduled announcement emailed on opening the dashboard): the script itself holds what arrives between 21:00 and 7:30.
+// scheduled announcement emailed on opening the dashboard): the script itself holds what arrives between 21:00 and 7:30. o.who = a line
+// saying which students this email is for, when an announcement goes in two emails (Roger, 9 Nov 2026: "tinc més que 12 alumnes": the
+// Catalan one said only "12 students", with no word that the English one for the other 16 came next)
 let MAIL_LATER=0;
 async function mailStudents(emails,subject,body,o={hold:S.hold,now:S.mailNow}){if(DEMO||!emails.length)return 0;
   // Roger, 6 Nov 2026: "before sending a mail, I want the program to ask me if I want to send it"
-  if(!confirm("✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?"+(o.hold?"\n🌙 It reaches them at "+lateWhen(o.hold)+".":"")+"\n\n"+subject+"\n\n"+body.slice(0,1600)+(body.length>1600?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
+  if(!confirm((o.who||"✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?")+(o.hold?"\n🌙 It reaches them at "+lateWhen(o.hold)+".":"")+"\n\n"+subject+"\n\n"+body.slice(0,1600)+(body.length>1600?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
   for(let i=0;i<emails.length;i+=45){const part=emails.slice(i,i+45);let j=null;
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(Object.assign({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"},o.hold?{at:o.hold}:o.now?{now:true}:{}))});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length;MAIL_LATER=j.later?Date.parse(j.later)||0:0}
@@ -2835,7 +2837,7 @@ function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;
   return `<div class="wrap ctw"><table class="ctab"><thead><tr><th>Student</th><th>Course</th><th>Task</th><th>Day</th></tr></thead>${body}</table></div>`}
 const corrHead=(t,L)=>{const E=L.filter(i=>i.eur!=null),sum=E.reduce((a,i)=>a+i.eur,0);
   return `<div class="chead"><h2 style="margin:0">${t}</h2><span class="muted">${L.length?plural(new Set(L.map(i=>i.u)).size,"student")+" · "+plural(L.length,"correction"):""}${E.length?` · 💶 <b>${eurTx(sum,E.some(i=>i.est))}</b> in all`:""}</span></div>`};
-// the next scheduled run: every weekday at about 15:15 (Madrid time; the scheduled task starts at 15:13; Roger, 24 Nov 2026)
+// the next scheduled run: every weekday at 17:43 (Madrid time; Roger, 24 Nov 2026: "I want the corrections on weekdays at 17:33", then saved 17:43; it was 15:13)
 // what the asked card says: started at once by the school script (fd), or why not and what to do
 function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).request||{}).err,why=e==="no task token"?"the task's token is not in your school script yet"
     :e==="old script"?"your school script is the old version":e?"the school script said: "+esc(e):"";
@@ -2843,7 +2845,7 @@ function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).reques
   if(st.fd)return `Beltran got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} but has not started after 20 minutes. Open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`;
   return `It could not start at once${why?" ("+why+")":""}. A backup check on GitHub will start it, but that can take a few hours. To start it now, open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`}
 function corrNext(){const now=window.EL_NOW?new Date(window.EL_NOW):new Date();for(let k=0;k<8;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k);
-  if(d.getDay()>=1&&d.getDay()<=5&&!(k===0&&now.getHours()*60+now.getMinutes()>=15*60+13))return d}return null}
+  if(d.getDay()>=1&&d.getDay()<=5&&!(k===0&&now.getHours()*60+now.getMinutes()>=17*60+43))return d}return null}
 const corrWhen=v=>new Date(v).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const corrDay=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
 // where the request is: {s: "asked" | "running" | "done" | "idle", ...}
@@ -2869,7 +2871,7 @@ function corrPage(){
   const card=`<div class="cbar2"><span>`+(chk&&st.s!=="running"&&st.s!=="asked"?`⏳ Fetching your students' latest work… <span class="muted">(Beltran corrected work on ${esc(corrWhen(corrRanAt()))})</span>`
     :st.s==="running"?`✏️ <b>Beltran is correcting now</b> <span class="muted">· started ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":" (the afternoon run)"} · usually 20 to 60 minutes</span>`
     :st.s==="asked"?`<b>${st.slow?"⚠️ Not started yet":"⏳ Starting now"}</b> <span class="muted">· asked ${esc(corrWhen(st.rq))}.</span> ${corrAskMsg(st,RUN)}`
-    :`Next correction: <b>${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Monday"}, about 15:15</b> · ${allNow?`<b>${plural(allNow,"piece")} waiting</b>`:"nothing waiting"}${st.st?` <span class="muted">· last run ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}</span>`:""}`)
+    :`Next correction: <b>${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Monday"}, about 17:43</b> · ${allNow?`<b>${plural(allNow,"piece")} waiting</b>`:"nothing waiting"}${st.st?` <span class="muted">· last run ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}</span>`:""}`)
     +`</span><span class="cbtns">${st.s==="running"||st.s==="asked"?`<button class="mini" data-do="corrcheck">↻ Check again</button>`:""}${st.s==="asked"?`<button class="g mini" data-do="corrcancel">✕ Cancel the request</button>`:""}`
     +`${allNow&&st.s!=="running"&&st.s!=="asked"&&!chk?`<button class="mini" data-do="corrask">✏️ Correct everything waiting now</button>`:""}<button class="g mini" data-fpg="cost" title="What Roig cost this month: speaking recordings transcribed and final product videos watched">💶 Roig this month</button></span></div>`;
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
@@ -2904,7 +2906,7 @@ function corrPage(){
   const infoB=`<div class="box">${fold("corrinfo","ⓘ What runs on its own and what needs Beltran",`
     <h3>Works on its own</h3><p>The whole site: sign-in, saving answers, every activity that marks itself, checkpoints, games, class mode and full screen, this dashboard, marks and levels, announcements, homework and the calendar feed. The emails (problem alerts, your Saturday summary, the students' Sunday email) are sent by a free GitHub Action through your school's Apps Script.</p>
     <h3>Needs Beltran (scheduled tasks)</h3><ul>
-      <li><b>Every weekday about 15:15</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
+      <li><b>Every weekday about 17:43</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
       <li><b>A few minutes after a student comments on their work</b> · Beltran answers it (anything that needs you shows 🙋 in the To do; what it said is under 🗨️ in the To do, to edit or remove). <b>Friday 15:00</b> answers any comment left.</li>
       <li><b>When students see it</b> · Beltran's corrections and answers to comments reach students only <b>Monday to Friday from 17:00</b>: the afternoon's corrections at 17:00, an answer to a comment at least 2 hours after it, and anything written in the evening (after 21:00) or at the weekend on the next weekday at 17:00. Until then it shows 🕗 Not shown yet here, with 📨 Show it now. What you write yourself shows at once. <b>Problem reports</b>: bugs and small tweaks are fixed at once, but the student's answer waits until you press 📨 Send it on the report.</li>
       <li><b>Friday 19:37</b> · checks that the week's runs worked and warns you on your phone if it did not.</li>
@@ -2923,7 +2925,7 @@ const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_
 const askBadge=(n,g)=>n?` <small class="ask" data-do="ask" data-g="${g}" role="link" title="${n} student${n>1?"s":""} asked for a level change: click to answer (Accept or Decline in the group's To do)">🎯 ${n} level ask${n>1?"s":""}</small>`:"";
 const corrBadge=(c=corrN())=>{if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
-  const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 15:15";
+  const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 17:43";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
@@ -5602,9 +5604,15 @@ function annSendNow(){
 // one, Core, Plus and Pro the English one. You are asked before each of them.
 async function annMail(a){const o={hold:S.hold,now:S.mailNow};   // taken now: the second email goes after lateAsk has finished
   if(!(a.ca&&a.en))return mailStudents(mailTo(annWho(a)),"English Lab · 📣 Announcement / Anunci del professor",a.text+mailFoot(null),o);
-  const W=annWho(a),en=W.filter(s=>msgCa(s)===false),ca=W.filter(s=>msgCa(s)!==false);
-  return (await mailStudents(mailTo(ca),"English Lab · 📣 Anunci del professor",a.ca+mailFoot(true),o))
-    +(await mailStudents(mailTo(en),"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false),o))}
+  const W=annWho(a),en=W.filter(s=>msgCa(s)===false),ca=W.filter(s=>msgCa(s)!==false),me=mailTo(ca),mn=mailTo(en),all=mailTo(W).length,
+    pl=n=>n+" student"+(n===1?"":"s"),both=me.length&&mn.length,
+    no=W.length-all?`\n(${pl(W.length-all)} of the ${W.length} have no school email and only see it on their board.)`:"";
+  const line=(n,lang,lv,i,rest)=>`✉️ ${both?`Email ${i} of 2: `:""}the ${lang} version to ${pl(n)} (${lv}), of the ${pl(all)} it is for.`
+    +(rest?`\n${rest}`:"")+(i===1||!me.length?no:"");
+  return (await mailStudents(me,"English Lab · 📣 Anunci del professor",a.ca+mailFoot(true),Object.assign({},o,{who:
+      line(me.length,"Catalan","Starter, Base or no level yet",1,both?`After this, you will be asked about the English version for the other ${pl(mn.length)} (Core, Plus, Pro).`:"")+"\nSend it?"})))
+    +(await mailStudents(mn,"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false),Object.assign({},o,{who:
+      line(mn.length,"English","Core, Plus or Pro",2,"")+"\nSend it?"})))}
 // scheduled announcements with ✉️: emailed by the first dashboard open after their time; a transaction marks them mailed first, so two
 // open dashboards (Mac, PC, phone) never send it twice
 function annDue(){if(DEMO||S.annDue||!S.D||S.D.copy)return;   // D.copy: an email may have gone since the copy (freshen)
