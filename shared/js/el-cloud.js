@@ -898,16 +898,20 @@ let mzReady=null,mzAs=null;
 // The account's copy of the flashcards (students/{uid}/flashcards/all), merged into this browser's, so the ⚡ also counts the cards studied on
 // another device (the phone, the Chromebook): read at most once every 30 minutes per browser (el_flash_chk_<uid>), then the bar and the
 // board's mascot redraw (event el-flash-sync). Problem seen 25 Nov 2026: students studied and their ⚡ stayed at 0.
-function mzSync(uid){const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
+function mzSync(uid){if(uid)mzTn(uid);const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
   if(!uid||Date.now()-t<30*60e3)return;try{localStorage.setItem(k,String(Date.now()))}catch(e){}
   getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{if(!s.exists()||!window.ELFlashDeck)return;const lk="el_flash_"+uid;let loc=null;
     try{loc=JSON.parse(localStorage.getItem(lk)||"null")}catch(e){}
     const m=window.ELFlashDeck.merge(loc||{},JSON.parse(s.data().p||"{}"));try{localStorage.setItem(lk,JSON.stringify(m))}catch(e){}
     dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e));
-  // ✦ the teacher's Towards Nativeness 🧠 My flashcards (tnFlash) live in his TN progress copy, which only a TN page pulls: on the dashboard
-  // and every other page the ⚡ said 0 when he had studied them on another device (Roger, 26 Nov 2026: "falta el número a flashcards
-  // revisades (dies)"). One read of that copy, in the same 30 minutes as above; kept apart (el_tnflash_cloud), merged by ELMascot.data.
-  if(isTeacher(user)&&!AS&&!tnLs())(window.EL_LS||[]).filter(l=>l.personal).forEach(l=>getDoc(doc(db,"students",uid,"progress",l.id)).then(s=>{
+}
+// ✦ the teacher's Towards Nativeness 🧠 My flashcards (tnFlash) live in his TN progress copy, which only a TN page pulls: on the dashboard
+// and every other page the ⚡ said 0 when he had studied them on another device (Roger, 26 Nov 2026: "falta el número a flashcards
+// revisades (dies)"; "update the number now"). One read of that copy, at once on the first page after this change, then at most every
+// 30 minutes (its own el_tnflash_chk_<uid>); kept apart (el_tnflash_cloud), merged by ELMascot.data.
+function mzTn(uid){if(!isTeacher(user)||AS||tnLs())return;const k="el_tnflash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
+  if(Date.now()-t<30*60e3)return;try{origSet.call(localStorage,k,String(Date.now()))}catch(e){}
+  (window.EL_LS||[]).filter(l=>l.personal).forEach(l=>getDoc(doc(db,"students",uid,"progress",l.id)).then(s=>{
     const v=s.exists()&&(s.data().data||{}).tnFlash;if(!v)return;try{origSet.call(localStorage,"el_tnflash_cloud",v)}catch(e){}draw(user)}).catch(e=>console.warn("tn flashcards read",e)))}
 function mzBar(ca){
   if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
