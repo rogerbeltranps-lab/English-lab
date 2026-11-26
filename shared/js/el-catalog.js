@@ -777,22 +777,36 @@ window.elStudentMenu=function(o){
   // link) with 🎯 General practice (lab/practice.html), 🧠 Flashcards (lab/practice.html#deck) and 📝 Mock exams (the board's
   // #exam-practice) · 📖 Books · 🔤 Print your grammar and vocab (the board's #language) · 🎲 Games · ❓ Help. 📱 Study on your phone
   // is no longer in the menu: it is a link inside ❓ Help.
-  // Sub-items only show while the mouse is on their item (Roger, 26 Nov 2026: "Els sub apartats apareixen al tocar amb el mouse"): each
-  // item with sub-items is a .nvg group, its sub-items in .nvsubs (CSS in el-app.css; open too while one of them is the page you are on,
-  // or has the keyboard focus). 📚 Study is a heading with tabindex, so a tap on a touch screen opens its sub-items too.
+  // Sub-items open with a click and stay open (Roger, 26 Nov 2026: "When I open the subtopics, they must stay open so that the menu
+  // doesn't move when I go down"; it replaces the hover opening of the same day): each item with sub-items is a .nvg group, its sub-items
+  // in .nvsubs. The ▾ at the right of My course / My progress, or the whole 📚 Study card, opens and closes them (elMenuToggle below);
+  // a group stays as it was left on that device (localStorage el_menu_open) and is open while one of its sub-items is the page you are on.
   const fl=R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0]);
-  const grp=(head,subs)=>subs?`<div class="nvg">${head}<div class="nvsubs">${subs}</div></div>`:head;
+  let keep=[];try{keep=JSON.parse(localStorage.getItem("el_menu_open")||"[]")||[]}catch(e){}
+  const tg=t("Mostra o amaga","Show or hide");
+  const car=`<span class="nvc" role="button" tabindex="0" aria-label="${tg}">▾</span>`;
+  const grp=(g,head,subs)=>{if(!subs)return head;const op=keep.includes(g)||/class="nv sub on"/.test(subs);
+    return `<div class="nvg${op?" open":""}" data-g="${g}">${head.replace(/<\/a>$/,car+"</a>")}<div class="nvsubs">${subs}</div></div>`};
   return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))
-    +cs.map(c=>grp(b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`),
+    +cs.map(c=>grp("course:"+c,b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`),
       lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join(""))).join("")
-    +grp(b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress")),b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks")))
-    +grp(`<span class="nv grp" role="heading" aria-level="2" tabindex="0"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span></span>`,
+    +grp("progress",b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress")),b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks")))
+    +grp("study",`<span class="nv grp" role="button" tabindex="0"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span><span class="nvc" aria-hidden="true">▾</span></span>`,
       b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams")))
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab")):"")
     +b("games","",R+"lab/","🎲",t("Jocs","Games"))
     +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
     +b("help","",bq+"#help","❓",t("Ajuda","Help"));
 };
+
+// Opens or closes a menu group (above) on a click on its ▾ or on the 📚 Study card, or Enter / Space on them; remembers it on the device.
+if(typeof document!=="undefined"&&!window.elMenuToggle){window.elMenuToggle=1;
+  const go=e=>{const c=e.target.closest&&e.target.closest(".nvg .nvc,.nvg>.nv.grp");if(!c)return;const g=c.closest(".nvg");if(!g||g.closest(".mtabs"))return;
+    e.preventDefault();e.stopPropagation();const op=g.classList.toggle("open");
+    try{const k=JSON.parse(localStorage.getItem("el_menu_open")||"[]").filter(x=>x!==g.dataset.g);if(op)k.push(g.dataset.g);localStorage.setItem("el_menu_open",JSON.stringify(k))}catch(x){}};
+  document.addEventListener("click",go,true);
+  document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".nvg .nvc,.nvg>.nv.grp"))go(e)},true);
+}
 
 // The phone's bottom tab bar for students (Roger, 8 Nov 2026: "la visió del mòbil necessita un gran remodelació … no ha de tenir
 // exactament el mateix que la visió web però sí la mateixa funcionalitat"; mockup option A): the same five tabs on every student page,
