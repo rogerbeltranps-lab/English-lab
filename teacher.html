@@ -3520,7 +3520,7 @@ function examsTile(grp,ls,studs){const e=exOf(ls),on=studs.filter(s=>s.uid),nd=e
 // group (ls/{ls}.webExam[group].open). Each finished exam is saved by itself into results/{ls}__assessment (sections, version, the
 // whole exam for the student's report: wxSync, 24 Nov 2026); students see it when the teacher presses 📣 Publish (wxPublish). After an exit, the copies of the answers taken at each exit
 // (snaps, which the student can never change) show what changed after coming back with the password, and whether it won points.
-const WX={docs:{},ls:null,at:0,busy:false};
+const WX={docs:{},old:{},ls:null,at:0,busy:false};
 const wxCfg=ls=>{const e=exOf(ls);return e&&e.web||null};
 const wxKey=ls=>{const c=wxCfg(ls),k=c&&S.D.ck&&S.D.ck[c.key];return k&&k.web||null};
 const wxDoc=u=>WX.docs[u]||null;
@@ -3568,7 +3568,9 @@ const wxOut=(x,d)=>{const a=Date.parse(x.at),b=x.back?Date.parse(x.back):d&&d.st
 const wxMin=(a,b)=>{const x=Date.parse(a),y=Date.parse(b);return isNaN(x)||isNaN(y)?null:Math.round((y-x)/6e3)/10};
 const hm=s=>String(s||"").slice(11,16);
 async function wxLoad(ls){const c=wxCfg(ls);if(!c||DEMO)return;WX.busy=true;WX.ls=ls;
-  try{const q=await ALL("exams",1),o={};q.forEach(x=>{const d=x.data();if(d.key===c.key)o[up(x)]=Object.assign(d,{uid:up(x)})});WX.docs=o;WX.ls=ls;WX.at=Date.now()}catch(e){console.warn("web exams",e)}
+  try{const q=await ALL("exams",1),o={},old={};q.forEach(x=>{const d=x.data(),u=up(x);if(d.key===c.key)o[u]=Object.assign(d,{uid:u});
+      else if(d.of===c.key&&!d.restored&&(!old[u]||String(d.at)>String(old[u].at)))old[u]=Object.assign(d,{id:x.id})});   // ↺ the copy of a try set aside for a make-up (wxRedo)
+    WX.docs=o;WX.old=old;WX.ls=ls;WX.at=Date.now()}catch(e){console.warn("web exams",e)}
   WX.busy=false;render();wxSync(ls).catch(e=>console.warn("exam sync",e))}   // 💾 the marks save themselves
 // the exam questions and texts (the page's data file), for the students' reports
 const wxData=c=>window.EL_EXAM&&EL_EXAM.key===c.key?Promise.resolve(EL_EXAM):new Promise(r=>{const s=document.createElement("script");s.src=c.page.replace(/[^/]*$/,"")+"data/exam.js";s.onload=()=>r(window.EL_EXAM||null);s.onerror=()=>r(null);document.head.append(s)});
@@ -3584,6 +3586,19 @@ function wxReport(d,K,ls,X){const e=exOf(ls),P=X&&X.papers[d.paper],qs=[];let n=
 // 📄 a paper exam (Roger, 20 Nov 2026: Shafay and Sara did it on paper; "safay exam is missing"): results/{ls}__assessment.paper = "base-B (paper)",
 // written by hand or by a script. The web exam box shows those marks, and the automatic save (wxSync) never overwrites them with the (empty) web exam.
 const wxPaper=(u,ls)=>{const r=res(u,asId(ls));return r&&/paper/i.test(String(r.paper||""))&&r.sections?r:null};
+// ⚠️ Was it done in class? (Roger, 26 Nov 2026: "in case a student does the exam from home, I can tell maybe because I see that his
+// connection is from another wifi"): the page can't see Wi-Fi names, so the row warns from what the exam doc already holds: started
+// outside the group's class time (EL_TIMETABLE), not on a Chromebook (env.dev, saved by el-web-exam.js), or finished in under half the
+// group's usual time (5 or more turned in). A hint to check, never proof; ↺ Redo it another day is in the student's window.
+function wxHome(d,gid,docs){const out=[];if(!d||!d.started)return out;const t0=Date.parse(d.started);
+  const cl=window.ELWeek&&ELWeek.classAt&&!isNaN(t0)?ELWeek.classAt(new Date(t0)):null;if(window.EL_TIMETABLE&&(!cl||cl.gid!==gid))out.push("🕘 started outside the group's class time ("+hm(d.started)+")");
+  // 🏠 the connection: env.net (a short code of the public address, el-web-exam.js netCode) against the code most of the group has
+  const nets={};(docs||[]).forEach(x=>{const n=x&&(x.env||{}).net;if(n)nets[n]=(nets[n]||0)+1});const top=Object.entries(nets).sort((a,b)=>b[1]-a[1])[0],nn=Object.values(nets).reduce((a,b)=>a+b,0);
+  const mine=(d.env||{}).net;if(mine&&top&&nn>=3&&top[1]>=nn/2&&mine!==top[0])out.push("🏠 a different internet connection from the rest of the class");
+  const dv=(d.env||{}).dev;if(dv==="mobile")out.push("📱 done on a phone or tablet");else if(dv&&dv!=="cros")out.push("💻 not done on a Chromebook");
+  const dur=x=>x&&x.status==="done"&&x.done&&x.started?Date.parse(x.done)-Date.parse(x.started):NaN,ds=(docs||[]).map(dur).filter(v=>v>0).sort((a,b)=>a-b),me=dur(d);
+  if(ds.length>=5&&me>0){const md=ds[Math.floor(ds.length/2)];if(me<md/2)out.push("⏩ finished in "+wxDur(me)+" (most took about "+wxDur(md)+")")}
+  return out}
 function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls),open=wxOpen(ls,grp.id);
   // a make-up exam (Roger, 17 Nov 2026: Elunei's LS1 exam): open only for students listed by email (ls/{ls}.webExam[group].only); students
   // offered for it = those with no exam mark yet and no web exam started
@@ -3612,9 +3627,10 @@ function wxBox(grp,ls,studs){const c=wxCfg(ls);if(!c)return "";const K=wxKey(ls)
     return `<tr title="Paper exam: the marks saved in 📊 Assessment details"><td class="n">${name(s)}</td><td style="white-space:nowrap">📄 ${esc(String(pr.paper).replace(/\s*\(paper\)/i,"").replace("base","Base").replace("core","Core"))}</td><td>📄 On paper <small class="muted" title="Saved in 📊 Assessment details">💾</small></td>`
       +WXSEC.map(([k])=>`<td>${sc[k]?f1(sc[k].score)+"/"+sc[k].max:"–"}</td>`).join("")+(wxW("",ls)?`<td>${sc.writing?`<b>${f1(sc.writing.score)}</b>`:"–"}</td>`:"")
       +`<td><b>${mx?f1(tot/mx*10):"–"}</b></td><td><span class="muted">–</span></td><td><span class="muted">–</span></td></tr>`}
-    const d=wxDoc(s.uid);if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="10">${st(null)}</td></tr>`;
+    const d=wxDoc(s.uid),o=(WX.old||{})[s.uid];
+    if(!d)return `<tr><td class="n">${name(s)}</td><td colspan="10">${st(null)}${o?` · <span style="color:#92400e">↺ Set aside for a make-up ${esc(new Date(o.at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</span> <small class="muted">(the old try: ${esc(String((o.exam||{}).paper||"").replace("base","Base").replace("core","Core"))}${o.mark!=null?" · "+f1(o.mark):""})</small> <button class="g" data-wx="unredo" data-u="${s.uid}" title="No make-up after all: the old try and its marks come back as they were">↩ Put the old try back</button>`:""}</td></tr>`;
     const m=K?wxMark(d,K,ls):null,w=wxW(s.uid,ls,d),as=K?wxAssess(d,K,ls):null,ex=(d.exits||[]).length,back=(d.exits||[]).filter(x=>x.back).length,saved=(res(s.uid,asId(ls)).sections||{}).listening;
-    return `<tr data-wx="dlg" data-u="${s.uid}" style="cursor:pointer" title="Click: every answer, and what changed after an exit"><td class="n">${s.tester?"🧪 ":""}${name(s)}</td><td style="white-space:nowrap">${esc((d.paper||"").replace("base","Base").replace("core","Core"))}</td><td>${st(d)}${saved?' <small class="muted" title="Saved in 📊 Assessment details">💾</small>':""}</td>`
+    return `<tr data-wx="dlg" data-u="${s.uid}" style="cursor:pointer" title="Click: every answer, and what changed after an exit"><td class="n">${s.tester?"🧪 ":""}${name(s)}${(()=>{const h=s.tester?[]:wxHome(d,grp.id,docs);return h.length?` <span style="color:#b45309;white-space:nowrap" title="${esc("Was it done in class? "+h.join(" · ")+". Click the row to check it, and ↺ Redo it another day if it can't count.")}">⚠️ check</span>`:""})()}</td><td style="white-space:nowrap">${esc((d.paper||"").replace("base","Base").replace("core","Core"))}</td><td>${st(d)}${saved?' <small class="muted" title="Saved in 📊 Assessment details">💾</small>':""}</td>`
       +WXSEC.map(([k])=>`<td>${m?m.sec[k].right+"/"+m.sec[k].n:"–"}</td>`).join("")+(w?`<td>${w.score!=null?`<b>${f1(w.score)}</b>${w.level?` <small class="muted">${w.level}</small>`:""}`:w.draft!=null?`<span style="color:#b45309;white-space:nowrap" title="Draft mark: not saved yet, students don't see it">≈ <b>${f1(w.draft)}</b> <small>draft</small></span>`:w.words?`<span style="color:#b45309;white-space:nowrap" title="Click the row to mark it">✍️ ${w.words} w.</span>`:'<span class="muted">blank</span>'}</td>`:"")
       +`<td>${m&&m.draft?'<small style="color:#b45309" title="With the writing draft: provisional, not saved yet">≈ </small>':""}<b>${m?f1(m.mark):"–"}</b>${m&&m.partial?'<small class="muted" title="Without the writing: not marked yet">*</small>':""}</td>`
       +`<td>${ex?`🚪 ${ex}${(()=>{const t=(d.exits||[]).map(x=>wxOut(x,d)).filter(v=>v!=null).reduce((a,b)=>a+b,0);return t?` · ⏱ <b>${wxDur(t)}</b> out`:""})()}${back?` · 🔓 ${back}`:""}${(d.glances||[]).length?` · 👀 ${d.glances.length}`:""}${d.tries?` · 🔑✗${d.tries}`:""}`:(d.glances||[]).length?`👀 ${d.glances.length}`:'<span class="muted">–</span>'}</td>`
@@ -3655,9 +3671,10 @@ function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=
     return `<tr><td>${i+1}</td><td style="text-align:left">${esc((K&&K[id]||{}).q||id)}</td><td><b>${esc(v)||'<span class="muted">(blank)</span>'}</b> ${K?ok?"✓":"✗":""}${K&&!ok?`<br><small class="muted">${esc((wxAcc(K,id)||[]).join(" / "))}</small>`:""}</td><td>${K&&!ok&&wxNorm(v)?`<button class="g" data-wx="acc" data-u="${u}" data-i="${esc(id)}" data-v="${esc(v)}" title="Accept this answer for every student">✓ Accept</button>`:(()=>{const x=K&&ok&&!((K[id]||{}).a||[]).some(a=>wxNorm(a)===wxNorm(v))&&((K[id]||{}).extra||[]).find(a=>wxNorm(a)===wxNorm(v));
       return x!=null&&x!==false?`<small class="muted">accepted by you</small><br><button class="g" data-wx="unacc" data-u="${u}" data-i="${esc(id)}" data-v="${esc(x)}" title="Take this answer off the accepted ones, for every student">✗ Undo</button>`:""})()}</td></tr>`}).join("")).join("");
   dlg(`<h3>🖥 Web exam · ${name(s)}</h3><p class="muted">${esc(d.paper)} · started ${hm(d.started)}${d.listenDone?` · listening locked ${hm(d.listenDone)}`:""} · ${esc(wxSt(d,wxOpen(ls,s.group)))}${d.done?" at "+hm(d.done):""}${m?` · <b>${f1(m.mark)}/10</b>`:""}</p>`
+    +(()=>{const h=s.tester?[]:wxHome(d,s.group||d.group,Object.values(WX.docs).filter(x=>(S.P[x.uid]||{}).group===(s.group||d.group)));return h.length?`<div class="box" style="background:#fffbeb;border-color:#fcd34d;padding:8px 12px"><b>⚠️ Was it done in class?</b><ul style="margin:4px 0">${h.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><small class="muted">A hint, not proof. If this try can't count, ↺ Redo it another day (at the bottom).</small></div>`:""})()
     +(ex?`<h4>🚪 Exits</h4><ul>${ex}</ul>`:"<p>🚪 No exits.</p>")+((d.glances||[]).length?`<p class="muted">👀 Flickers under 0.4 s just after full screen started (not exits): ${d.glances.map(g=>hm(g.at)+" ("+Math.round(g.ms/100)/10+" s)").join(", ")}</p>`:"")+(d.tries?`<p class="muted">🔑 Wrong passwords typed: ${d.tries}</p>`:"")
     +(as?`<h4>After coming back</h4>${chg}`:"")+(wxWBox(u,ls,d)||wxWText(d))+`<h4>Answers</h4><table>${rows}</table>`
-    +`<div class="row"><button class="g" data-wx="reset" data-u="${u}" title="Delete this exam: the student starts again from zero (new paper order)">↺ Let them start again</button></div>`,true)}
+    +`<div class="row"><button class="g" data-wx="redo" data-u="${u}" title="A try that can't count (done from home, for example): it is set aside with its marks, and the student does the exam again another day, with 👤 Only some students… (the next version, the audio twice with headphones)">↺ Redo it another day (make-up)</button></div>`,true)}
 // the writing in the student's dialog: the task, the text (and the text when they first left, if it changed), the 5.1 level buttons
 // LS1 web exams: the writing is marked apart with the C1–C4 rubric (wtask…, tools/exam-marks), so the box has no writing column; the
 // student's dialog still shows the text (Roger, 18 Nov 2026: "where's her writing")
@@ -3743,6 +3760,41 @@ function wxEditSave(u,ls){const box=$("#dlg [data-wedit]"),d=wxDoc(u),w=wxW(u,ls
   const o={ls,sections:{writing:{score,max:w.max}},levels:{writing:{"5.1":lv}},report:{writing},wredo:null,wdraft:null};if(!r.showFrom)o.showFrom=wxShow(d);
   quick([patch(u,asId(ls),o),wxRedoOff(u,ls)]);WX.edit=null;wxDlg(u,ls)}
 const wxRedoOff=(u,ls)=>DEMO?null:put(["settings","marking"],{examRedo:{[u+"__"+ls]:F.deleteField()}});
+// ↺ Redo it another day (Roger, 26 Nov 2026: "in case a student does the exam from home … I must be able to delete that exam and make him
+// do another version of the exam, another day"; it replaces ↺ Let them start again, which only deleted the doc, so the old try came back
+// from the student's browser, as with a 4ESOA make-up on 25 Nov). In order: (1) a copy of the try and of its marks goes to
+// students/{uid}/exams/{key}__old<ms> = {key: key+"__old", of: key, ls, exam, result, mark, at, why} (never shown to the student, never
+// marked: wxLoad, writing.mjs and the page only read key == the exam's key); only once that copy is saved, (2) the exam doc is deleted,
+// (3) the exam's marks leave results/{ls}__assessment (sections, report, the writing level, drafts, a redo request; showFrom back to
+// held, so the new mark waits for 📣 Publish) and (4) ls/{ls}.webExam[group].reset[uid] = the old try's start: the exam page drops a copy
+// of it from the browser, an old page still open reloads when its next save is refused, and firestore.rules refuse to create a try with
+// that start. The student is then ticked in 👤 Only some students… (no mark, no web exam): the next version, the audio twice.
+async function wxRedo(u,ls,grp,c){const s=S.P[u],d0=wxDoc(u);if(!s||!d0)return;const nm=name(s).replace(/<[^>]+>/g,""),K=wxKey(ls),m=K?wxMark(d0,K,ls):null;
+  if(!confirm(`↺ ${nm} does the exam again another day?\n\n• This try (${d0.paper}${m?", "+f1(m.mark)+"/10":""}) and its marks are kept apart: ↩ Put the old try back brings them back.\n• Its marks leave ${nm}'s results; the new try's marks wait for 📣 Publish.\n• On the make-up day, use 👤 Only some students…: ${nm} is ticked and gets the next version, playing the audio twice with headphones.`))return;
+  $("#dlg").close();if(DEMO){delete WX.docs[u];WX.old[u]={exam:d0,mark:m&&m.mark,at:new Date().toISOString()};WX.pick=grp.id+ls;render();return}
+  try{const er=F.doc(db(),"students",u,"exams",c.key),rr=F.doc(db(),"students",u,"results",resKey(asId(ls)));
+    const [es,rs]=await Promise.all([F.getDoc(er),F.getDoc(rr)]);if(!es.exists()){delete WX.docs[u];render();return alert("This exam is not in the database any more.")}
+    const ex=es.data(),at=new Date().toISOString(),id=c.key+"__old"+Date.now(),old={key:c.key+"__old",of:c.key,ls,exam:ex,result:rs.exists()?rs.data():null,mark:m?Math.round(m.mark*100)/100:null,at,why:"make-up",group:grp.id};
+    await F.setDoc(F.doc(db(),"students",u,"exams",id),old);   // the copy first: nothing is cleared unless it is saved
+    await put(["ls",ls],{webExam:{[grp.id]:{reset:{[u]:ex.started}}}});
+    await F.deleteDoc(er);
+    await Promise.all([patch(u,asId(ls),{ls,sections:null,report:null,wdraft:null,wredo:null,webPaper:null,levels:{writing:null},showFrom:WXHOLD}),wxRedoOff(u,ls)]);
+    const w=((S.D.ls[ls]=S.D.ls[ls]||{}).webExam=S.D.ls[ls].webExam||{});w[grp.id]=Object.assign({},w[grp.id],{reset:Object.assign({},(w[grp.id]||{}).reset,{[u]:ex.started})});
+    delete WX.docs[u];WX.old[u]=Object.assign(old,{id});if(!wxOpen(ls,grp.id))WX.pick=grp.id+ls;render()}
+  catch(e){console.warn("exam redo",e);alert("Could not set it aside: "+e.message+"\n\nNothing was deleted unless the copy was saved first.");WX.ls=null;wxLoad(ls)}}
+// ↩ Put the old try back: only while there is no new try. The exam doc and the results come back exactly as they were (from the copy), the
+// reset mark goes, and the copy stays, marked restored (nothing is deleted).
+async function wxUnredo(u,ls,grp,c){const o=(WX.old||{})[u],s=S.P[u];if(!o||!s)return;if(wxDoc(u))return alert("There is a new try already: it can't be replaced.");
+  if(!confirm(`↩ Put ${name(s).replace(/<[^>]+>/g,"")}'s old try back, with its marks?`))return;
+  if(DEMO){WX.docs[u]=Object.assign({},o.exam,{uid:u});delete WX.old[u];render();return}
+  try{const er=F.doc(db(),"students",u,"exams",c.key);if((await F.getDoc(er)).exists()){WX.ls=null;wxLoad(ls);return alert("There is a new try already: it can't be replaced.")}
+    await F.setDoc(er,o.exam);
+    if(o.result){await F.setDoc(F.doc(db(),"students",u,"results",resKey(asId(ls))),o.result);(S.D.rs[u]=S.D.rs[u]||{})[asId(ls)]=Object.assign({},o.result)}
+    await put(["ls",ls],{webExam:{[grp.id]:{reset:{[u]:F.deleteField()}}}});
+    const w=((S.D.ls[ls]||{}).webExam||{})[grp.id];if(w&&w.reset)delete w.reset[u];
+    if(o.id)await F.setDoc(F.doc(db(),"students",u,"exams",o.id),{restored:new Date().toISOString()},{merge:true});
+    WX.docs[u]=Object.assign({},o.exam,{uid:u});delete WX.old[u];saveCache();render()}
+  catch(e){console.warn("exam unredo",e);alert("Could not put it back: "+e.message)}}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!b||!S.D)return;const k=b.dataset,ls=S.ls,grp=GR.find(g=>g.id===S.g),c=wxCfg(ls);if(!c||!grp)return;
   const studs=Object.values(S.P).filter(s=>s.group===S.g&&!s.away&&!s.tester);
   // ls/{ls}.webExam[group] = {open, mode, go, only, at} (the exam page and firestore.rules read it); live/{group}.exam = {on, href, ls,
@@ -3786,8 +3838,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-wx]");if(!
     // ✗ Undo an accepted answer (Roger, 18 Nov 2026: "I accepted but it was a mistake, how do I undo this")
     unacc:()=>{const K=wxKey(ls),it=K&&K[k.i];if(!it)return;it.extra=(it.extra||[]).filter(x=>x!==k.v);
       Promise.resolve(DEMO?null:F.setDoc(F.doc(db(),"cpKeys",c.key),{web:{[k.i]:{extra:it.extra}}},{merge:true})).then(()=>wxSync(ls),x=>alert("Could not save: "+x.message));render();wxDlg(k.u,ls)},
-    reset:()=>{if(!confirm("Delete this student's exam? They start again from zero, with a new order. Their answers are lost."))return;$("#dlg").close();
-      Promise.resolve(DEMO?null:F.deleteDoc(F.doc(db(),"students",k.u,"exams",c.key))).then(()=>{delete WX.docs[k.u];render()},x=>alert("Could not delete: "+x.message))}
+    redo:()=>wxRedo(k.u,ls,grp,c),
+    unredo:()=>wxUnredo(k.u,ls,grp,c)
   })[k.wx]?.()});
 function examsPage(grp,ls,studs){const e=exOf(ls);studs=studs.slice().sort(xrSort(ls));
   if(!e)return `<div class="box"><p class="muted">This LS has no exam on the site yet.</p></div>`;
