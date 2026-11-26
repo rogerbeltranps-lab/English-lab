@@ -11,7 +11,8 @@ const txt=(v,l)=>typeof v==="string"?v:v?(v[l]||v.en||v.ca||""):"";
 const bare=(t,tab)=>String(t||"").replace(/<[^>]+>/g,"").replace(new RegExp("^\\s*(Recall|Listening|Reading|Speaking|Writing|Shadowing|Talk|Conversa|Vocabulary|Vocabulari|Grammar|Gramàtica|"+String(tab||"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")\\s*[:·]\\s*","i"),"").trim().replace(/^./,c=>c.toUpperCase());
 // 📋 a step's summary for the LS page's Activities (Roger, 26 Nov 2026: "They need to have a little description - summary"): the first
 // sentence of the step's intro (two when the first is very short; never the count of compulsory questions), at most about 150 characters. EL_STEP_TITLES[..][3] English, [4] Catalan.
-const sum=v=>{const s=String(v||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();if(!s)return "";
+// Students never hear of AI (REQUIREMENTS §3): a clause that names AI / IA is left out of the summary.
+const sum=v=>{const s=String(v||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim().split(/,\s+/).filter(c=>!/\b(AI|IA|Gemini|ChatGPT|Claude)\b/.test(c)).join(", ");if(!s)return "";
   const ss=(s.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g)||[s]).map(x=>x.trim()).filter(x=>!/compulsory|obligatòri|counter|comptador/i.test(x));if(!ss.length)return "";
   let o=ss[0];if(o.length<30&&ss[1])o+=" "+ss[1];
   return o.length>150?o.slice(0,o.lastIndexOf(" ",146))+"…":o};
