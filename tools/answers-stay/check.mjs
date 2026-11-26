@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.json': 'application/json' };
@@ -22,7 +23,7 @@ const filter = process.argv[2] || '';
 
 const browser = await chromium.launch();
 async function newPage() {
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+  const ctx = await browser.newContext(contextOptions(CHROMEBOOK, browser));
   await ctx.route('**/*', async route => {
     const u = new URL(route.request().url());
     if (u.host !== 'el.local') return route.fulfill({ status: 404, body: '' });   // no Firebase, fonts or CDNs: the page's own code only

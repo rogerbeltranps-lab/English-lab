@@ -27,7 +27,9 @@ export default [{
 
     const p = await cb.open(NB);
     await openLP3(p);
-    await p.click('.nb-addnote:visible >> nth=0');
+    // the ✍ (Add a note below this) of LP3's Recall, on the open pages at the Chromebook's normal size (1366 × 640), so the note goes
+    // into LP3 (at the old 1366 × 768 the test pressed the first ✍ it found, which was LP2's Writing on the page before)
+    await p.click('.nb-page:visible:has-text("Recall: Learning Paths") [data-nbadd]:not([data-pi])');
     const pad = p.locator('.nb-editing [contenteditable="true"]:visible, .nb-ed [contenteditable="true"]:visible, .nb-ed textarea:visible').first();
     await pad.click(); await p.keyboard.type('Revise the relative clauses before Friday');
     await p.locator('.nb-ed-ok:visible').first().click();

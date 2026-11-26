@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
@@ -100,7 +101,8 @@ export async function user({ uid, email, password = 'test-pass-123', name = '' }
 }
 
 // ---- a browser like a student's (Chromebook) or a phone ----
-export const CHROMEBOOK = { width: 1366, height: 768 }, PHONE = { width: 390, height: 844, phone: true };
+// the students' real screens (tools/devices.mjs): Chromebook normal mode 1366 × 640 (the default), full screen 1366 × 768, ChromeOS
+export { CHROMEBOOK, CHROMEBOOK_FULL, PHONE };
 let browser = null;
 // RU_CHROME=path: another Chrome (to try a run with an older or newer browser than the one Playwright brings)
 export async function launch() { browser = browser || (await chromium.launch(process.env.RU_CHROME ? { executablePath: process.env.RU_CHROME } : {})); return browser; }
@@ -112,8 +114,7 @@ export function missing() { const m = [...missingNow]; missingNow.clear(); retur
 export async function device(who, { size = CHROMEBOOK, now, lang = 'en-GB', local = {} } = {}) {
   const b = await launch();
   await serve();
-  const ctx = await b.newContext({ viewport: { width: size.width, height: size.height }, locale: lang, timezoneId: 'Europe/Madrid',
-    ...(size.phone ? { isMobile: true, hasTouch: true } : {}), ...(process.env.SHOTS ? { deviceScaleFactor: 2 } : {}) });
+  const ctx = await b.newContext({ ...contextOptions(size, b, { scale: process.env.SHOTS ? 2 : 1 }), locale: lang, timezoneId: 'Europe/Madrid' });
   const D = { ctx, errors: [], real: [], script: [], missing: [], pages: [] };
   await ctx.addInitScript(([who, local]) => {
     window.__RU = who;

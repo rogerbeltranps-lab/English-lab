@@ -1,6 +1,6 @@
 // ⛵ The voyage map on the student board (Roger, 19-20 Nov 2026): pictures of the real board offline, with the invented students of
 // tools/site-video/board/demo.mjs (Alex Sample, 4 ESO Core, English; Pau Exemple, 2 ESO Base, Catalan) and invented classmates.
-// No Firebase, nothing saved. Chromebook size (1366 × 768). Usage: node tools/voyage/preview.mjs en|ca [out dir] [only,ids]
+// No Firebase, nothing saved. Chromebook normal mode (1366 × 640, tools/devices.mjs). Usage: node tools/voyage/preview.mjs en|ca [out dir] [only,ids]
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -9,6 +9,7 @@ import { createRequire } from 'node:module';
 import { demo } from '../site-video/board/demo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const LANG = process.argv[2] === 'ca' ? 'ca' : 'en', EN = LANG === 'en';
@@ -45,7 +46,7 @@ const SHOTS = [
 const browser = await chromium.launch();
 for (const S of SHOTS) {
   if (ONLY && !ONLY.includes(S.id) || S.en && !EN) continue;
-  const ctx = await browser.newContext({ viewport: { width: S.w || 1366, height: S.h || 768 }, deviceScaleFactor: 1, locale: EN ? 'en-GB' : 'ca-ES', timezoneId: 'Europe/Madrid' });
+  const ctx = await browser.newContext({ ...contextOptions(S.w ? { width: S.w, height: S.h, phone: S.w < 500 } : CHROMEBOOK, browser), locale: EN ? 'en-GB' : 'ca-ES', timezoneId: 'Europe/Madrid' });
   await ctx.addInitScript(([who, seed, key]) => { try { localStorage.setItem('el_who', JSON.stringify(who)); localStorage.setItem('el_phone_seen', '1'); if (seed) localStorage.setItem(key, JSON.stringify(seed)); } catch (e) {} }, [{ role: 'student', group: C.group, ca: !EN, uid: 'demo' }, S.seed || null, 'el_voyage_demo_' + C.ls]);
   await ctx.route('**/*', async (route) => {
     const u = new URL(route.request().url());

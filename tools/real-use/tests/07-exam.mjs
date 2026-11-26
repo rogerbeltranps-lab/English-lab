@@ -17,7 +17,7 @@ const full = (p) => p.evaluate(() => !!document.fullscreenElement);
 export default [
   { name: '📝 Exam: the student sits it from the rules to 🏁 Turn in, and the turned-in exam is saved with the answers', async run(t) {
     const { alex } = await school(t, { extra: examOpen });
-    const p = await (await t.device(alex, { now: NOW })).open(EXAM);
+    const p = await (await t.device(alex, { now: NOW, size: t.CHROMEBOOK_FULL })).open(EXAM);
     await start(t, p);
     t.ok(await full(p), 'the exam did not go to full screen when it started');
     // Listening: one answer, then ✅ Listening finished → Yes, go on (the other sections stay closed until then)
@@ -65,7 +65,7 @@ export default [
 
   { name: '📝 Exam: leaving full screen stops the exam at once and it is saved as locked', async run(t) {
     const { alex } = await school(t, { extra: examOpen });
-    const p = await (await t.device(alex, { now: NOW })).open(EXAM);
+    const p = await (await t.device(alex, { now: NOW, size: t.CHROMEBOOK_FULL })).open(EXAM);
     await start(t, p);
     await p.locator('.wx-opt').first().click();
     await p.evaluate(() => document.exitFullscreen());

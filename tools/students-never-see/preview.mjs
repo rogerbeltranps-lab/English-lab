@@ -1,5 +1,5 @@
 // Pictures of what the teacher's student view shows (👁, today.html?student=…) and what a real student sees, offline, with the invented
-// 4 ESO Core student of tools/site-video/board/demo.mjs. No Firebase, nothing saved. Chromebook size (1366 × 768).
+// 4 ESO Core student of tools/site-video/board/demo.mjs. No Firebase, nothing saved. Chromebook normal mode (1366 × 640, tools/devices.mjs).
 // Usage: node tools/students-never-see/preview.mjs <out dir> [catalog to use instead of shared/js/el-catalog.js, e.g. the old one]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { demo } from '../site-video/board/demo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = process.argv[2] || 'students-never-see-preview', CAT = process.argv[3], TAG = CAT ? 'before' : 'after';
 fs.mkdirSync(OUT, { recursive: true });
@@ -20,7 +21,7 @@ const SHOTS = [
 ];
 const browser = await chromium.launch();
 for (const S of SHOTS) {
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1, locale: 'en-GB', timezoneId: 'Europe/Madrid' });
+  const ctx = await browser.newContext({ ...contextOptions(CHROMEBOOK, browser), locale: 'en-GB', timezoneId: 'Europe/Madrid' });
   await ctx.addInitScript((who) => { try { localStorage.setItem('el_who', JSON.stringify(who)); localStorage.setItem('el_phone_seen', '1'); } catch (e) {} }, { role: S.role, group: S.role === 'student' ? '4ESOA' : null, ca: false, uid: 'demo' });
   await ctx.route('**/*', async (route) => {
     const u = new URL(route.request().url());

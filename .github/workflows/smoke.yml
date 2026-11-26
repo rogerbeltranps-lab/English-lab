@@ -1,6 +1,6 @@
 # 🧪 Does it still open? (Roger, 24 Nov 2026). On every pull request that changes the site, tools/smoke/check.mjs opens the teacher's
 # dashboard (every item of its menu), the student board and its places, every LS2 page, Practise and Games with invented students only,
-# on a Chromebook and a phone screen, and fails when a page throws an error, shows nothing, is wider than a phone, misses a file,
+# on the two Chromebook screens (normal mode 1366 × 640, full screen 1366 × 768) and a phone, and fails when a page throws an error, shows nothing, is wider than a phone, misses a file,
 # or tries to reach the real database. Free, read-only, no secrets: every request outside the repo is blocked.
 name: Does it still open
 on:

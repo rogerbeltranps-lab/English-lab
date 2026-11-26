@@ -1,6 +1,6 @@
 // 🧪 "Does it still open?" (Roger, 24 Nov 2026: "okay go ahead", on a check that stops a fix from breaking pages that worked).
-// On every pull request it opens the main pages with INVENTED students only, at the students' Chromebook size (1366 × 768) and a phone
-// (390 × 844), and fails when a page breaks:
+// On every pull request it opens the main pages with INVENTED students only, on the students' two real Chromebook screens (normal
+// mode 1366 × 640 and full screen 1366 × 768, ChromeOS, tools/devices.mjs) and a phone (390 × 844), and fails when a page breaks:
 //   • the teacher's dashboard (teacher.html, demo data of tools/site-video/teacher-demo.mjs): every item of the side menu, one by one.
 //     Each must open with no error, light up itself only, and show its own page (two items showing the same page = a wrong link,
 //     as How it works opening Materials before PR #866);
@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const FILTER = process.argv[2] || '';
@@ -24,7 +25,7 @@ const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : '';
 if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.mp3': 'audio/mpeg', '.mp4': 'video/mp4', '.pdf': 'application/pdf' };
-const SIZES = [['chromebook', 1366, 768], ['phone', 390, 844]];
+const SIZES = [CHROMEBOOK, CHROMEBOOK_FULL, PHONE];
 // the real database and sign-in: a demo page must never even try them
 const REAL = /(^|\.)(firestore\.googleapis\.com|firebaseio\.com|identitytoolkit\.googleapis\.com|securetoken\.googleapis\.com|firebasestorage\.googleapis\.com)$|^script\.google(usercontent)?\.com$/;
 // errors that are not the page's fault: a file this check blocks on purpose (fonts, CDNs) failing to load
@@ -51,9 +52,7 @@ const browser = await chromium.launch();
 
 // serves the repo itself at http://el.local/, with the demo data put into the page; blocks everything else
 async function context(size, student) {
-  const [, w, h] = size;
-  const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: student?.lang === 'ca' ? 'ca-ES' : 'en-GB', timezoneId: 'Europe/Madrid',
-    ...(size[0] === 'phone' ? { isMobile: true, hasTouch: true } : {}) });
+  const ctx = await browser.newContext({ ...contextOptions(size, browser), locale: student?.lang === 'ca' ? 'ca-ES' : 'en-GB', timezoneId: 'Europe/Madrid' });
   const real = [], missing = [];
   if (student) await ctx.addInitScript(([who, pg, ls, level]) => {
     try { localStorage.setItem('el_who', JSON.stringify(who)); for (const k in pg) { localStorage.setItem(k, pg[k]); localStorage.setItem(k + 'Level', level); }
@@ -100,9 +99,9 @@ async function look(page, size) {
       if (wide > 2) out.push(`is ${wide}px wider than the phone screen (it scrolls sideways or shows tiny)`);
     }
     return out;
-  }, [size[0] === 'phone', size[1]]);
+  }, [!!size.phone, size.width]);
 }
-const label = (who, size, what) => `${who} · ${size[0]} · ${what}`;
+const label = (who, size, what) => `${who} · ${size.name} · ${what}`;
 async function report(name, size, c, extra = []) {
   opened++;
   const found = [...new Set(c.errs.splice(0))].map((e) => 'JavaScript error: ' + e);
@@ -126,7 +125,7 @@ for (const size of SIZES) {
   for (const { g, t } of items) {
     const btn = c.page.locator(`#tabs button[data-g="${g}"]`).first();
     // on a phone the menu may be folded away: press the button the same way a tap would reach it
-    if (size[0] === 'chromebook') await btn.click().catch((e) => problems.push(label('Dashboard', size, `${t}: the menu item can't be clicked (${e.message.split('\n')[0]})`)));
+    if (!size.phone) await btn.click().catch((e) => problems.push(label('Dashboard', size, `${t}: the menu item can't be clicked (${e.message.split('\n')[0]})`)));
     else await btn.evaluate((e) => e.click());
     await settle(c.page, 600);
     const s = await c.page.evaluate((g) => {
@@ -174,4 +173,4 @@ if (problems.length) {
   console.log(`\n${problems.length} problem(s) in ${opened} page(s) opened.`);
   process.exit(1);
 }
-console.log(`OK: ${opened} pages opened with invented students (Chromebook and phone): no errors, nothing empty, nothing wider than a phone, no try to reach the real database.`);
+console.log(`OK: ${opened} pages opened with invented students (Chromebook normal mode, Chromebook full screen and phone): no errors, nothing empty, nothing wider than a phone, no try to reach the real database.`);

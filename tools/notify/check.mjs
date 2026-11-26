@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : '';
 if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
@@ -100,8 +101,7 @@ const problems = [], ok = (c, m) => { if (!c) problems.push(m); };
 const browser = await chromium.launch();
 
 async function open(size, { teacher = false } = {}) {
-  const [w, h] = size;
-  const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'en-GB', timezoneId: 'Europe/Madrid', ...(SHOTS ? { deviceScaleFactor: 2 } : {}), ...(w < 500 ? { isMobile: true, hasTouch: true } : {}) });
+  const ctx = await browser.newContext({ ...contextOptions(size, browser, { scale: SHOTS ? 2 : 1 }), locale: 'en-GB', timezoneId: 'Europe/Madrid' });
   const user = teacher ? { uid: 'teacher', email: 'roger.beltranps@gmail.com', displayName: 'Teacher' } : { uid: UID, email: EMAIL, displayName: 'Alex Sample' };
   await ctx.addInitScript(([db, user, uid, NOW]) => {
     if (!window.__FAKE) { let s = null; try { s = JSON.parse(sessionStorage.getItem('__fake') || 'null'); } catch (e) {}
@@ -137,7 +137,7 @@ const closeCards = async (p) => { let empty = 0; for (let i = 0; i < 20 && empty
   if (!(await b.count())) { empty++; await p.waitForTimeout(700); continue; } empty = 0; await b.click({ timeout: 1000 }).catch(() => {}); await p.waitForTimeout(400); } };
 const shot = async (p, n, clip) => { if (SHOTS) await p.screenshot({ path: path.join(SHOTS, n + '.png'), ...(clip ? { clip } : {}) }); };
 
-for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]]) {
+for (const [name, size] of [['chromebook', CHROMEBOOK], ['phone', PHONE]]) {
   const { ctx, page, errs, real } = await open(size);
   await page.goto('http://el.local/' + LP);
   await settle(page, 4000);
@@ -196,7 +196,7 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
 {
   const reads = [];
   for (const block of [false, true]) {
-    const { ctx, page } = await open([1366, 768]);
+    const { ctx, page } = await open(CHROMEBOOK);
     if (block) await page.route('**/el-notify.js', (r) => r.fulfill({ status: 200, body: 'export function studentBell(){throw new Error("off")}', contentType: 'text/javascript' }));
     await page.goto('http://el.local/' + LP);
     await settle(page, 4000);
@@ -209,7 +209,7 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
 
 // the teacher's 👁 student view: the student's 📬, nothing written
 {
-  const { ctx, page, errs } = await open([1366, 768], { teacher: true });
+  const { ctx, page, errs } = await open(CHROMEBOOK, { teacher: true });
   // the teacher's own bar has the mascot with his ⚡ too (Roger, 25 Nov 2026: "the mascot shoulb always visble here")
   await page.goto('http://el.local/' + LP);
   await settle(page, 4000);
