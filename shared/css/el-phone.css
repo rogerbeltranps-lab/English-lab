@@ -296,3 +296,42 @@
   body.hfs .vyrank .vy-sea{border-width:2px;border-radius:14px}
   body.hfs .vyrank .vy-top{padding:6px 12px}
 }
+
+/* 🧑‍🎨 the streak mascot on the board (today.html mzHome, el-mascot.js): on a phone it sits at the top right of the greeting, above 🎯 My level,
+   so the level box keeps its own line (Roger, 24 Nov 2026: "Can you put the mascot next to level and always visible the strike?") */
+@media (max-width:640px){
+  .phead:has(#elmz){position:relative}
+  .phead #elmz{position:absolute;top:2px;right:0;z-index:2;margin-top:0}
+  .phead #elmz .elmz-img{width:64px!important;height:64px!important}
+  .phead #elmz .elmz-badge{left:auto;right:-4px;bottom:-12px;font-size:16px;border-width:2px;border-radius:12px}
+  .phead:has(#elmz) .pht{padding-right:72px}
+  .elmz-say{max-width:min(280px,calc(100vw - 32px))}
+}
+/* 🧑‍🎨 the teacher's own mascot with his ⚡ streak on the dashboard (teacher.html, el-cloud.js mzBar): on a phone the account bar goes
+   to the end of the page (section 8), so the mascot leaves it for the top right of the screen, as on the students' board (Roger,
+   25 Nov 2026: "On my cellphone I want this to be at the top right!", "On the teachers view"); it stays there while the page scrolls
+   (Roger, 25 Nov 2026: "I want it to stay always there"); the page header keeps room for it */
+@media (max-width:640px){
+  body.tph #el-cloud-bar .elcb-mz{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:12px;margin:0;z-index:30}
+  body.tph #el-cloud-bar .elcb-mz .elmz-img{width:60px!important;height:60px!important}
+  body.tph #el-cloud-bar .elcb-mz .elmz-badge{position:absolute;right:-6px;bottom:-10px;font-size:15px;z-index:1}
+  body.tph:has(#el-cloud-bar .elcb-mz) :is(#msg,#loadbar,#main>.ph){padding-right:68px}
+}
+@media (max-width:640px){
+  .elfd-mz{margin-left:0;width:100%;justify-content:flex-end}.elfd-mz .elmz-img{width:60px!important;height:60px!important}.elfd-say{font-size:.88rem}
+}
+/* 📄 Term report criteria cards: a long degree name ("Very good (Assoliment notable)") wraps instead of pushing the card past the screen */
+@media (max-width:640px){
+  .trep .cpc{min-width:0}.trep .cph .cpm{white-space:normal;align-items:flex-start;margin-left:0}.trep .cpm .dg{white-space:normal}
+}
+/* 📄 Why this level on a phone: the whole card's width, the piece on one line and its mark and degree under it */
+@media (max-width:640px){
+  .trep .cpwhy{margin-left:0!important}.trep .cpwhy .cpwr{grid-template-columns:auto 1fr}.trep .cpwhy .cpwl{grid-column:1/-1}.trep .cpwhy .dg{justify-self:start}.trep .cpcr>.cpm{margin-left:auto}
+}
+
+/* 📝 The next exam at the top of the board (today.html nextExamPill; Roger, 25 Nov 2026): on a phone one line each, without the dots */
+@media (max-width:640px){
+  #sub .nxex{flex-direction:column;align-items:flex-start;gap:2px;font-size:14px;padding:8px 12px;text-align:left}
+  #sub .nxex>*{align-self:flex-start;text-align:left}
+  #sub .nxex span::before{display:none}
+}

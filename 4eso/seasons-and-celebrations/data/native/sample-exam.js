@@ -80,7 +80,7 @@ window.LP.native = {
       { q: 'KWT: I have never seen such a crowd. NEVER → ___ such a crowd.', a: ['never have i seen', 'never before have i seen'] },
       { q: 'KWT: People believe the festival began in Ireland. THOUGHT → The festival ___ in Ireland.', a: ['is thought to have begun', 'is thought to have started', 'is thought to have originated'] },
       { q: 'KWT: If you have any questions, please contact us. SHOULD → ___ any questions, please contact us.', a: ['should you have'] },
-      { q: 'KWT: Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that'] }
+      { q: 'KWT: Thanksgiving did not become official until 1863. ONLY → It was ___ Thanksgiving became official.', a: ['only in 1863 that', 'only in 1863 when'] }
     ] },
 
   write: { type: 'marked', tab: 'Writing', title: '43. Writing: a formal letter (C2)', max: 30, criterion: '5.1 (formal letter, C2 Proficiency standard)', levelPts: [8, 15, 23, 30],

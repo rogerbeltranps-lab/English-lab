@@ -148,6 +148,7 @@ window.LP = {
       ] },
     // LS criterion 4.1: a reading log on two posts or web pages: what people are doing, where and when, what they usually do, and the purpose (inform, invite, sell).
     { id: 'log', type: 'step', tab: { ca: 'Registre de lectura', en: 'Reading log' }, title: { ca: 'Registre de lectura: els dos textos', en: 'Reading log: the two texts' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
+      textFrom: 'read', textTitle: { ca: '📖 Els dos textos', en: '📖 The two texts' },   // texts A and B above the boxes (Roger, 25 Nov 2026)
       intro: { ca: 'Torna a llegir els dos textos i omple el registre amb notes curtes <strong>en anglès</strong> (paraules clau, no frases copiades). Les preguntes estan en català per ajudar-te, però <strong>escriu les respostes en anglès</strong>. El professor el veu al seu tauler.', en: 'Read the two texts again and fill in the log with short notes <strong>in English</strong> (key words, not copied sentences). Your teacher sees it on the dashboard.' },
       html: { ca: '<div class="model"><strong>Propòsit:</strong> <em>to inform</em> (informar: explica què passa) · <em>to invite</em> (convidar: vol que hi vagis o ho provis) · <em>to sell</em> (vendre: vol que compris alguna cosa). Un text pot tenir dos propòsits.<br><strong>Exemple de nota en anglès:</strong> <em>to invite · “Come and try!”</em></div>', en: '<div class="model"><strong>Purpose:</strong> <em>to inform</em> (it tells you what is happening) · <em>to invite</em> (it wants you to come or try) · <em>to sell</em> (it wants you to buy something). A text can have two purposes.<br><strong>Example note:</strong> <em>to invite · “Come and try!”</em></div>' },
       fields: [
@@ -214,7 +215,8 @@ window.LP = {
         { r: 'daring', q: 'Laia says “It’s really noisy.” Why?', o: ['Omar is watching a basketball match at the sports centre.', 'Laia is playing the guitar.', 'Omar is in the square with friends.'] },
         { r: 'daring', q: 'Which sentence is about now, not about a habit?', o: ['My sister is playing basketball.', 'I usually go swimming.', 'Do you go every Saturday?'] }
       ] },
-    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
+    { id: 'shadow', type: 'shadow', hand: false, // opened before 24 Nov 2026: not handed in (ls2-engine.js R.shadow)
+      tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
       intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
       clip: { title: 'Live from the sports hall (Emma and Sam)', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [0.38, 36.41], ts: [0.38, 42.22], lines: [
         ['Emma', 'Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
@@ -303,8 +305,8 @@ window.LP = {
         { p: 'spell', q: 'Write the -ing form: read → ___', a: ['reading'], ca: 'Dues vocals: no es dobla.', en: 'Two vowels: no double consonant.' },
         { p: 'spell', r: 'safe', q: 'Write the -ing form: get → ___', a: ['getting'], en: 'Vowel + consonant: double it.' },
         { p: 'spell', r: 'safe', q: 'Write the -ing form: write → ___', a: ['writing'], en: 'Drop the -e.' },
-        { p: 'spell', r: 'daring', q: 'Correct the mistake: “She’s studing for the exam.” → ___', a: ['studying'], en: 'Verbs ending in -y keep the y: studying.' },
-        { p: 'spell', r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', a: ['running'], en: 'Double the n.' },
+        { p: 'spell', r: 'daring', q: 'Correct the mistake: “She’s studing for the exam.” → ___', fc: 'She’s studying for the exam.', a: ['studying'], en: 'Verbs ending in -y keep the y: studying.' },
+        { p: 'spell', r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', fc: 'They are running in the park.', a: ['running'], en: 'Double the n.' },
         { p: 'spell', a: [], own: { must: ["\\bswimming\\b", "\\briding\\b", "\\bshopping\\b", "\\bcooking\\b", "\\bhaving\\b"], min: 5 }, q: "Your turn: write the -ing form of: <em>swim, ride, shop, cook, have</em>. <span class=\"tiny\">(Escriu la forma -ing d’aquests cinc verbs.)</span>", show: "swimming, riding, shopping, cooking, having", ca: "Pensa en les tres regles.", en: "Think of the three rules." },
         { p: 'now', r: 'safe', q: 'The crowd ___ (cheer) at the moment: the match is exciting.', a: ['is cheering', "'s cheering"], en: 'Crowd is singular: is.' },
         { p: 'now', r: 'safe', q: 'Is she playing well? — Yes, she ___. (no contraction)', a: ['is'], en: 'Short answers have no contraction.' },
@@ -312,7 +314,7 @@ window.LP = {
         { p: 'now', r: 'safe', q: 'Who ___ (score)? — Marc!', a: ['is scoring', "'s scoring"], en: 'Who is the subject: Who is scoring?' },
         { p: 'now', r: 'daring', q: 'Twenty teams ___ (take) part in the tournament this weekend.', a: ['are taking', "'re taking"], en: 'Plural subject: are taking.' },
         { p: 'now', r: 'safe', a: [], own: { must: ["\\bthis weekend\\b", "\\bat the moment\\b"], min: 10 }, q: "Your turn: two sentences about you with <b>this weekend</b> and <b>at the moment</b>.", show: "I’m visiting my grandparents this weekend. At the moment I’m studying English.", en: "am / is / are + -ing with this weekend / at the moment." },
-        { p: 'order', r: 'daring', q: 'Order the words: are / why / the fans / cheering → ___?', a: ['why are the fans cheering'], en: 'Question word + are + subject + -ing.' },
+        { p: 'order', r: 'daring', q: 'Order the words: are / why / the fans / cheering → ___?', fc: 'Why are the fans cheering?', a: ['why are the fans cheering'], en: 'Question word + are + subject + -ing.' },
         { p: 'order', r: 'daring', a: [], own: { must: ["\\bwhat\\b", "\\bwhy\\b", "\\bwho\\b", "\\?"], min: 10 }, q: "Your turn: three questions about a photo with <b>What</b>, <b>Why</b> and <b>Who</b>.", show: "What is the boy doing? Why are the fans cheering? Who is winning?", en: "Question word + am / is / are + subject + -ing?" }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },

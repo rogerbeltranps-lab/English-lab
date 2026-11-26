@@ -97,6 +97,17 @@
 //   9. v19 (Roger, 12 Nov 2026: "can you read the emails of the school account and tell me which need my reply"): READ ONLY.
 //      {key, action: "inbox", days (1-30, default 7), max (1-50, default 30)} → {ok, threads: [{id, subject, unread, starred, messages:
 //      [{from, to, cc, date, body}]}]}. It never sends, marks as read, labels, archives or deletes anything.
+//  25. v39 (Roger, 25 Nov 2026: "I need you to run my task app, there I want you to add things to do, for instance the ones who need to
+//      do the exam and when"): Google Tasks of this school account, with the key only. Needs the advanced service Google Tasks API
+//      (editor › Services + › Google Tasks API › Add; it switches the API on by itself, no Google Cloud setup).
+//      {key, action: "tasks", list (default "English Lab"), items: [{title, notes, due: "YYYY-MM-DD"}]} → {ok, list, done: [{title, id}
+//      | {title, skipped}]}: a task with the same title already in the list (done or not) is skipped, so a run can be repeated.
+//      {key, action: "tasks_list", list} → {ok, list, tasks: [{id, title, notes, due, status}]} · {key, action: "tasks_done", list, ids}
+//      → {ok, done}. It never deletes a task or a list.
+//  26. v40 (Roger, 26 Nov 2026, 2 ESO B final products: "I don't see the video"): Drive's player in the dashboard showed only the first
+//      picture of a Google Slides recording. New action {idToken (teacher), action: "video_get", fileId} → {ok, mime, name, data (base64)}:
+//      only a video inside the Final product videos folder (or one of its folders, two levels down) and up to 30 MB, so the dashboard plays
+//      it in its own player. Read only.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -156,6 +167,7 @@ function doPost(e) {
   if (m.action === "fp_auto_list") return out(m.idToken && isTeacher(m.idToken) ? fpaList(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
   if (m.action === "audio_get") return out(m.idToken && isTeacher(m.idToken) ? audioGet(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "video_get") return out(m.idToken && isTeacher(m.idToken) ? videoGet(m) : {ok: false, error: "not the teacher"});
   if (m.action === "speak_an") return out(m.idToken && isTeacher(m.idToken) ? speakAn(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
@@ -166,6 +178,9 @@ function doPost(e) {
   if (m.action === "mark") return out(startMarking(m.at));
   if (m.action === "inbox") return out(readInbox(m));
   if (m.action === "backup") return out(keyOk ? saveBackup(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks") return out(keyOk ? tasksAdd(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks_list") return out(keyOk ? tasksList(m) : {ok: false, error: "wrong key"});
+  if (m.action === "tasks_done") return out(keyOk ? tasksDone(m) : {ok: false, error: "wrong key"});
   const to = clean(m.to), bcc = clean(m.bcc);
   if ((!to.length && !bcc.length) || !m.subject || !m.body) return out({ok: false, error: "nothing to send"});
   if (to.length + bcc.length > 50) return out({ok: false, error: "too many people in one email (50 at most)"});
@@ -299,6 +314,21 @@ function audioGet(m) {
   if (!r.ok) return r;
   const b = r.file.getBlob();
   return {ok: true, mime: b.getContentType() || "audio/webm", name: r.file.getName(), data: Utilities.base64Encode(b.getBytes())};
+}
+// v40: a final product video for the dashboard's own player (action "video_get", see 26 above). Only files inside VIDEO_FOLDER (directly,
+// in a group folder or in Classroom copies / Automatic drafts, two levels down), so the teacher's sign-in cannot read anything else.
+function videoGet(m) {
+  const id = String(m.fileId || "");
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the video could not be opened"}; }
+  let inside = false;
+  const up = (folder, n) => { if (inside || !folder) return; if (folder.getId() === VIDEO_FOLDER) { inside = true; return; }
+    if (n > 0) for (const ps = folder.getParents(); ps.hasNext() && !inside;) up(ps.next(), n - 1); };
+  for (const ps = f.getParents(); ps.hasNext() && !inside;) up(ps.next(), 2);
+  if (!inside) return {ok: false, error: "that file is not a final product video"};
+  if (f.getSize() > 30e6) return {ok: false, error: "the video is too big to play here (over 30 MB)"};
+  const b = f.getBlob(), mime = /^video\/[\w.+-]+$/.test(b.getContentType() || "") ? b.getContentType() : "video/mp4";
+  return {ok: true, mime, name: f.getName(), data: Utilities.base64Encode(b.getBytes())};
 }
 // a recording by its Drive id, only inside AUDIO_FOLDER (directly or in a group folder): {ok, file} or {ok: false, error}
 function recordingFile(fileId) {
@@ -1151,4 +1181,44 @@ function lateStatus() {
     return Utilities.formatDate(new Date(o.at || 0), LATE_TZ, "EEE d MMM HH:mm") + " · " + m.subject + " · " + (m.bcc ? String(m.bcc).split(",").length + " in Bcc" : m.to); }).join("\n")
     : "Nothing waiting");
   Logger.log("Now in Madrid: " + Utilities.formatDate(new Date(), LATE_TZ, "EEE d MMM HH:mm") + " · next 7:30 if late: " + (lateNext(new Date()) ? new Date(lateNext(new Date())).toISOString() : "not late now"));
+}
+
+// v39: Roger's to-dos in Google Tasks (advanced service "Tasks", Google Tasks API v1)
+function taskListId(name) {
+  const ls = Tasks.Tasklists.list({maxResults: 100}).items || [];
+  const f = ls.find(function (l) { return l.title === name; });
+  return f ? f.id : Tasks.Tasklists.insert({title: name}).id;
+}
+function allTasks(id) {
+  let out = [], tok;
+  do { const r = Tasks.Tasks.list(id, {showCompleted: true, showHidden: true, maxResults: 100, pageToken: tok});
+    out = out.concat(r.items || []); tok = r.nextPageToken; } while (tok);
+  return out;
+}
+function tasksAdd(m) {
+  try {
+    const list = String(m.list || "English Lab").slice(0, 100), id = taskListId(list);
+    const have = allTasks(id).map(function (t) { return t.title; }), done = [];
+    (m.items || []).slice(0, 30).forEach(function (it) {
+      const title = String(it.title || "").trim().slice(0, 250); if (!title) return;
+      if (have.indexOf(title) >= 0) { done.push({title: title, skipped: "already there"}); return; }
+      const t = {title: title}; if (it.notes) t.notes = String(it.notes).slice(0, 4000);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(it.due || ""))) t.due = it.due + "T00:00:00.000Z";
+      done.push({title: title, id: Tasks.Tasks.insert(t, id).id}); have.push(title);
+    });
+    return {ok: true, list: list, done: done};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
+}
+function tasksList(m) {
+  try {
+    const list = String(m.list || "English Lab"), id = taskListId(list);
+    return {ok: true, list: list, tasks: allTasks(id).map(function (t) { return {id: t.id, title: t.title, notes: t.notes || "", due: t.due || "", status: t.status}; })};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
+}
+function tasksDone(m) {
+  try {
+    const id = taskListId(String(m.list || "English Lab")), done = [];
+    (m.ids || []).slice(0, 30).forEach(function (t) { Tasks.Tasks.patch({status: "completed"}, id, String(t)); done.push(t); });
+    return {ok: true, done: done};
+  } catch (err) { return {ok: false, error: String(err && err.message || err)}; }
 }

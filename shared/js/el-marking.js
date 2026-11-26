@@ -18,6 +18,8 @@ window.ELMark=(function(){
       "Each student did the route shown (Starter and Base had more support and shorter tasks; Core and Plus fuller ones): judge the work against the indicators for what that route asked. Do not lower a level for small spelling mistakes unless the indicator says so. Empty work is NA.",
       "VOICE: you write as the students' teacher, Roger, in the first person (\"I liked…\", \"next time try…\"). Students must read it as their teacher's own words: never mention AI, Claude, a computer, an automatic correction or this sheet, and never sign it. Never write the student's name or surname, not even to greet them (Roger, 17 Nov 2026: it feels automatic). Catalan for the Starter and Base routes, English for Core, Plus and Pro, always.",
       "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log (pasting most of a long text in seconds, with few keys typed). A spoken transcript comes from speech recognition, so few typed keys is normal there: only pasting counts. Route Pro is a native speaker preparing C2: a perfect text is expected, so flag Pro only when most of it was pasted. A flag never decides the mark: the teacher checks it. Still give the levels the work would get if it were their own.",
+      // 📐 Roger, 24 Nov 2026 (a Listening chart handed in with one letter per box, "Gaming the system"): not a real try = NA and sent back
+      "NOT A REAL TRY: a hand-in made only to tick the step (one letter, symbol or the same word in every box, random letters, the question copied back) is NA in every criterion: add a fourth part | REDO? <short reason for the teacher, in English>. The student gets it back to do again (a kind note in their language is added for them); write the feedback as for any NA (what the task asks for, one concrete thing to do).",
       "",...o.crits.flatMap(c=>[o.crit[c]||c,...(o.ind[c]||[]).map((d,i)=>`  ${DEG[i]}: ${d}`),""])];
     const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · feedback in ${s.ca?"Catalan":"English"}${s.exam?" · exam writing "+s.exam:""}`,
       ...(s.ty?[`[writing log] ${tyText(s.ty)}`]:[]),
@@ -26,15 +28,26 @@ window.ELMark=(function(){
       `${V} | ${o.aid} | ${o.step} | ${o.group}`,
       `<code> | ${o.crits.map(c=>c+"=<level>").join("; ")} | <feedback: one or two short sentences to the student, in the language given, as their teacher (first person, no signature), saying one thing done well and one to improve>`,
       "(one line per student, every code above, same order)",
-      `For a flagged text add a fourth part at the end of its line: <code> | … | <feedback> | COPY? <short reason for the teacher, in English>`,"END",
+      `For a flagged text add a fourth part at the end of its line: <code> | … | <feedback> | COPY? <short reason for the teacher, in English>`,
+      `For a hand-in that is not a real try: <code> | ${o.crits.map(c=>c+"=NA").join("; ")} | <feedback> | REDO? <short reason>`,"END",
       "Levels must be exactly NA, AS, AN or AE. Never write | inside the feedback. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
   }
+  // 📐 Shadowing indicators (Roger, 24 Nov 2026: every activity NA to AE): how close the recording is to the model, as the indicators count
+  const SHADOW_IND=["Hard to follow next to the model: many words left out or unclear, and the stress and rhythm are their own (fewer than half of the sentences close to the model).",
+    "Follows the model in about half of the sentences: most words are there, some sounds or stressed words are off and it falls behind the speaker at times.",
+    "Close to the model in most sentences (7 in 10): clear sounds, the stressed words stressed, a few links and the melody mostly like the speaker's.",
+    "Very close to the model (9 in 10 sentences): clear sounds, stress, linking, melody and rhythm like the speaker's, keeping up all the way."];
   // Corrections without a level (crits empty): the same sheet, with a correction for each student instead of levels.
   // A writing also gets a 5.1 level (Roger, 21 Nov 2026, "Beltran adds a 5.1 level"): o.lvc = ["5.1"], with o.crit and o.ind as in a level
   // sheet and o.content = the learning path's content file (the task of each route). The level is evidence for criterion 5.1 and the Writing
   // skill on the charts; it never changes a mark and students never see it (they get the correction only).
-  function fbSheet(o){const L=o.mode==="writing"&&o.lvc&&o.lvc.length?o.lvc:[];
+  // A speaking also gets a level (Roger, 24 Nov 2026: "we said that the speaking should count for the diagram"): Speaking and Talk recordings
+  // and 🎲 Surprise questions get the LS's speaking criterion (o.lvc = ["3.2"] in LS2), from the Transcript and the Notes from the recording.
+  // Same rules: evidence for 3.2 and the Speaking skill on the charts, never a mark, never shown to the student.
+  function fbSheet(o){const L=o.mode!=="reply"&&o.lvc&&o.lvc.length?o.lvc:[],sp=o.mode!=="writing";
+    const LVSP=L.length&&sp?["LEVEL: also give each recording one level for criterion "+L.join(", ")+" (NA, AS, AN or AE), using the indicators below. They were written for this LS's final product (a longer, prepared talk): apply the same demand to this short recording and its route's task (read the task first). Judge only what can be heard: did they do the task and get the message across, how many sentences are understandable and right in the structures the LS works on (fewer than half NA, half AS, 7 in 10 AN, 9 in 10 AE), and how fluent and clear they are (the Notes from the recording). Judge against what their route asked (Starter and Base had more support and shorter answers). Ignore what the indicators say about editing a video, slides or linking to another speaker. Never lower a level for pronunciation slips that do not block the meaning, nor for spelling in the transcript (it comes from the audio). An empty or silent recording is NA. The student never sees the level: write nothing about it in the correction.",
+      ...L.flatMap(c=>[o.crit&&o.crit[c]||c,...((o.ind||{})[c]||[]).map((d,i)=>`  ${DEG[i]}: ${d}`)])]:[];
     const head=[`${V} SHEET · CORRECTIONS${L.length?" + LEVEL":""}`,`Activity: ${o.aid} · ${o.title}`,`Step: ${o.step} · ${o.stepName}`,`Group: ${o.group} · ${o.date}`,...(o.content?[`Task: the panel with id "${o.step}" in ${o.content} (each route's task, model and checklist)`]:[]),"",
       "You are correcting the work of secondary-school students of English (Catalonia), as their teacher. There is no mark: write each student a correction they will read on their learning path.",
       "VOICE: you write as the students' teacher, Roger, in the first person (\"I liked…\", \"next time try…\"). Students must read it as their teacher's own words: never mention AI, Claude, a computer, an automatic correction or this sheet, and never sign it. Never write the student's name or surname, not even to greet them (Roger, 17 Nov 2026: it feels automatic). Catalan for the Starter and Base routes, English for Core, Plus and Pro, always.",
@@ -48,21 +61,27 @@ window.ELMark=(function(){
           "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log. Never flag the Pro route for being too good. Still write the full correction: the teacher decides.",
           ...(L.length?["LEVEL: also give each text one level for criterion "+L.join(", ")+" (NA, AS, AN or AE), using the indicators below. They were written for this LS's final writing: apply the same demand to this smaller piece and its route's task (read the task first): did they do what the task asked and get the message across, and how many of the forms the task asks for are right (fewer than half NA, half AS, 7 in 10 AN, 9 in 10 AE). Judge against what their route asked (Starter and Base had more support and shorter tasks). Do not lower a level for small spelling slips. The student never sees the level: write nothing about it in the correction.",
             ...L.flatMap(c=>[o.crit&&o.crit[c]||c,...((o.ind||{})[c]||[]).map((d,i)=>`  ${DEG[i]}: ${d}`)])]:[])]
+        :o.mode==="shadow"?["🗣 SHADOWING (Roger, 24 Nov 2026: \"students turn them in and Roig corrects them\"): the student listened to a model recording and repeated it, sentence by sentence or speaking along with it ([Model sentences] = exactly what the model says). This is pronunciation practice: do NOT correct grammar or vocabulary, the words are the model's.",
+          "Base it on the Transcript of the recording (written from the audio) and the Notes from the recording (a listener compared it with the model: what was left out, sounds, word and sentence stress, linking, melody, rhythm). Write as their teacher, in the first person, with no signature, warm and encouraging: ONE short sentence on something they did well, then the TWO or THREE most useful things to improve, each short and concrete: a word or sound → how to say it (a simple respelling, e.g. 'usually → YOO-zhoo-uh-lee'), a stressed word to make stronger, two words to link (a‿b), the melody at the end of a sentence (↗ ↘), or keeping up with the speaker. Judge against their route (Starter and Base used the slower copy and more help). Never say the notes or the transcript came from a machine. Big parts left out: one point says so kindly. An empty or silent recording: tell them kindly to record a new go and hand it in again.",
+          ...(L.length?["LEVEL (Roger, 24 Nov 2026: every activity gets a level from term 2): also give each recording one level for criterion "+L.join(", ")+" (NA, AS, AN or AE) for how close it is to the model, using these shadowing indicators, never the grammar or the words. An empty or silent recording is NA. Write nothing about the level in the correction (the student sees it beside it).",
+            ...L.flatMap(c=>[o.crit&&o.crit[c]||c,...((o.ind||{})[c]||[]).map((d,i)=>`  ${DEG[i]}: ${d}`)])]:[])]
         :o.mode==="surprise"?["🎲 SURPRISE QUESTIONS (Roger, 21 Nov 2026): the student pressed record and then answered four questions they had NOT seen before, from easy to harder ([Questions asked]); [Help used] = they tapped for help words. They never see a mark or a level, only what to improve.",
-          "Write as their teacher, in the first person, with no signature, warm and encouraging: ONE short sentence on something they did well, then the TWO or THREE most useful things to improve, each short and concrete: quote their words → the better version, or a tip (answer every question, add a reason or a detail, use the LS grammar such as now vs usually, a word they mispronounced from the Notes from the recording). Base it on the Transcript of the recording (written from the audio) and the Notes from the recording. Judge against their route (Starter and Base had help and shorter answers). Never correct spelling or punctuation. Never say the notes or the transcript came from a machine. A question left unanswered: one point says so kindly. An empty or silent recording: tell them kindly to do a new round and hand it in again."]
+          "Write as their teacher, in the first person, with no signature, warm and encouraging: ONE short sentence on something they did well, then the TWO or THREE most useful things to improve, each short and concrete: quote their words → the better version, or a tip (answer every question, add a reason or a detail, use the LS grammar such as now vs usually, a word they mispronounced from the Notes from the recording). Base it on the Transcript of the recording (written from the audio) and the Notes from the recording. Judge against their route (Starter and Base had help and shorter answers). Never correct spelling or punctuation. Never say the notes or the transcript came from a machine. A question left unanswered: one point says so kindly. An empty or silent recording: tell them kindly to do a new round and hand it in again.",...LVSP]
         :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. When there is also a Transcript of the recording (Transcripció de la gravació), it was written from the audio itself and is the more accurate one: base the correction on it. SPEAKING AND TALK are for learning (Roger, 8 Nov 2026): be encouraging, not strict; focus on whether they did the task and on their pronunciation, using the Notes from the recording (a listener heard the audio: task, pronunciation, well done, next time), with at most one grammar point and only if it blocks the meaning. Never say the notes or the transcript came from a machine. Empty work: tell them kindly to do it and hand it in again.",
           // Roger, 7 Nov 2026 (a Speaking transcript with 568 characters pasted got a normal correction): speech recognition never pastes,
           // so a transcript with a [paste log] was typed or pasted, not spoken. Clearly pasted ones (ELMark.pasted) go back to redo at once.
-          "NOT SPOKEN: a line [paste log] means text was pasted into the transcript box (speech recognition never pastes). When most of the transcript was pasted, they did not speak it: still write the correction, and flag it."]),""];
+          "NOT SPOKEN: a line [paste log] means text was pasted into the transcript box (speech recognition never pastes). When most of the transcript was pasted, they did not speak it: still write the correction, and flag it.",...LVSP]),""];
     const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · ${o.mode==="reply"?"answer":"correction"} in ${s.ca?"Catalan":"English"}${o.mode==="writing"&&s.exam?" · exam writing "+s.exam:""}`,
       ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:o.mode!=="reply"&&s.ty&&+s.ty.p>0?[`[paste log] ${tyText(s.ty)}`]:[]),
       ...(s.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),""]);
+    const LV1=L.length?L.map(c=>c+"=<level>").join("; "):"-",LVX=L.length?["Levels must be exactly NA, AS, AN or AE."]:[];
     const fmt=["ANSWER FORMAT (strict: the site reads it automatically). Reply with ONLY these lines, in a single code block, nothing before or after:",
       `${V} | ${o.aid} | ${o.step} | ${o.group}`,
       ...(o.mode==="writing"?[`<code> | ${L.length?L.map(c=>c+"=<level>").join("; "):"-"} | <comment> ## <their words> => <correct form> :: <why> ## <their words> => <correct form> :: <why> ## TEXT: <their text corrected, changes in *asterisks*>`,
           `For a flagged text add a fourth part at the end of its line: <code> | ${L.length?"… ":"- "}| <the correction as above> | COPY? <short reason for the teacher, in English>`,...(L.length?["Levels must be exactly NA, AS, AN or AE."]:[])]
-        :o.mode==="surprise"?["<code> | - | <one thing done well> ## <thing to improve> ## <thing to improve> ## <thing to improve, optional>"]
-        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,...(o.mode==="reply"?[]:["For a transcript that was not spoken add a fourth part: <code> | - | <the correction> | COPY? pasted, not spoken"])]),
+        :o.mode==="shadow"?[`<code> | ${LV1} | <one thing done well> ## <thing to improve> ## <thing to improve> ## <thing to improve, optional>`,...LVX]
+        :o.mode==="surprise"?[`<code> | ${LV1} | <one thing done well> ## <thing to improve> ## <thing to improve> ## <thing to improve, optional>`,...LVX]
+        :[`<code> | ${LV1} | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,...(o.mode==="reply"?[]:[`For a transcript that was not spoken add a fourth part: <code> | ${L.length?"… ":"- "}| <the correction> | COPY? pasted, not spoken`]),...LVX]),
       "(one line per student, every code above, same order)","END",
       "Never write | inside the correction. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
@@ -74,7 +93,7 @@ window.ELMark=(function(){
   const FORM={can:"My scores (1-4) for the unit goals",improve:"What improved most",helped:"What helped me most",goal:"My goal for the next LS"};
   function fbItems(st,skip,form){st=st||{};skip=skip||new Set();const out={},R=/_(beginners|insecure|safe|daring|native)$/,has=v=>String(v||"").trim();
     if(form){const f=Object.entries(st.form||{}).filter(([,v])=>has(v)).map(([k,v])=>({l:FORM[k]||k,v}));return (st.done||{})[form]&&f.length?{[form]:{fields:f,date:(st.doneAt||{})[form]||null,ty:null,title:"Reflection",mode:"reply"}}:{}}
-    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null,...(h.w?{mode:"writing"}:h.sq?{mode:"surprise"}:{})}}
+    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null,...(h.w?{mode:"writing"}:h.sq?{mode:"surprise"}:h.sh?{mode:"shadow"}:{})}}
     const keys=new Set([...Object.keys(st.drafts||{}),...Object.keys(st.finals||{}),...Object.keys(st.texts||{}).filter(k=>(st.done||{})[k.replace(R,"")])]);
     for(const k of keys){const id=k.replace(R,"");if(skip.has(id)||out[id])continue;const f=(st.finals||{})[k],t=(st.texts||{})[k],d=(st.drafts||{})[k];
       const text=has((f&&f.text)||t||(d&&d.text));if(!text)continue;
@@ -104,8 +123,9 @@ window.ELMark=(function(){
     for(const l of ls.slice(h+1)){if(/^END$/i.test(l))break;const p=l.split("|").map(x=>x.trim());
       if(!o.codes.has(p[0])||seen.has(p[0])){bad.push(l);continue}const lv={};
       (p[1]||"").split(";").forEach(x=>{const r=/^(.+?)\s*=\s*(NA|AS|AN|AE)$/i.exec(x.trim());if(r&&o.crits.includes(r[1].trim()))lv[r[1].trim()]=r[2].toUpperCase()});
-      if(!o.crits.every(c=>lv[c])){bad.push(l);continue}seen.add(p[0]);const fi=p.findIndex((x,i)=>i>1&&/^COPY\??(\s|:|$)/i.test(x));
-      rows.push({code:p[0],lv,fb:(fi<0?p.slice(2):p.slice(2,fi)).join(" ").trim(),flag:fi<0?"":p.slice(fi).join(" ").replace(/^COPY\??:?\s*/i,"").trim()||"possible copy"})}
+      if(!o.crits.every(c=>lv[c])){bad.push(l);continue}seen.add(p[0]);const ri=p.findIndex((x,i)=>i>1&&/^REDO\??(\s|:|$)/i.test(x)),q=ri<0?p:p.slice(0,ri),fi=q.findIndex((x,i)=>i>1&&/^COPY\??(\s|:|$)/i.test(x));
+      rows.push({code:p[0],lv,fb:(fi<0?q.slice(2):q.slice(2,fi)).join(" ").trim(),flag:fi<0?"":q.slice(fi).join(" ").replace(/^COPY\??:?\s*/i,"").trim()||"possible copy",
+        redo:ri<0?"":p.slice(ri).join(" ").replace(/^REDO\??:?\s*/i,"").trim()||"not a real try"})}
     return {group,rows,bad,missing:[...o.codes.keys()].filter(c=>!seen.has(c))};
   }
   // When a step is ready to mark in a group: its last session in the plan (the due day; the line that names the activity or its
@@ -141,7 +161,10 @@ window.ELMark=(function(){
   // fbBy[step], nor by the corrections without a level, fbSig[step]), or Claude answered this very comment (answers[step] = {t, q, at}; a new comment opens it again).
   // asked(): Claude handed it to the teacher (ask[step] = {why, q, at}); then it waits in the To do as 🙋 and Claude leaves it.
   const q=h=>String((h&&h.comment)||"").trim();
-  function open(h,x,step){x=x||{};const c=q(h);if(!c||(window.elNoComment&&elNoComment(c))||(x.seen||{})[step])return false;
+  // A step sent back to redo (flags[step].done "redo": ↺ Redo on the dashboard, or Beltran's own redo in marks.mjs) has its answer: the Redo
+  // note. Its comment waits again only on the next hand-in (Roger, 25 Nov 2026: a Reading log sent back to redo still asked him to answer its "4r").
+  const redone=(h,x,step)=>{const f=((x||{}).flags||{})[step];return !!f&&f.done==="redo"&&!(String((h&&h.date)||"")>String(f.at||""))};
+  function open(h,x,step){x=x||{};const c=q(h);if(!c||(window.elNoComment&&elNoComment(c))||(x.seen||{})[step]||redone(h,x,step))return false;
     if((x.replies||{})[step]&&!(x.fbBy||{})[step]&&!(x.fbSig||{})[step])return false;   // fbSig: a correction without a level (marks.mjs fb-apply)
     const an=(x.answers||{})[step];return !(an&&an.q===c)}
   const asked=(h,x,step)=>{const k=((x||{}).ask||{})[step];return !!(k&&k.q===q(h))};
@@ -194,5 +217,5 @@ window.ELMark=(function(){
   // 646 characters pasted for 383 kept, 271 keys in 16 s: "it's evident, why didn't you do it automatically?"): the characters pasted
   // beyond the final text (p − n) were deleted, and those keys are not counted as typed.
   const pasted=t=>{t=t||{};const n=+t.n||0,p=+t.p||0,typed=(+t.k||0)-Math.max(0,p-n);return n>=40&&p>=0.8*n&&typed<0.5*n};
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,sqText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,sqText,q,open,asked,redone,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted,SHADOW_IND};
 })();

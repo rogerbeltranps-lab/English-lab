@@ -351,6 +351,17 @@ a.lss-chal img{width:120px;height:120px;object-fit:contain;flex:none}
 .lss-gvc h3{margin:0 0 4px;font-size:14.5px;color:#4a2f0e}
 .lss-gvc ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.4}
 .lss-gvc li{margin:0 0 4px}
+/* 🧭 Your steps: the board's voyage list (el-voyage.js .vy-steps) */
+.lss-steps h2{display:flex;justify-content:space-between;align-items:baseline;gap:6px}.lss-steps h2 small{font:600 12.5px system-ui,sans-serif;color:#8a5a1f;white-space:nowrap}
+.lss-steps .bar{height:8px;background:#ead9b5;margin:0 16px 6px;border-radius:9px;overflow:hidden}.lss-steps .bar i{display:block;height:100%;background:#15803d;border-radius:9px}
+.lss-steps ol{position:relative;list-style:none;margin:0;padding:0 10px;max-height:540px;overflow:auto;scrollbar-width:thin}
+.lss-steps .pt{display:flex;align-items:center;gap:6px;font:700 14px system-ui,sans-serif;color:#4a2f0e;padding:10px 6px 4px;border-bottom:1px dashed #d9c294}.lss-steps .pt .tk{margin-left:auto}
+.lss-steps li.s a{display:flex;align-items:center;gap:9px;padding:6px;border-radius:10px;font-size:14px;line-height:1.25;color:#1f2937;text-decoration:none}.lss-steps li.s a:hover{background:#f3e7cc}
+.lss-steps li.s small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.lss-steps .tk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;border:2px solid #c9b07a;color:transparent}
+.lss-steps .ok .tk,.lss-steps .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.lss-steps li.ok .n{color:#6b7280}
+.lss-steps li.now a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.lss-steps li.now .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}
+.lss-steps li.fp a{margin-top:8px;background:#fdf2d6;font-weight:700}.lss-steps li.fp .tk{border:0;font-size:18px;color:inherit}
 @media (max-width:1100px){.lss-gvc{grid-template-columns:1fr}}
-@media (max-width:900px){.lss-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.lss-grid{grid-template-columns:1fr}.lss-steps ol{max-height:60vh}}
 @media (max-width:640px){.sk-row{grid-template-columns:28px minmax(0,1fr)}.sk-row .sk-b{grid-column:1/-1}a.lss-chal img{width:80px;height:80px}}

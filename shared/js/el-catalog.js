@@ -207,6 +207,7 @@ window.elStepsOptional=function(st,ks){const o=(st&&st.opt)||{};return ks.length
 // The same in a student's loaded progress, in memory only (nothing is saved): pg = {ls: {key: state JSON}}, rs = {activity id: result}.
 // Each corrected step gets done[step] and, when it has none, doneAt[step] = the day the text was first saved (draft or final version).
 window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||[]).forEach(a=>{if(a.manual||!a.keys||!a.keys.length)return;
+  elReopened(a,rs[a.id],pg);
   const r=rs[a.id],ks=elCorrected(a,r);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
   const ex=(r&&r.excused)||{};
   let ch=false;ks.forEach(k=>{
@@ -219,6 +220,12 @@ window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||
     const at=[st.drafts,st.finals].flatMap(o=>Object.entries(o||{}).filter(([x])=>x===k||x.indexOf(k+"_")===0).map(([,v])=>v&&v.at)).filter(Boolean).sort()[0]||((st.steps||{})[k]||{}).date;
     if(at)(st.doneAt=st.doneAt||{})[k]=(st.doneAt||{})[k]||at});
   if(ch)L[a.keys[0]]=JSON.stringify(st)})};
+// A step the teacher sent back to redo from the dashboard (↩ Send it back to redo, Roger 24 Nov 2026; flags[step] = {done: "redo", reopen:
+// true, at}): not done until the student hands it in again after that time (state.steps[step].date), in memory only, like elInjectCorrected.
+window.elReopenedSteps=function(st,r){const fl=(r&&r.flags)||{},sp=(st&&st.steps)||{};
+  return Object.keys(fl).filter(k=>fl[k]&&fl[k].done==="redo"&&fl[k].reopen&&!(String((sp[k]||{}).date||"")>String(fl[k].at||"")))};
+window.elReopened=function(a,r,pg){const L=pg&&pg[a.ls];if(!r||!r.flags||!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
+  const ks=elReopenedSteps(st,r).filter(k=>(st.done||{})[k]);if(!ks.length)return;ks.forEach(k=>{delete st.done[k];if(st.doneAt)delete st.doneAt[k]});L[a.keys[0]]=JSON.stringify(st)};
 // Every step of a learning path done (Roger, 4 Nov 2026: "some students have that they did everything and that the bonus counts, however
 // this is not true"): the steps themselves (EL_ACTIONS without the not-scored ones), never the Submit or "Mark as done" flag, which a
 // student can press with 1 step of 10 done. done = Set of the student's done steps, r = results/{activity}; an activity with no steps
@@ -342,7 +349,9 @@ const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];retur
 // they can only see it not do it"): when the group has an agenda, a tab of an open learning path that is on no class day at all (nor ticked
 // as done in class, set as homework or pulled up; nor a path planned whole) is 🏫 for class too: shown read-only, never To do, like a tab
 // planned for a later day (it gets no day on its note). The tabs for a later day + these: [panel id].
-const laterTabs=(a,info,gid)=>{const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
+// 📖 The book is always open to read (Roger, 24 Nov 2026: "they did the book as fast finishers so I want them to be able to see the book and
+// turn the pages"): never hidden or read-only because the Time plan has no Book day (or a later one); its chapters are due only on Book days
+const laterTabs=(a,info,gid)=>{if(a&&elBookPath(a))return [];const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
   const S=(window.EL_SECTIONS||{})[a.id],ids=elBookPath(a)?["book"]:S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
   const un=ids.filter(id=>elSecSteps(a,id).length&&!L.planned.has(a.id+"#"+id)&&!L.free.has(a.id+"#"+id));
   return un.length?[...new Set([...later,...un])]:later};
@@ -463,13 +472,11 @@ window.elSlotNow=function(tt,at){if(!tt||!tt.slots)return null;const d=new Date(
   for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
     if(m>=s-5&&m<s+len)return {start:z.getTime()+s*60e3,end:z.getTime()+(s+len)*60e3}}
   return null};
-// ⛶ Full screen by the timetable (Roger, 6 Nov 2026: "no need to release since they get released after the class"): during a class of the
-// group it is on by itself ({on, at: the start of the class, until: its end, auto: true}) and it ends with the class. The teacher's switch
-// (live/{group}.fs) still counts: {on: true, …} turns it on outside a class; {on: false, off: true, until: end of the class} switches it
-// off for that class only. Returns the full screen in force now, or null.
-window.elFsEff=function(fs,tt,at){const now=at||Date.now(),c=elSlotNow(tt,now);
-  if(fs&&fs.at&&now<(fs.until||fs.at+70*60e3)){if(fs.on)return fs;if(fs.off&&c&&fs.until>=c.end)return null}
-  return c?{on:true,at:c.start,until:c.end,auto:true}:null};
+// ⛶ The class full screen in force now, or null: only the teacher's switch, live/{group}.fs = {on, at, until} (🎓 Class mode writes it when it
+// starts and ⏹ Stop clears it). It no longer goes on by itself in a class of the timetable (Roger, 24 Nov 2026: "I only want students to go
+// full screen when I start class mode, not when it's English time"; it replaces "according to the teacher's timetable students should go full
+// screen when they have class", 6 Nov). Older {on: false, off: true} switches count as off. tt and at are kept for the callers.
+window.elFsEff=function(fs,tt,at){const now=at||Date.now();return fs&&fs.on&&fs.at&&now<(fs.until||fs.at+70*60e3)?fs:null};
 // 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever
 // you are in the LS"): live/{group}.go = {cm: true, u: page path from the site root, p: tab or "", pn: tab name, t: page title, at, s: when
 // class mode started, lock: true, until}. Written by the teacher's class tab each time it moves (el-cloud.js cmSend); open student pages go there.
@@ -758,7 +765,7 @@ window.elMenuLs=function(courses,group){
     .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
 };
 // o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
-// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"flashcards"|"help"|"phone",
 // app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
 window.elStudentMenu=function(o){
   const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
@@ -768,9 +775,11 @@ window.elStudentMenu=function(o){
   // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
   // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
   // i revisem que estigui allà sempre?"): the board's #marks place
+  // 🎓 My progress right below My marks (Roger, 9 Nov 2026: "a table with their results … they can choose term"; 25 Nov 2026: "My progress
+  // should be under My marks"): the board's #progress place
+  // 🧠 Flashcards below it, apart from Practise (Roger, 25 Nov 2026: "Students will see their flashcards under progress"): lab/practice.html#deck
   // 📝 Exam practice below it (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen"): the board's #exam-practice place
-  // 🎓 My progress below it (Roger, 9 Nov 2026: "a table with their results … they can choose term"): the board's #progress place
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("flashcards","",R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0])+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
@@ -801,6 +810,85 @@ window.elPhoneTabs=function(o){
   if(!b){b=document.createElement("nav");b.className="elptabs";document.body.append(b)}
   b.setAttribute("aria-label",t("Menú","Menu"));
   b.innerHTML=it.map(([k,h,l])=>{const on=k===o.here;return `<a href="${h}"${on?' class="on" aria-current="page"':""}><span class="pi">${sv(I[k])}</span><span class="pl">${l}</span>${k==="todo"&&n?`<b>${n>99?"99+":n}</b>`:""}</a>`}).join("");
+  document.body.classList.add("elptab");
+  return b;
+};
+
+// ---- The teacher's side menu, ONE for every teacher page (Roger, 25 Nov 2026: "this menu should always be the same", showing the menu
+// of 🧠 Flashcards next to the dashboard's). The dashboard (teacher.html) draws it with its own buttons (dash: true); Games, Practise,
+// Flashcards, the LS homes, the learning paths, the vocabulary games and the course pages (el-app.js, el-ls-home.js) draw the same list,
+// in the same look (shared/css/el-app.css section 11), as links that open that place of the dashboard (teacher.html?g=…, ?p=…, ?do=…).
+// 🎯 Practise and 🎲 Games are in it too, so nothing the old menu had is lost. The numbers (students per group, level asks, corrections
+// waiting, new messages, 🛠 Maintenance ON) are the ones the dashboard showed last on this browser (el_tmenu, saved by teacher.html):
+// no Firestore reads. Items: [key, icon, label, what it opens, tooltip, extra class]; "lab:…" a heading, "sep" a line, "groups" the
+// groups, "tn" ✦ Towards Nativeness (only when the dashboard has it).
+window.EL_TMENU=[
+  ["ann","📣","Announcement",{do:"annnew"},"Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages","ann"],
+  ["mt","🛠","Maintenance",{do:"mtdlg"},"Close the site to students for a while: they see a maintenance message with worksheets to print"],
+  ["plan","🏠","Home",{g:"plan"},"How each class is doing: work done in each learning path, first tries, games and marks"],
+  ["fd","🧠","Flashcards",{href:"lab/practice.html#deck"},"Every LS's flashcards at every level: study them yourself, with your own statistics"],
+  "lab:Groups","groups",
+  ["lss","🧭","Learning situations",{g:"lss"},"Every LS by course: its learning paths, groups, status and materials"],
+  "sep",
+  ["corr","✏️","Corrections",{g:"corr"},"What Beltran corrected and when, what is still waiting, and Correct everything waiting now"],
+  ["week","📅","Time plan",{p:"week"},"Every group's week and exam day"],
+  ["msgs","💬","Messages",{p:"msgs"},"Announcements, problems and ideas"],
+  ["tt","🗓","Timetable",{p:"tt"},"Your classes with each group, days off"],
+  ["qa","🔎","Questions",{g:"qa"},"Which questions students answer well or badly the first time, by route and group"],
+  ["online","🟢","Online",{g:"online"},"Who is on English Lab now, and the history of visits: when, for how long, which pages"],
+  ["cres","📊","Class results",{g:"cres"},"Grammar and reading together, lesson by lesson: who did it and the % right on their first check"],
+  ["mat","📚","Materials",{g:"mat"},"Class games, paper worksheets and study PDFs of every LS"],
+  ["practise","🎯","Practise",{href:"lab/practice.html"},"The students' Practise, at every level"],
+  ["games","🎲","Games",{href:"lab/"},"The vocabulary and grammar games"],
+  ["ref","📖","Reference",{g:"ref"},"Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked"],
+  ["how","🎬","How it works",{g:"how"},"Guides for teachers and students"],
+  "tn"
+];
+window.EL_TMENU_TN=["tn","✦","Towards Nativeness",{g:"tn"},"Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"];
+// what the dashboard showed last on this browser: {t, n:{group:"29/29"}, ask:{group:n}, corr:{n,late}, msgs:{n,late}, mt, tn}; the
+// waiting counts only while fresh (12 hours), so an old number never stays on the menu for days
+window.elTmCache=function(){let c=null;try{c=JSON.parse(localStorage.getItem("el_tmenu")||"null")}catch(e){}c=c&&typeof c==="object"?c:{};
+  if(!(Date.now()-(c.t||0)<12*3600e3)){delete c.corr;delete c.msgs;delete c.ask}return c};
+// o: {root (the site root URL; "" on teacher.html), dash (teacher.html: buttons with data-do), on (the key that is on), cls ({key: extra
+// class}), extra ({key: html after the label}), counts ({group: "29/29"}), asks ({group: html}), none (html of the No group button, dash
+// only), mt (maintenance on), tn (✦ Towards Nativeness), list (true: the items as data, for the narrow strip of icons)}
+window.elTeacherMenu=function(o){
+  o=o||{};const R=o.root||"",D=R+"teacher.html",q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const C=o.dash?{}:elTmCache(),mt=o.dash?!!o.mt:!!C.mt,tn=o.dash?!!o.tn:!!C.tn,cls=Object.assign({},o.cls),extra=Object.assign({},o.extra),counts=o.counts||C.n||{},asks=o.asks||{};
+  if(mt){cls.mt=((cls.mt||"")+" mton").trim();extra.mt=(extra.mt||"")+'<small class="mt">ON</small>'}
+  if(!o.dash){const b=(x,n)=>x&&x.n?`<small class="${x.late?"late":""}" title="${x.n} ${n}">${x.n}</small>`:"";
+    if(!extra.corr)extra.corr=b(C.corr,"waiting to be corrected");if(!extra.msgs)extra.msgs=b(C.msgs,"new");
+    Object.entries(C.ask||{}).forEach(([g,n])=>{if(n&&!asks[g])asks[g]=` <small class="ask" title="${n} student${n>1?"s":""} asked for a level change">🎯 ${n} level ask${n>1?"s":""}</small>`})}
+  const href=w=>w.href?R+w.href:w.do?D+"?do="+w.do:w.p?D+"?g=plan&p="+w.p:D+"?g="+w.g;
+  const att=w=>w.href?`href="${R+w.href}"`:w.do?`data-do="${w.do}"`:w.p?`data-do="hplace" data-p="${w.p}"`:`data-do="tab" data-g="${w.g}"`;
+  const L=[];
+  const one=([k,ic,lb,w,tip,c0])=>L.push({k,ic,lb,tip,h:href(w),att:att(w),link:!!w.href,cls:[c0,cls[k]].filter(Boolean).join(" "),extra:extra[k]||"",on:o.on===k});
+  EL_TMENU.forEach(x=>{
+    if(x==="sep")L.push({sep:1});
+    else if(typeof x==="string"&&x.startsWith("lab:"))L.push({lab:x.slice(4)});
+    else if(x==="groups"){(window.EL_GROUPS||[]).forEach(g=>{L.push({k:g.id,g:1,ic:g.name.replace(/^(\d)ESO\s*/,"$1"),lb:g.name,tip:o.dash?o.gtip||"Students":"Open "+g.name,h:D+"?g="+g.id,att:`data-do="tab" data-g="${g.id}"`,cls:"c"+g.course+(cls[g.id]?" "+cls[g.id]:""),
+        extra:(counts[g.id]!=null?`<small>${q(counts[g.id])}</small>`:"")+(asks[g.id]||""),on:o.on===g.id})});if(o.dash&&o.none)L.push({raw:o.none})}
+    else if(x==="tn"){if(tn){L.push({sep:1});one(EL_TMENU_TN)}}
+    else one(x)});
+  if(o.list)return L.filter(x=>x.k);
+  return L.map(x=>x.sep?`<div class="sep"></div>`:x.lab?`<div class="lab">${q(x.lab)}</div>`:x.raw?x.raw
+    :(o.dash&&!x.link?`<button class="nv tm ${x.cls}${x.on?" on":""}" ${x.att} title="${q(x.tip)}">`:`<a class="nv tm ${x.cls}${x.on?" on":""}" href="${x.h}" title="${q(x.tip)}"${x.on?' aria-current="page"':""}>`)
+      +(x.g?`<span class="ic gi" aria-hidden="true">${q(x.ic)}</span><span class="lb gn">${q(x.lb)}</span>`:`<span class="ic" aria-hidden="true">${x.ic}</span><span class="lb">${q(x.lb)}</span>`)
+      +x.extra+(o.dash&&!x.link?`</button>`:`</a>`)).join("");
+};
+// the dashboard's tab bar on a phone (teacher.html phoneBar), on the teacher's other pages: Home · Groups · Corrections · Messages · More,
+// each opening that place of the dashboard (More: the dashboard with its More sheet open)
+window.EL_TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
+  corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
+window.elTeacherTabs=function(o){
+  o=o||{};const R=o.root||"",D=R+"teacher.html",C=elTmCache(),GS=window.EL_GROUPS||[];
+  let last=null;try{last=(JSON.parse(localStorage.getItem("el_t_last")||"{}")||{}).g}catch(e){}
+  const G=GS.find(g=>g.id===last)||GS[0]||{id:""},sv=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const it=[["home",D+"?g=plan","Home"],["groups",D+"?g="+G.id,"Groups"],["corr",D+"?g=corr","Corrections",(C.corr||{}).n],["msgs",D+"?g=plan&p=msgs","Messages",(C.msgs||{}).n],["more",D+"?more=1","More"]];
+  let b=document.querySelector("nav.elptabs");
+  if(!b){b=document.createElement("nav");b.className="elptabs";document.body.append(b)}
+  b.setAttribute("aria-label","Dashboard menu");
+  b.innerHTML=it.map(([k,h,l,n])=>`<a href="${h}"><span class="pi">${sv(EL_TPH_I[k])}</span><span class="pl">${l}</span>${n?`<b>${n>99?"99+":n}</b>`:""}</a>`).join("");
   document.body.classList.add("elptab");
   return b;
 };
@@ -849,7 +937,7 @@ window.elMiniRail=function(r){
   // menu"). html.elcmag = 📋 Today wanted (sessionStorage el_cm_ag, kept by el-cm-agenda.js; not set yet = wanted: it opens when class
   // mode starts), so the menu does not flash before it docks.
   try { if (sessionStorage.getItem("el_cm_ag") !== "0") h.classList.add("elcmag"); } catch (e) { h.classList.add("elcmag"); }
-  st.textContent = "html.elcmtab.elcmag .elrail .elside,html.elcmtab.elcmag .elrail .eln,html.elcmtab.elcmag aside.side .nvs,"
+  st.textContent = "html.elcmtab.elcmag .elrail .elside,html.elcmtab.elcmag .elrail .eltm,html.elcmtab.elcmag .elrail .eln,html.elcmtab.elcmag aside.side .nvs,"
     + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav,html.elcmtab .elptabs{display:none!important}"
     + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
     + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"

@@ -94,5 +94,13 @@ var learningSupport = {
 (function () {
   if (window.ELRead || document.querySelector('script[src*="el-read-aloud.js"]') || /exam|checkpoint/i.test(location.pathname)) return;
   const me = document.currentScript && document.currentScript.src; if (!me) return;
-  const s = document.createElement('script'); s.src = new URL('el-read-aloud.js?v=1', me).href; document.head.appendChild(s);
+  const s = document.createElement('script'); s.src = new URL('el-read-aloud.js?v=2', me).href; document.head.appendChild(s);
+})();
+
+// Aa Easy reading (Roger, 25 Nov 2026): a button beside 🔊 Listen to the text on every reading text, sample exams and recall
+// checkpoints included (shared/js/el-easy-read.js). The web exam loads it from el-web-exam.js.
+(function () {
+  if (window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=4', me).href; document.head.appendChild(s);
 })();

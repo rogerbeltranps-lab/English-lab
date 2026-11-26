@@ -39,7 +39,7 @@
           { ca: "Producte final: entrevista a un company/a i vídeo amb Google Slides sobre la seva rutina, valorant si és saludable.",
             en: "Final product: an interview with a classmate and a Google Slides video about their routine, saying whether it is healthy.",
             src: [{ fp: "2eso/final-product", part: "go" }] }] },
-        { ls: "2eso-free-time-live", name: "Free Time, Live!", pts: [
+        { fpLater: true, ls: "2eso-free-time-live", name: "Free Time, Live!", pts: [
           { ca: "Vocabulari i expressions del temps lliure i les aficions (<i>go skateboarding, hang out with friends</i>).",
             en: "Free-time and hobby vocabulary and expressions (<i>go skateboarding, hang out with friends</i>).",
             src: [{ p: "ls2GettingStarted2ESO", ps: ["vocabEx"] }, { g: "Vocabulary · Free-time activities" }, { x: "2eso-free-time-live", k: ["vocabulary"] }] },
@@ -84,7 +84,7 @@
           { ca: "Producte final: entrevista a un company/a i vídeo amb Google Slides sobre les nostres rutines i els hàbits saludables.",
             en: "Final product: an interview with a classmate and a Google Slides video about our routines and healthy habits.",
             src: [{ fp: "4eso/final-product", part: "go" }] }] },
-        { ls: "4eso-seasons-and-celebrations", name: "Seasons & Celebrations", pts: [
+        { fpLater: true, ls: "4eso-seasons-and-celebrations", name: "Seasons & Celebrations", pts: [
           { ca: "La Castanyada i Halloween: vocabulari de la tardor (<i>chestnuts, pumpkin, fallen leaves</i>), listening i expressió oral.",
             en: "La Castanyada and Halloween: autumn vocabulary (<i>chestnuts, pumpkin, fallen leaves</i>), listening and speaking.",
             src: [{ p: "ls2GettingStarted4ESO", ps: ["words", "listen"] }, { g: "Vocabulary · Autumn words" }, { d: "ls2GettingStarted4ESO", ps: ["speak"] }] },
@@ -105,6 +105,8 @@
           "Your mark comes from your everyday work, the My Real Routine and Seasons & Celebrations exams, and the My Real Routine final product.",
           "The Seasons & Celebrations final product will count in term 2."] } }
   };
+  // fpLater: this LS's final product counts in the next term, so the report leaves it out (Roger, 25 Nov 2026: "the final product of the
+  // LS2 shouldn't be included in the report")
   window.EL_TREP = { t1: T1 };
 
   // A point's % for one student. ctx = {pg: {lsId: {storeKey: state (string or object)}}, rs: {activity: result}, games: [{title, r, of}],

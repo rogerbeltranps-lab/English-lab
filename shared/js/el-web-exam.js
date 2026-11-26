@@ -17,6 +17,12 @@
    - Page text can't be copied, and nothing from outside can be pasted; students can copy and paste their own text inside their boxes (el-nocopy.js); no marks or answers on the page: the marks reach the student's board when the teacher
      saves them (dashboard → results/{ls}__assessment, as every exam).
    The teacher (and window.EL_EXAM_PREVIEW) sees a preview with every paper and the audio, and nothing is saved. */
+// Aa Easy reading on the exam's reading text (Roger, 25 Nov 2026: exams too; shared/js/el-easy-read.js, .wx-text).
+(function () {
+  if (!window.EL_EXAM || window.ELEasyRead || document.querySelector('script[src*="el-easy-read.js"]')) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-easy-read.js?v=4', me).href; document.head.appendChild(s);
+})();
 (function () {
   const X = window.EL_EXAM; if (!X) return;
   const FS = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
@@ -177,7 +183,12 @@
     ca = level === 'beginners';   // Catalan for Starter only (Roger, 21 Nov 2026: Base reads English)
     let d = null, l = null;
     try { [d, l] = await Promise.all([readDoc(), readLs()]); } catch (e) { console.warn('exam read', e); }
-    lsDoc = l; const loc = local.get();
+    lsDoc = l; let loc = local.get();
+    // a student who redoes the exam (a make-up after a try that cannot count, Roger 25 Nov 2026: a student saw the exam done at home):
+    // the teacher keeps a copy and clears it, and ls/{ls}.webExam[group].reset[uid] holds that old try's start, so neither the copy in
+    // this browser nor a cloud copy with that start comes back; the student begins a new paper
+    const rs = mode !== 'view' && me && ((((l || {}).webExam || {})[group] || {}).reset || {})[me.uid];
+    if (rs) { if (loc && loc.started === rs) { local.del(); loc = null; } if (d && d.started === rs) d = null; }
     if (mode === 'view') return viewOnly(d);
     if (d && d.status === 'done') { S = Object.assign({}, d); return handedIn(); }
     // started here or on another device: the cloud copy, unless this browser has newer answers that never reached it

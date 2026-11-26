@@ -578,7 +578,7 @@ var LS2 = (function () {
     if (!rec || !Array.isArray(rec.v) || !Array.isArray(rec.q) || !rec.q.length) return rec;
     const A = state.ans && state.ans[id], N = state.nb && state.nb[id], re = N && N.re && typeof N.re === 'object' ? N.re : {};
     const useA = !!A && A !== rec && Array.isArray(A.q) && Array.isArray(A.v) && !A.from;
-    const out = Object.assign({}, rec, { v: rec.v.slice(), tries: Object.assign({}, rec.tries || {}) });
+    const out = Object.assign({}, rec, { q: rec.q.slice(), v: rec.v.slice(), tries: Object.assign({}, rec.tries || {}) });
     rec.q.forEach((q, i) => {
       if (!filledV(rec.v[i])) return;   // a question not answered in this try (a new try after ↺ Practise again) stays empty
       let at = rec === A ? ansAt(id, A, i) : firstAt(id), best = null;
@@ -590,14 +590,19 @@ var LS2 = (function () {
       Object.keys(out.tries).forEach(k => { if (new RegExp('^' + prefix + i + '(\\D|$)').test(k)) delete out.tries[k]; });
       if (best.t) out.tries[prefix + i] = best.t;
     });
+    // questions added to the step after this record (24 Nov 2026): their newest answers come along too
+    if (useA) A.q.forEach((q, j) => { if (!out.q.includes(q) && filledV(A.v[j])) { out.q.push(q); out.v.push(A.v[j]); } });
+    Object.keys(re).forEach(q => { const r = re[q], j = out.q.indexOf(q); if (r && filledV(r.v) && (j < 0 || !filledV(out.v[j]))) { if (j < 0) { out.q.push(q); out.v.push(r.v); } else out.v[j] = r.v; } });
     return out;
   }
   const okIn = f => !f ? null : f.classList.contains('ok') ? 1 : f.classList.contains('no') ? 0 : null;
   // question it's answer v goes into the newest answers (state.ans[id]): when it was checked (at) and whether it was right (ok)
   function setAns(id, it, v, ok, at) {
     const A = state.ans && state.ans[id]; if (!A || !Array.isArray(A.q) || !Array.isArray(A.v) || A.from) return false;
-    const j = A.q.indexOf(qid(it)); if (j < 0) return false;
     if (state.nb && state.nb[id] === A) state.nb[id] = JSON.parse(JSON.stringify(A));   // the notebook's first try never changes with it
+    let j = A.q.indexOf(qid(it));
+    // a question added after the step was done (24 Nov 2026): its first answer joins the record
+    if (j < 0) { if (!filledV(v)) return false; A.q.push(qid(it)); A.v.push(null); j = A.q.length - 1; }
     let ch = false;
     if (String(A.v[j]) !== String(v)) { A.v[j] = v; A.t = A.t || []; A.t[j] = at || new Date().toISOString(); ch = true; }
     if (ok != null) { A.ok = A.ok || []; if (A.ok[j] !== ok) { A.ok[j] = ok; ch = true; } }
@@ -704,6 +709,10 @@ var LS2 = (function () {
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
+  /* A step opened again (Roger, 24 Nov 2026, problem report 4ESOB: "he should see his latest answers"): a question still empty is not a
+     mistake to point at. It shows no red "Type an answer." (that line is only for a ✓ Check pressed on an empty box), so questions added
+     after the step was done look new, not lost. Only questions the saved answers do not have (k.v[i] null): a box left empty in a Check keeps it. */
+  const quiet = (k, prefix, items) => k.fresh && items.forEach((_, i) => { const f = $('#' + prefix + 'f' + i); if (k.v[i] == null && f && f.classList.contains('no')) { f.innerHTML = ''; f.className = 'feedback'; } });
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count, only): the step's own check (only: the questions to check and show; null = all); stays(id, prefix, listId, items, check)
   // wires Check, Do it again and the restore. src: the panel's whole list (p.items / p.practice), to place answers saved at another route.
@@ -727,7 +736,7 @@ var LS2 = (function () {
       L.addEventListener('keydown', e => { const t = e.target; if (e.key !== 'Enter' || !t.matches || !t.matches('input.typed') || t.id.indexOf(prefix) !== 0) return; const i = t.id.slice(prefix.length); if (!/^\d+$/.test(i)) return; e.preventDefault(); go(+i); });
     }
     // ↺ in the notebook look: the page goes back to the laptop look and the new try is done there (nbShow below)
-    // ⛵ a student who sees only the notebook look (window.elNbOnly, el-app.js; Roger, 19 Nov 2026): the new try is a fresh notebook page
+    // ⛵ a student keeps the look they chose (window.elNbOnly, el-app.js; Roger, 25 Nov 2026): in the notebook look the new try is a fresh notebook page
     // (state.nbAgain[id]: the page shows the latest try from now on, as the laptop look did); the first try still counts for the mark
     $('#' + id + 'Again').onclick = () => { const nbk = nbFrozen(id); if (nbk && window.elNbOnly) { state.nbAgain = state.nbAgain || {}; state.nbAgain[id] = 1; } forget(id, prefix); if (nbk && window.elLpNb && !window.elNbOnly) window.elLpNb(false); clearStep(id, listId); nbLock(id, listId, false); nbSaved(id, false); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
@@ -737,7 +746,7 @@ var LS2 = (function () {
     retryBack(id);
     if (nbFrozen(id)) return nbShow(NBS[id]);
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
-    if (k) { fill(items, prefix, k.v); check(false, k.c); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); quiet(k, prefix, items); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
     nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* 📓 The notebook keeps the first try (Roger, 14 Nov 2026: "If they want to do the activity again, they can see the button there but
@@ -774,7 +783,7 @@ var LS2 = (function () {
     Object.keys(tries).forEach(x => { delete tries[x]; }); Object.assign(tries, T0);
     const k = kept(id, prefix, items, src, on ? state.nb[id] : null), t = k || on ? null : typed(id, prefix, items, src); CHK[id] = new Set(k && k.c ? k.c : k ? allIx(items) : []);
     nbMerge(S, on && k0, on && k);
-    if (k) { fill(items, prefix, k.v); check(false, k.c); } else if (t) fill(items, prefix, t);
+    if (k) { fill(items, prefix, k.v); check(false, k.c); quiet(k, prefix, items); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
     nbLock(id, listId, on && !!k); nbSaved(id, !!k); if (k) latestBack(id, prefix, items);
   }
   /* ✏️ Correct a wrong answer in the notebook, one question at a time (Roger, 19 Nov 2026: "I want them to be able to redo the questions
@@ -799,7 +808,9 @@ var LS2 = (function () {
     if (!S.open) S.open = new Set();
     if (!S.first) S.first = vals(S.items, S.prefix);   // frozen just now, with the last ✓ Check: what is on the page is the first try
     S.one.forEach(i => {
-      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q || !filledV((S.cur || S.first)[i])) return;
+      const f = $('#' + S.prefix + 'f' + i), q = f && f.closest('.question'), it = S.items[i]; if (!q) return;
+      // a counted question still empty (added after the step was done, 24 Nov 2026) stays open: it can be answered and ✓ Checked here
+      if (!filledV((S.cur || S.first)[i])) { S.open.add(i); q.inert = false; q.classList.add('el-nbopen'); return; }
       const open = S.open.has(i), wrong = f.classList.contains('no');
       if (!wrong && !open) { if (!q.inert) [...q.children].forEach(c => { c.inert = true; }); return; }   // right (corrected too): it stays in pen
       q.inert = false;
@@ -945,9 +956,19 @@ var LS2 = (function () {
     }
   });
 
+  /* 📝 A step can show another step's reading text (Roger, 25 Nov 2026, on the Reading log: "Yes; to make it easier to read", after a
+     Starter student couldn't find texts A and B and typed only the start of each line): textFrom: '<panel id>' borrows that panel's
+     media.text at the student's route (Pro's own panel when Pro replaces it), with textTitle as a small heading above it. The text is
+     the same .reading box, so 🔊 Listen, Aa Easy reading and 🖍 Underline work on it, and the marks made in the Reading tab show here
+     too (same text, same marks). The notebook keeps the text once, in the Reading step (el-exam.js readText reads only p.media). */
+  function mediaOf(p) {
+    const m = p.media || {}, src = p.textFrom && !m.text && LP.panels.find(x => x.id === p.textFrom), t = src && src.media && src.media.text;
+    return t && t !== true ? Object.assign({}, m, { text: t, _from: 1 }) : m;
+  }
   function mediaHtml(p) {
-    const m = p.media || {};
+    const m = mediaOf(p);
     let h = '';
+    if (m.text && m._from && p.textTitle) h += '<h3 class="el-log-text" style="margin:20px 0 8px">' + tx(p.textTitle) + '</h3>';
     if (m.text) h += '<div class="reading">' + byLevel(m.text) + '</div>'; // a string, or one text per route
     if (m.pages) h += '<div class="el-book" id="' + p.id + 'Book"></div>';   // 📖 the book's page pictures, one list per route (shared/js/el-book.js)
     if (m.youtube) h += '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + m.youtube + '" title="' + esc(m.title || 'Video') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>' +
@@ -1335,6 +1356,8 @@ var LS2 = (function () {
   function wroteMsg(p) { const h = (state.steps || {})[p.id]; return ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. Ja no el pots canviar. Quan el professor l’hagi corregit, veuràs la correcció a dalt de tot d’aquesta secció: el teu text, una taula amb les errades i el text corregit.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. You can’t change it now. When your teacher has corrected it, you will see the correction at the top of this section: your text, a table with your mistakes and your text, corrected.'; }
   addEventListener('el-result', e => {
     const r = (e.detail || {}).result || {}, ms = v => v == null ? 0 : typeof v === 'number' ? v : v.toDate ? +v.toDate() : v.seconds ? v.seconds * 1000 : +new Date(v) || 0;
+    // ↩ sent back to redo from the dashboard (any handed-in step, Roger 24 Nov 2026): its done tick goes until the student hands it in again
+    if (window.elReopenedSteps) { const ks = elReopenedSteps(state, r).filter(k => state.done[k]); if (ks.length) { ks.forEach(k => { delete state.done[k]; if (state.doneAt) delete state.doneAt[k]; }); save(); } }
     (LP.panels || []).filter(p => p.type === 'writing' && toTeacher(p)).forEach(p => {
       const h = (state.steps || {})[p.id]; if (!h || reopened[p.id]) return;
       const fl = (r.flags || {})[p.id], at = ms(h.date);
@@ -1464,13 +1487,13 @@ var LS2 = (function () {
       (p.rate ? '<div class="section-card"><h3>' + (ca() ? 'Autoavaluació' : 'Self-assessment') + '</h3><p class="instruction">' + (ca() ? 'Puntua’t amb sinceritat: 1 ' + SCALE.ca[0] + ' · 2 ' + SCALE.ca[1] + ' · 3 ' + SCALE.ca[2] + ' · 4 ' + SCALE.ca[3] + '.' : 'Be honest: 1 ' + SCALE.en[0] + ' · 2 ' + SCALE.en[1] + ' · 3 ' + SCALE.en[2] + ' · 4 ' + SCALE.en[3] + '.') + '</p><div id="' + p.id + 'Rate"></div></div>' : '') +
       (p.peers ? '<div class="section-card"><h3>' + (ca() ? 'Els meus companys' : 'My teammates') + '</h3><p class="instruction">' + tx(p.peersIntro) + '</p><div id="' + p.id + 'Peers"></div></div>' : '') +
       '<div class="section-card"><label class="field"><strong>' + (ca() ? 'Tens algun dubte o problema per explicar al professor? (opcional: si tot ha anat bé, deixa-ho en blanc)' : 'Any question or problem to tell your teacher? (optional: if everything went well, leave it empty)') + '</strong><textarea id="' + p.id + 'Comment" rows="3"></textarea></label>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Send">' + (ca() ? 'Entrega aquest pas' : 'Hand in this step') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
+      '<p class="feedback" id="' + p.id + 'Msg"></p></div>',
     bind() {
       bindAudio(p); bindCycle(p); bindDict(p);
       state.steps = state.steps || {};
       const key = p.id, draft = (state.stepDraft = state.stepDraft || {})[key] = state.stepDraft[key] || { f: p.product && state.form ? Object.assign({}, state.form) : {}, rate: [], peers: [] };
       const fields = forLevel(p.fields), stm = byLevel(p.rate) || [];
-      const keep = () => save();
+      let tm = 0; const keep = () => { save(); clearTimeout(tm); tm = setTimeout(() => hand(), 700); };
       $('#' + key + 'Fields').innerHTML = fields.map(f => '<label class="field"><strong>' + tx(f.label) + '</strong><textarea data-f="' + f.id + '" rows="' + (f.rows || 3) + '" placeholder="' + esc(tx(f.ph) || '') + '"></textarea></label>').join('');
       $$('#' + key + 'Fields textarea').forEach(t => { t.value = draft.f[t.dataset.f] || ''; t.oninput = () => { draft.f[t.dataset.f] = t.value; keep(); }; });
       const scale = ca() ? SCALE.ca : SCALE.en;
@@ -1488,23 +1511,27 @@ var LS2 = (function () {
       }
       const com = $('#' + key + 'Comment'); com.value = draft.comment || ''; com.oninput = () => { draft.comment = com.value; keep(); };
       const msg = $('#' + key + 'Msg');
-      if (state.steps[key]) { msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregat el ' : 'Handed in on ') + new Date(state.steps[key].date).toLocaleDateString() + (ca() ? '. Si canvies alguna cosa, torna’l a entregar.' : '. If you change anything, hand it in again.'); }
-      $('#' + key + 'Send').onclick = () => {
+      // No Hand in button (Roger, 24 Nov 2026: "I don't want them to have to press any button, the system needs to understand it as done"):
+      // once every box, rating and teammate is filled in, the step is handed in by itself, and every later change updates it.
+      const wait = t => { if (state.steps[key]) return; msg.className = 'feedback'; msg.textContent = (ca() ? 'Quan ho tinguis tot fet, s’entrega sol. ' : 'Once it is all done, it is handed in by itself. ') + t; };
+      function hand() {
         const empty = fields.filter(f => !f.optional && !(draft.f[f.id] || '').trim());
-        if (empty.length) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Falta omplir: ' : 'Still empty: ') + empty.map(f => tx(f.label)).join(' · '); return; }
+        if (empty.length) { wait((ca() ? 'Falta omplir: ' : 'Still empty: ') + empty.map(f => tx(f.label)).join(' · ')); return; }
         const blocked = p.check ? p.check(level) : '';
-        if (blocked) { msg.className = 'feedback no'; msg.textContent = blocked; return; }
-        if (stm.some((s, i) => !draft.rate[i])) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Puntua totes les frases de l’autoavaluació.' : 'Rate every statement of the self-assessment.'; return; }
+        if (blocked) { wait(blocked); return; }
+        if (stm.some((s, i) => !draft.rate[i])) { wait(ca() ? 'Puntua totes les frases de l’autoavaluació.' : 'Rate every statement of the self-assessment.'); return; }
         const ps = byLevel(p.peerRate) || [], peers = (draft.peers || []).filter(d => d && (d.name || '').trim());
-        if (p.peers && (peers.length < (p.minPeers || 2) || peers.some(d => ps.some((s, i) => !(d.r || [])[i])))) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escriu el nom de cada company i puntua totes les frases.' : 'Write each teammate’s name and rate every statement.'; return; }
+        if (p.peers && (peers.length < (p.minPeers || 2) || peers.some(d => ps.some((s, i) => !(d.r || [])[i])))) { wait(ca() ? 'Escriu el nom de cada company i puntua totes les frases.' : 'Write each teammate’s name and rate every statement.'); return; }
         const rate = stm.map((s, i) => ({ s, v: draft.rate[i] }));
         state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
           peers: p.peers ? peers.map(d => ({ name: d.name.trim(), r: ps.map((s, i) => ({ s, v: d.r[i] })) })) : undefined, comment: (draft.comment || '').trim(), date: new Date().toISOString() };
         // A step can also be a product piece (the research card): it then appears on the final product page too.
         if (p.product) saveProduct(p.product, state.steps[key].f.filter(f => f.v).map(f => f.l + ': ' + f.v).join('\n'));
         state.done[key] = true; stamp(key); save();
-        msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregat ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.') + (p.product ? (ca() ? ' També la trobaràs a la pàgina del producte final.' : ' You will also find it on the final product page.') : '');
-      };
+        shown();
+      }
+      function shown() { msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregat ✓ El professor ho veurà al seu tauler. Els canvis es desen sols.' : 'Handed in ✓ Your teacher will see it on the dashboard. Changes are saved by themselves.') + (p.product ? (ca() ? ' També la trobaràs a la pàgina del producte final.' : ' You will also find it on the final product page.') : ''); }
+      if (state.steps[key]) shown(); else hand();   // work written before 24 Nov 2026 and never handed in counts as soon as the page opens
     }
   });
 
@@ -1730,8 +1757,21 @@ var LS2 = (function () {
      🔁 Listen and repeat (clip.cues: one sentence, a pause to say it, the next) sits next to 🗣 Shadowing (shared/js/el-shadow.js).
      A Listen and repeat run counts as a play. Listening buttons carry data-vs, so they still work in the teacher's read-only student
      view and in locked sections (el-cloud.js leaves [data-vs] on; Roger, 7 Nov 2026: "it's not working" in student view). */
+  /* Shadowing is handed in and Roig corrects it (Roger, 24 Nov 2026: "in the new shadowing activities I want students to turn them in
+     and roig will correct them"): every Shadowing step hands in the recording of the last go, like Speaking (handRec: Drive + Roig's
+     transcript and notes on how close it is to the model: words, stress, linking, melody, rhythm), and is done only then; the afternoon
+     correction (marks.mjs fb-*, mode "shadow") gives one thing done well and the things to improve. p.hand === false keeps the older
+     step (done after 3 plays and a self-rating, the recording only for the student): the two shadowing steps students had already
+     opened before 24 Nov 2026 (2 ESO LP2, 4 ESO LP3). */
+  const shadowTask = (c, mode, slow) => {
+    const plain = c.lines.map(l => Array.isArray(l) ? l[l.length - 1] : l).join(' ').replace(/\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+    const marked = c.marks ? [].concat(...c.marks).join(' ') : '';
+    const head = 'SHADOWING, not a free speaking task: the student ' + (mode === 'repeat' ? 'hears one model sentence at a time and repeats it in the pause' : 'speaks along with the model recording, just behind it') + (slow ? ' (the slower copy)' : '') +
+      '. The model voice may be heard in the background: judge only the student. In task: how much of the model they said (sentences or words left out or changed). In pronunciation: how close they are to the model in sounds, word and sentence stress, linking, melody (↗ ↘) and rhythm, then at most three words or sounds to practise. Model sentences' + (marked ? ' (stressed syllables in **, linked words ‿)' : '') + ': ';
+    return head + (marked && head.length + marked.length <= 1500 ? marked : plain);
+  };
   R.shadow = p => {
-    const id = p.id, c = p.clip, SH = window.elShadow;
+    const id = p.id, c = p.clip, SH = window.elShadow, hand = p.hand !== false;
     const repeatHow = ca() ? ['Prem ▶: sentiràs una frase i l’àudio s’aturarà.', 'Digues la frase en veu alta: copia les síl·labes fortes, les paraules unides i la melodia (↗ ↘).', 'La frase següent sona sola. Amb ↺ Una altra vegada la tornes a sentir.', 'Després prova 🗣 Shadowing: tot el fragment seguit, parlant alhora.']
       : ['Press ▶: you hear one sentence, then the audio stops.', 'Say the sentence aloud: copy the stressed words, the linking and the melody (↗ ↘).', 'The next sentence plays by itself. Press ↺ Again to hear a sentence once more.', 'Then try 🗣 Shadowing: the whole clip, speaking along.'];
     const howList = list => '<ol style="margin:6px 0;padding-left:22px;line-height:1.8">' + list.map(r => '<li>' + r + '</li>').join('') + '</ol>';
@@ -1747,11 +1787,13 @@ var LS2 = (function () {
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" data-vs id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
         '<div id="' + id + 'Key">' + (SH && SH.has(c) ? SH.key(ca()) : '') + '</div>' +
         '<div class="reading" id="' + id + 'Script">' + (SH ? SH.script(c, 'strong') : c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')) + '</div></div>' +
-        '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
+        '<div class="section-card"><h3>' + (hand ? (ca() ? 'Grava’t i entrega-ho' : 'Record yourself and hand it in') : ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (hand
+          ? (ca() ? 'Quan ja ho facis bé, prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes. Escolta’t, i si t’agrada, prem <strong>Entrega al professor</strong>. El professor escoltarà la gravació i et donarà consells de pronunciació aquí mateix. Si et tornes a gravar millor, torna-la a entregar.' : 'When you are ready, press <strong>Record and play</strong>: the clip plays and you say it with the speaker. Listen to yourself, and when you are happy with it, press <strong>Hand it in to my teacher</strong>. Your teacher will listen to it and give you pronunciation tips right here. If you record a better version, hand it in again.')
+          : (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.')) + '</p>' +
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button><button class="btn secondary" type="button" id="' + id + 'RecStop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
         [['3', ca() ? '😀 Ho he seguit tot' : '😀 I kept up all the way'], ['2', ca() ? '🙂 Gairebé tot' : '🙂 Most of it'], ['1', ca() ? '😕 Em perdia' : '😕 I got lost']].map(r => '<button class="btn secondary" type="button" data-rate="' + id + '" data-v="' + r[0] + '">' + r[1] + '</button>').join('') +
-        '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
+        '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (hand ? teacherBtn() : ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
       bind() {
         const key = id + '_' + level, m = $('#' + id + 'Media'), msg = $('#' + id + 'Msg');
         state.shadow = state.shadow || {}; const sh = state.shadow[key] = state.shadow[key] || { plays: 0 };
@@ -1780,6 +1822,8 @@ var LS2 = (function () {
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
         const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
+        let took = null;   // how the last recording was made (mode, slower copy), for Roig
+        if (hand) cantRow(recBtn.closest('.section-card'), id, 'Shadowing');
         recStop.onclick = () => { if (rp) rp.stop(); endAt = 0; halt(); };
         recBtn.onclick = async () => {
           if (processor) return; recBtn.disabled = true; if (rp) rp.stop();
@@ -1793,6 +1837,7 @@ var LS2 = (function () {
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
           const rr = repeat();   // Listen and repeat: the recording follows the pauses after each sentence (Roger, 7 Nov 2026)
+          took = { mode: rr ? 'repeat' : 'shadow', slow };
           recStop.disabled = false; recMsg.textContent = rr ? (ca() ? 'Gravant… repeteix cada frase quan s’aturi.' : 'Recording… say each sentence when it stops.') : (ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.');
           (c.video ? m : recBtn).scrollIntoView({ behavior: 'smooth', block: 'center' });   // the video has to be in view to follow it
           const fin = async () => {
@@ -1812,10 +1857,30 @@ var LS2 = (function () {
           if (rr) rp.start(0, fin); else play(fin);
         };
         count(); mark(); rate();
-        if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
-        $('#' + id + 'Done').onclick = () => {
+        const handed = () => { const h = (state.steps || {})[id]; if (!h) return; msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà els consells aquí mateix. Si et tornes a gravar millor, torna-la a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s tips will appear right here. If you record a better version, hand it in again.'; };
+        if (hand) handed();
+        else if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
+        let sending = false;
+        $('#' + id + 'Done').onclick = async () => {
           if ((sh.plays || 0) < 3) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escolta el fragment almenys 3 vegades (una per ronda).' : 'Play the clip at least 3 times (one for each round).'; return; }
           if (!sh.rate) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Tria com ha anat.' : 'Choose how it went.'; return; }
+          if (hand) {
+            if (processor) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Atura la gravació primer.' : 'Stop the recording first.'; return; }
+            if (sending) return;
+            // the recording has to cover most of the clip (60 % of the normal copy, at least 8 s)
+            const recMin = Math.max(8, Math.round((c.t[1] - c.t[0]) * 0.6));
+            if (recSecs(id + 'Rec') < recMin) { msg.className = 'feedback no'; msg.textContent = ca()
+              ? 'Grava’t fent tot el fragment (almenys ' + recMin + ' segons) amb Grava i escolta, i després entrega la gravació. Si el micròfon no funciona, prem 🎙️ No puc gravar.'
+              : 'Record yourself doing the whole clip (at least ' + recMin + ' seconds) with Record and play, then hand in your recording. If the microphone doesn’t work, press 🎙️ I can’t record.'; return; }
+            sending = true; msg.className = 'feedback'; msg.textContent = ca() ? 'Enviant la gravació al professor…' : 'Sending your recording to your teacher…';
+            const t = took || { mode: repeat() ? 'repeat' : 'shadow', slow }, title = 'Shadowing · ' + (c.title || ''), r = await handRec(id + 'Rec', id, title, shadowTask(c, t.mode, t.slow)); sending = false;
+            if (!r) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La gravació no s’ha pogut enviar. Torna-ho a provar d’aquí a una estona.' : 'Your recording could not be sent. Try again in a moment.'; return; }
+            const model = c.lines.map(l => Array.isArray(l) ? l[l.length - 1] : l).join(' ').replace(/\s+/g, ' ').trim();
+            state.steps = state.steps || {};
+            state.steps[id] = { level, title, ty: null, audio: r.audio, sh: 1, f: [{ l: 'Model sentences', v: model, model: 1 }, ...(r.f.length ? r.f : [{ l: ca() ? 'Transcripció' : 'Transcript', v: '' }])], how: t.mode + (t.slow ? ' · slower' : ''), rate: [], avg: null, comment: '', date: new Date().toISOString() };
+            sh.date = state.steps[id].date; complete(id); save(); handed(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
+            return;
+          }
           sh.date = new Date().toISOString(); complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Molt bé! Com més ho facis, més fàcil serà.' : 'Done ✓ Well done! The more you do it, the easier it gets.';
         };
