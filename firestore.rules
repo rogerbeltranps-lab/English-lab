@@ -381,16 +381,19 @@ service cloud.firestore {
           && (exGrp(ls).get('only', null) == null || myEmail() in exGrp(ls).only); }
         function exOk() {
           let d = request.resource.data;
-          return d.keys().hasOnly(['ls','key','paper','level','group','order','answers','started','listenDone','status','exits','glances','changes','snaps','tries','plays','done','updated'])
+          return d.keys().hasOnly(['ls','key','paper','level','group','order','answers','started','listenDone','status','exits','glances','changes','snaps','tries','plays','done','env','updated'])
             && d.key == key && d.updated == request.time && d.status in ['in', 'out', 'done']
             && d.answers is map && d.answers.size() <= 120 && d.order is map
             && d.exits is list && d.exits.size() <= 30 && d.snaps is list && d.snaps.size() <= 30
             && d.changes is list && d.changes.size() <= 300 && d.glances is list && d.glances.size() <= 60
             && d.get('plays', 0) is int && d.get('plays', 0) >= 0 && d.get('plays', 0) <= 5
+            && d.get('env', {}) is map && d.get('env', {}).size() <= 3
             && (exOpen(d.ls) || isTester());
         }
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create: if signedIn() && request.auth.uid == uid && exOk() && request.resource.data.snaps.size() == 0;
+        // ↺ a try the teacher set aside for a make-up (ls/{ls}.webExam[group].reset[uid] = its start, teacher.html wxRedo) is never created again
+        allow create: if signedIn() && request.auth.uid == uid && exOk() && request.resource.data.snaps.size() == 0
+          && request.resource.data.started != exGrp(request.resource.data.ls).get('reset', {}).get(uid, null);
         allow update: if signedIn() && request.auth.uid == uid && exOk() && resource.data.status != 'done'
           && request.resource.data.ls == resource.data.ls && request.resource.data.paper == resource.data.paper && request.resource.data.started == resource.data.started
           && request.resource.data.snaps.size() >= resource.data.snaps.size()

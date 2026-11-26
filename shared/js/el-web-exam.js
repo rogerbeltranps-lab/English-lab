@@ -164,7 +164,23 @@
   const auMax = () => (X.audio && X.audio.plays) || (MU ? 2 : 0);
   const payload = F => ({ ls: X.ls, key: X.key, paper: S.paper, level: S.level, group: S.group || null, order: S.order, answers: S.answers, started: S.started,
     listenDone: S.listenDone || null, status: S.status, exits: S.exits.slice(0, 30), glances: S.glances.slice(-60), changes: S.changes.slice(-300),
-    snaps: S.snaps.slice(0, 30), tries: S.tries || 0, plays: S.plays || 0, done: S.done || null, updated: F.serverTimestamp() });
+    snaps: S.snaps.slice(0, 30), tries: S.tries || 0, plays: S.plays || 0, done: S.done || null, env: S.env || (S.env = envNow()), updated: F.serverTimestamp() });
+  // the device the exam was done on, for the dashboard's ⚠️ check (Roger, 26 Nov 2026: a student did the exam from home): a Chromebook,
+  // a phone or tablet, or another computer. Only that word; nothing else about the device or the connection
+  function envNow() { const u = navigator.userAgent || ''; return { dev: /CrOS/.test(u) ? 'cros' : /Mobi|Android|iPhone|iPad/.test(u) ? 'mobile' : 'other' }; }
+  // 🏠 the same internet connection as the class? (Roger chose it, 26 Nov 2026: "Yes, save only a short code"): the page asks a free
+  // service (api.ipify.org) for the connection's public address and saves only env.net = the first 8 hex of SHA-256("el-net|" + exam key
+  // + "|" + address), never the address. The school's Chromebooks share one connection, so the class has one code and a try from home
+  // another. No answer in 4 s, or no Web Crypto: no code (the dashboard then says nothing about the network).
+  let netP = null;
+  function netCode() { return netP || (netP = (async () => { try {
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 4000);
+    const r = await fetch('https://api.ipify.org?format=json', { signal: ac.signal, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' }); clearTimeout(tm);
+    const ip = r.ok && (await r.json()).ip; if (!ip || !(window.crypto && crypto.subtle)) return null;
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('el-net|' + X.key + '|' + ip)));
+    return [...h.slice(0, 4)].map((b) => b.toString(16).padStart(2, '0')).join(''); } catch (e) { return null; } })()); }
+  function fillNet() { if (PV || mode !== 'student' || isTester() || (S.env && S.env.net)) return;
+    netCode().then((n) => { if (!n || !S || !S.started || S.status === 'done') return; S.env = Object.assign({}, S.env || envNow(), { net: n }); keep(); if (S.status === 'in' && !saveT) saveT = setTimeout(save, SAVE_MS); }); }
   function keep() { S.at = Date.now(); local.set(S); }
   function touch() { keep(); dirty = true; clearTimeout(saveT); saveT = setTimeout(save, SAVE_MS); mark(t('Desant…', 'Saving…')); }
   async function save(force) {   // force: a turn-in retry goes even while an earlier write still waits (Firestore queues both)
@@ -173,7 +189,10 @@
     busy = true; const was = dirty; dirty = false; const sentDone = S.status === 'done';
     try { const F = await fsLib(); await F.setDoc(ref(F), payload(F)); S.cloudAt = now(); if (sentDone && S.stuck) { busy = false; stuckDone(); return true; } keep(); mark('✓ ' + t('Desat', 'Saved') + ' ' + new Date().toTimeString().slice(0, 5)); busy = false; return true; }
     catch (e) { busy = false; dirty = dirty || was; console.warn('exam save', e);
-      if (e && /permission/i.test(String(e.code || e.message))) { try { const l = await readLs(); if (!isOpen(l, S.group) && S.status !== 'done') return closedNow(); } catch (x) {} }
+      if (e && /permission/i.test(String(e.code || e.message))) { try { const l = await readLs();
+        // ↺ the teacher set this try aside for a make-up (teacher.html wxRedo) while this page was still open: it never comes back
+        if (me && S.started && ((((l || {}).webExam || {})[S.group] || {}).reset || {})[me.uid] === S.started) { local.del(); window.EL_EXAM_LOCK = false; try { if (D.fullscreenElement) await D.exitFullscreen(); } catch (x) {} return location.reload(); }
+        if (!isOpen(l, S.group) && S.status !== 'done') return closedNow(); } catch (x) {} }
       mark('⚠️ ' + t('No s’ha pogut desar: es tornarà a provar', 'Not saved yet: trying again'), true); saveT = setTimeout(save, 8000); return false; }
   }
   function mark(txt, bad) { const el = $('#wxSaved'); if (el) { el.textContent = txt; el.style.color = bad ? '#fecaca' : ''; } }
@@ -285,10 +304,11 @@
       const pl = paperOf(S.level), vs = ['A', 'B', 'C', 'D'].filter(x => X.papers[pl + '-' + x]), v = vs.length ? vs[(hash32(String(me.uid) + X.key) + (MU ? 1 : 0)) % vs.length] : 'A', paper = PV && PV.paper || tPaper || pick(pl, v);   // as many versions as the exam has (4ESO LS2: A, B, C; Roger 19 Nov 2026 "so that students can't copy")
       const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
-      S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0 };
-      await goFull(); keep(); run(); save();
+      S = { group: S.group, level: S.level, paper, order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [], tries: 0, env: envNow() };
+      fillNet(); await goFull(); keep(); run(); save();
   }
   function resume() {   // back in after the password, or a reload in the first seconds: full screen needs a click
+    fillNet();
     if (fsOk() && !isFull() && !PV) {
       root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Continua l’examen', 'Go on with the exam') + '</h2><p>' + t('Prem el botó per tornar a la pantalla completa.', 'Press the button to go back to full screen.') + '</p><button class="wx-btn" id="wxBack">⛶ ' + t('Continua a pantalla completa', 'Continue in full screen') + '</button></div>';
       $('#wxBack').onclick = async () => { await goFull(); S.status = 'in'; keep(); run(); save(); };
