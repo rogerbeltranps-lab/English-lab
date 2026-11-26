@@ -800,7 +800,7 @@ window.elStudentMenu=function(o){
 };
 
 // Opens or closes a menu group (above) on a click on its ▾ or on the 📚 Study card, or Enter / Space on them; remembers it on the device.
-if(!window.elMenuToggle){window.elMenuToggle=1;
+if(typeof document!=="undefined"&&!window.elMenuToggle){window.elMenuToggle=1;
   const go=e=>{const c=e.target.closest&&e.target.closest(".nvg .nvc,.nvg>.nv.grp");if(!c)return;const g=c.closest(".nvg");if(!g||g.closest(".mtabs"))return;
     e.preventDefault();e.stopPropagation();const op=g.classList.toggle("open");
     try{const k=JSON.parse(localStorage.getItem("el_menu_open")||"[]").filter(x=>x!==g.dataset.g);if(op)k.push(g.dataset.g);localStorage.setItem("el_menu_open",JSON.stringify(k))}catch(x){}};
