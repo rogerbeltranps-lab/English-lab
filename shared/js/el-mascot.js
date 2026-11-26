@@ -51,7 +51,13 @@
   // the student's flashcards and the counts Practise left: { P, st (streak), left (cards still to study today, null = not known) }
   function data(uid, P) {
     const F = FD(); if (!F) return null;
-    P = P || load('el_flash' + (uid ? '_' + uid : '')) || {};
+    if (!P) {   // own bar (not a 👁 student view, which passes the student's copy)
+      P = load('el_flash' + (uid ? '_' + uid : '')) || {};
+      // Roger's Towards Nativeness 🧠 My flashcards (localStorage tnFlash, decks tn-…) count in his ⚡ too (Roger, 26 Nov 2026: "as a teacher,
+      // yesterday I did my flashcards (Towards Nativeness) but I see 0"). Only teacher/tester browsers have it: students never see TN.
+      const tn = load('tnFlash');
+      if (tn && tn.decks && Object.keys(tn.decks).length) P = { decks: Object.assign({}, P.decks || {}, tn.decks) };
+    }
     const now = Date.now(), st = F.streak(P, now), today = F.dayKey(now), sum = load('el_flash_sum' + (uid ? '_' + uid : ''));
     let left = null;
     if (sum && sum.d === today) left = (+sum.due || 0) + (+sum.nw || 0);

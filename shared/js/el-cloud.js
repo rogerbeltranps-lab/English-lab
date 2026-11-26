@@ -903,7 +903,7 @@ function mzSync(uid){const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.get
     dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e))}
 function mzBar(ca){
   if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
-  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261125",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
+  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261126",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
   let P=null;
   if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
       try{const c=JSON.parse(sessionStorage.getItem(k)||"null");if(c&&Date.now()-c.t<30*60e3){mzAs.P=c.P;}else getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{mzAs.P=s.exists()?JSON.parse(s.data().p||"{}"):{};

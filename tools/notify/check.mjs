@@ -103,14 +103,14 @@ async function open(size, { teacher = false } = {}) {
   const [w, h] = size;
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'en-GB', timezoneId: 'Europe/Madrid', ...(SHOTS ? { deviceScaleFactor: 2 } : {}), ...(w < 500 ? { isMobile: true, hasTouch: true } : {}) });
   const user = teacher ? { uid: 'teacher', email: 'roger.beltranps@gmail.com', displayName: 'Teacher' } : { uid: UID, email: EMAIL, displayName: 'Alex Sample' };
-  await ctx.addInitScript(([db, user, uid]) => {
+  await ctx.addInitScript(([db, user, uid, NOW]) => {
     if (!window.__FAKE) { let s = null; try { s = JSON.parse(sessionStorage.getItem('__fake') || 'null'); } catch (e) {}
       window.__FAKE = { db: s || db, user: Object.assign({ getIdToken: async () => 'x' }, user), reads: [], writes: [] };
       addEventListener('pagehide', () => { try { sessionStorage.setItem('__fake', JSON.stringify(window.__FAKE.db)); } catch (e) {} }); }
     // five days of flashcards in a row (the ⚡ streak)
-    try { const log = {}; for (let i = 0; i < 5; i++) { const d = new Date(Date.now() - i * 864e5); log[d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')] = [12, 0, 0]; }
+    try { const log = {}; for (let i = 0; i < 5; i++) { const d = new Date(NOW - i * 864e5); log[d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')] = [12, 0, 0]; }
       localStorage.setItem('el_flash_' + uid, JSON.stringify({ decks: { x: { c: {}, log } } })); localStorage.setItem('el_phone_seen', '1'); } catch (e) {}
-  }, [data(), user, UID]);
+  }, [data(), user, UID, NOW]);
   const real = [];
   await ctx.route('**/*', (route) => {
     const u = new URL(route.request().url());
@@ -176,7 +176,7 @@ for (const [name, size] of [['chromebook', [1366, 768]], ['phone', [390, 844]]])
   // the mascot with ⚡ 5 in the bar
   const mz = page.locator('#el-cloud-bar .elcb-mz');
   ok(await mz.count(), `${name}: no mascot in the bar`);
-  ok(/5/.test(await mz.locator('.elmz-badge').textContent().catch(() => '')), `${name}: the ⚡ streak number is not 5`);
+  { const bt = await mz.locator(".elmz-badge").textContent().catch(() => "ERR"); ok(/5/.test(bt), `${name}: the ⚡ streak number is not 5 (${bt})`); }
   // next page: the number stays away, the board has the mascot in the bar too, the sample exam has neither
   await page.goto('http://el.local/today.html');
   await settle(page, 3500); await closeCards(page);
