@@ -140,7 +140,12 @@ export async function device(who, { size = CHROMEBOOK, now, lang = 'en-GB', loca
     page.on('pageerror', (e) => keep(e.message || e));
     page.on('console', (m) => { if (m.type() === 'error' && /^(Uncaught )?(\w*Error|TypeError|ReferenceError|SyntaxError)\b/.test(m.text())) keep(m.text());
       if (/real-use sign-in/.test(m.text())) keep(m.text()); });
+    // the robot's mouse rests at the right edge, as a student's hand would be off the menu: Chrome starts a new page with the mouse at the
+    // top left, over the LS's icon strip (.elrail), which opens on hover and then covers the learning path's tabs (seen on GitHub only)
+    const rest = () => (size.phone ? Promise.resolve() : page.mouse.move(size.width - 20, Math.round(size.height / 2))).catch(() => {});
+    page.on('load', rest);
     await page.goto(SITE + url, { waitUntil: 'load' });
+    await rest();
     if (wait === 'cloud') await signedIn(page);
     D.pages.push(page);
     return page;
