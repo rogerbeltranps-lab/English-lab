@@ -62,7 +62,9 @@ for (const f of files) {
     const stuck = fails.length;   // the test stopped or a check failed: say where each device was and what it showed
     for (const [n, d] of devices.entries()) {
       const last = d.pages[d.pages.length - 1];
-      if (stuck && last) { const txt = await last.evaluate(() => (document.body.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 220)).catch(() => '?');
+      if (stuck && last) { const txt = await last.evaluate(() => { const nav = document.querySelector('nav, aside, .el-side, #el-side'), all = (document.body.innerText || '').replace(/\s+/g, ' ').trim(), n = nav ? (nav.innerText || '').replace(/\s+/g, ' ').trim() : '';
+          const tabs = [...document.querySelectorAll('.tab')], vis = tabs.filter((e) => e.offsetParent).length;
+          return (n && all.startsWith(n) ? all.slice(n.length) : all).trim().slice(0, 600) + (tabs.length ? ' [' + vis + ' of ' + tabs.length + ' tabs visible]' : ''); }).catch(() => '?');
         fails.push('device ' + (n + 1) + ' was on ' + last.url().replace(/^https?:\/\/[^/]+\//, '') + ': "' + txt + '"'); }
       for (const e of new Set(d.errors)) fails.push('JavaScript error on ' + e);
       if (d.real.length) fails.push('tried to reach the REAL database: ' + [...new Set(d.real)].join(', '));
