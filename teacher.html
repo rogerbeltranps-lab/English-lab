@@ -6089,12 +6089,42 @@ function stuPanel(u){redraw=null;
   const entry=s.tester?"":`<details data-k="roform" ${s.ro&&s.email?"":"open"}><summary style="font-size:1rem">${s.ro?"Edit the list entry":"Add to the student list"}</summary>${roForm(s)}</details>`;
   // 🕘 their visit history, day by day (Roger, 14 Nov 2026: "I want this kind of history student by student")
   const vh=s.away?"":`<p class="vhl"><button class="g" data-do="vhist" data-u="${u}" title="When ${esc(fullName(s))} was on English Lab, for how long and on which pages (📓 notebook included), day by day">🕘 Visit history</button></p>`;
-  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+vh+msgLine(u)+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
-  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>${vh}${msgLine(u)}
+  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+vh+loginLine(u)+msgLine(u)+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
+  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>${vh}${loginLine(u)}${msgLine(u)}
     <label>Group</label>${groupSel(u,s.group)}
     <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>${toldLine(u,ls)}
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
+// ---- 🔑 Email their login (Roger, 26 Nov 2026: "Hauria de tenir al teacher dashboard, un botó per poder enviar al mail el seu usuari i
+// contrasenya"): in the student's window, 🔑 Email their login opens the email (both languages, theirs first, no name, editable) and
+// 📨 Send emails it from the school account. The password is never in this page, the repo or Firestore: the text goes with {{PASSWORD}}
+// and the school script (v41, action "login_mail") writes in the password it keeps in its private Script Properties
+// (tools/student-accounts/logins-upload.mjs). The address goes as `student`, never `to`, so an older script refuses it ("nothing to send")
+// instead of sending the text with {{PASSWORD}} in it. 21:00 to 7:30: lateAsk, as for every send to students.
+function loginLine(u){const s=S.P[u];if(!s||s.tester||!mailTo([s]).length)return "";
+  return `<div class="bar" style="margin:4px 0 8px"><button class="g" data-do="loginmail" data-u="${esc(u)}">🔑 Email their login</button><span class="muted">Their school email and password, to ${esc(mailTo([s])[0])}. You see it before it goes.</span></div>`}
+function loginText(s){const em=mailTo([s])[0],url=new URL("today.html",location.href).href,ca=msgCa(s);
+  const C=`Hola!\n\nAquí tens les teves dades per entrar a English Lab:\n\n1. Obre ${url}\n2. Prem Entra / Sign in.\n3. Escriu el teu correu de l'institut i aquesta contrasenya:\n\nUsuari: ${em}\nContrasenya: {{PASSWORD}}\n\nGuarda-la en un lloc segur i no la comparteixis amb ningú. Si encara no pots entrar, digues-m'ho a classe.\n\nRoger`;
+  const E=`Hi!\n\nHere is your login for English Lab:\n\n1. Open ${url}\n2. Press Sign in / Entra.\n3. Type your school email and this password:\n\nLogin: ${em}\nPassword: {{PASSWORD}}\n\nKeep it somewhere safe and don't share it with anyone. If you still can't get in, tell me in class.\n\nRoger`;
+  return {em,subject:ca===false?"English Lab: your login / les teves dades d'accés":"English Lab: les teves dades d'accés / your login",body:(ca===false?[E,C]:[C,E]).join("\n\n— — —\n\n")}}
+function loginDialog(u){const s=S.P[u];if(!s)return;const t=loginText(s);
+  dlg(`<h3>🔑 Email their login · ${name(s)}</h3><p class="muted" style="margin:0 0 6px">To <b>${esc(t.em)}</b>, from your school account. Both languages, ${msgCa(s)===false?"English":"Catalan"} first.</p>
+    <label for="lgs">Subject</label><input id="lgs" value="${esc(t.subject)}" maxlength="200" style="width:100%;box-sizing:border-box">
+    <label for="lgt">Email <small class="muted">(change anything you like)</small></label><textarea id="lgt" style="min-height:260px">${esc(t.body)}</textarea>
+    <p class="muted" style="margin:6px 0">🔒 <b>{{PASSWORD}}</b> is where your school account writes their password as the email goes: the password never reaches this page or GitHub.</p>
+    <p id="lgst" class="muted" style="margin:4px 0"></p>
+    <div class="row" style="justify-content:flex-start"><button data-do="loginsend" data-u="${esc(u)}" id="lgsend">📨 Send</button><button class="g" data-do="stu" data-u="${esc(u)}">Back</button></div>`);
+  const tx=$("#lgt"),chk=()=>{const ok=tx.value.includes("{{PASSWORD}}")&&$("#lgs").value.trim();$("#lgsend").disabled=!ok;$("#lgst").textContent=tx.value.includes("{{PASSWORD}}")?"":"⚠️ Put {{PASSWORD}} back in the email, or it can't go."};tx.oninput=chk;$("#lgs").oninput=chk;chk()}
+async function loginSend(u){const s=S.P[u],em=mailTo([s])[0],subject=$("#lgs").value.trim(),body=$("#lgt").value,st=$("#lgst"),b=$("#lgsend");if(!s||!em||!body.includes("{{PASSWORD}}"))return;
+  const hold=S.hold,now=S.mailNow,toast=m=>{const d=document.createElement("div");d.textContent=m;d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)};
+  if(DEMO){$("#dlg").close();toast("🔑 Login emailed to "+em+" (demo: nothing sent)");return}
+  b.disabled=true;st.textContent="📨 Sending…";let j=null;
+  try{const tok=await ELCloud.auth.currentUser.getIdToken();
+    const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(Object.assign({idToken:tok,action:"login_mail",student:em,subject,body,name:"Roger Beltran · English Lab"},hold?{at:hold}:now?{now:true}:{}))});j=await r.json()}
+  catch(e){j={ok:false,error:"the school mail script did not answer"}}
+  if(j&&j.ok){$("#dlg").close();toast(j.later?"🔑 Login email goes to "+em+" at "+lateWhen(Date.parse(j.later)):"🔑 Login emailed to "+em);return}
+  const e=j&&j.error;b.disabled=false;
+  st.textContent="⚠️ It didn't go: "+(e==="no password saved"?"your school script has no password saved for this student (a new student? Their account and password are made first, then saved in the script).":e==="nothing to send"?"your school script is still the old version (it needs v41).":e||"no answer")}
 // ---- a private message to one student (Roger, 7 Nov 2026: "I want to have the option of sending students messages through the app, and
 // then it would be a notification and they would receive an email with the message"). From the student's window (a name in any table):
 // ✉️ Send a message. It is an announcement only for them (announcements/{id} with to:"one", uids:[the student, testers]): they see it once
@@ -7075,7 +7105,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),vfs:()=>vfs(!(S.vfs&&!S.tfs)),tfs:()=>vfs(!(S.vfs&&S.tfs),true),hfs:()=>hfs(!S.hfs),gz:()=>gz(k.z),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";S.msgTab="sg";S.sgOpen=null;render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>lateAsk(()=>msgSend(u,k.id)),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annAtMs()?annSendNow():lateAsk(annSendNow),annto:()=>{annToggle(k.v);annDialog(true)},
+    annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),loginmail:()=>loginDialog(u),loginsend:()=>lateAsk(()=>loginSend(u)),msgsend:()=>lateAsk(()=>msgSend(u,k.id)),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annAtMs()?annSendNow():lateAsk(annSendNow),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdone:()=>act(api.sgDone(k.id,!!k.v)),msgtab:()=>{S.msgTab=k.t;S.pbOpen=S.sgOpen=null;render()},
     pbview:()=>{S.pbOpen=k.id||null;const x=k.id&&S.D.pb.find(y=>y.id===k.id);scrollTo(0,0);if(x&&!pbDone(x)&&!x.seen)act(api.pbSeen(x.id));else render()},
