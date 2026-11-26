@@ -284,6 +284,8 @@
   // myGames/{email} per page (kept for #notes too); circles show "–" until there is a result, and for the teacher.
   let mg=null,mgBusy=false;
   function homeCard(){
+    // the LS page's 🧩 Grammar and 🔤 Vocabulary cards (el-ls-home.js) use the same read: the % in each class game topic
+    if(mg&&window.EL_MY_GAMES!==mg){window.EL_MY_GAMES=mg;document.dispatchEvent(new Event("elmygames"))}
     const a=document.querySelector('a.tile.nt[href="#notes"]');if(!a||!window.elRing)return;
     const g=Object.values(mg||{}).filter(x=>x&&x.ls===LS),st=window.elGameStats?elGameStats(g):{},tip=k=>window.elGameTip&&g.length?elGameTip(g,k,ca()):"";
     a.classList.add("gm");

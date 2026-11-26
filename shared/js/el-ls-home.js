@@ -120,7 +120,7 @@
     if(!all&&!closed)for(const {a} of rows){if(a.manual||a.optional||dropped.includes(a.id)||!open(a)||done(a)||!can(a).some(k=>!doneOf(a).has(k)))continue;
       const cp=elCheckpointMissing(a,doneOf,open),k=can(a).find(x=>!doneOf(a).has(x)&&!(a.skip||[]).includes(x));next=cp?{a:cp,cp:true}:{a,k};break}
     const soonAny=!all&&!closed&&rows.some(({a})=>open(a)&&!dropped.includes(a.id)&&soonOf(a).some(k=>!doneOf(a).has(k)));
-    return {open,done,dropped,next,all,closed,vis,soonAny};
+    return {open,done,dropped,next,all,closed,vis,can,rows,soonAny};
   }
   // Students see only the learning paths the teacher has opened for their group (Roger, 6 Nov 2026: "I don't want students to see the
   // future LP as depending on the time left they might not do them"): not open yet and dropped ones are left out; the teacher and testers see all.
@@ -200,120 +200,120 @@
       +`<span class="abgo">${t("Descobreix-ho","Find out")} →</span>`;
   }
 
-  // ---- the simple LS home (Roger, 20 Nov 2026: "the LS must be similar to the new format and simple, there is too much info: there should
-  // be aims, challenge, criteria, grammar vocab list, and a percentage of each communicative skill's performance in the activities so far
-  // (average of all tries) and the exams"). In the voyage board's look (parchment cards, Georgia titles). Built from this page's own
-  // content (the About place, a.chal, [data-ls-lists]), so every LS page gets it with no change to its HTML; the old home (Continue card,
-  // learning paths, tiles, About banner) stays in the file but is hidden (the board's 🧭 voyage has the steps). LS1 and a personal LS keep
-  // their home. No new Firestore reads: the progress in this browser and the results the page already read.
+  // ---- the LS page (Roger, 26 Nov 2026, doc "New student's organization menu", his sketch of the LS: "Easy to read. Format (all LS all
+  // course same color"; it replaces the simple LS home of 20 Nov and its 📊 skills card and 🧭 Your steps): a band in the course's colour
+  // (the LS's number and title, its question, 🏆 Final product on the right) · 🎯 What you will learn | 📏 How you will be assessed ·
+  // 🧩 Grammar | 🔤 Vocabulary (each class game topic with the student's % in the class games, 📖 Study = its class explanation here,
+  // 🧠 Cards = Flashcards) · 📋 Activities, grouped by skill: each tab the student can see, with its result and Open ›. Built from this
+  // page's own content (the About place, a.chal, [data-ls-lists]) and the catalogue, so every LS page gets it with no change to its HTML.
+  // LS1 and a personal LS keep their home. No new Firestore reads: the progress in this browser, the results the page already read and
+  // the class games el-notes.js already reads for this page (myGames, window.EL_MY_GAMES).
   const SIMPLE=!ALL_LPS&&!ls.personal;
   let LV=null;   // the student's level (route id) for the grammar and vocabulary lines; null = every line (teacher, testers, not known yet)
   const RK={beginners:0,insecure:1,safe:2,daring:3,native:4},RN={Beginners:"beginners",Insecure:"insecure",Safe:"safe",Daring:"daring",Native:"native",Starter:"beginners",Base:"insecure",Core:"safe",Plus:"daring",Pro:"native"};
-  // the skills, as on the voyage map (el-voyage.js SK): label (Catalan where the map has one), icon, colour
-  const SKL={Reading:["Reading","📖","#1d4ed8"],Listening:["Listening","🎧","#7e22ce"],Speaking:["Speaking","🗣","#c2410c"],Writing:["Escriptura","✍️","#15803d"],
-    Grammar:["Gramàtica","🧩","#b91c1c"],Vocabulary:["Vocabulari","🔤","#0f766e"]};
-  const SK4=["Reading","Listening","Speaking","Writing"],SK2=["Grammar","Vocabulary"];
-  const skName=k=>CA?SKL[k][0]:k;
-  // a step's skill: the voyage map's (el-voyage.js skill), only the six above (recall, research and checkpoints mix things up: left out)
-  function skillOf(a,pid){let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
-    if(!s)s=/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d/.test(pid)?"Reading":"";
-    s=String(s).split(" · ")[0];return SKL[s]?s:null}
-  // 📊 each skill's % in the activities: every checked step of this LS (the engine's state: all = every try since 20 Nov 2026, before
-  // that the first and the latest try), a step marked by the teacher (results levels) when it has no checks; each step counts the same.
-  // In the exam: the points of the exam parts of that skill (results/{ls}__assessment sections), never while the results are held.
+  // the skill groups of 📋 Activities, in this order: label, Catalan, icon (as on the voyage map, el-voyage.js SK)
+  const GRP=[["Reading","Reading","📖"],["Listening","Listening","🎧"],["Speaking","Speaking","🗣"],["Writing","Escriptura","✍️"],["Grammar","Gramàtica","🧩"],
+    ["Vocabulary","Vocabulari","🔤"],["Research","Recerca","🔎"],["Recall","Repàs","🧠"]];
+  // a tab's group: the voyage map's skill of its first step (el-voyage.js skill), "Speaking · Talk" → Speaking; checkpoints → Recall
+  function groupOf(a,pid){if(/checkpoint/.test(a.id))return "Recall";let s="";try{s=window.elVoyage?elVoyage.skill(a.id,pid,null):""}catch(e){}
+    if(!s)s=/^recall/.test(pid)?"Recall":/^(vocab|words|cards|practice)/.test(pid)?"Vocabulary":/^(grammar|mixed)/.test(pid)?"Grammar":/^(shadow|talk|speak)/.test(pid)?"Speaking":/^(write|card)/.test(pid)?"Writing":/listen|again|chart/.test(pid)?"Listening":/read|log|^ch\d|^book/.test(pid)?"Reading":"";
+    s=String(s).split(" · ")[0];return GRP.some(g=>g[0]===s)?s:null}
   const LVL=/_(beginners|insecure|safe|daring|native)$/;
-  function skillData(){const act={},ex={},put=(k,v)=>{if(v==null||isNaN(v))return;const z=act[k]||(act[k]={s:0,n:0});z.s+=Math.max(0,Math.min(1,v));z.n++};
-    if(!ST)return {act,ex,held:null};
-    acts().forEach(a=>{if(/checkpoint/.test(a.id)||a.graded===false)return;const seen=new Set();
-      a.keys.forEach(key=>{let st=null;try{st=JSON.parse(ST.pg[key]||"null")}catch(e){}if(!st)return;
-        const A=st.all||{},F=st.tries||{},L=st.last||{};
-        new Set([...Object.keys(A),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(LVL,""),sk=skillOf(a,pid);if(!sk)return;
-          let v=null;if(A[k]&&A[k].n)v=A[k].s/A[k].n;
-          else{const f=F[k],l=L[k],xs=[f];if(l&&(!f||Math.abs(Date.parse(l.date)-Date.parse(f.date))>5000))xs.push(l);
-            const ok=xs.filter(x=>x&&+x.max>0);if(ok.length)v=ok.reduce((n,x)=>n+(+x.score||0)/+x.max,0)/ok.length}
-          if(v!=null){put(sk,v);seen.add(pid)}})});
-      const M=window.EL_DEGREE_MARK||{NA:2.5,AS:5,AN:7.5,AE:10};
-      Object.entries(((ST.rs||{})[a.id]||{}).levels||{}).forEach(([pid,cs])=>{if(seen.has(pid))return;const sk=skillOf(a,pid);if(!sk)return;
-        const ms=Object.values(cs||{}).map(d=>M[d]).filter(n=>n!=null);if(ms.length)put(sk,ms.reduce((n,m)=>n+m,0)/ms.length/10)})});
-    const X=(ST.raw||{})[LS+"__assessment"],G=((window.EL_GRADING||{})[LS]||{}).exam;
-    const held=X&&(X.held||(X.showFrom&&Date.now()<Date.parse(X.showFrom)))?(X.held||X.showFrom):null;
-    if(X&&G&&!held&&X.sections)G.sections.forEach(([k,name,max])=>{const v=X.sections[k];if(!v||v.score==null)return;const sk=String(name).split(/\s|·/)[0];if(!SKL[sk])return;
-      const z=ex[sk]||(ex[sk]={s:0,m:0});z.s+=+v.score||0;z.m+=+(v.max||max)||0});
-    return {act,ex,held}}
-  const pc=(s,n)=>n?Math.round(s/n*100):null;
-  function skillsCard(){
-    const D=skillData(),T=teach();
-    const bar=(lab,p,k,note)=>`<div class="sk-b"><em>${lab}</em><span class="sk-bar"><i style="width:${p||0}%;background:${SKL[k][2]}"></i></span><strong${p==null?' class="na"':""}>${p==null?(note||"–"):p+" %"}</strong></div>`;
-    const heldTx=D.held?(()=>{const d=window.elHeldDay?elHeldDay(D.held):new Date(D.held);if(!d)return t("Resultats de l'examen: aviat","Exam results: soon");return t("Resultats de l'examen: ","Exam results: ")+d.toLocaleDateString(CA?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})})():"";
-    const row=k=>{const a=D.act[k],e=D.ex[k],pa=a?pc(a.s,a.n):null,pe=e&&e.m?Math.round(e.s/e.m*100):null;
-      return `<div class="sk-row" style="--k:${SKL[k][2]}"><span class="sk-ic" aria-hidden="true">${SKL[k][1]}</span><b class="sk-n">${esc(skName(k))}</b>`
-        +bar(t("Activitats","Activities"),pa,k)+bar(t("Examen","Exam"),pe,k)+`</div>`};
-    return `<section class="lss-card lss-skills"><h2>📊 ${t("Com et va a cada destresa","How you are doing in each skill")}</h2>`
-      +(T?`<p class="lss-lead">${"Each student sees their own percentages here: the average of all their tries in the activities, and their mark in each part of the exam."}</p>`:
-        `<p class="lss-lead">${t("Activitats: la mitjana de tots els teus intents. Examen: la nota de cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}</p>`)
-      +SK4.map(row).join("")+`<div class="sk-sep"></div>`+SK2.map(row).join("")
-      +(heldTx?`<p class="lss-held">📝 ${esc(heldTx)}</p>`:"")+`</section>`}
+  // a step's latest score (0–1) in this browser's progress: the newest check of any level (the latest version shows, never the first try)
+  function stepScore(a,k){let best=null;if(!ST)return null;
+    a.keys.forEach(key=>{let st=null;try{st=JSON.parse(ST.pg[key]||"null")}catch(e){}if(!st)return;const L=st.last||{};
+      Object.keys(L).forEach(x=>{if(x.replace(LVL,"")!==k)return;const l=L[x];if(l&&+l.max>0&&(!best||Date.parse(l.date)>Date.parse(best.date)))best=l})});
+    return best?Math.max(0,Math.min(1,(+best.score||0)/+best.max)):null}
+  const pcCol=p=>window.elPctCol?elPctCol(p):"#64748b";
   // the page's own content, read once
   let SRC=null;
   function source(){if(SRC)return SRC;
     const tx=e=>e?e.textContent.replace(/\s+/g," ").trim():"",ab=$('[data-place="about"]')||document.createElement("div"),c=$("a.chal"),fin=$('[data-place="final"] a.btn');
-    SRC={aims:[...ab.querySelectorAll(".ab-obj")].map(o=>({i:tx(o.querySelector(".ab-oi")),v:tx(o.querySelector(".ab-oh b")),p:tx(o.querySelector("p:not(.ab-why)")),w:tx(o.querySelector(".ab-why")).replace(/^➜\s*/,"")})),
+    SRC={q:tx($('[data-place="home"] .lshead p.q')),
+      aims:[...ab.querySelectorAll(".ab-obj")].map(o=>({i:tx(o.querySelector(".ab-oi")),v:tx(o.querySelector(".ab-oh b")),p:tx(o.querySelector("p:not(.ab-why)")).replace(/,\s*$/,".")})),
       crit:[...ab.querySelectorAll(".ab-crit")].map(d=>({k:([...d.classList].find(x=>/^k[0-9a-z]$/.test(x))||"kb"),chip:(d.querySelector(".ab-chip")||{}).outerHTML||"",sk:tx(d.querySelector(".ab-ch b")),
         d:tx(d.querySelector(".ab-do")).replace(/^In this LS:\s*/,""),off:tx(d.querySelector(".ab-off")).replace(/^Curriculum criterion:\s*/,"")})),
-      chal:c?{b:tx(c.querySelector("b")),d:tx(c.querySelector(".d")),h:fin?fin.getAttribute("href"):c.getAttribute("href")}:null,
+      chal:c?{b:tx(c.querySelector("b")),h:fin?fin.getAttribute("href"):c.getAttribute("href")}:null,
       lists:[...document.querySelectorAll("[data-ls-lists] .bigcard")].map(e=>({h:tx(e.querySelector("h2")),li:[...e.querySelectorAll("li")].map(tx)})).filter(x=>x.h&&x.li.length)};
     return SRC}
-  // a line of the lists for the student's level, as the board's langLists (today.html): "Safe: …" lines from that level up, the tag dropped
+  // a line of the programme's lists for the student's level, as the board's langLists (today.html): "Safe: …" lines from that level up
   function listLine(x){const all=LV==null,me=all?99:RK[LV]??0,re=/\b(Beginners|Insecure|Safe|Daring|Native)\b/g,nm=v=>(window.EL_ROUTE_RENAME||{})[v]||v;
     const N="Beginners|Insecure|Safe|Daring|Native|Starter|Base|Core|Plus|Pro",m=x.match(new RegExp("^("+N+"):\\s*")),tg=x.match(new RegExp("\\s*\\(((?:"+N+")(?:,\\s*(?:"+N+"))*)\\)"));
     const lv=m?[m[1]]:tg?tg[1].split(/,\s*/):[];if(lv.length&&me<Math.min(...lv.map(v=>RK[RN[v]])))return "";
     let s=x;if(!all){if(m)s=s.slice(m[0].length);if(tg)s=s.replace(tg[0],"")}else s=s.replace(re,nm);
     return `<li>${esc(s)}</li>`}
-  // ---- 🧭 Your steps on the LS page too (Roger, 25 Nov 2026: "here I want this too", on the empty space under 🔤 Grammar and vocabulary):
-  // the same list as the board's voyage (ports as headings, ✓ when done, ▶ on the next step, 🏆 final product last), each step a link.
-  // It is the board's copy in this browser (today.html voyageKeep: el_voyage_steps_<ls>, or el_voyage_steps when it is this LS): no reads.
-  // A step done in this browser since the board made its copy gets its ✓ from this page's progress (only adds ticks; not in the teacher's
-  // student view, where this browser holds the teacher's own progress). Only the student (and the teacher's 👁 student view); nothing
-  // until the board has been opened on this LS in this browser.
-  function stepsData(){if(who.role!=="student"&&who.role!=="as")return null;
-    const J=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
-    let o=J("el_voyage_steps_"+LS);if(!o||o.ls!==LS){o=J("el_voyage_steps");if(o&&o.ls!==LS)o=null}
-    if(!o||!Array.isArray(o.items)||!o.items.length)return null;
-    if(o.u!=="demo"&&(!who.uid||o.u!==who.uid))return null;
-    return o}
-  function localDone(k){const i=String(k||"").lastIndexOf("#");if(i<0||!ST||who.role!=="student"||!window.elSecSteps)return false;
-    const a=acts().find(x=>x.id===k.slice(0,i));if(!a||!a.keys)return false;
-    const s=doneOf(a),st=elSecSteps(a,k.slice(i+1));return st.length>0&&st.every(d=>s.has(d))}
-  function stepsCard(){const o=stepsData();if(!o)return "";
-    let h="",n=0,ok=0,port=null,pd=true;const ports=[];
-    const items=o.items.map(x=>x.p?x:Object.assign({},x,{d:!!x.d||localDone(x.k)}));
-    items.forEach(x=>{if(x.p){port={x,ok:true};ports.push(port);return}n++;if(x.d)ok++;else if(port)port.ok=false});
-    const pOk=new Map(ports.map(p=>[p.x,p.ok]));
-    const now=items.find(x=>!x.p&&x.k===o.now&&!x.d)||null;
-    items.forEach(x=>{
-      if(x.p){h+=`<li class="pt"><span>${esc(x.p)}</span>${esc(x.c)}<span class="tk${pOk.get(x)?" ok":""}">✓</span></li>`;return}
-      const nw=now===x;
-      h+=`<li class="s${x.d?" ok":""}${nw?" now":""}"><a href="${esc(ROOT+x.h)}"><span class="tk">${nw?"▶":"✓"}</span><span class="n"><small style="color:${esc(x.c||"#8a5a1f")}">${esc(x.s||"")}</small>${esc(x.t)}</span></a></li>`});
-    const fp=o.fp||{};
-    if(fp.title)h+=`<li class="s fp${fp.done?" ok":""}${!now&&!fp.done?" now":""}"><a href="${esc(ROOT+(fp.href||""))}"><span class="tk">🏆</span><span class="n"><small style="color:#b45309">${t("Producte final","Final product")}</small>${esc(fp.title)}</span></a></li>`;
-    return `<section class="lss-card lss-steps" aria-label="${esc(t("Els teus passos","Your steps"))}"><h2>🧭 ${t("Els teus passos","Your steps")} <small>${t(`${ok} de ${n} fets`,`${ok} of ${n} done`)}</small></h2>`
-      +`<div class="bar"><i style="width:${n?Math.round(ok/n*100):0}%"></i></div><ol>${h}</ol></section>`}
-  function destImg(){try{if(!window.elVoyage||!elVoyage.SKINS[LS])return "";const S=elVoyage.skin({skin:LS});return S.I+S.dest.img+".webp"}catch(e){return ""}}
+
+  // 🧩 Grammar | 🔤 Vocabulary: the class game topics of this LS (lab/game/decks/theory.js: the theory slides explained in class), only the
+  // ones of a learning path the student can open or has played; % = right answers in its class games (myGames), "–" before any.
+  // With no class game yet (a new LS), the programme's lists at the student's level, as before.
+  function gvTopics(kind,S){const TH=window.EL_GAME_THEORY||{},num=(window.elLsNum?elLsNum(ls):"").toLowerCase(),pre=COURSE+"-"+num+"-lp";if(!num)return [];
+    const G=window.EL_GAMES||[],mg=Object.values(window.EL_MY_GAMES||{}).filter(g=>g&&g.ls===LS);
+    const actOf=k=>{const g=G.find(d=>d.id===k);if(g&&g.act)return g.act;const lp=(k.match(/-lp\d+-/)||[])[0],s=lp&&G.find(d=>d.act&&d.id.includes(lp)&&d.id.startsWith(COURSE+"-"+num));return s?s.act:null};
+    return Object.keys(TH).filter(k=>k.startsWith(pre)&&(kind==="grammar"?/-grammar$/.test(k):/-vocab$/.test(k))).sort((a,b)=>a.localeCompare(b,"en",{numeric:true})).map(k=>{
+      const gs=mg.filter(g=>g.deck===k),r=gs.reduce((n,g)=>n+(+g.r||0),0),of=gs.reduce((n,g)=>n+(+g.of||0),0);
+      const act=actOf(k),a=act&&acts().find(x=>x.id===act);
+      const ok=S.all||S.closed||gs.length||(a&&S.open(a)&&!S.dropped.includes(a.id));
+      return ok?{k,title:String(TH[k].title||"").replace(/^(Grammar|Vocabulary) · /,""),parts:(TH[k].parts||[]).map(p=>(CA&&p.nameCa)||p.name).filter(Boolean),pc:of?r/of*100:null}:null}).filter(Boolean)}
+  function gvCard(kind,S){const L=gvTopics(kind,S),gr=kind==="grammar",S0=source(),list=S0.lists[gr?0:1];
+    const head=`<h2>${gr?"🧩 "+t("Gramàtica","Grammar"):"🔤 "+t("Vocabulari","Vocabulary")}</h2>`;
+    if(!L.length)return list?`<section class="lsn-card lsn-gv">${head}<ul class="lsn-ul">${list.li.map(listLine).join("")}</ul></section>`:"";
+    return `<section class="lsn-card lsn-gv">${head}<ul class="lsn-topics">${L.map(x=>`<li><span class="lsn-tt"><b>${esc(x.title)}</b>${x.parts.length?`<small>${esc(x.parts.join(" · "))}</small>`:""}</span>`
+      +`<span class="lsn-pc" style="color:${x.pc==null?"#94a3b8":pcCol(x.pc)}">${x.pc==null?"–":Math.round(x.pc)+" %"}</span>`
+      +(gr?`<button type="button" class="lsn-btn" data-do="lsstudy" data-k="${esc(x.k)}">📖 ${t("Estudia","Study")}</button>`
+        :`<a class="lsn-btn" href="${ROOT}lab/practice.html#deck">🧠 ${t("Targetes","Cards")}</a>`)+`</li>`).join("")}</ul></section>`}
+  // 📖 Study: the topic's class explanation (its theory slides) in a window on this page, each point with the student's own words in Catalan for Starter
+  const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/~~(.+?)~~/g,"<s>$1</s>");
+  function study(k){const T=(window.EL_GAME_THEORY||{})[k];if(!T)return;
+    let d=$("#lsnDlg");if(!d){d=document.createElement("dialog");d.id="lsnDlg";d.className="lsn-dlg";document.body.appendChild(d);
+      d.addEventListener("click",e=>{if(e.target===d||e.target.closest("[data-do=lsclose]"))d.close()})}
+    const sl=s=>`<div class="lsn-sl"><h4>${esc(s.img||"")} ${esc(s.theory||"")}</h4>`+(CA&&s.ca?`<ul>${s.ca.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:"")
+      +(s.lines||[]).map(x=>typeof x==="string"?`<p>${md(x)}</p>`:x.table?`<div class="lsn-tw"><table>${x.table.map((r,i)=>`<tr>${r.map(c=>i?`<td>${md(c)}</td>`:`<th>${md(c)}</th>`).join("")}</tr>`).join("")}</table></div>`:x.watch?`<p class="lsn-watch">⚠️ ${md(x.watch)}</p>`:"").join("")+`</div>`;
+    d.innerHTML=`<div class="lsn-dh"><h3>📖 ${esc(String(T.title||"").replace(/^(Grammar|Vocabulary) · /,""))}</h3><button type="button" class="lsn-x" data-do="lsclose">✕ ${t("Tanca","Close")}</button></div>`
+      +(T.parts||[]).map(p=>`<section><h3 class="lsn-ph">${esc((CA&&p.nameCa)||p.name||"")}</h3>${(p.slides||[]).map(sl).join("")}</section>`).join("");
+    if(d.showModal&&!d.open)d.showModal();d.scrollTop=0}
+  document.addEventListener("click",e=>{const b=e.target.closest('[data-do="lsstudy"]');if(b)study(b.dataset.k)});
+
+  // 📋 Activities by skill: the learning paths the student can open (not dropped, not behind a checkpoint), each tab they can see
+  // (never one for a later class), in the group's order; its result: the latest score of its checked steps (x / 10), ✓ Done, or To do.
+  // Checkpoints show only Done (their marks wait for 📣 Release feedback). The sample exam, the final product and Reflect are not here.
+  function actGroups(S){const out={},secs=a=>(window.EL_SECTIONS||{})[a.id]||[],TT=(a,p)=>((window.EL_STEP_TITLES||{})[a]||{})[p]||null;
+    const lpT=a=>a.title.replace(/\s*\(warm-up\)$/,""),fpH=(source().chal||{}).h||"";
+    S.rows.forEach(({a})=>{if(a.optional||a.manual||(fpH&&a.path.endsWith("/"+fpH)))return;
+      if(!S.all&&!S.closed&&(S.dropped.includes(a.id)||!S.open(a)||elCheckpointMissing(a,doneOf,S.open)))return;
+      const ks=S.can(a);if(!ks.length)return;const ds=ST?doneOf(a):new Set(),href=a.path.split("/").pop();
+      if(/checkpoint/.test(a.id)){(out.Recall=out.Recall||[]).push({t:lpT(a),d:"",h:href,v:null,done:ks.every(k=>ds.has(k)),cp:1});return}
+      elTabGroups(a,ks).forEach(g=>{const tab=secs(a).some(y=>y[0]===g[0])?g[0]:(g[0]==="cards"||g[0]==="practice")?"vocab":elTabOf(a.id,g[0]);
+        const grp=groupOf(a,tab==="book"?"ch1":g[0]);if(!grp)return;
+        const sn=(secs(a).find(y=>y[0]===tab)||[])[1]||(tab==="book"?"Book":tab),tt=TT(a.id,tab)||TT(a.id,g[0]),desc=tt?((CA&&tt[2])||tt[1]||""):"";
+        const sc=g.map(k=>stepScore(a,k)).filter(v=>v!=null),n=g.filter(k=>ds.has(k)).length;
+        (out[grp]=out[grp]||[]).push({t:(tab==="book"?"📖 ":"")+lpT(a)+" · "+sn.replace(/^💬\s*/,"💬 "),d:desc&&desc!==sn&&!/^Learning Path \d/.test(desc)?desc:"",h:href+"#"+encodeURIComponent(tab),
+          v:sc.length?sc.reduce((x,y)=>x+y,0)/sc.length:null,done:n===g.length,part:g.length>1&&tab==="book"?[n,g.length]:null})})});
+    return out}
+  function actsSection(S){const O=actGroups(S),T=teach();
+    const res=x=>T?"":x.v!=null&&!x.cp?`<span class="lsn-r" style="--rc:${pcCol(x.v*100)}">${(Math.round(x.v*100)/10).toLocaleString(CA?"ca":"en")} / 10</span>`
+      :x.done?`<span class="lsn-r ok">✓ ${t("Fet","Done")}</span>`:x.part&&x.part[0]?`<span class="lsn-r">${x.part[0]} / ${x.part[1]}</span>`:`<span class="lsn-r todo">${t("Per fer","To do")}</span>`;
+    const cards=GRP.filter(g=>(O[g[0]]||[]).length).map(([k,ca,ic])=>{const L=O[k],vs=L.filter(x=>x.v!=null&&!x.cp).map(x=>x.v),av=vs.length?vs.reduce((x,y)=>x+y,0)/vs.length*100:null;
+      return `<section class="lsn-card lsn-sk"><h3><span>${ic} ${esc(CA?ca:k)}</span>${!T&&av!=null?`<span class="lsn-av" style="--rc:${pcCol(av)}">${Math.round(av)} %</span>`:""}</h3><ul>`
+        +L.map(x=>`<li><a href="${esc(x.h)}"><span class="lsn-at"><b>${esc(x.t)}</b>${x.d?`<small>${esc(x.d)}</small>`:""}</span>${res(x)}<span class="lsn-open">${t("Obre","Open")} ›</span></a></li>`).join("")+`</ul></section>`}).join("");
+    return `<div class="lsn-ah"><h2>📋 ${t("Activitats","Activities")}</h2><span>${T?"Each student sees their own result in each activity.":t("Per destreses · el teu resultat a cada una · obre-la des d'aquí","Grouped by skill · your result in each · open it from here")}</span></div>`
+      +(cards?`<div class="lsn-acts">${cards}</div>`:`<p class="lsn-none">${t("El professor obrirà les activitats a classe, quan toqui.","Your teacher will open the activities in class, when it is time.")}</p>`)}
+
   function simpleHome(){if(!SIMPLE)return;
     const home=$('[data-place="home"]'),head=home&&home.querySelector(".lshead");if(!head)return;
     document.body.classList.add("lss");
-    let w=$("#lsSimple");if(!w){w=document.createElement("div");w.id="lsSimple";w.className="lss-grid";head.after(w)}
-    const S=source(),img=destImg();
-    const chal=S.chal?`<a class="lss-card lss-chal" href="${esc(S.chal.h)}">${img?`<img src="${esc(img)}" alt="" loading="lazy">`:""}<span class="lss-cb"><span class="lss-k">🏆 ${t("El teu repte · producte final","Your challenge · final product")}</span><b>${esc(S.chal.b)}</b><span class="lss-d">${esc(S.chal.d)}</span><span class="lss-go">${t("Mira què has de fer","See what to do")} →</span></span></a>`:"";
-    const aims=S.aims.length?`<section class="lss-card lss-aims"><h2>🎯 ${t("Què aprendràs","What you will learn")}</h2><ol>${S.aims.map(o=>`<li><span class="lss-ai" aria-hidden="true">${esc(o.i)}</span><span><b>${esc(o.v)}</b> ${esc(o.p)}${o.w?` <small>${esc(o.w)}</small>`:""}</span></li>`).join("")}</ol></section>`:"";
-    const crit=S.crit.length?`<section class="lss-card lss-crit"><h2>📏 ${t("Com t'avaluarem","How you are assessed")}</h2><p class="lss-lead">${t("Els criteris d'avaluació d'aquesta LS. Toca'n un per veure el text oficial.","The assessment criteria of this LS. Tap one to see its official wording.")}</p>`
-      +S.crit.map(c=>`<details class="lss-cr ${esc(c.k)}"><summary>${c.chip}<span class="lss-crt"><b>${esc(c.sk)}</b> ${esc(c.d)}</span></summary><p>${esc(c.off)}</p></details>`).join("")+`</section>`:"";
-    const lists=S.lists.length?`<section class="lss-card lss-gv"><h2>🔤 ${t("Gramàtica i vocabulari","Grammar and vocabulary")}</h2><div class="lss-gvc">${S.lists.map(c=>`<div><h3>${esc(c.h)}</h3><ul>${c.li.map(listLine).join("")}</ul></div>`).join("")}</div></section>`:"";
-    w.innerHTML=`<div class="lss-col">${chal}${aims}${crit}</div><div class="lss-col">${skillsCard()}${lists}${stepsCard()}</div>`;
+    let w=$("#lsSimple");if(!w){w=document.createElement("div");w.id="lsSimple";w.className="lsn";head.after(w)}
+    const S0=source(),S=ST?status():{all:true,closed:false,open:()=>true,dropped:[],rows:acts().map(a=>({a})),can:a=>stepsOf(a)};
+    const num=window.elLsNum?elLsNum(ls):"";
+    const fp=S0.chal?`<a class="lsn-fp" href="${esc(S0.chal.h)}"><span class="lsn-k">🏆 ${t("Producte final","Final product")}</span><b>${esc(S0.chal.b)}</b><span class="lsn-go">${t("Mira què has de fer","See what to do")} →</span></a>`:"";
+    const band=`<header class="lsn-band"><div class="lsn-bt"><span class="lsn-eye">${esc(CN[COURSE]||"")}${num?" · "+esc(num):""}</span><h1>${esc(lsName(ls))}</h1>${S0.q?`<p>${esc(S0.q)}</p>`:""}</div>${fp}</header>`;
+    const aims=S0.aims.length?`<section class="lsn-card lsn-aims"><h2>🎯 ${t("Què aprendràs","What you will learn")}</h2><ul>${S0.aims.map(o=>`<li><span class="lsn-ai" aria-hidden="true">${esc(o.i)}</span><span><b>${esc(o.v)}</b> ${esc(o.p)}</span></li>`).join("")}</ul></section>`:"";
+    const crit=S0.crit.length?`<section class="lsn-card lsn-crit"><h2>📏 ${t("Com t'avaluarem","How you will be assessed")}</h2>`
+      +S0.crit.map(c=>`<details class="lsn-cr ${esc(c.k)}"><summary>${c.chip}<span class="lsn-crt"><b>${esc(c.sk)}</b> · ${esc(c.d)}</span></summary>${c.off?`<p>${esc(c.off)}</p>`:""}</details>`).join("")
+      +`<p class="lsn-tip">${t("Toca un criteri per llegir-lo sencer ›","Tap a criterion to read its full text ›")}</p></section>`:"";
+    w.innerHTML=band+`<div class="lsn-two">${aims}${crit}</div><div class="lsn-two">${gvCard("grammar",S)}${gvCard("vocab",S)}</div>`+actsSection(S);
     if(window.elRouteFix)try{elRouteFix(w)}catch(e){}
-    // 🧭 the list scrolls inside its card: the next step in view, a little below the top
-    const sl=w.querySelector(".lss-steps ol"),nw=sl&&sl.querySelector("li.now");if(nw)sl.scrollTop=Math.max(0,nw.offsetTop-sl.offsetTop-80);
   }
+  document.addEventListener("elmygames",()=>{if(SIMPLE)simpleHome()});   // el-notes.js has read the class games
   function draw(){
     lang();nav();place();aboutBanner();simpleHome();
     // 📈 My formative assessment tile (Roger, 7 Nov 2026: "instead of study, my formative assessment"): the board's formative tab of this LS
