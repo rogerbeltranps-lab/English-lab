@@ -67,6 +67,10 @@ function pickDay(list){const t=today(),has=(x,d)=>((x.ag.days||{})[d]||[]).some(
   if(list.some(x=>has(x,t)))return t;
   return list.flatMap(x=>Object.keys(x.ag.days||{}).concat(x.ag.exam?[x.ag.exam]:[]).filter(d=>d>t&&has(x,d))).sort()[0]||t}
 
+// 🖨 Print session with nothing on today's plan (Roger, 23 Nov 2026: "didn't I have a print button?", on an exam day): the tab the class
+// is on, as one agenda item ("<lp id>#<tab>", or the whole learning path when no tab is active); [] when this page is not a learning path
+function hereTab(){const a=(window.EL_CATALOG||[]).find(z=>z.path&&new URL(z.path,C.root).pathname===location.pathname);if(!a)return [];
+  const t=document.querySelector(".tab.active[data-panel]");return [a.id+"#"+(t&&secs(a).some(([p])=>p===t.dataset.panel)?t.dataset.panel:"")]}
 function hereIs(a,p){if(!a)return false;const u=new URL(a.path,C.root);if(u.pathname!==location.pathname)return false;
   if(!p)return true;const t=document.querySelector(".tab.active[data-panel]");return !!t&&t.dataset.panel===p}
 
@@ -293,7 +297,7 @@ async function draw(){if(!box)return;
         if(MO===it)body+=`<div class="acts">${p?`<button data-hw="${n}" class="${hw?"on":""}" title="${hw?"It is homework for "+E(dLab(hw[1].by))+" · click to take it off":"Students do it at home for the next class"}">🏠 ${hw?"Homework ✓":"Homework"}</button>`:""}${nd?`<button data-nx="${n}" title="It moves to the next class on your Time plan">⏭ Next class · ${E(dLab(nd))}</button>`:""}</div>`;body+=cr})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60,tabs=its.filter(z=>z.a&&!isGame(z.p)),allOn=tabs.length>0&&tabs.every(z=>EN.has(z.it)||hereIs(z.a,z.p)),nOn=tabs.filter(z=>EN.has(z.it)&&!hereIs(z.a,z.p)).length;
   box.innerHTML=`<div class="hd"><b>📋 ${live?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`+tbBar()
-    +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
+    +`<button class="pr" data-pr="1" title="${its.some(x=>x.a)?"This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key":"Nothing to print on the plan: prints the tab the class is on, per level, with an answer key"}">🖨 Print session</button>`
     +`<div class="tools">${live&&nTab>1?`<button data-all="1" class="${allOn?"on":""}" title="${allOn?"Back to one step: students follow your tab":"Students can move between all of today's steps"}">👥 ${allOn?"Only mine":"Open all"}</button>`:""}<button data-wu="1" title="A quick whole-class game with the words and grammar of today’s learning path (hangman, word order…): you tap what the students call out">🔥 Warm-up</button><button data-add="1" title="Put another step on today's class: it opens and students can do it">➕ Add a step</button></div>`
     +(live&&nOn?`<p class="hint">👥 Students can move between ${nOn+1} steps.</p>`:"")+msg()
     +(tot?`<p class="tot ${tot>len?"over":""}">⏱ ${tot} of ${len} min planned</p>`:"")
@@ -316,7 +320,9 @@ function drawAdd(){const t=today(),on=new Set(todayItems().map(z=>z.it)),its=[];
   box._add=its}
 function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();if(b.dataset.map)return mapOpen();if(b.dataset.rep)return repSet(!repIs()).then(draw);if(b.dataset.self)return selfSet(!selfIs()).then(draw);if(b.dataset.tb){TB=b.dataset.tb;ADD=false;MO=null;return draw()}if(b.dataset.wu)return warmOpen();
   if(b.dataset.ex){location.href=new URL(b.dataset.ex,C.root).href;return}
-  if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
+  if(b.dataset.pr){let its=(box._its||[]).filter(x=>x.a).map(x=>x.it);if(!its.length)its=hereTab();   // 🖨 always there (Roger, 23 Nov 2026)
+    if(!its.length)return say("Open a learning path tab first: 🖨 Print session prints the tab the class is on when today's plan has none.",true),draw();
+    window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
   if(b.dataset.c!=null){const y=(box._its||[])[+b.dataset.c],r=y&&readingOf(y.a.path,y.p);if(r)openCorrect(C.root,Object.assign({tab:y.p,g:C.g},r));return}
   if(b.dataset.add){ADD=true;MO=null;return draw()}
