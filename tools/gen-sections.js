@@ -9,13 +9,20 @@ const out={},titles={};
 // without a leading "Listening: " (the map shows the skill above the title). Only LS2 engine pages have titles.
 const txt=(v,l)=>typeof v==="string"?v:v?(v[l]||v.en||v.ca||""):"";
 const bare=(t,tab)=>String(t||"").replace(/<[^>]+>/g,"").replace(new RegExp("^\\s*(Recall|Listening|Reading|Speaking|Writing|Shadowing|Talk|Conversa|Vocabulary|Vocabulari|Grammar|Gramàtica|"+String(tab||"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")\\s*[:·]\\s*","i"),"").trim().replace(/^./,c=>c.toUpperCase());
+// 📋 a step's summary for the LS page's Activities (Roger, 26 Nov 2026: "They need to have a little description - summary"): the first
+// sentence of the step's intro (two when the first is very short; never the count of compulsory questions), at most about 150 characters. EL_STEP_TITLES[..][3] English, [4] Catalan.
+const sum=v=>{const s=String(v||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();if(!s)return "";
+  const ss=(s.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g)||[s]).map(x=>x.trim()).filter(x=>!/compulsory|obligatòri|counter|comptador/i.test(x));if(!ss.length)return "";
+  let o=ss[0];if(o.length<30&&ss[1])o+=" "+ss[1];
+  return o.length>150?o.slice(0,o.lastIndexOf(" ",146))+"…":o};
 for(const a of EL_CATALOG){
   const file=path.join(R,a.path);if(!fs.existsSync(file))continue;
   const h=fs.readFileSync(file,"utf8"),m=h.match(/<script src="(data\/[^"]+\.js)"/);let list;
   if(m){const c={window:{}};vm.runInNewContext(fs.readFileSync(path.join(path.dirname(file),m[1]),"utf8"),c);
     const ps=(c.window.LP||c.LP||{}).panels||[];
     list=ps.map(p=>[p.id,typeof p.tab==="string"?p.tab:(p.tab||{}).en||(p.tab||{}).ca||p.id]);
-    const T={};ps.forEach(p=>{const en=bare(txt(p.title,"en"),txt(p.tab,"en")),ca=bare(txt(p.title,"ca"),txt(p.tab,"ca"));if(en||ca)T[p.id]=[p.type||"",en,ca===en?"":ca]});
+    const T={};ps.forEach(p=>{const en=bare(txt(p.title,"en"),txt(p.tab,"en")),ca=bare(txt(p.title,"ca"),txt(p.tab,"ca")),se=sum(txt(p.intro,"en")),sc=sum(txt(p.intro,"ca"));
+      if(en||ca)T[p.id]=[p.type||"",en,ca===en?"":ca].concat(se||sc?[se,sc===se?"":sc]:[])});
     if(Object.keys(T).length)titles[a.id]=T}
   else list=[...h.matchAll(/<button class="tab[^"]*" data-panel="([^"]+)">([^<]+)</g)].map(x=>[x[1],x[2].replace(/^\d+\s+/,"").trim()]);
   if(window.elBookPath&&elBookPath(a))list=[["book","📖 The book"]];   // 📖 the book is one tab (its chapters are its steps, elTabOf)

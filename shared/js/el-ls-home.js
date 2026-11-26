@@ -273,30 +273,58 @@
     if(d.showModal&&!d.open)d.showModal();d.scrollTop=0}
   document.addEventListener("click",e=>{const b=e.target.closest('[data-do="lsstudy"]');if(b)study(b.dataset.k)});
 
-  // 📋 Activities by skill: the learning paths the student can open (not dropped, not behind a checkpoint), each tab they can see
-  // (never one for a later class), in the group's order; its result: the latest score of its checked steps (x / 10), ✓ Done, or To do.
-  // Checkpoints show only Done (their marks wait for 📣 Release feedback). The sample exam, the final product and Reflect are not here.
-  function actGroups(S){const out={},secs=a=>(window.EL_SECTIONS||{})[a.id]||[],TT=(a,p)=>((window.EL_STEP_TITLES||{})[a]||{})[p]||null;
-    const lpT=a=>a.title.replace(/\s*\(warm-up\)$/,""),fpH=(source().chal||{}).h||"";
+  // 📋 Activities: the learning paths the student can open (not dropped, not behind a checkpoint), each tab they can see (never one for a
+  // later class), in the group's order; its result: the latest score of its checked steps (x / 10), ✓ Done, or To do. Checkpoints show only
+  // Done (their marks wait for 📣 Release feedback). The sample exam, the final product and Reflect are not here. Each row: the step's topic,
+  // a one-line summary (EL_STEP_TITLES [3] / [4], from the step's intro: Roger, 26 Nov 2026, "They need to have a little description -
+  // summary") and the learning path · tab. 📖 The book is one row (its chapters are its steps, n / 6 until all are done).
+  // Two views (Roger, 26 Nov 2026: "I want the option of viewing the activities in order of appearence"): 🧩 By skill (a card per skill)
+  // or 🔢 In order (a card per learning path, its tabs in the path's order); the choice stays on this device (el_ls_actview).
+  function actItems(S){const out=[],secs=a=>(window.EL_SECTIONS||{})[a.id]||[],TT=(a,p)=>((window.EL_STEP_TITLES||{})[a]||{})[p]||null;
+    const lpT=a=>a.title.replace(/\s*\(warm-up\)$/,""),fpH=(source().chal||{}).h||"",noIc=s=>String(s).replace(/^[\u{1F300}-\u{1FAFF}☀-➿]️?\s*/u,"");
     S.rows.forEach(({a})=>{if(a.optional||a.manual||(fpH&&a.path.endsWith("/"+fpH)))return;
       if(!S.all&&!S.closed&&(S.dropped.includes(a.id)||!S.open(a)||elCheckpointMissing(a,doneOf,S.open)))return;
-      const ks=S.can(a);if(!ks.length)return;const ds=ST?doneOf(a):new Set(),href=a.path.split("/").pop();
-      if(/checkpoint/.test(a.id)){(out.Recall=out.Recall||[]).push({t:lpT(a),d:"",h:href,v:null,done:ks.every(k=>ds.has(k)),cp:1});return}
-      elTabGroups(a,ks).forEach(g=>{const tab=secs(a).some(y=>y[0]===g[0])?g[0]:(g[0]==="cards"||g[0]==="practice")?"vocab":elTabOf(a.id,g[0]);
-        const grp=groupOf(a,tab==="book"?"ch1":g[0]);if(!grp)return;
-        const sn=(secs(a).find(y=>y[0]===tab)||[])[1]||(tab==="book"?"Book":tab),tt=TT(a.id,tab)||TT(a.id,g[0]),desc=tt?((CA&&tt[2])||tt[1]||""):"";
+      const ks=S.can(a);if(!ks.length)return;const ds=ST?doneOf(a):new Set(),href=a.path.split("/").pop(),lp=lpT(a);
+      if(/checkpoint/.test(a.id)){out.push({a,lp,grp:"Recall",t:lp,s:t("Un repàs curt del que has après, sense apunts.","A short review of what you have learnt, without notes."),
+        m:"",h:href,v:null,done:ks.every(k=>ds.has(k)),cp:1});return}
+      const tabs=[];elTabGroups(a,ks).forEach(g=>{const tab=secs(a).some(y=>y[0]===g[0])?g[0]:(g[0]==="cards"||g[0]==="practice")?"vocab":elTabOf(a.id,g[0]);
+        const o=tabs.find(x=>x.tab===tab);if(o)o.g=o.g.concat(g);else tabs.push({tab,g:g.slice()})});
+      tabs.forEach(({tab,g})=>{const bk=tab==="book",grp=groupOf(a,bk?"ch1":g[0]);if(!grp)return;
+        const sn=noIc((secs(a).find(y=>y[0]===tab)||[])[1]||(bk?"Book":tab)),tt=bk?null:(TT(a.id,tab)||TT(a.id,g[0]));
+        let ti=tt?((CA&&tt[2])||tt[1]||""):"",su=tt?((CA&&tt[4])||tt[3]||""):"";if(/^Learning Path \d/.test(ti))ti="";
+        if(bk){ti=noIc(lp);su=t("Llegeix la història capítol a capítol i respon les preguntes de cada capítol.","Read the story chapter by chapter and answer the questions on each one.")}
         const sc=g.map(k=>stepScore(a,k)).filter(v=>v!=null),n=g.filter(k=>ds.has(k)).length;
-        (out[grp]=out[grp]||[]).push({t:(tab==="book"?"📖 ":"")+lpT(a)+" · "+sn.replace(/^💬\s*/,"💬 "),d:desc&&desc!==sn&&!/^Learning Path \d/.test(desc)?desc:"",h:href+"#"+encodeURIComponent(tab),
-          v:sc.length?sc.reduce((x,y)=>x+y,0)/sc.length:null,done:n===g.length,part:g.length>1&&tab==="book"?[n,g.length]:null})})});
+        out.push({a,lp,grp,sn,t:ti||sn,s:su,m:bk?"":lp+" · "+sn,h:href+"#"+encodeURIComponent(tab),
+          v:sc.length?sc.reduce((x,y)=>x+y,0)/sc.length:null,done:n===g.length,part:g.length>1&&bk?[n,g.length]:null})})});
     return out}
-  function actsSection(S){const O=actGroups(S),T=teach();
+  let ACT_S=null,ACT_N=0,AV="skill";try{AV=localStorage.getItem("el_ls_actview")==="order"?"order":"skill"}catch(e){}
+  const actCols=()=>innerWidth<=640?1:innerWidth<=1100?2:3;
+  function actsBody(S){const I=actItems(S),T=teach(),ic=k=>(GRP.find(g=>g[0]===k)||[])[2]||"",gn=k=>{const g=GRP.find(x=>x[0]===k);return g?(CA?g[1]:g[0]):k};
     const res=x=>T?"":x.v!=null&&!x.cp?`<span class="lsn-r" style="--rc:${pcCol(x.v*100)}">${(Math.round(x.v*100)/10).toLocaleString(CA?"ca":"en")} / 10</span>`
       :x.done?`<span class="lsn-r ok">✓ ${t("Fet","Done")}</span>`:x.part&&x.part[0]?`<span class="lsn-r">${x.part[0]} / ${x.part[1]}</span>`:`<span class="lsn-r todo">${t("Per fer","To do")}</span>`;
-    const cards=GRP.filter(g=>(O[g[0]]||[]).length).map(([k,ca,ic])=>{const L=O[k],vs=L.filter(x=>x.v!=null&&!x.cp).map(x=>x.v),av=vs.length?vs.reduce((x,y)=>x+y,0)/vs.length*100:null;
-      return `<section class="lsn-card lsn-sk"><h3><span>${ic} ${esc(CA?ca:k)}</span>${!T&&av!=null?`<span class="lsn-av" style="--rc:${pcCol(av)}">${Math.round(av)} %</span>`:""}</h3><ul>`
-        +L.map(x=>`<li><a href="${esc(x.h)}"><span class="lsn-at"><b>${esc(x.t)}</b>${x.d?`<small>${esc(x.d)}</small>`:""}</span>${res(x)}<span class="lsn-open">${t("Obre","Open")} ›</span></a></li>`).join("")+`</ul></section>`}).join("");
-    return `<div class="lsn-ah"><h2>📋 ${t("Activitats","Activities")}</h2><span>${T?"Each student sees their own result in each activity.":t("Per destreses · el teu resultat a cada una · obre-la des d'aquí","Grouped by skill · your result in each · open it from here")}</span></div>`
-      +(cards?`<div class="lsn-acts">${cards}</div>`:`<p class="lsn-none">${t("El professor obrirà les activitats a classe, quan toqui.","Your teacher will open the activities in class, when it is time.")}</p>`)}
+    const row=(x,meta)=>`<li><a href="${esc(x.h)}"><span class="lsn-at"><b>${esc(x.t)}</b>${x.s?`<small>${esc(x.s)}</small>`:""}${meta?`<em>${esc(meta)}</em>`:""}</span>${res(x)}<span class="lsn-open">${t("Obre","Open")} ›</span></a></li>`;
+    const avg=L=>{const vs=L.filter(x=>x.v!=null&&!x.cp).map(x=>x.v);return vs.length?vs.reduce((x,y)=>x+y,0)/vs.length*100:null};
+    const card=(head,L,meta)=>{const av=avg(L);return {n:L.length,h:`<section class="lsn-card lsn-sk"><h3><span>${head}</span>${!T&&av!=null?`<span class="lsn-av" style="--rc:${pcCol(av)}">${Math.round(av)} %</span>`:""}</h3><ul>${L.map(x=>row(x,meta(x))).join("")}</ul></section>`}};
+    let cards;
+    if(AV==="order"){const by=[];I.forEach(x=>{let c=by.find(y=>y.a===x.a);if(!c)by.push(c={a:x.a,L:[]});c.L.push(x)});
+      cards=by.map(c=>card(esc(c.L[0].lp),c.L,x=>x.cp?"":ic(x.grp)+" "+(x.sn||gn(x.grp))))}
+    else cards=GRP.map(([k,ca,i])=>{const L=I.filter(x=>x.grp===k);return L.length?card(i+" "+esc(CA?ca:k),L,x=>x.m):null}).filter(Boolean);
+    if(!cards.length)return `<p class="lsn-none">${t("El professor obrirà les activitats a classe, quan toqui.","Your teacher will open the activities in class, when it is time.")}</p>`;
+    // no gaps (Roger, 26 Nov 2026: "I dont want the blank spaces here"): each card goes under the shortest column so far, in reading order
+    const n=ACT_N=actCols(),col=Array.from({length:n},()=>({h:0,s:""}));
+    // 🔢 In order reads down each column, then the next one (learning paths in a row); 🧩 By skill fills the shortest column
+    const hOf=c=>c.n*2.6+3,tot=cards.reduce((x,c)=>x+hOf(c),0);let k=0;
+    cards.forEach((c,i)=>{if(AV==="order"){if(k<n-1&&col[k].h&&col[k].h+hOf(c)/2>tot/n)k++}else k=col.reduce((b,x,j)=>x.h<col[b].h?j:b,0);col[k].s+=c.h;col[k].h+=hOf(c)});
+    return `<div class="lsn-acts" data-n="${n}">${col.map(c=>`<div class="lsn-col">${c.s}</div>`).join("")}</div>`}
+    function actsSection(S){ACT_S=S;const T=teach();
+    const sw=`<span class="lsn-view" role="group" aria-label="${t("Ordena les activitats","Order the activities")}">`
+      +[["skill","🧩",t("Per destreses","By skill")],["order","🔢",t("En ordre","In order")]].map(([v,i,l])=>`<button type="button" data-do="lsview" data-v="${v}" aria-pressed="${AV===v}">${i} ${l}</button>`).join("")+`</span>`;
+    return `<div class="lsn-ah"><h2>📋 ${t("Activitats","Activities")}</h2><span class="lsn-sub">${T?"Each student sees their own result in each activity.":AV==="order"
+      ?t("En l'ordre de cada learning path · el teu resultat a cada una","In the order of each learning path · your result in each"):t("Per destreses · el teu resultat a cada una","Grouped by skill · your result in each")}</span>${sw}</div>`
+      +`<div id="lsnActs">${actsBody(S)}</div>`}
+  document.addEventListener("click",e=>{const b=e.target.closest('[data-do="lsview"]');if(!b||!ACT_S)return;AV=b.dataset.v;try{localStorage.setItem("el_ls_actview",AV)}catch(x){}
+    simpleHome()});
+  addEventListener("resize",()=>{const n=actCols(),b=$("#lsnActs");if(!b||!ACT_S||n===ACT_N)return;ACT_N=n;b.innerHTML=actsBody(ACT_S)});
 
   function simpleHome(){if(!SIMPLE)return;
     const home=$('[data-place="home"]'),head=home&&home.querySelector(".lshead");if(!head)return;
