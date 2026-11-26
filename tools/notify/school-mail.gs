@@ -104,6 +104,10 @@
 //      | {title, skipped}]}: a task with the same title already in the list (done or not) is skipped, so a run can be repeated.
 //      {key, action: "tasks_list", list} → {ok, list, tasks: [{id, title, notes, due, status}]} · {key, action: "tasks_done", list, ids}
 //      → {ok, done}. It never deletes a task or a list.
+//  26. v40 (Roger, 26 Nov 2026, 2 ESO B final products: "I don't see the video"): Drive's player in the dashboard showed only the first
+//      picture of a Google Slides recording. New action {idToken (teacher), action: "video_get", fileId} → {ok, mime, name, data (base64)}:
+//      only a video inside the Final product videos folder (or one of its folders, two levels down) and up to 30 MB, so the dashboard plays
+//      it in its own player. Read only.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -163,6 +167,7 @@ function doPost(e) {
   if (m.action === "fp_auto_list") return out(m.idToken && isTeacher(m.idToken) ? fpaList(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
   if (m.action === "audio_get") return out(m.idToken && isTeacher(m.idToken) ? audioGet(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "video_get") return out(m.idToken && isTeacher(m.idToken) ? videoGet(m) : {ok: false, error: "not the teacher"});
   if (m.action === "speak_an") return out(m.idToken && isTeacher(m.idToken) ? speakAn(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
@@ -309,6 +314,21 @@ function audioGet(m) {
   if (!r.ok) return r;
   const b = r.file.getBlob();
   return {ok: true, mime: b.getContentType() || "audio/webm", name: r.file.getName(), data: Utilities.base64Encode(b.getBytes())};
+}
+// v40: a final product video for the dashboard's own player (action "video_get", see 26 above). Only files inside VIDEO_FOLDER (directly,
+// in a group folder or in Classroom copies / Automatic drafts, two levels down), so the teacher's sign-in cannot read anything else.
+function videoGet(m) {
+  const id = String(m.fileId || "");
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the video could not be opened"}; }
+  let inside = false;
+  const up = (folder, n) => { if (inside || !folder) return; if (folder.getId() === VIDEO_FOLDER) { inside = true; return; }
+    if (n > 0) for (const ps = folder.getParents(); ps.hasNext() && !inside;) up(ps.next(), n - 1); };
+  for (const ps = f.getParents(); ps.hasNext() && !inside;) up(ps.next(), 2);
+  if (!inside) return {ok: false, error: "that file is not a final product video"};
+  if (f.getSize() > 30e6) return {ok: false, error: "the video is too big to play here (over 30 MB)"};
+  const b = f.getBlob(), mime = /^video\/[\w.+-]+$/.test(b.getContentType() || "") ? b.getContentType() : "video/mp4";
+  return {ok: true, mime, name: f.getName(), data: Utilities.base64Encode(b.getBytes())};
 }
 // a recording by its Drive id, only inside AUDIO_FOLDER (directly or in a group folder): {ok, file} or {ok: false, error}
 function recordingFile(fileId) {

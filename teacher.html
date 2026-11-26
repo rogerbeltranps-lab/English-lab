@@ -2440,7 +2440,24 @@ function fpVidBox(src,pid,au){if(pid&&!(pid in FPG.ar)){FPG.ar[pid]=0;const im=n
       document.querySelectorAll(".fpvid[data-ar]").forEach(b=>{if(b.dataset.ar===pid)b.style.cssText=fpArCss(FPG.ar[pid])})};
     im.onerror=()=>{delete FPG.ar[pid]};   // no thumbnail yet (a copy Drive is still processing): 16:9 now, tried again next time
     im.src=`https://drive.google.com/thumbnail?id=${encodeURIComponent(pid)}&sz=w400${au?"&"+au.slice(1):""}`}
-  return `<div class="fpvid"${pid?` data-ar="${esc(pid)}"`:""} style="${fpArCss(pid&&FPG.ar[pid])}"><iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`}
+  const own=pid&&FPV[pid]&&FPV[pid].url;
+  return `<div class="fpvid"${pid?` data-ar="${esc(pid)}"`:""} style="${fpArCss(pid&&FPG.ar[pid])}">${own?fpvTag(FPV[pid].url):`<iframe src="${src}" allow="autoplay; fullscreen" allowfullscreen></iframe>`}</div>`
+    +(pid&&!own?`<p class="fpvget" data-fpv="${esc(pid)}" style="margin:4px 0 0;font-size:12px"><button class="g mini" data-fpvget="${esc(pid)}">▶ Not playing? Play it here</button></p>`:"")}
+// ▶ Play it here (Roger, 26 Nov 2026, 2 ESO B final products: "I don't see the video"): Drive's own player showed only the first picture of
+// a Google Slides recording (no ▶), because Drive could not get that file ready to play. The school script (v40, action "video_get", like
+// "audio_get" for recordings) sends the file itself (only a final product video in his Final product videos folder, up to 30 MB) and the
+// browser plays it in a plain video player, Drive or not. Kept per file while the page is open; nothing read from Firestore.
+const FPV={};   // Drive file id → {url} once loaded, {busy} while loading
+const fpvTag=u=>`<video src="${u}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000"></video>`;
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-fpvget]");if(!b)return;const id=b.dataset.fpvget;if(FPV[id])return;FPV[id]={busy:1};
+  const note=t=>document.querySelectorAll(`.fpvget[data-fpv="${CSS.escape(id)}"]`).forEach(p=>p.innerHTML=t);
+  note(`<small class="muted">⏳ Loading the video (a few seconds)…</small>`);
+  try{const j=await fpgCall({action:"video_get",fileId:id}),bin=atob(j.data||""),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+    FPV[id]={url:URL.createObjectURL(new Blob([a],{type:j.mime||"video/mp4"}))};
+    document.querySelectorAll(`.fpvid[data-ar="${CSS.escape(id)}"]`).forEach(x=>{x.innerHTML=fpvTag(FPV[id].url);
+      x.querySelector("video").addEventListener("error",()=>note(`<small class="muted">⚠️ This browser cannot play this video here: open it in Drive.</small>`))});
+    note("")}
+  catch(err){delete FPV[id];note(`<small class="muted">⚠️ The video could not be loaded here (${esc(String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v40"))}): open it in Drive.</small>`)}});
 function fpSideVid(u,a,v){if(!v&&fpMarked(u,a)&&!((FPG.d[a.id]||{})[u]||{}).draft)return {k:"none",h:""};   // marked by hand, no video needed
   if(!v&&FPG_APP)return {k:"none",h:`<p class="muted">No video on the site yet. If it is on Classroom or Drive, attach it to the Roig chat yourself.</p>`};
   if(!v)return {k:"none",h:`<p class="muted">No video found yet. <button class="g mini" data-do="cell" data-u="${u}" data-a="${esc(a.id)}">Open the box</button> to look on Classroom or paste a Drive link.</p>`};
@@ -6452,9 +6469,18 @@ function fpgAppRead(t,R){t=String(t||"").replace(/[“”]/g,'"');const i=t.inde
     next_time:str(o.next_time).slice(0,400),secs:Number(o.seconds)||null,
     sounds:[].concat(o.sounds||[]).slice(0,12).map(x=>({word:str(x&&x.word).slice(0,40),heard:str(x&&x.heard).slice(0,60),tip:str(x&&x.tip).slice(0,120)})).filter(x=>x.word)}}
 // copy at once, in the click itself (a new tab takes the focus, and the clipboard then refuses), then open Roig
-function fpgCopy(t){let ok=false;try{const x=document.createElement("textarea");x.value=t;x.setAttribute("readonly","");x.style.cssText="position:fixed;top:-1000px;opacity:0";
-  document.body.appendChild(x);x.select();ok=document.execCommand("copy");x.remove()}catch(e){}if(!ok&&navigator.clipboard)navigator.clipboard.writeText(t).then(()=>{},()=>{});return ok}
-function fpgAppGo(u,a,open){const t=fpgAppPrompt(u,a);if(!t)return;fpgCopy(t);const k=u+"|"+a.id;FPG.app[k]={at:Date.now(),copied:1};
+// 📋 copy the prompt (Roger, 26 Nov 2026: "the link doesnt copy the prompt for gemini"): the hidden box used to copy from sat on the page,
+// outside the open window, and an open window (<dialog>) makes the rest of the page inert: the copy took nothing and still said ✅ Copied.
+// Now the box goes inside the open window (copied at once, before Roig's tab takes the focus), and the browser's clipboard if that fails;
+// it says ✅ only when the copy really worked.
+async function fpgCopy(t){if(!t)return false;let ok=false;
+  try{const host=[...document.querySelectorAll("dialog[open]")].pop()||document.body,x=document.createElement("textarea"),f=document.activeElement;x.value=t;x.setAttribute("readonly","");
+    x.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0";host.appendChild(x);x.focus();x.select();x.setSelectionRange(0,t.length);
+    ok=document.activeElement===x&&x.selectionEnd-x.selectionStart===t.length&&document.execCommand("copy");x.remove();if(f&&f.focus)f.focus({preventScroll:true})}catch(e){}
+  if(!ok)try{if(navigator.clipboard){await navigator.clipboard.writeText(t);ok=true}}catch(e){}
+  return ok}
+function fpgCopyNote(b,ok){if(b)b.textContent=ok?"✅ Copied":"⚠️ Not copied: press 📋 again";}
+function fpgAppGo(u,a,open){const t=fpgAppPrompt(u,a);if(!t)return;const k=u+"|"+a.id;FPG.app[k]={at:Date.now(),copied:1};fpgCopy(t).then(ok=>{if(!ok&&FPG.app[k]){FPG.app[k].copied=0;fpgFill(u,a)}});
   if(open!==false)window.open(FPG_APPURL,"_blank","noopener");fpgFill(u,a);setTimeout(()=>{const p=document.querySelector(`textarea.fpgpaste[data-u="${u}"]`);if(p)p.scrollIntoView({block:"nearest"})},60)}
 async function fpgAppUse(u,a,t){const R=fpgRubric(a);if(!R)return;let x;try{x=fpgAppRead(t,R)}catch(e){alert("That didn't work: "+e.message+".");return}
   const old=(FPG.d[a.id]||{})[u]||{},v=fpgVideo(u,a);
@@ -6475,7 +6501,7 @@ function fpgAppSteps(u,a){const k=u+"|"+a.id;if(!FPG.app[k])return "";const fs=f
   return `<div class="fpgapp" style="flex-basis:100%;margin:8px 0 4px;padding:8px 10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;font-size:.9rem">`
     +`<b>✨ In your Roig tab</b> <small class="muted">(school account, a new tab)</small><ol style="margin:4px 0 6px;padding-left:20px">`
     +`<li>${vid}</li>`
-    +`<li>Click in the message box, paste the prompt (<b>Ctrl+V</b> / <b>⌘V</b>) and send. <small class="muted">It's copied with the rubric. <a href="#" data-fpg="appcopy" data-u="${u}" data-a="${esc(a.id)}">📋 Copy it again</a> · <a href="${esc(FPG_APPURL)}" target="_blank" rel="noopener">Open Roig again ↗</a></small></li>`
+    +`<li>Click in the message box, paste the prompt (<b>Ctrl+V</b> / <b>⌘V</b>) and send. <small class="muted">${FPG.app[k].copied===0?`<b style="color:#b45309">⚠️ The prompt wasn't copied: press 📋 Copy it again.</b>`:"It's copied with the rubric."} <a href="#" data-fpg="appcopy" data-u="${u}" data-a="${esc(a.id)}">📋 Copy it again</a> · <a href="${esc(FPG_APPURL)}" target="_blank" rel="noopener">Open Roig again ↗</a></small></li>`
     +`<li>Copy Roig's whole answer (the copy button under it) and paste it here:</li></ol>`
     +`<textarea class="fpgpaste" data-u="${u}" data-a="${esc(a.id)}" rows="3" placeholder="Paste Roig's answer here (it starts with { )" style="width:100%;box-sizing:border-box;font:inherit;font-size:.85rem">${esc(FPG.app[k].t||"")}</textarea>`
     +`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:4px"><button data-fpg="appuse" data-u="${u}" data-a="${esc(a.id)}">📥 Use Roig's answer</button><button class="g mini" data-fpg="appx" data-u="${u}" data-a="${esc(a.id)}">Cancel</button></div>`
@@ -6484,7 +6510,7 @@ document.addEventListener("input",e=>{const t=e.target;if(t.classList&&t.classLi
 document.addEventListener("click",e=>{const b=e.target.closest('[data-fpg="app"],[data-fpg="appcopy"],[data-fpg="appuse"],[data-fpg="appx"]');if(!b)return;e.preventDefault();e.stopPropagation();
   const k=b.dataset,a=cat.find(x=>x.id===k.a);if(!a)return;
   if(k.fpg==="app")fpgAppGo(k.u,a);
-  else if(k.fpg==="appcopy"){fpgCopy(fpgAppPrompt(k.u,a));b.textContent="✅ Copied"}
+  else if(k.fpg==="appcopy"){b.textContent="⏳ Copying…";fpgCopy(fpgAppPrompt(k.u,a)).then(ok=>fpgCopyNote(b,ok))}
   else if(k.fpg==="appx"){delete FPG.app[k.u+"|"+a.id];fpgFill(k.u,a)}
   else{const t=b.closest(".fpgapp").querySelector("textarea.fpgpaste");if(!t.value.trim())return alert("Paste Roig's answer in the box first.");fpgAppUse(k.u,a,t.value)}},true);
 // ---- 🤖 Automatic drafts (Roger, 14 Nov 2026: "next final product, I will ask students to load it on the web" … "students don't have to see
