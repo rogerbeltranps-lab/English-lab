@@ -108,6 +108,13 @@
 //      picture of a Google Slides recording. New action {idToken (teacher), action: "video_get", fileId} → {ok, mime, name, data (base64)}:
 //      only a video inside the Final product videos folder (or one of its folders, two levels down) and up to 30 MB, so the dashboard plays
 //      it in its own player. Read only.
+//  27. v41 (Roger, 26 Nov 2026: "Hauria de tenir al teacher dashboard, un botó per poder enviar al mail el seu usuari i contrasenya"):
+//      students' sign-in passwords live only here, in this script's private Script Properties ("pw:" + school email), never in the repo,
+//      Firestore or the dashboard page. {key, action: "logins_set", list: [{email, password}]} saves them (tools/student-accounts/
+//      logins-upload.mjs, from the private student-passwords.csv) → {ok, n}; it never sends a password back. {idToken (teacher), action:
+//      "login_mail", to, subject, body, at|now} emails ONE student their login: the dashboard's 🔑 Email their login sends the text with
+//      {{PASSWORD}} in it and this script puts the saved password there, so the password never passes through the page. {key or idToken,
+//      action: "logins_count"} → {ok, n}. The 🌙 21:00 to 7:30 hold works as for every other email.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -118,7 +125,8 @@ const TEACHER = "roger.beltranps@gmail.com";   // the teacher's English Lab sign
 const TEACHER_MAIL = "roger.beltran@ietramuntana.cat";
 const ALLOWED = /^[^@\s,]+@ietramuntana\.cat$/i;
 // MARK_TASK_TOKEN: the API token of the scheduled task "English Lab: mark and correct" (claude.ai/code/routines > that task > API trigger >
-// Generate token). Never in the repo (this copy has a placeholder: the button then falls back to the GitHub Action).
+// Generate token). Never in the repo. v37 (24 Nov 2026): the token is kept in this private copy too (like PROBLEM_TASK_TOKEN), because
+// pasting a copy with a placeholder over the live script wiped it, and ✏️ Correct everything waiting now could not start at once.
 const MARK_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
 const MARK_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_019KQmvwTDQJ8wgujGeotDmG/fire";
 // The Drive folder for recordings (Teacher Studio › 04_Students (private) › Speaking recordings): share it with this school account as
@@ -139,6 +147,9 @@ const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
 // videos now go to Google's flagship Gemini 4 Argon, with sharper frames (MEDIA_RESOLUTION_HIGH) and the default temperature 1.0 that Google
 // advises for Gemini 3 and later. About €0.07 a 100-second video (introductory price; Google doubles it on 1 Dec 2026).
 const FP_MODEL = "gemini-4-argon";
+// v38 (Roger, 24 Nov 2026: "I wanted to quantify the words they pronounce well … and the structure of the speech and over time decide a
+// way of comparing it"; he chose "every recording, every day"): speak_an also answers the weekday correction run with the key (never a
+// final product video), and every analysis carries counts n = {words, clear, sentences, correct, conn, secs} for the dashboard's lines.
 // v35: the weekly database copies (Teacher Studio › 04_Students (private) › English Lab database copies). The school account already has
 // Editor access through 04_Students.
 const BACKUP_FOLDER = "1H0X0RRewzYBcBr8Qd-eP9c2tNun64b_f";
@@ -168,13 +179,18 @@ function doPost(e) {
   if (m.action === "fp_auto_ack") return out(m.idToken && isTeacher(m.idToken) ? fpaAck(m) : {ok: false, error: "not the teacher"});
   if (m.action === "audio_get") return out(m.idToken && isTeacher(m.idToken) ? audioGet(m) : {ok: false, error: "not the teacher"});
   if (m.action === "video_get") return out(m.idToken && isTeacher(m.idToken) ? videoGet(m) : {ok: false, error: "not the teacher"});
-  if (m.action === "speak_an") return out(m.idToken && isTeacher(m.idToken) ? speakAn(m) : {ok: false, error: "not the teacher"});
+  // v38: the weekday run (tools/speaking/analyse.mjs) asks too, with the key; never a final product video that way (cost)
+  if (m.action === "speak_an") return out((m.idToken && isTeacher(m.idToken)) || (KEY.length >= 20 && KEY !== "PUT-THE-KEY-HERE" && m.key === KEY && !m.fp) ? speakAn(m) : {ok: false, error: "not the teacher"});
+  // v41: 🔑 Email their login (one student; the password is filled in here, never sent by the page)
+  if (m.action === "login_mail") return out(m.idToken && isTeacher(m.idToken) ? loginMail(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
   const keyOk = KEY.length >= 20 && KEY !== "PUT-THE-KEY-HERE" && m.key === KEY;
   if (m.action === "problem") return out(keyOk || (m.idToken && isUser(m.idToken)) ? startProblems() : {ok: false, error: "not signed in"});
   if (!keyOk && !(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: m.idToken ? "not the teacher" : "wrong key"});
+  if (m.action === "logins_set") return out(keyOk ? loginsSet(m) : {ok: false, error: "wrong key"});
+  if (m.action === "logins_count") return out({ok: true, n: PropertiesService.getScriptProperties().getKeys().filter(k => /^pw:/.test(k)).length});
   if (m.action === "mark") return out(startMarking(m.at));
   if (m.action === "inbox") return out(readInbox(m));
   if (m.action === "backup") return out(keyOk ? saveBackup(m) : {ok: false, error: "wrong key"});
@@ -201,6 +217,31 @@ function doPost(e) {
   if (later) { lateQueue(mail, later); return out({ok: true, later: new Date(later).toISOString(), left: MailApp.getRemainingDailyQuota()}); }
   MailApp.sendEmail(mail);
   return out({ok: true, left: MailApp.getRemainingDailyQuota()});
+}
+
+// v41: students' sign-in passwords, kept only in this script's Script Properties ("pw:" + school email, lower case)
+function loginsSet(m) {
+  const list = [].concat(m.list || []), o = {};
+  list.forEach(x => { const e = String(x && x.email || "").trim().toLowerCase(), p = String(x && x.password || "");
+    if (ALLOWED.test(e) && p && p.length <= 100) o["pw:" + e] = p; });
+  if (!Object.keys(o).length) return {ok: false, error: "no valid rows"};
+  PropertiesService.getScriptProperties().setProperties(o);
+  return {ok: true, n: Object.keys(o).length};
+}
+// 🔑 Email their login: one school address, the saved password put where the text says {{PASSWORD}}
+function loginMail(m) {
+  const to = String(m.to || "").trim().toLowerCase();
+  if (!ALLOWED.test(to)) return {ok: false, error: "not a school address"};
+  const pw = PropertiesService.getScriptProperties().getProperty("pw:" + to);
+  if (!pw) return {ok: false, error: "no password saved"};
+  const body = String(m.body || ""), subject = String(m.subject || "").slice(0, 200);
+  if (!subject || body.indexOf("{{PASSWORD}}") < 0) return {ok: false, error: "the text has no {{PASSWORD}}"};
+  if (MailApp.getRemainingDailyQuota() < 1) return {ok: false, error: "daily email limit reached"};
+  const mail = {to, subject, body: body.slice(0, 20000).split("{{PASSWORD}}").join(pw), name: String(m.name || "Roger Beltran · English Lab").slice(0, 80)};
+  const later = lateUntil(m, [to]);
+  if (later) { lateQueue(mail, later); return {ok: true, later: new Date(later).toISOString()}; }
+  MailApp.sendEmail(mail);
+  return {ok: true};
 }
 
 // ✏️ Correct everything waiting now: start the scheduled task once for this request (the lock stops the dashboard and the Action firing
@@ -411,6 +452,7 @@ function speakAnPrompt(m) {
     "structure: {opening: true if they introduce the topic or greet; ending: true if they close it (e.g. 'That's all', a conclusion); order: one sentence on how the ideas are organised (a list, a sequence with first/then, reasons with because, examples, jumps between ideas); sentences: \"words\" (mostly single words or lists) | \"simple\" (short simple sentences) | \"joined\" (sentences joined with and/but/because/so) | \"complex\" (subordinate clauses: when, if, who, that); note: one sentence on how the talk is built; level};",
     "pronunciation: {note: one sentence on how understandable they are and their main sound problem; level};",
     "task: {done: \"yes\" | \"partly\" | \"no\", note: one sentence on what they covered or missed}.",
+    "counts (v38, Roger 24 Nov 2026: so his speaking can be compared over time; count, do not estimate loosely): {words: how many English words the student said (not the computer voice, not repeated false starts), clear: how many of those words a listener understands at once (pronounced well enough; a small accent is fine), sentences: how many sentences or sentence-like units they said, correct: how many of those sentences have no grammar mistake, connectors: how many linking words they used in total (each use counts), seconds: about how many seconds the student really speaks}.",
     "Every level is 1-4 at the course level: 4 = very good, 3 = good, 2 = fair, 1 = developing (0 only when the student does not speak English at all).",
     "Write everything in English, short."
   ].join("\n");
@@ -430,7 +472,12 @@ function speakAnClean(o) {
     str: {opening: T.opening === true, ending: T.ending === true, order: s(T.order, 300), sentences: ["words", "simple", "joined", "complex"].indexOf(T.sentences) >= 0 ? T.sentences : "",
       note: s(T.note, 300), level: lv(T.level)},
     pron: {note: s(P.note, 300), level: lv(P.level)},
-    task: {done: ["yes", "partly", "no"].indexOf(K.done) >= 0 ? K.done : "", note: s(K.note, 300)}
+    task: {done: ["yes", "partly", "no"].indexOf(K.done) >= 0 ? K.done : "", note: s(K.note, 300)},
+    n: (function (c) { c = c || {}; const i = v => { const x = Math.round(Number(v)); return isFinite(x) && x >= 0 && x <= 5000 ? x : null; };
+      const r = {words: i(c.words), clear: i(c.clear), sentences: i(c.sentences), correct: i(c.correct), conn: i(c.connectors), secs: i(c.seconds)};
+      if (r.words != null && r.clear != null && r.clear > r.words) r.clear = r.words;
+      if (r.sentences != null && r.correct != null && r.correct > r.sentences) r.correct = r.sentences;
+      return r; })(o.counts)
   };
 }
 
@@ -1182,6 +1229,7 @@ function lateStatus() {
     : "Nothing waiting");
   Logger.log("Now in Madrid: " + Utilities.formatDate(new Date(), LATE_TZ, "EEE d MMM HH:mm") + " · next 7:30 if late: " + (lateNext(new Date()) ? new Date(lateNext(new Date())).toISOString() : "not late now"));
 }
+
 
 // v39: Roger's to-dos in Google Tasks (advanced service "Tasks", Google Tasks API v1)
 function taskListId(name) {
