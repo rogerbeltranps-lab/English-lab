@@ -22,6 +22,7 @@ body.lsh{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;ba
 .nv.on{background:var(--blue);color:#fff}
 .nv.sub{padding:8px 14px 8px 26px;font-size:14px;font-weight:600}
 .nv.sub.on{background:#eaf0ff;color:var(--blue)}
+.nv.grp{cursor:default}.nv.grp:hover{background:transparent;color:#667085}
 .nv.home{color:var(--blue);background:#eaf0ff}
 .nv.home:hover{background:var(--blue);color:#fff}
 .nvsep{height:1px;background:#e5e7eb;margin:4px 6px}

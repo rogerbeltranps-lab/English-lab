@@ -39,6 +39,11 @@ html.elgate.elwait:not(.elready) body{animation-delay:8s}
 .side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
 .side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}
 .side .nvh{padding-top:10px}
+/* 📚 Study: a heading over its sub-items (General practice, Flashcards, Mock exams), not a link (Roger, 26 Nov 2026) */
+.side .nv.grp,.elside .nv.grp{background:transparent;border-color:transparent;box-shadow:none;cursor:default;color:#475569;padding-top:6px;padding-bottom:2px}
+.side .nv.grp::after,.elside .nv.grp::after{content:none}
+.side .nv.grp:hover,.elside .nv.grp:hover{background:transparent;border-color:transparent;box-shadow:none;transform:none;color:#475569}
+
 /* the sticky side menu is exactly one screen tall, padding included: with its padding added to 100vh it hung below the screen and its
    top (the brand, My dashboard) slid away at the end of a page; when the menu is longer than the screen it scrolls on its own */
 .app>.side,.app>.sidebar{box-sizing:border-box;overflow-y:auto}
