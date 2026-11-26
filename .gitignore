@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
 tools/model-video/out/
+.real-use-firebase.json
+real-use-shots/
+firestore-debug.log
