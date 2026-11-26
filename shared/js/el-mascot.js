@@ -55,8 +55,10 @@
       P = load('el_flash' + (uid ? '_' + uid : '')) || {};
       // Roger's Towards Nativeness 🧠 My flashcards (localStorage tnFlash, decks tn-…) count in his ⚡ too (Roger, 26 Nov 2026: "as a teacher,
       // yesterday I did my flashcards (Towards Nativeness) but I see 0"). Only teacher/tester browsers have it: students never see TN.
-      const tn = load('tnFlash');
-      if (tn && tn.decks && Object.keys(tn.decks).length) P = { decks: Object.assign({}, P.decks || {}, tn.decks) };
+      // The copy in this browser (a TN page here) merged with his account's copy (el_tnflash_cloud, read by el-cloud.js on other pages), so
+      // cards studied on his phone count on the dashboard too (Roger, 26 Nov 2026: "falta el número a flashcards revisades (dies)").
+      const tn = F.merge(load('tnFlash') || {}, load('el_tnflash_cloud') || {});
+      if (Object.keys(tn.decks).length) P = { decks: Object.assign({}, P.decks || {}, tn.decks) };
     }
     const now = Date.now(), st = F.streak(P, now), today = F.dayKey(now), sum = load('el_flash_sum' + (uid ? '_' + uid : ''));
     let left = null;
