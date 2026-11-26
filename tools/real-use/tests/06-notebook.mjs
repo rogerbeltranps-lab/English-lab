@@ -41,4 +41,37 @@ export default [{
     t.ok(await pageWith(q, /relative clauses before Friday/), 'on the phone, 📓 My notebook has no page with the ✍ note written on the Chromebook');
     t.ok(/Where traditions come from/.test(await q.innerText('body')), 'on the phone, the notebook\'s LP3 tab does not open LP3');
   },
+},
+{
+  // Roger, 26 Nov 2026 ("this I want it here"): the 📓 button is an icon of the bottom-right bar, beside ⚠️ 💡 📬, no longer a round button
+  // floating bottom left; on the board and a learning path, on the Chromebook and on the phone, it opens the notebook
+  name: 'Notebook: 📓 sits in the bottom-right bar with ⚠️ 💡 📬 (not floating bottom left) and opens My notebook',
+  async run(t) {
+    const { alex } = await school(t);
+    for (const size of [undefined, t.PHONE]) {
+      const where = size ? 'on the phone' : 'on the Chromebook';
+      const d = await t.device(alex, { now: NOW, ...(size ? { size } : {}) });
+      for (const page of ['today.html', LP3]) {
+        const p = await d.open(page);
+        await p.locator('#el-cloud-bar #el-nbfab').waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
+        const nb = await p.evaluate(() => { const a = document.getElementById('el-nbfab'), bar = document.getElementById('el-cloud-bar');
+          if (!a) return null; const r = a.getBoundingClientRect(), w = innerWidth;
+          return { inBar: !!(bar && bar.contains(a)), shown: !!a.offsetParent && r.width > 0, href: a.getAttribute('href') || '', fixed: getComputedStyle(a).position === 'fixed',
+            fits: r.right <= w + 1, tip: a.dataset.tip || '', after: [...bar.children].indexOf(a) < [...bar.children].findIndex((x) => /⚠️/.test(x.textContent)) };
+        });
+        t.ok(nb, `${where}, ${page} has no 📓 My notebook button`);
+        if (!nb) continue;
+        t.ok(nb.inBar && !nb.fixed, `${where}, on ${page} the 📓 button is not in the bottom-right bar (it floats on its own)`);
+        t.ok(nb.shown && nb.fits, `${where}, on ${page} the 📓 button in the bar is hidden or off the screen`);
+        t.ok(nb.after, `${where}, on ${page} the 📓 button is not before ⚠️ Report a problem in the bar`);
+        t.ok(/My notebook/.test(nb.tip), `${where}, on ${page} the 📓 button has no "My notebook" name on hover (it has "${nb.tip}")`);
+        t.ok(/seasons-and-celebrations\/index\.html#notes$/.test(nb.href), `${where}, on ${page} the 📓 button does not open the LS2 notebook (it opens "${nb.href}")`);
+      }
+    }
+    const d = await t.device(alex, { now: NOW });
+    const p = await d.open(LP3);
+    await p.locator('#el-cloud-bar #el-nbfab').click();
+    t.ok(await p.locator('.nb-ctab:visible').first().waitFor({ timeout: 15000 }).then(() => true, () => false), 'pressing 📓 in the bar did not open My notebook');
+    t.ok(await p.evaluate(() => { const a = document.getElementById('el-nbfab'); return !a || !a.offsetParent; }), 'the 📓 button still shows on the notebook itself');
+  },
 }];

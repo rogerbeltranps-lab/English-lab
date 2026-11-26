@@ -864,12 +864,14 @@ function bar(){
     if(!u){}
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};   // the student's own bar; its buttons do nothing here
       const mz=mzBar(ca);if(mz)el.append(mz," ");
+      if(nbA)el.append(nbA," ");   // 📓 My notebook (nbFab below)
       el.append(ic("⚠️",ca?"Avisa d'un problema":"Report a problem",no,"#b45309")," ",ic("💡",ca?"Suggereix una idea":"Suggest an idea",no)," ");
       if(nbellEl)el.append(nbellEl," ");   // the student's own 📬, as they see it (shared/js/el-notify.js)
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");   // the teacher's 🔔 here too (Roger, 25 Nov 2026: "notifications should also appear here")
       el.append(ic("✕","Exit the student view: back to your dashboard",asExit,"#dc2626"))}
     else if(isStudent(u)&&!isTeacher(u)){
       const mz=mzBar(!repEn());if(mz)el.append(mz," ");
+      if(nbA)el.append(nbA," ");   // 📓 My notebook (nbFab below)
       el.append(ic("⚠️",repEn()?"Report a problem":"Avisa d'un problema",()=>reportProblem(u),"#b45309")," ",ic("💡",repEn()?"Suggest an idea":"Suggereix una idea",()=>suggest(u))," ");
       if(nbellEl)el.append(nbellEl," ");   // 📬 their notifications (shared/js/el-notify.js)
       if(isTester(u))testerSel(u,el);
@@ -879,6 +881,7 @@ function bar(){
       // no "My dashboard" / "Games" links here for students: the left menu already has both (Roger, 7 Nov 2026: "we don't need this
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
+      if(nbA)el.append(nbA," ");   // 📓 My notebook (nbFab below)
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Beltran looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
@@ -1340,25 +1343,26 @@ function wbClose(){if(WB.dirty)wbSave();if(WB.m)WB.m.close();WB.rt=null}
 addEventListener("pagehide",()=>{if(WB.dirty)wbSave()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&WB.dirty)wbSave()});
 /* 📓 My notebook, always at hand (Roger, 13 Nov 2026: "a floating icon like a notebook always present", "didn't I say that they should see
-   the notebook here?" on the board): a round 📓 button bottom left on every student page, the board, the learning paths, English Lab and
-   the course pages. It opens the notebook (the LS page's #notes) of the LS the student is in: this LS on an LS page from LS2 on (LS1 has no
-   notebook), elsewhere the last one the board or an LS page showed (el_nb on this device; window.elNbFab(href) from the board). Hidden on
-   the notebook itself, under the whiteboard and on the teacher's dashboard. No reads. */
+   the notebook here?" on the board): a 📓 button on every student page, the board, the learning paths, English Lab and the course pages.
+   It sits in the bottom-right bar with ⚡, ⚠️, 💡 and 📬, an icon like the others with its name on hover (Roger, 26 Nov 2026: "this I want
+   it here"; it was a round button floating bottom left). It opens the notebook (the LS page's #notes) of the LS the student is in: this LS
+   on an LS page from LS2 on (LS1 has no notebook), elsewhere the last one the board or an LS page showed (el_nb on this device;
+   window.elNbFab(href) from the board). Hidden on the notebook itself, under the whiteboard, in exams and on the teacher's dashboard. The
+   element keeps its id #el-nbfab (class mode, ✍ Notes and the notebook's CSS look for it); bar() puts it back after every redraw. No reads. */
+let nbA=null;
 function nbFab(){
-  if(document.getElementById("el-nbfab")||/\/teacher\.html$/.test(location.pathname)||examPage)return;   // never on an exam page
+  if(nbA||/\/teacher\.html$/.test(location.pathname)||examPage)return;   // never on an exam page
   let href=null;
   if(lsId&&m){const L=(window.EL_LS||[]).find(x=>x.id===lsId);if(!L||!window.elLsNum)return;
     href=location.pathname.slice(0,location.pathname.length-relPath.length)+m[0]+"index.html#notes";try{localStorage.setItem("el_nb",href)}catch(e){}}
   else{try{href=localStorage.getItem("el_nb")}catch(e){}}
-  const st=document.createElement("style");st.textContent="#el-nbfab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;gap:0;height:52px;min-width:52px;padding:0 13px;border-radius:26px;background:#fffef8;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#1f4fb5;text-decoration:none;font:700 15px system-ui,sans-serif;transition:transform .15s}"+
-    "#el-nbfab[hidden]{display:none}#el-nbfab span{font-size:24px;line-height:1}#el-nbfab b{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s,margin .25s}#el-nbfab:hover b,#el-nbfab:focus-visible b{max-width:140px;margin-left:8px}#el-nbfab:hover{transform:translateY(-2px)}"+
-    "#el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none}@media print{#el-nbfab{display:none}}"+
-    // on a phone, above the students' tab bar (el-phone.css), not over 🏠 Home
-    "@media (max-width:640px){body.elptab #el-nbfab{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}";
+  const st=document.createElement("style");st.textContent="#el-cloud-bar #el-nbfab{display:inline-flex;align-items:center;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:999px;padding:4px 9px;text-decoration:none;font:15px/1.2 system-ui,sans-serif;cursor:pointer}"+
+    "#el-cloud-bar #el-nbfab:hover{background:#f8fafc}#el-cloud-bar #el-nbfab[hidden]{display:none}#el-cloud-bar #el-nbfab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}"+
+    "html.el-wb-on #el-nbfab,html.el-nbfab-off #el-nbfab,html.el-nb-full #el-nbfab{display:none!important}@media print{#el-nbfab{display:none}}";
   document.head.append(st);
-  const a=document.createElement("a");a.id="el-nbfab";a.hidden=!href;if(href)a.href=href;
-  const lab=()=>{const ca=lockCa();a.title=ca?"📓 La meva llibreta":"📓 My notebook";a.setAttribute("aria-label",a.title);a.innerHTML=`<span aria-hidden="true">📓</span><b>${ca?"La meva llibreta":"My notebook"}</b>`};
-  lab();document.body.append(a);
+  const a=document.createElement("a");a.id="el-nbfab";a.className="elcb-i";a.hidden=!href;if(href)a.href=href;a.textContent="📓";
+  const lab=()=>{const t=lockCa()?"La meva llibreta":"My notebook";a.dataset.tip=t;a.title="";a.setAttribute("aria-label",t)};
+  lab();nbA=a;draw(user);
   // the 📓 button always opens the notebook itself (Roger, 16 Nov 2026: "students should open their notebook whenever they press the notebook
   // button"); the ✍ Quick note pad it used to open first (qnOpen below) is no longer started from here
   const here=()=>document.documentElement.classList.toggle("el-nbfab-off",location.hash==="#notes"&&!!lsId&&/\/(index\.html)?$/.test(location.pathname));
@@ -1430,9 +1434,9 @@ function qnCss(){if(document.getElementById("el-qn-css"))return;const st=documen
   "#el-qn.side{left:0;top:0;bottom:0;width:390px;height:auto;border-radius:0 14px 14px 0;border-left:0;box-shadow:6px 0 24px rgba(20,40,90,.22)}#el-qn.side .qn-top{flex-wrap:wrap;row-gap:2px;padding:10px 12px}#el-qn.side .qn-top b{font-size:17px}#el-qn .qn-sp{flex:1}#el-qn.side .qn-w{flex-basis:100%;white-space:normal;font-weight:600}"+
   "#el-qn .qn-foot{display:flex;align-items:center;gap:8px;padding:6px 10px 10px;border-top:1px solid #e5eaf3}#el-qn .qn-foot .qn-st{flex:1;padding:0}"+
   "@media (min-width:900px){html.el-qn-side body{margin-left:390px!important}html.el-qn-side #el-nbfab,html.el-qn-side #el-qnbtn{display:none}}"+
-  "#el-qnbtn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(max(14px,env(safe-area-inset-bottom,0px)) + 60px);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:52px;padding:0;border-radius:16px;background:#1f4fb5;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#fff;font:700 11px/1 system-ui,sans-serif;cursor:pointer;transition:transform .15s}"+
+  "#el-qnbtn{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:52px;height:52px;padding:0;border-radius:16px;background:#1f4fb5;border:2px solid #1f4fb5;box-shadow:0 6px 16px rgba(20,40,90,.25);color:#fff;font:700 11px/1 system-ui,sans-serif;cursor:pointer;transition:transform .15s}"+
   "#el-qnbtn[hidden]{display:none}#el-qnbtn:hover{transform:translateY(-2px)}#el-qnbtn:focus-visible{outline:3px solid #2f5bd3;outline-offset:3px}#el-qnbtn span{font-size:20px;line-height:1}html.el-wb-on #el-qnbtn,html.el-nb-full #el-qnbtn{display:none}"+
-  "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn.side{top:auto;border-radius:14px;border-left:2px solid #1f4fb5}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}body.elptab #el-qnbtn{bottom:calc(132px + env(safe-area-inset-bottom,0px))}}@media print{#el-qn,#el-qnbtn{display:none}}";document.head.append(st)}
+  "@media (max-width:640px){#el-qn{left:8px;right:8px;width:auto;bottom:74px;height:min(70vh,calc(100vh - 100px))}#el-qn.side{top:auto;border-radius:14px;border-left:2px solid #1f4fb5}body.elptab #el-qn{bottom:calc(132px + env(safe-area-inset-bottom,0px));height:min(62vh,calc(100vh - 160px))}#el-qn .qn-w{display:none}body.elptab #el-qnbtn{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}@media print{#el-qn,#el-qnbtn{display:none}}";document.head.append(st)}
 // o.side: the ✍ Notes panel beside the activity (else the small quick note over the page)
 function qnOpen(o){
   o=o||{};if(!user||!isStudent(user)||AS||document.documentElement.classList.contains("el-nbfab-off")||document.documentElement.classList.contains("el-exam-on"))return false;

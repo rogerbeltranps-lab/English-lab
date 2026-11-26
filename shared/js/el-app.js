@@ -502,8 +502,7 @@
       + ".ellp-voy .ok .tk,.ellp-voy .pt .tk.ok{background:#15803d;border-color:#15803d;color:#fff}.ellp-voy li.ok .n{color:#6b7280}"
       + ".ellp-voy li.here a{background:#fff;box-shadow:0 0 0 2px #b45309 inset;font-weight:700}.ellp-voy li.here .tk{border-color:#b45309;background:#b45309;color:#fff;font-size:10px}"
       + ".ellp-voy li.fp a{margin-top:6px;background:#fdf2d6;font-weight:700}.ellp-voy li.fp .tk{border:0;font-size:17px;color:inherit}"
-      + ".ellp-voyback{margin-bottom:10px;padding-bottom:6px}.ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}"
-      + "html.el-voy #el-nbfab b{max-width:140px;margin-left:8px}";
+      + ".ellp-voyback{margin-bottom:10px;padding-bottom:6px}.ellpside.ellp-isvoy .ellp-steps,.ellpside.ellp-isvoy .ellp-prog{display:none}html.elcmtab .ellp-voy{display:none}html.elcmtab .ellpside.ellp-isvoy .ellp-steps,html.elcmtab .ellpside.ellp-isvoy .ellp-prog{display:block}";
     document.head.append(st);
   }
   function voyDraw() {
