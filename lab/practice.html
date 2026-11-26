@@ -70,6 +70,9 @@
     .lsc .lsk{display:flex;flex-wrap:wrap;gap:6px}.lsc .lsk span{background:#f1f5f9;border-radius:999px;padding:3px 9px;font-weight:700;font-size:.88rem}
     .lsc .lsgo{margin-top:auto;align-self:flex-end;color:var(--c);font-weight:800}
     .lsc.mix{--c:#7c3aed;background:#faf5ff;border-color:#e9d5ff;border-top-color:#7c3aed}
+    .lsbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+    .lsb{--c:#3157d5;cursor:pointer;border:2px solid var(--c);background:#fff;color:var(--c);border-radius:999px;padding:8px 16px;font-family:inherit;font-weight:800;font-size:1rem;line-height:1.2}
+    .lsb:hover{background:color-mix(in srgb,var(--c) 8%,#fff)}.lsb.on{background:var(--c);color:#fff}
     .lshd{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 4px}.lshd h2{margin:0}
     .tab.zero{opacity:.55}.item.mixq{background:#faf5ff;border-color:#e9d5ff}
     .rtext{background:#fffdf7;border:1px solid #f3e8c8;border-radius:14px;padding:12px 18px;line-height:1.65;font-size:1.04rem}.rtext p{margin:.5em 0}.rtext .tiny{font-size:.86rem;color:var(--muted)}
@@ -462,9 +465,17 @@ function chooser() {
   return `<h2 class="pick">${t('Tria una LS', 'Choose an LS')}</h2><div class="lsgrid">${L.map(({ l, n }) => `<button class="lsc" style="--c:${lsCol(l)}" data-do="ls" data-v="${esc(l.id)}"><span class="lsn">${esc(lsName(l))}</span><span class="lsk">${chips(n)}</span><span class="lsgo">${t('Obre', 'Open')} ›</span></button>`).join('')}${mix}</div>`;
 }
 // 2. Choose a skill: the LS (or 🔀 all of them), six tiles, then the practice itself
+// The LS is chosen on top, as tabs, and stays there while you practise (Roger, 26 Nov 2026, doc "New student's organization menu":
+// "On top you choose the LS"): one tab per LS with something to practise (newest first, in the course's colour) and 🔀 All mixed; a tab
+// keeps the skill you are on. With no LS in the address the newest LS opens (lsWithWork()[0]).
+const lsWithWork = () => XA.ls.filter(l => Object.values(counts(view(XA, l.id))).some(Boolean));
+function lsBar() {
+  const L = lsWithWork(), b = (id, txt, c) => `<button class="lsb${S.ls === id ? ' on' : ''}" style="--c:${c}" role="tab" aria-selected="${S.ls === id}" data-do="lsb" data-v="${esc(id)}">${txt}</button>`;
+  return `<div class="lsbar" role="tablist" aria-label="LS">${L.map(l => b(l.id, esc(lsName(l)), lsCol(l))).join('')}${L.length > 1 ? b('all', '🔀 ' + t('Totes barrejades', 'All mixed'), '#7c3aed') : ''}</div>`;
+}
 function skills() {
-  const n = counts(X), back = XA.ls.length > 1 || S.ls !== 'all';
-  return `<div class="lshd">${back ? `<button class="btn g sm" data-do="home">← ${t('Totes les LS', 'All LSs')}</button>` : ''}<h2>${esc(lsTitle(S.ls))}</h2></div>` + filters(X)
+  const n = counts(X);
+  return lsBar() + filters(X)
     + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab ${S.tab === k ? 'on' : ''}${n[k] ? '' : ' zero'}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
 }
 function body() {
@@ -481,7 +492,8 @@ async function render() {
   fdSum(fdLoad());
   if (FC) { X = XA; $('#app').innerHTML = header() + '<div id="body"></div>'; return deck(); }
   if (S.ls && S.ls !== 'all' && !XA.ls.some(l => l.id === S.ls)) { S.ls = null; history.replaceState(null, '', location.pathname + location.search); }   // an LS of another course or level
-  if (!S.ls) { X = XA; $('#app').innerHTML = header() + chooser(); return; }
+  if (!S.ls) { const f = lsWithWork()[0]; if (!f) { X = XA; $('#app').innerHTML = header() + none(); return; }
+    S.ls = f.id; history.replaceState(null, '', '#' + f.id); }   // the newest LS, chosen on top (lsBar)
   X = view(XA, S.ls);
   $('#app').innerHTML = header() + skills();
   body();
@@ -976,7 +988,7 @@ document.addEventListener('click', e => {
   ({
     course: () => go(() => { S.course = k.v; S.lp = 'all'; S.open = null; }, 1),
     level: () => { if (all()) go(() => { [S.course, S.level] = k.v.split('|'); S.step = stepOf(S.course, S.level); S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
-    ls: () => nav(k.v, null), home: () => nav(null, null),
+    ls: () => nav(k.v, null), lsb: () => nav(k.v, S.tab && counts(view(XA, k.v))[S.tab] ? S.tab : null), home: () => nav(null, null),
     tab: () => { if (S.tab === k.v && !S.open) return; nav(S.ls, k.v); setTimeout(() => { const b = $('#body'); if (b && innerWidth < 981) window.scrollTo({ top: Math.max(0, b.getBoundingClientRect().top + scrollY - 70) }); }); },
     mode: () => go(() => { S.mode = k.v; }),
     core: () => go(() => { S.coreOnly = el.checked; }),
@@ -1016,7 +1028,7 @@ function start() {
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
   $('#lead').innerHTML = FC ? t('Tot el vocabulari i la gramàtica de cada LS, al teu nivell. Estudia una mica cada dia: cada targeta torna quan la necessites.', 'All the vocabulary and grammar of each LS, at your level. Study a little every day: each card comes back when you need it.')
-    : t('Tria una LS, o totes barrejades, i després què vols practicar: vocabulari, gramàtica, listening, reading, writing o speaking. Tot és del teu nivell i no s’entrega res: practica tant com vulguis.', 'Choose an LS, or all of them mixed, and then what you want to practise: vocabulary, grammar, listening, reading, writing or speaking. It is all at your level and nothing is handed in: practise as much as you like.');
+    : t('A dalt tria una LS, o totes barrejades, i després què vols practicar: vocabulari, gramàtica, listening, reading, writing o speaking. Tot és del teu nivell i no s’entrega res: practica tant com vulguis.', 'Choose an LS at the top, or all of them mixed, and then what you want to practise: vocabulary, grammar, listening, reading, writing or speaking. It is all at your level and nothing is handed in: practise as much as you like.');
   S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // students get everything at their level in one place (no LS filter, newest LS first: content())
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';
