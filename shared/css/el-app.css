@@ -39,20 +39,20 @@ html.elgate.elwait:not(.elready) body{animation-delay:8s}
 .side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
 .side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}
 .side .nvh{padding-top:10px}
-/* a group (an item and its sub-items: My course + its LSs, My progress + My marks, 📚 Study + its three): the sub-items open while the
-   mouse is on the group, after a short pause so a mouse passing by does not open them (Roger, 26 Nov 2026: "Els sub apartats apareixen
-   al tocar amb el mouse"); open too while one of them is the page you are on or has the keyboard focus (a tap on a touch screen) */
+/* a group (an item and its sub-items: My course + its LSs, My progress + My marks, 📚 Study + its three): the ▾ (or the whole Study
+   card) opens the sub-items and they stay open, so the menu never moves under the mouse (Roger, 26 Nov 2026: "When I open the subtopics,
+   they must stay open"); el-catalog.js elMenuToggle */
 .nvg{display:flex;flex-direction:column}
-.nvsubs{display:flex;flex-direction:column;max-height:0;opacity:0;overflow:hidden;padding:0 2px;margin:0 -2px;transition:max-height .22s ease .25s,opacity .15s ease .25s}
+.nvsubs{display:flex;flex-direction:column;max-height:0;opacity:0;overflow:hidden;visibility:hidden;padding:0 2px;margin:0 -2px;transition:max-height .2s ease,opacity .15s ease,visibility 0s .2s}
 .nvsubs>.nv{margin-top:6px}.nvsubs>.nv:last-child{margin-bottom:2px}
-.nvg:focus-within>.nvsubs,.nvg:has(.nv.on)>.nvsubs{max-height:480px;opacity:1;transition-delay:0s}
-@media (hover:hover){.nvg:hover>.nvsubs{max-height:480px;opacity:1;transition-delay:.15s}}
-.mtabs .nvg,.mtabs .nvsubs{display:contents}
-
-/* 📚 Study: a heading over its sub-items (General practice, Flashcards, Mock exams), not a link (Roger, 26 Nov 2026) */
-.side .nv.grp,.elside .nv.grp{background:transparent;border-color:transparent;box-shadow:none;cursor:default;color:#475569;padding-top:6px;padding-bottom:2px}
-.side .nv.grp::after,.elside .nv.grp::after{content:none}
-.side .nv.grp:hover,.elside .nv.grp:hover{background:transparent;border-color:transparent;box-shadow:none;transform:none;color:#475569}
+.nvg.open>.nvsubs{max-height:480px;opacity:1;visibility:visible;transition:max-height .2s ease,opacity .15s ease}
+.mtabs .nvg,.mtabs .nvsubs{display:contents}.mtabs .nvc{display:none}
+/* the ▾ in place of the ›: a button of its own (a click on it never opens the page); ▸ while closed */
+.side .nvg>.nv::after,.elside .nvg>.nv::after{content:none}
+.nvc{flex:0 0 auto;margin:-6px -8px -6px auto;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;color:#64748b;font-size:15px;line-height:1;cursor:pointer;transition:transform .15s ease,background .12s ease}
+.nvc:hover,.nvc:focus-visible{background:#eef2ff;color:#3157d5}
+.nvg:not(.open)>.nv .nvc{transform:rotate(-90deg)}
+.side .nv.grp,.elside .nv.grp{cursor:pointer}
 
 /* the sticky side menu is exactly one screen tall, padding included: with its padding added to 100vh it hung below the screen and its
    top (the brand, My dashboard) slid away at the end of a page; when the menu is longer than the screen it scrolls on its own */
@@ -338,17 +338,18 @@ body.elapp.elcourse .elcrumb{max-width:980px}
   body.elmini .elrail .nv .ic.lsn,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv .ic.lsn{font-size:11.5px}
   body.elmini .elrail .nv .lb,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv .lb{overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .1s ease}
   body.elmini .elrail .nv::after,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv::after{font-size:18px;opacity:0;transition:opacity .1s ease}
+  body.elmini :is(.elrail,aside.side,aside.sidebar) .nvc{opacity:0;transition:opacity .1s ease}
   body.elmini .elrail .nv.sub,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv.sub{margin-left:0!important;padding:4px 8px 4px 10px;font-size:13.5px}
   body.elmini .elrail .nv.sub .ic,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv.sub .ic{width:26px;height:26px;font-size:14px;border-radius:8px}
   body.elmini .elrail .nv.sub .ic.lsn,body:is(.lsh,.elbd,.ellab).elmini :is(aside.side,aside.sidebar) .nv.sub .ic.lsn{font-size:10.5px}
   /* open: brand, labels and › come in; an LS goes in under its course again */
-  body.elmini :is(.elrail,aside.side,aside.sidebar):is(.elopen,:has(:focus-visible)) :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.12s}
+  body.elmini :is(.elrail,aside.side,aside.sidebar):is(.elopen,:has(:focus-visible)) :is(.elmtop>a,.nv .lb,.nv::after,.nvc){opacity:1;transition-delay:.12s}
   body.elmini :is(.elrail,aside.side,aside.sidebar):is(.elopen,:has(:focus-visible)) .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:0s}
 }
 /* the mouse opens it: after a short pause, so a mouse crossing to the page does not */
 @media (min-width:981px) and (hover:hover){
   body.elmini .elrail:hover,body:is(.lsh,.elbd,.ellab).elmini .app>:is(aside.side,aside.sidebar):hover{width:var(--elopen)!important;box-shadow:10px 0 30px rgba(15,23,42,.14)!important;transition-delay:.15s}
-  body.elmini :is(.elrail,aside.side,aside.sidebar):hover :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.27s}
+  body.elmini :is(.elrail,aside.side,aside.sidebar):hover :is(.elmtop>a,.nv .lb,.nv::after,.nvc){opacity:1;transition-delay:.27s}
   body.elmini :is(.elrail,aside.side,aside.sidebar):hover .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:.15s}
 }
 
