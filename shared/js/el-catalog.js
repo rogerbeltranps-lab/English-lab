@@ -772,21 +772,26 @@ window.elStudentMenu=function(o){
   const lss=o.lss||elMenuLs(cs,o.group),q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
   const bq=board.split("#")[0];
-  // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
-  // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
-  // i revisem que estigui allà sempre?"): the board's #marks place
-  // 🎓 My progress right below My marks (Roger, 9 Nov 2026: "a table with their results … they can choose term"; 25 Nov 2026: "My progress
-  // should be under My marks"): the board's #progress place
-  // 🧠 Flashcards below it, apart from Practise (Roger, 25 Nov 2026: "Students will see their flashcards under progress"): lab/practice.html#deck
-  // 📝 Exam practice below it (Roger, 19 Nov 2026: "un botó a l'esquerra que sigui practica per l'examen"): the board's #exam-practice place
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("flashcards","",R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0])+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep","",bq+"#exam-practice","📝",t("Practica per l'examen","Exam practice"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
-    +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
-      +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
-    +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
+  // The order (Roger, 26 Nov 2026, doc "New student's organization menu"): 🏠 My dashboard · 🗂 My course · N ESO and its LSs (an LS
+  // appears when the teacher opens it) · 🎓 My progress with 📊 My marks under it ("Details -> My marks") · 📚 Study (a heading, not a
+  // link) with 🎯 General practice (lab/practice.html), 🧠 Flashcards (lab/practice.html#deck) and 📝 Mock exams (the board's
+  // #exam-practice) · 📖 Books · 🔤 Print your grammar and vocab (the board's #language) · 🎲 Games · ❓ Help. 📱 Study on your phone
+  // is no longer in the menu: it is a link inside ❓ Help.
+  // Sub-items only show while the mouse is on their item (Roger, 26 Nov 2026: "Els sub apartats apareixen al tocar amb el mouse"): each
+  // item with sub-items is a .nvg group, its sub-items in .nvsubs (CSS in el-app.css; open too while one of them is the page you are on,
+  // or has the keyboard focus). 📚 Study is a heading with tabindex, so a tap on a touch screen opens its sub-items too.
+  const fl=R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0]);
+  const grp=(head,subs)=>subs?`<div class="nvg">${head}<div class="nvsubs">${subs}</div></div>`:head;
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))
+    +cs.map(c=>grp(b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`),
+      lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join(""))).join("")
+    +grp(b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress")),b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks")))
+    +grp(`<span class="nv grp" role="heading" aria-level="2" tabindex="0"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span></span>`,
+      b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams")))
+    +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab")):"")
     +b("games","",R+"lab/","🎲",t("Jocs","Games"))
     +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
-    +b("help","",bq+"#help","❓",t("Ajuda","Help"))
-    +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
+    +b("help","",bq+"#help","❓",t("Ajuda","Help"));
 };
 
 // The phone's bottom tab bar for students (Roger, 8 Nov 2026: "la visió del mòbil necessita un gran remodelació … no ha de tenir

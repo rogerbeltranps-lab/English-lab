@@ -47,6 +47,7 @@ button.mkr:hover{background:#f8fafc}.mki{width:34px;height:34px;border-radius:10
 .mklate{list-style:none;margin:0;padding:0;display:grid;gap:8px}.mklate li{background:#fef2f2;border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center}
 .mklate b{font-size:14.5px}.mklate small{color:#7f1d1d;font-size:13px;grid-column:1}.mklate small a{color:inherit;text-decoration:underline;font-weight:600}.mklate a.mkdo{grid-row:1/3;grid-column:2;background:#b91c1c;color:#fff;text-decoration:none;font-weight:700;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap}
 .mkopen{font-size:14px;color:#475569;margin:10px 0 0}.mkopen a{font-weight:700}
+#ptbox>.mkpts{margin:0 0 16px!important}
 .mkpts{margin-top:16px!important;display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding:12px 20px}.mkp b{font-size:24px;color:#b45309}.mkp{font-weight:700}.mkb b{font-size:17px;color:#6d28d9}
 .mklock{font-size:14px;color:#991b1b;background:#fef2f2;border-radius:999px;padding:4px 12px}.mkunl{font-size:14px;color:#166534;background:#dcfce7;border-radius:999px;padding:4px 12px}
 .mkhow{margin-left:auto;font-size:14px}.mkhow summary{cursor:pointer;font-weight:600;color:var(--c-dark,#2443ad)}.mkhow[open]{flex-basis:100%;margin-left:0}
@@ -452,6 +453,9 @@ function nav(g,lss){
   if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
+  // the menu is a strip of icons that opens when the mouse is on it, as on the LS pages (Roger, 26 Nov 2026: "el menu es fa petit com
+  // amb les LS"; elMiniRail in el-catalog.js, el-app.css section 3; body.elbd = the board's aside.side)
+  if(window.elMiniRail){document.body.classList.add("elbd","elmini");elMiniRail(document.querySelector(".app>aside.side"))}
 }
 // ❓ Help: a picture guide instead of the old videos (Roger, 7 Nov 2026: "instead of the videos (which are obsolete) I need a guide
 // with images so that students can check it if they want it"). One folded part per place of the site, each with a real screenshot
@@ -471,9 +475,10 @@ const helpGuide=()=>{
       t("A sota tens la teva <b>Learning Situation d'ara</b>: els seus learning paths i el teu repte (el producte final).","Below is your <b>Learning Situation now</b>: its learning paths and your challenge (the final product).")]),
     part("☰",t("El menú","The menu"),t("Per anar a qualsevol lloc de la web","To go anywhere on the website"),img("menu",t("El menú de l'esquerra","The menu on the left"),"narrow"),[
       t("El menú de l'esquerra és igual a totes les pàgines. Al mòbil el trobes a baix.","The menu on the left is the same on every page. On a phone it is at the bottom."),
-      t("<b>🏠 El meu tauler</b>: torna a l'inici. <b>📊 Les meves notes</b>: les teves activitats, notes i exàmens. <b>🎯 Practica</b>: practica pel teu compte.","<b>🏠 My dashboard</b>: back to the start. <b>📊 My marks</b>: your activities, marks and exams. <b>🎯 Practise</b>: practise on your own."),
-      t("<b>🗂 El meu curs</b> i a sota cada <b>LS</b>: obre la pàgina d'una Learning Situation.","<b>🗂 My course</b> and each <b>LS</b> below it: open the page of a Learning Situation."),
-      t("<b>📖 Llibres</b>, <b>🔤 Gramàtica i vocabulari</b> (els resums per estudiar), <b>🎲 Jocs</b>, <b>❓ Ajuda</b> (aquesta pàgina) i <b>📱 Estudia amb el mòbil</b>.","<b>📖 Books</b>, <b>🔤 Grammar and vocabulary</b> (summaries to study), <b>🎲 Games</b>, <b>❓ Help</b> (this page) and <b>📱 Study on your phone</b>.")]),
+      t("<b>🏠 El meu tauler</b>: torna a l'inici. <b>🗂 El meu curs</b> i a sota cada <b>LS</b>: obre la pàgina d'una Learning Situation.","<b>🏠 My dashboard</b>: back to the start. <b>🗂 My course</b> and each <b>LS</b> below it: open the page of a Learning Situation."),
+      t("<b>🎓 El meu progrés</b>: com avances, i a sota <b>📊 Les meves notes</b>: les teves activitats, notes i exàmens.","<b>🎓 My progress</b>: how you are getting on, and under it <b>📊 My marks</b>: your activities, marks and exams."),
+      t("<b>📚 Estudia</b>: <b>🎯 Pràctica general</b>, <b>🧠 Targetes</b> i <b>📝 Exàmens de prova</b>.","<b>📚 Study</b>: <b>🎯 General practice</b>, <b>🧠 Flashcards</b> and <b>📝 Mock exams</b>."),
+      t("<b>📖 Llibres</b>, <b>🔤 Imprimeix la gramàtica i el vocabulari</b> (els resums per estudiar), <b>🎲 Jocs</b> i <b>❓ Ajuda</b> (aquesta pàgina, on també trobes <b>📱 Estudia amb el mòbil</b>).","<b>📖 Books</b>, <b>🔤 Print your grammar and vocab</b> (summaries to study), <b>🎲 Games</b> and <b>❓ Help</b> (this page, where you also find <b>📱 Study on your phone</b>).")]),
     part("📚",t("La pàgina d'una LS","An LS page"),t("Els learning paths i el producte final","The learning paths and the final product"),img("ls",t("La pàgina de la LS","The LS page")),[
       t("Fes els <b>learning paths</b> en ordre: cada un acaba amb una peça del teu producte final. Hi veus <b>✓ Fet</b> o quants passos portes.","Do the <b>learning paths</b> in order: each one ends with a piece of your final product. You see <b>✓ Done</b> or how many steps you have done."),
       t("<b>▶ Continua</b> t'obre el learning path i el pas que et toca.","<b>▶ Continue</b> opens the learning path and the step you need to do."),
@@ -517,7 +522,7 @@ const helpGuide=()=>{
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
 const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang",report:"report"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({examprep:t("Practica per l'examen","Exam practice"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary"),report:"📄 "+t("Informe del 1r trimestre","Term 1 report")})[p];
+const placeTitle=p=>({examprep:t("Exàmens de prova","Mock exams"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab"),report:"📄 "+t("Informe del 1r trimestre","Term 1 report")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
@@ -609,12 +614,14 @@ function meBox(lss,ls){
     bt=(w,i,l)=>`<button type="button" data-do="pbar" data-w="${w}"><i aria-hidden="true">${i}</i><span>${l}</span></button>`;
   return `<div class="pme"><div class="pmeh"><span class="pmea" aria-hidden="true">${esc(ini)}</span><div><b>${esc(nm)}</b><small>${esc(g?g.name:"")}${ls?" · "+lsName(ls):""}</small></div></div>`
     +levelBox(ls)
-    +`<h2>${t("Les meves notes","My marks")}</h2><div class="pml">`+r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, el que tens endarrerit, exàmens","LS mark, what's late, exams"))
-    +r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck","🧠",t("Targetes","Flashcards"),t("el vocabulari i la gramàtica de cada LS","the vocabulary and grammar of each LS"))+r("#exam-practice","📝",t("Practica per l'examen","Exam practice"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))
+    // the same order as the side menu (Roger, 26 Nov 2026): 🎓 My progress with 📊 My marks, then 📚 Study
+    +`<h2>${t("El meu progrés","My progress")}</h2><div class="pml">`+r("#progress","🎓",t("El meu progrés","My progress"),t("les notes de cada LS, per trimestres","your marks in each LS, by term"))
+    +r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, el que tens endarrerit, exàmens","LS mark, what's late, exams"))+`</div>`
+    +`<h2>${t("Estudia","Study")}</h2><div class="pml">`+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):""),"🎯",t("Pràctica general","General practice"),t("vocabulari, gramàtica i les quatre habilitats de cada LS","vocabulary, grammar and the four skills of each LS"))+r("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS):"")+"#deck","🧠",t("Targetes","Flashcards"),t("el vocabulari i la gramàtica de cada LS","the vocabulary and grammar of each LS"))+r("#exam-practice","📝",t("Exàmens de prova","Mock exams"),t("els exàmens de pràctica de cada LS","the practice exams of each LS"))
     +(ls?(window.elLsNum&&elLsNum(ls)!=="LS1"?r(lsHref(ls)+"#notes","📓",t("La meva llibreta","My notebook"),t("índex, teoria, vocabulari i els teus apunts","index, theory, vocabulary and your notes")):r(lsHref(ls)+"#notes","🎯",t("Què entra a l'examen","What's in the exam"),t("el que hem fet, paraules clau, teoria i els teus apunts","what we've done, key terms, theory and your notes"))):"")+`</div>`
     +`<h2>${t("Més","More")}</h2><div class="pml">`+r("#units","🗂",t("Les meves Learning Situations","My Learning Situations"))
     +r("#news","📣",t("Anuncis del professor","Announcements from your teacher"))
-    +r("#books","📖",t("Llibres","Books"))+r("#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"))
+    +r("#books","📖",t("Llibres","Books"))+r("#language","🔤",t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab"))
     +r("lab/","🎲",t("Jocs","Games"))+r("#help","❓",t("Ajuda","Help"))+(APP()?"":r("#phone","📱",t("Estudia amb el mòbil","Study on your phone")))
     +(AS||DEMO?"":bt("prob","⚠️",t("Avisa d'un problema","Report a problem"))+bt("idea","💡",t("Envia una idea","Send an idea")))+`</div></div>`}
 function homeHtml(lss,ls,info){
@@ -1045,7 +1052,7 @@ function marksHome(lss,ls){try{if(lvTerm())localStorage.setItem("el_lv_seen","1"
         +`<p class="mklead">${t(W.nm>1?"Compten 0 fins que les facis.":"Compta 0 fins que la facis.",W.nm>1?"They count 0 until you do them.":"It counts 0 until you do it.")} ${up!=null?t(`Fes-les i la teva nota pujarà almenys fins a <b>${f1(up)}</b>.`,`Do them and your mark goes up to at least <b>${f1(up)}</b>.`):t("Fes-les ara i la teva nota puja.","Do them now and your mark goes up.")}</p>`
         +`<ul class="mklate">${shown.map(([a,d,o])=>{const ln=leftLinks(a,o);return `<li><b>${esc(a.title)}</b><small>${ln?ln+" · ":""}${t("calia fer-la el","due on")} ${when(d)}</small><a class="mkdo" href="${lateHref(a,o)}">${t("Fes-la","Do it")} →</a></li>`}).join("")}</ul>`
         +(more?`<p class="mkopen"><a href="#todo">${t(`I ${nAct(more)} més a ✅ Per fer`,`And ${nAct(more)} more in ✅ To do`)} →</a></p>`:"")+`</section>`}}
-  return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div>${mkSkills(ls)}<div id="ptbox">${pointsLine()}</div>`}
+  return `<div class="mkgrid${todo?"":" one"}">${hero}${todo}</div>${mkSkills(ls)}`}   // 🏆 points and term bonus: now at the top of 🎓 My progress (progressPlace)
 // The LS mark's parts as one bar: each part as wide as its share of the mark, filled by its mark so far, and its name under it (Roger, 21 Nov
 // 2026: "below each bar what it is: Everyday work, Final Product, Exam"). On 📊 My marks (marksHome) and on My dashboard (markMini).
 function mkSplit(ls,M){if(!M)return "";const ps=[];if(!M.only)ps.push(["daily",M.w.daily,M.daily]);
@@ -1080,7 +1087,7 @@ function mkSkills(ls){if(!window.ELCharts)return "";const SK=ELCharts.SK,nm=k=>E
     if(k==="Speaking"&&!e&&FP)return `<div class="mkskr"><span class="mkskn">${SK[k][0]} ${esc(nm(k))}</span>${bar(t("Activitats","Activities"),pa,SK[k][1])}${bar(t("Prod. final","Final prod."),FP.p,SK[k][1])}</div>`;
     return `<div class="mkskr${i===4?" sep":""}"><span class="mkskn">${SK[k][0]} ${esc(nm(k))}</span>${bar(t("Activitats","Activities"),pa,SK[k][1])}${bar(t("Examen","Exam"),pe,SK[k][1])}</div>`};
   const hd=held&&X.showFrom&&(!window.elHeldDay||elHeldDay(X.showFrom))?new Date(X.showFrom).toLocaleDateString(EN?"en-GB":"ca",{weekday:"short",day:"numeric",month:"short"}):"";
-  return `<section class="box mkc mksk"><h2>📊 ${t("Com et va a cada destresa","How you are doing in each skill")}</h2><p class="mklead">${t("Activitats: la mitjana de tots els teus intents. Examen: la teva nota a cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}${FP&&!ex.Speaking?" "+(gr.only?t("Speaking: la nota del producte final, que és oral.","Speaking: your final product mark, as it is spoken."):t("Speaking: la part oral del producte final.","Speaking: the spoken part of your final product.")):""}</p>`
+  return `<section class="box mkc mksk"><h2>📊 ${t("Activitats: com et va a cada destresa","Activities: how you are doing in each skill")}</h2><p class="mklead">${t("Activitats: la mitjana de tots els teus intents. Examen: la teva nota a cada part.","Activities: the average of all your tries. Exam: your mark in each part.")}${FP&&!ex.Speaking?" "+(gr.only?t("Speaking: la nota del producte final, que és oral.","Speaking: your final product mark, as it is spoken."):t("Speaking: la part oral del producte final.","Speaking: the spoken part of your final product.")):""}</p>`
     +Object.keys(SK).map(row).join("")+(held?`<p class="mkskh">🔒 ${hd?t(`Resultats de l'examen: ${esc(hd)}`,`Exam results: ${esc(hd)}`):t("Els resultats de l'examen sortiran aviat.","Your exam results are coming soon.")}</p>`:"")+`</section>`}
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
 function unitsBox(lss,ls,st,stTag){
@@ -1154,7 +1161,7 @@ function render(){
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
     $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info);if(S.vy){elVoyage.wire($("#main"),S.vy);vyRace(lss);if(S.vyPend)vyPend(lss)}}
-  else{mzOff();$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
+  else{mzOff();$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=place==="marks"&&marksTitle(ls)||placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
   const lc=document.querySelector(".lscard");if(lc&&getComputedStyle(lc).position==="sticky")document.documentElement.style.setProperty("--lsh",(lc.offsetHeight+12)+"px");
@@ -1179,6 +1186,9 @@ const pseg=(on,lss,ls)=>{const nt=todoItems(lss).reduce((n,x)=>n+todoTabs(x),0),
 // student board"), one screen since 19 Nov 2026 (marksHome): S.tab "home" is the summary; "daily" (📚 everyday work: how the LS mark is
 // made), "cp", "fp" and "exam" are the details, with ‹ My marks to go back. #work, #checkpoints, #final and #exam open them
 // (today.html#exam is also the link of the "results are ready" card).
+// the heading of a part of 📊 My marks says that part, not "My marks" (Roger, 26 Nov 2026: "When I open My Exam, final product… On top
+// I need to see My Exam, final product… not my marks"); the one-screen summary keeps "My marks"
+function marksTitle(ls){return ({exam:t("El meu examen","My exam"),fp:t("El meu producte final","My final product"),daily:t("Feina de cada dia","Everyday work"),cp:t("Els meus checkpoints","My checkpoints")})[tabOf(ls)]||""}
 function tabOf(ls){const h=location.hash.slice(1);let m={exam:"exam",work:"daily",final:"fp",checkpoints:"cp"}[h];if((m==="fp"&&!hasFp(ls))||(m==="cp"&&!cpList(ls).length)||(m==="daily"&&only(ls.id)))m="home";
   if(S.tab==="cp"&&S.tabLs===ls.id&&!cpList(ls).length)S.tab="home";
   if(S.tab&&S.tabLs===ls.id)return S.tab;S.tabLs=ls.id;
@@ -1971,7 +1981,9 @@ function progressPlace(lss,ls){
   // 📄 The term reports at the top of My progress, right under its title (Roger, 25 Nov 2026: "the reports will apear here on top"): one
   // card per report the student can open (Term 1 now), whatever term is chosen below
   const reps=repOk()?`<a class="pgrep" href="#report"><span aria-hidden="true">📄</span><span><b>${t("El meu informe del 1r trimestre (esborrany)","My Term 1 report (draft)")}</b><small>${t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`:"";
-  return reps+`<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
+  // 🏆 my points and the term bonus at the top of My progress, under the term report card (Roger, 26 Nov 2026: "This should go on top
+  // of My progress, not in my marks")
+  return reps+`<div id="ptbox">${pointsLine()}</div>`+`<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
     +`<div class="pgtms"><div class="pgtm"><small>${t("Tasques fetes","Tasks done")}</small>${TP==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(TP)}">${Math.round(TP)} %</b>`}<span class="xbar"><span style="width:${TP==null?0:Math.max(0,Math.min(100,TP))}%;background:${TP==null?"#e2e8f0":col(TP)}"></span></span></div><div class="pgtm"><small>${tm===0?t("Nota del curs fins ara","Year mark so far"):tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:dgMark(TM)}${bonusNote(TB)}</div></div></div>`
     +`<p class="fvlead">${t("Les teves notes de cada Learning Situation, trimestre a trimestre. Tria un trimestre o tot el curs:","Your marks in each Learning Situation, term by term. Choose a term or the whole year:")}</p>`
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}${yr}</div>`

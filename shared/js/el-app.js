@@ -139,7 +139,9 @@
     // Not the teacher's class tab (html.elcmtab, el-catalog.js): there the column is the place of 📋 Today (el-cm-agenda.js docks it
     // in a menu ≥200 px wide), so a strip left it empty and white (Roger, 16 Nov 2026: "look! There's a bug")
     const cmTab = document.documentElement.classList.contains("elcmtab");
-    const sm = stuMenu(), mini = !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail && (!!sm || !cmTab);
+    // every student page shrinks its menu to icons too (Roger, 26 Nov 2026: "el menu es fa petit com amb les LS"): Practise, Flashcards,
+    // Games, the course pages
+    const sm = stuMenu(), mini = !!window.elMiniRail && ((!!curLs && (mode === "lp" || mode === "games") && (!!sm || !cmTab)) || (!!sm && !cmTab));
     document.body.classList.toggle("elmini", mini);
     // the teacher: the dashboard's side menu, the same list and look as on teacher.html (elTeacherMenu in el-catalog.js; Roger, 25 Nov
     // 2026: "this menu should always be the same"); the narrow strip shows the same items as icons
@@ -195,6 +197,11 @@
       br.textContent = tm ? "Teacher dashboard" : br.dataset.en; br.setAttribute("href", tm ? ROOT + "teacher.html" : br.dataset.h); }
     if (tm) { s.innerHTML = elTeacherMenu({ root: ROOT, on: tmHere() }); return; }
     s.innerHTML = stuMenu() || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
+    // a student: the menu shrinks to a strip of icons that opens when the mouse is on it, as on the LS pages (Roger, 26 Nov 2026: "el
+    // menu es fa petit com amb les LS"; el-app.css section 3, body.ellab)
+    const sb = $(".sidebar"), mini = !!stuMenu() && !!window.elMiniRail && !document.documentElement.classList.contains("elcmtab");
+    document.body.classList.toggle("elmini", mini);
+    if (mini && sb) elMiniRail(sb);
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
     if (mode !== "course") return;
