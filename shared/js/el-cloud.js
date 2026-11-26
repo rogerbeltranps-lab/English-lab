@@ -903,10 +903,15 @@ function mzSync(uid){const k="el_flash_chk_"+uid;let t=0;try{t=+localStorage.get
   getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{if(!s.exists()||!window.ELFlashDeck)return;const lk="el_flash_"+uid;let loc=null;
     try{loc=JSON.parse(localStorage.getItem(lk)||"null")}catch(e){}
     const m=window.ELFlashDeck.merge(loc||{},JSON.parse(s.data().p||"{}"));try{localStorage.setItem(lk,JSON.stringify(m))}catch(e){}
-    dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e))}
+    dispatchEvent(new CustomEvent("el-flash-sync",{detail:{uid}}));draw(user)}).catch(e=>console.warn("flashcards read",e));
+  // ✦ the teacher's Towards Nativeness 🧠 My flashcards (tnFlash) live in his TN progress copy, which only a TN page pulls: on the dashboard
+  // and every other page the ⚡ said 0 when he had studied them on another device (Roger, 26 Nov 2026: "falta el número a flashcards
+  // revisades (dies)"). One read of that copy, in the same 30 minutes as above; kept apart (el_tnflash_cloud), merged by ELMascot.data.
+  if(isTeacher(user)&&!AS&&!tnLs())(window.EL_LS||[]).filter(l=>l.personal).forEach(l=>getDoc(doc(db,"students",uid,"progress",l.id)).then(s=>{
+    const v=s.exists()&&(s.data().data||{}).tnFlash;if(!v)return;try{origSet.call(localStorage,"el_tnflash_cloud",v)}catch(e){}draw(user)}).catch(e=>console.warn("tn flashcards read",e)))}
 function mzBar(ca){
   if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
-  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261126",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
+  if(!window.ELMascot||!window.ELFlashDeck){if(!mzReady)mzReady=loadScript("shared/js/el-flashdeck.js?v=20261125d",()=>window.ELFlashDeck).then(()=>loadScript("shared/js/el-mascot.js?v=20261126b",()=>window.ELMascot)).then(()=>{if(window.ELMascot)draw(user)}).catch(e=>console.warn("mascot",e));return null}
   let P=null;
   if(AS){if(!mzAs||mzAs.uid!==AS.uid){const uid=AS.uid,k="el_mz_as_"+uid;mzAs={uid,P:{}};
       try{const c=JSON.parse(sessionStorage.getItem(k)||"null");if(c&&Date.now()-c.t<30*60e3){mzAs.P=c.P;}else getDoc(doc(db,"students",uid,"flashcards","all")).then(s=>{mzAs.P=s.exists()?JSON.parse(s.data().p||"{}"):{};
