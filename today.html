@@ -453,6 +453,9 @@ function nav(g,lss){
   if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
+  // the menu is a strip of icons that opens when the mouse is on it, as on the LS pages (Roger, 26 Nov 2026: "el menu es fa petit com
+  // amb les LS"; elMiniRail in el-catalog.js, el-app.css section 3; body.elbd = the board's aside.side)
+  if(window.elMiniRail){document.body.classList.add("elbd","elmini");elMiniRail(document.querySelector(".app>aside.side"))}
 }
 // ❓ Help: a picture guide instead of the old videos (Roger, 7 Nov 2026: "instead of the videos (which are obsolete) I need a guide
 // with images so that students can check it if they want it"). One folded part per place of the site, each with a real screenshot

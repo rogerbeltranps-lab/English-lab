@@ -777,13 +777,17 @@ window.elStudentMenu=function(o){
   // link) with 🎯 General practice (lab/practice.html), 🧠 Flashcards (lab/practice.html#deck) and 📝 Mock exams (the board's
   // #exam-practice) · 📖 Books · 🔤 Print your grammar and vocab (the board's #language) · 🎲 Games · ❓ Help. 📱 Study on your phone
   // is no longer in the menu: it is a link inside ❓ Help.
+  // Sub-items only show while the mouse is on their item (Roger, 26 Nov 2026: "Els sub apartats apareixen al tocar amb el mouse"): each
+  // item with sub-items is a .nvg group, its sub-items in .nvsubs (CSS in el-app.css; open too while one of them is the page you are on,
+  // or has the keyboard focus). 📚 Study is a heading with tabindex, so a tap on a touch screen opens its sub-items too.
   const fl=R+"lab/practice.html"+((bq.match(/\?student=[^#&]*/)||[""])[0]);
+  const grp=(head,subs)=>subs?`<div class="nvg">${head}<div class="nvsubs">${subs}</div></div>`:head;
   return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))
-    +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
-      +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
-    +b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress"))+b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks"))
-    +`<span class="nv grp" role="heading" aria-level="2"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span></span>`
-    +b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams"))
+    +cs.map(c=>grp(b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`),
+      lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join(""))).join("")
+    +grp(b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress")),b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks")))
+    +grp(`<span class="nv grp" role="heading" aria-level="2" tabindex="0"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span></span>`,
+      b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams")))
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab")):"")
     +b("games","",R+"lab/","🎲",t("Jocs","Games"))
     +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
