@@ -335,3 +335,9 @@
   #sub .nxex>*{align-self:flex-start;text-align:left}
   #sub .nxex span::before{display:none}
 }
+/* 🎯 Practise: the LS tabs on top (lsBar, lab/practice.html; Roger, 26 Nov 2026) are one row that scrolls sideways, not a stack */
+@media (max-width:640px){
+  .lsbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -4px 12px;padding:2px 4px}
+  .lsbar::-webkit-scrollbar{display:none}
+  .lsb{flex:0 0 auto;white-space:nowrap;padding:6px 12px;font-size:.9rem}
+}
