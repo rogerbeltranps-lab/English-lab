@@ -3660,7 +3660,7 @@ function wxMailDlg(ls,o,err){const c=wxCfg(ls),K=wxKey(ls),lt=x=>x?new Date(x).t
     :`<p>${d?`The website kept a copy saved at ${d.updated&&d.updated.toDate?d.updated.toDate().toTimeString().slice(0,5):"?"}: <b>${diff}</b> answer(s) in the email are newer or different.`:"The website has no copy of this exam."}</p>
       <div class="row"><button data-wx="mturn" style="background:#166534;color:#fff;border-color:#166534">🏁 Turn it in for ${esc(name(s))}</button></div>`;
   WX.mail={o,u};
-  dlg(box+`<h4>🖥 ${s?name(s):esc(o.name||o.email||"?")} · ${esc(o.group||"")} · ${esc(String(o.paper||"").replace("base","Base").replace("core","Core"))}</h4>
+  dlg(box+`<h4>🖥 ${s?name(s):esc(o.name||o.email||"?")} · ${esc(o.group||"")} · ${esc(String(o.paper||"").replace("starter","Starter").replace("base","Base").replace("core","Core"))}</h4>
     <p class="muted">Started ${lt(o.started)} · answers frozen ${lt(o.done)} · code made ${lt(o.sealed)}${o.exits?` · 🚪 ${o.exits} exit(s)`:""}${m?` · <b>${f1(m.mark)}/10</b>${m.partial?" *":""}`:""}</p>`
     +state+(rows?`<h4>Answers</h4><table>${rows}</table>`:""),true)}
 function wxDlg(u,ls){const d=wxDoc(u),K=wxKey(ls),s=S.P[u];if(!d)return;const m=K?wxMark(d,K,ls):null,as=K?wxAssess(d,K,ls):null;
@@ -3710,7 +3710,7 @@ const wxShow=()=>WXHOLD;
 function wxRec(d,K,ls,X,cur){const m=wxMark(d,K,ls),sections={};WXSEC.forEach(([k])=>sections[k]={score:m.sec[k].score,max:m.sec[k].max});
   if(m.w&&m.w.score==null&&!m.w.words)sections.writing={score:0,max:m.w.max};   // a blank writing is 0; a written one waits for its correction
   const rp=wxReport(d,K,ls,X);if(((cur.report||{}).writing||{}).rubric)delete rp.writing;   // a corrected writing (tools/web-exam/writing.mjs) stays
-  return {ls,sections,version:d.paper.startsWith("core")?"safe":"insecure",webPaper:d.paper,report:rp,showFrom:cur.showFrom||wxShow(d)}}
+  return {ls,sections,version:d.paper.startsWith("core")?"safe":d.paper.startsWith("starter")?"beginners":"insecure",webPaper:d.paper,report:rp,showFrom:cur.showFrom||wxShow(d)}}
 const wxSig=x=>{const sc=x.sections||{},q=((x.report||{}).questions)||[];return WXSEC.map(([k])=>sc[k]?sc[k].score+"/"+sc[k].max:"-").join(",")+"|"+q.map(y=>(y.ok?1:0)+String(y.mine||"")).join("¦")+"|"+(x.webPaper||"")};
 async function wxSync(ls,only){const c=wxCfg(ls),K=wxKey(ls);if(!c||!K||DEMO||WX.ls!==ls)return 0;const X=await wxData(c);if(!X||X.key!==c.key)return 0;let n=0;
   for(const [u,d] of Object.entries(WX.docs)){if(only&&!only.includes(u))continue;const s=S.P[u];if(!s||s.tester||wxPaper(u,ls))continue;
@@ -6494,7 +6494,9 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
   fpgFill(u,a);return !d.error}
 // what Roig gets about one student's final product (the site's paid Roig and the ✨ prompt for your own Roig app)
 function fpgAsk(u,a,R){const s=S.P[u],cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO",ls1=/my-real-routine/.test(a.ls);
-  return {course:cs,level:ls1&&cs==="2 ESO"?"A1":"A2+",route:level(u,a.ls),student:fullName(s),group:!!teamOf(u,a.id)||/proposal/.test(a.id),
+  // 🕶 never the student's name (Roger, 26 Nov 2026: "even if you correct student's work you never read their names"; REQUIREMENTS § 8)
+  const tm=teamOf(u,a.id);
+  return {course:cs,level:ls1&&cs==="2 ESO"?"A1":"A2+",route:level(u,a.ls),student:"",group:!!tm||/proposal/.test(a.id),
     task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d}))}}
 // ---- ✨ Correct in your own Roig app (Roger, 20 Nov 2026: "I dont want to use gemini anymore since it's going to be very expensive. What I
 // want is that when I press correct, it opens my gemini with the video attached and a prompt with the rubric"). Nothing paid is called from
@@ -6509,13 +6511,12 @@ const FPG_APPURL="https://gemini.google.com/app?authuser="+encodeURIComponent(FP
 FPG.app={};
 // the school script's fpPrompt (tools/notify/school-mail.gs), for a chat: the video is attached by Roger, the answer comes back as one JSON block
 function fpgAppPrompt(u,a){const R=fpgRubric(a);if(!R)return "";const ask=fpgAsk(u,a,R),v=fpgVideo(u,a),rows=ask.rows,marks=ask.marks;
-  const nm=String(ask.student||"").trim(),cm=nm.indexOf(","),who=cm>0?(nm.slice(cm+1).trim()+" "+nm.slice(0,cm).trim()).trim():nm;
   const L=[
     "You are helping Roger, an English teacher at a secondary school in Catalonia, mark a final product video by a student aged 12-16.",
     "Course: "+ask.course+". Every student is marked on the SAME rubric, at about "+ask.level+" level.",
     "The task: "+String(ask.task||"a short video presentation in English with slides").slice(0,1500),
-    ask.group?"It is a GROUP video. The student being marked is "+who+". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group."
-      :"The student is "+who+" (only so you know who it is: never write their name, see below).",
+    ask.group?"It is a GROUP video. Roger tells you below which person in the video is the student being marked (for example \"the second person who speaks\"), never by name. Judge the group rows on the whole video and the individual rows on that student's part; if he does not say or you cannot tell which person they are, say so in the reading note and judge the group."
+      :"One student made this video. You are not told who they are, and never write any name (see below).",
     v&&v.youtube?"The video is on YouTube: "+v.youtube+" . Watch and listen to the whole video.":"The video is attached to this message. Watch and listen to the whole video.",
     "If no video or recording is attached (or you cannot open it), do not invent anything: answer only \"Please attach the video.\"",
     "",
@@ -6543,6 +6544,7 @@ function fpgAppPrompt(u,a){const R=fpgRubric(a);if(!R)return "";const ask=fpgAsk
   const les=fpgLesLines(u,a).map(x=>String(x||"").replace(/\s+/g," ").trim().slice(0,700)).filter(Boolean).slice(0,6);
   if(les.length){let room=3500;L.push("","HOW ROGER CORRECTED YOUR RECENT DRAFTS (other students' videos). Learn his standard from them: where he moved a level or a mark up or down, mark the same kind of performance the same way; where he rewrote your comment, write like him. Do not copy anything from these examples into this answer: judge THIS video only.");
     les.forEach((x,i)=>{if(x.length<=room){L.push("Correction "+(i+1)+": "+x);room-=x.length}})}
+  if(ask.group)L.push("","THE STUDENT BEING MARKED (Roger writes which person, never a name): ");
   return L.join("\n")}
 // Roig's pasted answer → a draft, read as the school script's fpAsk reads the API's answer (a row's mark kept inside its level's band)
 const FPG_BAND=[[0,0],[1.5,3.5],[4,6],[6.5,8.5],[10,10]];

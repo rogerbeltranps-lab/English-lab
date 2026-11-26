@@ -46,7 +46,13 @@
   // ---------- helpers ----------
   function hash32(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-  const paperOf = lvl => (lvl === 'safe' || lvl === 'daring' || lvl === 'native' ? 'core' : 'base');
+  // Papers by level (REQUIREMENTS § 6.3): Core for Core, Plus and Pro, Base for Base (and no level), and Starter for Starter when the exam has
+  // a starter paper (Roger, 25 Nov 2026: "I'll do 3 exams next time, core, base and starter"; 26 Nov 2026: "If I ever create a new kind of
+  // test it must be included in the system like this"). An exam without starter-A… papers gives Starter the Base paper, as before.
+  const hasPaper = pl => Object.keys(X.papers || {}).some(k => k === pl || k.startsWith(pl + '-'));
+  const paperOf = lvl => (lvl === 'safe' || lvl === 'daring' || lvl === 'native' ? 'core' : lvl === 'beginners' && hasPaper('starter') ? 'starter' : 'base');
+  const levelOfPaper = p => String(p).startsWith('core') ? 'safe' : String(p).startsWith('starter') ? 'beginners' : 'insecure';
+  const paperName = p => String(p).replace('starter', 'Starter').replace('base', 'Base').replace('core', 'Core').replace('-', ' ');
   const P = () => X.papers[S.paper];
   const pick = (pl, v) => X.papers[pl + '-' + v] ? pl + '-' + v : pl + '-A';   // an exam with one version per level (a make-up) has only -A
   const items = s => P().sections[s] || [];
@@ -238,7 +244,7 @@
   }
   let tPaper = null;   // 🧪 the paper the tester chose
   function intro() {
-    if (tPaper) { S.level = tPaper.startsWith('core') ? 'safe' : 'insecure'; ca = false; }
+    if (tPaper) { S.level = levelOfPaper(tPaper); ca = false; }
     const pl = paperOf(S.level), n = SECS.reduce((a, s) => a + X.papers[pick(pl, 'A')].sections[s].length, 0);
     root.innerHTML = '<div class="wx-card"><h2>📝 ' + t('Examen', 'Exam') + ' · ' + (X.lsShort || 'LS2') + ' · ' + (pl === 'core' ? 'Core' : 'Base') + '</h2>' +
       '<p>' + t('Té 5 parts: <b>🎧 Listening</b> (' + (selfAu() ? 'amb auriculars' : 'tots junts') + ', al principi), <b>📖 Reading</b>, <b>📚 Vocabulari</b>, <b>🧩 Gramàtica</b> i <b>✍️ Writing</b> (un text curt). ', 'It has 5 parts: <b>🎧 Listening</b> (' + (selfAu() ? 'with headphones' : 'all together') + ', at the start), <b>📖 Reading</b>, <b>📚 Vocabulary</b>, <b>🧩 Grammar</b> and <b>✍️ Writing</b> (a short text). ') + t((n - 1) + ' preguntes i un text.', (n - 1) + ' questions and one text.') + '</p>' +
@@ -253,7 +259,7 @@
       '<label style="display:flex;gap:8px;align-items:center;font-weight:700;margin:12px 0"><input type="checkbox" id="wxRead"> ' + t('He llegit les instruccions', 'I have read the rules') + '</label>' +
       '<button class="wx-btn" id="wxStart" disabled>' + t('Comença l’examen', 'Start the exam') + '</button>' +
       (isTester() ? '<div class="wx-warn" style="background:#eef6ff;border-color:#bfdbfe">🧪 <b>Tester</b>: you can do it while it is closed for the groups. Paper: ' +
-        Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-tp="' + p + '" style="margin:3px;padding:6px 11px' + ((tPaper || pick(paperOf(S.level), hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A')) === p ? ';background:#174d3d;color:#fff' : '') + '">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') +
+        Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-tp="' + p + '" style="margin:3px;padding:6px 11px' + ((tPaper || pick(paperOf(S.level), hash32(String(me.uid) + X.key) % 2 ? 'B' : 'A')) === p ? ';background:#174d3d;color:#fff' : '') + '">' + paperName(p) + '</button>').join('') +
         '<br><small>Everything works as for a student (full screen, lock, password, saving, turn in, games). Your try shows as 🧪 in the dashboard’s Web exam box, in every group (it is never saved with the marks). 🧪 Tester: start again, at the end, deletes it.</small></div>' : '') + '</div>';
     root.querySelectorAll('[data-tp]').forEach(b => b.onclick = () => { tPaper = b.dataset.tp; intro(); });
     watchGo();   // ▶ Start and the end of exam mode, read live (the same live/{group} document el-cloud.js already listens to)
@@ -322,7 +328,7 @@
   function run() {
     unbind(); if (wrap) wrap.remove();
     wrap = D.createElement('div'); wrap.className = 'wx-run'; D.body.appendChild(wrap);
-    wrap.innerHTML = '<div class="wx-top"><b class="wx-t">📝 ' + t('Examen', 'Exam') + ' ' + (X.lsShort || 'LS2') + ' · ' + (S.paper.startsWith('core') ? 'Core' : 'Base') + '</b><div class="wx-tabs" id="wxTabs"></div><span class="wx-saved" id="wxSaved"></span></div><div class="wx-body" id="wxBody"></div>';
+    wrap.innerHTML = '<div class="wx-top"><b class="wx-t">📝 ' + t('Examen', 'Exam') + ' ' + (X.lsShort || 'LS2') + ' · ' + paperName(S.paper).split(' ')[0] + '</b><div class="wx-tabs" id="wxTabs"></div><span class="wx-saved" id="wxSaved"></span></div><div class="wx-body" id="wxBody"></div>';
     draw();
     // nothing from the page can be copied, and nothing from outside pasted; inside their own answer boxes students can copy, cut and paste
     // their OWN text (Roger, 17 Nov 2026, as on the rest of the site: el-nocopy.js lets a paste through only when it is text they copied
@@ -493,8 +499,8 @@
   // gets no email button: the answers stay on that computer (and the page keeps trying to turn them in).
   const who = () => { const u = me || {}; return { name: (PV && PV.name) || u.displayName || '', mail: (PV && PV.email) || u.email || '' }; };
   async function mailText() {
-    const w = who(), paperName = (S.paper.startsWith('core') ? 'Core' : 'Base') + ' ' + (S.paper.split('-')[1] || '');
-    const L = ['English Lab · ' + t('Examen', 'Exam') + ' ' + (X.lsShort || 'LS2') + ' · ' + paperName, (w.name || w.mail) + (w.name && w.mail ? ' · ' + w.mail : '') + ' · ' + (S.group || ''), ''];
+    const w = who(), pName = paperName(S.paper).split(' ')[0] + ' ' + (S.paper.split('-')[1] || '');
+    const L = ['English Lab · ' + t('Examen', 'Exam') + ' ' + (X.lsShort || 'LS2') + ' · ' + pName, (w.name || w.mail) + (w.name && w.mail ? ' · ' + w.mail : '') + ' · ' + (S.group || ''), ''];
     let code = null;
     if (window.ELExamSeal && ELExamSeal.ok) try {
       code = await ELExamSeal.seal({ v: 1, ls: X.ls, key: X.key, uid: me ? me.uid : null, email: w.mail, name: w.name, group: S.group || null, paper: S.paper, level: S.level,
@@ -649,14 +655,14 @@
     ca = false;
     root.innerHTML = '<div class="wx-card"><h2>📝 Exam preview (teacher)</h2>' + (note ? '<p class="wx-done">' + esc(note) + '</p>' : '') +
       '<p>Students see only their own paper: <b>Base</b> for Starter and Base, <b>Core</b> for Core and Plus, version A, B or C from their account, with the questions in order (as in the audio and the texts) and the options shuffled. Here you can try any paper; nothing is saved. Open and close the exam for each group, and see the answers, on the dashboard (📝 Exams).</p>' +
-      '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + p.replace('base', 'Base').replace('core', 'Core').replace('-', ' ') + '</button>').join('') + '</p>' +
+      '<p>' + Object.keys(X.papers).map(p => '<button class="wx-btn sec" data-p="' + p + '" style="margin:4px">' + paperName(p) + '</button>').join('') + '</p>' +
       '<p><button class="wx-btn sec" id="wxTryLock">🧪 Try the lock screen (your password)</button>' + (X.games ? ' <button class="wx-btn sec" id="wxTryGames">🎮 Try the games (after turning in)</button>' : '') + '</p></div><div id="wxGames"></div>';
     const tg = $('#wxTryGames'); if (tg) tg.onclick = () => { tg.disabled = true; games(); $('#wxGames').scrollIntoView({ behavior: 'smooth' }); };
     const cg = !PV && cmGroup(); if (cg && !$('#wxCm')) { const box = D.createElement('div'); box.className = 'wx-card'; box.id = 'wxCm'; box.style.borderColor = '#4338ca'; box.innerHTML = '<p>Loading exam mode…</p>'; root.prepend(box); classPanel(cg, box).catch(e => { box.innerHTML = '<p class="wx-warn">✗ ' + esc(e.message || e) + '</p>'; }); }
     root.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const paper = b.dataset.p;
       const order = {}; SECS.forEach(s => order[s] = X.papers[paper].sections[s].map(x => x.id));   // in the paper's order: the audio's and the text's (Roger, 17 Nov 2026)
       const opts = {}; SECS.forEach(s => X.papers[paper].sections[s].forEach(it => { if (it.t === 'mc') opts[it.id] = shuffle(it.o.map((_, i) => i)); }));
-      S = { paper, level: paper.startsWith('core') ? 'safe' : 'insecure', order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [] };
+      S = { paper, level: levelOfPaper(paper), order, opts, answers: {}, started: now(), status: 'in', sec: 'listening', exits: [], glances: [], changes: [], snaps: [] };
       ca = false; run(); });
     $('#wxTryLock').onclick = () => { S = S || { exits: [], answers: {} }; S.exits = [{ at: now(), why: 'fullscreen' }]; S.status = 'out'; ca = false;
       locked(); const L = $('.wx-lock .box'); const x = D.createElement('p'); x.innerHTML = '<button class="wx-btn sec" id="wxLockOut">Close this test</button>'; L.appendChild(x);
