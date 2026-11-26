@@ -395,6 +395,6 @@ window.TN_PREPS = [
       try { const old = localStorage.getItem('tnPrepDeck'); if (old && !localStorage.getItem('tnFlash')) localStorage.setItem('tnFlash', old); } catch (e) {}
       const load = () => { try { return JSON.parse(localStorage.getItem('tnFlash') || '{}'); } catch (e) { return {}; } };
       ELFlashDeck.mount(host, { decks: () => [{ id: 'tn-prepositions', name: '📍 My prepositions', cards: window.TN_PREP_CARDS }], only: 'tn-prepositions', ca: () => false, say: x => (window.TN_SAY ? TN_SAY(x) : window.ELVoice && ELVoice.say(x)),
-        load, save: x => { try { localStorage.setItem('tnFlash', JSON.stringify(x)); } catch (e) {} }, me: () => null }); } });
+        load, save: x => { try { localStorage.setItem('tnFlash', JSON.stringify(x)); } catch (e) {} if (window.elMascotRefresh) elMascotRefresh(); }, me: () => null }); } });
   window.LP = { key: 'tnMistakes', n: 5, title: 'My latest mistakes', panels };
 })();
