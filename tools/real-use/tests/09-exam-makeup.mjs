@@ -47,7 +47,7 @@ export default [
     // the make-up day: 👤 only Alex; his browser still has the old try saved, and it must not come back
     await t.seed({ ['ls/' + LS4]: Object.assign({}, l, { webExam: { '4ESOA': { open: true, only: [alex.email], reset: { 'u-alex': OLD } } } }) });
     const mine = Object.assign({}, oldTry, { status: 'in', updated: null, at: NOW });   // the old try as this browser last kept it, still running
-    const d = await t.device(alex, { now: NOW + 3600e3, local: { ['el_webexam_' + KEY + '_u-alex']: JSON.stringify(mine) } });
+    const d = await t.device(alex, { now: NOW + 3600e3, size: t.CHROMEBOOK_FULL, local: { ['el_webexam_' + KEY + '_u-alex']: JSON.stringify(mine) } });
     // the connection check: the free address service answers with an invented address (only a short code of it may be saved)
     await d.ctx.route(/api\.ipify\.org/, (r) => r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"ip":"203.0.113.7"}' }));
     const p = await d.open(EXAM);

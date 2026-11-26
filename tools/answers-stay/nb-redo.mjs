@@ -1,5 +1,5 @@
 // ✏️ Correct a wrong answer in the notebook look, one question at a time (Roger, 19 Nov 2026: "I want them to be able to redo the
-// questions one by one"). Offline check + pictures on a Chromebook screen (1366 × 768), with an invented student and nothing saved
+// questions one by one"). Offline check + pictures on a Chromebook screen (normal mode, 1366 × 640), with an invented student and nothing saved
 // anywhere: 2 ESO LP2 "What are they doing?" Listening, q7 wrong at the first try, then corrected in the notebook.
 // Usage: node tools/answers-stay/nb-redo.mjs [out dir]   (PNG pictures; exits 1 when a check fails)
 import fs from 'node:fs';
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = process.argv[2] || fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'nb-redo-'));
@@ -18,7 +19,7 @@ let fails = 0;
 const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++; };
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1.5, locale: LANG === 'ca' ? 'ca-ES' : 'en-GB', timezoneId: 'Europe/Madrid' });
+const ctx = await browser.newContext({ ...contextOptions(CHROMEBOOK, browser, { scale: 1.5 }), locale: LANG === 'ca' ? 'ca-ES' : 'en-GB', timezoneId: 'Europe/Madrid' });
 await ctx.addInitScript(([lv, ca]) => { try { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('el_who', JSON.stringify({ role: 'student', group: '2ESOA', ca, uid: 'demo' })); localStorage.setItem('ls2Doing2ESOLevel', lv); localStorage.setItem('el_phone_seen', '1'); localStorage.setItem('el_dict_seen_demo', '1'); } } catch (e) {} }, [LV, LANG === 'ca']);
 await ctx.route('**/*', async (route) => {
   const u = new URL(route.request().url());

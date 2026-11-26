@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = process.argv[2] || '/tmp/shadow-preview';
 fs.mkdirSync(OUT, { recursive: true });
@@ -38,8 +39,8 @@ async function lp(ctx, dir, f, level, name, full) {
   await card.screenshot({ path: path.join(OUT, name) });
   return page;
 }
-// Chromebook 1366x768
-let ctx = await ctxFor({ viewport: { width: 1366, height: 768 }, deviceScaleFactor: 2 });
+// Chromebook normal mode 1366 × 640 (tools/devices.mjs); a sharper picture
+let ctx = await ctxFor(contextOptions(CHROMEBOOK, browser, { scale: 2 }));
 let p = await ctx.newPage(); p.on('pageerror', e => errs.push('class: ' + e.message));
 await p.goto('http://el.local/English-lab/shared/shadow/index.html?ls=2eso/free-time-live'); await p.waitForTimeout(800);
 await p.screenshot({ path: path.join(OUT, '1-class-2eso-listen-and-repeat.png'), fullPage: true });

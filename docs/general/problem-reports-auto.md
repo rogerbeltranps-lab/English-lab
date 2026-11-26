@@ -54,7 +54,7 @@ hourly task "English Lab: problem reports" is switched off.
 3. Fix: a branch `claude/problem-<short id>` from `main`, the smallest change that fixes it, following `AGENTS.md`, plus a line in
    `AGENTS.md` if it sets a rule ("(problem report, <group>, <date>)"), plus **a real-use test that does what the student did and fails
    without the fix** (`tools/real-use/tests/`, REQUIREMENTS.md § 11; run `node tools/real-use/check.mjs <filter>`). Run the repo's checks that apply (`node tools/vocab-cards/check.mjs`,
-   `node --check` on changed JS, a Playwright look at the page at 1366×768 when it is visual). Open the PR (attribution block, assignee and
+   `node --check` on changed JS, a Playwright look at the page on the Chromebook screens of `tools/devices.mjs`, 1366 × 640 and 1366 × 768, when it is visual). Open the PR (attribution block, assignee and
    reviewer `rogerbeltranps-lab`), wait for its checks, **squash-merge it without asking** (Roger's standing approval for technical fixes
    from problem reports). Never put student names or emails in the PR, commits or code: say "problem report, 2ESOA, 8 Nov".
 4. Answer the student: `node tools/problems/auto.mjs fixed <id> --msg "…" --msg2 "…" --note "… PR #n" --apply`. The card already says "Fixed! Thank

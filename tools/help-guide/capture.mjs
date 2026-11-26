@@ -1,7 +1,7 @@
 // Pictures for the students' picture guide on Help (today.html#help; Roger, 7 Nov 2026: "instead of the videos (which are obsolete)
 // I need a guide with images so that students can check it if they want"). Real pages of this repo, offline, with invented students
 // (tools/site-video/board/demo.mjs: Alex Sample, 4 ESO Core, English; Pau Exemple, 2 ESO Base, Catalan): no Firebase, nothing saved.
-// Chromebook size (1366 × 768), the students' screen. Students never see locked things, and the class full screen is not shown.
+// the students' Chromebook in normal mode (1366 × 640, tools/devices.mjs). Students never see locked things, and the class full screen is not shown.
 // Usage: node tools/help-guide/capture.mjs en|ca [only,ids]   → shared/img/help/<id>-<lang>.webp (needs python3 + Pillow to make WebP)
 // Run it again when the student pages change a lot, then bump HELP_V in today.html so browsers fetch the new pictures.
 import fs from 'node:fs';
@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 import { demo } from '../site-video/board/demo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
+import { CHROMEBOOK, CHROMEBOOK_FULL, PHONE, contextOptions } from '../devices.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../..');
@@ -22,7 +23,7 @@ const OUT = path.join(ROOT, 'shared/img/help');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'help-guide-'));
 fs.mkdirSync(OUT, { recursive: true });
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.mp3': 'audio/mpeg' };
-const SCALE = 1.5, W = 1366, H = 768;
+const SCALE = 1.5;   // only a sharper picture: the page is laid out as on the Chromebook
 
 const EN = LANG === 'en';
 const { today, demo: D } = demo(LANG, 'mid');
@@ -84,7 +85,7 @@ const SHOTS = [
 const browser = await chromium.launch();
 for (const S of SHOTS) {
   if (ONLY ? !ONLY.includes(S.id) : S.preview) continue;
-  const ctx = await browser.newContext({ viewport: { width: S.w || W, height: S.h || H }, deviceScaleFactor: SCALE, locale: EN ? 'en-GB' : 'ca-ES', timezoneId: 'Europe/Madrid' });
+  const ctx = await browser.newContext({ ...contextOptions(S.w ? { width: S.w, height: S.h, phone: S.w < 500 } : CHROMEBOOK, browser, { scale: SCALE }), locale: EN ? 'en-GB' : 'ca-ES', timezoneId: 'Europe/Madrid' });
   await ctx.addInitScript(([who, pgs, lvKey, lv]) => {   // who was signed in on this browser (el-app.js draws the student's menu) and the answers
     try { localStorage.setItem('el_who', JSON.stringify(who)); for (const k in pgs) localStorage.setItem(k, pgs[k]); localStorage.setItem(lvKey, lv); localStorage.setItem('el_phone_seen', '1'); } catch (e) {}
   }, [WHO, { ...pg, ...(S.pg || {}) }, C.lpKey + 'Level', C.level]);
