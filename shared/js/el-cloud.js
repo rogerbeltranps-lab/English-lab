@@ -911,7 +911,9 @@ function mzSync(uid){if(uid)mzTn(uid);const k="el_flash_chk_"+uid;let t=0;try{t=
 // 30 minutes (its own el_tnflash_chk_<uid>); kept apart (el_tnflash_cloud), merged by ELMascot.data.
 function mzTn(uid){if(!isTeacher(user)||AS||tnLs())return;const k="el_tnflash_chk_"+uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
   if(Date.now()-t<30*60e3)return;try{origSet.call(localStorage,k,String(Date.now()))}catch(e){}
-  (window.EL_LS||[]).filter(l=>l.personal).forEach(l=>getDoc(doc(db,"students",uid,"progress",l.id)).then(s=>{
+  // the dashboard takes the personal LS out of EL_LS into TN_LS (teacher.html), so read both: with EL_LS only, the dashboard never read it
+  // and its ⚡ stayed at 0 (Roger, 27 Nov 2026: "count the streak there")
+  (window.EL_LS||[]).concat(window.TN_LS||[]).filter((l,i,a)=>l.personal&&a.findIndex(x=>x.id===l.id)===i).forEach(l=>getDoc(doc(db,"students",uid,"progress",l.id)).then(s=>{
     const v=s.exists()&&(s.data().data||{}).tnFlash;if(!v)return;try{origSet.call(localStorage,"el_tnflash_cloud",v)}catch(e){}draw(user)}).catch(e=>console.warn("tn flashcards read",e)))}
 function mzBar(ca){
   if(noCorner())return null;   // every page, the board too (Roger, 25 Nov 2026: "the mascot should be everywhere"); never in exams
@@ -923,8 +925,11 @@ function mzBar(ca){
     P=mzAs.P}
   else if(user)mzSync(user.uid);
   const M=window.ELMascot,x=M.data(AS?null:(user||{}).uid,P);if(!x)return null;
-  const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL("lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
-  const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):"🧠 Flashcards · ⚡ "+n+(n===1?" day in a row":" days in a row");
+  // the teacher's own mascot opens his Towards Nativeness 🧠 My flashcards, whose ⚡ it counts (Roger, 27 Nov 2026: "the teacher mascot on
+  // the teachers mode needs to go to towards nativeness flashcard and count the streak there"); a student (and the 👁 student view) 🧠 Flashcards
+  const tn=!AS&&isTeacher(user);
+  const a=document.createElement("a");a.className="elcb-i elcb-mz";a.href=new URL(tn?"4eso/towards-nativeness/flashcards.html":"lab/practice.html"+(AS?"?student="+encodeURIComponent(AS.uid):"")+"#deck",ROOT).href;
+  const n=x.st.n,tip=ca?"🧠 Targetes · ⚡ "+n+(n===1?" dia seguit":" dies seguits"):(tn?"🧠 My flashcards":"🧠 Flashcards")+" · ⚡ "+n+(n===1?" day in a row":" days in a row");
   a.dataset.tip=tip;a.dataset.ca=ca?"1":"";a.setAttribute("aria-label",tip);a.innerHTML=M.badge(n,"sm")+M.img(M.mood(x),50,"");
   return a}
 // the flashcards page calls it after saving, so the ⚡ number and the mood follow the cards just studied without a reload

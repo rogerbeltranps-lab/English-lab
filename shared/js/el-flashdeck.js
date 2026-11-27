@@ -131,6 +131,10 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const N = (k, c, e) => (o.names && o.names[k]) || t(c, e);
     const say = x => { try { (o.say || (y => root.ELVoice && root.ELVoice.say(y)))(x); } catch (e) {} };
     let P = o.load() || {}; P.decks = P.decks || {};
+    // o.days: another saved copy whose study days also count in the ⚡ streak shown here, never saved with this page's cards (Towards Nativeness ›
+    // 🧠 My flashcards counts the days Roger studied 🧠 Flashcards too, so its ⚡ is the same as his mascot's: Roger, 27 Nov 2026, "count the
+    // streak there")
+    const stP = () => { const x = o.days && o.days(); return x && x.decks ? merge(x, P) : P; };
     const D = id => (P.decks[id] = P.decks[id] || { c: {}, log: {} });
     // Saved only after studying (dirty), and merged with the copy saved last (another tab, or the account's copy the page merged in), so a tab
     // left open on an old copy never wipes cards studied elsewhere when it is hidden or closed (problem seen 25 Nov 2026: students studied
@@ -178,7 +182,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const leftToday = () => { const now = Date.now(); return decks().reduce((a, d) => { const n = counts(d, now); return a + n.newToday + n.lrn + n.due; }, 0); };
     function mzHead() {
       const M = MZ(); if (!M) return '';
-      const st = streak(P, Date.now()), left = leftToday(), m = M.mood({ st, left }), n = st.n;
+      const st = streak(stP(), Date.now()), left = leftToday(), m = M.mood({ st, left }), n = st.n;
       const line = st.today && !left ? t('Tot fet per avui. Fins demà! 😴', 'All done for today. See you tomorrow! 😴')
         : st.today ? (n > 1 ? t(`<b>${n} dies seguits!</b> Continua així ⚡`, `<b>${n} days in a row!</b> Keep going ⚡`) : t('Bon començament! Torna demà i seran 2 ⚡', 'Good start! Come back tomorrow to make it 2 ⚡'))
         : n ? t(`Estudia avui i mantens la ratxa de <b>${n} ${n === 1 ? 'dia' : 'dies'}</b>!`, `Study today to keep your <b>${n}-day</b> streak!`)
@@ -187,7 +191,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     }
     function mzDone() {   // the picture at the end of a session: 🎉 a milestone (once, shared with the board), 😴 nothing left today, or 🙂
       const M = MZ(); if (!M) return { h: '', mile: 0 };
-      const st = streak(P, Date.now()), mile = M.milestone(st), k = 'el_mz_party_' + (me() || ''), v = mile + '@' + dayKey(Date.now());
+      const st = streak(stP(), Date.now()), mile = M.milestone(st), k = 'el_mz_party_' + (me() || ''), v = mile + '@' + dayKey(Date.now());
       if (mile && me() !== null && M.seen.get(k) !== v) { M.seen.set(k, v); return { h: M.img('party', 150, '') + M.badge(st.n, 'xl'), mile }; }
       return { h: M.img(leftToday() ? (st.n >= 7 ? 'energised' : 'happy') : 'sleeping', 130, '') + M.badge(st.n), mile: 0 };
     }
@@ -296,7 +300,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       const sumDay = k => logs.reduce((a, L) => { const x = L[k]; if (x) x.forEach((v, i) => a[i] += v); return a; }, [0, 0, 0, 0, 0, 0]);
       const td = sumDay(dayKey(now)), s = strength(d, d.cards);
       let rv = 0, rok = 0; for (let i = 0; i < 30; i++) { const x = sumDay(dayKey(now - i * DAY)); rv += x[4]; rok += x[5]; }
-      const streak = streakOf(P, now).n;
+      const streak = streakOf(stP(), now).n;
       const end = dayStart(now) + DAY, fc = [0, 0, 0, 0, 0, 0, 0];
       d.cards.forEach(c => { const x = D(deckOfCard(d, c)).c[c.id]; if (!x) return; const i = x[1] < end ? 0 : Math.floor((x[1] - end) / DAY) + 1; if (i < 7) fc[i]++; });
       const mx = Math.max(1, ...fc), WD = ca() ? ['Avui', 'Demà'] : ['Today', 'Tmrw'], dn = i => i < 2 ? WD[i] : new Date(now + i * DAY).toLocaleDateString(ca() ? 'ca' : 'en-GB', { weekday: 'short' });

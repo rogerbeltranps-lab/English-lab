@@ -12,7 +12,8 @@
      {x: LS id, k: [exam section keys]}     that LS's exam sections (only once the results are out)
      {fp: activity id}                      a final product mark (LS1: results/{activity}.score / max)
      {g: "deck title"}                      the class games of that deck (its latest play)
-   A point's % is the average of its sources that have data; null when none has. */
+   A point's % is the average of its sources that have data; null when none has. Only the steps taught to the group count (ctx.taught).
+   A term with no text here gets its points from the class games the group played (elTrepWorked, below). */
 (function () {
   const T1 = {
     "2eso": {
@@ -107,18 +108,22 @@
   };
   // fpLater: this LS's final product counts in the next term, so the report leaves it out (Roger, 25 Nov 2026: "the final product of the
   // LS2 shouldn't be included in the report")
+  // deadline: the last day activities still count for the term's report (its "Draft" line: Fri 27 Nov 2026 for term 1)
   window.EL_TREP = { t1: T1 };
+  window.EL_TREP_DEADLINE = { t1: "2026-11-27" };
 
   // A point's % for one student. ctx = {pg: {lsId: {storeKey: state (string or object)}}, rs: {activity: result}, games: [{title, r, of}],
   // held: lsId => true while that exam's results are held}. Returns {pct, n} (n = sources with data) or {pct: null, n: 0}.
   const st = (ctx, key) => { for (const l of Object.values(ctx.pg || {})) { const v = l && l[key]; if (v) { try { return typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return null; } } } return null; };
   function one(s, ctx) {
+    // only the steps taught to the group: a step still 🔒 locked for the group is left out, never 0 (problem report, 2ESOB, 27 Nov 2026;
+    // Roger, 27 Nov 2026). ctx.taught(key, step) → bool (elTrepTaught), or ctx.due(key) = Set of the step ids taught
+    const k = s.p || s.d, due = !ctx.taught && ctx.due && k ? ctx.due(k) : null;
+    const ps = (s.ps || []).filter(id => ctx.taught ? ctx.taught(k, id) : due ? due.has(id) : true);
+    if ((s.p || s.d) && !ps.length) return null;
     if (s.p) { const S = st(ctx, s.p); if (!S) return null; const L = S.last || {}, T = S.tries || {}; let a = 0, b = 0;
-      s.ps.forEach(id => { const y = L[id] || T[id]; if (y && y.max) { a += +y.score || 0; b += +y.max; } }); return b ? a / b * 100 : null; }
-    // a "done" point counts only the steps taught for the student's group (ctx.due(key) = Set of step ids done in class or set as homework
-    // by the end of term); a step still 🔒 locked for the group is left out, never 0 (problem report, 2ESOB, 27 Nov 2026)
-    if (s.d) { const S = st(ctx, s.d); if (!S) return null; const dn = S.done || {}, due = ctx.due ? ctx.due(s.d) : null;
-      const ps = due ? s.ps.filter(id => due.has(id)) : s.ps; return ps.length ? ps.filter(id => dn[id]).length / ps.length * 100 : null; }
+      ps.forEach(id => { const y = L[id] || T[id]; if (y && y.max) { a += +y.score || 0; b += +y.max; } }); return b ? a / b * 100 : null; }
+    if (s.d) { const S = st(ctx, s.d); if (!S) return null; const dn = S.done || {}; return ps.filter(id => dn[id]).length / ps.length * 100; }
     if (s.x) { if (ctx.held && ctx.held(s.x)) return null; const sc = ((ctx.rs || {})[s.x + "/assessment"] || {}).sections || {}; let a = 0, b = 0;
       s.k.forEach(k => { const y = sc[k]; if (y && y.score != null && y.max) { a += +y.score; b += +y.max; } }); return b ? a / b * 100 : null; }
     if (s.fp) { const f = (ctx.rs || {})[s.fp] || {}; return f.max && f.score != null ? f.score / f.max * 100 : null; }
@@ -127,4 +132,157 @@
     return null; }
   window.elTrepPct = function (pt, ctx) { const v = (pt.src || []).map(s => one(s, ctx)).filter(x => x != null);
     return v.length ? { pct: Math.round(v.reduce((n, x) => n + x, 0) / v.length), n: v.length } : { pct: null, n: 0 }; };
+})();
+
+/* 📄 Reports that build themselves (Roger, 26 Nov 2026: "I want the report's to get done alone according to the activities done and
+   criteria"; 27 Nov 2026: "reports must be done as we do activities, meaning they pull the information automatically on their own").
+   docs/REQUIREMENTS.md § 3 "Term report". Everything the report says about a student is worked out here from their own data each time the
+   page opens (today.html#report) or the drafts run (tools/term-report/draft.mjs), with the same code in both places:
+     elTrepTaught(gid, infoOf, upTo)  → (store key, step) => was that step taught to the group (on the Time plan agenda up to upTo, ticked as
+                                         done in class or set as homework: elDueBefore, the same test as ✅ To do and the marking). A step
+                                         that was never unlocked never counts, in a point's % or in the daily work.
+     elTrepWorked(term, course, games) → the term's "What we worked on": Roger's own text (EL_TREP) when he wrote one, otherwise one point per
+                                         grammar and vocabulary class game the group played that term (its % = the student's latest play).
+     elTrepBuild(C, ctx)               → {pts: [{pct, line}], strong, work, time, comment}: what termReports/{email} holds, now live.
+   ctx = {course, group, lang ("ca" | "en"), pg, rs, games, taught, infoOf (ls id → ls doc), term: {from, to, deadline}, lp (store key → the
+   learning path's data, or null: the page does not load it), prev (the saved draft: a point keeps its written line while its % is the same)}. */
+(function () {
+  // a date as YYYY-MM-DD: an ISO text, a time in ms or a Firestore time ({seconds}); "" when it is none of them
+  const day = s => { if (!s) return ""; if (typeof s === "object" && s.seconds != null) s = s.seconds * 1000; if (typeof s === "number" || /^\d{9,}$/.test(s)) { const d = new Date(+s); return isNaN(d) ? "" : d.toISOString().slice(0, 10); }
+    const t = String(s).slice(0, 10); return /^\d{4}-\d\d-\d\d$/.test(t) ? t : ""; }, addD = (d, n) => { const x = new Date(d + "T12:00:00Z"); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+  const monday = d => { const x = new Date(d + "T12:00:00Z"), k = (x.getUTCDay() + 6) % 7; x.setUTCDate(x.getUTCDate() - k); return x.toISOString().slice(0, 10); };
+  const strip = h => String(h == null ? "" : h).replace(/<[^>]+>/g, "");
+  const esc = x => String(x == null ? "" : x).replace(/[<>]/g, "");   // students' own text in the lines: no tags (the page escapes everything but <i>)
+  const norm = s => String(s == null ? "" : s).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[.!?¡¿,;:"“”]+/g, " ").replace(/\s+/g, " ").trim();
+  const lc = s => /^(La |Halloween|Diwali|Free |My |Seasons)/.test(s) ? s : s[0].toLowerCase() + s.slice(1);
+  const short = p => strip(p).split(/[:(]/)[0].trim().replace(/\.$/, "");
+  const parse = v => { if (!v) return null; try { return typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return null; } };
+  const st = (ctx, key) => { for (const l of Object.values(ctx.pg || {})) { const v = parse(l && l[key]); if (v) return v; } return null; };
+  const actOfKey = key => (window.EL_CATALOG || []).find(a => (a.keys || []).includes(key)) || null;
+
+  window.elTrepTaught = function (gid, infoOf, upTo) {
+    const DB = {};
+    return function (key, step) {
+      const a = actOfKey(key); if (!a || a.optional || !window.elDueBefore || !window.elTabsOf) return true;
+      if (!(a.ls in DB)) DB[a.ls] = gid ? elDueBefore(infoOf(a.ls) || {}, gid, upTo) : null;
+      const db = DB[a.ls]; if (!db || db.acts.has(a.id)) return true;
+      const all = elTabsOf(a); if (!all || !all.some(x => x.includes(step))) return true;   // a step outside the tabs: not held back
+      const ps = db.tabs[a.id]; if (!ps || !ps.size) return false;
+      const g = elTabsOf(a, new Set([...ps].map(x => elTabOf(a.id, x)))); return !!g && g.some(x => x.includes(step)); }; };
+
+  // the class day of every tab: {"activity#tab": YYYY-MM-DD}, the earliest of the agenda, the tick "done in class" and the homework's day
+  window.elTrepClassDays = function (info, gid, upTo) {
+    const o = {}, put = (k, d) => { if (!d || d === true || (upTo && d > upTo)) return; k = String(k); const i = k.indexOf("#"); if (i < 0 || /^note:|#game:/.test(k)) return;
+      const id = k.slice(0, i), p = window.elTabOf ? elTabOf(id, k.slice(i + 1)) : k.slice(i + 1); if (!p) return; const kk = id + "#" + p; if (!o[kk] || d < o[kk]) o[kk] = d; };
+    const ag = window.elAgendaOf ? elAgendaOf(info, gid) : null;
+    Object.entries((ag && ag.days) || {}).forEach(([d, its]) => (its || []).forEach(it => put(it, d)));
+    Object.entries(((info && info.done) || {})[gid] || {}).forEach(([k, d]) => put(k, d));
+    Object.values(((info && info.homework) || {})[gid] || {}).forEach(h => { if (!h || !h.tabs || typeof h.tabs !== "object" || !h.set) return;
+      Object.entries(h.tabs).forEach(([id, ps]) => (ps || []).forEach(p => put(id + "#" + p, h.set))); });
+    return o; };
+
+  // "What we worked on": Roger's own text, or the grammar and vocabulary class games of the term (one point each)
+  window.elTrepWorked = function (term, course, games) {
+    const C = ((window.EL_TREP || {})[term] || {})[course]; if (C) return C;
+    const [from, to] = window.elTermSpan ? elTermSpan(term) : ["", "9999-12-31"];
+    const lss = (window.EL_LS || []).filter(l => l.course === course), by = {};
+    (games || []).forEach(g => { if (!g || !g.title || !g.ls || !g.of || (g.day && (day(g.day) <= from || day(g.day) > to))) return;
+      const l = lss.find(x => x.id === g.ls); if (!l) return; (by[l.id] = by[l.id] || new Set()).add(g.title); });
+    const out = lss.filter(l => by[l.id]).map(l => ({ ls: l.id, name: String(l.title).replace(/^\S+ · /, ""), pts: [...by[l.id]].sort().map(tt => {
+      const n = tt.replace(/^(Grammar|Vocabulary) · /, ""), gr = /^Grammar/.test(tt);
+      return { ca: (gr ? "Gramàtica: " : "Vocabulari: ") + n, en: (gr ? "Grammar: " : "Vocabulary: ") + n, src: [{ g: tt }] }; }) }));
+    return out.length ? { auto: true, lss: out, how: { ca: ["Hem fet les activitats a través de la web English Lab i hem repassat amb jocs de vocabulari i de gramàtica.",
+      "Per avaluar comptem les activitats corregides que hem fet a classe o que eren deures, i els exàmens."],
+      en: ["We did the activities on the English Lab website and reviewed with vocabulary and grammar games.",
+        "Your mark comes from the corrected activities we did in class or set as homework, and the exams."] } } : null; };
+
+  // a writing mistake only illustrates the rubric row of its point (Roger, 25 Nov 2026: "did we really do this?")
+  const WKIND = t => { t = String(t || ""); return /spell|ortogra/i.test(t) ? "spell" : /task|reused|content|tasca/i.test(t) ? "task" : /punctu|capital|linker|connect|cohes|organi|paragraph|majúsc|puntua/i.test(t) ? "org"
+    : /vocab|expression|colloc|phrasal|word|time|lèxic|expressi/i.test(t) ? "vocab" : "grammar"; };
+  const WKEY = { wtask: "task", wgrammar: "grammar", wvocab: "vocab", worg: "org" };
+  const latestGame = (ctx, title) => (ctx.games || []).filter(g => g && g.title === title).sort((a, b) => String(b.day || "").localeCompare(String(a.day || "")))[0] || null;
+  // a typed question still answered wrongly now (the latest answer, never the first try); needs the path's data (draft.mjs)
+  function wrongNow(ctx, key, panels) { const s = st(ctx, key), L = ctx.lp && ctx.lp(key); if (!s || !L) return []; const out = [];
+    panels.forEach(pid => { if (ctx.taught && !ctx.taught(key, pid)) return; const a = (s.ans || {})[pid], P = (L.panels || []).find(p => p.id === pid); if (!a || !P || !Array.isArray(a.q) || !Array.isArray(a.v)) return;
+      a.q.forEach((q, i) => { const it = (P.items || []).find(x => norm(strip(x.q)) === norm(strip(q))); if (!it || !Array.isArray(it.a)) return; const v = a.v[i];
+        if (v == null || v === "" || typeof v !== "string") return; if (it.a.some(x => norm(x) === norm(v))) return;
+        out.push({ q: strip(q), mine: v, fix: it.a[0], ca: it.ca || it.he || it.en, en: it.he || it.en || it.ca }); }); }); return out; }
+  function evidence(ctx, pt) { const ev = [];
+    for (const s of pt.src) {
+      if (s.g) { const g = latestGame(ctx, s.g); ((g && g.miss) || []).forEach(m => m && m.q && m.ok && ev.push({ k: "game", q: strip(m.q), mine: m.a, fix: m.ok })); }
+      if (s.p) ev.push(...wrongNow(ctx, s.p, s.ps).map(x => Object.assign({ k: "lp" }, x)));
+      if (s.x) { const r = ((ctx.rs || {})[s.x + "/assessment"] || {}).report || {};
+        const parts = { listening: "Listening", reading: "Reading", vocabulary: "Vocabulary", grammar: "Grammar", vchoose: "Vocabulary", vcomplete: "Vocabulary", gchoose: "Grammar", gcomplete: "Grammar" };
+        const want = new Set(s.k.map(k => parts[k]).filter(Boolean));
+        (r.questions || []).filter(q => q && !q.ok && want.has(q.part) && q.right).forEach(q => ev.push({ k: "exam", q: strip(q.text || ""), mine: strip(q.mine || ""), fix: strip(q.right).replace(/\.$/, ""), why: q.why }));
+        const wk = s.k.includes("writing") ? null : new Set(s.k.map(k => WKEY[k]).filter(Boolean));
+        if (wk === null || wk.size) ((r.writing || {}).errors || []).filter(e => e && WKIND(e.type) !== "spell" && (wk === null || wk.has(WKIND(e.type)))).forEach(e => ev.push({ k: "write", mine: e.orig, fix: e.fix, why: e.why })); }
+      if (s.fp) { const fb = String(((ctx.rs || {})[s.fp] || {}).feedback || ""); const ok = fb.split("\n").find(l => /^✔/.test(l.trim())), go = fb.split("\n").find(l => /^➜/.test(l.trim()));
+        if (ok) ev.push({ k: "fpok", t: ok.trim().replace(/^✔\s*/, "") }); if (go) ev.push({ k: "fpgo", t: go.trim().replace(/^➜\s*/, "") }); } }
+    return ev; }
+  const BAND = { ca: [[90, "Excel·lent."], [80, "Molt bé."], [60, "Bé."], [50, "Hi vas arribant."], [0, "Aquí has de treballar més."]], en: [[90, "Excellent."], [80, "Very good."], [60, "Good."], [50, "Getting there."], [0, "This needs more work."]] };
+  function lineOf(pct, ev, L, pt) { if (pct == null) return L === "ca" ? "Encara no has fet prou activitats d'aquest punt per saber com et va." : "You haven't done enough activities on this point yet for us to know how it's going.";
+    const b = BAND[L].find(([m]) => pct >= m)[1], e = ev.find(x => x.k !== "fpok" && x.k !== "fpgo" && strip(x.fix).trim()), ok = ev.find(x => x.k === "fpok"), go = ev.find(x => x.k === "fpgo");
+    const fpw = (pt.src.find(s => s.fp) || {}).part;   // a final product split in two points: the first says what went well, the second what to improve
+    if (ok || go) return [b, fpw !== "go" && ok ? esc(ok.t) : "", fpw !== "ok" && pct < 90 && go ? (L === "ca" ? "Per millorar: " : "To improve: ") + esc(go.t) : ""].filter(Boolean).join(" ");
+    if (pct >= 90) return b;
+    if (!e) return b + " " + (pct >= 60 ? (L === "ca" ? "Continua així." : "Keep it up.") : pt.src.some(s => s.d) ? (L === "ca" ? "Fes les gravacions i el shadowing que et falten: és la millor manera de guanyar fluïdesa." : "Do the recordings and shadowing you still have to do: it is the best way to become fluent.") : (L === "ca" ? "Torna a fer aquestes activitats i fixa't en l'explicació de cada error." : "Do these activities again and read the explanation of each mistake."));
+    const fx = `<i>${esc(String(e.fix).replace(/\.$/, ""))}</i>`, mn = e.mine ? `<i>${esc(e.mine)}</i>` : "", rule = strip(L === "ca" ? (e.ca || e.why || "") : (e.en || e.why || "")), eq = esc(e.q);
+    if (e.k === "write") return `${b} ${L === "ca" ? "Al teu writing" : "In your writing"}: ${mn} → ${fx}.${rule ? " " + rule : ""}`;
+    if (e.k === "exam") return `${b} ${L === "ca" ? "A l'examen" : "In the exam"}, “${eq}”: ${L === "ca" ? "la resposta era" : "the answer was"} ${fx}.`;
+    return `${b} ${L === "ca" ? "Vigila" : "Watch out"}: “${eq}” → ${fx}.${rule ? " " + rule : ""}`; }
+
+  // when the work was done: every tab taught in the term (its class day), done in the week of its class, later, or at the last minute
+  function timing(C, ctx) {
+    const T = ctx.term || {}, to = T.to || "9999-12-31", from = T.from || "", G = window.EL_GRADING || {}, W = window.ELWeek;
+    const lss = C.lss.map(x => x.ls).filter(id => G[id] && !G[id].only);   // LS1 (exam and final product only): its paths were practice
+    let due = 0, dn = 0, inWeek = 0, lastMin = 0, lateN = 0, exam = null, start = null; const wk = {};
+    lss.forEach(ls => { const p = (window.EL_PLAN || {})[ls], gi = p && W ? W.col(p, ctx.group) : -1;
+      if (p && gi >= 0 && p.exam && p.exam[gi]) exam = p.exam[gi];
+      const sp = p && W && W.span(p); if (sp && (!start || sp[0] < start)) start = sp[0];
+      const info = ctx.infoOf ? ctx.infoOf(ls) : null; let days = elTrepClassDays(info, ctx.group, to);
+      // a group with no Time plan agenda and no ticks: each path's tabs on its due day of the plan (EL_PLAN due), as ✅ To do does then
+      if (!Object.keys(days).length && p && gi >= 0 && W) (window.EL_CATALOG || []).filter(a => a.ls === ls).forEach(a => { const d = W.due(p, a.id, gi); if (!d || d > to) return;
+        ((window.EL_SECTIONS || {})[a.id] || []).forEach(([tab]) => { days[a.id + "#" + tab] = d; }); });
+      (window.EL_CATALOG || []).filter(a => a.ls === ls && !a.manual && !a.optional).forEach(a => {
+        const S = (a.keys || []).map(k => st(ctx, k)).filter(Boolean), D = Object.assign({}, ...S.map(s => s.done || {})), A = Object.assign({}, ...S.map(s => s.doneAt || {}));
+        Object.entries(D).forEach(([pid, v]) => { const at = v && day(A[pid]); if (at) wk[monday(at)] = (wk[monday(at)] || 0) + 1; });   // the weekly bars: every step finished
+        Object.entries(days).forEach(([k, d]) => { if (!k.startsWith(a.id + "#") || d <= from) return; const tab = k.slice(a.id.length + 1);
+          const steps = window.elSecSteps ? elSecSteps(a, tab) : [tab]; if (!steps.length) return; due++;
+          if (!steps.every(s => D[s])) return; dn++; const at = day(steps.map(s => A[s]).filter(Boolean).sort().pop()); if (!at) return;
+          if (at <= addD(d, 7)) inWeek++; else { lateN++; if (at >= addD(to, -6) || (exam && at >= addD(exam, -3) && at <= exam)) lastMin++; } }); }); });
+    const weeks = []; if (start) for (let w = monday(start); w <= monday(exam && exam > to ? exam : to); w = addD(w, 7)) { weeks.push([w, wk[w] || 0]); if (weeks.length > 30) break; }
+    const p = due ? Math.round(inWeek / due * 100) : 0, lm = dn ? Math.round(lastMin / dn * 100) : 0, prof = !due ? null : !dn ? "none" : p >= 70 ? "steady" : lm >= 40 ? "last" : "behind";
+    return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam }; }
+
+  // the comment, in Roger's voice (never a name)
+  function comment(L, pts, tm, ctx, C) { const ca = L === "ca", today = (window.ELWeek && ELWeek.today()) || new Date().toISOString().slice(0, 10), open = !ctx.term || !ctx.term.deadline || today <= ctx.term.deadline;
+    const ex = id => { const sc = ((ctx.rs || {})[id + "/assessment"] || {}).sections || {}; let a = 0, b = 0; Object.values(sc).forEach(y => { if (y && y.score != null && y.max) { a += +y.score; b += +y.max; } }); return b ? Math.round(a / b * 100) / 10 : null; };
+    const xs = C.lss.map(x => ex(x.ls)), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs[xs.length - 1], f = n => ca ? String(n).replace(".", ",") : String(n), out = [];
+    const n1 = C.lss.length > 1 ? C.lss[C.lss.length - 2] : null, N1 = n1 && window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === n1.ls) || {}) || "LS1" : "LS1", N2 = (window.elLsNum && elLsNum((window.EL_LS || []).find(l => l.id === (C.lss[C.lss.length - 1] || {}).ls) || {})) || "LS2";
+    if (e1 != null && e2 != null) out.push(e2 > e1 + 0.4 ? (ca ? `Has millorat des de l'examen de la ${N1}: de ${f(e1)} a ${f(e2)}. Això vol dir que, quan treballes, aprens.` : `You have improved since the ${N1} exam: from ${f(e1)} to ${f(e2)}. That shows that when you work, you learn.`)
+      : e2 < e1 - 0.4 ? (ca ? `A l'examen de la ${N2} has baixat respecte a la ${N1} (de ${f(e1)} a ${f(e2)}): mirem junts què ha passat.` : `Your ${N2} exam went down compared with ${N1} (from ${f(e1)} to ${f(e2)}), so let's look at what happened.`)
+      : (ca ? `Els teus dos exàmens han anat semblant (${f(e1)} i ${f(e2)}).` : `Your two exams were similar (${f(e1)} and ${f(e2)}).`));
+    const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse();
+    if (best.length) out.push(ca ? `El que domines més: ${best.map(p => lc(short(p.t))).join(" i ")}.` : `What you know best: ${best.map(p => lc(short(p.t))).join(" and ")}.`);
+    if (worst.length) { const w = worst[0]; out.push(ca ? `On has de posar més atenció és en ${lc(short(w.t))} (${w.pct} %). ${w.line.replace(/^[^.]*\.\s*/, "")}` : `Where you need to focus most is ${lc(short(w.t))} (${w.pct}%). ${w.line.replace(/^[^.]*\.\s*/, "")}`); }
+    const left = tm.due - tm.done, todo = open && left > 0;
+    const T = { steady: ca ? `Has treballat de manera constant, setmana a setmana: continua així.` : `You worked steadily, week by week: keep it up.`,
+      behind: (ca ? `De les activitats que vam fer a classe, n'has fet ${tm.done} de ${tm.due}` : `Of the activities we did in class, you did ${tm.done} of ${tm.due}`)
+        + (tm.late >= 3 ? (ca ? `, i ${tm.late} les vas fer més tard de la setmana que tocava.` : `, and ${tm.late} of them later than the week we did them.`) : ".")
+        + (todo ? (ca ? ` ${left === 1 ? "Et falta 1: fes-la" : `Et falten ${left}: fes-les`} abans de divendres.` : ` ${left === 1 ? "1 is" : left + " are"} still to do: finish ${left === 1 ? "it" : "them"} before Friday.`) : ""),
+      last: ca ? `Vas deixar moltes activitats per al final (${tm.lastMin} % l'última setmana o just abans de l'examen), i així no tens temps de practicar abans dels exàmens.` : `You left many activities until the end (${tm.lastMin}% in the last week or just before the exam), so there was no time to practise before the exams.`,
+      none: ca ? `Encara no has fet les activitats dels learning paths: són la base de la nota.` : `You haven't done the learning path activities yet: they are the basis of your mark.` }[tm.profile]; if (T) out.push(T);
+    if (todo && tm.profile !== "behind" && tm.profile !== "none") out.push(ca ? (left === 1 ? `Et falta 1 activitat: fes-la abans de divendres.` : `Et falten ${left} activitats: fes-les abans de divendres.`) : (left === 1 ? `You still have 1 activity to do: finish it before Friday.` : `You still have ${left} activities to do: finish them before Friday.`));
+    const w = worst[0]; out.push(ca ? `Al proper trimestre, fes cada activitat la setmana que la fem a classe${w ? ` i practica ${lc(short(w.t))} a 🎯 Practica` : ""}.` : `Next term, do each activity in the week we do it in class${w ? ` and practise ${lc(short(w.t))} in 🎯 Practise` : ""}.`);
+    return out.join(" "); }
+
+  window.elTrepBuild = function (C, ctx) { const L = ctx.lang === "ca" ? "ca" : "en", prev = (ctx.prev && ctx.prev.pts) || [], pts = [];
+    C.lss.forEach((l, li) => l.pts.forEach(pt => { const i = pts.length, { pct } = elTrepPct(pt, ctx), was = prev[i];
+      // a line written by the drafts (they read the learning paths' answers, the page does not) stays while its % is the same
+      const line = was && was.line && was.pct === pct && !ctx.lp ? was.line : lineOf(pct, evidence(ctx, pt), L, pt);
+      pts.push({ i, ls: li, t: pt[L] || pt.en, pct, line }); }));
+    const tm = timing(C, ctx), has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct);
+    return { lang: L, live: true, pts: pts.map(p => ({ pct: p.pct, line: p.line })), strong: has.filter(p => p.pct >= 70).slice(0, 3).map(p => p.i), work: has.filter(p => p.pct < 70).slice(-2).map(p => p.i),
+      time: { due: tm.due, done: tm.done, inWeek: tm.inWeek, lastMin: tm.lastMin, profile: tm.profile, weeks: tm.weeks, exam: tm.exam }, comment: comment(L, pts, tm, ctx, C) }; };
 })();

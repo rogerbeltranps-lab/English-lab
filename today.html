@@ -339,8 +339,8 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-fp-rubrics.js?v=20261127b"></script>
 <script src="shared/js/el-plan.js"></script>
-<script src="shared/js/el-flashdeck.js?v=20261127n"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
-<script src="shared/js/el-term-report.js?v=20261125"></script>
+<script src="shared/js/el-flashdeck.js?v=20261127u"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
+<script src="shared/js/el-term-report.js?v=20261127"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
@@ -1916,12 +1916,20 @@ function repWeeks(T){const w=(T&&T.weeks)||[];if(!w.length)return "";const n=w.l
     +`<text x="${x+ww/2}" y="${H-10}" text-anchor="middle">${d===ex?"▲ ":""}${new Date(d+"T12:00:00").toLocaleDateString(EN?"en-GB":"ca",{day:"numeric",month:"short"})}</text>`});
   return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
 const repName=()=>{const n=String(D.me.name||"").trim();return n.includes(",")?n.split(",")[1].trim()+" "+n.split(",")[0].trim():n};
+function repLive(C,course){if(!window.elTrepBuild||!D.me.group)return null;
+  try{const [from,to]=elTermSpan("t1"),upTo=to<ELWeek.today()?ELWeek.add(to,1):undefined,inf=id=>D.ls[id]||{};
+    return elTrepBuild(C,{course,group:D.me.group,lang:EN?"en":"ca",pg:D.pg,rs:D.rs,games:Object.values(D.mg||{}).filter(g=>g&&g.title&&g.of),
+      taught:elTrepTaught(D.me.group,inf,upTo),infoOf:inf,term:{from,to,deadline:(window.EL_TREP_DEADLINE||{}).t1},prev:S.rep||null})}
+  catch(e){console.warn("live term report",e);return null}}
 function reportPlace(lss,ls){
   const course=all()?ls.course:((EL_GROUPS.find(x=>x.id===D.me.group)||{}).course||ls.course),C=((window.EL_TREP||{}).t1||{})[course];
   if(!C)return `<div class="box"><p class="muted">${t("Encara no hi ha cap informe.","There is no report yet.")}</p></div>`;
   if(S.rep===undefined){S.rep=null;repLoad()}
   if(!S.rep)return `<div class="box"><p class="muted">${t("Carregant…","Loading…")}</p></div>`;
-  const R=S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
+  // built live from the student's own work each time the page opens (Roger, 27 Nov 2026: "reports must be done as we do activities, meaning
+  // they pull the information automatically on their own"; el-term-report.js elTrepBuild): only the tabs taught by the term's last day
+  // count, so a step that was never unlocked never counts; the saved draft (S.rep) only lends its written lines while a % is the same
+  const R=repLive(C,course)||S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lv=(elRouteOf(D.lv,(mine[mine.length-1]||{}).id)||{}).level;
   const P=[];C.lss.forEach(x=>x.pts.forEach(p=>P.push(p)));
   const pill=v=>v==null?`<span class="rpp none">–</span>`:`<span class="rpp" style="background:${col(v)}">${v} %</span>`;
@@ -1940,7 +1948,7 @@ function reportPlace(lss,ls){
     behind:["late",t("🟡 Vas endarrerit.","🟡 Falling behind."),t(`Només ${T.inWeek||0} % de les activitats les vas fer la setmana de la classe; la resta, més tard o encara no.`,`You did only ${T.inWeek||0}% of the activities in the week of the class; the rest later, or not yet.`)],
     last:["late",t("🟠 Ho has deixat per al final.","🟠 Left until the end."),t(`${T.lastMin||0} % de les activitats que vas fer, les vas fer l'última setmana del trimestre o just abans de l'examen.`,`${T.lastMin||0}% of the activities you did were done in the last week of term or just before the exam.`)],
     none:["late",t("🔴 Encara no has fet les activitats.","🔴 No activities done yet."),t("Les activitats dels learning paths són la base de la teva nota.","The learning path activities are the basis of your mark.")]}[prof];
-  const daily=T.due!=null?repWeeks(T)+`<div class="rpkv"><div><b>${T.done||0} / ${T.due}</b><span>${t("activitats fetes de les que hem fet a classe","activities done of the ones we did in class")}</span></div><div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("fetes la mateixa setmana de la classe","done in the week of the class")}</span></div></div>`
+  const daily=T.due!=null?repWeeks(T)+(!T.due?"":`<div class="rpkv"><div><b>${T.done||0} / ${T.due}</b><span>${t("activitats fetes de les que hem fet a classe","activities done of the ones we did in class")}</span></div><div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("fetes la mateixa setmana de la classe","done in the week of the class")}</span></div></div>`)
     +(VD?`<div class="rpv ${VD[0]}"><b>${VD[1]}</b> ${VD[2]}</div>`:""):`<p class="muted">${t("Encara no hi ha dades.","No data yet.")}</p>`;
   const next=`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
   const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
