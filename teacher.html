@@ -315,7 +315,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-marking.js?v=20261125todo"></script>
 <script src="shared/js/el-fix.js?v=1"></script>
 <script src="shared/js/el-grading.js"></script>
-<script src="shared/js/el-fp-rubrics.js"></script>
+<script src="shared/js/el-fp-rubrics.js?v=20261127"></script>
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
@@ -4324,7 +4324,12 @@ function pieces(it){const g=it.g,b=it.b,w=b.w,shares=o=>{const t=Object.values(o
     return e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(x=>x&&(x.exam===k||(x[0]==="exam"&&x[1]===k))));
       if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;   // vocabulary and grammar sections with no criteria: as the grammar and vocabulary block
       return spread(cs,w*secMax(e,k)/tot,s=>{const y=(res(s.uid,asId(it.l.id)).sections||{})[k];return y&&y.score!=null?elBoosted(y.score/(y.max||secMax(e,k))*10,exF(s.uid,it.l.id)):S.zero&&!(y&&y.excused)?0:null},sn)})}
-  if(b.id==="fp"){const f=g.fp;if(f.mark)return spread((byId(f.a)||{}).criteria||[],w,s=>fpBlock(s.uid));
+  // LS1 (a mark, marked with a rubric): each criterion by its own rubric row (Roger, 27 Nov 2026, option (a)), as the student's 📄 Term report
+  // and 🧩 My competences (today.html compPieces): the rows of EL_FP_RUBRICS with the mark of each feedback part (elFpRows); a feedback
+  // with no parts gives every row the whole final product mark.
+  if(b.id==="fp"){const f=g.fp;if(f.mark&&window.elFpRows&&(window.EL_FP_RUBRICS||{})[f.a]){const R=EL_FP_RUBRICS[f.a],tw=R.rows.reduce((a,r)=>a+r.w,0);
+      return R.rows.map((r,i)=>({c:r.c,w:w*r.w/tw,n:r.name,m:s=>{const v=fpBlock(s.uid),fr=elFpRows(f.a,res(s.uid,f.a).feedback,v);return fr?fr[i].m:v}}))}
+    if(f.mark)return spread((byId(f.a)||{}).criteria||[],w,s=>fpBlock(s.uid));
     const tot=f.rows.reduce((a,r)=>a+r.w,0);return f.rows.map(r=>({c:r.c,w:w*r.w/tot,n:r.name,m:s=>{const v=lvMark(lvOf(s.uid,f.a,r.step,r.c));return v==null&&S.zero?0:v}}))}
   if(b.id==="gv"){const sh=shares(gvShares(g));return (sh.length?sh:[{c:null,w}]).map(x=>Object.assign(x,{m:s=>gvBlock(s.uid,s.group).mark}))}
   if(b.id==="other")return spread(g.other||[],w,null).map(x=>Object.assign(x,{m:s=>otherCrit(s.uid,x.c).mark}));
