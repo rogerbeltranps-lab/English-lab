@@ -102,6 +102,16 @@ function timing(S,course,group){const ls=LS2[course],done=((DATA.ls[ls]||{}).don
   const p=due?Math.round(inWeek/due*100):0,lm=dn?Math.round(lastMin/dn*100):0,prof=!dn?"none":p>=70?"steady":lm>=40?"last":"behind";
   return {due,done:dn,late:lateN,inWeek:p,lastMin:lm,profile:prof,weeks,exam}}
 
+// the steps taught to a group by the end of term (ticked as done in class on the Time plan, or set as homework): a step still locked for the
+// group never counts as not done (problem report, 2ESOB, 27 Nov 2026; REQUIREMENTS § 8 "only what is on the agenda")
+const TAUGHT={};
+function taught(course,group,key){const id=LS2[course]+"|"+group;if(!TAUGHT[id]){const o={},ls=DATA.ls[LS2[course]]||{},actKey={};
+  Object.entries(LPS).forEach(([k,v])=>actKey[v.act]=k);const add=(act,pid)=>{const k=actKey[act];if(k&&pid)(o[k]=o[k]||new Set()).add(pid)};
+  Object.entries((ls.done||{})[group]||{}).forEach(([tab,d])=>{if(d&&d<=T1_END){const [act,pid]=tab.split("#");add(act,pid)}});
+  Object.values((ls.homework||{})[group]||{}).forEach(h=>{if(h&&h.tabs&&day(h.set)<=T1_END)Object.entries(h.tabs).forEach(([act,pids])=>(pids||[]).forEach(pid=>add(act,pid)))});
+  TAUGHT[id]=o}
+  return TAUGHT[id][key]||new Set()}
+
 // ---------- teacher only: first tries vs latest per skill ----------
 const SK={read:"reading",listen:"listening",again:"listening",grammar:"grammar",mixed:"grammar",grammarPrep:"grammar",grammarRel:"grammar",grammarComp:"grammar",grammarFeel:"grammar",vocabEx:"vocabulary",words:"vocabulary"};
 function firstLatest(S,course){const o={};Object.entries(LPS).filter(([,v])=>v.course===course).forEach(([k])=>{const s=st(S,k);if(!s)return;
@@ -131,7 +141,7 @@ function comment(L,pts,tm,S,course){const ca=L==="ca",ex=id=>{const x=(S.rs||{})
 const drafts={};
 for(const [email,R] of Object.entries(DATA.roster)){const S=DATA.students[email];if(!S)continue;const course=R.group.startsWith("2")?"2eso":"4eso",C=TREP[course];
   const lv=lvlOf(S,course),L=!lv||lv==="beginners"?"ca":"en";
-  const ctx={pg:S.pg,rs:S.rs,games:games(S),held:ls=>held(S,ls)};
+  const ctx={pg:S.pg,rs:S.rs,games:games(S),held:ls=>held(S,ls),due:key=>taught(course,R.group,key)};
   const pts=[];C.lss.forEach((l,li)=>l.pts.forEach((pt,pi)=>{const {pct}=pctOf(pt,ctx),ev=evidence(S,pt,course);pts.push({i:pts.length,ls:li,t:pt[L]||pt.en,pct,line:lineOf(pct,ev,L,pt)})}));
   const tm=timing(S,course,R.group);
   const has=pts.filter(p=>p.pct!=null).sort((a,b)=>b.pct-a.pct);
