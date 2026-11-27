@@ -19,7 +19,12 @@ export default [{
         const cv = document.createElement('canvas'); cv.width = cv.height = 8; return cv;
       };
     });
-    await p.click('#el-cloud-bar [aria-label="Report a problem"]');
+    // the board's once-a-day ✅ card (#el-rem) covers the page at first: close it like the student would, then open ⚠️ Report a problem
+    await p.waitForSelector('#el-cloud-bar [aria-label="Report a problem"]', { timeout: 20000 });
+    await p.waitForTimeout(1500);
+    await p.evaluate(() => { const r = document.getElementById('el-rem'); if (r) r.remove(); });
+    await p.evaluate(() => document.querySelector('#el-cloud-bar [aria-label="Report a problem"]').click());
+    await p.waitForSelector('dialog[open] [data-cap]', { timeout: 10000 });
     await p.click('dialog[open] [data-cap]');
     await p.waitForFunction(() => typeof window.__shot === 'string', null, { timeout: 10000 }).catch(() => {});
     const shot = await p.evaluate(() => window.__shot);
