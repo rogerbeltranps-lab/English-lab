@@ -115,7 +115,10 @@
   function one(s, ctx) {
     if (s.p) { const S = st(ctx, s.p); if (!S) return null; const L = S.last || {}, T = S.tries || {}; let a = 0, b = 0;
       s.ps.forEach(id => { const y = L[id] || T[id]; if (y && y.max) { a += +y.score || 0; b += +y.max; } }); return b ? a / b * 100 : null; }
-    if (s.d) { const S = st(ctx, s.d); if (!S) return null; const dn = S.done || {}; return s.ps.filter(id => dn[id]).length / s.ps.length * 100; }
+    // a "done" point counts only the steps taught for the student's group (ctx.due(key) = Set of step ids done in class or set as homework
+    // by the end of term); a step still 🔒 locked for the group is left out, never 0 (problem report, 2ESOB, 27 Nov 2026)
+    if (s.d) { const S = st(ctx, s.d); if (!S) return null; const dn = S.done || {}, due = ctx.due ? ctx.due(s.d) : null;
+      const ps = due ? s.ps.filter(id => due.has(id)) : s.ps; return ps.length ? ps.filter(id => dn[id]).length / ps.length * 100 : null; }
     if (s.x) { if (ctx.held && ctx.held(s.x)) return null; const sc = ((ctx.rs || {})[s.x + "/assessment"] || {}).sections || {}; let a = 0, b = 0;
       s.k.forEach(k => { const y = sc[k]; if (y && y.score != null && y.max) { a += +y.score; b += +y.max; } }); return b ? a / b * 100 : null; }
     if (s.fp) { const f = (ctx.rs || {})[s.fp] || {}; return f.max && f.score != null ? f.score / f.max * 100 : null; }
