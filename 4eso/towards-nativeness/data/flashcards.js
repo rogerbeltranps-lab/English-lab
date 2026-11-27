@@ -37,16 +37,48 @@
   // Catalan → English
   const catEn = (it, part, pre) => { const a = Array.isArray(it.a) ? it.a[0] : it.a;
     return { id: pre + key(it.q), kind: 'e', part, say: dot(plain(a)), front: hint('Say it in English') + esc(plain(it.q)), back: ans(esc(dot(a))) + why(esc(it.en || '')) }; };
+  /* ✍ A card that asks to write ("Rewrite as a question…", "(write - if nothing)") is typed and checked before it turns over, as in the
+     students' 🧠 Flashcards (Roger, 27 Nov 2026: "I want to write the sentence here", on 🧠 My flashcards on his iPhone; el-flashdeck.js
+     `check`). Right = any answer of the item, or the whole sentence filled in; capitals, punctuation, curly or missing apostrophes,
+     contractions and British spellings never count; one slip in a longer word gets "Almost! Check the spelling." once. */
+  const WRITE = /\b(write|rewrite|type)\b/i;
+  const US = { colour: 'color', favourite: 'favorite', organise: 'organize', organised: 'organized', centre: 'center', programme: 'program', towards: 'toward', grey: 'gray', travelled: 'traveled', burnt: 'burned' };
+  const nrm = x => (' ' + String(x || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, ' ')
+    .replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will')
+    .replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/\b(it|that|what|there|he|she|who|where|how)'s\b/g, '$1 is')
+    .replace(/\b(doesnt|dont|didnt|isnt|arent|wasnt|werent|cant|wont|hasnt|havent)\b/g, m => ({ cant: 'cannot', wont: 'will not' })[m] || m.slice(0, -2) + ' not')
+    .replace(/[a-z]+/g, w => US[w] || w) + ' ').replace(/\s+/g, ' ')
+    .replace(/\b(does|do|did|is|are|was|were|can|cannot|will|would|should|could|has|have) not (it|he|she|they|we|you|i|there)\b/g, '$1 $2 not')   // doesn't it = does it not
+    .replace(/\bcannot\b/g, 'can not').replace(/'/g, '').trim();   // a missing apostrophe never counts (dont, apps)
+  const edit1 = (a, b) => { if (a === b || Math.abs(a.length - b.length) > 1) return a === b; let i = 0; while (i < a.length && a[i] === b[i]) i++;
+    const r = (x, y) => x === y; return r(a.slice(i + 1), b.slice(i + 1)) || r(a.slice(i), b.slice(i + 1)) || r(a.slice(i + 1), b.slice(i)) ||
+      (a[i] === b[i + 1] && a[i + 1] === b[i] && r(a.slice(i + 2), b.slice(i + 2))); };
+  const checker = (answers) => { const ok = answers.map(nrm).filter(Boolean);
+    return val => { const v = nrm(val); if (!String(val || '').trim()) return null; if (ok.includes(v)) return { ok: true };
+      const vw = v.split(' ');
+      const slip = ok.some(a => { const aw = a.split(' '); if (aw.length !== vw.length) return false; const d = aw.map((x, i) => x === vw[i] ? 0 : x.length >= 4 && edit1(x, vw[i]) ? 1 : 2);
+        return d.every(x => x < 2) && d.some(x => x === 1); });
+      return slip ? { slip: 'Almost! Check the spelling.' } : { ok: false }; }; };
+  /* the gap filled in, marked; "I ’ve just uploaded" shows as "I’ve just uploaded" (the say text keeps its space: recordings are keyed by it) */
+  const hl = x => esc(x).replace(/ \u0001([’'](?:ve|s|re|ll|d|m)\b)/g, '<mark style="padding-left:0">$1').replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>');
+  /* ✓ Also right (Roger, 27 Nov 2026: "Cant i use the last here?", on "I ___ (just / upload) the photos"): the other answers of a
+     one-gap card that are really different (not only a contraction), each as a whole sentence, at most two. American English takes
+     the past simple with just / already / yet (I just uploaded), so those cards list it. */
+  const ct = x => nrm(String(x).replace(/[’']d\b/g, ' had').replace(/[’']s\b/g, ' has'));   // I’d never = I had never, the app’s taken = has taken
+  const same = (a, b) => nrm(a) === nrm(b) || ct(a) === ct(b);
+  const also = xs => xs.length ? '<div class="elfd-why">✓ Also right: ' + xs.slice(0, 2).map(x => hl(x).replace(/<mark[^>]*>/g, '<strong>').replace(/<\/mark>/g, '</strong>')).join(' · ') + '</div>' : '';
   // a typed question: the gaps filled with the answer, or the question → the answer
   function typed(it, part, pre) {
-    const q = plain(it.q), n = (q.match(GAP) || []).length, a0 = String(it.a[0]);
+    const q = plain(it.q), n = (q.match(GAP) || []).length, a0 = String(it.a[0]), all = (it.a || []).map(String);
     if (n) {
       const w = a0.split(/\s*\/\s*|\s+/); let k = 0;
       const fill = mk => q.replace(GAP, () => mk(n > 1 ? w[k++] || '' : a0)).replace(/\s*\([^)]*\)/g, '').replace(/\s+([.,?!])/g, '$1');
       return { id: pre + key(it.q), kind: 'g', part, front: esc(q).replace(GAP, '<span class="elfd-gap"></span>'), say: fill(x => x),
-        back: ans(esc(fill(x => '\u0001' + x + '\u0002')).replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>')) + why(esc(it.en || '')) };
+        check: WRITE.test(q) ? checker(all.concat(fill(x => x))) : null,
+        back: ans(hl(fill(x => '\u0001' + x + '\u0002'))) + also(n === 1 ? all.slice(1).filter(x => !same(x, a0)).map(x => q.replace(/^.*→\s*/, '').replace(GAP, () => '\u0001' + x + '\u0002')
+          .replace(/\s*\([^)]*\)/g, '').replace(/\s+([.,?!])/g, '$1')) : []) + why(esc(it.en || '')) };
     }
-    return { id: pre + key(it.q), kind: 'g', part, front: esc(q), say: dot(a0), back: ans(esc(dot(a0))) + why(esc(it.en || '')) };
+    return { id: pre + key(it.q), kind: 'g', part, front: esc(q), say: dot(a0), check: WRITE.test(q) ? checker(all) : null, back: ans(esc(dot(a0))) + why(esc(it.en || '')) };
   }
   const vocab = (w, part, pre) => ({ id: pre + key(w[0]), kind: 'v', part, front: esc(w[0]), en: w[0], ca: w[1] || '', ex: w[2] || '', say: w[0].replace(/\s*\([^)]*\)/g, ''),
     back: ans(esc(w[1] || '')) + (w[2] ? '<div class="elfd-ex">' + esc(w[2]) + '</div>' : '') });

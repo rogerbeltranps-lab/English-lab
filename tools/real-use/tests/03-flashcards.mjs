@@ -9,7 +9,9 @@ export async function study(p, n) {
   await p.click('[data-fd="ls"] >> nth=0');
   await p.click('.elfd-main[data-fd="study"]');
   for (let i = 0; i < n; i++) {
-    await p.click('[data-fd="show"]');
+    // a card that asks to write (11-typed-flashcards.mjs) has no Turn over: something typed and ✓ Check turns it
+    if (await p.$('#elfdIn')) { await p.fill('#elfdIn', 'zzz'); await p.click('[data-fd="check"]'); }
+    else await p.click('[data-fd="show"]');
     await p.click('[data-fd="ans"][data-v="3"]');   // Good
   }
   await p.click('.elfd-x[data-fd="close"]');   // ✕ Close: the session is saved at once

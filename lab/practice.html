@@ -94,7 +94,7 @@
   <script src="../shared/js/el-voice.js"></script>
   <script src="../shared/js/el-wordcards.js"></script>
   <script src="../shared/js/el-plan.js"></script>
-  <script src="../shared/js/el-flashdeck.js?v=20261127u"></script>
+  <script src="../shared/js/el-flashdeck.js?v=20261127w"></script>
   <script src="../shared/js/el-mascot.js?v=20261126b"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
@@ -233,6 +233,7 @@ function gAlts(it, w) {   // per word of the first answer, the other right words
     if (diff.length && diff.every(i => RELW.test(v[i]) && RELW.test(w[i]))) diff.forEach(i => { if (!alts[i].some(y => norm(y) === norm(v[i]))) alts[i].push(v[i]); }); });
   return alts;
 }
+const WRITE = /\b(write|rewrite|type|escriu|escriviu|reescriu)\b/i;
 function gCard(it, items, kind, part, lv, salt) {
   const q = String(it.fq || it.q), a = it.a[0], pq = plain(q), mk = x => '<mark>' + esc(x) + '</mark>';
   const w = a.split(/\s+/).map(x => { if (x === 'i') return 'I'; if (RELW.test(x)) return x;   // "which takes place in november" → November, as in the question
@@ -260,7 +261,10 @@ function gCard(it, items, kind, part, lv, salt) {
   const two = alts.find(x => x.length > 1 && x.some(y => /^that$/i.test(y)));
   const why = why0 && two && !/\bthat\b/i.test(plain(why0)) ? plain(why0) + ' ' + two.join(' / ') + (elCa(lvB) ? ': les dues són correctes.' : ': both are right.') : why0;
   const opts = lvB === 'beginners' ? (it.opts || choices(it, items, salt)) : lvB === 'insecure' ? (it.opts || null) : null;
-  return { id: 'g:' + hash(plain(it.q) + '|' + a), kind, part, front: q.replace(G, '<span class="elfd-gap"></span>'), opts,
+  // ✍ a card that asks to write ("Write the -ing form…", "Rewrite…", "Escriu…") is really typed before it turns over (Roger, 27 Nov 2026:
+  // "pots fer que a les flashcards que diu escriu sigui de veritat que escriguin?"); Starter taps one of its options instead
+  const check = WRITE.test(plain(q)) ? val => fcCheck(it, items, q, val, spoken) : null;
+  return { id: 'g:' + hash(plain(it.q) + '|' + a), kind, part, front: q.replace(G, '<span class="elfd-gap"></span>'), opts, check,
     say: spoken && (it.fq ? !/→/.test(plain(spoken)) : !/→|:/.test(plain(spoken))) ? (T === q && !it.fq ? plain(spoken) : plain(spoken).replace(/\s+([.,!?;:])/g, '$1')) : '',
     back: `<div class="elfd-ans">${clean || mk(a)}</div>${why ? `<div class="elfd-why">💡 ${esc(plain(why))}</div>` : ''}` };
 }
@@ -813,6 +817,15 @@ function grammar() {
   const kept = !g.mix && store.gram[gKey()];
   if (kept && kept.v) { (kept.tr || []).forEach((n, i) => { gtries[g.key + i] = n; }); kept.v.forEach((v, i) => { const b = $('#gq' + i); if (b) b.value = v || ''; $$(`[data-do="gpick"][data-i="${i}"]`).forEach(x => x.classList.toggle('on', norm(x.dataset.v) === norm(v))); }); gcheck(false); }
   $$('#body input.typed').forEach(b => b.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gcheck(true); } }));
+}
+// a typed flashcard (el-flashdeck.js): right = any accepted answer, or the whole sentence filled in, checked as in the grammar tab
+// (capitals, final punctuation, apostrophes and contractions never count); a spelling slip says which word, and the student tries again
+function fcCheck(it, items, q, val, full) {
+  if (!norm(val)) return null;
+  const e = expand(val);
+  if (it.a.some(x => expand(x) === e) || (full && expand(plain(full)) === e)) return { ok: true };
+  const sl = !starterLv() ? spellSlips(q, it.a, val, items.flatMap(x => x.a || [])) : null;
+  return sl ? { slip: spellHint(sl, !EN) } : { ok: false };
 }
 function gcheck(count) {
   const g = gFind(); if (!g) return;

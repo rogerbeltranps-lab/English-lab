@@ -127,7 +127,7 @@ window.LP = {
       explain: [
         '<strong>want / ask / allow / encourage / need + someone + to</strong>: <em>I want you to check it. It should allow you to mark it.</em> Never <s>I want that you</s>, <s>allow to mark</s>.',
         '<strong>let / make + someone + verb</strong> (no to): <em>Let them choose. Make them think.</em>',
-        '<strong>Now</strong>: <em>I’m attaching, I’m sending, I’ve just uploaded</em>. <strong>yet / already</strong> take the present perfect: <em>They haven’t done it yet.</em>',
+        '<strong>Now</strong>: <em>I’m attaching, I’m sending, I’ve just uploaded</em>. <strong>yet / already / just</strong> take the present perfect: <em>They haven’t done it yet.</em> In American English the past simple is just as natural: <em>I just uploaded it. They didn’t do it yet.</em>',
         '<strong>One subject per verb</strong>: <em>It’s online now. There’s nothing at the top. The audio isn’t working</em> (not <s>the audio it’s</s>). After <strong>did</strong>: the base form.'
       ],
       items: [
@@ -138,7 +138,7 @@ window.LP = {
         { q: 'Add the subject: “___ says Kokoro couldn’t load.”', a: ['It'] },
         { q: 'Add the subject: “___ should be nothing at the top.”', a: ['There'] },
         { q: 'Fix it: “fix what it doesn’t work” → fix what ___', a: ['doesn’t work', 'does not work'] },
-        { q: 'Some students ___ (not do) the exam yet.', a: ['haven’t done', 'have not done'] },
+        { q: 'Some students ___ (not do) the exam yet.', a: ['haven’t done', 'have not done', 'didn’t do', 'did not do'] },
         { q: 'When ___ (we / create) this page?', a: ['did we create'] },
         { q: 'I ___ (just / upload) the photos, can you see them?', a: ['’ve just uploaded', 'have just uploaded', 'just uploaded'] }
       ] },
