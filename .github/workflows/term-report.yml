@@ -1,0 +1,17 @@
+name: Term report
+# Reports build themselves and a locked step never counts (Roger, 26-27 Nov 2026; docs/REQUIREMENTS.md § 3). tools/term-report/check.mjs
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/term-report/check.mjs
