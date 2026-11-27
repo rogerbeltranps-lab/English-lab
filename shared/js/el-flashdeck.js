@@ -325,7 +325,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
         const box = pickIt ? `<div class="elfd-opts">${c.opts.map((x, i) => `<button data-fd="opt" data-v="${i}">${esc(x)}</button>`).join('')}</div>`
           : `<input class="elfd-type" id="elfdIn" type="text" value="${esc(ses.val)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="${esc(t('La teva resposta', 'Your answer'))}" placeholder="${esc(t('Escriu la resposta…', 'Type your answer…'))}">`;
         return top + `<div class="elfd-card">${tag}${f0}${box}<p class="elfd-fbk" role="status">${ses.fb}</p><p class="elfd-tag">${pickIt ? t('Tria la resposta correcta.', 'Choose the right answer.') : t('Escriu la resposta i prem Comprova.', 'Type the answer and press Check.')}</p></div>
-          <div class="elfd-btns">${pickIt ? '' : `<button class="b elfd-show" data-fd="check">✓ ${t('Comprova', 'Check')}</button>`}<button class="b g sm" data-fd="idk">${t('No ho sé: gira-la', 'I don’t know: turn it over')}</button></div><p class="elfd-keys">${pickIt ? '' : t('Enter: comprova', 'Enter: check')}</p>`;
+          <div class="elfd-btns">${pickIt ? '' : `<button class="b elfd-show" data-fd="check">✓ ${t('Comprova', 'Check')}</button>`}</div><p class="elfd-keys">${pickIt ? '' : t('Enter: comprova', 'Enter: check')}</p>`;
       }
       if (!ses.shown) return top + `<div class="elfd-card">${tag}${front}${c.kind === 'v' && !rev ? listen : ''}<p class="elfd-tag">${help2}</p></div><button class="b elfd-show" data-fd="show">${t('Gira la targeta', 'Turn over')}</button><p class="elfd-keys">${t('Espai: girar', 'Space: turn over')}</p>`;
       const s = st(c), opt = [1, 2, 3, 4].map(a => { const early = ses.part && s && s[0] === S_REV && s[1] >= dayStart(now) + DAY && a >= 3; if (early) return t('igual', 'same'); const x = next(s, a, now); return span(x[0] === S_REV ? x[2] * DAY : until(x, now), ca()); });
@@ -359,10 +359,11 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       else if (k === 'close') close();
       else if (k === 'statsnow') { const id = ses.d.id; close(); view = { k: 'stats', id }; render(); }
       else if (k === 'show') turn();
-      else if (k === 'check' || k === 'opt' || k === 'idk') {   // ✍ a typed card: right or wrong, it turns over; a spelling slip tries again
+      else if (k === 'check' || k === 'opt') {   // ✍ a typed card: right or wrong, it turns over; a spelling slip tries again
         const c = ses.cur; if (!c || ses.shown) return;
-        const val = k === 'opt' ? c.opts[+v] : k === 'idk' ? '' : ((layer.querySelector('#elfdIn') || {}).value || '');
-        const r = k === 'idk' ? { ok: false } : c.check(val);
+        // no "I don't know" button: the card turns over only once something is typed (Roger, 27 Nov 2026: "I don't want students to see
+        // the answer, only to type")
+        const val = k === 'opt' ? c.opts[+v] : ((layer.querySelector('#elfdIn') || {}).value || ''), r = c.check(val);
         if (!r) { ses.fb = t('Escriu una resposta.', 'Type an answer.'); render(); return; }
         // a spelling slip names the word once (never the grammar rule); the next try counts, so the answer can't be guessed letter by letter
         if (r.slip && !ses.hinted) { ses.hinted = true; ses.val = val; ses.fb = r.slip + ' ' + t('Torna-ho a provar.', 'Try again.'); render(); return; }

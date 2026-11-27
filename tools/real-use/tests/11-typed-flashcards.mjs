@@ -21,10 +21,11 @@ export default [{
     await p.click(`[data-fd="part"][data-p="${part}"]`);
     const verb = async () => ((await p.$eval('.elfd-full .elfd-front', (e) => e.textContent).catch(() => '')).match(/form: (\w+)/) || [])[1];
     const toTyped = async () => { for (let i = 0; i < 10; i++) { if (await p.$('#elfdIn') && ING[await verb()]) return true;
-      await p.click('[data-fd="show"], [data-fd="idk"]'); await p.click('[data-fd="ans"][data-v="4"]'); } return false; };
+      if (await p.$('#elfdIn')) { await p.fill('#elfdIn', 'zzz'); await p.click('[data-fd="check"]'); } else await p.click('[data-fd="show"]');
+      await p.click('[data-fd="ans"][data-v="4"]'); } return false; };
 
     t.ok(await toTyped(), 'no "Write the -ing form" card with a box to type in came up (it still only turns over?)');
-    t.ok(!(await p.$('[data-fd="show"]')), 'a "Write…" card still has the plain Turn over button, so it can be turned without writing');
+    t.ok(!(await p.$('[data-fd="show"], [data-fd="idk"]')), 'a "Write…" card still has a button that turns it over without writing');
     await p.fill('#elfdIn', 'gone');
     await p.click('[data-fd="check"]');
     const no = await p.textContent('.elfd-res').catch(() => '');
