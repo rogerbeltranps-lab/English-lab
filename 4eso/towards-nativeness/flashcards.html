@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" class="notranslate" translate="no">
 <head>
-<meta charset="utf-8"><meta name="google" content="notranslate"><script src="tn-night.js?v=20261121b"></script>
+<meta charset="utf-8"><meta name="google" content="notranslate"><script src="tn-night.js?v=20261127n"></script>
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#315f9f">
@@ -39,7 +39,7 @@ html,body{overflow-x:clip}
 
 <script src="../../shared/js/el-catalog.js"></script>
 <script src="../../shared/js/el-voice.js"></script>
-<script src="../../shared/js/el-flashdeck.js?v=20261127a"></script>
+<script src="../../shared/js/el-flashdeck.js?v=20261127w"></script>
 <script src="../../shared/js/el-mascot.js?v=20261126b"></script>
 <script>window.TN_LPS = [];</script>
 <script src="data/talking-to-your-tech.js?v=20261125"></script><script>TN_LPS.push(window.LP);</script>
@@ -55,8 +55,14 @@ html,body{overflow-x:clip}
   try { const old = localStorage.getItem('tnPrepDeck'); if (old && !localStorage.getItem(K)) localStorage.setItem(K, old); } catch (e) {}   // the 🧠 Preposition flashcards step's first copy
   const load = () => { try { return JSON.parse(localStorage.getItem(K) || '{}'); } catch (e) { return {}; } };
   const decks = window.TN_FLASH_DECKS();
-  ELFlashDeck.mount(host, { decks: () => decks, ca: () => false, say: x => TN_SAY(x), load, save: x => { try { localStorage.setItem(K, JSON.stringify(x)); } catch (e) {} if (window.elMascotRefresh) elMascotRefresh(); }, me: () => null,
+  // the ⚡ here is the same as Roger's mascot's (Roger, 27 Nov 2026: "count the streak there"): the days he studied 🧠 Flashcards (el_flash_<uid>)
+  // and this deck's copy from his account (el_tnflash_cloud) count too; never saved into tnFlash
+  const days = () => { const g = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, uid = (() => { try { return localStorage.getItem('el_uid') || ''; } catch (e) { return ''; } })();
+    return ELFlashDeck.merge(g('el_flash' + (uid ? '_' + uid : '')) || {}, g('el_tnflash_cloud') || {}); };
+  const fd = ELFlashDeck.mount(host, { decks: () => decks, ca: () => false, say: x => TN_SAY(x), load, save: x => { try { localStorage.setItem(K, JSON.stringify(x)); } catch (e) {} if (window.elMascotRefresh) elMascotRefresh(); }, me: () => null, days,
     names: { all: 'All my decks', choose: 'Choose a deck', chooseHow: 'Your slips, your prepositions and each learning path, each with its own cards.', mix: 'Study all my decks mixed', stats: 'My statistics · all my decks' } });
+  // the account's copy of 🧠 Flashcards came in (el-cloud.js): the ⚡ here follows it, never in the middle of a study session
+  addEventListener('el-flash-sync', () => { if (!document.documentElement.classList.contains('elfd-on')) fd.render(); });
 })();
 </script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>

@@ -88,10 +88,12 @@ window.elFpRowMarks=function(act,txt){const R=(window.EL_FP_RUBRICS||{})[act],P=
     const i=R.rows.findIndex((r,k)=>!row[k]&&eq(r,p));if(i>=0){row[i]=p;used.add(p)}}));
   return R.rows.map((r,i)=>({c:r.c,w:r.w,name:r.name,m:row[i]&&!isNaN(row[i].m)?row[i].m:null}))};
 // The pieces of a final product marked with a rubric: elFpRowMarks. A row the feedback has no part for is a part the teacher left out (no
-// slides, no video): the final product mark is the other rows rescaled to 10, so that row is left out too (m null), never 0. With no parts
-// at all (not marked yet, or "No presentat" with no rubric lines), every row has the whole mark fm and .whole = true.
+// slides, no video), and the final product mark is the other rows rescaled to 10: that row keeps the whole mark fm, as before 27 Nov 2026
+// (r.whole), so the rows still weigh what the whole final product weighs and no LS or term mark moves (Roger, 27 Nov 2026: "tell me if the
+// students' term marks have changed"). With no parts at all (not marked yet, or "No presentat" with no rubric lines), every row has fm.
 // Returns the rows with .tw (their total weight), or null when the activity has no rubric.
-window.elFpRows=function(act,txt,fm){const R=(window.EL_FP_RUBRICS||{})[act];if(!R)return null;
+window.elFpRows=function(act,txt,fm){const R=(window.EL_FP_RUBRICS||{})[act];if(!R)return null;fm=fm==null||isNaN(fm)?null:fm;
   let rs=window.elFpRowMarks(act,txt);
-  if(!rs||!rs.some(r=>r.m!=null)){rs=R.rows.map(r=>({c:r.c,w:r.w,name:r.name,m:fm==null||isNaN(fm)?null:fm}));rs.whole=true}
+  if(!rs||!rs.some(r=>r.m!=null)){rs=R.rows.map(r=>({c:r.c,w:r.w,name:r.name,m:null}));rs.whole=true}
+  rs.forEach(r=>{if(r.m==null){r.m=fm;r.whole=true}});
   rs.tw=rs.reduce((n,r)=>n+r.w,0);return rs};

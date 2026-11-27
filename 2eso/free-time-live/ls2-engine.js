@@ -270,7 +270,9 @@ var LS2 = (function () {
       '.gnote{padding:10px 14px;border-radius:12px;background:#f3f7fc;border:1px solid #c5d8ef;line-height:1.55;margin-bottom:6px}' +
       '.gkind{display:inline-block;margin:0 0 6px;padding:2px 10px;border-radius:999px;font-size:.82em;font-weight:800;background:#eef2f7;color:#334155}' +
       '.gk-pick{background:#e0f2fe;color:#075985}.gk-join{background:#ede9fe;color:#5b21b6}.gk-change{background:#fef3c7;color:#92400e}.gk-fix{background:#fee2e2;color:#991b1b}.gk-own{background:#dcfce7;color:#166534}.gk-listen{background:#f1f5f9;color:#334155}' +
-      '.question input.typed.own{width:100%;max-width:none}' +
+      '.question .typed.own{width:100%;max-width:none}' +
+      '.question textarea.typed.own{display:block;min-height:66px;line-height:1.4;resize:vertical;field-sizing:content;max-height:320px}' +
+      'html.el-lpnb .lp-panels .panel textarea.typed.own{min-height:68px!important}' +
       '.gcount{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;font-size:.62em;font-weight:800;vertical-align:middle;background:#eef2f7;color:#334155}.gcount.ok{background:#dcfce7;color:#166534}' +
       '.gbd{margin:14px 0 0;padding:10px 14px;border-radius:12px;background:#dcfce7;border:1px solid #86efac;color:#14532d;font-weight:700}' +
       '#el-gready{font:700 15px system-ui,-apple-system,Segoe UI,sans-serif;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147481000;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#14532d;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}' +
@@ -278,6 +280,11 @@ var LS2 = (function () {
       '.gextra{margin:22px 0 4px;padding:10px 14px;border-radius:12px;background:#fff7ed;border:1px dashed #fdba74;color:#7c2d12}';
     document.head.appendChild(st);
   }
+  /* ↵ Enter starts a new line in "Your own example" (Roger, 27 Nov 2026: "Enter a new line"; problem report, 4ESOA: Enter checked the
+     sentence before it was finished). The own-example box is a <textarea class="typed own">: it holds more than one line and grows with
+     what is written, Enter adds a line, and only its ✓ Check (or Check all) checks it. Every other typed box stays an <input>, where
+     Enter still checks. Not for a 🎤 Say it box (it is filled by the microphone). */
+  const ownBox = (it, m) => !!it.own && m !== 'say';
   // one: every question gets its own ✓ Check (not the recall warm-up, which is one try for the whole set)
   function typedHtml(items, prefix, mode, parts, one) {
     if (starter() || items.some(it => it.opts)) bindPicks();
@@ -294,7 +301,7 @@ var LS2 = (function () {
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (m === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      (one ? '<div class="el-onerow">' : '') + '<input type="text" class="typed' + (it.own ? ' own' : '') + '" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (one ? oneBtn(prefix, i) + '</div>' : '') +
+      (one ? '<div class="el-onerow">' : '') + (ownBox(it, m) ? '<textarea rows="2" class="typed own"' : '<input type="text" class="typed' + (it.own ? ' own' : '') + '"') + ' id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (m === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : pk ? ' readonly placeholder="' + (ca() ? 'Tria una opció' : 'Choose an option') + '"' : it.own ? ' placeholder="' + (ca() ? 'Escriu la teva frase' : 'Write your own sentence') + '"' : '') + '>' + (ownBox(it, m) ? '</textarea>' : '') + (one ? oneBtn(prefix, i) + '</div>' : '') +
       (pk ? picksHtml(it, items, prefix, i, m) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>' + (parts && !EXTRA.has(it) && (!items[i + 1] || items[i + 1].p !== it.p || EXTRA.has(items[i + 1])) ? '<div class="gbd" data-part="' + esc(it.p) + '" hidden></div>' : ''); }).join('');
   }
@@ -521,6 +528,8 @@ var LS2 = (function () {
     if (document.getElementById('el-one-css')) return;
     const st = document.createElement('style'); st.id = 'el-one-css';
     st.textContent = '.el-onerow{display:flex;gap:8px;align-items:center}.el-onerow>input.typed{flex:1 1 auto;min-width:0}' +
+      // ↵ the own-example box takes the whole line and its ✓ Check sits under it
+      '.el-onerow:has(>textarea.typed.own){flex-wrap:wrap;align-items:flex-start}.el-onerow>textarea.typed.own{flex:1 1 100%;min-width:0}' +
       '.el-one{flex:0 0 auto;padding:6px 14px!important;font-size:.9em!important;min-height:0!important;white-space:nowrap}' +
       '.question>.el-one{display:inline-block;margin-top:8px}.el-nbink .el-one{display:none!important}.el-nbink .question.gx .el-one{display:inline-block!important}' +
       '.el-nbink .question.el-nbopen .el-one{display:inline-block!important}.el-nbfix{display:inline-block;margin-top:6px;padding:6px 14px!important;font-size:.9em!important;min-height:0!important}' +
@@ -713,7 +722,7 @@ var LS2 = (function () {
      mistake to point at. It shows no red "Type an answer." (that line is only for a ✓ Check pressed on an empty box), so questions added
      after the step was done look new, not lost. Only questions the saved answers do not have (k.v[i] null): a box left empty in a Check keeps it. */
   const quiet = (k, prefix, items) => k.fresh && items.forEach((_, i) => { const f = $('#' + prefix + 'f' + i); if (k.v[i] == null && f && f.classList.contains('no')) { f.innerHTML = ''; f.className = 'feedback'; } });
-  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
+  function clearStep(id, listId) { $$('#' + listId + ' input,#' + listId + ' textarea.typed').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count, only): the step's own check (only: the questions to check and show; null = all); stays(id, prefix, listId, items, check)
   // wires Check, Do it again and the restore. src: the panel's whole list (p.items / p.practice), to place answers saved at another route.
   // one: the counted questions (positions) when every question has its own ✓ Check; without it (the recall warm-up) one Check for the set.
