@@ -74,3 +74,24 @@ window.EL_FP_RUBRICS={
         "At the end of the video I say what I improved, but the change hardly shows or the sentence is unclear.",
         "I don't say what I improved, but the video shows I rehearsed: few pauses and I look little at my notes.",
         "Nothing shows rehearsal or review: I read, stop often, or the video has problems a review would have caught (sound, camera, slides)."]}]}};
+// The teacher's final product feedback, "Part (w %) · m / 10" lines (then ✔ / ➜ lines): [{n, w, m}] with m a number.
+window.elFpParts=function(txt){const H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/,out=[];
+  String(txt||"").split("\n").forEach(l=>{const h=l.trim().match(H);if(h)out.push({n:h[1].trim(),w:+h[2].replace(",","."),m:+h[3].replace(",",".")})});return out};
+// Each criterion by its own rubric row (Roger, 27 Nov 2026, option (a): "Mark each criterion by its own rubric row"; it replaces giving every
+// criterion of an LS1 final product the mark of the whole final product). The rubric's rows (EL_FP_RUBRICS[act]) with the mark of the
+// feedback part that goes with each one: the same name, else the same first word ("Speaking & delivery" = "Speaking"), else the next free
+// row with the same weight. Returns [{c, w, name, m}] (m null for a row the feedback has no part for), or null with no rubric or no parts.
+// Used by the student's 🧩 My competences and 📄 Term report (today.html compPieces / repWhy) and the dashboard (teacher.html pieces).
+window.elFpRowMarks=function(act,txt){const R=(window.EL_FP_RUBRICS||{})[act],P=window.elFpParts(txt);if(!R||!P.length)return null;
+  const nm=x=>String(x||"").trim().toLowerCase(),w1=x=>nm(x).match(/[a-zà-ü]+/)?.[0]||"",row=R.rows.map(()=>null),used=new Set();
+  [(r,p)=>nm(r.name)===nm(p.n),(r,p)=>w1(r.name)===w1(p.n),(r,p)=>r.w===p.w].forEach(eq=>P.forEach(p=>{if(used.has(p))return;
+    const i=R.rows.findIndex((r,k)=>!row[k]&&eq(r,p));if(i>=0){row[i]=p;used.add(p)}}));
+  return R.rows.map((r,i)=>({c:r.c,w:r.w,name:r.name,m:row[i]&&!isNaN(row[i].m)?row[i].m:null}))};
+// The pieces of a final product marked with a rubric: elFpRowMarks. A row the feedback has no part for is a part the teacher left out (no
+// slides, no video): the final product mark is the other rows rescaled to 10, so that row is left out too (m null), never 0. With no parts
+// at all (not marked yet, or "No presentat" with no rubric lines), every row has the whole mark fm and .whole = true.
+// Returns the rows with .tw (their total weight), or null when the activity has no rubric.
+window.elFpRows=function(act,txt,fm){const R=(window.EL_FP_RUBRICS||{})[act];if(!R)return null;
+  let rs=window.elFpRowMarks(act,txt);
+  if(!rs||!rs.some(r=>r.m!=null)){rs=R.rows.map(r=>({c:r.c,w:r.w,name:r.name,m:fm==null||isNaN(fm)?null:fm}));rs.whole=true}
+  rs.tw=rs.reduce((n,r)=>n+r.w,0);return rs};

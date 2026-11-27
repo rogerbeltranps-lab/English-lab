@@ -337,7 +337,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-criteria-easy.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-comp-map.js"></script>
-<script src="shared/js/el-fp-rubrics.js"></script>
+<script src="shared/js/el-fp-rubrics.js?v=20261127"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261125g"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
 <script src="shared/js/el-term-report.js?v=20261125"></script>
@@ -1684,7 +1684,10 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
       pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
         if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
         return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?elBoosted(y.score/(+(y.max||secMax(e,k)))*10,elExamBoost(e,x)):null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
-    else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
+    else if(b.id==="fp"&&g.fp){const f=g.fp,fr=f.mark&&window.elFpRows&&elFpRows(f.a,(D.rs[f.a]||{}).feedback,fpM());
+      // LS1: each criterion by its own rubric row (Roger, 27 Nov 2026, option (a); elFpRows); not marked by rows yet: the whole mark on every row
+      if(fr)pcs=fr.map(r=>({c:r.c,w:w*r.w/fr.tw,m:r.m,src:["🎬 "+t("Producte final","Final product"),fr.whole?"":nmT(r.name)]}));
+      else if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
       else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))
       .flatMap(y=>seg.gv?seg.gv.map(e=>Object.assign({},y,{w:y.w*e.f,m:e.m,tt:e.t})):[y])}
@@ -1727,16 +1730,17 @@ function indLine(c,C){const i=dgIdx(C.m);if(i<0)return "";const L=indLss(c,C.ls|
   return `<span class="cpind dgb-${DGK[i]}"><b>${dgName(i)}</b>${L.map(l=>`<span>${L.length>1?`<i>${esc(elLsNum(l))}</i> `:""}${esc(indOf(l,c)[i])}</span>`).join("")}</span>`}
 // 📄 Why this level, under each criterion of the term report (Roger, 25 Nov 2026: "here there should be a and explanation of the assessment
 // indicator"): every piece of work the criterion's mark comes from, with its own mark; a final product marked with a rubric (LS1) gives the
-// student's level in that criterion's row and the row's descriptor, word for word (EL_FP_RUBRICS), so the student reads why.
+// student's level in that criterion's row and the row's descriptor, word for word (EL_FP_RUBRICS), so the student reads why. Since 27 Nov
+// 2026 the criterion's mark is that row's mark (compPieces, elFpRows), so the number here and the criterion's mark agree.
 function repWhy(c,C){const by=new Map();(C.pcs||[]).filter(y=>y.m!=null&&y.w>0).forEach(y=>{const k=y.src[0]+"|"+(y.src[1]||"")+"|"+(y.ls?y.ls.id:"");
     const z=by.get(k)||{src:y.src,ls:y.ls,w:0,s:0};z.w+=y.w;z.s+=y.m*y.w;by.set(k,z)});
   if(!by.size)return "";
   const li=[...by.values()].map(z=>{const m=z.s/z.w,g=(window.EL_GRADING||{})[z.ls&&z.ls.id]||{},fa=g.fp&&g.fp.mark&&/^🎬/.test(z.src[0])?g.fp.a:null,R=fa&&(window.EL_FP_RUBRICS||{})[fa];
     const head=`${z.ls&&C.ls&&C.ls.size>1?`<i>${esc(elLsNum(z.ls))}</i> `:""}${esc(z.src[0])}${z.src[1]?" · "+esc(z.src[1]):""}`;
-    if(R){const r=R.rows.find(x=>x.c===c),fb=String((D.rs[fa]||{}).feedback||""),H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/;
-      const hit=r&&fb.split("\n").map(l=>l.trim().match(H)).find(h=>h&&h[1].trim().toLowerCase()===r.name.toLowerCase());
-      if(r&&hit){const v=parseFloat(hit[3].replace(",",".")),L=4-Math.max(0,Math.min(4,Math.round(v/2.5)));
-        return `<span class="cpwr"><span class="cpwl">${head} · ${esc(r.name)}</span><span class="cpwn">${f1(v)}</span>${wdg(v)}${r.d[L]?`<span class="cpwd">${esc(R.levels[L])}: ${esc(r.d[L])}</span>`:""}</span>`}}
+    // the piece is the criterion's own row (compPieces, elFpRows), so the mark shown is the row's and the descriptor is that level's
+    if(R){const r=R.rows.find(x=>x.c===c);
+      if(r&&z.src[1]){const L=4-Math.max(0,Math.min(4,Math.round(m/2.5)));
+        return `<span class="cpwr"><span class="cpwl">${head}</span><span class="cpwn">${f1(m)}</span>${wdg(m)}${r.d[L]?`<span class="cpwd">${esc(R.levels[L])}: ${esc(r.d[L])}</span>`:""}</span>`}}
     return `<span class="cpwr"><span class="cpwl">${head}</span><span class="cpwn">${f1(m)}</span>${wdg(m)}</span>`});
   return `<span class="cpwhy"><b>${t("Per què aquest nivell","Why this level")}</b>${li.join("")}</span>`}
 // one short chip per line (Roger, 25 Nov 2026: "can you make this shorter or more compacted?"): the English name with the Catalan one-word
