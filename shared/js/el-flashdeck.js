@@ -79,6 +79,9 @@
 .elfd-full{position:fixed;inset:0;z-index:2147480000;display:flex;flex-direction:column;padding:16px clamp(14px,4vw,48px);background:#f5f7fb;overflow:auto;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 .elfd-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.elfd-top .grow{flex:1}.elfd-top .nm{font-weight:800;color:#475569}
 .elfd-x{border:0;background:#172033;color:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer}
+.elfd-ib{flex:none;display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;border:1px solid #dbe5f1;background:#fff;font-size:19px;line-height:1;cursor:pointer}.elfd-ib:hover{border-color:#3157d5}.elfd-ib:focus-visible{outline:3px solid #3157d5;outline-offset:2px}
+.elfd-full.elfd-dark{filter:invert(.9) hue-rotate(180deg)}
+.elfd-dark :is(img,video,canvas,picture,.elfd-ib span,.elfd-star,.elfd-rate button,.elfd-show),html.tn-dark .elfd-full :is(.elfd-ib span,.elfd-star,.elfd-rate button,.elfd-show){filter:invert(1) hue-rotate(180deg)}
 .elfd-cnt{display:flex;gap:14px;font-weight:800;font-size:1.1rem;font-variant-numeric:tabular-nums}.elfd-cnt u{text-decoration-thickness:3px;text-underline-offset:4px}
 .elfd-card{flex:1;min-height:260px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;border:2px solid #e5e7eb;border-radius:24px;padding:24px;background:linear-gradient(180deg,#fff,#f8fafc)}
 .elfd-tag{font-weight:700;color:#667085;font-size:.95rem}.elfd-tag.g{color:#7c3aed}.elfd-tag.e{color:#0f766e}
@@ -114,7 +117,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
 .elfd-say b{color:#1d4ed8}.elfd-say:after{content:"";position:absolute;right:-17px;top:50%;margin-top:-8px;border:8px solid transparent;border-left-color:#c7d2fe}
 .elfd-head .elfd-side{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
 .elfd-card .elmz-img{margin:-6px auto -4px}
-@media (max-width:640px){.elfd-rate{gap:6px}.elfd-rate button{padding:9px 2px;font-size:.92rem}.elfd-n span{min-width:38px;font-size:1rem}.elfd-card{padding:16px;min-height:200px}.elfd-full{padding:12px}}`;
+@media (max-width:640px){.elfd-top{gap:8px}.elfd-top .nm{flex:1 1 auto;min-width:0}.elfd-top .grow{display:none}.elfd-top::after{content:"";order:8;flex-basis:100%}.elfd-cnt{order:9;flex:1 0 auto}.elfd-ib,.elfd-dir{order:10}.elfd-ib{width:38px;height:38px;font-size:18px}.elfd-rate{gap:6px}.elfd-rate button{padding:9px 2px;font-size:.92rem}.elfd-n span{min-width:38px;font-size:1rem}.elfd-card{padding:16px;min-height:200px}.elfd-full{padding:12px}}`;
   const css = () => { if (document.getElementById('elfd-css')) return; const s = document.createElement('style'); s.id = 'elfd-css'; s.textContent = CSS; document.head.appendChild(s); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
@@ -145,6 +148,28 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     const DIRS = ['auto', 'en', 'ca'];
     let dir = (() => { try { const v = localStorage.getItem('el_fd_dir'); return DIRS.includes(v) ? v : 'auto'; } catch (e) { return 'auto'; } })();
     const caFirst = c => c && c.kind === 'v' && !!c.ca && (dir === 'ca' || dir === 'auto' && /\S\s+\S/.test(String(c.en || '').trim()));
+    // 🌙 Dark mode on the study screen (Roger, 27 Nov 2026: "I want dark mode available here … also for my students"): the button in the
+    // study top bar. Towards Nativeness has its own night mode for the whole page (tn-night.js: 21:00–7:00 or the device's dark mode),
+    // so there the button switches that one (window.TNNight) and the screen follows the page. Everywhere else it darkens only the study
+    // screen, by hand, the choice kept on that device (localStorage el_fd_theme); off by default. Like TN, the screen is inverted
+    // (pictures inverted back), so every text keeps its daytime contrast (REQUIREMENTS §3) and the cards' own colours need no dark rules.
+    const TNN = () => root.TNNight && typeof root.TNNight.toggle === 'function' ? root.TNNight : null;
+    let fdDark = (() => { try { return localStorage.getItem('el_fd_theme') === 'dark'; } catch (e) { return false; } })();
+    const isDark = () => { const n = TNN(); return n ? !!n.dark() : fdDark; };
+    const darkBtn = () => { const d = isDark(), l = d ? t('Mode clar', 'Light mode') : t('Mode fosc', 'Dark mode');
+      return `<button class="elfd-ib" data-fd="theme" title="${esc(l)}" aria-label="${esc(l)}"><span aria-hidden="true">${d ? '☀️' : '🌙'}</span></button>`; };
+    // ⚠️ Report a problem (Roger, 27 Nov 2026): the study screen covers the page's bottom bar, so it has its own ⚠️, the same window and the
+    // same problem reports (el-cloud.js window.elReport, as the 📓 notebook does), told which deck and card. Only where the page's bar would
+    // have it (a signed-in student or the teacher; never in the 👁 student view, where elReport is null).
+    const repBtn = () => typeof root.elReport === 'function' ? `<button class="elfd-ib" data-fd="report" title="${esc(t("Avisa d'un problema", 'Report a problem'))}" aria-label="${esc(t("Avisa d'un problema", 'Report a problem'))}"><span aria-hidden="true">⚠️</span></button>` : '';
+    const plain = h => { const x = document.createElement('div'); x.innerHTML = String(h || ''); return (x.textContent || '').replace(/\s+/g, ' ').trim(); };
+    function reportCard() {
+      if (typeof root.elReport !== 'function' || !ses) return;
+      const c = ses.cur, dk = c ? deckOfCard(ses.d, c) : ses.d.id, dn = (decks().find(x => x.id === dk) || ses.d).name;
+      // the card's id first, so the 120 characters the report keeps always name it
+      const txt = c ? plain(caFirst(c) ? c.ca : c.front) : '', card = txt.length > 40 ? txt.slice(0, 39) + '…' : txt;
+      root.elReport({ where: '🧠 ' + t('Targetes', 'Flashcards') + ' › ' + dn + (c ? ' › [' + c.id + ']' + (card ? ' “' + card + '”' : '') : '') });
+    }
     const dirLbl = () => dir === 'en' ? t('Primer l’anglès', 'English first') : dir === 'ca' ? t('Primer el català', 'Catalan first') : t('Primer: automàtic', 'First: automatic');
 
     const decks = () => (o.decks() || []).filter(d => d.cards.length);
@@ -295,7 +320,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       const d = ses.d, c = ses.cur, now = Date.now(), st = x => D(deckOfCard(d, x)).c[x.id];
       const nN = ses.fresh.length, nL = ses.lrn.filter(x => st(x)[1] - now <= AHEAD * MIN).length, nR = ses.due.length + ses.extra.length;
       const kindOf = x => !x ? '' : !st(x) ? 'new' : st(x)[0] === S_REV ? 'due' : 'lrn';
-      const top = `<div class="elfd-top"><button class="elfd-x" data-fd="close">✕ ${t('Tanca', 'Close')}</button><span class="nm">${esc(d.name)}${ses.part ? ' · ' + esc(ses.part) : ''}</span><span class="grow"></span><button class="b g sm elfd-dir" data-fd="dir" title="${esc(t('Automàtic: les expressions de més d’una paraula surten primer en català, i les paraules soles en anglès. Toca per canviar-ho.', 'Automatic: expressions of more than one word show the Catalan first, single words the English first. Tap to change it.'))}">⇄ ${dirLbl()}</button>
+      const top = `<div class="elfd-top"><button class="elfd-x" data-fd="close">✕ ${t('Tanca', 'Close')}</button><span class="nm">${esc(d.name)}${ses.part ? ' · ' + esc(ses.part) : ''}</span><span class="grow"></span>${darkBtn()}${repBtn()}<button class="b g sm elfd-dir" data-fd="dir" title="${esc(t('Automàtic: les expressions de més d’una paraula surten primer en català, i les paraules soles en anglès. Toca per canviar-ho.', 'Automatic: expressions of more than one word show the Catalan first, single words the English first. Tap to change it.'))}">⇄ ${dirLbl()}</button>
         <span class="elfd-cnt"><span class="new">${kindOf(c) === 'new' && !ses.shown ? '<u>' + (nN + 1) + '</u>' : nN}</span><span class="lrn">${kindOf(c) === 'lrn' && !ses.shown ? '<u>' + nL + '</u>' : nL}</span><span class="due">${kindOf(c) === 'due' && !ses.shown ? '<u>' + (nR + 1) + '</u>' : nR}</span></span></div>`;
       if (!c) {
         const later = ses.lrn.length ? Math.min(...ses.lrn.map(x => st(x)[1])) - now : 0;
@@ -322,7 +347,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
     function close() { if (layer && layer.isConnected) layer.remove(); document.documentElement.classList.remove('elfd-on'); if (ses) saveSoon(true); const id = ses && ses.d.id; ses = null; if (view.k === 'study') view = id && id !== '*' ? { k: 'ls', id } : { k: 'list' }; render(); }
     function render() {
       host.classList.add('elfd');
-      if (view.k === 'study' && ses) { open(); layer.innerHTML = studyHtml(); return; }
+      if (view.k === 'study' && ses) { open(); layer.classList.toggle('elfd-dark', !TNN() && fdDark); layer.innerHTML = studyHtml(); return; }
       const ds = decks(), d = view.id === '*' ? allDeck(ds) : ds.find(x => x.id === view.id);
       host.innerHTML = view.k === 'ls' && d ? lsPage(d) : view.k === 'stats' && d ? stats(d) : list();
     }
@@ -337,11 +362,13 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       else if (k === 'show') { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }
       else if (k === 'ans') answer(+v);
       else if (k === 'say') say(ses.cur.say);
+      else if (k === 'theme') { const n = TNN(); if (n) n.toggle(); else { fdDark = !fdDark; try { fdDark ? localStorage.setItem('el_fd_theme', 'dark') : localStorage.removeItem('el_fd_theme'); } catch (e) {} } render(); }
+      else if (k === 'report') reportCard();
       else if (k === 'dir') { dir = DIRS[(DIRS.indexOf(dir) + 1) % DIRS.length]; try { localStorage.setItem('el_fd_dir', dir); } catch (e) {} render(); }
     }
     host.addEventListener('click', click);
     document.addEventListener('keydown', e => {
-      if (!ses || view.k !== 'study' || (e.target.closest && e.target.closest('input,textarea,select'))) return;
+      if (!ses || view.k !== 'study' || (e.target.closest && e.target.closest('input,textarea,select,dialog')) || document.querySelector('dialog[open]')) return;   // the ⚠️ window is open: its keys are its own
       if (e.key === 'Escape') { e.preventDefault(); close(); }
       else if ((e.key === ' ' || e.key === 'Enter') && !ses.shown && ses.cur) { e.preventDefault(); click({ target: layer.querySelector('[data-fd="show"]') }); }
       else if (ses.shown && /^[1-4]$/.test(e.key)) { e.preventDefault(); answer(+e.key); }

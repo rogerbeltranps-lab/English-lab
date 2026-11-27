@@ -49,6 +49,9 @@
     try{ next === "auto" ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, next); }catch(e){}
     apply();
   }
+  /* the 🧠 flashcards study screen (el-flashdeck.js) covers the top bar, so it has its own 🌙 / ☀️ button that uses this one
+     (Roger, 27 Nov 2026: "I want dark mode available here"): one setting for the whole course */
+  window.TNNight = { toggle: toggle, dark: isDark, pref: pref };
 
   /* Where the button goes: the phone's top bar (header.elplh, before ⓘ) when it shows; beside the title on the course home;
      otherwise a round button at the top right (a learning path on a computer, where the phone bar is hidden). */
