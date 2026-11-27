@@ -337,7 +337,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-criteria-easy.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-comp-map.js"></script>
-<script src="shared/js/el-fp-rubrics.js?v=20261127"></script>
+<script src="shared/js/el-fp-rubrics.js?v=20261127b"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261125g"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
 <script src="shared/js/el-term-report.js?v=20261125"></script>
@@ -1686,7 +1686,7 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
         return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?elBoosted(y.score/(+(y.max||secMax(e,k)))*10,elExamBoost(e,x)):null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
     else if(b.id==="fp"&&g.fp){const f=g.fp,fr=f.mark&&window.elFpRows&&elFpRows(f.a,(D.rs[f.a]||{}).feedback,fpM());
       // LS1: each criterion by its own rubric row (Roger, 27 Nov 2026, option (a); elFpRows); not marked by rows yet: the whole mark on every row
-      if(fr)pcs=fr.map(r=>({c:r.c,w:w*r.w/fr.tw,m:r.m,src:["🎬 "+t("Producte final","Final product"),fr.whole?"":nmT(r.name)]}));
+      if(fr)pcs=fr.map(r=>({c:r.c,w:w*r.w/fr.tw,m:r.m,src:["🎬 "+t("Producte final","Final product"),r.whole?"":nmT(r.name)]}));
       else if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
       else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))
