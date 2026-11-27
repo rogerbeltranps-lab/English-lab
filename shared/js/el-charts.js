@@ -108,6 +108,9 @@
           Object.entries(st.doneAt||{}).forEach(([k,d])=>{const p=k.replace(LVL,""),t=tms(d);if(t&&!hd[p])hd[p]=t});
           const AL=st.all||{},F=st.tries||{},L=st.last||{},ok=x=>x&&+x.max>0,sc=x=>Math.min(1,(+x.score||0)/+x.max);
           new Set([...Object.keys(AL),...Object.keys(F),...Object.keys(L)]).forEach(k=>{const pid=k.replace(LVL,""),sk=skillOf(a,pid);if(!sk)return;
+            // a step checked question by question (per: 1) and not finished yet (full: false) is not a try yet: its questions not checked
+            // count 0 only for the mark, so 1 right out of 8 is not 13 % in the skill (problem report, 2ESOB, 27 Nov 2026)
+            if(F[k]&&F[k].per&&F[k].full===false)return;
             const f=F[k],l=L[k],two=ok(l)&&(!ok(f)||Math.abs(tms(l.date)-tms(f.date))>5000);
             let v=null;if(AL[k]&&AL[k].n)v=AL[k].s/AL[k].n;else{const xs=[f,two?l:null].filter(ok);if(xs.length)v=xs.reduce((n,x)=>n+sc(x),0)/xs.length}
             if(v!=null&&!pr){put(sk,v);seen.add(pid)}
