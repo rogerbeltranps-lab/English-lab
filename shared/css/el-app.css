@@ -364,6 +364,9 @@ body.elapp.elcourse .elcrumb{max-width:980px}
 .panel-head>.elslpgo{order:3}
 @media (max-width:640px){.elslpgo,.elslpbar{display:none!important}}
 body.elslpfs .elslpgo{display:none}
+/* the fixed copy at the top right while scrolling (Roger, 27 Nov 2026; el-app.js flUpd) */
+.elslpfl{position:fixed;right:20px;top:12px;z-index:60;margin:0;box-shadow:0 4px 14px rgba(15,23,42,.18)}
+.elslpfl[hidden]{display:none}
 /* the view: everything around the step goes */
 body.elslpfs :is(.elrail,.elbar,.topbar,header.hero,.ellpside,.lp-top,.plan-card,.elplh,.elptabs,#el-banner,body>footer,#el-todo-btn,.lp-body>nav.tabs,.lp-body>.el-tsec){display:none!important}
 body.elapp.elslpfs.elhas-rail{padding-left:0!important}
