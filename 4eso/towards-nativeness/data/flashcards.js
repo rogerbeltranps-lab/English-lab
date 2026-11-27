@@ -59,6 +59,14 @@
       const slip = ok.some(a => { const aw = a.split(' '); if (aw.length !== vw.length) return false; const d = aw.map((x, i) => x === vw[i] ? 0 : x.length >= 4 && edit1(x, vw[i]) ? 1 : 2);
         return d.every(x => x < 2) && d.some(x => x === 1); });
       return slip ? { slip: 'Almost! Check the spelling.' } : { ok: false }; }; };
+  /* the gap filled in, marked; "I ’ve just uploaded" shows as "I’ve just uploaded" (the say text keeps its space: recordings are keyed by it) */
+  const hl = x => esc(x).replace(/ \u0001([’'](?:ve|s|re|ll|d|m)\b)/g, '<mark style="padding-left:0">$1').replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>');
+  /* ✓ Also right (Roger, 27 Nov 2026: "Cant i use the last here?", on "I ___ (just / upload) the photos"): the other answers of a
+     one-gap card that are really different (not only a contraction), each as a whole sentence, at most two. American English takes
+     the past simple with just / already / yet (I just uploaded), so those cards list it. */
+  const ct = x => nrm(String(x).replace(/[’']d\b/g, ' had').replace(/[’']s\b/g, ' has'));   // I’d never = I had never, the app’s taken = has taken
+  const same = (a, b) => nrm(a) === nrm(b) || ct(a) === ct(b);
+  const also = xs => xs.length ? '<div class="elfd-why">✓ Also right: ' + xs.slice(0, 2).map(x => hl(x).replace(/<mark[^>]*>/g, '<strong>').replace(/<\/mark>/g, '</strong>')).join(' · ') + '</div>' : '';
   // a typed question: the gaps filled with the answer, or the question → the answer
   function typed(it, part, pre) {
     const q = plain(it.q), n = (q.match(GAP) || []).length, a0 = String(it.a[0]), all = (it.a || []).map(String);
@@ -67,7 +75,8 @@
       const fill = mk => q.replace(GAP, () => mk(n > 1 ? w[k++] || '' : a0)).replace(/\s*\([^)]*\)/g, '').replace(/\s+([.,?!])/g, '$1');
       return { id: pre + key(it.q), kind: 'g', part, front: esc(q).replace(GAP, '<span class="elfd-gap"></span>'), say: fill(x => x),
         check: WRITE.test(q) ? checker(all.concat(fill(x => x))) : null,
-        back: ans(esc(fill(x => '\u0001' + x + '\u0002')).replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>')) + why(esc(it.en || '')) };
+        back: ans(hl(fill(x => '\u0001' + x + '\u0002'))) + also(n === 1 ? all.slice(1).filter(x => !same(x, a0)).map(x => q.replace(/^.*→\s*/, '').replace(GAP, () => '\u0001' + x + '\u0002')
+          .replace(/\s*\([^)]*\)/g, '').replace(/\s+([.,?!])/g, '$1')) : []) + why(esc(it.en || '')) };
     }
     return { id: pre + key(it.q), kind: 'g', part, front: esc(q), say: dot(a0), check: WRITE.test(q) ? checker(all) : null, back: ans(esc(dot(a0))) + why(esc(it.en || '')) };
   }
