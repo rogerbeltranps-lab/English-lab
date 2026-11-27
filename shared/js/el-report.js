@@ -65,11 +65,21 @@ let h2c=null;
 const loadH2c=()=>h2c||(h2c=new Promise((ok,no)=>{if(window.html2canvas)return ok(window.html2canvas);
   const s=document.createElement("script");s.src=new URL("./vendor/html2canvas-1.4.1.min.js",import.meta.url).href;
   s.onload=()=>ok(window.html2canvas);s.onerror=()=>{h2c=null;no(new Error("html2canvas did not load"))};document.head.append(s)}));
+// 🕶 No names in the picture (Roger, 27 Nov 2026, "Yes"; REQUIREMENTS § 8 Marking never knows who the student is): the copy that
+// html2canvas draws hides the student's name under the menu or in the bar (.el-who, .elcb-nm), classmates' first names under their
+// vehicles on the road (.vy-boat b) and every word of the student's own name anywhere else ("Hi, Name"), as •••. The page itself is untouched.
+export function hideNames(doc,name){
+  doc.querySelectorAll(".el-who,.elcb-nm,.vy-boat>b").forEach(e=>{e.textContent="•••"});
+  const ws=[...new Set(String(name||"").split("@")[0].split(/[\s,.]+/).filter(w=>w.length>=3&&!/\d/.test(w)))];if(!ws.length)return;
+  const esc=w=>w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),re=new RegExp("(^|[^\\p{L}])("+ws.map(esc).join("|")+")(?![\\p{L}])","giu");
+  const tw=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);for(let n;(n=tw.nextNode());)if(re.test(n.nodeValue)){re.lastIndex=0;n.nodeValue=n.nodeValue.replace(re,"$1•••")}
+  doc.querySelectorAll("input,textarea").forEach(e=>{if(re.test(e.value)){re.lastIndex=0;e.value=e.value.replace(re,"$1•••")}re.lastIndex=0});
+}
 // What the student sees right now (the part of the page on screen), without the report window.
 async function pageShot(skip){
   const html2canvas=await loadH2c(),w=innerWidth,h=innerHeight;
   const c=await html2canvas(document.body,{x:scrollX,y:scrollY,scrollX:0,scrollY:0,width:w,height:h,windowWidth:w,windowHeight:h,   // the part on screen (scrollX/Y 0: crop by x/y)
-    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",ignoreElements:el=>el===skip||el.id==="el-cloud-bar"||(el.tagName!=="SUMMARY"&&el.parentElement&&el.parentElement.matches("details:not([open])"))});   // the bottom bar would come out in the wrong place
+    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",onclone:d=>hideNames(d,window.EL_WHO_NAME),ignoreElements:el=>el===skip||el.id==="el-cloud-bar"||(el.tagName!=="SUMMARY"&&el.parentElement&&el.parentElement.matches("details:not([open])"))});   // the bottom bar would come out in the wrong place
   return jpeg(c,c.width,c.height);
 }
 
