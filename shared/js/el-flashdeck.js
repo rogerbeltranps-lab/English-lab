@@ -13,7 +13,9 @@
    Days start at 4:00 (as in Anki), so a late-night review counts for the same day.
 
    ELFlashDeck.mount(host, {
-     decks: () => [{ id, name, cards: [{ id, kind: 'v'|'g'|'e', part, front (html), back (html), say, ex, star, opts }] }],
+     decks: () => [{ id, name, cards: [{ id, kind: 'v'|'g'|'e', part, front (html), back (html), say, ex, star, opts, check }] }],
+                                    // check: val => null (empty) | { ok } | { slip: html }: the card asks to write, so it is typed (or, with
+                                    // opts, one option is tapped) before it turns over (Roger, 27 Nov 2026)
      ca: () => bool,                // Catalan (Starter)
      load: () => state, save: state => {},   // the student's progress { decks: { lsId: { c: { cardId: [...] }, log: { day: [...] } } } }
      say: x => {}                   // play a text or [word, example]
@@ -86,6 +88,12 @@
 .elfd-front.s{font-size:clamp(1.25rem,3vw,2rem);font-weight:700;max-width:36ch}
 .elfd-front em{font-style:normal;color:#7c3aed}.elfd-gap{display:inline-block;min-width:3.2em;border-bottom:3px solid #94a3b8;margin:0 .15em}
 .elfd-opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.elfd-opts span{border:1px solid #cbd5e1;border-radius:10px;padding:4px 12px;background:#fff;font-weight:700}
+.elfd-opts button{border:2px solid #cbd5e1;border-radius:12px;padding:8px 18px;background:#fff;color:#172033;font:inherit;font-weight:800;font-size:1.1rem;cursor:pointer}.elfd-opts button:hover{border-color:#3157d5;background:#eaf0ff}.elfd-opts button:disabled{opacity:.45;cursor:default;text-decoration:line-through}
+.elfd-type{font:inherit;font-size:max(16px,1.35rem);font-weight:700;color:#172033;background:#fff;padding:10px 16px;border:2px solid #cbd5e1;border-radius:14px;width:min(440px,100%);box-sizing:border-box;text-align:center}.elfd-type:focus{outline:none;border-color:#3157d5;box-shadow:0 0 0 3px rgba(49,87,213,.18)}
+.elfd-fbk{min-height:1.3em;margin:0;color:#92400e;font-weight:700}.elfd-fbk:empty{display:none}
+.elfd-res{font-weight:800;font-size:1.1rem;border-radius:12px;padding:6px 14px}.elfd-res.ok{background:#dcfce7;color:#14532d}.elfd-res.no{background:#fee2e2;color:#7f1d1d}.elfd-res s{font-weight:700}
+.elfd-btns{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center;align-items:center;margin:14px 0 4px}.elfd-btns .elfd-show{margin:0}
+.elfd-rate .sug{outline:3px solid #172033;outline-offset:3px}
 .elfd-back{border-top:2px dashed #e5e7eb;padding-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;max-width:40ch}
 .elfd-ans{font-size:clamp(1.3rem,3.4vw,2.2rem);font-weight:800;color:#0f766e}.elfd-ans mark{background:#dcfce7;color:#14532d;border-radius:6px;padding:0 .2em}
 .elfd-ex{color:#667085;font-style:italic;font-size:clamp(1rem,2vw,1.3rem)}.elfd-why{background:#fffbeb;color:#92400e;border-radius:10px;padding:6px 12px}
@@ -202,7 +210,7 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
         c = takeNew ? ses.fresh.shift() : ses.due.shift(); }
       else if (ses.extra.length) c = ses.extra.shift();
       else if (ses.lrn.length && st(ses.lrn[0])[1] - now <= AHEAD * MIN) c = ses.lrn[0];   // learn ahead when nothing else is left
-      ses.cur = c; ses.shown = false; ses.t1 = Date.now(); render();
+      ses.cur = c; ses.shown = false; ses.val = ''; ses.fb = ''; ses.res = null; ses.hinted = false; ses.t1 = Date.now(); render();
     }
     function answer(ans) {
       const c = ses.cur; if (!c || !ses.shown) return;
@@ -310,22 +318,38 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       const listen = c.say ? `<button class="b g sm" data-fd="say">🔊 ${t('Escolta', 'Listen')}</button>` : '';
       const help = c.kind === 'v' ? t('Digues què vol dir en veu alta. Després gira la targeta.', 'Say what it means out loud. Then turn the card over.') : t('Digues la frase completa en veu alta. Després gira la targeta.', 'Say the whole sentence out loud. Then turn the card over.');
       const help2 = rev ? t('Digues-ho en anglès en veu alta. Després gira la targeta.', 'Say it in English out loud. Then turn the card over.') : help;
+      // ✍ a card that asks to write: typed (or one option tapped) and checked before it turns over
+      const typed = c.check && !rev, pickIt = typed && c.opts && c.opts.length;
+      if (!ses.shown && typed) {
+        const f0 = `<div class="elfd-front s">${c.front}${c.star ? ' <span class="elfd-star">⭐</span>' : ''}</div>`;
+        const box = pickIt ? `<div class="elfd-opts">${c.opts.map((x, i) => `<button data-fd="opt" data-v="${i}">${esc(x)}</button>`).join('')}</div>`
+          : `<input class="elfd-type" id="elfdIn" type="text" value="${esc(ses.val)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="${esc(t('La teva resposta', 'Your answer'))}" placeholder="${esc(t('Escriu la resposta…', 'Type your answer…'))}">`;
+        return top + `<div class="elfd-card">${tag}${f0}${box}<p class="elfd-fbk" role="status">${ses.fb}</p><p class="elfd-tag">${pickIt ? t('Tria la resposta correcta.', 'Choose the right answer.') : t('Escriu la resposta i prem Comprova.', 'Type the answer and press Check.')}</p></div>
+          <div class="elfd-btns">${pickIt ? '' : `<button class="b elfd-show" data-fd="check">✓ ${t('Comprova', 'Check')}</button>`}<button class="b g sm" data-fd="idk">${t('No ho sé: gira-la', 'I don’t know: turn it over')}</button></div><p class="elfd-keys">${pickIt ? '' : t('Enter: comprova', 'Enter: check')}</p>`;
+      }
       if (!ses.shown) return top + `<div class="elfd-card">${tag}${front}${c.kind === 'v' && !rev ? listen : ''}<p class="elfd-tag">${help2}</p></div><button class="b elfd-show" data-fd="show">${t('Gira la targeta', 'Turn over')}</button><p class="elfd-keys">${t('Espai: girar', 'Space: turn over')}</p>`;
       const s = st(c), opt = [1, 2, 3, 4].map(a => { const early = ses.part && s && s[0] === S_REV && s[1] >= dayStart(now) + DAY && a >= 3; if (early) return t('igual', 'same'); const x = next(s, a, now); return span(x[0] === S_REV ? x[2] * DAY : until(x, now), ca()); });
       const L = [['De nou', 'Again'], ['Difícil', 'Hard'], ['Bé', 'Good'], ['Fàcil', 'Easy']];
       const back = rev ? `<div class="elfd-ans">${esc(c.en)}</div>${c.ex ? `<div class="elfd-ex">${esc(c.ex)}</div>` : ''}` : c.back;
-      return top + `<div class="elfd-card">${tag}${front}<div class="elfd-back">${back}${listen}</div></div>
-        <div class="elfd-rate">${L.map(([a, b], i) => `<button class="a${i + 1}" data-fd="ans" data-v="${i + 1}">${t(a, b)}<small>${opt[i]}</small></button>`).join('')}</div><p class="elfd-keys">${t('Tecles 1 2 3 4', 'Keys 1 2 3 4')}</p>`;
+      // what they typed: ✓ right, or ✗ with their answer, and Again lit up so a wrong card comes back soon
+      const R = typed && ses.res, res = !R ? '' : R.ok ? `<div class="elfd-res ok">✓ ${t('Correcte!', 'Right!')}</div>`
+        : R.val ? `<div class="elfd-res no">✗ ${R.pick ? t('Has triat', 'You chose') : t('Has escrit', 'You wrote')}: <s>${esc(R.val)}</s></div>` : '';
+      return top + `<div class="elfd-card">${tag}${typed ? `<div class="elfd-front s">${c.front}</div>` : front}${res}<div class="elfd-back">${back}${listen}</div></div>
+        <div class="elfd-rate">${L.map(([a, b], i) => `<button class="a${i + 1}${R && !R.ok && !i ? ' sug' : ''}" data-fd="ans" data-v="${i + 1}">${t(a, b)}<small>${opt[i]}</small></button>`).join('')}</div><p class="elfd-keys">${t('Tecles 1 2 3 4', 'Keys 1 2 3 4')}</p>`;
     }
 
     function open() { document.documentElement.classList.add('elfd-on'); if (!layer) { layer = document.createElement('div'); layer.className = 'elfd elfd-full'; layer.setAttribute('role', 'dialog'); layer.setAttribute('aria-modal', 'true'); layer.addEventListener('click', click); } if (!layer.isConnected) document.body.appendChild(layer); }
     function close() { if (layer && layer.isConnected) layer.remove(); document.documentElement.classList.remove('elfd-on'); if (ses) saveSoon(true); const id = ses && ses.d.id; ses = null; if (view.k === 'study') view = id && id !== '*' ? { k: 'ls', id } : { k: 'list' }; render(); }
     function render() {
       host.classList.add('elfd');
-      if (view.k === 'study' && ses) { open(); layer.innerHTML = studyHtml(); return; }
+      if (view.k === 'study' && ses) { open(); layer.innerHTML = studyHtml();
+        const box = layer.querySelector('#elfdIn'); if (box) { box.addEventListener('input', () => { ses.val = box.value; });
+          if (!matchMedia('(pointer:coarse)').matches || ses.fb) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } }
+        return; }
       const ds = decks(), d = view.id === '*' ? allDeck(ds) : ds.find(x => x.id === view.id);
       host.innerHTML = view.k === 'ls' && d ? lsPage(d) : view.k === 'stats' && d ? stats(d) : list();
     }
+    function turn() { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }
     function click(e) {
       const el = e.target.closest('[data-fd]'); if (!el) return; const k = el.dataset.fd, v = el.dataset.v, ds = decks(), d = v === '*' ? allDeck(ds) : ds.find(x => x.id === v);
       if (k === 'study' && d) start(d);
@@ -334,16 +358,25 @@ html.elfd-on,html.elfd-on body{overflow:hidden}
       else if (k === 'back') { view = o.only ? { k: 'ls', id: o.only } : view.k === 'stats' && view.id !== '*' ? { k: 'ls', id: view.id } : { k: 'list' }; render(); }
       else if (k === 'close') close();
       else if (k === 'statsnow') { const id = ses.d.id; close(); view = { k: 'stats', id }; render(); }
-      else if (k === 'show') { ses.shown = true; const c = ses.cur; if (c.say) say(c.kind === 'v' && c.ex ? [c.say, c.ex] : c.say); render(); }
+      else if (k === 'show') turn();
+      else if (k === 'check' || k === 'opt' || k === 'idk') {   // ✍ a typed card: right or wrong, it turns over; a spelling slip tries again
+        const c = ses.cur; if (!c || ses.shown) return;
+        const val = k === 'opt' ? c.opts[+v] : k === 'idk' ? '' : ((layer.querySelector('#elfdIn') || {}).value || '');
+        const r = k === 'idk' ? { ok: false } : c.check(val);
+        if (!r) { ses.fb = t('Escriu una resposta.', 'Type an answer.'); render(); return; }
+        // a spelling slip names the word once (never the grammar rule); the next try counts, so the answer can't be guessed letter by letter
+        if (r.slip && !ses.hinted) { ses.hinted = true; ses.val = val; ses.fb = r.slip + ' ' + t('Torna-ho a provar.', 'Try again.'); render(); return; }
+        ses.res = { ok: !!r.ok, val: String(val).trim().slice(0, 80), pick: k === 'opt' }; ses.fb = ''; turn(); }
       else if (k === 'ans') answer(+v);
       else if (k === 'say') say(ses.cur.say);
       else if (k === 'dir') { dir = DIRS[(DIRS.indexOf(dir) + 1) % DIRS.length]; try { localStorage.setItem('el_fd_dir', dir); } catch (e) {} render(); }
     }
     host.addEventListener('click', click);
     document.addEventListener('keydown', e => {
+      if (ses && view.k === 'study' && e.target.id === 'elfdIn' && e.key === 'Enter') { e.preventDefault(); click({ target: layer.querySelector('[data-fd="check"]') }); return; }
       if (!ses || view.k !== 'study' || (e.target.closest && e.target.closest('input,textarea,select'))) return;
       if (e.key === 'Escape') { e.preventDefault(); close(); }
-      else if ((e.key === ' ' || e.key === 'Enter') && !ses.shown && ses.cur) { e.preventDefault(); click({ target: layer.querySelector('[data-fd="show"]') }); }
+      else if ((e.key === ' ' || e.key === 'Enter') && !ses.shown && ses.cur) { const b = layer.querySelector('[data-fd="show"]'); if (b) { e.preventDefault(); click({ target: b }); } }
       else if (ses.shown && /^[1-4]$/.test(e.key)) { e.preventDefault(); answer(+e.key); }
     });
     addEventListener('pagehide', () => saveSoon(true));
