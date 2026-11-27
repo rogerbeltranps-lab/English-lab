@@ -250,8 +250,8 @@
         m.outerHTML = '<div class="listen">🎧 ' + T('La gravació d’aquest Learning Path', 'The recording from this Learning Path') + (t >= 0 ? ' · ' + T('si no la pots escoltar, llegeix la transcripció ' + (t + 1) + ' al final.', 'if you cannot listen to it, read transcript ' + (t + 1) + ' at the end.') : '.') + '</div>';
       });
       b.querySelectorAll('.question').forEach((qn, i) => {
-        const it = items[i] || {}, inp = qn.querySelector('input.typed');
-        if (inp) { const t = qn.querySelector('.q-title'); t.innerHTML = t.innerHTML.replace(/_{2,}/g, '<span class="gap"></span>') + (key ? ' <span class="key-line">→ ' + esc((it.a || [''])[0]) + '</span>' : ''); inp.outerHTML = /_{2,}/.test(it.q || '') || key ? '' : lines(1); }
+        const it = items[i] || {}, inp = qn.querySelector('input.typed,textarea.typed');
+        if (inp) { const t = qn.querySelector('.q-title'); t.innerHTML = t.innerHTML.replace(/_{2,}/g, '<span class="gap"></span>') + (key ? ' <span class="key-line">→ ' + esc((it.a || [''])[0]) + '</span>' : ''); inp.outerHTML = /_{2,}/.test(it.q || '') || key ? '' : lines(inp.tagName === 'TEXTAREA' ? 2 : 1); }
         const opts = qn.querySelector('.options');
         if (opts) opts.outerHTML = '<div class="opts">' + [...opts.querySelectorAll('label')].map((l, j) => '<span class="opt' + (key && l.querySelector('input').value === '0' ? ' right' : '') + '"><b>' + 'abcd'[j] + ')</b> ' + l.querySelector('span').innerHTML + '</span>').join('') + '</div>';
       });
