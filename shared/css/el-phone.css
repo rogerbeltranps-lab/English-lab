@@ -341,3 +341,19 @@
   .lsbar::-webkit-scrollbar{display:none}
   .lsb{flex:0 0 auto;white-space:nowrap;padding:6px 12px;font-size:.9rem}
 }
+/* 🔁 Learn from your mistakes (today.html#mistakes, 28 Nov 2026): the LS tabs in one row that scrolls sideways, and the three source cards
+   side by side under ▶ Practise 10 mistakes, so the question is close to the top */
+@media (max-width:640px){
+  .mxw .mxtabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -4px 12px;padding:2px 4px}
+  .mxw .mxtabs::-webkit-scrollbar{display:none}
+  .mxw .mxtabs button{flex:0 0 auto;white-space:nowrap}
+  .mxw .mxcards{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .mxw .mxc.go{grid-column:1/-1}
+  .mxw .mxc:not(.go){padding:10px 8px;align-items:center;text-align:center}
+  .mxw .mxc:not(.go)>small{display:none}
+  .mxw .mxc:not(.go) b{font-size:13.5px}
+  .mxw .mxc:not(.go) .mxn{font-size:22px}
+  .mxw .mxc:not(.go) .mxn small{display:block;font-size:12px}
+  .mxw .mxq,.mxw .mxlist{padding:14px}
+  .mxw .mxs{font-size:18px}
+}
