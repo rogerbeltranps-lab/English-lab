@@ -284,13 +284,12 @@
     left:     { when: "Before the activities deadline: 2 or more activities due are still not done", en: "You still have {n} activities to do: finish them before Friday.", ca: "Et falten {n} activitats: fes-les abans de divendres." },
     next:     { when: "Always, at the end", en: "Next term, do each activity in the week we do it in class.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe." },
     nextPr:   { when: "At the end, when there is a point to work on (in place of the one above)", en: "Next term, do each activity in the week we do it in class and practise “{x}” in 🎯 Practise.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe i practica «{x}» a 🎯 Practica." },
-    // a personal close, one of these, from what the work shows (Roger, 28 Nov 2026: "Add nice personal sentences at the end")
-    endProud: { when: "Close: everyday work Very good or Excellent and the activities on time", en: "I'm really proud of the way you worked this term. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat aquest trimestre. Continua gaudint de l'anglès!" },
-    endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure next term will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que el proper trimestre anirà encara millor." },
-    endFresh: { when: "Close: none of the activities due is done", en: "Next term is a fresh start, and I'm here to help you every step of the way.", ca: "El proper trimestre és un nou començament, i sóc aquí per ajudar-te en cada pas." },
-    endBelieve:{ when: "Close: the activities were late or at the last minute, or everyday work Not satisfactory or Satisfactory", en: "I know you can do it: with a little work every week, you'll see the difference. I'm here to help you.", ca: "Sé que ho pots aconseguir: amb una mica de feina cada setmana, veuràs la diferència. Sóc aquí per ajudar-te." },
-    endThanks:{ when: "Close: any other case", en: "Thank you for your work this term. Let's keep learning together!", ca: "Gràcies per la feina d'aquest trimestre. Seguim aprenent!" },
-    bye:      { when: "Always, the very last sentence", en: "See you in class!", ca: "Ens veiem a classe!" } };
+    // a closing sentence, one of these, from what the work shows (Roger, 28 Nov 2026: "Add nice personal sentences at the end"; then "too personal, I'm a teacher not a friend")
+    endProud: { when: "Close: everyday work Very good or Excellent and the activities on time", en: "Very good work this term: keep working in the same way.", ca: "Molt bona feina aquest trimestre: continua treballant de la mateixa manera." },
+    endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "Correcting your mistakes is the way to improve: keep doing it.", ca: "Corregir els errors és la manera de millorar: continua fent-ho." },
+    endFresh: { when: "Close: none of the activities due is done", en: "Next term is a new opportunity: start by doing each activity in class.", ca: "El proper trimestre és una nova oportunitat: comença fent cada activitat a classe." },
+    endBelieve:{ when: "Close: the activities were late or at the last minute, or everyday work Not satisfactory or Satisfactory", en: "With regular work every week, your results can improve.", ca: "Amb una feina regular cada setmana, els teus resultats poden millorar." },
+    endThanks:{ when: "Close: any other case", en: "Keep working steadily next term.", ca: "Continua treballant amb constància el proper trimestre." } };
   const DEG = { en: ["Not satisfactory (No assoliment)", "Satisfactory (Assoliment satisfactori)", "Very good (Assoliment notable)", "Excellent (Assoliment excel·lent)"],
     ca: ["No assoliment", "Assoliment satisfactori", "Assoliment notable", "Assoliment excel·lent"] };
   const degOf = m => m < 5 ? 0 : m < 7 ? 1 : m < 9 ? 2 : 3;
@@ -312,7 +311,7 @@
     const left = tm.due - tm.done, todo = open && left > 0;
     if (todo && tm.profile !== "none") say(left === 1 ? "left1" : "left", { n: left });
     w ? say("nextPr", { x: lc(short(w.t)) }) : say("next");
-    const P = tm.profile; say(P === "none" ? "endFresh" : P === "steady" && lv >= 2 ? "endProud" : up ? "endEffort" : P === "behind" || P === "last" || (lv != null && lv <= 1) ? "endBelieve" : "endThanks"); say("bye");
+    const P = tm.profile; say(P === "none" ? "endFresh" : P === "steady" && lv >= 2 ? "endProud" : up ? "endEffort" : P === "behind" || P === "last" || (lv != null && lv <= 1) ? "endBelieve" : "endThanks");
     return out.join(" "); }
 
   window.elTrepBuild = function (C, ctx) { const L = ctx.lang === "ca" ? "ca" : "en", prev = (ctx.prev && ctx.prev.pts) || [], pts = [], ptsCa = [];

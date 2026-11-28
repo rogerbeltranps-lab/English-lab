@@ -46,9 +46,9 @@ ok(!/\d+[.,]\d|\d+ ?%|SECRET/.test(RX.comment),"the comment must have no exam nu
 ok(typeof RX.commentCa==="string"&&/Assoliment satisfactori/.test(RX.commentCa)&&/Assoliment notable/.test(RX.commentCa)&&!/ exam /.test(RX.commentCa),"an English report must carry its comment in Catalan: "+RX.commentCa);
 ok(RX.pts.every(p=>typeof p.ca==="string"&&p.ca.length>3),"every point line must have its Catalan");
 ok(/^Your everyday work/.test(RX.comment)&&RX.comment.indexOf("exam")>RX.comment.indexOf("everyday work"),"the comment opens with everyday work, the exam comes after: "+RX.comment);
-// a personal close from the bank, then "See you in class!" (Roger, 28 Nov 2026: "Add nice personal sentences at the end")
-{const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(/See you in class!$/.test(RX.comment)&&E.some(b=>RX.comment.includes(b.en)),"the comment ends with a personal sentence and See you in class!: "+RX.comment);
- ok(/Ens veiem a classe!$/.test(RX.commentCa)&&E.some(b=>RX.commentCa.includes(b.ca)),"the Catalan comment ends the same way: "+RX.commentCa);}
+// a closing sentence from the bank, a teacher's, not a friend's (Roger, 28 Nov 2026)
+{const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(E.some(b=>RX.comment.endsWith(b.en)),"the comment ends with a closing sentence: "+RX.comment);
+ ok(E.some(b=>RX.commentCa.endsWith(b.ca)),"the Catalan comment ends the same way: "+RX.commentCa);}
 const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
 if(bad.length){console.error("✗ Term report:\n  "+bad.join("\n  "));process.exit(1)}
 console.log("✓ Term report: built live, locked steps never count, saved lines kept while unchanged");
