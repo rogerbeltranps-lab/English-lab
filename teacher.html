@@ -4523,18 +4523,19 @@ function repLoad(){if(REPS.busy||REPS.d)return;if(DEMO){REPS.d=DEMO.trep||{};ret
 // Can you make a publish draft button?"): teams/{group}.repPub.t1 = when; the Firestore rules then let the group's students read their own
 // termReports/{email} at any time, and their board shows 📄 My Term 1 report (draft). 🔒 Hide sets it back to null.
 function repPublish(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
-  if(!confirm(on?`Publish the Term 1 draft reports of ${g.name} now?\n\nEach student can open their own report on their board (📄 My Term 1 report · draft) until you hide them again. They never see anyone else's.`
-    :`Hide the draft reports of ${g.name} again?\n\nStudents will see theirs only while you press 📄 Show draft reports in class mode.`))return;
+  if(!confirm(on?`Show the draft Term 1 reports to ${g.name}?\n\nEach student can open their own report on their board (📄 My Term 1 report · draft), check it, finish what is missing and tell you about any mistake with ⚠️ Report a problem. They never see anyone else's.`
+    :`Hide the reports of ${g.name}?\n\nStudents can't open them any more (only while you press 📄 Show draft reports in class mode), and they are a draft again.`))return;
   const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repPub=Object.assign({},t.repPub,{t1:v});
-  const p=put(["teams",gid],{repPub:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
+  const o={repPub:{t1:v}};if(!on){t.repFinal=Object.assign({},t.repFinal,{t1:null});o.repFinal={t1:null}}const p=put(["teams",gid],o);render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
 // ✅ Final version (Roger, 28 Nov 2026: "the button to say that the current reports are the last version (even though I must be able to do any
 // changes I want)"): teams/{group}.repFinal.t1 = when. Students then see the saved report as it is, labelled final (no "draft", no live
 // build). Nothing is locked: 🔄 Rebuild still rewrites any report, and ✏️ Back to draft sets it back to null.
 function repFinal(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
-  if(!confirm(on?`Make the current Term 1 reports of ${g.name} the final version?\n\nStudents see their report as it is now, as the final version (no "draft"), and it no longer changes with their work. You can still 🔄 rebuild any report or go back to draft.`
-    :`Set the reports of ${g.name} back to draft?\n\nThey are labelled draft again and change with the students' work.`))return;
-  const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repFinal=Object.assign({},t.repFinal,{t1:v});
-  const p=put(["teams",gid],{repFinal:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
+  if(!confirm(on?`Publish the final version of the Term 1 reports of ${g.name}?\n\nEvery student sees their report as it is now, as the final version (no "draft"), on their board, and it no longer changes with their work. You can still 🔄 rebuild any report or go back to draft.`
+    :`Take the reports of ${g.name} back to draft?\n\nStudents still see them, labelled draft again, and they change with their work.`))return;
+  // the final version is published too; back to draft keeps the draft shown
+  const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{},pv=((t.repPub||{}).t1)||v;t.repFinal=Object.assign({},t.repFinal,{t1:v});
+  const o={repFinal:{t1:v}};if(on){t.repPub=Object.assign({},t.repPub,{t1:pv});o.repPub={t1:pv}}const p=put(["teams",gid],o);render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
 // 🔄 Rebuild the reports (Roger, 28 Nov 2026: "I could press a button to generate a term report and everthing and even the comments get
 // generated out of fixed sentences"; "yes"): the same build as tools/term-report/draft.mjs, in Roger's browser, no Claude or AI. For every
 // student of the group (not the tester, not away): their work already on the dashboard (S.D.pg, S.D.rs, S.D.lv, S.D.ls), their class games
@@ -4591,16 +4592,17 @@ function repView(grp,studs,place){repLoad();(REPS.studs=REPS.studs||{})[grp.id]=
   const n=k=>studs.filter(s=>{const R=REPS.d[String(s.email||"").toLowerCase()];return R&&R.time&&R.time.profile===k}).length;
   const pub=((S.D.tm[grp.id]||{}).repPub||{}).t1;
   const fin=((S.D.tm[grp.id]||{}).repFinal||{}).t1,when=v=>esc(new Date(v).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(v).toTimeString().slice(0,5));
-  const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${pub
-      ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">📣 Draft published ${esc(new Date(pub).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(pub).toTimeString().slice(0,5))}: every student of ${esc(grp.name)} can open theirs on their board</span><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide the drafts again</button>`
-      :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">${fin?"🔒 Not published yet: press 📣 Publish the reports so students can open their final report":"🔒 Not published: students see theirs only while you press 📄 Show draft reports in class mode"}</span><button data-do="reppub" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">📣 Publish ${fin?"the reports":"the draft"}</button>`}</div>`;
-  const finBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center">${fin
-      ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">✅ Final version since ${when(fin)}: students see the report as it is saved, without "draft". A 🔄 Rebuild still changes it.</span><button class="chip" data-do="repfin" data-g="${grp.id}" data-v="0">✏️ Back to draft</button>`
-      :`<button data-do="repfin" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">✅ Make these the final version</button><span class="muted" style="font-size:13px">Now a draft: each report changes with the student's work.</span>`}</div>`;
+  // one path (Roger, 28 Nov 2026: "show them a draft some days before in case they still have tasks to do… they revise it and tell me
+  // anything in case they see a mistake, when all agree I publish the final version"): 1 hidden → 2 📣 draft for students to check → 3 ✅ final
+  const pill=(bg,fg,h)=>`<span style="background:${bg};color:${fg};border-radius:999px;padding:3px 10px;font-weight:700">${h}</span>`,btn=(d,v,bg,h)=>`<button data-do="${d}" data-g="${grp.id}" data-v="${v}" style="background:${bg};color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${h}</button>`;
+  const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${fin&&pub
+      ?pill("#dcfce7","#166534",`✅ Final version published ${when(fin)}: every student of ${esc(grp.name)} sees their final report on their board. A 🔄 Rebuild still changes it.`)+`<button class="chip" data-do="repfin" data-g="${grp.id}" data-v="0">✏️ Back to draft</button><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide</button>`
+      :pub?pill("#fef3c7","#92400e",`📣 Draft shown to students since ${when(pub)}: they check it, finish what is missing and tell you about any mistake (⚠️ Report a problem). It changes with their work.`)+btn("repfin",1,"#166534","✅ Publish the final version")+`<button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide</button>`
+      :pill("#f1f5f9","#334155","🔒 Students can't see their report yet.")+btn("reppub",1,"#b45309","📣 Show them the draft")+btn("repfin",1,"#166534","✅ Publish the final version")}</div>`;
   const rb=REPS.rb===grp.id,dn=REPS.done&&REPS.done.g===grp.id?REPS.done:null;
   const rbBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center"><button data-do="reprb" data-g="${grp.id}" ${REPS.rb?"disabled":""} style="background:#1d4ed8;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${rb?"⏳ Rebuilding…":"🔄 Rebuild the reports"}</button>`
     +`<span class="muted" style="font-size:13px">${dn?`✅ ${dn.one?"1 report":dn.n+" reports"} rebuilt ${esc(new Date(dn.at).toTimeString().slice(0,5))}.`:"Works out every report again from the students' work, with fixed sentences in your voice (no AI): the lines that quote their mistakes and this list too."}</span></div>`;
-  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}${finBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
+  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
     +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
