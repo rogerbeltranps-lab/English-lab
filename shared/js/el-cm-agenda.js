@@ -218,7 +218,12 @@ async function tickDone(list){if(!list.length)return;const t=today(),ref=C.doc(C
   const tk={};list.forEach(z=>{tk[z.x.ls.id+"|@"+t+"#"+z.it]=t});
   [...new Set(list.map(z=>z.x))].forEach(x=>{const its=[...((x.ag.days||{})[t]||[]).filter(it=>it!=="self"),...(x.ag.exam===t?["exam"]:[])],
     on=it=>{const k=x.ls.id+"|@"+t+"#"+it;return k in tk?tk[k]:cur[k]},all=its.length>0&&its.every(on),k=x.ls.id+"|@"+t;if(!!cur[k]!==all)tk[k]=all?t:false});
-  await C.setDoc(ref,{ticks:tk,updated:C.serverTimestamp()},{merge:true})}
+  await C.setDoc(ref,{ticks:tk,updated:C.serverTimestamp()},{merge:true});
+  // ✔ Finished is what makes a tab To do for the students who didn't finish it (Roger, 28 Nov 2026: "when I mark them as finish is when
+  // student who didnt finish them see that they have tasks to do"; elDueBefore from EL_HAND_TICK): ls/{ls}.done[group] gets it at once,
+  // as the dashboard's doneSync would, so students see it without waiting for the dashboard to open
+  const dn={};list.forEach(z=>{const it=String(z.it||""),i=it.indexOf("#");if(i<0||/^note:/.test(it)||isGame(it.slice(i+1)))return;(dn[z.x.ls.id]=dn[z.x.ls.id]||{})[it]=t});
+  for(const [ls,m] of Object.entries(dn))await C.setDoc(C.doc(C.db,"ls",ls),{done:{[C.g]:m}},{merge:true})}
 // a learning path or tab still locked for the group opens (as Start class mode on the dashboard does)
 async function ensureOpen(x,a,p){const info=x.info,g=C.g,ref=C.doc(C.db,"ls",a.ls);
   if(window.elLpOpen&&!elLpOpen(a,info,g,true)){const ids=[...(window.EL_CATALOG||[]).filter(y=>y.ls===a.ls&&elLpOpen(y,info,g,true)).map(y=>y.id),a.id],Lk=elLpLocks(a.ls,ids);
@@ -447,7 +452,7 @@ export async function wrapUp(canBack){try{await init();L=await agendas()}catch(e
   const seg=(i,z)=>[["done","✔ Finished"],...(nd?[["next","⏭ Next class"]]:[]),...(z.p&&!isGame(z.p)?[["hw","🏠 Homework"]]:[])].map(([v,l])=>`<button type="button" data-r="${i}" data-v="${v}" class="${ch[i]===v?"on":""}" aria-pressed="${ch[i]===v}">${l}</button>`).join("");
   const body=()=>rows.map((z,i)=>{const lp=z.p?lpLab(z.x,z.a):"",h=lp&&lp!==last?`<div class="lp">${E(lp)}</div>`:"";last=lp||last;
     return h+`<div class="r"><span class="n">${E(z.p?itName(z.a,z.p):lpLab(z.x,z.a))}</span><span class="seg">${seg(i,z)}</span></div>`}).join("");
-  w.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-cmwrap-h"><div class="hd"><h2 id="el-cmwrap-h">🎓 End of the class · ${E(C.gname)}</h2><p>How did today's steps go? ✔ Finished is ticked on your Time plan, ⏭ Next class moves it to ${nd?E(dLab(nd)):"the next class"}, 🏠 Homework is for students to finish at home by then.</p></div>`
+  w.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="el-cmwrap-h"><div class="hd"><h2 id="el-cmwrap-h">🎓 End of the class · ${E(C.gname)}</h2><p>How did today's steps go? ✔ Finished is ticked on your Time plan and goes to ✅ To do for the students who haven't finished it (nothing else does), ⏭ Next class moves it to ${nd?E(dLab(nd)):"the next class"}, 🏠 Homework is for students to finish at home by then.</p></div>`
     +`<div class="ls">${body()}</div><label class="ml"><input type="checkbox" ${mailOn()?"checked":""}> ✉️ Email students their result: below ${PERF.BELOW}% of the ✔ Finished steps “please keep up”, 100% “well done” <small>(only students who were in class mode; everyone's % goes to 📈 Class performance in Students' progress)</small></label><div class="ft"><span class="m"></span>${canBack?'<button type="button" data-a="back">↩ Back to class</button>':""}<button type="button" data-a="skip">End without saving</button><button type="button" class="go" data-a="save">✔ Save and end class</button></div></div>`;
   document.body.append(w);
   return new Promise(res=>{const m=w.querySelector(".ft .m"),done=v=>{w.remove();res(v)};

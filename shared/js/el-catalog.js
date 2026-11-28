@@ -385,13 +385,19 @@ window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gi
 // a Time plan agenda, a tab is in ✅ To do only if it was on a class day before today (the agenda, or ticked as done in class: ls/{id}.done)
 // or the teacher set it as homework (from its set day). Open tabs planned for today or later, or on no class day, are not To do.
 // Returns {acts: Set of whole paths, tabs: {activity id: Set of panel ids}}, or null when the group has no agenda (then opened = To do).
+// ✅ From Mon 30 Nov 2026 a planned tab is To do only once Roger says it was done in class (Roger, 28 Nov 2026: "those activities that I
+// plan, are only a to do thing when I finish a class and inform what we've done … after the classmode, when I stop it"): an agenda day
+// from EL_HAND_TICK on no longer counts by itself (not ~1 hour after the class opens, not once the day has passed): only its ✔ Finished in
+// the end-of-class window, or a tick in the Time plan (ls/{id}.done), or 🏠 homework. Earlier days keep counting as before.
+window.EL_HAND_TICK=window.EL_HAND_TICK||"2026-11-30";
+window.elAgendaSelfCounts=d=>!!d&&d<window.EL_HAND_TICK;
 window.elDueBefore=function(info,gid,today){const ag=elAgendaOf(info,gid);if(!ag)return null;const real=!today;today=today||agToday();
   // today's class counts too once it is over (Roger, 9 Nov 2026: "If the student didn't come to class they can do the checkpoint at home.
   // So that be a to do thing"): about an hour after the class opens (elClassOpenAt = 5 minutes before it starts); no class today: tomorrow
   const op=real?elClassOpenAt(gid,today):null,over=op!=null&&Date.now()>op+60*60e3;
   const v={acts:new Set(),tabs:{}},add=(it,d)=>{if(d!==true&&(!d||d>today||(d===today&&!over)))return;it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;
     const id=it.slice(0,i),p=it.slice(i+1);if(/^game:/.test(p))return;if(!p)v.acts.add(id);else (v.tabs[id]=v.tabs[id]||new Set()).add(p)};
-  Object.entries(ag.days||{}).forEach(([d,its])=>(its||[]).forEach(it=>add(it,d)));
+  Object.entries(ag.days||{}).forEach(([d,its])=>{if(elAgendaSelfCounts(d))(its||[]).forEach(it=>add(it,d))});
   Object.entries(((info.done||{})[gid])||{}).forEach(([k,d])=>add(k,d));
   Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;
     Object.entries(h.tabs).forEach(([id,ps])=>{if(!ps||!ps.length)v.acts.add(id);else ps.forEach(p=>add(id+"#"+p,true))})});

@@ -24,3 +24,4 @@ jobs:
       - run: node tools/smoke/check.mjs
       # 🔔 the students' notifications and the mascot in the bar, with a fake in-memory database (Roger, 25 Nov 2026): nothing held shows early
       - run: node tools/notify/check.mjs
+      - run: node tools/hand-tick/check.mjs
