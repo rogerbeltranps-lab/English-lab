@@ -371,3 +371,19 @@
   .rpsw{display:grid!important;grid-template-columns:1fr 1fr;gap:6px}
   .rpsw .pgt{min-width:0;width:auto;padding:6px 10px}
 }
+
+/* 🎓 My progress in tabs (today.html progressPlace, 28 Nov 2026): the tabs in one row that scrolls sideways, the term chips under them,
+   the ⭐ Overview's cards one under another */
+@media (max-width:640px){
+  .pgtop{display:block;border-bottom:0;margin-bottom:10px}
+  .pgtabs{overflow-x:auto;scrollbar-width:none;border-bottom:2px solid #e2e8f0;padding-top:2px}
+  .pgtabs::-webkit-scrollbar{display:none}
+  .pgtabs a{padding:7px 10px;font-size:14px;top:0;flex:0 0 auto}
+  .pgtch{padding:8px 0 0}
+  .pgov,.pgov2,.pgsk2{grid-template-columns:minmax(0,1fr)}
+  .ovsub{display:none}
+  .ovtiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ovrow{gap:10px}
+  .hw-h3w{display:block}.hw-f{margin-top:6px}
+  .hw .hw-t td.hw-go{grid-column:2;text-align:left}
+}
