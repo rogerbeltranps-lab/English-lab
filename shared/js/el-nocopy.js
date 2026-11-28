@@ -6,8 +6,9 @@
 //  - In the answer boxes students type as usual, can right-click, and can copy/cut their OWN text. Pasting text is only
 //    allowed when it is that own text (moving a sentence inside their writing); anything else (a translator, a web page, a chat) is
 //    stopped, and so is dropping text dragged in from another window. Pasting an image still works (screenshot in the report dialog).
-//  - A blocked paste stops here (window, capture phase), so shared/js/el-typing.js never counts it as pasted characters; allowed pastes
-//    still reach it and are counted as before.
+//  - A blocked paste stops here (window, capture phase), so shared/js/el-typing.js never counts it as pasted characters. An allowed paste
+//    (their own text) is marked e.__elOwn, and el-typing.js does not count it either (Roger, 28 Nov 2026: a Reading log written by the
+//    student was sent back as "pasted 251 of 315 characters" because they had moved their own answers between boxes).
 //  - No spelling help (Roger, 13 Nov 2026: "when students write in the web I don't want the corrector to underline their mistakes or
 //    solve their misspelling mistakes"): every answer box, also the ones a page builds later, gets spellcheck="false" (no red
 //    underlines, no spelling suggestions on right-click), autocorrect="off", autocapitalize="off", writingsuggestions="false" (Chrome's
@@ -55,11 +56,13 @@
     try { t = cd ? cd.getData('text') || '' : ''; } catch (x) {}
     if (!norm(t)) return;                       // nothing as text (an image, a file): let it through
     if (!editable(e.target) || own.indexOf(norm(t)) < 0) stop(e);
+    else e.__elOwn = true;   // their own text moved inside their boxes: el-typing.js does not count it as pasted (28 Nov 2026)
   }, true);
   window.addEventListener('drop', function (e) {
     var dt = e.dataTransfer, t = '';
     try { t = dt ? dt.getData('text') || '' : ''; } catch (x) {}
     if (!inside && norm(t) && own.indexOf(norm(t)) < 0) stop(e);   // drag-and-drop inside the page (a game) still works
+    else e.__elOwn = true;
   }, true);
   var inside = false;
   window.addEventListener('dragstart', function (e) {
