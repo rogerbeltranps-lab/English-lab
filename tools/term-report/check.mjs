@@ -50,6 +50,17 @@ ok(/^Your everyday work/.test(RX.comment)&&RX.comment.indexOf("exam")>RX.comment
 {const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(E.some(b=>RX.comment.endsWith(b.en)),"the comment ends with a closing sentence: "+RX.comment);
  ok(E.some(b=>RX.commentCa.endsWith(b.ca)),"the Catalan comment ends the same way: "+RX.commentCa);}
 const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
+// term 1: the comment never says when the activities were done (Roger, 28 Nov 2026: "not in this ones because I was building the web"); from term 2 it does
+{const TS=["onTime","notOnTime","lastMin"].map(k=>W.EL_TREP_BANK[k]),has=(c,l)=>TS.some(b=>c.includes(b[l].split(/[:{,]/)[0]));
+ for(const r of [R,RX,RC])ok(!has(r.comment,r.lang)&&!has(r.commentCa,"ca"),"a term 1 comment talks about when the activities were done: "+r.comment);
+ const R2=W.elTrepBuild(Object.assign({},C,{timing:true}),Object.assign({},ctx,{rs:rsX}));ok(R2.time.profile==="none"||has(R2.comment,"en"),"from term 2 the comment must say when the activities were done ("+R2.time.profile+"): "+R2.comment);}
+// Firestore takes no array straight inside another array (🔄 Rebuild failed with "Nested arrays are not supported", 28 Nov 2026)
+const nested=(v,inArr)=>Array.isArray(v)?(inArr||v.some(x=>nested(x,true))):v&&typeof v==="object"?Object.values(v).some(x=>nested(x,false)):false;
+for(const [n,r] of [["English",RX],["Catalan",RC],["first",R]])ok(!nested(r,false),`the ${n} report holds an array inside an array (Firestore refuses to save it): `+JSON.stringify(r.time&&r.time.weeks));
+ok(RX.time.weeks.length&&RX.time.weeks.every(w=>typeof w.d==="string"&&typeof w.n==="number"),"each week is {d, n}: "+JSON.stringify(RX.time.weeks));
+{const old={time:{weeks:[["2026-10-26",5],["2026-11-02",0]]},pts:[{pct:50}]},sf=W.elTrepSafe(old);
+ ok(!nested(sf,false)&&sf.time.weeks[0].d==="2026-10-26"&&sf.time.weeks[0].n===5,"elTrepSafe turns an old saved report's [monday, n] weeks into {d, n}: "+JSON.stringify(sf));
+ ok(JSON.stringify(W.elTrepWeeks(old))===JSON.stringify(W.elTrepWeeks(sf)),"elTrepWeeks reads old and new weeks the same");}
 // 📋 How I'm working (Roger, 28 Nov 2026): the students' table has the report's numbers and one row per tab taught, never a locked one
 {const T=W.elTrepTabs([LS],ctx);ok(T.due===R.time.due&&T.done===R.time.done&&T.inWeek===R.time.inWeek&&T.profile===R.time.profile,"the table's numbers must be the report's");
  ok(T.rows.length===1&&T.rows[0].a.id==="4eso/ls2-celebrations-around-the-world"&&T.rows[0].tab==="read"&&T.rows[0].day==="2026-11-04"&&T.rows[0].done&&T.rows[0].at==="2026-11-05","one row: the Reading taught on 4 Nov, done on 5 Nov ("+JSON.stringify(T.rows.map(r=>[r.a.id,r.tab,r.day,r.at]))+")");}

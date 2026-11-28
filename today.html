@@ -363,6 +363,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 .rptags{display:flex;flex-wrap:wrap;gap:6px}.rptag{border:1.5px solid #e2e8f0;border-radius:999px;padding:3px 10px;font-size:13.5px;color:#0f172a;background:#fff}.rptag.good{border-color:#16a34a}.rptag.work{border-color:#ea580c}
 .rpw{overflow-x:auto}.rpw svg{min-width:460px;display:block}.rpw text{fill:#64748b;font:12px system-ui,sans-serif}.rpw text.lb{fill:#0f172a;font-weight:700}
 .rpkv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}.rpkv div{background:#f1f5f9;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column}
+.rpk3 b i{font-style:normal;font-weight:600;font-size:14px;opacity:.85}
 .rpkv b{font-size:20px;color:#0f172a;font-variant-numeric:tabular-nums}.rpkv span{font-size:13px;color:#475569}
 .rpv{border-radius:10px;padding:10px 14px;margin:8px 0;font-size:14.5px;color:#0f172a}.rpv.ok{background:#dcfce7}.rpv.late{background:#ffedd5}.rpv.next{background:#fff7ed;border:1.5px solid #ea580c}
 .rpc{border-left:3px solid var(--rk);padding:4px 0 4px 12px;margin:4px 0;font-size:15px;color:#0f172a;line-height:1.55}.rpfoot{font-size:12px;text-align:center}
@@ -377,7 +378,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-fp-rubrics.js?v=20261127b"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261127w"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
-<script src="shared/js/el-term-report.js?v=20261128h"></script>
+<script src="shared/js/el-term-report.js?v=20261128i"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
@@ -2102,7 +2103,7 @@ function repLoad(){
   const mail=String((AS?D.me.email:U&&U.email)||"").toLowerCase();if(!mail){S.rep={};return}
   F.getDoc(F.doc(ELCloud.db,"termReports",mail)).then(x=>{S.rep=(x.exists()&&x.data().t1)||{}}).catch(e=>{console.warn("term report",e);S.rep={}}).then(()=>{if(placeNow()==="report")render()})}
 // the bars of the weeks: how many activities were finished each week (▲ = the exam's week), the last week orange when it holds far more than the rest
-function repWeeks(T){const w=(T&&T.weeks)||[];if(!w.length)return "";const n=w.length,Wd=640,H=170,L=30,R=10,Tp=18,B=30,max=Math.max(10,...w.map(x=>+x[1]||0)),bw=(Wd-L-R)/n,ys=v=>Tp+(max-v)*(H-Tp-B)/max;
+function repWeeks(T){const w=(window.elTrepWeeks?elTrepWeeks(T):[]).map(x=>[x.d,x.n]);if(!w.length)return "";const n=w.length,Wd=640,H=170,L=30,R=10,Tp=18,B=30,max=Math.max(10,...w.map(x=>+x[1]||0)),bw=(Wd-L-R)/n,ys=v=>Tp+(max-v)*(H-Tp-B)/max;
   const avg=w.reduce((s,x)=>s+(+x[1]||0),0)/n,ex=T.exam?(()=>{const d=new Date(T.exam+"T12:00:00Z"),k=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-k);return d.toISOString().slice(0,10)})():"";
   let g=[0,Math.round(max/2),max].map(v=>`<line x1="${L}" x2="${Wd-R}" y1="${ys(v)}" y2="${ys(v)}" stroke="#e2e8f0"/><text x="${L-6}" y="${ys(v)+4}" text-anchor="end">${v}</text>`).join("");
   w.forEach(([d,v],i)=>{v=+v||0;const x=L+i*bw+bw*.18,ww=bw*.64,hot=v>2*avg&&v>=5;g+=`<rect x="${x}" y="${ys(v)}" width="${ww}" height="${ys(0)-ys(v)}" rx="3" fill="${hot?"#ea580c":"var(--rk,#2563eb)"}"/>`
@@ -2142,8 +2143,14 @@ function reportPlace(lss,ls){
     behind:["late",t("🟡 Vas endarrerit.","🟡 Falling behind."),t(`Només ${T.inWeek||0} % de les activitats les vas fer la setmana de la classe; la resta, més tard o encara no.`,`You did only ${T.inWeek||0}% of the activities in the week of the class; the rest later, or not yet.`)],
     last:["late",t("🟠 Ho has deixat per al final.","🟠 Left until the end."),t(`${T.lastMin||0} % de les activitats que vas fer, les vas fer l'última setmana del trimestre o just abans de l'examen.`,`${T.lastMin||0}% of the activities you did were done in the last week of term or just before the exam.`)],
     none:["late",t("🔴 Encara no has fet les activitats.","🔴 No activities done yet."),t("Les activitats dels learning paths són la base de la teva nota.","The learning path activities are the basis of your mark.")]}[prof];
-  const daily=T.due!=null?repWeeks(T)+(!T.due?"":`<div class="rpkv"><div><b>${T.done||0} / ${T.due}</b><span>${t("activitats fetes de les que hem fet a classe","activities done of the ones we did in class")}</span></div><div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("fetes la mateixa setmana de la classe","done in the week of the class")}</span></div></div>`)
-    +(VD?`<div class="rpv ${VD[0]}"><b>${VD[1]}</b> ${VD[2]}</div>`:""):`<p class="muted">${t("Encara no hi ha dades.","No data yet.")}</p>`;
+  // the three numbers Roger reads first on his 📄 Term reports list (Roger, 28 Nov 2026: "this is important for the students to see in their
+  // reports"): how they worked, activities done and % done in the week of the class, in a row at the top of the box, then why, then the weeks
+  const PFL={steady:["🟢","Constant","Steady","#dcfce7","#166534"],behind:["🟡","Endarrerit","Behind","#fef9c3","#854d0e"],last:["🟠","A última hora","Last minute","#ffedd5","#9a3412"],none:["🔴","Res fet","Nothing done","#fee2e2","#991b1b"]}[prof];
+  const lab=(ca,en)=>EN?`${en} <i>(${ca})</i>`:ca;
+  const daily=T.due!=null?(!T.due?"":`<div class="rpkv rpk3">${PFL?`<div style="background:${PFL[3]}"><b style="color:${PFL[4]}">${PFL[0]} ${lab(PFL[1],PFL[2])}</b><span>${t("Com has treballat","How you worked")}</span></div>`:""}`
+      +`<div><b>${T.done||0} / ${T.due}</b><span>${t("Activitats fetes de les que hem fet a classe","Activities done of the ones we did in class")}</span></div>`
+      +`<div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("Fetes la mateixa setmana de la classe","Done in the week of the class")}</span></div></div>`)
+    +(VD?`<div class="rpv ${VD[0]}">${VD[2]}</div>`:"")+repWeeks(T):`<p class="muted">${t("Encara no hi ha dades.","No data yet.")}</p>`;
   const next=`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
   const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
   return `<div class="trep" data-c="${esc(course)}"><div class="rph"><div><small>${esc(g?g.name:"")} · English</small><h2>${esc(repName())}</h2></div>${lv?levelTag(course,lv):""}</div>`
@@ -2153,7 +2160,10 @@ function reportPlace(lss,ls){
     +compBox(mine,1)
     +((R.strong||[]).length||(R.work||[]).length?box("🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),"",`<div class="rpgv"><div><h3>💪 ${t("El que domines","What you know well")}</h3><div class="rptags">${tags(R.strong,"good")||`<span class="muted">–</span>`}</div></div><div><h3>🎯 ${t("El que has de treballar","What to work on")}</h3><div class="rptags">${tags(R.work,"work")||`<span class="muted">–</span>`}</div></div></div>`):"")
     +skGrowBox(course)
-    +box("📅",t("La teva feina de cada dia i quan la vas fer","Your daily work and when you did it"),t("cada barra és una setmana","each bar is a week"),daily+next)
+    // term 1 is the exception (Roger, 28 Nov 2026: "in this case, we won't mention what they did in class… this term is an exception and I want
+    // the web to always show what was done in class in the reports"): its report (EL_TREP.t1, timing: false) leaves this box out, only the notice stays
+    +(((((window.EL_TREP||{}).t1||{})[course]||{}).timing===false)?next
+      :box("📅",t("La teva feina de cada dia i quan la vas fer","Your daily work and when you did it"),t("cada barra és una setmana","each bar is a week"),daily+next))
     +(R.comment?box("💬",t("Comentari del professor","Your teacher's comment"),"",`<p class="rpc">${repTxt(R.comment)}</p>`):"")
     +`<p class="muted rpfoot">© ${new Date().getFullYear()} Roger Beltran · English Lab · ${t("Tots els drets reservats","All rights reserved")}</p></div>`}
 // 📋 How I'm working, at the top of 🎓 My progress (Roger, 28 Nov 2026: "it's a good idea that the students see that during the term.

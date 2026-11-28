@@ -109,6 +109,9 @@
   // fpLater: this LS's final product counts in the next term, so the report leaves it out (Roger, 25 Nov 2026: "the final product of the
   // LS2 shouldn't be included in the report")
   // deadline: the last day activities still count for the term's report (its "Draft" line: Fri 27 Nov 2026 for term 1)
+  // timing: when the activities were done (on time, late, at the last minute) is said in the comment only from term 2 (Roger, 28 Nov 2026:
+  // "it should be in the comments (but not in this ones because I was building the web)"). Term 1's report still shows it in its daily work box.
+  Object.values(T1).forEach(c => { c.timing = false; });
   window.EL_TREP = { t1: T1 };
   window.EL_TREP_DEADLINE = { t1: "2026-11-27" };
 
@@ -256,7 +259,7 @@
           const steps = window.elSecSteps ? elSecSteps(a, tab) : [tab]; if (!steps.length) return; due++; const row = { ls, a, tab, day: d, done: false, at: "" }; rows.push(row);
           if (!steps.every(s => D[s])) return; dn++; row.done = true; const at = day(steps.map(s => A[s]).filter(Boolean).sort().pop()); if (!at) return; row.at = at;
           if (at <= addD(d, 7)) inWeek++; else { lateN++; if (at >= addD(to, -6) || (exam && at >= addD(exam, -3) && at <= exam)) lastMin++; } }); }); });
-    const weeks = []; if (start) for (let w = monday(start); w <= monday(exam && exam > to ? exam : to); w = addD(w, 7)) { weeks.push([w, wk[w] || 0]); if (weeks.length > 30) break; }
+    const weeks = []; if (start) for (let w = monday(start); w <= monday(exam && exam > to ? exam : to); w = addD(w, 7)) { weeks.push({ d: w, n: wk[w] || 0 }); if (weeks.length > 30) break; }
     const p = due ? Math.round(inWeek / due * 100) : 0, lm = dn ? Math.round(lastMin / dn * 100) : 0, prof = !due ? null : !dn ? "none" : p >= 70 ? "steady" : lm >= 40 ? "last" : "behind";
     return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam, rows }; }
 
@@ -269,10 +272,10 @@
     work:     { when: "Everyday work, first (Roger, 28 Nov 2026: the exam is not what matters most): the average % of the points of “What we worked on” (activities, class games, hand-ins) as a level", en: "Your everyday work this term (activities, class games and the work you handed in) showed {d} results.", ca: "La teva feina de cada dia aquest trimestre (activitats, jocs de classe i les feines que has entregat) ha mostrat un {d}." },
     progUp:   { when: "Progress: the activities' latest answers are 10 points or more above the first tries (the student went back and corrected them)", en: "You make progress when you correct your work: your answers now are much better than your first tries.", ca: "Progresses quan corregeixes la feina: les teves respostes d'ara són molt millors que els primers intents." },
     progNone: { when: "Progress: first tries had many mistakes (under 70 %) and the student hardly corrected them", en: "You can still correct many of your answers: going back to your mistakes is how you make progress.", ca: "Encara pots corregir moltes de les teves respostes: tornar als errors és com es progressa." },
-    onTime:   { when: "Daily work: 70 % or more of the activities due were done in the week of their class", en: "You did your activities on time: most of them in the same week as the class. Keep it up.", ca: "Has fet les activitats a temps: la majoria, la mateixa setmana de la classe. Continua així." },
-    notOnTime:{ when: "Daily work: under 70 % done in the week of the class (and not mostly at the last minute)", en: "You didn't do all your activities on time: you did {done} of the {due} activities we did in class.", ca: "No has fet totes les activitats a temps: n'has fet {done} de les {due} que vam fer a classe." },
-    late:     { when: "…and 3 or more were done after the week of their class", en: "{late} of them were done after the week of the class.", ca: "{late} les vas fer després de la setmana de la classe." },
-    lastMin:  { when: "Daily work: 40 % or more of what was done was done in the last week of term or the 3 days before the exam", en: "You left many activities until the end of the term or just before the exam, so there was less time to practise.", ca: "Vas deixar moltes activitats per al final del trimestre o just abans de l'examen, i així vas tenir menys temps per practicar." },
+    onTime:   { when: "From term 2 (never in term 1). Daily work: 70 % or more of the activities due were done in the week of their class", en: "You did your activities on time: most of them in the same week as the class. Keep it up.", ca: "Has fet les activitats a temps: la majoria, la mateixa setmana de la classe. Continua així." },
+    notOnTime:{ when: "From term 2 (never in term 1). Daily work: under 70 % done in the week of the class (and not mostly at the last minute)", en: "You didn't do all your activities on time: you did {done} of the {due} activities we did in class.", ca: "No has fet totes les activitats a temps: n'has fet {done} de les {due} que vam fer a classe." },
+    late:     { when: "From term 2. …and 3 or more were done after the week of their class", en: "{late} of them were done after the week of the class.", ca: "{late} les vas fer després de la setmana de la classe." },
+    lastMin:  { when: "From term 2 (never in term 1). Daily work: 40 % or more of what was done was done in the last week of term or the 3 days before the exam", en: "You left many activities until the end of the term or just before the exam, so there was less time to practise.", ca: "Vas deixar moltes activitats per al final del trimestre o just abans de l'examen, i així vas tenir menys temps per practicar." },
     none:     { when: "Daily work: none of the activities due is done", en: "You haven't done the activities we did in class yet: they are the basis of your mark.", ca: "Encara no has fet les activitats que vam fer a classe: són la base de la nota." },
     best:     { when: "Points of “What we worked on”: the one or two with the best % (70 % or more)", en: "Your work shows your strongest points: {x}.", ca: "La teva feina mostra els teus punts forts: {x}." },
     focus:    { when: "Points: the one with the lowest % (under 70 %)", en: "Your work shows the point you need to work on most: {x}.", ca: "La teva feina mostra el punt que has de treballar més: {x}." },
@@ -290,10 +293,10 @@
     next:     { when: "Always, at the end", en: "Next term, do each activity in the week we do it in class.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe." },
     nextPr:   { when: "At the end, when there is a point to work on (in place of the one above)", en: "Next term, do each activity in the week we do it in class and practise “{x}” in 🎯 Practise.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe i practica «{x}» a 🎯 Practica." },
     // a closing sentence, one of these, from what the work shows (Roger, 28 Nov 2026: "Add nice personal sentences at the end"; "too personal, I'm a teacher not a friend" for the others; he kept endProud, endEffort and endFresh)
-    endProud: { when: "Close: everyday work Very good or Excellent and the activities on time", en: "I'm really proud of the way you worked this term. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat aquest trimestre. Continua gaudint de l'anglès!" },
+    endProud: { when: "Close: everyday work Very good or Excellent and (from term 2) the activities on time", en: "I'm really proud of the way you worked this term. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat aquest trimestre. Continua gaudint de l'anglès!" },
     endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure next term will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que el proper trimestre anirà encara millor." },
     endFresh: { when: "Close: none of the activities due is done", en: "Next term is a fresh start, and I'm here to help you every step of the way.", ca: "El proper trimestre és un nou començament, i sóc aquí per ajudar-te en cada pas." },
-    endBelieve:{ when: "Close: the activities were late or at the last minute, or everyday work Not satisfactory or Satisfactory", en: "With regular work every week, your results can improve.", ca: "Amb una feina regular cada setmana, els teus resultats poden millorar." },
+    endBelieve:{ when: "Close: everyday work Not satisfactory or Satisfactory, or (from term 2) the activities late or at the last minute", en: "With regular work every week, your results can improve.", ca: "Amb una feina regular cada setmana, els teus resultats poden millorar." },
     endThanks:{ when: "Close: any other case", en: "Keep working steadily next term.", ca: "Continua treballant amb constància el proper trimestre." } };
   const DEG = { en: ["Not satisfactory (No assoliment)", "Satisfactory (Assoliment satisfactori)", "Very good (Assoliment notable)", "Excellent (Assoliment excel·lent)"],
     ca: ["No assoliment", "Assoliment satisfactori", "Assoliment notable", "Assoliment excel·lent"] };
@@ -308,17 +311,25 @@
     const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse(), w = worst[0];
     let lv = null; if (has.length) { const avg = has.reduce((a, p) => a + p.pct, 0) / has.length; lv = avg >= 90 ? 3 : avg >= 70 ? 2 : avg >= 50 ? 1 : 0; say("work", { d: D[lv] }); }
     const pr = ctx.prog, up = !!(pr && pr.m >= 10 && pr.l - pr.f >= 10); if (pr && pr.m >= 10) { if (up) say("progUp"); else if (pr.f < 70 && pr.l - pr.f < 3) say("progNone"); }
-    if (tm.profile === "steady") say("onTime"); else if (tm.profile === "behind") { say("notOnTime", tm); if (tm.late >= 3) say("late", tm); }
-    else if (tm.profile === "last") say("lastMin"); else if (tm.profile === "none") say("none");
+    const tOn = C.timing !== false, P = tm.profile;
+    if (P === "none") say("none"); else if (tOn) { if (P === "steady") say("onTime"); else if (P === "behind") { say("notOnTime", tm); if (tm.late >= 3) say("late", tm); } else if (P === "last") say("lastMin"); }
     if (best.length) say("best", { x: best.map(p => lc(short(p.t))).join(ca ? " i " : " and ") });
     if (w) { say("focus", { x: lc(short(w.t)) }); say({ write: "tipWrite", game: "tipGame", lp: "tipLp" }[w.ek] || (w.speak ? "tipSpeak" : "tipRedo")); }
     if (d1 != null && d2 != null) say(d2 > d1 ? "examUp" : d2 < d1 ? "examDown" : "examSame", V); else if (d2 != null) say("examOne", V);
     const left = tm.due - tm.done, todo = open && left > 0;
     if (todo && tm.profile !== "none") say(left === 1 ? "left1" : "left", { n: left });
     w ? say("nextPr", { x: lc(short(w.t)) }) : say("next");
-    const P = tm.profile; say(P === "none" ? "endFresh" : P === "steady" && lv >= 2 ? "endProud" : up ? "endEffort" : P === "behind" || P === "last" || (lv != null && lv <= 1) ? "endBelieve" : "endThanks");
+    // term 1: the close follows the everyday work's level alone, never when it was done
+    const late = tOn && (P === "behind" || P === "last");
+    say(P === "none" ? "endFresh" : (tOn ? P === "steady" : true) && lv >= 2 ? "endProud" : up ? "endEffort" : late || (lv != null && lv <= 1) ? "endBelieve" : "endThanks");
     return out.join(" "); }
 
+  // Firestore takes no array straight inside another array ("Nested arrays are not supported": 🔄 Rebuild failed on 28 Nov 2026), so a
+  // week is { d: monday, n: activities finished }. Reports saved before then (tools/term-report/draft.mjs) hold [monday, n] pairs:
+  // elTrepWeeks reads both, elTrepSafe turns any old pair into the new shape before a report is written again (backups, restores).
+  window.elTrepWeeks = function (T) { return ((T && T.weeks) || []).map(x => Array.isArray(x) ? { d: x[0], n: +x[1] || 0 } : { d: x && x.d, n: +(x && x.n) || 0 }); };
+  window.elTrepSafe = function safe(v) { return Array.isArray(v) ? v.map(x => Array.isArray(x) ? (x.length === 2 && typeof x[0] === "string" ? { d: x[0], n: x[1] } : Object.assign({}, x.map(safe))) : safe(x))
+    : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, safe(x)])) : v; };
   window.elTrepBuild = function (C, ctx) { const L = ctx.lang === "ca" ? "ca" : "en", prev = (ctx.prev && ctx.prev.pts) || [], pts = [], ptsCa = [];
     C.lss.forEach((l, li) => l.pts.forEach(pt => { const i = pts.length, { pct } = elTrepPct(pt, ctx), was = prev[i], ev = evidence(ctx, pt);
       const e0 = ev.find(x => x.k !== "fpok" && x.k !== "fpgo" && strip(x.fix).trim()), ek = e0 ? e0.k : null, speak = !e0 && pct != null && pct < 60 && pt.src.some(s => s.d);
