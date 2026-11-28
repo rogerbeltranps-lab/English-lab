@@ -1704,6 +1704,8 @@ const NMCA={"Listening":"Comprensió oral","Reading":"Comprensió lectora","Voca
   "My part":"La meva part","My email":"El meu correu","My source":"La meva font","My research card":"La meva fitxa de recerca","Video: what it means (group)":"Vídeo: què significa (grup)",
   "Video: local link (group)":"Vídeo: relació amb el nostre entorn (grup)","My vlog":"El meu vlog","My script and slides":"El meu guió i les diapositives","My fact file and credits":"La meva fitxa i els crèdits"};
 const nmT=n=>EN?n:NMCA[n]||n;
+// a final-product row (rows marked by level, not LS1's rubric mark) on criterion c with no mark yet: the "other" half of c waits for it
+const fpWait=(g,P,c)=>{const f=g.fp;if(!f||f.mark||!f.rows)return false;const rs=f.rows.filter(r=>r.c===c);return rs.length>0&&rs.every(r=>(P.fp||{})[r.step+"|"+r.c]==null)};
 function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
   const x=D.rs[l.id+"/assessment"]||{},pr=x.progress||{},P=pr.parts||{},sc=x.sections||{},fin=x.final||{},SC=window.EL_STEP_CRITERIA||{};
   // 🔒 a closed term (the teacher's Close term, teams/{group}.closed): the dashboard splits the daily work by term (progress.seg, progSync):
@@ -1729,8 +1731,10 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
       else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))
       .flatMap(y=>seg.gv?seg.gv.map(e=>Object.assign({},y,{w:y.w*e.f,m:e.m,tt:e.t})):[y])}
-    else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}))
-      .flatMap(y=>seg.other&&seg.other[y.c]?seg.other[y.c].map(e=>Object.assign({},y,{w:y.w*e.f,m:e.m,tt:e.t})):[y]);
+    // 1.1 / 1.2 wait for the final product (Roger, 28 Nov 2026, Term 2 showed 1.1 Excellent from one done step): a criterion whose real
+    // evidence is a final-product row (4ESO LS2: the group video) shows "not yet" until that row has a mark; then the done steps count with it
+    else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:fpWait(g,P,y.c)?null:(P.other||{})[y.c]??null}))
+      .flatMap(y=>seg.other&&seg.other[y.c]?seg.other[y.c].map(e=>Object.assign({},y,{w:y.w*e.f,m:y.m==null?null:e.m,tt:e.t})):[y]);
     pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c))||!(y.w>0))return;   // English criteria only ("5.1"); transversals and process/teamwork out
       if(fin[y.c])y.m=EL_DEGREE_MARK[fin[y.c]]??y.m;y.term=y.tt||term;y.ls=l;out.push(y)})});
   // "by how much it is worked", as the dashboard (teacher.html lsWork/byWork): each competence's share of the LS is how many steps of the LS
