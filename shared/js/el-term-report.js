@@ -261,10 +261,13 @@
   // Exams by their level, never their numbers or questions ("avoid exam numbers, you can say your exam and task showed a Very Good mark results").
   // {x} = filled in; the bank is printed for Roger by tools/term-report/bank.mjs.
   const BANK = window.EL_TREP_BANK = {
-    examUp:   { when: "Exams: the last LS exam reached a higher level than the one before", en: "Your exams have gone up, from {d1} in {N1} to {d2} in {N2}. That shows that when you work, you learn.", ca: "Els teus exàmens han pujat: a la {N1} vas treure un {d1} i a la {N2}, un {d2}. Això vol dir que, quan treballes, aprens." },
-    examDown: { when: "Exams: the last LS exam reached a lower level than the one before", en: "Your {N2} exam showed {d2} results, lower than {N1} ({d1}), so let's look together at what happened.", ca: "A l'examen de la {N2} has tret un {d2}, per sota de la {N1} (un {d1}): mirem junts què ha passat." },
-    examSame: { when: "Exams: both LS exams reached the same level", en: "Your {N1} and {N2} exams both showed {d2} results.", ca: "Als exàmens de la {N1} i de la {N2} has tret un {d2} totes dues vegades." },
-    examOne:  { when: "Exams: only the last LS exam has a mark", en: "Your {N2} exam showed {d2} results.", ca: "A l'examen de la {N2} has tret un {d2}." },
+    work:     { when: "Everyday work, first (Roger, 28 Nov 2026: the exam is not what matters most): the average % of the points of “What we worked on” (activities, class games, hand-ins) as a level", en: "Your everyday work this term (activities, class games and the work you handed in) showed {d} results.", ca: "La teva feina de cada dia aquest trimestre (activitats, jocs de classe i les feines que has entregat) ha mostrat un {d}." },
+    progUp:   { when: "Progress: the activities' latest answers are 10 points or more above the first tries (the student went back and corrected them)", en: "You make progress when you correct your work: your answers now are much better than your first tries.", ca: "Progresses quan corregeixes la feina: les teves respostes d'ara són molt millors que els primers intents." },
+    progNone: { when: "Progress: first tries had many mistakes (under 70 %) and the student hardly corrected them", en: "You can still correct many of your answers: going back to your mistakes is how you make progress.", ca: "Encara pots corregir moltes de les teves respostes: tornar als errors és com es progressa." },
+    examUp:   { when: "Exams, after the everyday work: the last LS exam reached a higher level than the one before", en: "In the exams, you went up from {d1} in {N1} to {d2} in {N2}.", ca: "Als exàmens has pujat d'un {d1} a la {N1} a un {d2} a la {N2}." },
+    examDown: { when: "Exams: the last LS exam reached a lower level than the one before", en: "In the exams, you went down from {d1} in {N1} to {d2} in {N2}.", ca: "Als exàmens has baixat d'un {d1} a la {N1} a un {d2} a la {N2}." },
+    examSame: { when: "Exams: both LS exams reached the same level", en: "In the exams of {N1} and {N2}, you showed {d2} results both times.", ca: "Als exàmens de la {N1} i de la {N2} has tret un {d2} totes dues vegades." },
+    examOne:  { when: "Exams: only the last LS exam has a mark", en: "In the {N2} exam, you showed {d2} results.", ca: "A l'examen de la {N2} has tret un {d2}." },
     best:     { when: "Points of “What we worked on”: the one or two with the best % (70 % or more)", en: "Your work shows your strongest points: {x}.", ca: "La teva feina mostra els teus punts forts: {x}." },
     focus:    { when: "Points: the one with the lowest % (under 70 %)", en: "Your work shows the point you need to work on most: {x}.", ca: "La teva feina mostra el punt que has de treballar més: {x}." },
     tipWrite: { when: "…and that point's mistakes are in a corrected writing", en: "Read the corrections of your writings and write those sentences again.", ca: "Llegeix les correccions dels teus writings i torna a escriure aquelles frases." },
@@ -290,13 +293,16 @@
     const xs = C.lss.map(x => ex(x.ls)), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs[xs.length - 1];
     const n1 = C.lss.length > 1 ? C.lss[C.lss.length - 2] : null, N1 = n1 && window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === n1.ls) || {}) || "LS1" : "LS1", N2 = (window.elLsNum && elLsNum((window.EL_LS || []).find(l => l.id === (C.lss[C.lss.length - 1] || {}).ls) || {})) || "LS2";
     const D = DEG[ca ? "ca" : "en"], d1 = e1 != null ? degOf(e1) : null, d2 = e2 != null ? degOf(e2) : null, V = { N1, N2, d1: D[d1], d2: D[d2] };
-    if (d1 != null && d2 != null) say(d2 > d1 ? "examUp" : d2 < d1 ? "examDown" : "examSame", V); else if (d2 != null) say("examOne", V);
+    // everyday work and progress first, the exam after (Roger, 28 Nov 2026: "it seem that we focus more on the exam that on the rest and it isn't true")
     const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse(), w = worst[0];
-    if (best.length) say("best", { x: best.map(p => lc(short(p.t))).join(ca ? " i " : " and ") });
-    if (w) { say("focus", { x: lc(short(w.t)) }); say({ write: "tipWrite", game: "tipGame", lp: "tipLp" }[w.ek] || (w.speak ? "tipSpeak" : "tipRedo")); }
-    const left = tm.due - tm.done, todo = open && left > 0;
+    if (has.length) { const avg = has.reduce((a, p) => a + p.pct, 0) / has.length; say("work", { d: D[avg >= 90 ? 3 : avg >= 70 ? 2 : avg >= 50 ? 1 : 0] }); }
+    const pr = ctx.prog; if (pr && pr.m >= 10) { if (pr.l - pr.f >= 10) say("progUp"); else if (pr.f < 70 && pr.l - pr.f < 3) say("progNone"); }
     if (tm.profile === "steady") say("onTime"); else if (tm.profile === "behind") { say("notOnTime", tm); if (tm.late >= 3) say("late", tm); }
     else if (tm.profile === "last") say("lastMin"); else if (tm.profile === "none") say("none");
+    if (best.length) say("best", { x: best.map(p => lc(short(p.t))).join(ca ? " i " : " and ") });
+    if (w) { say("focus", { x: lc(short(w.t)) }); say({ write: "tipWrite", game: "tipGame", lp: "tipLp" }[w.ek] || (w.speak ? "tipSpeak" : "tipRedo")); }
+    if (d1 != null && d2 != null) say(d2 > d1 ? "examUp" : d2 < d1 ? "examDown" : "examSame", V); else if (d2 != null) say("examOne", V);
+    const left = tm.due - tm.done, todo = open && left > 0;
     if (todo && tm.profile !== "none") say(left === 1 ? "left1" : "left", { n: left });
     w ? say("nextPr", { x: lc(short(w.t)) }) : say("next");
     return out.join(" "); }
@@ -309,6 +315,11 @@
       // every English sentence has its Catalan, for the butlletí de notes (Roger, 28 Nov 2026: "per every sentence that we build in English we need the catalan version")
       const lineCa = L === "ca" ? line : keep && was.ca ? was.ca : lineOf(pct, ev, "ca", pt);
       pts.push({ i, ls: li, t: pt[L] || pt.en, pct, line, ek, speak }); ptsCa.push({ i, ls: li, t: pt.ca || pt.en, pct, line: lineCa, ek, speak }); }));
+    // progress (formative): first tries against the latest answers of every auto-checked step taught (the learning paths' stores)
+    let f = 0, l = 0, m = 0; Object.values(ctx.pg || {}).forEach(ls => Object.entries(ls || {}).forEach(([key, v]) => { let s; try { s = typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return; }
+      if (!s || !s.tries) return; Object.entries(s.tries).forEach(([pid, t]) => { if (!t || !t.max || (ctx.taught && !ctx.taught(key, pid))) return; const z = (s.last || {})[pid] || t;
+        f += +t.score || 0; l += +(z.score ?? t.score) || 0; m += +t.max; }); }));
+    ctx = Object.assign({}, ctx, { prog: m ? { f: Math.round(f / m * 100), l: Math.round(l / m * 100), m } : null });
     const tm = timing(C, ctx), has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), cm = comment(L, pts, tm, ctx, C);
     return { lang: L, live: true, pts: pts.map((p, i) => ({ pct: p.pct, line: p.line, ca: ptsCa[i].line })), strong: has.filter(p => p.pct >= 70).slice(0, 3).map(p => p.i), work: has.filter(p => p.pct < 70).slice(-2).map(p => p.i),
       time: { due: tm.due, done: tm.done, inWeek: tm.inWeek, lastMin: tm.lastMin, profile: tm.profile, weeks: tm.weeks, exam: tm.exam }, comment: cm, commentCa: L === "ca" ? cm : comment("ca", ptsCa, tm, ctx, C) }; };

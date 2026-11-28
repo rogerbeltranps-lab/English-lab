@@ -45,6 +45,7 @@ ok(/Satisfactory \(Assoliment satisfactori\)/.test(RX.comment)&&/Very good \(Ass
 ok(!/\d+[.,]\d|\d+ ?%|SECRET/.test(RX.comment),"the comment must have no exam numbers, %, or exam questions: "+RX.comment);
 ok(typeof RX.commentCa==="string"&&/Assoliment satisfactori/.test(RX.commentCa)&&/Assoliment notable/.test(RX.commentCa)&&!/ exam /.test(RX.commentCa),"an English report must carry its comment in Catalan: "+RX.commentCa);
 ok(RX.pts.every(p=>typeof p.ca==="string"&&p.ca.length>3),"every point line must have its Catalan");
+ok(/^Your everyday work/.test(RX.comment)&&RX.comment.indexOf("exam")>RX.comment.indexOf("everyday work"),"the comment opens with everyday work, the exam comes after: "+RX.comment);
 const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
 if(bad.length){console.error("✗ Term report:\n  "+bad.join("\n  "));process.exit(1)}
 console.log("✓ Term report: built live, locked steps never count, saved lines kept while unchanged");
