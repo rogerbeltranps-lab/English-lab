@@ -80,6 +80,7 @@ hourly task "English Lab: problem reports" is switched off.
 - `--todo` (only with `you`): what Roger must do first, one short line ("Press ↺ Let them do it again on her checkpoint 1 score").
 - `--reply`: the answer to the student, in the report's language (the tool says which), Roger's voice, first person, plain and kind,
   two or three short sentences; never AI, Claude, PRs or code. Write it so it is true once the todo is done.
+- Levels, never numbers (Roger, 28 Nov 2026; REQUIREMENTS § 9): a reply says the level (Satisfactory (Assoliment satisfactori)…), never a % or a mark.
 - `--reply2`: the same answer in the other language (the tool says which). Both go to the student with one click.
 - **Every reply and draft is built on what the website really has** (Roger, 20 Nov 2026: "always suggest replies according to the web
   info"): check the pages and data first and point the student to the real thing, with the names they see (sample exam, 🎯 Practise,
