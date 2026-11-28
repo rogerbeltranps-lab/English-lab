@@ -357,3 +357,14 @@
   .mxw .mxq,.mxw .mxlist{padding:14px}
   .mxw .mxs{font-size:18px}
 }
+
+/* ✏️ Corrections › 📅 Newest first on a phone (teacher.html corrByDate; Roger, 28 Nov 2026): each correction is a small card under its day,
+   time · student · course on one line and the task below it, instead of a table wider than the screen */
+@media (max-width:640px){
+  table.ctab.cbd,table.ctab.cbd tbody,table.ctab.cbd tr,table.ctab.cbd th,table.ctab.cbd td{display:block;width:auto;min-width:0}
+  table.ctab.cbd thead{display:none}
+  table.ctab.cbd tr[data-cn]{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:4px 8px;padding:8px 6px;border-top:1px solid #e2e8f0}
+  table.ctab.cbd tr[data-cn] td{border:0;padding:0}
+  table.ctab.cbd tr[data-cn] td:last-child{grid-column:1/-1}
+  table.ctab.cbd [hidden]{display:none}
+}
