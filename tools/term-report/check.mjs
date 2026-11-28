@@ -47,8 +47,29 @@ ok(typeof RX.commentCa==="string"&&/Assoliment satisfactori/.test(RX.commentCa)&
 ok(RX.pts.every(p=>typeof p.ca==="string"&&p.ca.length>3),"every point line must have its Catalan");
 ok(/^Your everyday work/.test(RX.comment)&&RX.comment.indexOf("exam")>RX.comment.indexOf("everyday work"),"the comment opens with everyday work, the exam comes after: "+RX.comment);
 // a closing sentence from the bank, a teacher's, not a friend's (Roger, 28 Nov 2026)
-{const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(E.some(b=>RX.comment.endsWith(b.en)),"the comment ends with a closing sentence: "+RX.comment);
- ok(E.some(b=>RX.commentCa.endsWith(b.ca)),"the Catalan comment ends the same way: "+RX.commentCa);}
+// a bank sentence with this term's words filled in ({tw} this term, {nx} next term…: elTrepWords)
+const fill=(x,scope,L)=>{const w=W.elTrepWords(scope,L);return x.replace(/\{(\w+)\}/g,(m,k)=>w[k]!=null?w[k]:m)};
+{const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(E.some(b=>RX.comment.endsWith(fill(b.en,"t1","en"))),"the comment ends with a closing sentence: "+RX.comment);
+ ok(E.some(b=>RX.commentCa.endsWith(fill(b.ca,"t1","ca"))),"the Catalan comment ends the same way: "+RX.commentCa);}
+ok(!/[{}]/.test(RX.comment+RX.commentCa),"no {placeholder} left in a comment: "+RX.comment);
+// 📄 Term 1, Term 2, Term 3 and the final report of the year (Roger, 28 Nov 2026: "I should have a 1st term, 2n term, 3rd term and final mark
+// report option (with all the competences of the school year")
+{const w1=W.elTrepWords("t1","en"),w3=W.elTrepWords("t3","en"),wy=W.elTrepWords("y","ca");
+ ok(w1.tw==="this term"&&w1.Nx==="Next term"&&w3.Nx==="Next year"&&wy.tw==="aquest curs"&&wy.Anx==="El curs vinent","the term words: "+JSON.stringify([w1,w3,wy]));
+ ok(W.elTrepWords("t2","en","2027-02-26","2027-02-22").by==="before Friday"&&W.elTrepWords("t2","ca","2027-02-26","2027-01-10").by==="abans del 26 de febrer"&&W.elTrepWords("t2","en").by==="before the end of the term","the deadline words");}
+const G2=[{title:"Grammar · Something new",ls:LS,of:10,r:7,day:"2026-12-03"}];
+const Z2=W.elTrepScope("t2","4eso",G2,"2026-12-10"),ZY=W.elTrepScope("y","4eso",G2,"2026-12-10"),ZE=W.elTrepScope("t3","4eso",[],"2026-12-10");
+ok(Z2.C&&Z2.C.lss.length===1&&Z2.term.from==="2026-11-20"&&Z2.term.to==="2026-12-10"&&Z2.lss.includes("4eso-my-real-routine")&&!Z2.exams.includes("4eso-my-real-routine"),"term 2 scope: "+JSON.stringify(Z2));
+ok(ZE.C&&ZE.C.lss.length===0,"a term with no games still gets a report (marks, competences, daily work)");
+ok(ZY.C.year&&ZY.C.lss.some(l=>l.pts.some(p=>/Something new/.test(p.en)))&&ZY.C.lss[0].pts.length===C.lss[0].pts.length&&ZY.term.from==="2026-11-20"&&ZY.exams.length>=2,"the year: every term's points; when the work was done counts from term 2");
+// term 2: only the tabs taught in term 2 count in the daily work, and the comment talks about it
+{const inf2={status:"open",planEdits:{[G]:{agenda:JSON.stringify({days:{"2026-11-04":["4eso/ls2-celebrations-around-the-world#read"],"2026-12-02":["4eso/ls2-getting-started#speak"]}})}}};
+ const ctx2=Object.assign({},ctx,{scope:"t2",lss:Z2.lss,exams:Z2.exams,term:Z2.term,games:G2,infoOf:()=>inf2,taught:W.elTrepTaught(G,()=>inf2,"2026-12-11")});
+ const R2=W.elTrepBuild(Z2.C,ctx2);ok(R2.time.due===1&&R2.time.done===0,"term 2 daily work counts only the term's tabs: "+JSON.stringify(R2.time));
+ ok(!/[{}]/.test(R2.comment+R2.commentCa)&&/this term/.test(R2.comment)&&!/LS1/.test(R2.comment),"term 2 comment: "+R2.comment);
+ const RY=W.elTrepBuild(ZY.C,Object.assign({},ctx2,{scope:"y",lss:ZY.lss,exams:ZY.exams,term:ZY.term,rs:rsX}));
+ ok(/this school year/.test(RY.comment)&&/Next year/.test(RY.comment)&&/El curs vinent|el curs vinent/.test(RY.commentCa)&&!/[{}]/.test(RY.comment),"the final report's comment talks about the year: "+RY.comment);
+ ok(RY.pts.length===ZY.C.lss.reduce((n,l)=>n+l.pts.length,0)&&W.elTrepPoints(ZY.C).every(l=>l.pts.every(p=>p.en&&!p.src)),"the year: one line per point; saved points keep only their words");}
 const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
 // term 1: the comment never says when the activities were done (Roger, 28 Nov 2026: "not in this ones because I was building the web"); from term 2 it does
 {const TS=["onTime","notOnTime","lastMin"].map(k=>W.EL_TREP_BANK[k]),has=(c,l)=>TS.some(b=>c.includes(b[l].split(/[:{,]/)[0]));

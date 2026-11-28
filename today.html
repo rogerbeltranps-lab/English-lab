@@ -171,6 +171,7 @@ ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{marg
 .pgt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:160px;padding:9px 16px;border-radius:12px;border:2px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;text-align:left;font:inherit;font-size:15px}
 .pgt:hover{border-color:var(--c-dark)}.pgt.on{border-color:var(--c-dark);background:var(--c-soft);box-shadow:0 0 0 2px var(--c-soft)}
 .pgt em{vertical-align:2px;font-style:normal;font-size:11.5px;font-weight:800;background:#16a34a;color:#fff;border-radius:999px;padding:1px 8px}.pgt small{color:#64748b;font-size:13px}
+.rpsw a.pgt{text-decoration:none;color:#0f172a}
 table.pgt-t th{text-align:center;white-space:nowrap}table.pgt-t th:first-child{text-align:left}
 table.pgt-t td{vertical-align:middle;text-align:center;padding-top:10px;padding-bottom:10px}table.pgt-t td small{display:block;color:#64748b;font-size:12px;white-space:nowrap}table.pgt-t td b{font-size:1.3rem}
 table.pgt-t td.l{text-align:left;white-space:nowrap}
@@ -423,7 +424,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-fp-rubrics.js?v=20261127b"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261127w"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
-<script src="shared/js/el-term-report.js?v=20261128i"></script>
+<script src="shared/js/el-term-report.js?v=20261128j"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
@@ -603,9 +604,9 @@ const helpGuide=()=>{
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress","progress-activities":"progress","progress-skills":"progress","progress-competences":"progress","progress-reports":"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang",report:"report",mistakes:"mistakes"};
+const PLACE_OF={"exam-practice":"examprep",work:"marks",progress:"progress","progress-activities":"progress","progress-skills":"progress","progress-competences":"progress","progress-reports":"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang",report:"report","report-t2":"report","report-t3":"report","report-y":"report",mistakes:"mistakes"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({examprep:t("Exàmens de prova","Mock exams"),mistakes:t("Aprèn dels teus errors","Learn from your mistakes"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab"),report:"📄 "+t("Informe del 1r trimestre","Term 1 report")})[p];
+const placeTitle=p=>({examprep:t("Exàmens de prova","Mock exams"),mistakes:t("Aprèn dels teus errors","Learn from your mistakes"),progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab"),report:"📄 "+repTitle(repTerm())})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
@@ -1233,7 +1234,7 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  if(placeNow()==="report"&&!repOk())try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}   // 📄 only while the teacher shows it (reportPlace)
+  if(placeNow()==="report"&&!repOk(repTerm()))try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}   // 📄 only while the teacher shows it (reportPlace)
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){mzOff();$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
@@ -1837,7 +1838,7 @@ const CPN={1:["Interculturalitat","Cultures and respect"],2:["Comprensió oral",
 const CPC={1:["#0f766e","#ccfbf1"],2:["#1d4ed8","#dbeafe"],3:["#c2410c","#ffedd5"],4:["#15803d","#dcfce7"],5:["#7e22ce","#f3e8ff"],6:["#a16207","#fef3c7"],7:["#0e7490","#cffafe"],8:["#4338ca","#e0e7ff"],9:["#be123c","#ffe4e6"],10:["#4d7c0f","#ecfccb"]};
 const CPI={1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎",7:"📚",8:"🔁",9:"🧠",10:"💬"};
 const tmName=tm=>tm?EL_TERMS[tm-1][EN?"en":"ca"]:t("Tot el curs","Whole year");   // tm 0 = the whole year (Roger, 9 Nov 2026: "the entire year is missing")
-function compBox(ls2,tm){const ps=ls2.flatMap(compPieces).filter(y=>!tm||y.term===tm),o=compOfPieces(ps),ks=Object.keys(o).sort((a,b)=>a-b);if(!ks.length)return "";
+function compBox(ls2,tm){const p0=ls2.flatMap(compPieces),ps=tm?p0.filter(y=>y.term===tm):yearPcs(p0),o=compOfPieces(ps),ks=Object.keys(o).sort((a,b)=>a-b);if(!ks.length)return "";
   const any=ks.some(k=>o[k].m!=null),mk=m=>m==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(m*10)}">${f1(m)}</b>`,
     dg=m=>{const d=degOf(m);return d?`<span class="dg dg-${d[0]}">${d[1]}</span>`:""};
   const card=k=>{const K=o[k],cs=Object.keys(K.crit).sort((a,b)=>String(a).localeCompare(String(b),"en",{numeric:true}));
@@ -2128,13 +2129,24 @@ function mxDo(d){const M=S.mx;
 // (Roger's own words), each point with the student's % and one line written by tools/term-report/draft.mjs; the marks, criteria and the
 // skills chart are worked out here, live, as on 📊 My marks and 🎓 My progress; when the work was done and the comment come from the draft.
 // or at any time once the teacher publishes the group's drafts (📣 Publish the draft on the dashboard: teams/{group}.repPub.t1; Roger, 24 Nov 2026)
-const repPub=()=>!!(((D&&D.tm)||{}).repPub||{}).t1;
+// 📄 Term 1, Term 2, Term 3 or the final report of the year (Roger, 28 Nov 2026: "I should have a 1st term, 2n term, 3rd term and final mark
+// report option (with all the competences of the school year"): #report (Term 1), #report-t2, #report-t3, #report-y. Each one is shown and
+// published on its own (teams/{group}.repPub.{term}, repFinal.{term}); Term 1 is saved in termReports/{email}.t1, the others in
+// termReportsN/{term}_{email}. el-term-report.js elTrepScope gives each its points, LSs, exams and dates.
+const REP_TS=["t1","t2","t3","y"],repTerm=()=>{const m=location.hash.match(/^#report-(t[23]|y)$/);return m?m[1]:"t1"},repHash=k=>k==="t1"?"#report":"#report-"+k;
+const repTN=k=>k==="y"?t("informe final del curs","final report of the school year"):({t1:t("informe del 1r trimestre","Term 1 report"),t2:t("informe del 2n trimestre","Term 2 report"),t3:t("informe del 3r trimestre","Term 3 report")})[k];
+const repTitle=k=>k==="y"?t("Informe final del curs","Final report of the year"):({t1:t("Informe del 1r trimestre","Term 1 report"),t2:t("Informe del 2n trimestre","Term 2 report"),t3:t("Informe del 3r trimestre","Term 3 report")})[k];
+const repMy=k=>k==="y"?t("El meu informe final del curs","My final report of the year"):({t1:t("El meu informe del 1r trimestre","My Term 1 report"),t2:t("El meu informe del 2n trimestre","My Term 2 report"),t3:t("El meu informe del 3r trimestre","My Term 3 report")})[k];
+const repPub=(k="t1")=>!!(((D&&D.tm)||{}).repPub||{})[k];
 // ✅ the final version (Roger, 28 Nov 2026: "the button to say that the current reports are the last version (even though I must be able to do
 // any changes I want)"): teams/{group}.repFinal.t1 = when. The page then shows the saved report as it is (no live build, so it no longer
 // changes with the student's work), without "draft"; Roger can still rebuild any report or go back to draft from the dashboard.
-const repFin=()=>!!(((D&&D.tm)||{}).repFinal||{}).t1,repDr=()=>repFin()?"":t(" (esborrany)"," (draft)");
-const repOk=()=>!!(DEMO||AS||all()||window.EL_REP_ON||repPub());
-const repChip=cls=>repPub()&&!all()?`<a class="${cls}" href="#report">📄 ${t("El meu informe del 1r trimestre","My Term 1 report")}${repDr()}</a>`:"";
+const repFin=(k="t1")=>!!(((D&&D.tm)||{}).repFinal||{})[k],repDr=(k="t1")=>repFin(k)?"":t(" (esborrany)"," (draft)");
+// a later term's report exists once that term has started (Term 1 and the year always)
+const repStarted=k=>k==="t1"||k==="y"||EL_TERMS.findIndex(x=>x.id===elTerm())>=EL_TERMS.findIndex(x=>x.id===k);
+const repOk=(k="t1")=>repStarted(k)&&!!(DEMO||AS||all()||(window.EL_REP_ON&&(window.EL_REP_TERM||"t1")===k)||repPub(k));
+// the board's chips: every report Roger has published, the newest first
+const repChip=cls=>all()?"":REP_TS.filter(k=>repPub(k)).reverse().map(k=>`<a class="${cls}" href="${repHash(k)}">📄 ${repMy(k)}${repDr(k)}</a>`).join("");
 const repTxt=s=>esc(s).replace(/&lt;(\/?)i&gt;/g,"<$1i>");   // the draft's lines: plain text with <i> only
 // the level names: English with the official Catalan in brackets (Roger, 23 Nov 2026: "students must see the translation though")
 const REP_DEG=[["No assoliment","Not satisfactory"],["Assoliment satisfactori","Satisfactory"],["Assoliment notable","Very good"],["Assoliment excel·lent","Excellent"]];
@@ -2144,10 +2156,11 @@ const bonusNote=B=>{if(!B||B.base==null||!B.x||!(B.x.could>0))return "";const L=
     :`<small class="bnote off">🔒 ${t(`Sense bonus: et ${n===1?"falta 1 activitat que tocava":`falten ${n} activitats que tocaven`} (podries tenir +${elNum(B.x.could,L)})`,`No bonus: ${n===1?"1 activity that was due is":`${n} activities that were due are`} not done (you could have +${elNum(B.x.could,L)})`)}</small>`};
 const repDeg=(m,big)=>{const i=dgIdx(m);if(i<0)return `<span class="pgna">${t("encara no","not yet")}</span>`;const [ca,en]=REP_DEG[i];
   return `<span class="dgm${big?" big":""}"><span class="dgbx dg-${DGK[i]}">${EN?`${en} <small>(${ca})</small>`:ca}</span><span class="dgn">${f1(m)}<small>&nbsp;/&nbsp;10</small></span></span>`};
-function repLoad(){
-  if(DEMO){S.rep=(DEMO.trep||{}).t1||{};return}
+function repLoad(k){S.repK=k;
+  if(DEMO){S.rep=(DEMO.trep||{})[k]||{};return}
   const mail=String((AS?D.me.email:U&&U.email)||"").toLowerCase();if(!mail){S.rep={};return}
-  F.getDoc(F.doc(ELCloud.db,"termReports",mail)).then(x=>{S.rep=(x.exists()&&x.data().t1)||{}}).catch(e=>{console.warn("term report",e);S.rep={}}).then(()=>{if(placeNow()==="report")render()})}
+  (k==="t1"?F.getDoc(F.doc(ELCloud.db,"termReports",mail)).then(x=>(x.exists()&&x.data().t1)||{}):F.getDoc(F.doc(ELCloud.db,"termReportsN",k+"_"+mail)).then(x=>(x.exists()&&x.data())||{}))
+    .then(r=>{if(S.repK===k)S.rep=r}).catch(e=>{console.warn("term report",e);if(S.repK===k)S.rep={}}).then(()=>{if(placeNow()==="report")render()})}
 // the bars of the weeks: how many activities were finished each week (▲ = the exam's week), the last week orange when it holds far more than the rest
 function repWeeks(T){const w=(window.elTrepWeeks?elTrepWeeks(T):[]).map(x=>[x.d,x.n]);if(!w.length)return "";const n=w.length,Wd=640,H=170,L=30,R=10,Tp=18,B=30,max=Math.max(10,...w.map(x=>+x[1]||0)),bw=(Wd-L-R)/n,ys=v=>Tp+(max-v)*(H-Tp-B)/max;
   const avg=w.reduce((s,x)=>s+(+x[1]||0),0)/n,ex=T.exam?(()=>{const d=new Date(T.exam+"T12:00:00Z"),k=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-k);return d.toISOString().slice(0,10)})():"";
@@ -2155,35 +2168,54 @@ function repWeeks(T){const w=(window.elTrepWeeks?elTrepWeeks(T):[]).map(x=>[x.d,
   w.forEach(([d,v],i)=>{v=+v||0;const x=L+i*bw+bw*.18,ww=bw*.64,hot=v>2*avg&&v>=5;g+=`<rect x="${x}" y="${ys(v)}" width="${ww}" height="${ys(0)-ys(v)}" rx="3" fill="${hot?"#ea580c":"var(--rk,#2563eb)"}"/>`
     +(v?`<text class="lb" x="${x+ww/2}" y="${ys(v)-4}" text-anchor="middle">${v}</text>`:"")
     +`<text x="${x+ww/2}" y="${H-10}" text-anchor="middle">${d===ex?"▲ ":""}${new Date(d+"T12:00:00").toLocaleDateString(EN?"en-GB":"ca",{day:"numeric",month:"short"})}</text>`});
-  return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
+  return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" style="max-width:720px;display:block" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
 const repName=()=>{const n=String(D.me.name||"").trim();return n.includes(",")?n.split(",")[1].trim()+" "+n.split(",")[0].trim():n};
-function repLive(C,course){if(!window.elTrepBuild||!D.me.group)return null;
-  try{const [from,to]=elTermSpan("t1"),upTo=to<ELWeek.today()?ELWeek.add(to,1):undefined,inf=id=>D.ls[id]||{};
-    return elTrepBuild(C,{course,group:D.me.group,lang:EN?"en":"ca",pg:D.pg,rs:D.rs,games:Object.values(D.mg||{}).filter(g=>g&&g.title&&g.of),
-      taught:elTrepTaught(D.me.group,inf,upTo),infoOf:inf,term:{from,to,deadline:(window.EL_TREP_DEADLINE||{}).t1},prev:S.rep||null})}
+const repGames=()=>Object.values(D.mg||{}).filter(g=>g&&g.title&&g.of);
+function repLive(C,course,Z){if(!window.elTrepBuild||!D.me.group)return null;
+  try{const inf=id=>D.ls[id]||{};
+    return elTrepBuild(C,{course,group:D.me.group,lang:EN?"en":"ca",pg:D.pg,rs:D.rs,games:repGames(),scope:Z.scope,lss:Z.lss,exams:Z.exams,
+      taught:elTrepTaught(D.me.group,inf,Z.upTo),infoOf:inf,term:Z.term,prev:S.rep||null})}
   catch(e){console.warn("live term report",e);return null}}
+// the year (docs/REQUIREMENTS.md § 4: Term 1 ×1, Term 2 ×2, Term 3 ×3), as the dashboard's yearOf: each competence's mark is its term marks
+// weighted by the term's number, and it keeps its share of the year. The pieces' weights are rescaled so that compOfPieces and termMark give it.
+function yearPcs(ps){const by={};ps.forEach(y=>{if(y.m==null||!(y.w>0))return;const k=String(y.c).split(".")[0],K=by[k]=by[k]||{sw:0,t:{}};K.sw+=y.w;K.t[y.term]=(K.t[y.term]||0)+y.w});
+  return ps.map(y=>{const K=by[String(y.c).split(".")[0]];if(y.m==null||!(y.w>0)||!K||!K.t[y.term])return y;const tn=Object.keys(K.t).reduce((a,n)=>a+(+n||1),0);
+    return Object.assign({},y,{w:y.w/K.t[y.term]*(+y.term||1)/tn*K.sw})})}
+// the year mark with each term's points bonus, weighted the same way (as teacher.html yMark)
+function yearMark(ps){const m=termMark(yearPcs(ps));if(m==null)return {m};const ts=EL_TERMS.map((_,i)=>[i+1,withBonus(termMark(ps.filter(y=>y.term===i+1)),i+1)]).filter(([,x])=>x.m!=null),
+  w=ts.reduce((a,[n])=>a+n,0),b=w?Math.round(ts.reduce((a,[n,x])=>a+n*(x.b||0),0)/w*100)/100:0;return {m:Math.min(10,m+b),base:m,b,ts}}
+// the reports this page can open (the teacher's student view: all four), as chips at the top when there is more than one
+function repSwitch(term){const ks=REP_TS.filter(k=>repOk(k));if(ks.length<2)return "";
+  return `<div class="pgterms rpsw" style="margin:0 0 10px" role="group" aria-label="${t("Informe","Report")}">${ks.map(k=>`<a class="pgt${k===term?" on":""}" href="${repHash(k)}"${k===term?' aria-current="page"':""}><b>${k==="y"?"🎓 "+t("Final del curs","Final, whole year"):esc(tmName(+k.slice(1)))}</b><small>${repDr(k)?t("esborrany","draft"):t("versió final","final version")}</small></a>`).join("")}</div>`}
 function reportPlace(lss,ls){
-  const course=all()?ls.course:((EL_GROUPS.find(x=>x.id===D.me.group)||{}).course||ls.course),C=((window.EL_TREP||{}).t1||{})[course];
+  const course=all()?ls.course:((EL_GROUPS.find(x=>x.id===D.me.group)||{}).course||ls.course),term=repTerm(),tn=term==="y"?0:+term.slice(1);
+  const Z=window.elTrepScope?elTrepScope(term,course,repGames()):{C:term==="t1"?((window.EL_TREP||{}).t1||{})[course]:null};let C=Z.C;
   if(!C)return `<div class="box"><p class="muted">${t("Encara no hi ha cap informe.","There is no report yet.")}</p></div>`;
-  if(S.rep===undefined){S.rep=null;repLoad()}
+  if(S.rep===undefined||S.repK!==term){S.rep=null;repLoad(term)}
   if(!S.rep)return `<div class="box"><p class="muted">${t("Carregant…","Loading…")}</p></div>`;
+  // ✅ a final version keeps the points it was saved with (Term 2 on: they come from the class games, which can change)
+  if(repFin(term)&&term!=="t1"&&Array.isArray(S.rep.wk))C=Object.assign({},C,{lss:S.rep.wk});
   // built live from the student's own work each time the page opens (Roger, 27 Nov 2026: "reports must be done as we do activities, meaning
   // they pull the information automatically on their own"; el-term-report.js elTrepBuild): only the tabs taught by the term's last day
   // count, so a step that was never unlocked never counts; the saved draft (S.rep) only lends its written lines while a % is the same
-  const R=(repFin()?null:repLive(C,course))||S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
+  // the LSs of the report: Term 1 its two LSs; a later term every LS the student can see with work in that term; the year every one
+  const vis=lss.filter(l=>l.course===course),mine=term==="t1"?C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean):(tn?vis.filter(l=>compPieces(l).some(y=>y.term===tn)):vis.slice()).sort((a,b)=>EL_LS.indexOf(a)-EL_LS.indexOf(b));
+  const R=(repFin(term)?null:repLive(C,course,Z))||S.rep,pts=R.pts||[],g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lv=(elRouteOf(D.lv,(mine[mine.length-1]||{}).id)||{}).level;
   const P=[];C.lss.forEach(x=>x.pts.forEach(p=>P.push(p)));
   const pill=v=>v==null?`<span class="rpp none">–</span>`:`<span class="rpp" style="background:${col(v)}">${v} %</span>`;
   const short=h=>String(h).replace(/<[^>]+>/g,"").split(/[:(]/)[0].trim().replace(/\.$/,"");
-  let k=0;const worked=`<div class="rpls">${C.lss.map(x=>`<div class="rpl"><h3>${esc(x.name)}</h3><ul>${x.pts.map(p=>{const r=pts[k++]||{};
+  let k=0;const hasPts=C.lss.some(x=>x.pts.length),worked=`<div class="rpls">${C.lss.map(x=>`<div class="rpl"><h3>${esc(x.name)}</h3><ul>${x.pts.map(p=>{const r=pts[k++]||{};
     return `<li><span class="rpt">${EN?p.en:p.ca}</span>${r.line||r.pct!=null?`<span class="rpf">${pill(r.pct)} ${repTxt(r.line||"")}</span>`:""}</li>`}).join("")}</ul></div>`).join("")}</div>`
     +`<div class="rpl rphow"><h3>${t("Com hem treballat i avaluat","How we worked and how you were assessed")}</h3><ul>${(C.how[EN?"en":"ca"]||[]).map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`;
   // the marks: the term (as 🎓 My progress), each LS (LS1 whole; LS2 part by part while its final product counts in term 2)
-  const TB=withBonus(termMark(mine.flatMap(compPieces).filter(y=>y.term===1)),1),TM=TB.m;
-  S.repNoFp=new Set(C.lss.filter(x=>x.fpLater).map(x=>x.ls));
+  S.repNoFp=new Set(term==="t1"?C.lss.filter(x=>x.fpLater).map(x=>x.ls):[]);
+  const PS=mine.flatMap(compPieces),TB=tn?withBonus(termMark(PS.filter(y=>y.term===tn)),tn):yearMark(PS),TM=TB.m;
   const lsTile=l=>{const M=lsMarks(l);if(!M)return "";const P0=lsPts(l,M),Pt=P0&&S.repNoFp.has(l.id)?Object.assign({},P0,{all:false,parts:P0.parts.filter(p=>p.k!=="fp")}):P0,part=Pt&&!Pt.all;
     return `<div class="rpm"><h3>${esc(window.elLsNum?elLsNum(l):"")} · ${esc(String(l.title).replace(/^\S+ · /,""))}</h3>${part?ptLine(l,Pt):repDeg(M.total)}</div>`};
-  const glance=`<div class="rpms"><div class="rpm main"><h3>${t("Nota del 1r trimestre","Term 1 mark")}</h3>${repDeg(TM,true)}<p class="muted">${t("Amb tots els criteris de les dues LS del trimestre.","From every criterion of the term's two LSs.")}</p>${bonusNote(TB)}</div>${mine.map(lsTile).join("")}</div>`;
+  // the final report: the year mark, then each term's mark (with its bonus) and each LS
+  const tTile=([n,x])=>`<div class="rpm"><h3>${esc(tmName(n))}</h3>${repDeg(x.m)}</div>`;
+  const glance=`<div class="rpms"><div class="rpm main"><h3>${tn?esc(tmName(tn))+" · "+t("nota","mark"):t("Nota del curs","Year mark")}</h3>${repDeg(TM,true)}<p class="muted">${term==="t1"?t("Amb tots els criteris de les dues LS del trimestre.","From every criterion of the term's two LSs."):tn?t("Amb tots els criteris treballats aquest trimestre.","From every criterion worked this term."):t("Amb tots els criteris del curs: el 1r trimestre compta ×1, el 2n ×2 i el 3r ×3.","From every criterion of the year: Term 1 counts ×1, Term 2 ×2 and Term 3 ×3.")}</p>${tn?bonusNote(TB):TB.b?`<small class="bnote">⭐ ${t(`Inclou +${elNum(TB.b,lang())} de bonus dels trimestres`,`Includes a +${elNum(TB.b,lang())} bonus from the terms`)}</small>`:""}</div>${tn?"":(TB.ts||[]).map(tTile).join("")}${mine.map(lsTile).join("")}</div>`;
   const tags=(ix,c)=>(ix||[]).map(i=>P[i]?`<span class="rptag ${c}">${esc(short(EN?P[i].en:P[i].ca))}</span>`:"").join("");
   const T=R.time||{},prof=T.profile,VD={steady:["ok",t("🟢 Feina constant.","🟢 Steady work."),t("Has fet la majoria d'activitats la mateixa setmana de la classe.","You did most activities in the same week as the class.")],
     behind:["late",t("🟡 Vas endarrerit.","🟡 Falling behind."),t(`Només ${T.inWeek||0} % de les activitats les vas fer la setmana de la classe; la resta, més tard o encara no.`,`You did only ${T.inWeek||0}% of the activities in the week of the class; the rest later, or not yet.`)],
@@ -2197,18 +2229,19 @@ function reportPlace(lss,ls){
       +`<div><b>${T.done||0} / ${T.due}</b><span>${t("Activitats fetes de les que hem fet a classe","Activities done of the ones we did in class")}</span></div>`
       +`<div><b style="color:${col(T.inWeek||0)}">${T.inWeek||0} %</b><span>${t("Fetes la mateixa setmana de la classe","Done in the week of the class")}</span></div></div>`)
     +(VD?`<div class="rpv ${VD[0]}">${VD[2]}</div>`:"")+repWeeks(T):`<p class="muted">${t("Encara no hi ha dades.","No data yet.")}</p>`;
-  const next=`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
+  const next=term!=="t1"?"":`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
   const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
   return `<div class="trep" data-c="${esc(course)}"><div class="rph"><div><small>${esc(g?g.name:"")} · English</small><h2>${esc(repName())}</h2></div>${lv?levelTag(course,lv):""}</div>`
-    +(repFin()?`<p class="rpdraft fin">✅ ${t("<b>Versió final</b> del teu informe del 1r trimestre.","<b>Final version</b> of your Term 1 report.")}</p>`:`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Revisa'l: encara pot canviar amb les activitats que acabis. Si hi veus cap error, digues-m'ho amb ⚠️ Avisa d'un problema.","<b>Draft.</b> Check it: it can still change with the activities you finish. If you see a mistake, tell me with ⚠️ Report a problem.")}</p>`)
+    +repSwitch(term)
+    +(repFin(term)?`<p class="rpdraft fin">✅ ${t(`<b>Versió final</b> del teu ${repTN(term)}.`,`<b>Final version</b> of your ${repTN(term)}.`)}</p>`:`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Revisa'l: encara pot canviar amb les activitats que acabis. Si hi veus cap error, digues-m'ho amb ⚠️ Avisa d'un problema.","<b>Draft.</b> Check it: it can still change with the activities you finish. If you see a mistake, tell me with ⚠️ Report a problem.")}</p>`)
     +box("🎓",t("Les teves notes","Your marks"),"",glance)   // first, right under the Draft line (Roger, 25 Nov 2026: "this should be at the top under draft")
-    +box("🧭",t("Aquest primer trimestre hem treballat","What we worked on this term"),t("i com t'ha anat cada punt","and how each point went for you"),worked)
-    +compBox(mine,1)
+    +(hasPts?box("🧭",{t1:t("Aquest primer trimestre hem treballat","What we worked on this term"),t2:t("Aquest segon trimestre hem treballat","What we worked on this term"),t3:t("Aquest tercer trimestre hem treballat","What we worked on this term"),y:t("Aquest curs hem treballat","What we worked on this year")}[term],t("i com t'ha anat cada punt","and how each point went for you"),worked):"")
+    +compBox(mine,tn)
     +((R.strong||[]).length||(R.work||[]).length?box("🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),"",`<div class="rpgv"><div><h3>💪 ${t("El que domines","What you know well")}</h3><div class="rptags">${tags(R.strong,"good")||`<span class="muted">–</span>`}</div></div><div><h3>🎯 ${t("El que has de treballar","What to work on")}</h3><div class="rptags">${tags(R.work,"work")||`<span class="muted">–</span>`}</div></div></div>`):"")
     +skGrowBox(course)
     // term 1 is the exception (Roger, 28 Nov 2026: "in this case, we won't mention what they did in class… this term is an exception and I want
-    // the web to always show what was done in class in the reports"): its report (EL_TREP.t1, timing: false) leaves this box out, only the notice stays
-    +(((((window.EL_TREP||{}).t1||{})[course]||{}).timing===false)?next
+    // the web to always show what was done in class in the reports"): its report (EL_TREP.t1, timing: false) leaves this box out, only the notice stays; Term 2, Term 3 and the year always show it
+    +(term==="t1"&&C.timing===false?next
       :box("📅",t("La teva feina de cada dia i quan la vas fer","Your daily work and when you did it"),t("cada barra és una setmana","each bar is a week"),daily+next))
     +(R.comment?box("💬",t("Comentari del professor","Your teacher's comment"),"",`<p class="rpc">${repTxt(R.comment)}</p>`):"")
     +`<p class="muted rpfoot">© ${new Date().getFullYear()} Roger Beltran · English Lab · ${t("Tots els drets reservats","All rights reserved")}</p></div>`}
@@ -2313,11 +2346,11 @@ function howCard(tm,course){
 const PGT=[["overview","progress","⭐","Resum","Overview"],["act","progress-activities","✅","Les meves activitats","My activities"],["sk","progress-skills","💪","Les meves destreses","My skills"],
   ["comp","progress-competences","🧩","Les meves competències","My competences"],["marks","marks","📊","Les meves notes","My marks"],["rep","progress-reports","📄","Els meus informes","My reports"]];
 const pgTab=()=>{const k=({"progress-activities":"act","progress-skills":"sk","progress-competences":"comp","progress-reports":"rep"})[location.hash.slice(1)];
-  return k==="rep"&&!repOk()?"overview":k||(placeNow()==="marks"?"marks":"overview")};
+  return k==="rep"&&!REP_TS.some(k=>repOk(k))?"overview":k||(placeNow()==="marks"?"marks":"overview")};
 const pgCourse=ls=>all()?ls.course:((EL_GROUPS.find(x=>x.id===D.me.group)||{}).course||ls.course);
 const pgNow=()=>EL_TERMS.findIndex(x=>x.id===elTerm())+1||1;
 function pgTabs(ls,right){const cur=pgTab(),n=all()?0:howOpen(howCalc(pgNow(),pgCourse(ls)));
-  return `<div class="pgtop"><nav class="pgtabs" aria-label="${t("El meu progrés","My progress")}">${PGT.filter(x=>x[0]!=="rep"||repOk()).map(([k,h,i,ca,en])=>`<a href="#${h}" class="${k===cur?"on":""}"${k===cur?' aria-current="page"':""}><span aria-hidden="true">${i}</span> ${t(ca,en)}${k==="act"&&n?` <b class="pgbadge">${n}</b>`:""}</a>`).join("")}</nav>${right||""}</div>`}
+  return `<div class="pgtop"><nav class="pgtabs" aria-label="${t("El meu progrés","My progress")}">${PGT.filter(x=>x[0]!=="rep"||REP_TS.some(k=>repOk(k))).map(([k,h,i,ca,en])=>`<a href="#${h}" class="${k===cur?"on":""}"${k===cur?' aria-current="page"':""}><span aria-hidden="true">${i}</span> ${t(ca,en)}${k==="act"&&n?` <b class="pgbadge">${n}</b>`:""}</a>`).join("")}</nav>${right||""}</div>`}
 function progressPlace(lss,ls){
   const course=pgCourse(ls),mine=EL_LS.filter(l=>l.course===course);
   const map=(window.EL_COMP_MAP||{})[course]||{},nT=EL_TERMS.length,N=Math.max(mine.length,...Object.keys(map).map(Number).filter(n=>n>0),0);
@@ -2333,7 +2366,7 @@ function progressPlace(lss,ls){
   if(tab==="rep")return head+pgReports();
   return head+pgOverview(lss,ls,course,now)}
 // 📄 My reports: one card per report the student can open (Term 1 now)
-const pgRepCard=()=>repOk()?`<a class="pgrep" href="#report"><span aria-hidden="true">📄</span><span><b>${t("El meu informe del 1r trimestre","My Term 1 report")}${repDr()}</b><small>${t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`:"";
+const pgRepCard=()=>REP_TS.filter(k=>repOk(k)).reverse().map(k=>`<a class="pgrep" href="${repHash(k)}"><span aria-hidden="true">${k==="y"?"🎓":"📄"}</span><span><b>${repMy(k)}${repDr(k)}</b><small>${k==="y"?t("totes les competències del curs, la nota del curs, la teva feina de cada dia i el comentari del professor","every competence of the year, your year mark, your daily work and your teacher's comment"):t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`).join("");
 const pgReports=()=>pgRepCard()||`<div class="box"><p class="muted" style="margin:0">${t("Els teus informes sortiran aquí quan el professor te'ls ensenyi.","Your reports will show here when your teacher shares them.")}</p></div>`;
 // ⭐ Overview: how am I doing, at a glance. Row 1: 📊 my LS mark so far · 📋 how I'm working · 👉 what to do next. Row 2: 💪 my skills · 🏆 my points
 function pgOverview(lss,ls,course,now){const H=all()?null:howCalc(now,course);
@@ -2399,7 +2432,7 @@ function pgTermCard(rows,these,tm,now){
       +`<td class="pgdn"${H("✅","Tasques fetes","Tasks done")}>${dn==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(dn)}">${Math.round(dn)} %</b><span class="xbar"><span style="width:${Math.max(0,Math.min(100,dn))}%;background:${col(dn)}"></span></span>${dp?`<small>${dp.n} ${t("de","of")} ${dp.of} SLP</small>`:""}`}</td>`
       +`<td><button type="button" class="g pgo" data-do="pgo" data-ls="${r.l.id}" data-h="${M.only?"exam":"formative"}">${t("Detalls","Details")} →</button></td></tr>`};
   const nc=these.length-these.filter(r=>r.st!=="coming").length;
-  const TB=tm?withBonus(termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)).filter(y=>y.term===tm)),tm):{m:termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)))},TM=TB.m;
+  const TB=tm?withBonus(termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)).filter(y=>y.term===tm)),tm):yearMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l))),TM=TB.m;
   const tp=rows.filter(r=>r.l).map(r=>lsDone(r.l,tm)).filter(Boolean).flatMap(x=>x.parts),tw=tp.reduce((n,x)=>n+x.w,0),TP=tw?tp.reduce((n,x)=>n+x.w*x.f,0)/tw*100:null;
   return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",(tm===0?t("La meva nota del curs","My year mark"):t("La meva nota del trimestre","My term mark"))+" · "+esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
     +`<div class="pgtms"><div class="pgtm"><small>${t("Tasques fetes","Tasks done")}</small>${TP==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(TP)}">${Math.round(TP)} %</b>`}<span class="xbar"><span style="width:${TP==null?0:Math.max(0,Math.min(100,TP))}%;background:${TP==null?"#e2e8f0":col(TP)}"></span></span></div><div class="pgtm"><small>${tm===0?t("Nota del curs fins ara","Year mark so far"):tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:dgMark(TM)}${bonusNote(TB)}</div></div></div>`

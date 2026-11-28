@@ -397,7 +397,9 @@ export function remind(){if(!C||!C.s)return Promise.resolve();return C.setDoc(C.
 const REP_K="el_cm_rep",repIs=()=>{try{return !!C&&!!C.s&&sessionStorage.getItem(REP_K)===String(C.s)}catch(e){return false}};
 const repBtn=()=>`<button class="shmap shrep${repIs()?" on":""}" data-rep="1" title="${repIs()?"Students go back to the class":"Every student in class mode sees their own draft term report (nobody else's)"}">${repIs()?"✕ Hide the draft reports":"📄 Show draft reports"}</button>`;
 function repSet(on){if(!C||!C.s)return Promise.resolve();try{if(on)sessionStorage.setItem(REP_K,String(C.s));else sessionStorage.removeItem(REP_K)}catch(e){}
-  return C.setDoc(C.doc(C.db,"live",C.g),{go:{report:on?{s:C.s,at:Date.now()}:null}},{merge:true}).catch(e=>console.warn("draft reports",e))}
+  // the report the dashboard's 📄 Term reports page showed last (Term 1, 2, 3 or the year: teacher.html, localStorage el_rep_term)
+  let k="t1";try{const v=localStorage.getItem("el_rep_term");if(/^(t[123]|y)$/.test(v||""))k=v}catch(e){}
+  return C.setDoc(C.doc(C.db,"live",C.g),{go:{report:on?{s:C.s,at:Date.now(),term:k}:null}},{merge:true}).catch(e=>console.warn("draft reports",e))}
 // 🧑‍🎓 Self study (Roger, 24 Nov 2026: "in class mode I want to have the option of self study to work on whatever they need to"): on,
 // live/{group}.go.self = {s, at}: every student in this class mode is let go to work on their own (el-cloud.js cmSelf: free on the site,
 // a bar with ✅ My pending tasks, 📖 the book and 🎲 Games, the To do card opened once). ✕ End self study (or ⏹ Stop) takes it off and class
