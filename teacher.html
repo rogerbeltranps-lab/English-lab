@@ -153,6 +153,13 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cbar2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:14px}.cbar2 .cbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.cbar2 button{margin:0}
 .ctw{max-height:62vh}table.ctab{width:100%}table.ctab td,table.ctab th{text-align:left;vertical-align:top;font-size:13.5px}table.ctab td.ctn{min-width:150px}table.ctab td.ctg{white-space:nowrap;font-weight:600}table.ctab td.ctd{min-width:150px;width:1%}table.ctab td.ctd .cchip{display:block;margin:0 0 3px;white-space:nowrap}table.ctab tbody+tbody tr:first-child td{border-top:2px solid #cbd5e1}.cfind{flex:1 1 200px;max-width:280px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;font:inherit;font-size:14px}
+/* 🚩 Possible problems (flgPage) */
+.flsums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 12px}a.flsum{min-width:0;white-space:normal;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#0f172a;text-decoration:none}
+a.flsum,a.flsum *{text-decoration:none}a.flsum b{font-size:1.25rem}a.flsum span{font-size:13px;color:#475569}a.flsum.hot{background:#fef2f2;border-color:#fca5a5}a.flsum.hot b{color:#b91c1c}a.flsum:hover{border-color:#94a3b8}
+.flsec{margin-bottom:12px;scroll-margin-top:12px}.flcnt{font-weight:700;color:#475569}.flnone{color:#166534;font-weight:600;margin:4px 0}.flex{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:4px 0 8px}
+.flr{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:flex-start;padding:9px 0;border-top:1px solid #eef2f7;font-size:14px}.flr[hidden]{display:none}
+.flw{flex:0 0 220px;min-width:0}.flm{flex:1 1 300px;min-width:0;overflow-wrap:anywhere}.flt{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-left:auto}.flt button{margin:0}
+.flold{color:#b45309;font-weight:700}#fldone>details>summary{cursor:pointer;font-size:1.05rem}
 .cline{padding:7px 0;border-top:1px solid #eef2f7}.cwho{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}details.cgrp details.cgrp,details.cday details.cgrp{margin-left:14px}
 .chip.cchip{font-size:13px;padding:2px 10px;cursor:pointer}.chip.cchip:hover{border-color:#3157d5;color:#2443ad}.chip.cchip.late{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
 .cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
@@ -383,7 +390,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
   // the teacher's menu on the other pages (elTeacherMenu, el-catalog.js) opens a place of the dashboard: ?g= a group or a menu item
   // (plan = 🏠 Home, corr, lss…), ?p= a Home place (week, msgs, tt), ?do= annnew (📣 Announcement) or mtdlg (🛠 Maintenance), ?more=1
   // (the phone's More sheet)
-  const TABS=["plan","corr","qa","cres","online","mat","how","ref","lss","none","tn"];
+  const TABS=["plan","corr","flg","qa","cres","online","mat","how","ref","lss","none","tn"];
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(TABS.includes(q.get("g"))){S.g=q.get("g");if(S.g==="plan"&&["week","msgs","tt"].includes(q.get("p")))CLS.place=q.get("p")}
   else if(q.has("do")||q.has("more"))S.g=TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g))?LAST.g:"plan";
@@ -1463,6 +1470,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only · Back or ✕ Exit returns here")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
+    +`<h2>Check</h2><div class="tpl">${(n=>r('data-do="tab" data-g="flg"',"🚩","Possible problems",n?n+" possible cop"+(n===1?"y":"ies")+" waiting for you":"redo, possible copies, odd checkpoints and exams"))(flgN())}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}<a href="lab/practice.html#deck"><i aria-hidden="true">🧠</i><span>Flashcards<small>every LS at every level, with your own statistics</small></span></a>${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="how"',"🎬","How it works","guides for teachers and students")}</div>`
     +((window.TN_LS||[]).length&&!DEMO?`<h2>Mine</h2><div class="tpl">${r('data-do="tab" data-g="tn"',"✦","Towards Nativeness","your own course: progress, Roig's corrections, your mistakes")}</div>`:"")
@@ -1838,15 +1846,16 @@ function render0(){
   // left menu"); 🧭 Learning situations (Roger, 12 Nov 2026); ✦ Towards Nativeness, Roger's own course (tnPage)
   const tmOn=S.g==="plan"?((S.place||"home")==="home"?"plan":S.place):S.g,tmN={},tmAsk={},tmAskN={};
   GR.forEach(g=>{tmN[g.id]=String(cnt(g.id));const a=inGr(g.id).filter(s=>!s.away).reduce((x,s)=>x+lvAsks(s.uid).length,0);tmAskN[g.id]=a;tmAsk[g.id]=askBadge(a,g.id)});
-  const tmTn=!!(window.TN_LS||[]).length&&!DEMO,tmMsg=msgsN(),tmC=corrN();
+  const tmTn=!!(window.TN_LS||[]).length&&!DEMO,tmMsg=msgsN(),tmC=corrN(),tmF=flgN();
   $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`+elTeacherMenu({dash:true,on:tmOn,mt:mtOn(),tn:tmTn,counts:tmN,asks:tmAsk,gtip:listed()?"Signed in / on the student list":"Students",
-    extra:{corr:corrBadge(tmC),msgs:tmMsg?`<small class="${pbNew().length?"late":""}">${tmMsg}</small>`:""},
+    extra:{corr:corrBadge(tmC),flg:tmF?`<small class="late" title="${tmF} possible cop${tmF===1?"y":"ies"} waiting for you">${tmF}</small>`:"",msgs:tmMsg?`<small class="${pbNew().length?"late":""}">${tmMsg}</small>`:""},
     none:n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):""});
   if(window.elWhoPlace)elWhoPlace();   // Roger's name under "Teacher dashboard" (el-cloud.js; Roger, 25 Nov 2026)
   // the numbers the other teacher pages show on the same menu (elTmCache): no reads there
-  if(!DEMO)try{localStorage.setItem("el_tmenu",JSON.stringify({t:Date.now(),n:tmN,ask:tmAskN,corr:tmC.chk?(elTmCache().corr||{n:0}):{n:tmC.n||0,late:!!tmC.late},msgs:{n:tmMsg,late:!!pbNew().length},mt:mtOn(),tn:tmTn}))}catch(e){}
+  if(!DEMO)try{localStorage.setItem("el_tmenu",JSON.stringify({t:Date.now(),n:tmN,ask:tmAskN,corr:tmC.chk?(elTmCache().corr||{n:0}):{n:tmC.n||0,late:!!tmC.late},msgs:{n:tmMsg,late:!!pbNew().length},flg:{n:tmF,late:true},mt:mtOn(),tn:tmTn}))}catch(e){}
   if(S.g==="plan"){$("#main").innerHTML=homePage();return}
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
+  if(S.g==="flg"){$("#main").innerHTML=flgPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="cres"){$("#main").innerHTML=crPage();return}
   if(S.g==="tn"){$("#main").innerHTML=tnPage();return}
@@ -2896,12 +2905,12 @@ function corrPage(){
     +(S.corrV==="act"
       ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
       :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"open":""} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
-    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Beltran does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`);
+    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Beltran does not correct these: check each one (Accept or Redo). They are also in each group's To do and in <a href="#" data-do="tab" data-g="flg">🚩 Possible problems</a>.</p>${corrLines(you)}`:"")+`</div>`);
   // the two tables: Gemini's corrections and Claude's, by student › task › day
   const Gm=corrScan().gem.concat(corrFpGem()).filter(gf);setTimeout(corrFind);
   const gemB=`<div class="box">${corrHead("🔷 Roig's corrections",Gm)}<p class="muted">Speaking recordings Roig transcribed, with its notes on the task and pronunciation, and final product videos it drafted on the rubric. 💶 is what each one cost (≈ an estimate for the older ones). Click a day to open it.</p>`
     +corrTable(Gm,`Nothing from Roig yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
-  const claB=`<div class="box">${corrHead("✏️ Beltran's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected every weekday afternoon (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got.</p>`
+  const claB=`<div class="box">${corrHead("✏️ Beltran's corrections",Dn)}<p class="muted">Writings, transcripts, reflections and marked steps corrected every weekday afternoon (or when you asked), comments answered, work sent back to redo and possible copies. Click a day to see the correction the student got. <a href="#" data-do="tab" data-g="flg">🚩 Possible problems</a> shows only what to keep an eye on.</p>`
     +corrTable(Dn,`No corrections yet${S.corrG==="all"?"":" in this group"}.`)+`</div>`;
   const infoB=`<div class="box">${fold("corrinfo","ⓘ What runs on its own and what needs Beltran",`
     <h3>Works on its own</h3><p>The whole site: sign-in, saving answers, every activity that marks itself, checkpoints, games, class mode and full screen, this dashboard, marks and levels, announcements, homework and the calendar feed. The emails (problem alerts, your Saturday summary, the students' Sunday email) are sent by a free GitHub Action through your school's Apps Script.</p>
@@ -2927,6 +2936,100 @@ const corrBadge=(c=corrN())=>{if(c.chk)return `<small title="Fetching the latest
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
   const sub=st.s==="running"?"Beltran is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Monday")+" 17:43";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
+// ---- 🚩 Possible problems (Roger, 28 Nov 2026: "I need a place to see the possible problems like redo, copying, etc."): one page, in the
+// side menu under ✏️ Corrections, with every warning the dashboard already knows, so they are no longer mixed into the long ✏️ Beltran's
+// corrections table. Nothing new is worked out or saved: it reads what the dashboard has loaded (no Firestore reads), except 🔍 Check the
+// exam tries, which reads the students' web exams once, the same read as opening a web exam box, and only when pressed.
+//  • 👉 Waiting for you: possible copies Beltran left to you (results.flags[step] = {why, at}, no done): ⚠️ Check it opens cpOpen (Accept or Redo).
+//  • ↺ Sent back to redo, waiting for the student: flags[step].done "redo" and nothing handed in since (who sent it back, why, how long ago).
+//    auto = Beltran (reopen: not a real try; otherwise mostly pasted); not auto = Roger (↩ Send it back, ↺ Redo, or Redo on a possible copy).
+//  • 🎯 Recall checkpoints that look odd: far above the student's usual level (cpGap), sent by itself because they left the page, 3+ glances.
+//  • 📝 Web exam tries that look odd: the ⚠️ check of the web exam box (wxHome) and every exit from the exam (full screen, another tab, reload).
+//  • ✅ Dealt with (folded): handed in again after a redo, possible copies accepted as their own work, exam tries set aside for a make-up.
+const FLG={ex:null,busy:false,err:null,d:null,t:0,v:null};S.flgG="all";
+const FLGSTEP={read:"Reading",log:"Reading log",listen:"Listening",chart:"Listening chart",write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing",reflect:"Reflection",grammar:"Grammar",mixed:"Mixed practice",practice:"Practice",recall:"Recall warm-up",check:"Checkpoint"};
+const flgStep=(a,step)=>((a.steps||[]).find(z=>z[0]===step)||[])[1]||(n=>n===step&&FLGSTEP[step]||n)(corrNm(a.id,step));
+const flgAgo=t=>{if(!t)return "";const d=Math.floor((Date.now()-t)/864e5);return d<=0?"today":d===1?"yesterday":d+" days ago"};
+const flgDay=t=>t?ELWeek.date(ymd(t)):"";
+// when a step sent back was handed in again: the step's date, or the date of a writing kept the older way
+function flgHanded(u,a,step){const h=handedIn(u,a)[step];if(h&&h.date)return h.date;
+  try{return (ELMark.fbItems(pstate(u,a),new Set(),/reflect$/.test(a.id)?"reflect":null)[step]||{}).date||null}catch(e){return null}}
+// why a step was sent back, in plain words
+function flgWhy(f){if(f.auto)return f.reopen?{who:"Beltran",t:"Not a real try",d:f.why||f.back||""}:{who:"Beltran",t:"Mostly pasted",d:f.why||""};
+  return f.why&&!f.back?{t:"Possible copy: you sent it back",d:f.why}:{t:"You sent it back",d:f.back||f.why||""}}
+function flgScan(){if(FLG.d===S.D&&FLG.v&&Date.now()-FLG.t<4000)return FLG.v;
+  const you=[],back=[],cp=[],done=[];
+  Object.values(S.P).filter(s=>s.uid&&!s.tester&&GR.some(g=>g.id===s.group)).forEach(s=>{const u=s.uid,grp=GR.find(g=>g.id===s.group),base0={u,gid:grp.id};
+    Object.entries(S.D.rs[u]||{}).forEach(([aid,x])=>{const a=byId(aid);if(!a||!a.keys||!a.keys.length||!a.ls.startsWith(grp.course+"-"))return;
+      Object.entries((x&&x.flags)||{}).forEach(([step,f])=>{if(!f||typeof f!=="object")return;
+        const base=Object.assign({aid,ls:a.ls,step,name:flgStep(a,step),at:tms(f.at),reopen:!!f.reopen},base0);
+        if(f.why&&!f.done)return you.push(Object.assign({k:"copy",t:"Possible copy",d:f.why},base));
+        if(f.done==="redo"){const w=flgWhy(f),hd=flgHanded(u,a,step),again=hd&&String(hd)>String(f.at||"");
+          return (again?done:back).push(Object.assign({k:again?"again":"redo",who:w.who,t:w.t,d:w.d,again:again?tms(hd):0},base))}
+        if(f.done==="accepted"&&f.why)done.push(Object.assign({k:"ok",t:"Possible copy: you accepted it as their own work",d:f.why},base))})});
+    cat.filter(a=>a.checkpoint&&a.keys&&a.keys[0]&&a.ls.startsWith(grp.course+"-")).forEach(a=>{const d=cpDoc(u,a);if(!d||d.redo)return;
+      const K=(S.D.ck||{})[a.keys[0]],gp=K?cpGap(u,a,d,K):null,gl=(d.leaves||[]).length,why=[];
+      if(gp&&gp.up)why.push("⚠️ "+gp.t);if(d.auto==="left")why.push("⚡ Sent by itself: they left the page");if(gl>=3)why.push("👀 Left the page "+gl+" times for less than 2 s");
+      if(why.length)cp.push(Object.assign({k:"cp",aid:a.id,ls:a.ls,name:a.title,t:"Recall checkpoint",d:why.join(" · "),at:tms(cpDate(d.sent)||d.started)},base0))})});
+  const nw=(p,q)=>(q.again||q.at)-(p.again||p.at);[you,back,cp,done].forEach(L=>L.sort(nw));
+  FLG.d=S.D;FLG.t=Date.now();FLG.v={you,back,cp,done};return FLG.v}
+// the menu badge: what only Roger can decide (the possible copies)
+const flgN=()=>{try{return flgScan().you.length}catch(e){console.warn("possible problems",e);return 0}};
+// 📝 web exam tries: every LS with a web exam, the docs by exam key (the copies of tries set aside for a make-up apart: of = the key)
+const flgExLs=()=>EL_LS.filter(l=>wxCfg(l.id)&&GR.some(g=>g.course===l.course));
+function flgExDocs(){if(DEMO){const by={};Object.entries(DEMO.ex||{}).forEach(([u,d])=>{if(d&&d.key)(by[d.key]=by[d.key]||{})[u]=Object.assign({uid:u},d)});return {by,old:{},all:true}}
+  if(FLG.ex)return Object.assign({all:true},FLG.ex);
+  const c=WX.ls&&wxCfg(WX.ls);return c&&WX.docs?{by:{[c.key]:WX.docs},old:{[c.key]:WX.old||{}},all:false,only:WX.ls}:null}
+async function flgExLoad(){if(FLG.busy||DEMO)return;FLG.busy=true;FLG.err=null;render();
+  try{const q=await ALL("exams",1),by={},old={};q.forEach(x=>{const d=x.data(),u=up(x);if(!d)return;
+      if(d.key)(by[d.key]=by[d.key]||{})[u]=Object.assign(d,{uid:u});
+      else if(d.of&&!d.restored){const o=old[d.of]=old[d.of]||{};if(!o[u]||String(d.at)>String(o[u].at))o[u]=Object.assign(d,{id:x.id})}});
+    FLG.ex={by,old,at:Date.now()}}
+  catch(e){console.warn("possible problems: exams",e);FLG.err=String(e.message||e)}
+  FLG.busy=false;render()}
+const WXWHY={fullscreen:"left full screen",left:"another tab, window or app",reload:"closed or reloaded the page"};
+function flgExams(){const X=flgExDocs();if(!X)return null;const out=[],set=[];
+  flgExLs().filter(l=>!X.only||X.only===l.id).forEach(l=>{const c=wxCfg(l.id),D=X.by[c.key]||{},O=(X.old||{})[c.key]||{};
+    GR.filter(g=>g.course===l.course).forEach(g=>{const studs=Object.values(S.P).filter(s=>s.uid&&!s.tester&&s.group===g.id),docs=studs.map(s=>D[s.uid]).filter(Boolean);
+      studs.forEach(s=>{const d=D[s.uid],base={u:s.uid,gid:g.id,ls:l.id,name:lsLabel(l).replace(/&amp;/g,"&")+" exam"};
+        if(d){const why=wxHome(d,g.id,docs),ex=(d.exits||[]);
+          if(ex.length){const k=[...new Set(ex.map(x=>WXWHY[x.why]||x.why))];why.push("🔒 left the exam "+(ex.length===1?"once":ex.length+" times")+" ("+k.join(", ")+")")}
+          if(why.length)out.push(Object.assign({k:"ex",t:"Web exam",d:why.join(" · "),at:tms(d.started)},base))}
+        const o=O[s.uid];if(o)set.push(Object.assign({k:"exold",t:"Exam try set aside for a make-up",d:"The old try and its marks are kept apart; the student does another version another day.",at:tms(o.at)},base))})})});
+  const nw=(p,q)=>q.at-p.at;return {out:out.sort(nw),set:set.sort(nw),all:X.all,only:X.only}}
+function flgPage(){const {you,back,cp,done}=flgScan(),gf=i=>S.flgG==="all"||i.gid===S.flgG,X=flgExams(),EX=X?X.out.filter(gf):[],XS=X?X.set.filter(gf):[];
+  const Y=you.filter(gf),B=back.filter(gf),C=cp.filter(gf),Dn=done.filter(gf).concat(XS).sort((p,q)=>(q.again||q.at)-(p.again||p.at)),wk=7*864e5;
+  const row=(i,btn)=>{const s=S.P[i.u],g=GR.find(x=>x.id===i.gid),sub=i.aid&&actTitle(i.aid)!==i.name?actTitle(i.aid):"",old=i.k==="redo"&&i.at&&Date.now()-i.at>wk;
+    return `<div class="flr" data-cn="${esc(corrFold(s?fullName(s)+" "+name(s):""))}"><div class="flw"><b>${s?name(s):"?"}</b> <span class="muted">· ${esc(g?g.name:"")}</span></div>`
+      +`<div class="flm"><b>${esc(i.name)}</b>${sub?` <span class="muted">· ${esc(sub)}</span>`:""}<br><small><b>${i.who?esc(i.who)+": ":""}${esc(i.t)}</b>${i.d?` · ${esc(String(i.d).slice(0,220))}`:""}</small></div>`
+      +`<div class="flt"><small class="${old?"flold":"muted"}" title="${esc(flgDay(i.at))}">${i.k==="again"?"✅ handed in again "+esc(flgDay(i.again)):i.k==="redo"?"sent back "+esc(flgAgo(i.at))+(old?" ⏰":""):esc(flgDay(i.at))}</small>${btn(i)}</div></div>`};
+  const open=i=>`<button class="mini ${i.k==="copy"?"":"g"}" data-do="flgopen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-r="${i.reopen?1:""}" data-k="${i.k}">${i.k==="copy"?"⚠️ Check it":"Open"}</button>`;
+  const cpB=i=>`<button class="g mini" data-do="flgcp" data-u="${i.u}" data-a="${esc(i.aid)}">Open</button>`;
+  const exB=i=>i.k==="exold"?"":`<button class="g mini" data-do="flgex" data-u="${i.u}" data-g="${i.gid}" data-ls="${esc(i.ls)}">Open</button>`;
+  const anyB=i=>i.k==="cp"?cpB(i):i.k==="ex"||i.k==="exold"?exB(i):open(i);
+  const sec=(id,h,n,intro,body,empty)=>`<div class="box flsec" id="${id}"><div class="chead"><h2 style="margin:0">${h}</h2><span class="flcnt">${n||""}</span></div><p class="muted">${intro}</p>${n?body:`<p class="flnone">${empty}</p>`}</div>`;
+  const exHead=!X?`<div class="flex"><button class="mini" data-do="flgexload" ${FLG.busy?"disabled":""}>${FLG.busy?"⏳ Checking…":"🔍 Check the exam tries"}</button> <span class="muted">Reads every student's web exam once (the same as opening an exam's 🖥 Web exam box).</span>${FLG.err?` <span class="late">Could not read them: ${esc(FLG.err)}</span>`:""}</div>`
+    :!X.all?`<div class="flex"><span class="muted">Only ${lsLabel(EL_LS.find(l=>l.id===X.only))} so far (the exam box you opened).</span> <button class="g mini" data-do="flgexload" ${FLG.busy?"disabled":""}>${FLG.busy?"⏳ Checking…":"🔍 Check every exam"}</button></div>`
+    :`<div class="flex"><span class="muted">Checked ${FLG.ex?esc(whenAt(FLG.ex.at)):"now"}.</span> ${DEMO?"":`<button class="g mini" data-do="flgexload" ${FLG.busy?"disabled":""}>${FLG.busy?"⏳ Checking…":"🔄 Check again"}</button>`}</div>`;
+  const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.flgG===g?"on":""}" data-do="flgg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")
+    +`<input id="flgfind" class="cfind" type="search" placeholder="🔍 Find a student" value="${esc(S.flgQ||"")}" autocomplete="off"></div>`;
+  const jump=(id,ic,n,t,hot)=>`<a class="flsum${hot&&n?" hot":""}" href="#${id}" data-do="flgjump" data-id="${id}"><b>${ic} ${n==null?"?":n}</b><span>${t}</span></a>`;
+  const sum=`<div class="flsums">${jump("flyou","👉",Y.length,"waiting for you",true)}${jump("flback","↺",B.length,"sent back, not redone yet")}${jump("flcp","🎯",C.length,"checkpoints to look at")}${jump("flex","📝",X?EX.length:null,X?"exam tries to look at":"exams not checked yet")}${jump("fldone","✅",Dn.length,"dealt with")}</div>`;
+  setTimeout(flgFind);
+  return `<div class="ph"><h1>🚩 Possible problems</h1><div class="sub">Possible copies, work sent back to redo, and checkpoints or exams that look odd · everything to keep an eye on, in one place</div></div>`
+    +gchips+sum
+    +sec("flyou","👉 Waiting for you: possible copies",Y.length,"Beltran does not correct these. Open each one to see why (the writing log: how long it took, keys pressed, text pasted) and press <b>✓ Accept</b> if it is their own work or <b>↺ Redo</b> to send it back.",Y.map(i=>row(i,open)).join(""),"Nothing waiting for you. 🎉")
+    +sec("flback","↺ Sent back to redo: waiting for the student",B.length,"Nothing to do: each step counts as not done until the student hands it in again, and then Beltran corrects the new version. Work done from 30 Nov gets one week from the day it is sent back; after that it is NA. ⏰ = sent back more than a week ago.",B.map(i=>row(i,open)).join(""),"Nothing sent back is waiting.")
+    +sec("flcp","🎯 Recall checkpoints that look odd",C.length,"A hint to look at, never proof: a checkpoint "+CP_GAP+" points or more above the student's usual level (exam marks and recall warm-ups), sent by itself because they left the page, or 3 or more quick glances away. Open it to see every answer and the time on each question; ↺ Let them do it again is there.",C.map(i=>row(i,cpB)).join(""),"No checkpoint looks odd.")
+    +`<div class="box flsec" id="flex"><div class="chead"><h2 style="margin:0">📝 Web exam tries that look odd</h2></div><p class="muted">The same ⚠️ check as the exam's 🖥 Web exam box (a different internet connection from the class, started outside class time, not on a Chromebook, finished in under half the usual time) and every time a student left the exam. A hint to look at, never proof. Open shows the try, with ↺ Redo it another day.</p>${exHead}${X?(EX.length?EX.map(i=>row(i,exB)).join(""):`<p class="flnone">No exam try looks odd.</p>`):""}</div>`
+    +`<div class="box flsec" id="fldone">${fold("fldone",`<b>✅ Dealt with</b> <span class="muted">· ${Dn.length}</span>`,`<p class="muted">Handed in again after a redo (Beltran corrects the new version), possible copies you accepted, and exam tries set aside for a make-up.</p>${Dn.length?Dn.map(i=>row(i,anyB)).join(""):`<p class="flnone">Nothing yet.</p>`}`)}</div>`}
+function flgFind(){const q=corrFold(S.flgQ).trim();document.querySelectorAll("#main .flr[data-cn]").forEach(b=>{b.hidden=!!q&&!b.dataset.cn.includes(q)})}
+document.addEventListener("input",e=>{if(e.target.id==="flgfind"){S.flgQ=e.target.value;flgFind()}});
+function flgOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;if(k.k==="copy")return cpOpen(k.u,k.a,k.s);if(k.r)return cellPanel(k.u,k.a);wrOpen(k.u,k.a,k.s)}
+// an exam try: the group's 📝 Exams page on that LS (its web exam box already has the tries read here), then the student's window
+function flgExOpen(k){const X=flgExDocs(),c=wxCfg(k.ls);if(!c)return;S.g=k.g;S.ls=k.ls;S.tutor="all";S.year=S.reps=false;
+  if(X&&!DEMO&&X.by[c.key]){WX.docs=X.by[c.key];WX.old=(X.old||{})[c.key]||{};WX.ls=k.ls;WX.at=Date.now()}
+  goPlace("exams");setTimeout(()=>wxDlg(k.u,k.ls),50)}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
 // LS1 (only: true) saves no answers per question, so it is not offered.
@@ -6996,7 +7099,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       try{await spkOne(r,s.group)}catch(err){alert("Roig could not analyse it: "+String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v34"))}
       if(redraw&&$("#dlg").open)redraw();else render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
-    corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
+    corrg:()=>{S.corrG=k.g;render()},flgg:()=>{S.flgG=k.g;render()},flgopen:()=>flgOpen(k),flgcp:()=>{const a=byId(k.a);if(a){S.ls=a.ls;cpDlg(k.u,a)}},flgex:()=>flgExOpen(k),flgexload:()=>flgExLoad(),
+    flgjump:()=>{e.preventDefault();const x=document.getElementById(k.id);if(x){if(k.id==="fldone"){const d=x.querySelector("details");if(d)d.open=true}x.scrollIntoView({behavior:"smooth",block:"start"})}},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
     corrcheck:()=>{const r=api.mkRead();(r&&r.then?r:Promise.resolve()).then(render,e=>alert("Could not check: "+e.message))},   // one read, never a full load
     sethw:()=>{e.preventDefault();const x=planX(k.ls,k.gid),r=x.p.rows[+k.i];hwOpen(x,noCp(x,k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,"")),lineDate(r,k.line)||ELWeek.today(),origOf(x,k.line));
