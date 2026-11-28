@@ -91,6 +91,7 @@ window.elHandInStarts=function(info,gid,today){today=today||(window.ELWeek?ELWee
   const put=(k,d)=>{if(!d||d>today)return;if(!m[k]||d<m[k])m[k]=d};
   const ag=window.elAgendaOf?elAgendaOf(info,gid):null;
   Object.entries((ag&&ag.days)||{}).sort((a,b)=>a[0]<b[0]?-1:1).forEach(([d,its])=>(its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;
+    if(window.elAgendaSelfCounts&&!elAgendaSelfCounts(d))return;   // from 30 Nov 2026: the tick's day (below), not the agenda's
     const id=it.slice(0,i),p=it.slice(i+1);if(/^game:/.test(p))return;
     if(window.elBookPath&&elBookPath(id)){const b=book[id]=book[id]||[];if(!b.includes(d)&&d<=today)b.push(d);return}put(id+"#"+p,d)}));
   Object.entries(((info&&info.done||{})[gid])||{}).forEach(([k,d])=>put(k,elLvDay(d)));

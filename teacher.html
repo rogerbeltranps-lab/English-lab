@@ -331,7 +331,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
-<script src="shared/js/el-points.js?v=20261125"></script>
+<script src="shared/js/el-points.js?v=20261128h"></script>
 <script src="shared/js/el-term-report.js?v=20261128j"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
@@ -1302,7 +1302,22 @@ function cmStart(gid,href,ls,aid,p){const now=Date.now(),until=elClassEnd(gid,no
   if(DEMO){FSW.g=gid;FSW.x=Object.assign({},FSW.x,{go:{cm:true,u:t.href,p:p||"",pn:p?((EL_SECTIONS[t.a]||[]).find(z=>z[0]===p)||[])[1]||p:"",t:a?elLpLabel(a):"LS home",at:now,s:now,lock:true,until}});fsDraw();render();return}
   if(!GR.some(x=>x.id===S.g))fsWatch(gid);   // from Home: watch that group, so its card and the top right show ⏹ Stop class mode
   window.open(u.href,"_blank","noopener")}
-function cmStop(gid){if(DEMO){if(FSW.x)FSW.x=Object.assign({},FSW.x,{go:null,fs:null});fsDraw();render();return}
+// ⏹ Stop here opens the same end-of-class window as on the class tab (el-cm-agenda.js wrapUp: ✔ Finished · ⏭ Next class · 🏠 Homework for
+// each of today's steps; Roger, 28 Nov 2026: "those activities that I plan, are only a to do thing when I finish a class and inform what
+// we've done … after the classmode, when I stop it"): from 30 Nov a step is To do for students only once it is ✔ Finished (EL_HAND_TICK).
+// ↩ Back to class keeps class mode on; nothing planned today stops at once.
+let cmStopping=false;
+async function cmWrap(gid){const g=GR.find(x=>x.id===gid)||{},c=cmOf(gid)||{};
+  const m=await import("./shared/js/el-cm-agenda.js?v=20261128h");
+  const no=async()=>{},Z=DEMO?{doc:(...a)=>a,setDoc:no,getDoc:async()=>({exists:()=>false,data:()=>({})}),getDocs:async()=>({docs:[],size:0,forEach(){}}),collection:(...a)=>a,
+    query:(...a)=>a,where:(...a)=>a,deleteField:()=>null,serverTimestamp:()=>Date.now()}:F;   // the demo saves nothing
+  m.setup({db:DEMO?null:db(),doc:Z.doc,setDoc:Z.setDoc,getDoc:Z.getDoc,getDocs:Z.getDocs,collection:Z.collection,query:Z.query,where:Z.where,deleteField:Z.deleteField,
+    serverTimestamp:Z.serverTimestamp,lsInfo:id=>Promise.resolve(S.D.ls[id]||{}),root:new URL("./",location.href).href,g:gid,gname:g.name||gid,s:c.s,
+    token:()=>DEMO?Promise.resolve(""):ELCloud.user.getIdToken(),tester:e=>DEMO?false:ELCloud.isTester({email:e})});
+  return m.wrapUp(true)}
+async function cmStop(gid){if(cmStopping)return;cmStopping=true;let r="none";try{r=await cmWrap(gid)}catch(e){console.warn("end of class",e)}cmStopping=false;if(r==="back")return;
+  if(r==="saved"&&!DEMO)F.getDoc(F.doc(db(),"teacherPlan",gid)).then(t=>{if(t.exists()&&S.D){S.D.tk[gid]=t.data();render()}}).catch(e=>console.warn("ticks",e));   // the window saved the ticks: show them
+  if(DEMO){if(FSW.x)FSW.x=Object.assign({},FSW.x,{go:null,fs:null});fsDraw();render();return}
   F.setDoc(F.doc(db(),"live",gid),{go:null,fs:null},{merge:true}).catch(x=>alert("Could not stop class mode: "+x.message))}
 const cmTabBtn=(ls,gid,a,p)=>{const x=cmOf(gid),on=x&&x.p===p&&new URL(x.u,location.href).pathname===new URL(a.path,location.href).pathname,gn=(GR.find(g=>g.id===gid)||{}).name||gid;
   return `<button type="button" class="pin ${on?"on":""}" data-do="cmstart" data-gid="${gid}" data-href="${esc(a.path)}" data-ls="${ls}" data-a="${esc(a.id)}" data-p="${esc(p||"")}" title="${on?`${esc(gn)} is on this tab in class mode now`:`🎓 Class mode for ${esc(gn)} at this tab: opens it in a new tab and the students follow it`}">🎓</button>`};
