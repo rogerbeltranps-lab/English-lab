@@ -6,7 +6,8 @@ const LP3 = '4eso/seasons-and-celebrations/where-traditions-come-from.html', KEY
 export async function fillChart(p, words = 'She values her family, because she smiles when she talks about them.') {
   await p.click('.tab[data-panel="chart"]');
   const boxes = p.locator('#chartFields textarea');
-  for (let i = 0; i < await boxes.count(); i++) await boxes.nth(i).fill(words + ' (' + (i + 1) + ')');
+  // typed key by key, as a student does (writing boxes refuse text that arrives in one chunk: dictation, swipe, Playwright's fill)
+  for (let i = 0; i < await boxes.count(); i++) { await boxes.nth(i).click(); await p.keyboard.type(words + ' (' + (i + 1) + ')'); }
   const names = await p.$$eval('#chartRate input[type=radio]', (rs) => [...new Set(rs.map((r) => r.name))]);
   for (const n of names) await p.check(`#chartRate input[name="${n}"][value="3"]`);
 }

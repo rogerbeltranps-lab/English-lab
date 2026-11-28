@@ -112,7 +112,7 @@ window.ELMark=(function(){
   function sqText(fb){const ps=String(fb||"").split(/\s*##\s*/).map(x=>x.trim()).filter(Boolean);if(ps.length<2)return String(fb||"").trim();
     return [ps[0],"",...ps.slice(1).map(x=>"➜ "+x.replace(/^➜\s*/,""))].join("\n")}
   // the writing log in words: "pasted 180 characters (the text has 200) · 40 keys typed · 3 min writing"
-  function tyText(t){return `pasted ${t.p||0} characters (the text has ${t.n||0}) · ${t.k||0} keys typed · ${t.s>=60?Math.round(t.s/60)+" min":(t.s||0)+" s"} writing`}
+  function tyText(t){return `pasted ${t.p||0} characters (the text has ${t.n||0}) · ${t.k||0} keys typed · ${t.s>=60?Math.round(t.s/60)+" min":(t.s||0)+" s"} writing${t.c?` · ${t.c} characters refused (dictated or swiped in chunks)`:""}`}
   // the answer: {err} or {group, rows:[{code, lv:{c: level}, fb, flag (the COPY? reason or "")}], bad:[lines left out], missing:[codes without a line]}
   function parse(txt,o){   // o = {aid, step, crits, codes: Map code → anything}
     const ls=String(txt||"").replace(/```[a-z]*/gi,"").split(/\r?\n/).map(l=>l.trim()).filter(Boolean),h=ls.findIndex(l=>l.replace(/\s+\|/,"|").startsWith(V+"|"));

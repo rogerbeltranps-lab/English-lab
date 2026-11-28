@@ -29,6 +29,7 @@ var LS2 = (function () {
   // Catalan only for Starter (Roger, 21 Nov 2026: "base is also in English, no Catalan help"). Base keeps its extra support
   // (questions shown, slower voice), now in English: sup().
   const ca = () => level === 'beginners', sup = () => level === 'beginners' || level === 'insecure';
+  window.elPageCa = () => ca();   // other helpers (el-typing.js) speak Catalan first only to Starter
   window.elMicCa = ca;   // the microphone helper (shared/js/el-mic.js) speaks the route's language
   /* Starter works differently, not only with fewer questions (Roger, 31 Oct 2026, thread "Explain Starter vs Base learning paths").
      Only in Learning Paths whose data says starter: true (paths students had not started that day; started ones stay as they were):
