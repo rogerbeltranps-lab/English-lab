@@ -199,6 +199,44 @@
       en: ["We did the activities on the English Lab website and reviewed with vocabulary and grammar games.",
         "Your mark comes from the corrected activities we did in class or set as homework, and the exams."] } } : null; };
 
+  // 📄 Term 1, Term 2, Term 3 or the final report of the whole year (Roger, 28 Nov 2026: "I should have a 1st term, 2n term, 3rd term and final
+  // mark report option (with all the competences of the school year"). scope "t1" | "t2" | "t3" | "y" → {scope, C, lss, exams, term, upTo}:
+  //   C      what we worked on (t1: Roger's text; t2, t3: elTrepWorked; y: every term's points, LS by LS); never null for t2, t3 and y
+  //   lss    every LS of the course (t2, t3, y), so the daily work counts each tab taught in the term, whichever LS it belongs to
+  //   exams  the LSs whose exam the comment names: the term's own LSs (EL_LS .term or two per term), every LS for the year
+  //   term   {id, from, to, deadline}: to is today while the term is running; the final report's daily work starts with term 2, because
+  //          when the work was done counts from term 2 (Roger, 28 Nov 2026: "not in this ones because I was building the web")
+  //   upTo   the day after the term's last day once it has ended (elTrepTaught), else undefined (today)
+  const lsTermOf = (l, all) => Math.min(3, l.term || Math.ceil((all.indexOf(l) + 1) / 2));
+  window.elTrepScope = function (scope, course, games, today) {
+    today = today || (window.ELWeek && ELWeek.today()) || new Date().toISOString().slice(0, 10);
+    const TS = window.EL_TERMS || [], all = (window.EL_LS || []).filter(l => l.course === course), DL = window.EL_TREP_DEADLINE || {};
+    const span = id => window.elTermSpan ? elTermSpan(id) : ["", "9999-12-31"], cut = d => d > today ? today : d;
+    if (scope === "t1") { const [from, to] = span("t1"); return { scope, C: ((window.EL_TREP || {}).t1 || {})[course] || null, term: { id: "t1", from, to, deadline: DL.t1 }, upTo: to < today ? addD(to, 1) : undefined }; }
+    const HOW = { ca: ["Hem fet les activitats a través de la web English Lab i hem repassat amb jocs de vocabulari i de gramàtica.", "Per avaluar comptem les activitats corregides que hem fet a classe o que eren deures, i els exàmens."],
+      en: ["We did the activities on the English Lab website and reviewed with vocabulary and grammar games.", "Your mark comes from the corrected activities we did in class or set as homework, and the exams."] };
+    if (scope === "y") { const by = {}, order = [];
+      ["t1", "t2", "t3"].forEach(t => { const c = elTrepWorked(t, course, games); ((c && c.lss) || []).forEach(l => { const o = by[l.ls] || (by[l.ls] = { ls: l.ls, name: l.name, pts: [] }); if (!order.includes(l.ls)) order.push(l.ls);
+        l.pts.forEach(p => { if (!o.pts.some(q => q.en === p.en)) o.pts.push(p); }); }); });
+      const t3 = span("t3"), last = TS.length ? TS[TS.length - 1].id : "t3";
+      return { scope, C: { year: true, lss: order.map(id => by[id]), how: { ca: [HOW.ca[0], "La nota del curs surt de les competències de tot l'any: cada trimestre compta més que l'anterior (1r ×1, 2n ×2, 3r ×3)."],
+          en: [HOW.en[0], "Your year mark comes from your competences across the whole year: each term counts more than the one before (Term 1 ×1, Term 2 ×2, Term 3 ×3)."] } },
+        lss: all.map(l => l.id), exams: all.map(l => l.id), term: { id: "y", from: span("t1")[1], to: cut(t3[1]), deadline: DL.y || DL[last] }, upTo: t3[1] < today ? addD(t3[1], 1) : undefined }; }
+    const n = +String(scope).slice(1), [from, to] = span(scope), C = elTrepWorked(scope, course, games) || { auto: true, lss: [], how: HOW };
+    return { scope, C, lss: all.map(l => l.id), exams: all.filter(l => lsTermOf(l, all) === n).map(l => l.id), term: { id: scope, from, to: cut(to), deadline: DL[scope] }, upTo: to < today ? addD(to, 1) : undefined }; };
+  // the words that change with the report: this term / this school year, next term / next year, and the activities' deadline
+  const DAYS = { ca: ["diumenge", "dilluns", "dimarts", "dimecres", "dijous", "divendres", "dissabte"], en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] };
+  const MON = ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"];
+  window.elTrepWords = function (scope, L, deadline, today) { const ca = L === "ca", yr = scope === "y", nextYr = yr || scope === "t3";
+    let by; if (deadline) { const d = new Date(deadline + "T12:00:00Z"), days = (d - new Date((today || deadline) + "T12:00:00Z")) / 864e5, dn = d.getUTCDate(), m = d.getUTCMonth();
+      by = days >= 0 && days <= 6 ? (ca ? "abans de " : "before ") + DAYS[ca ? "ca" : "en"][d.getUTCDay()]
+        : ca ? `abans ${dn === 1 || dn === 11 ? "de l'" : "del "}${dn} ${/^[aeiou]/.test(MON[m]) ? "d'" : "de "}${MON[m]}` : `before ${dn} ${d.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" })}`; }
+    else by = ca ? (yr ? "abans que acabi el curs" : "abans que acabi el trimestre") : (yr ? "before the end of the school year" : "before the end of the term");
+    return ca ? { tw: yr ? "aquest curs" : "aquest trimestre", nx: nextYr ? "el curs vinent" : "el proper trimestre", Nx: nextYr ? "El curs vinent" : "El proper trimestre", Anx: nextYr ? "El curs vinent" : "Al proper trimestre", by }
+      : { tw: yr ? "this school year" : "this term", nx: nextYr ? "next year" : "next term", Nx: nextYr ? "Next year" : "Next term", Anx: nextYr ? "Next year" : "Next term", by }; };
+  // what a saved report keeps of its points (t2, t3, the year): their words, so the list and the page show them even when the games change
+  window.elTrepPoints = C => ((C && C.lss) || []).map(l => ({ ls: l.ls, name: l.name, pts: l.pts.map(p => ({ ca: p.ca, en: p.en })) }));
+
   // a writing mistake only illustrates the rubric row of its point (Roger, 25 Nov 2026: "did we really do this?")
   const WKIND = t => { t = String(t || ""); return /spell|ortogra/i.test(t) ? "spell" : /task|reused|content|tasca/i.test(t) ? "task" : /punctu|capital|linker|connect|cohes|organi|paragraph|majúsc|puntua/i.test(t) ? "org"
     : /vocab|expression|colloc|phrasal|word|time|lèxic|expressi/i.test(t) ? "vocab" : "grammar"; };
@@ -239,15 +277,17 @@
   // The same measures, tab by tab, are what the student sees all term in 🎓 My progress › 📋 How I'm working (Roger, 28 Nov 2026: "it's a
   // good idea that the students see that during the term… a table with their progress easy to understand"; today.html howCard):
   // elTrepTabs(LS ids, ctx) gives the summary below plus rows = [{ls, a (activity), tab, day (its class day), at (the day it was finished, or "")}]
-  function timing(C, ctx) { return tabs(C.lss.map(x => x.ls), ctx); }
+  // ctx.lss (elTrepScope): every LS of the course, so a term counts all the tabs taught in it, whichever LS they belong to
+  function timing(C, ctx) { return tabs(ctx.lss || C.lss.map(x => x.ls), ctx); }
   window.elTrepTabs = (ids, ctx) => tabs(ids, ctx);
   function tabs(ids, ctx) {
     const T = ctx.term || {}, to = T.to || "9999-12-31", from = T.from || "", G = window.EL_GRADING || {}, W = window.ELWeek, rows = [];
     const lss = ids.filter(id => G[id] && !G[id].only);   // LS1 (exam and final product only): its paths were practice
     let due = 0, dn = 0, inWeek = 0, lastMin = 0, lateN = 0, exam = null, start = null; const wk = {};
     lss.forEach(ls => { const p = (window.EL_PLAN || {})[ls], gi = p && W ? W.col(p, ctx.group) : -1;
-      if (p && gi >= 0 && p.exam && p.exam[gi]) exam = p.exam[gi];
-      const sp = p && W && W.span(p); if (sp && (!start || sp[0] < start)) start = sp[0];
+      // with ctx.lss, only an exam of the term (or up to two weeks after it ends, as the LS2 exams after term 1) is "the exam"
+      if (p && gi >= 0 && p.exam && p.exam[gi] && (!ctx.lss || (p.exam[gi] > from && p.exam[gi] <= addD(to, 14)))) exam = p.exam[gi];
+      const sp = p && W && W.span(p); if (sp && (!ctx.lss || (sp[1] || "9999") > from) && (!start || sp[0] < start)) start = sp[0];
       const info = ctx.infoOf ? ctx.infoOf(ls) : null; let days = elTrepClassDays(info, ctx.group, to);
       // a group with no Time plan agenda and no ticks: each path's tabs on its due day of the plan (EL_PLAN due), as ✅ To do does then
       if (!Object.keys(days).length && p && gi >= 0 && W) (window.EL_CATALOG || []).filter(a => a.ls === ls).forEach(a => { const d = W.due(p, a.id, gi); if (!d || d > to) return;
@@ -259,6 +299,8 @@
           const steps = window.elSecSteps ? elSecSteps(a, tab) : [tab]; if (!steps.length) return; due++; const row = { ls, a, tab, day: d, done: false, at: "" }; rows.push(row);
           if (!steps.every(s => D[s])) return; dn++; row.done = true; const at = day(steps.map(s => A[s]).filter(Boolean).sort().pop()); if (!at) return; row.at = at;
           if (at <= addD(d, 7)) inWeek++; else { lateN++; if (at >= addD(to, -6) || (exam && at >= addD(exam, -3) && at <= exam)) lastMin++; } }); }); });
+    // the bars start with the term: its first school day (the Monday after a term that ends on a Friday)
+    if (ctx.lss && start && from && start <= from) { start = addD(from, 1); const wd = new Date(start + "T12:00:00Z").getUTCDay(); if (wd === 6 || wd === 0) start = addD(start, wd === 6 ? 2 : 1); }
     const weeks = []; if (start) for (let w = monday(start); w <= monday(exam && exam > to ? exam : to); w = addD(w, 7)) { weeks.push({ d: w, n: wk[w] || 0 }); if (weeks.length > 30) break; }
     const p = due ? Math.round(inWeek / due * 100) : 0, lm = dn ? Math.round(lastMin / dn * 100) : 0, prof = !due ? null : !dn ? "none" : p >= 70 ? "steady" : lm >= 40 ? "last" : "behind";
     return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam, rows }; }
@@ -269,7 +311,7 @@
   // Exams by their level, never their numbers or questions ("avoid exam numbers, you can say your exam and task showed a Very Good mark results").
   // {x} = filled in; the bank is printed for Roger by tools/term-report/bank.mjs.
   const BANK = window.EL_TREP_BANK = {
-    work:     { when: "Everyday work, first (Roger, 28 Nov 2026: the exam is not what matters most): the average % of the points of “What we worked on” (activities, class games, hand-ins) as a level", en: "Your everyday work this term (activities, class games and the work you handed in) showed {d} results.", ca: "La teva feina de cada dia aquest trimestre (activitats, jocs de classe i les feines que has entregat) ha mostrat un {d}." },
+    work:     { when: "Everyday work, first (Roger, 28 Nov 2026: the exam is not what matters most): the average % of the points of “What we worked on” (activities, class games, hand-ins) as a level", en: "Your everyday work {tw} (activities, class games and the work you handed in) showed {d} results.", ca: "La teva feina de cada dia {tw} (activitats, jocs de classe i les feines que has entregat) ha mostrat un {d}." },
     progUp:   { when: "Progress: the activities' latest answers are 10 points or more above the first tries (the student went back and corrected them)", en: "You make progress when you correct your work: your answers now are much better than your first tries.", ca: "Progresses quan corregeixes la feina: les teves respostes d'ara són molt millors que els primers intents." },
     progNone: { when: "Progress: first tries had many mistakes (under 70 %) and the student hardly corrected them", en: "You can still correct many of your answers: going back to your mistakes is how you make progress.", ca: "Encara pots corregir moltes de les teves respostes: tornar als errors és com es progressa." },
     onTime:   { when: "From term 2 (never in term 1). Daily work: 70 % or more of the activities due were done in the week of their class", en: "You did your activities on time: most of them in the same week as the class. Keep it up.", ca: "Has fet les activitats a temps: la majoria, la mateixa setmana de la classe. Continua així." },
@@ -288,24 +330,27 @@
     examDown: { when: "Exams: the last LS exam reached a lower level than the one before", en: "In the exams, you went down from {d1} in {N1} to {d2} in {N2}.", ca: "Als exàmens has baixat d'un {d1} a la {N1} a un {d2} a la {N2}." },
     examSame: { when: "Exams: both LS exams reached the same level", en: "In the exams of {N1} and {N2}, you showed {d2} results both times.", ca: "Als exàmens de la {N1} i de la {N2} has tret un {d2} totes dues vegades." },
     examOne:  { when: "Exams: only the last LS exam has a mark", en: "In the {N2} exam, you showed {d2} results.", ca: "A l'examen de la {N2} has tret un {d2}." },
-    left1:    { when: "Before the activities deadline: 1 activity due is still not done", en: "You still have 1 activity to do: finish it before Friday.", ca: "Et falta 1 activitat: fes-la abans de divendres." },
-    left:     { when: "Before the activities deadline: 2 or more activities due are still not done", en: "You still have {n} activities to do: finish them before Friday.", ca: "Et falten {n} activitats: fes-les abans de divendres." },
-    next:     { when: "Always, at the end", en: "Next term, do each activity in the week we do it in class.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe." },
-    nextPr:   { when: "At the end, when there is a point to work on (in place of the one above)", en: "Next term, do each activity in the week we do it in class and practise “{x}” in 🎯 Practise.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe i practica «{x}» a 🎯 Practica." },
+    left1:    { when: "Before the activities deadline: 1 activity due is still not done", en: "You still have 1 activity to do: finish it {by}.", ca: "Et falta 1 activitat: fes-la {by}." },
+    left:     { when: "Before the activities deadline: 2 or more activities due are still not done", en: "You still have {n} activities to do: finish them {by}.", ca: "Et falten {n} activitats: fes-les {by}." },
+    next:     { when: "Always, at the end", en: "{Nx}, do each activity in the week we do it in class.", ca: "{Anx}, fes cada activitat la setmana que la fem a classe." },
+    nextPr:   { when: "At the end, when there is a point to work on (in place of the one above)", en: "{Nx}, do each activity in the week we do it in class and practise “{x}” in 🎯 Practise.", ca: "{Anx}, fes cada activitat la setmana que la fem a classe i practica «{x}» a 🎯 Practica." },
     // a closing sentence, one of these, from what the work shows (Roger, 28 Nov 2026: "Add nice personal sentences at the end"; "too personal, I'm a teacher not a friend" for the others; he kept endProud, endEffort and endFresh)
-    endProud: { when: "Close: everyday work Very good or Excellent and (from term 2) the activities on time", en: "I'm really proud of the way you worked this term. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat aquest trimestre. Continua gaudint de l'anglès!" },
-    endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure next term will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que el proper trimestre anirà encara millor." },
-    endFresh: { when: "Close: none of the activities due is done", en: "Next term is a fresh start, and I'm here to help you every step of the way.", ca: "El proper trimestre és un nou començament, i sóc aquí per ajudar-te en cada pas." },
+    endProud: { when: "Close: everyday work Very good or Excellent and (from term 2) the activities on time", en: "I'm really proud of the way you worked {tw}. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat {tw}. Continua gaudint de l'anglès!" },
+    endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure {nx} will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que {nx} anirà encara millor." },
+    endFresh: { when: "Close: none of the activities due is done", en: "{Nx} is a fresh start, and I'm here to help you every step of the way.", ca: "{Nx} és un nou començament, i sóc aquí per ajudar-te en cada pas." },
     endBelieve:{ when: "Close: everyday work Not satisfactory or Satisfactory, or (from term 2) the activities late or at the last minute", en: "With regular work every week, your results can improve.", ca: "Amb una feina regular cada setmana, els teus resultats poden millorar." },
-    endThanks:{ when: "Close: any other case", en: "Keep working steadily next term.", ca: "Continua treballant amb constància el proper trimestre." } };
+    endThanks:{ when: "Close: any other case", en: "Keep working steadily {nx}.", ca: "Continua treballant amb constància {nx}." } };
   const DEG = { en: ["Not satisfactory (No assoliment)", "Satisfactory (Assoliment satisfactori)", "Very good (Assoliment notable)", "Excellent (Assoliment excel·lent)"],
     ca: ["No assoliment", "Assoliment satisfactori", "Assoliment notable", "Assoliment excel·lent"] };
   const degOf = m => m < 5 ? 0 : m < 7 ? 1 : m < 9 ? 2 : 3;
-  function comment(L, pts, tm, ctx, C) { const ca = L === "ca", today = (window.ELWeek && ELWeek.today()) || new Date().toISOString().slice(0, 10), open = !ctx.term || !ctx.term.deadline || today <= ctx.term.deadline;
-    const out = [], say = (id, v) => out.push(BANK[id][ca ? "ca" : "en"].replace(/\{(\w+)\}/g, (m, k) => v && v[k] != null ? v[k] : m));
+  function comment(L, pts, tm, ctx, C) { const ca = L === "ca", today = (window.ELWeek && ELWeek.today()) || new Date().toISOString().slice(0, 10), open = ctx.term && ctx.term.deadline ? today <= ctx.term.deadline : !ctx.term || !ctx.term.to || today <= ctx.term.to;
+    // {tw} this term / this school year, {nx} {Nx} {Anx} next term / next year, {by} before the deadline (elTrepWords: term 3 and the final report look to next year)
+    const WD = elTrepWords(ctx.scope || "t1", L, ctx.term && ctx.term.deadline, today);
+    const out = [], say = (id, v) => out.push(BANK[id][ca ? "ca" : "en"].replace(/\{(\w+)\}/g, (m, k) => v && v[k] != null ? v[k] : WD[k] != null ? WD[k] : m));
     const ex = id => { const sc = ((ctx.rs || {})[id + "/assessment"] || {}).sections || {}; let a = 0, b = 0; Object.values(sc).forEach(y => { if (y && y.score != null && y.max) { a += +y.score; b += +y.max; } }); return b ? Math.round(a / b * 100) / 10 : null; };
-    const xs = C.lss.map(x => ex(x.ls)), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs[xs.length - 1];
-    const n1 = C.lss.length > 1 ? C.lss[C.lss.length - 2] : null, N1 = n1 && window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === n1.ls) || {}) || "LS1" : "LS1", N2 = (window.elLsNum && elLsNum((window.EL_LS || []).find(l => l.id === (C.lss[C.lss.length - 1] || {}).ls) || {})) || "LS2";
+    // the exams of the report: the term's LSs (ctx.exams, only those with a mark; elTrepScope) or, in term 1, its two LSs as Roger wrote them
+    const XI = ctx.exams ? ctx.exams.filter(id => ex(id) != null) : C.lss.map(x => x.ls), xs = XI.map(ex), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs.length ? xs[xs.length - 1] : null;
+    const lsN = id => (window.elLsNum && elLsNum((window.EL_LS || []).find(l => l.id === id) || {})) || "", N1 = (XI.length > 1 && lsN(XI[XI.length - 2])) || "LS1", N2 = (XI.length && lsN(XI[XI.length - 1])) || "LS2";
     const D = DEG[ca ? "ca" : "en"], d1 = e1 != null ? degOf(e1) : null, d2 = e2 != null ? degOf(e2) : null, V = { N1, N2, d1: D[d1], d2: D[d2] };
     // everyday work and progress first, the exam after (Roger, 28 Nov 2026: "it seem that we focus more on the exam that on the rest and it isn't true")
     const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse(), w = worst[0];
