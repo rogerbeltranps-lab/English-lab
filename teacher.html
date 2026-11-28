@@ -681,6 +681,10 @@ async function markStart(at){try{const tok=await ELCloud.auth.currentUser.getIdT
 function mailNote(p,what,fail){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+(MAIL_LATER>Date.now()?" email goes to "+n+" student"+(n===1?"":"s")+" at "+lateWhen(MAIL_LATER):" emailed to "+n+" student"+(n===1?"":"s"));
   d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)})
   .catch(e=>{console.warn("mail",e);alert(fail||"Saved, but the email to the students did not go: "+e.message+". They still see it on their board.")})}
+// once an answer to a report or an idea is sent (📨 Send, ✏️ Edit first / ↩ Answer › Send, 📨 Send it), the page goes back to the list
+// (‹ All reports / ‹ All ideas) so the next one is one click away (Roger, 28 Nov 2026: "when I send a message it should go back to
+// problems"). Only once the save worked: if it fails, the report stays open with its alert.
+const sentBack=(p,k)=>Promise.resolve(p).then(()=>{S[k]=null;if(/^#pb-/.test(location.hash))history.replaceState(null,"","#probs");scrollTo(0,0)});
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await reread();render()}
 // 🌙 Late messages (Roger, 14 Nov 2026: "que els alumnes no vegin la hora en que els envio els missatges" … "I want to have the option to
 // tell you send it anyway and you always ask me"): between 21:00 and 7:30 every send to students (announcements, messages and answers,
@@ -7279,7 +7283,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdone:()=>act(api.sgDone(k.id,!!k.v)),msgtab:()=>{S.msgTab=k.t;S.pbOpen=S.sgOpen=null;render()},
     pbview:()=>{S.pbOpen=k.id||null;const x=k.id&&S.D.pb.find(y=>y.id===k.id);scrollTo(0,0);if(x&&!pbDone(x)&&!x.seen)act(api.pbSeen(x.id));else render()},
     sgview:()=>{S.sgOpen=k.id||null;const x=k.id&&(S.D.sg||[]).find(y=>y.id===k.id);scrollTo(0,0);if(x&&!x.read&&!sgDone(x))act(api.sgRead(x.id,true));else render()},msgsseen:()=>act(msgsSeen()),sgmsg:()=>sgAnswer(k.id),
-    sgmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(api.sgMsg(k.id,v))})},sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
+    sgmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(sentBack(api.sgMsg(k.id,v),"sgOpen"))})},sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";S.msgTab="pb";S.pbOpen=null;render();$("#probs").scrollIntoView({behavior:"smooth"})},
     pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";
       dlg(`<h3>📷 Screenshot</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p><p id="pbimg">Loading…</p>`,true);
@@ -7287,13 +7291,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
         $("#pbimg").innerHTML=ok?`<img src="${img}" alt="Screenshot from the student" title="Click to see it full size" onclick="this.style.maxWidth=this.style.maxWidth==='none'?'100%':'none'" style="max-width:100%;cursor:zoom-in;border:1px solid #cbd5e1;border-radius:8px"><br><small class="muted">${cap}</small>`:"The screenshot could not be found."}
       catch(e){console.warn("shot",e);$("#pbimg").textContent="The screenshot could not be loaded: "+e.message}},
     pbclaude:()=>pbClaude(k.id),pbmsg:()=>{const x=S.D.pb.find(y=>y.id===k.id);pbAnswer(k.id,x&&pbPre(x))},
-    pbmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(api.pbMsg(k.id,v,!!k.f))})},
+    pbmsgok:()=>{if(!S.rpW||!S.rpW.ready())return;const v=S.rpW.vals();lateAsk(()=>{$("#dlg").close();act(sentBack(api.pbMsg(k.id,v,!!k.f),"pbOpen"))})},
     // Beltran's suggested reply goes in both languages (auto.reply in the report's language, auto.reply2 the other one); an older one
     // with only one version opens ✏️ Edit first, where Google Translate writes the other version for him to read
     pbsug:()=>{const x=S.D.pb.find(y=>y.id===k.id),a=x&&x.auto;if(!a||!a.reply)return;   // sent without the student's name (pbRe → noNames)
      if(!a.reply2)return pbAnswer(k.id,pbPre(x));
-      const en=!!x.route&&!elCa(x.route),r=pbRe(x,"reply"),r2=pbRe(x,"reply2"),v={text:r,en:en?r:r2,ca:en?r2:r};lateAsk(()=>act(api.pbMsg(k.id,v,k.f==="1"?true:k.f==="close"?"close":false,true)))},
-    pbnow:()=>act(api.pbNow(k.id)),
+      const en=!!x.route&&!elCa(x.route),r=pbRe(x,"reply"),r2=pbRe(x,"reply2"),v={text:r,en:en?r:r2,ca:en?r2:r};lateAsk(()=>act(sentBack(api.pbMsg(k.id,v,k.f==="1"?true:k.f==="close"?"close":false,true),"pbOpen")))},
+    pbnow:()=>act(sentBack(api.pbNow(k.id),"pbOpen")),
     pbsuged:()=>{const x=S.D.pb.find(y=>y.id===k.id);if(x)pbAnswer(k.id,pbPre(x))},
     pbcopy:async()=>{const txt=$("#pbq").value,app=k.v==="app";let ok=true;try{await navigator.clipboard.writeText(txt)}catch(e){ok=false;$("#pbq").select()}
       $("#pbmsg").textContent=ok?`Copied. Paste it in the English Lab project chat (it opened ${app?"in the app":"in a new tab"}) to start a thread.`:"Could not copy: the text is selected, press Cmd+C or Ctrl+C, then paste it in the project chat.";
