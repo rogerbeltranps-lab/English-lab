@@ -149,10 +149,13 @@ for (const size of SIZES) {
     const lsOn = () => c.page.evaluate(() => document.querySelector('#main .ph select')?.selectedOptions[0]?.textContent || '');
     await pick('4ESOB'); await c.page.selectOption('#main .ph select', { index: 0 }); await settle(c.page, 600);
     const was = await lsOn(), chip = await c.page.locator('.vyhome .vynow').count();
+    // LS1's paths were practice: a student with an LS1 exam mark counts as finished (Roger, 28 Nov 2026), so the class is near 100 %
+    const avg = await c.page.evaluate(() => +((/(\d+)\s*% average/.exec(document.querySelector('.vyhome')?.innerText || '') || [])[1] ?? -1));
     await pick('plan'); await pick('2ESOA'); const a2 = await lsOn(); await pick('plan'); await pick('4ESOB'); const b4 = await lsOn();
     const extra = [];
     if (!/^LS1\b/.test(was)) extra.push(`picking LS1 in the heading shows "${was}"`);
     if (!chip) extra.push('the class voyage on LS1 has no ↩ LS2 (now) button');
+    if (avg < 80) extra.push(`LS1's class voyage shows ${avg} % average: students with an LS1 exam mark should count as finished`);
     if (!/^LS2\b/.test(a2) || !/^LS2\b/.test(b4)) extra.push(`after 🏠 Home a group's page stays on another LS (2ESO A: "${a2}", 4ESO B: "${b4}"), not the one the group is doing now`);
     await report(label('Dashboard', size, "a group's page opens on its current LS"), size, c, extra);
   }

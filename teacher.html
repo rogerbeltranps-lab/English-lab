@@ -2304,6 +2304,11 @@ const vyTab=(a,k)=>{const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);k
 // students who had done everything, the 4 others planned for next week): the tabs done in class or set as homework (elDueBefore, the same
 // test as ✅ To do, ⏰ late and the Learning paths table). done/total/miss = those; later = the steps on the Time plan still to come (not
 // counted); all/allDone = every stop of the map (the boats' place on the map). No agenda: every open tab counts, as before.
+// An LS whose learning paths were only practice (EL_GRADING[ls].only: LS1, done mostly before students signed in, so no step was saved):
+// a student with its exam marked has finished it, so on the ⛵ voyage and in 🧭 Class steps they count as having done every stop
+// (Roger, 28 Nov 2026: "the LS1 got the format but not the content"; he chose "count LS1 as finished").
+function vyLsDone(s,ls){const g=(window.EL_GRADING||{})[ls];if(!g||!g.only||!s||!s.uid)return false;const x=res(s.uid,asId(ls))||{};
+  return Object.values(x.sections||{}).some(v=>v&&v.score!=null)||!!(x.progress&&x.progress.exam!=null)}
 function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0,later=0,all=0,allDone=0;const miss=[],on=vyOnPlan(ls,gid),db=window.elDueBefore?elDueBefore(info,gid):null;
   const due=(a,g)=>{if(!db||db.acts.has(a.id))return true;const ps=db.tabs[a.id];if(!ps)return false;const id=vyTab(a,g[0]);return [...ps].some(p=>g.includes(p)||vyTab(a,p)===id)};
   acts(ls).filter(a=>!a.optional&&!a.manual&&(!fa||a.id!==fa.id)&&!(window.elBookPath&&elBookPath(a.id))&&elLpOpen(a,info,gid)).forEach(a=>{
@@ -2312,6 +2317,7 @@ function vySteps(s,ls,gid,fa){const info=S.D.ls[ls]||{};let done=0,total=0,later
       if(pl){all++;if(d)allDone++}
       if(!du){if(!d)later++;return}
       total++;if(d)done++;else miss.push([a,g[0]])})});
+  if(vyLsDone(s,ls))return {done:total,total,miss:[],later:0,all,allDone:all};
   return {done,total,miss,later,all,allDone}}
 // a student's LS mark so far (m, out of 10, as stored by progSync) and its parts in points (pt, elLsPts)
 function lsPtsOf(s,ls){const P=(ls,v)=>window.elLsPts?elLsPts(ls,v):null,dOf=(ls,p)=>window.elDailyOf?elDailyOf(ls,p):null;try{const pr=((S.D.rs[s.uid]||{})[asId(ls)]||{}).progress;
@@ -2390,10 +2396,10 @@ function vyMap(grp,ls,rows,fa,first){if(!window.elVoyage)return "";const info=S.
 // class, and not homework: elDueBefore, the same test as ✅ To do) shows its share in grey and stays out of the average. No reads; names
 // only when the teacher taps a step or a place (who).
 function vyPct(ls,gid,info,rows,beds){const N=rows.length,pct={},pctPort={},later=new Set();if(!N)return {pct,pctPort,later};
-  const db=window.elDueBefore?elDueBefore(info,gid):null,who={};
+  const db=window.elDueBefore?elDueBefore(info,gid):null,who={},fin=rows.map(r=>vyLsDone(r.s,ls));   // fin: LS1 finished (vyLsDone)
   beds.forEach(b=>{const a=byId(b.id);if(!a)return;const ds=rows.map(r=>doneSet(r.s.uid,a));
     b.plants.forEach(p=>{const g=p.ks||[],ok=new Set();
-      rows.forEach((r,i)=>{if(g.length&&g.every(k=>ds[i].has(k)))ok.add(r.s.uid)});who[p.key]=ok;pct[p.key]=Math.round(ok.size/N*100);
+      rows.forEach((r,i)=>{if(fin[i]||g.length&&g.every(k=>ds[i].has(k)))ok.add(r.s.uid)});who[p.key]=ok;pct[p.key]=Math.round(ok.size/N*100);
       if(db&&!db.acts.has(a.id)&&![...(db.tabs[a.id]||[])].some(x=>vyTab(a,x)===p.id))later.add(p.key)})});
   const M=elVoyage.model({skin:ls,en:true,beds});
   const port={};M.ports.forEach(x=>{if(!x.keys.length)return;const ok=new Set(rows.filter(r=>x.keys.every(k=>who[k]&&who[k].has(r.s.uid))).map(r=>r.s.uid));
