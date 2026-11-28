@@ -589,6 +589,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 - Term 1 ended 20 Nov 2026: Roger closes each group with 🔒 Close term.
 - Class games: a missed game or one under half right is left out, never 0; a game played again counts only its latest play.
 - Self-assessment never counts in the mark.
+- **A criterion whose evidence is the final product waits for it** (Roger, 28 Nov 2026, on Term 2 showing 1.1 Excellent from one done step: "I think this is a mistake"): in 🧩 My competences, the 📄 Term report and the dashboard's competence view, a criterion with a final product row (4 ESO LS2: 1.1 and 1.2, the group video) shows "not yet" until that row has a mark; then its done learning-path steps count with it. The LS mark is unchanged.
 - Year mark: Term 1 ×1, Term 2 ×2, Term 3 ×3 (section 4).
 
 ---

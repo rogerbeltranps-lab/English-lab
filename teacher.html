@@ -4499,7 +4499,10 @@ function pieces(it){const g=it.g,b=it.b,w=b.w,shares=o=>{const t=Object.values(o
     if(f.mark)return spread((byId(f.a)||{}).criteria||[],w,s=>fpBlock(s.uid));
     const tot=f.rows.reduce((a,r)=>a+r.w,0);return f.rows.map(r=>({c:r.c,w:w*r.w/tot,n:r.name,m:s=>{const v=lvMark(lvOf(s.uid,f.a,r.step,r.c));return v==null&&S.zero?0:v}}))}
   if(b.id==="gv"){const sh=shares(gvShares(g));return (sh.length?sh:[{c:null,w}]).map(x=>Object.assign(x,{m:s=>gvBlock(s.uid,s.group).mark}))}
-  if(b.id==="other")return spread(g.other||[],w,null).map(x=>Object.assign(x,{m:s=>otherCrit(s.uid,x.c).mark}));
+  // 1.1 / 1.2 wait for the final product (Roger, 28 Nov 2026), as today.html compPieces (fpWait): a criterion with a final-product row
+  // (4ESO LS2: the group video) has no mark here until that row is marked; then the done steps count with it
+  if(b.id==="other"){const f=g.fp,fr=c=>f&&!f.mark&&f.rows?f.rows.filter(r=>r.c===c):[];
+    return spread(g.other||[],w,null).map(x=>Object.assign(x,{m:s=>{const rs=fr(x.c);if(rs.length&&rs.every(r=>lvMark(lvOf(s.uid,f.a,r.step,r.c))==null))return null;return otherCrit(s.uid,x.c).mark}}))}
   return [{c:null,w,m:()=>null}]}
 // a student's marks: one row per piece {it, c, k (competence), w, m}; "Missing work counts 0" only once the item's day has passed
 function marksOf(s,items){const today=ELWeek.today(),out=[];
