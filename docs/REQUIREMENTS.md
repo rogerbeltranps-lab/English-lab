@@ -603,6 +603,7 @@ From ***How we make rubrics*** (27 Oct 2026), for every rubric: exam writings, f
 
 - **Every suggested reply or draft to a student** (problem reports, ideas, private-message answers, comments) is built on **what the website really has** (20 Nov 2026): point to the real thing with the names students see (Examen de mostra / Sample exam, 🎯 Practica / Practise, Games, the learning paths, a step's title) and say how to use it. No generic advice, and never promise something new Roger hasn't decided.
 - Short, kind, plain, first person as Roger. Never AI, Claude, PRs or code.
+- **Levels, never numbers** (Roger, 28 Nov 2026: "don't talk about number, always NA, AS..."): an answer to a student names how they are doing with the level (Not satisfactory (No assoliment) · Satisfactory (Assoliment satisfactori) · Very good (Assoliment notable) · Excellent (Assoliment excel·lent); Catalan only for Starter), never a % or a mark out of 10. The pages themselves (the 📄 Term report's % per point, marks) stay as they are (Roger chose "Only in replies to students").
 - **Every 💬 Answer box opens with Beltran's draft** (Catalan + English, Roger's voice, no names; 20 Nov 2026, PR #777). It is never sent by itself: Roger edits it and presses Send. Routine details: [problem-reports-auto.md › Drafts for ideas and private answers](general/problem-reports-auto.md).
 
 ---
