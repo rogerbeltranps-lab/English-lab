@@ -76,7 +76,7 @@ var learningSupport = {
   [['el-mic.js', window.elMic], ['el-typing.js', window.elTyping]].forEach(function (x) {
     if (x[1]) return;
     var e = document.createElement('script');
-    e.src = s.src.replace(/learning-path-support\.js(\?[^#]*)?/, x[0] + (x[0] === 'el-typing.js' ? '?v=20261128lock' : ''));
+    e.src = s.src.replace(/learning-path-support\.js(\?[^#]*)?/, x[0] + (x[0] === 'el-typing.js' ? '?v=20261128tn' : ''));
     document.head.appendChild(e);
   });
 })();

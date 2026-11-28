@@ -37,4 +37,25 @@ export default [{
       }
     }
   },
+}, {
+  name: 'Towards Nativeness: Roger\'s writing box refuses dictated text too, but his one-line answer boxes still take it',
+  async run(t) {
+    const { roger } = await school(t);
+    const d = await t.device(roger, { now: NOW, local: { el_who: JSON.stringify({ uid: 'u-teacher', role: 'teacher', t: NOW - 864e5 }) } });
+    const p = await d.open('4eso/towards-nativeness/getting-things-done.html');
+    await p.click('.tab[data-panel="write"]');
+    const box = p.locator('#write textarea:visible').first();
+    await box.click();
+    const cdp = await p.context().newCDPSession(p);
+    await cdp.send('Input.insertText', { text: 'Add a button that saves the draft.' });
+    t.ok((await box.inputValue()) === '', `in Towards Nativeness, a dictated sentence went into the writing box (it holds: "${await box.inputValue()}")`);
+    await p.keyboard.type('Add a button.');
+    t.ok((await box.inputValue()) === 'Add a button.', `in Towards Nativeness, typing no longer works in the writing box (it holds: "${await box.inputValue()}")`);
+    const one = p.locator('section.panel textarea.typed');
+    if (await one.count()) {
+      const id = await one.first().getAttribute('id');
+      const v = await p.evaluate((i) => { const b = document.getElementById(i), e = new InputEvent('beforeinput', { inputType: 'insertText', data: 'on my phone', cancelable: true, bubbles: true }); return b.dispatchEvent(e); }, id);
+      t.ok(v, 'in Towards Nativeness, a one-line answer box (Spot the mistake, Catalan → English) refuses a word suggestion: only writing boxes should');
+    }
+  },
 }];

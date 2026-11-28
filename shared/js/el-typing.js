@@ -16,13 +16,14 @@ window.elTyping = window.elTyping || (function () {
   document.addEventListener('keydown', function (e) { var el = box(e.target); if (!el || e.ctrlKey || e.metaKey || e.altKey) return; if (e.key && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter')) { rec(el).k++; keep(); } }, true);
   document.addEventListener('input', function (e) { var el = box(e.target); if (!el) return; var k = keyOf(el), now = Date.now(); if (last[k] && now - last[k] < GAP) rec(el).ms += now - last[k]; last[k] = now; keep(); }, true);
   /* No dictation in writing boxes (Roger, 28 Nov 2026: a writing of 521 characters went in with 26 keys in 3 minutes; "lock it"):
-     a writing box (any <textarea> of an activity, section.panel, on a learning path page; not a dialog such as ⚠️ Report a problem, not
-     Towards Nativeness) takes text only a few letters at a time, the way a
+     a writing box (any <textarea> of an activity, section.panel, on a learning path page; not a dialog such as ⚠️ Report a problem) takes text only a few letters at a time, the way a
      keyboard types it. Text that arrives in a chunk (dictation on a Chromebook or a phone, swipe typing, a phone's word suggestions,
      autofill) is refused: cancelled in beforeinput where the browser allows it, otherwise taken back in input. Pasting is left to
      el-nocopy.js (own text only) and undo/redo still work. Each refused chunk counts in c (characters), so the writing log can say it. */
-  var MAX = 3, LOCK = !/towards-nativeness/.test(location.pathname), pre = null, tipAt = 0;
-  function wbox(el) { return LOCK && el && el.tagName === 'TEXTAREA' && !el.readOnly && !el.disabled && el.closest('section.panel') && !el.closest('dialog') ? el : null; }
+  var MAX = 3, TN = /towards-nativeness/.test(location.pathname), pre = null, tipAt = 0;
+  // Towards Nativeness too (Roger, 28 Nov 2026: "I need to have the same in towards nativeness since it's when I can spot any bug"),
+  // except its one-line answer boxes (textarea.typed: Spot the mistake, Catalan → English…), which are short gaps (<input>) on student pages
+  function wbox(el) { return el && el.tagName === 'TEXTAREA' && !el.readOnly && !el.disabled && el.closest('section.panel') && !el.closest('dialog') && !(TN && el.classList.contains('typed')) ? el : null; }
   function freeType(t) { return !t || /^(delete|history|insertFromPaste|insertFromDrop|insertLineBreak|insertParagraph|format)/.test(t); }
   function tip(el) {
     var now = Date.now(); if (now - tipAt < 4000) return; tipAt = now;
