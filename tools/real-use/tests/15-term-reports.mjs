@@ -6,7 +6,7 @@ import { school, NOW } from './world.mjs';
 const H = 3600e3, DOC = 'termReportsN/t2_alex.sample@ietramuntana.cat';
 
 export default [{
-  name: '📄 Term 2 report: Roger rebuilds it, the student sees it only after ✅ Publish the final version',
+  name: '📄 Term 2 report: Roger rebuilds it (the one it replaces is kept), the student sees it only after ✅ Publish the final version',
   async run(t) {
     const { alex, roger } = await school(t);
     // before: no chip, and #report-t2 sends the student back to the board
@@ -26,6 +26,10 @@ export default [{
     t.ok(r && !/\{(tw|nx|Nx|Anx|by)\}/.test(r.comment + r.commentCa), 'the saved comment kept a {placeholder}: ' + (r && r.comment));
     const old = await t.read('termReports/alex.sample@ietramuntana.cat');
     t.ok(!old || !old.t2, 'the Term 2 rebuild wrote into the Term 1 report document');
+    // 🔄 Rebuild again: the Term 2 report it replaces is kept apart (termReportsBak/{email}.t2), never in Term 1's list (.v)
+    await q.locator('[data-do="reprb"]:not([disabled])').click({ timeout: 25000 });
+    const bk = await t.until(() => t.read('termReportsBak/alex.sample@ietramuntana.cat'), (x) => x && Array.isArray(x.t2) && x.t2.length, 25000);
+    t.ok(bk && bk.t2[0].term === 't2' && bk.t2[0].bak && !(bk.v || []).some((x) => x.term === 't2'), 'the second Term 2 rebuild did not keep the report it replaced: ' + JSON.stringify(bk).slice(0, 200));
 
     // ✅ Publish the final version (Term 2)
     await q.locator('[data-do="repfin"][data-v="1"]').first().click({ timeout: 15000 });

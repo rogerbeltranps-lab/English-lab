@@ -294,7 +294,7 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 @media(max-width:900px){.tp2s .tp2col{position:static;height:auto;display:block}.tp2s .agw{display:grid}.tp2s .agr{overflow:visible}.tp2s{grid-template-columns:1fr}.tp2sr{position:static;max-height:none}.tp2sr .lpall .wrap{max-height:75vh}}
 @media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
 </style>
-<link rel="stylesheet" href="shared/css/el-phone.css?v=20261128c"></head><body>
+<link rel="stylesheet" href="shared/css/el-phone.css?v=20261128d"></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
@@ -332,7 +332,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
-<script src="shared/js/el-term-report.js?v=20261128b"></script>
+<script src="shared/js/el-term-report.js?v=20261128j"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
@@ -4630,16 +4630,51 @@ async function repRebuild(gid,one,k=repTerm()){const g=GR.find(x=>x.id===gid);if
           term:Z.term,taught:elTrepTaught(gid,inf,Z.upTo),lp:key=>lps[key]||null});delete P.live;
         const W=P.time&&P.time.weeks;if(Array.isArray(W))P.time.weeks=W.map(w=>Array.isArray(w)?{d:w[0],n:w[1]}:w);   // Firestore takes no array inside an array
         const pub=(window.elTrepSafe||(x=>x))(Object.assign({term:k},P,{wk:elTrepPoints(Z.C),at}));
-        if(!DEMO)await Promise.all([F.setDoc(F.doc(db(),"termReportsN",k+"_"+email),pub),F.setDoc(F.doc(db(),"termReportsT",email),{[k]:{firstLatest:trepFirstLatest(pg,lps)}},{merge:true})]);
-        ((REPS.n=REPS.n||{})[k]=REPS.n[k]||{})[email]=pub;n++;continue}
+        // the report it replaces is kept first, as for Term 1 (termReportsBak/{email}.{k})
+        if(!DEMO){const old=await repOld(email,k);if(old)await repKeep(email,old,at,k);
+          await Promise.all([repPut(email,pub,k),F.setDoc(F.doc(db(),"termReportsT",email),{[k]:{firstLatest:trepFirstLatest(pg,lps)}},{merge:true})])}
+        else((REPS.n=REPS.n||{})[k]=REPS.n[k]||{})[email]=pub;n++;continue}
       const P=elTrepBuild(C,{course,group:gid,lang:L,pg,rs:S.D.rs[u]||{},games,infoOf:inf,
         term:{from,to,deadline:(window.EL_TREP_DEADLINE||{}).t1},taught,lp:key=>lps[key]||null});delete P.live;
-      const pub=Object.assign({term:"t1"},P,{at});
-      if(!DEMO)await Promise.all([F.setDoc(F.doc(db(),"termReports",email),{t1:pub}),F.setDoc(F.doc(db(),"termReportsT",email),{t1:{firstLatest:trepFirstLatest(pg,lps)}})]);
+      const pub=elTrepSafe(Object.assign({term:"t1"},P,{at}));
+      // the report it replaces is kept first (Roger, 28 Nov 2026: "I want to have the old reports saved in case there's a problem with the new ones")
+      if(!DEMO){const old=await repOld(email);if(old)await repKeep(email,old,at);
+        await Promise.all([F.setDoc(F.doc(db(),"termReports",email),{t1:pub}),F.setDoc(F.doc(db(),"termReportsT",email),{t1:{firstLatest:trepFirstLatest(pg,lps)}})])}
       if(REPS.d)REPS.d[email]=pub;n++}
     REPS.done={g:gid,n,at,one:one||null,k}}
   catch(e){console.warn("rebuild reports",e);alert("Could not rebuild the reports: "+(e.message||e))}
   REPS.rb=null;REPS.rb1=null;render()}
+// ↩ Earlier versions (Roger, 28 Nov 2026: "I want to have the old reports saved in case there's a problem with the new ones"): before a 🔄 Rebuild
+// or a restore writes termReports/{email}.t1, the report there is added to termReportsBak/{email}.v (teacher only, never read by students), with
+// bak = when it was replaced. ↩ Earlier versions on the group's list reads those (one read per student, only when pressed) and puts back, for
+// every student, the version that was there before the rebuild Roger picks; what it replaces is kept too, so a restore can be undone.
+// Term 2, Term 3 and the year keep theirs the same way, in the same document: termReportsBak/{email}.t2 / .t3 / .y (Term 1 stays in .v).
+const repBakF=k=>k==="t1"?"v":k;
+async function repOld(email,k="t1"){const R=repsOf(k);if(REPS[k==="t1"?"d":"n"]&&email in R)return R[email];
+  if(k==="t1"){const x=await F.getDoc(F.doc(db(),"termReports",email));return x.exists()&&(x.data()||{}).t1||null}
+  const x=await F.getDoc(F.doc(db(),"termReportsN",k+"_"+email));return x.exists()&&x.data()||null}
+function repKeep(email,old,at,k="t1"){return F.setDoc(F.doc(db(),"termReportsBak",email),{[repBakF(k)]:F.arrayUnion(Object.assign(elTrepSafe(old),{bak:at}))},{merge:true})}
+function repPut(email,v,k){if(k==="t1"){if(REPS.d)REPS.d[email]=v;return F.setDoc(F.doc(db(),"termReports",email),{t1:v})}
+  ((REPS.n=REPS.n||{})[k]=REPS.n[k]||{})[email]=v;return F.setDoc(F.doc(db(),"termReportsN",k+"_"+email),v)}
+async function repBakLoad(gid,k=repTerm()){const studs=((REPS.studs||{})[gid]||[]).filter(s=>s.email&&!s.tester),o={};REPS.bak={g:gid,k,busy:true};render();
+  try{await Promise.all(studs.map(async s=>{const e=String(s.email).toLowerCase(),x=await F.getDoc(F.doc(db(),"termReportsBak",e));o[e]=x.exists()&&(x.data()||{})[repBakF(k)]||[]}));REPS.bak={g:gid,k,d:o}}
+  catch(e){REPS.bak={g:gid,k,err:e.message||String(e)}}render()}
+async function repRestore(gid,when){const g=GR.find(x=>x.id===gid),B=REPS.bak&&REPS.bak.g===gid&&REPS.bak.d,k=REPS.bak&&REPS.bak.k||"t1";if(!g||!B)return;
+  const pick=Object.entries(B).map(([e,v])=>[e,v.filter(x=>x&&x.bak===when).pop()]).filter(([,x])=>x);if(!pick.length)return;
+  if(!confirm(`Put back ${pick.length} ${repTName(k)}${pick.length>1?"s":""} of ${g.name} as they were before the rebuild of ${repWhen(when)}?\n\nThe reports there now are kept too, so you can put them back later.`))return;
+  REPS.rb=gid;render();const at=new Date().toISOString();
+  try{for(const [e,x] of pick){const old=await repOld(e,k),v=Object.assign({},x);delete v.bak;if(old)await repKeep(e,old,at,k);await repPut(e,v,k)}
+    REPS.done={g:gid,n:pick.length,at,back:true,k};await repBakLoad(gid,k)}
+  catch(e){console.warn("restore reports",e);alert("Could not put the reports back: "+(e.message||e))}
+  REPS.rb=null;render()}
+const repWhen=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(v).toTimeString().slice(0,5);
+function repBakBox(grp){const B=REPS.bak&&REPS.bak.g===grp.id&&(REPS.bak.k||"t1")===repTerm()?REPS.bak:null;if(!B)return "";
+  if(B.busy)return `<div class="box" style="margin:0 0 10px"><p class="muted">Loading the earlier versions…</p></div>`;
+  if(B.err)return `<div class="box" style="margin:0 0 10px"><p class="muted">Couldn't read the earlier versions: ${esc(B.err)}</p></div>`;
+  const by={};Object.values(B.d).forEach(v=>v.forEach(x=>{if(x&&x.bak){const y=by[x.bak]=by[x.bak]||{n:0,made:x.at};y.n++}}));
+  const rows=Object.entries(by).sort((a,b)=>b[0]<a[0]?-1:1).map(([w,y])=>`<li style="margin:6px 0">The reports before the change of <b>${esc(repWhen(w))}</b> <span class="muted">(${y.n} report${y.n>1?"s":""}${y.made?", made "+esc(repWhen(y.made)):""})</span> <button class="chip" data-do="repback" data-g="${grp.id}" data-v="${esc(w)}" ${REPS.rb?"disabled":""}>↩ Put these back</button></li>`).join("");
+  return `<div class="box" style="margin:0 0 10px"><b>↩ Earlier versions of the reports</b> <button class="chip" data-do="repbakx" style="float:right">✕ Close</button>`
+    +(rows?`<ul style="margin:8px 0 0;padding-left:18px">${rows}</ul>`:`<p class="muted" style="margin:6px 0 0">None yet: the first 🔄 Rebuild keeps the reports it replaces here.</p>`)+`</div>`}
 function repView(grp,studs,place){repLoad();(REPS.studs=REPS.studs||{})[grp.id]=studs;
   const back=place?"":`<div class="bar"><button class="chip" data-do="repclose">‹ Back to ${esc(grp.name)}</button></div>`;
   if(REPS.err)return back+`<div class="box"><p class="muted">Couldn't read the reports: ${esc(REPS.err)}</p></div>`;
@@ -4676,7 +4711,8 @@ function repView(grp,studs,place){repLoad();(REPS.studs=REPS.studs||{})[grp.id]=
   const tNote=K==="y"?`<p class="muted" style="margin:0 0 8px">Every competence of the school year: each competence's term marks weighted Term 1 ×1, Term 2 ×2, Term 3 ×3, with each term's points bonus, and every point of the three terms. When the work was done counts from Term 2.</p>`
     :K!=="t1"?`<p class="muted" style="margin:0 0 8px">What we worked on comes from the class games the group played this term; the comment also says whether the activities were done on time and in the week of the class.</p>`:"";
   const rbBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center"><button data-do="reprb" data-g="${grp.id}" ${REPS.rb?"disabled":""} style="background:#1d4ed8;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${rb?"⏳ Rebuilding…":"🔄 Rebuild the reports"}</button>`
-    +`<span class="muted" style="font-size:13px">${dn?`✅ ${dn.one?"1 report":dn.n+" reports"} rebuilt ${esc(new Date(dn.at).toTimeString().slice(0,5))}.`:"Works out every report again from the students' work, with fixed sentences in your voice (no AI): the lines that quote their mistakes and this list too."}</span></div>`;
+    +`<span class="muted" style="font-size:13px">${dn?`✅ ${dn.one||dn.n===1?"1 report":dn.n+" reports"} ${dn.back?"put back":"rebuilt"} ${esc(new Date(dn.at).toTimeString().slice(0,5))}.`:"Works out every report again from the students' work, with fixed sentences in your voice (no AI): the lines that quote their mistakes and this list too. The reports it replaces are kept."}</span>`
+    +`<button class="chip" data-do="repbak" data-g="${grp.id}" ${REPS.rb?"disabled":""} style="margin-left:auto" title="The reports as they were before each 🔄 Rebuild: put them back if something went wrong">↩ Earlier versions</button></div>`+(DEMO?"":repBakBox(grp));
   return back+`<div class="box"><h2>📄 ${esc(repTNs(K).replace(/^f/,"F"))} · ${esc(grp.name)}</h2>${tBar}${tNote}${pubBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
     +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
@@ -7443,7 +7479,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=S.reps=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
     tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
-    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reprb:()=>repRebuild(k.g),reprb1:()=>repRebuild(k.g,k.v),repfin:()=>repFinal(k.g,k.v==="1"),repterm:()=>{repTermSet(k.v);render()},reppub:()=>repPublish(k.g,k.v==="1"),
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reprb:()=>repRebuild(k.g),reprb1:()=>repRebuild(k.g,k.v),repbak:()=>repBakLoad(k.g),repbakx:()=>{REPS.bak=null;render()},repback:()=>repRestore(k.g,k.v),repfin:()=>repFinal(k.g,k.v==="1"),repterm:()=>{repTermSet(k.v);render()},reppub:()=>repPublish(k.g,k.v==="1"),
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?termLss(EL_LS.filter(l=>l.course===g.course),k.t,g.id):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},

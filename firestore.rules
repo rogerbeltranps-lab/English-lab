@@ -200,6 +200,11 @@ service cloud.firestore {
     match /termReportsT/{email} {
       allow read, write: if isTeacher();
     }
+    // termReportsBak/{email} = {v: [earlier versions of termReports/{email}.t1, each with bak = when it was replaced], t2 | t3 | y: the same for termReportsN}: kept before every
+    // 🔄 Rebuild or ↩ restore on the dashboard (Roger, 28 Nov 2026: "I want to have the old reports saved"). Teacher only.
+    match /termReportsBak/{email} {
+      allow read, write: if isTeacher();
+    }
     match /live/{group} {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();
