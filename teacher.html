@@ -4527,6 +4527,14 @@ function repPublish(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
     :`Hide the draft reports of ${g.name} again?\n\nStudents will see theirs only while you press 📄 Show draft reports in class mode.`))return;
   const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repPub=Object.assign({},t.repPub,{t1:v});
   const p=put(["teams",gid],{repPub:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
+// ✅ Final version (Roger, 28 Nov 2026: "the button to say that the current reports are the last version (even though I must be able to do any
+// changes I want)"): teams/{group}.repFinal.t1 = when. Students then see the saved report as it is, labelled final (no "draft", no live
+// build). Nothing is locked: 🔄 Rebuild still rewrites any report, and ✏️ Back to draft sets it back to null.
+function repFinal(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
+  if(!confirm(on?`Make the current Term 1 reports of ${g.name} the final version?\n\nStudents see their report as it is now, as the final version (no "draft"), and it no longer changes with their work. You can still 🔄 rebuild any report or go back to draft.`
+    :`Set the reports of ${g.name} back to draft?\n\nThey are labelled draft again and change with the students' work.`))return;
+  const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repFinal=Object.assign({},t.repFinal,{t1:v});
+  const p=put(["teams",gid],{repFinal:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
 // 🔄 Rebuild the reports (Roger, 28 Nov 2026: "I could press a button to generate a term report and everthing and even the comments get
 // generated out of fixed sentences"; "yes"): the same build as tools/term-report/draft.mjs, in Roger's browser, no Claude or AI. For every
 // student of the group (not the tester, not away): their work already on the dashboard (S.D.pg, S.D.rs, S.D.lv, S.D.ls), their class games
@@ -4582,13 +4590,17 @@ function repView(grp,studs,place){repLoad();(REPS.studs=REPS.studs||{})[grp.id]=
       :`<td colspan="5" class="muted">No report yet</td><td style="white-space:nowrap">${rb1(s)}</td>`)+`</tr>`}).join("");
   const n=k=>studs.filter(s=>{const R=REPS.d[String(s.email||"").toLowerCase()];return R&&R.time&&R.time.profile===k}).length;
   const pub=((S.D.tm[grp.id]||{}).repPub||{}).t1;
+  const fin=((S.D.tm[grp.id]||{}).repFinal||{}).t1,when=v=>esc(new Date(v).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(v).toTimeString().slice(0,5));
   const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${pub
       ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">📣 Draft published ${esc(new Date(pub).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(pub).toTimeString().slice(0,5))}: every student of ${esc(grp.name)} can open theirs on their board</span><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide the drafts again</button>`
-      :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Not published: students see theirs only while you press 📄 Show draft reports in class mode</span><button data-do="reppub" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">📣 Publish the draft</button>`}</div>`;
+      :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Not published: students see theirs only while you press 📄 Show draft reports in class mode</span><button data-do="reppub" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">📣 Publish ${fin?"the reports":"the draft"}</button>`}</div>`;
+  const finBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center">${fin
+      ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">✅ Final version since ${when(fin)}: students see the report as it is saved, without "draft". A 🔄 Rebuild still changes it.</span><button class="chip" data-do="repfin" data-g="${grp.id}" data-v="0">✏️ Back to draft</button>`
+      :`<button data-do="repfin" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">✅ Make these the final version</button><span class="muted" style="font-size:13px">Now a draft: each report changes with the student's work.</span>`}</div>`;
   const rb=REPS.rb===grp.id,dn=REPS.done&&REPS.done.g===grp.id?REPS.done:null;
   const rbBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center"><button data-do="reprb" data-g="${grp.id}" ${REPS.rb?"disabled":""} style="background:#1d4ed8;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${rb?"⏳ Rebuilding…":"🔄 Rebuild the reports"}</button>`
     +`<span class="muted" style="font-size:13px">${dn?`✅ ${dn.one?"1 report":dn.n+" reports"} rebuilt ${esc(new Date(dn.at).toTimeString().slice(0,5))}.`:"Works out every report again from the students' work, with fixed sentences in your voice (no AI): the lines that quote their mistakes and this list too."}</span></div>`;
-  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
+  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}${finBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
     +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
@@ -7354,7 +7366,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=S.reps=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
     tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
-    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reprb:()=>repRebuild(k.g),reprb1:()=>repRebuild(k.g,k.v),reppub:()=>repPublish(k.g,k.v==="1"),
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reprb:()=>repRebuild(k.g),reprb1:()=>repRebuild(k.g,k.v),repfin:()=>repFinal(k.g,k.v==="1"),reppub:()=>repPublish(k.g,k.v==="1"),
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?termLss(EL_LS.filter(l=>l.course===g.course),k.t,g.id):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},
