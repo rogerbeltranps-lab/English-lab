@@ -289,7 +289,7 @@
     endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure next term will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que el proper trimestre anirà encara millor." },
     endFresh: { when: "Close: none of the activities due is done", en: "Next term is a fresh start, and I'm here to help you every step of the way.", ca: "El proper trimestre és un nou començament, i sóc aquí per ajudar-te en cada pas." },
     endBelieve:{ when: "Close: the activities were late or at the last minute, or everyday work Not satisfactory or Satisfactory", en: "I know you can do it: with a little work every week, you'll see the difference. I'm here to help you.", ca: "Sé que ho pots aconseguir: amb una mica de feina cada setmana, veuràs la diferència. Sóc aquí per ajudar-te." },
-    endThanks:{ when: "Close: any other case", en: "Thank you for your work this term. I'm looking forward to next term with you!", ca: "Gràcies per la feina d'aquest trimestre. Tinc moltes ganes de continuar el proper trimestre amb tu!" },
+    endThanks:{ when: "Close: any other case", en: "Thank you for your work this term. Let's keep learning together!", ca: "Gràcies per la feina d'aquest trimestre. Seguim aprenent!" },
     bye:      { when: "Always, the very last sentence", en: "See you in class!", ca: "Ens veiem a classe!" } };
   const DEG = { en: ["Not satisfactory (No assoliment)", "Satisfactory (Assoliment satisfactori)", "Very good (Assoliment notable)", "Excellent (Assoliment excel·lent)"],
     ca: ["No assoliment", "Assoliment satisfactori", "Assoliment notable", "Assoliment excel·lent"] };
