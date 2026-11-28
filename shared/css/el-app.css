@@ -1,4 +1,4 @@
-@import url("el-phone.css");   /* the phone look (≤640 px only): tab bar, Me place, touch sizes; el-phone.css */
+@import url("el-phone.css?v=20261128p");   /* the phone look (≤640 px only): tab bar, Me place, touch sizes; el-phone.css */
 /* a mark el-app.js reads to know this file reached the page: if a load failed (the site was being updated), it loads it again */
 :root{--el-app-css:1}
 /* English Lab as an app (Roger, 6 Nov 2026: "I want everything to look like an app for them even though they connect through a
