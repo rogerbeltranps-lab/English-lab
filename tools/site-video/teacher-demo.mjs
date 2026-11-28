@@ -160,6 +160,37 @@ D.fpg = {};
   }
 }
 
+// 🚩 Possible problems (Roger, 28 Nov 2026: "a place to see the possible problems like redo, copying"): a possible copy waiting, work sent
+// back (by Beltran: mostly pasted, not a real try; by the teacher), one handed in again, a copy accepted, a recall checkpoint sent by
+// itself, and 4 ESO B's LS2 web exam tries with the ⚠️ checks (D.ex). No rnd() calls, so the rest of the demo stays the same.
+{ const at = (d, h, m = 0) => new Date(Date.UTC(2026, 10, d, h, m)).toISOString(), ls4 = LS2['4eso'], ls2 = LS2['2eso'];
+  const c4 = CAT.find((a) => a.id === '4eso/ls2-celebrations-around-the-world'), t4 = CAT.find((a) => a.id === '4eso/ls2-where-traditions-come-from'), d2 = CAT.find((a) => a.id === '2eso/ls2-what-are-they-doing');
+  const B = Object.values(D.st).filter((s) => s.group === '4ESOB'), A2 = Object.values(D.st).filter((s) => s.group === '2ESOA');
+  const step = (s, a, k, h) => { const pg = (D.pg[s.uid] = D.pg[s.uid] || {}), L = (pg[a.ls] = pg[a.ls] || {}), st = JSON.parse(L[a.keys[0]] || '{}'); st.steps = st.steps || {}; st.steps[k] = h; L[a.keys[0]] = JSON.stringify(st); };
+  const flag = (s, a, k, f) => { const r = (D.rs[s.uid][a.id] = D.rs[s.uid][a.id] || { ls: a.ls, activity: a.id }); r.flags = Object.assign({}, r.flags, { [k]: f }); };
+  const TXT = 'Diwali is the festival of lights. It is celebrated in India in October or November and it lasts five days. People clean their houses, light oil lamps and share sweets with their families.';
+  const W = (s, a, date, ty) => step(s, a, 'write', { title: 'Writing', w: 1, date, ty, f: [{ l: 'My text', v: TXT }] });
+  if (B[8]) { W(B[8], c4, at(27, 16, 51), { p: 495, k: 26, s: 180 }); flag(B[8], c4, 'write', { why: 'written in 3 minutes: 26 keys for 521 characters, 495 pasted', at: at(27, 16, 54), ty: { p: 495, k: 26, s: 180 }, lv: {}, fb: '' }); }
+  if (B[9]) { step(B[9], t4, 'chart', { title: 'Listening chart', date: at(24, 9, 40), f: [{ l: 'Where', v: 'a' }, { l: 'When', v: 'a' }, { l: 'Why', v: 'a' }] });
+    flag(B[9], t4, 'chart', { done: 'redo', reopen: true, auto: true, why: 'one letter in every box', back: 'Please write a real answer in each box and hand it in again.', at: at(25, 16, 43) }); }
+  if (B[10]) { W(B[10], c4, at(16, 18, 2), { p: 610, k: 12, s: 60 }); flag(B[10], c4, 'write', { why: 'mostly pasted: 610 of 640 characters', done: 'redo', auto: true, at: at(18, 16, 43) }); }
+  if (B[11]) { W(B[11], c4, at(23, 19, 10), { p: 0, k: 640, s: 1500 }); flag(B[11], c4, 'write', { why: 'mostly pasted: 590 of 600 characters', done: 'redo', auto: true, at: at(18, 16, 43) }); }
+  if (B[12]) { W(B[12], c4, at(12, 17, 0), { p: 120, k: 400, s: 900 }); flag(B[12], c4, 'write', { why: 'a long sentence pasted in the middle', done: 'accepted', at: at(13, 16, 43) }); }
+  if (A2[8]) { step(A2[8], d2, 'write', { title: 'Writing', w: 1, date: at(19, 12, 30), f: [{ l: 'My text', v: 'In the photo they are play football.' }] });
+    flag(A2[8], d2, 'write', { done: 'redo', back: 'Please write it again in your own words: two or three sentences about the photo.', at: at(20, 18, 5) }); }
+  // a recall checkpoint sent by itself (left the page) after three quick glances
+  const cp = CAT.find((a) => a.id === '4eso/ls2-recall-checkpoint-1');
+  if (cp && B[13]) { const key = cp.keys[0];
+    D.ck[key] = { items: { q1: { a: ['went'], q: 'Yesterday we ___ (go) to the parade.' }, q2: { a: ['on'], q: 'We exchange gifts ___ Christmas Day.' }, q3: { a: ['which', 'that'], q: 'The lamp ___ we lit was red.' } } };
+    (D.cp[B[13].uid] = D.cp[B[13].uid] || {})[key] = { level: 'safe', ids: ['q1', 'q2', 'q3'], answers: ['went', 'on', 'which'], times: [12, 9, 15], started: at(17, 10, 31), sent: at(17, 10, 33), auto: 'left',
+      leaves: [{ at: at(17, 10, 31, 40), ms: 900 }, { at: at(17, 10, 32), ms: 1200 }, { at: at(17, 10, 32, 30), ms: 700 }] }; }
+  // 4 ESO B's LS2 web exam (Mon 23 Nov, class 15:00 Madrid = 14:00 UTC): one from home in the evening, one on a phone, one very fast, one who left full screen
+  D.ex = {};
+  B.slice(0, 8).forEach((s, i) => { const st = i === 1 ? at(23, 19, 40) : at(23, 14, 4 + (i % 3)), mins = i === 3 ? 11 : 38 + i;
+    D.ex[s.uid] = { key: 'ls2Exam4ESO', status: 'done', paper: 'core-A', started: st, done: new Date(Date.parse(st) + mins * 60e3).toISOString(), env: { dev: i === 2 ? 'mobile' : 'cros', net: i === 1 ? '9f31c0aa' : '5e0d27b4' },
+      exits: i === 4 ? [{ at: at(23, 14, 21), why: 'fullscreen', back: at(23, 14, 23) }, { at: at(23, 14, 30), why: 'left', back: at(23, 14, 31) }] : [] }; });
+}
+
 // 📐 Levels NA–AE (EL_DEMO_LV=1; Roger, 24 Nov 2026): term 1 of the demo counts levels from 1 Nov, so the Learning paths table shows the chips
 if (process.env.EL_DEMO_LV) Object.values(D.tm).forEach((t) => { t.formative = { t1: 'levels', from: '2026-11-01' }; });
 // …and every tab of 4 ESO LS2's first three paths was done in class on 5 Nov in 4 ESO A (Time plan ticks), so their two weeks are over

@@ -850,6 +850,7 @@ window.EL_TMENU=[
   ["lss","🧭","Learning situations",{g:"lss"},"Every LS by course: its learning paths, groups, status and materials"],
   "sep",
   ["corr","✏️","Corrections",{g:"corr"},"What Beltran corrected and when, what is still waiting, and Correct everything waiting now"],
+  ["flg","🚩","Possible problems",{g:"flg"},"Possible copies waiting for you, work sent back to redo, and checkpoints or exam tries that look odd: everything to keep an eye on, in one place"],
   ["week","📅","Time plan",{p:"week"},"Every group's week and exam day"],
   ["msgs","💬","Messages",{p:"msgs"},"Announcements, problems and ideas"],
   ["tt","🗓","Timetable",{p:"tt"},"Your classes with each group, days off"],
@@ -864,10 +865,10 @@ window.EL_TMENU=[
   "tn"
 ];
 window.EL_TMENU_TN=["tn","✦","Towards Nativeness",{g:"tn"},"Your own C1 → C2 course: progress, Roig's corrections and your recurring mistakes"];
-// what the dashboard showed last on this browser: {t, n:{group:"29/29"}, ask:{group:n}, corr:{n,late}, msgs:{n,late}, mt, tn}; the
+// what the dashboard showed last on this browser: {t, n:{group:"29/29"}, ask:{group:n}, corr:{n,late}, msgs:{n,late}, flg:{n,late}, mt, tn}; the
 // waiting counts only while fresh (12 hours), so an old number never stays on the menu for days
 window.elTmCache=function(){let c=null;try{c=JSON.parse(localStorage.getItem("el_tmenu")||"null")}catch(e){}c=c&&typeof c==="object"?c:{};
-  if(!(Date.now()-(c.t||0)<12*3600e3)){delete c.corr;delete c.msgs;delete c.ask}return c};
+  if(!(Date.now()-(c.t||0)<12*3600e3)){delete c.corr;delete c.msgs;delete c.ask;delete c.flg}return c};
 // o: {root (the site root URL; "" on teacher.html), dash (teacher.html: buttons with data-do), on (the key that is on), cls ({key: extra
 // class}), extra ({key: html after the label}), counts ({group: "29/29"}), asks ({group: html}), none (html of the No group button, dash
 // only), mt (maintenance on), tn (✦ Towards Nativeness), list (true: the items as data, for the narrow strip of icons)}
@@ -876,7 +877,7 @@ window.elTeacherMenu=function(o){
   const C=o.dash?{}:elTmCache(),mt=o.dash?!!o.mt:!!C.mt,tn=o.dash?!!o.tn:!!C.tn,cls=Object.assign({},o.cls),extra=Object.assign({},o.extra),counts=o.counts||C.n||{},asks=o.asks||{};
   if(mt){cls.mt=((cls.mt||"")+" mton").trim();extra.mt=(extra.mt||"")+'<small class="mt">ON</small>'}
   if(!o.dash){const b=(x,n)=>x&&x.n?`<small class="${x.late?"late":""}" title="${x.n} ${n}">${x.n}</small>`:"";
-    if(!extra.corr)extra.corr=b(C.corr,"waiting to be corrected");if(!extra.msgs)extra.msgs=b(C.msgs,"new");
+    if(!extra.corr)extra.corr=b(C.corr,"waiting to be corrected");if(!extra.flg)extra.flg=b(C.flg,"possible copies waiting for you");if(!extra.msgs)extra.msgs=b(C.msgs,"new");
     Object.entries(C.ask||{}).forEach(([g,n])=>{if(n&&!asks[g])asks[g]=` <small class="ask" title="${n} student${n>1?"s":""} asked for a level change">🎯 ${n} level ask${n>1?"s":""}</small>`})}
   const href=w=>w.href?R+w.href:w.do?D+"?do="+w.do:w.p?D+"?g=plan&p="+w.p:D+"?g="+w.g;
   const att=w=>w.href?`href="${R+w.href}"`:w.do?`data-do="${w.do}"`:w.p?`data-do="hplace" data-p="${w.p}"`:`data-do="tab" data-g="${w.g}"`;
