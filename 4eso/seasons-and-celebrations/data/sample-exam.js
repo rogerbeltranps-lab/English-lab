@@ -16,7 +16,6 @@ const TABLE = {
     ROW('3 Vocabulary: 14 preguntes (2,5 punts cada una)', 35) + ROW('4 Grammar: 10 preguntes (1,5 punts cada una)', 15) + ROW('5 Writing: descriu una celebració', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>',
   en: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 questions + listening chart, 5 questions (2 points each)', 20) + ROW('2 Reading: 5 questions + reading log, 5 questions (2 points each)', 20) +
     ROW('3 Vocabulary: 14 questions (2.5 points each)', 35) + ROW('4 Grammar: 10 questions (1.5 points each)', 15) + ROW('5 Writing: describe a celebration', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>' };
-const SHADOW_VIDEO = '<video controls preload="none" playsinline poster="video/shadowing-poster.jpg" src="video/shadowing.mp4" style="width:100%;border-radius:14px;margin:8px 0;background:#000"></video>';
 const SCRIPT = [
   ['Callum', '[cheerful] Hi, I’m Callum, from Edinburgh in Scotland. In Scotland, New Year’s Eve is called Hogmanay, and for us it’s bigger than Christmas! There’s a huge street party in the city centre, with concerts and fireworks over the castle at midnight. It’s usually freezing, so you wear about three jumpers. [laughs]'],
   ['Callum', 'Then everyone holds hands and sings an old song, “Auld Lang Syne”. [laughs] Nobody knows all the words! It’s a song about old friends and remembering the good times. After midnight, we go “first-footing”: you visit your neighbours and you’re the first person to walk into their house in the new year.'],
@@ -41,10 +40,6 @@ const AUDIO = { audio: 'audio/sample-exam-new-year.mp3', title: 'Two New Years: 
 window.LP = {
   key: 'ls2SampleExam4ESO', n: 'E', title: 'Sample exam 1',
   panels: [
-    // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
-    { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
-      html: { ca: '<p>Un repàs de 6 minuts per escoltar i parlar: frases de les escoltes de la unitat. Escolta, repeteix en veu alta i torna-ho a fer sense text. El vídeo t’espera.</p>' + SHADOW_VIDEO,
-        en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
       html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong>. Només surt el que hem fet a classe: <strong>LP1 Getting started</strong>, <strong>LP2 Celebrations around the world</strong> i el vocabulari i la gramàtica (Past Simple / used to) de <strong>LP3 Where traditions come from</strong>. 55 minuts, sense apunts.</p>' + TABLE.ca +
         '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El text no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',

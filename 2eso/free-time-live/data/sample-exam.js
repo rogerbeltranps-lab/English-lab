@@ -17,7 +17,6 @@ const TABLE = {
     ROW('3 Vocabulary: 14 preguntes (2,5 punts cada una)', 35) + ROW('4 Grammar: 10 preguntes (1,5 punts cada una)', 15) + ROW('5 Writing: un post per al blog de la classe', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>',
   en: '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + ROW('1 Listening: 5 questions + listening chart, 5 questions (2 points each)', 20) + ROW('2 Reading: 5 questions + reading log, 5 questions (2 points each)', 20) +
     ROW('3 Vocabulary: 14 questions (2.5 points each)', 35) + ROW('4 Grammar: 10 questions (1.5 points each)', 15) + ROW('5 Writing: a post for the class blog', 10) + ROW('<strong>Total</strong>', '<strong>100</strong>') + '</tbody></table>' };
-const SHADOW_VIDEO = '<video controls preload="none" playsinline poster="video/shadowing-poster.jpg" src="video/shadowing.mp4" style="width:100%;border-radius:14px;margin:8px 0;background:#000"></video>';
 const SCRIPT = [
   ['Ellie', '[cheerful] Hi everyone, I’m Ellie and welcome to my vlog! Today I’m at the town theatre, because my dance group is in a competition. It’s Saturday afternoon and it’s raining outside, but in here it’s hot and really noisy. I’m wearing my black costume and white trainers, and I’m very nervous!'],
   ['Ellie', 'Right now the group from Girona is dancing on the stage, and they’re really good. We’re next! I usually practise on Tuesdays and Thursdays at the dance school, and I love it. But this month we’re training every day, because we want to win. [laughs] OK, the music is starting. Wish me luck!'],
@@ -41,10 +40,6 @@ const AUDIO = { audio: 'audio/sample-exam-two-vlogs.mp3', title: 'Two vlogs: Ell
 window.LP = {
   key: 'ls2SampleExam2ESO', n: 'E', title: 'Sample exam 1',
   panels: [
-    // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
-    { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
-      html: { ca: '<p>Un repàs de 6 minuts per escoltar i parlar: frases de les escoltes de la unitat. Escolta, repeteix en veu alta i torna-ho a fer sense text. El vídeo t’espera.</p>' + SHADOW_VIDEO,
-        en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és el primer examen', en: 'How the first exam works' },
       html: { ca: '<p>Aquesta pràctica té <strong>el mateix format i els mateixos punts que el primer examen</strong> (el faràs al web, en mode examen). Només surt el que hem fet a classe: <strong>LP1 Getting started</strong> i <strong>LP2 What are they doing?</strong> 55 minuts, sense apunts.</p>' + TABLE.ca +
         '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El post no té nota en aquesta pràctica: el botó obre ChatGPT, que et fa una taula de les errades (la correcció i per què) i et torna el text corregit. Al final, a <em>La meva nota</em>, veuràs el total.</p>',
