@@ -118,9 +118,10 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
   for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);
     let h=null;try{h=(JSON.parse(st.data[a.keys[0]]||"{}").steps||{})[m.step]}catch(e){}
     const lv=((st.res.levels||{})[m.step])||{},f=((st.res.flags||{})[m.step]);
-    const waits=!!f&&!(f.done==="redo"&&h&&h.date>f.at);   // a possible copy waiting for the teacher (as mkWaits in teacher.html)
+    const waits=!!f&&(!f.done||f.done==="redo"&&!(h&&h.date>f.at));   // a possible copy waiting for the teacher, or sent back and not handed in again (as mkWaits in teacher.html); accepted or "kept" (↩ No need to redo) is marked
+    const kept=!!f&&f.done==="kept";   // Roger took the redo back (↩ No need to redo, 28 Nov 2026): never flagged or sent back again
     const again=!!h&&!!(st.res.marked||{})[m.step]&&h.date>st.res.marked[m.step];   // handed in again after the sheet marked it (as mkAgain)
-    if(h&&(!m.c.every(c=>lv[c])||again)&&!waits&&taught(a,grp.id,m.step))out.push({s,h,route:st.route,exam:st.exam})}
+    if(h&&(!m.c.every(c=>lv[c])||again)&&!waits&&taught(a,grp.id,m.step))out.push({s,h,route:st.route,exam:st.exam,kept})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
   return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,atOnce:m.atOnce})}
@@ -148,7 +149,7 @@ async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.
       if((res.fbSig||{})[step]===v)continue;                               // this version is corrected
       if((res.replies||{})[step]&&!(res.fbSig||{})[step])continue;          // the teacher answered it by hand
       const fl=(res.flags||{})[step];if(fl&&!fl.done||fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))continue;   // a possible copy waiting for the teacher, or redone in class and not handed in again
-      (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title,mode:it.mode})}}
+      (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title,mode:it.mode,kept:!!fl&&fl.done==="kept"})}}
   for(const k in out)out[k].sort((x,y)=>x.s.uid<y.s.uid?-1:1);return out}
 const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing"};
 // A writing's correction also gives a 5.1 level (Roger, 21 Nov 2026: corrected writings count in the Writing skill and criterion 5.1):
@@ -317,6 +318,7 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
   const LV=sh.lvc.length>0;   // a writing: its 5.1 level is saved with the correction; a speaking: its 3.2 level
   const rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code);x.fb=unmk(row.s.uid,x.fb);x.flag=unmk(row.s.uid,x.flag);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
+    if(row.kept&&x.flag){console.log("  "+x.code+": Roger said no need to redo (↩ kept): not flagged again");x.flag=""}
     if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);
     else if(row.mode==="surprise"||row.mode==="shadow")x.fb=W.ELMark.sqText(x.fb);   // 🎲 one sentence + "➜ " things to improve (el-corrections.js)   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
@@ -347,7 +349,8 @@ else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,s
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
   const r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:m.a,step:m.step,crits:m.c,codes:sh.codes});if(r.err)throw new Error(r.err);
   const a=W.EL_CATALOG.find(x=>x.id===m.a),rk=a.id.replace("/","__");
-  for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s;x.fb=unmk(s.uid,x.fb);x.flag=unmk(s.uid,x.flag);x.redo=unmk(s.uid,x.redo);const fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
+  for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s;x.fb=unmk(s.uid,x.fb);x.flag=unmk(s.uid,x.flag);x.redo=unmk(s.uid,x.redo);
+    if(row.kept&&(x.flag||x.redo)){console.log("  "+x.code+": Roger said no need to redo (↩ kept): not flagged or sent back again");x.flag="";x.redo=""}const fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     if(x.redo){console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+" · ↺ NOT A REAL TRY: sent back to redo ("+x.redo+")");if(!flags.has("--apply"))continue;
       // 📐 Roger, 24 Nov 2026 ("Gaming the system"): its NA is saved, and it goes back as the dashboard's ↺ Redo does (hbBack): the step counts
       // as not done until it is handed in again, within a week of today (elHandInBy), and the new hand-in is marked again
@@ -384,6 +387,22 @@ else if(cmd==="comments"||cmd==="answer"){const its=await comments();
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
     if(NEW&&flags.has("--apply"))await cmtDone();
     console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.filter(x=>x.kind==="ANSWER").length} answers · ${r.rows.filter(x=>x.kind==="FORYOU").length} for the teacher · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}}
+// 🔎 Leave it to Roger (Roger, 28 Nov 2026: "I want only have to check the problems that you want me to verify when you detect any thing
+// new, or when you cant be sure and want me to analyse it"): a hand-in Beltran can't be sure about, or a kind of problem he hasn't seen
+// before, goes to the dashboard's 🚩 Possible problems › 👉 Check these (and its red number): flags[step] = {why, kind, lv: {}, at}, no done.
+// Nothing goes to the student and the step is not corrected until Roger presses ✓ Accept (the next run corrects it) or ↺ Redo.
+// Anything Beltran is sure about is not asked: it is done (corrected, or sent back with redo) and Roger only reads it.
+//   node tools/marking/marks.mjs ask <student> <activity> <step> --kind "short name of the problem" --why "what to look at" [--apply]
+else if(cmd==="ask"){const [who,aid,step]=args,pre=String(who||"").replace(/^S-/,""),ss=studs.filter(x=>pre&&x.uid.startsWith(pre)),a=W.EL_CATALOG.find(x=>x.id===aid);
+  if(ss.length!==1)throw new Error(ss.length?"More than one student starts with "+pre:"No student "+who);if(!a||!step)throw new Error("Unknown activity or step: "+aid+" "+step);
+  const arg=k=>{const i=process.argv.indexOf(k);return i>0?String(process.argv[i+1]||"").trim():""},why=arg("--why"),kind=arg("--kind"),s=ss[0],rk=a.id.replace("/","__");
+  if(!why||!kind)throw new Error("Say what Roger should look at: --kind \"…\" --why \"…\"");
+  const res=doc(await api("GET",DOCS+`students/${s.uid}/results/${rk}`))||{},f=(res.flags||{})[step],at=new Date().toISOString();
+  if(f&&!f.done){console.log("S-"+pre+" · "+a.id+" · "+step+": already waiting for Roger ("+(f.kind||"possible copy")+")");process.exit(0)}
+  console.log((flags.has("--apply")?"✓ ":"→ ")+"S-"+pre+" · "+a.id+" · "+step+" · 🔎 for Roger to check: "+kind+" · "+why);
+  if(flags.has("--apply"))await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+    {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},flags:fsv({[step]:{why,kind,lv:{},at}})}});
+  else console.log("Nothing written: run again with --apply.")}
 // ↺ Redo straight away (Roger, 25 Nov 2026: "always when you detect that they've done sth like this, you must ask them to redo it"):
 // a hand-in that is not a real try (filler letters, "no", blank-looking boxes), seen in any run (a comment, a report, marking), goes back
 // as the dashboard's ↺ Redo does (hbBack in teacher.html): flags[step] = {done:"redo", reopen:true, back, why, at, auto:true} + the note
@@ -394,6 +413,7 @@ else if(cmd==="redo"){const [who,aid,step]=args,pre=String(who||"").replace(/^S-
   const s=ss[0],wi=process.argv.indexOf("--why"),why=wi>0?process.argv[wi+1]:"not a real try",rk=a.id.replace("/","__");
   const lvs=Object.fromEntries(((await api("GET",DOCS+`students/${s.uid}/levels`))?.documents||[]).map(d=>[d.name.split("/").pop(),doc(d)])),route=W.elRouteOf(lvs,a.ls).level;
   const res=doc(await api("GET",DOCS+`students/${s.uid}/results/${rk}`))||{},old=String((res.replies||{})[step]||"").trim(),at=new Date().toISOString();
+  const kf=(res.flags||{})[step];if(kf&&kf.done==="kept"&&!flags.has("--force")){console.log("S-"+pre+" · "+a.id+" · "+step+": Roger said no need to redo (↩ kept "+String(kf.keptAt||"").slice(0,10)+"): not sent back. --force only if he asks.");process.exit(0)}
   const note=!route||CA_RT.includes(route)?"Les teves respostes no estan fetes: torna a fer aquest pas amb les teves paraules i torna’l a entregar.":"Your answers aren't finished: do this step again in your own words and hand it in again.";
   console.log((flags.has("--apply")?"✓ ":"→ ")+"S-"+pre+" · "+a.id+" · "+step+" · ↺ sent back to redo ("+why+") · note: "+note);
   if(flags.has("--apply"))await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),

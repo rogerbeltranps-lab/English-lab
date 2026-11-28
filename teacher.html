@@ -155,6 +155,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .ctw{max-height:62vh}table.ctab{width:100%}table.ctab td,table.ctab th{text-align:left;vertical-align:top;font-size:13.5px}table.ctab td.ctn{min-width:150px}table.ctab td.ctg{white-space:nowrap;font-weight:600}table.ctab td.ctd{min-width:150px;width:1%}table.ctab td.ctd .cchip{display:block;margin:0 0 3px;white-space:nowrap}table.ctab tbody+tbody tr:first-child td{border-top:2px solid #cbd5e1}.cfind{flex:1 1 200px;max-width:280px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;font:inherit;font-size:14px}
 /* 🚩 Possible problems (flgPage) */
 .flsums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 12px}a.flsum{min-width:0;white-space:normal;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#0f172a;text-decoration:none}
+.flsums.one{grid-template-columns:minmax(140px,280px)}.flinfo{margin:4px 0 6px;font-size:13px;color:#475569}.flinfoh{margin:22px 0 4px;padding-top:14px;border-top:2px dashed #cbd5e1;color:#334155}#flback,#flcp,#flex,#fldone{background:#f8fafc}
 a.flsum,a.flsum *{text-decoration:none}a.flsum b{font-size:1.25rem}a.flsum span{font-size:13px;color:#475569}a.flsum.hot{background:#fef2f2;border-color:#fca5a5}a.flsum.hot b{color:#b91c1c}a.flsum:hover{border-color:#94a3b8}
 .flsec{margin-bottom:12px;scroll-margin-top:12px}.flcnt{font-weight:700;color:#475569}.flnone{color:#166534;font-weight:600;margin:4px 0}.flex{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:4px 0 8px}
 .flr{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:flex-start;padding:9px 0;border-top:1px solid #eef2f7;font-size:14px}.flr[hidden]{display:none}
@@ -1047,11 +1048,12 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   // Speaking and Talk (Roger, 7 Nov 2026: "what's going on here?" on "pasted 0 · 0 keys · 0 s"): their transcript comes from the microphone,
 // so the log shows only when something was pasted into it (then it was not spoken). Empty writing logs are left out too.
 // rich: a correction with the table (✗ rows, ✅ corrected text) shows the first text inside it; plain feedback (a Reading log's comment) shows every answer below it
-  const t=(x.replies||{})[step],rich=/^(✗|✅) /m.test(String(t||"")),fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
+  const t=(x.replies||{})[step],rich=/^(✗|✅) /m.test(String(t||"")),fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!=="kept"&&fs!==sigOf(JSON.stringify(f));
   const mo=(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).some(m=>m.a===aid&&m.step===step),canBack=!!f.length&&!mo&&isWriting(a,step,pstate(u,a))&&!(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")));
   const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty&&(/speak|talk/.test(step)?+it.ty.p>0:(it.ty.p||it.ty.k||it.ty.s))?`<p class="muted">${/speak|talk/.test(step)?"⚠️ Pasted into the transcript box (speech recognition never pastes)":"✍️ Writing log"}: ${esc(ELMark.tyText(it.ty))}</p>`:"";
-  const back=fl&&fl.back&&fl.done==="redo"?`<p class="muted">↩ <b>You sent it back</b>${fl.at?" on "+on(fl.at):""}: “${esc(fl.back)}”</p>`:"";
-  const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
+  const back=fl&&fl.back&&fl.done==="redo"?`<p class="muted">↩ <b>You sent it back</b>${fl.at?" on "+on(fl.at):""}: “${esc(fl.back)}”</p>`
+    :fl&&fl.back&&fl.done==="kept"?`<p class="muted">↩ <b>You said no need to redo</b>${fl.keptAt?" on "+on(fl.keptAt):""}: “${esc(fl.keptNote||"")}”</p>`:"";
+  const copy=fl&&fl.why&&!fl.back?`<p class="muted">${fl.kind?"🔎 <b>"+esc(fl.kind)+"</b>":"⚠️ <b>Possible copy</b>"}${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):fl.done==="kept"?"you said no need to redo":"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
   // 🤖 Roig's feedback on a recording (Roger, 17 Nov 2026: "I also want to be able [to see] Gemini's corrections and feedback"): the notes
   // Roig wrote when the recording was handed in (field "Notes from the recording", el-mic.js → school script "audio") go in their own box
   // right under the player, before the Wednesday correction; the transcript is labelled as Roig's. Only the teacher sees the name Roig.
@@ -2800,7 +2802,7 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
       // possible copies waiting for the teacher (Claude does not correct them again: Accept or Redo in the To do)
       Object.entries(fl).forEach(([step,f])=>{if(f&&f.why&&!f.done)wait.push(Object.assign({step,k:"copy",name:corrNm(a.id,step),ready:false,at:tms(f.at)},base))});
       // history
-      Object.entries(x.fbSig||{}).forEach(([step,v])=>{if(!v||v==="redo")return;const at=(x.fbAt||{})[step];done.push(Object.assign({step,k:ckOf(step,items[step]),name:(items[step]||{}).title||corrNm(a.id,step),at:tms(at||x.updated),approx:!at},base))});
+      Object.entries(x.fbSig||{}).forEach(([step,v])=>{if(!v||v==="redo"||v==="kept")return;const at=(x.fbAt||{})[step];done.push(Object.assign({step,k:ckOf(step,items[step]),name:(items[step]||{}).title||corrNm(a.id,step),at:tms(at||x.updated),approx:!at},base))});
       Object.entries(x.marked||{}).forEach(([step,at])=>{if(ms.some(m=>m.step===step))done.push(Object.assign({step,k:"level",name:corrNm(a.id,step),at:tms(at)},base))});
       Object.entries(fl).forEach(([step,f])=>{if(!f||!f.at)return;if(f.auto&&f.done==="redo")done.push(Object.assign({step,k:"back",name:corrNm(a.id,step),at:tms(f.at)},base));
         else if(f.why&&!f.back&&!f.auto)done.push(Object.assign({step,k:"copy",name:corrNm(a.id,step),at:tms(f.at)},base))});
@@ -2956,12 +2958,18 @@ function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
 // side menu under ✏️ Corrections, with every warning the dashboard already knows, so they are no longer mixed into the long ✏️ Beltran's
 // corrections table. Nothing new is worked out or saved: it reads what the dashboard has loaded (no Firestore reads), except 🔍 Check the
 // exam tries, which reads the students' web exams once, the same read as opening a web exam box, and only when pressed.
-//  • 👉 Waiting for you: possible copies Beltran left to you (results.flags[step] = {why, at}, no done): ⚠️ Check it opens cpOpen (Accept or Redo).
+// Only 👉 Check these needs Roger (Roger, 28 Nov 2026: "I want only have to check the problems that you want me to verify when you detect
+// any thing new, or when you cant be sure and want me to analyse it, the other, I can read them and change whatever I want, Like sending a
+// message saying they dont need to redo"): it alone counts in the red number; the rest is under 📖 For your information, to read, and on
+// every line sent back to redo ↩ No need to redo takes the redo back (flgKeep: flags[step].done "kept") with a message to the student.
+//  • 👉 Check these: what Beltran left to Roger because he couldn't be sure (results.flags[step] = {why, at}, no done: a possible copy) or
+//    a kind of problem he hasn't seen before (the same, plus kind = its name: marks.mjs ask). ⚠️ Check it opens cpOpen (Accept or Redo).
 //  • ↺ Sent back to redo, waiting for the student: flags[step].done "redo" and nothing handed in since (who sent it back, why, how long ago).
 //    auto = Beltran (reopen: not a real try; otherwise mostly pasted); not auto = Roger (↩ Send it back, ↺ Redo, or Redo on a possible copy).
 //  • 🎯 Recall checkpoints that look odd: far above the student's usual level (cpGap), sent by itself because they left the page, 3+ glances.
 //  • 📝 Web exam tries that look odd: the ⚠️ check of the web exam box (wxHome) and every exit from the exam (full screen, another tab, reload).
-//  • ✅ Dealt with (folded): handed in again after a redo, possible copies accepted as their own work, exam tries set aside for a make-up.
+//  • ✅ Dealt with (folded): handed in again after a redo, possible copies accepted as their own work, redos taken back (↩ No need to redo),
+//    exam tries set aside for a make-up.
 const FLG={ex:null,busy:false,err:null,d:null,t:0,v:null};S.flgG="all";
 const FLGSTEP={read:"Reading",log:"Reading log",listen:"Listening",chart:"Listening chart",write:"Writing",speak:"Speaking",talk:"Talk",shadow:"Shadowing",reflect:"Reflection",grammar:"Grammar",mixed:"Mixed practice",practice:"Practice",recall:"Recall warm-up",check:"Checkpoint"};
 const flgStep=(a,step)=>((a.steps||[]).find(z=>z[0]===step)||[])[1]||(n=>n===step&&FLGSTEP[step]||n)(corrNm(a.id,step));
@@ -2972,17 +2980,18 @@ function flgHanded(u,a,step){const h=handedIn(u,a)[step];if(h&&h.date)return h.d
   try{return (ELMark.fbItems(pstate(u,a),new Set(),/reflect$/.test(a.id)?"reflect":null)[step]||{}).date||null}catch(e){return null}}
 // why a step was sent back, in plain words
 function flgWhy(f){if(f.auto)return f.reopen?{who:"Beltran",t:"Not a real try",d:f.why||f.back||""}:{who:"Beltran",t:"Mostly pasted",d:f.why||""};
-  return f.why&&!f.back?{t:"Possible copy: you sent it back",d:f.why}:{t:"You sent it back",d:f.back||f.why||""}}
+  return f.why&&!f.back?{t:(f.kind||"Possible copy")+": you sent it back",d:f.why}:{t:"You sent it back",d:f.back||f.why||""}}
 function flgScan(){if(FLG.d===S.D&&FLG.v&&Date.now()-FLG.t<4000)return FLG.v;
   const you=[],back=[],cp=[],done=[];
   Object.values(S.P).filter(s=>s.uid&&!s.tester&&GR.some(g=>g.id===s.group)).forEach(s=>{const u=s.uid,grp=GR.find(g=>g.id===s.group),base0={u,gid:grp.id};
     Object.entries(S.D.rs[u]||{}).forEach(([aid,x])=>{const a=byId(aid);if(!a||!a.keys||!a.keys.length||!a.ls.startsWith(grp.course+"-"))return;
       Object.entries((x&&x.flags)||{}).forEach(([step,f])=>{if(!f||typeof f!=="object")return;
         const base=Object.assign({aid,ls:a.ls,step,name:flgStep(a,step),at:tms(f.at),reopen:!!f.reopen},base0);
-        if(f.why&&!f.done)return you.push(Object.assign({k:"copy",t:"Possible copy",d:f.why},base));
+        if(f.why&&!f.done)return you.push(Object.assign({k:"copy",t:f.kind?"🔎 "+f.kind:"Possible copy",d:f.why},base));
+        if(f.done==="kept")return done.push(Object.assign({k:"kept",t:"You said no need to redo",d:f.keptNote||"",at:tms(f.keptAt||f.at)},base));
         if(f.done==="redo"){const w=flgWhy(f),hd=flgHanded(u,a,step),again=hd&&String(hd)>String(f.at||"");
           return (again?done:back).push(Object.assign({k:again?"again":"redo",who:w.who,t:w.t,d:w.d,again:again?tms(hd):0},base))}
-        if(f.done==="accepted"&&f.why)done.push(Object.assign({k:"ok",t:"Possible copy: you accepted it as their own work",d:f.why},base))})});
+        if(f.done==="accepted"&&f.why)done.push(Object.assign({k:"ok",t:f.kind?"🔎 "+f.kind+": you accepted it":"Possible copy: you accepted it as their own work",d:f.why},base))})});
     cat.filter(a=>a.checkpoint&&a.keys&&a.keys[0]&&a.ls.startsWith(grp.course+"-")).forEach(a=>{const d=cpDoc(u,a);if(!d||d.redo)return;
       const K=(S.D.ck||{})[a.keys[0]],gp=K?cpGap(u,a,d,K):null,gl=(d.leaves||[]).length,why=[];
       if(gp&&gp.up)why.push("⚠️ "+gp.t);if(d.auto==="left")why.push("⚡ Sent by itself: they left the page");if(gl>=3)why.push("👀 Left the page "+gl+" times for less than 2 s");
@@ -3023,6 +3032,7 @@ function flgPage(){const {you,back,cp,done}=flgScan(),gf=i=>S.flgG==="all"||i.gi
   const cpB=i=>`<button class="g mini" data-do="flgcp" data-u="${i.u}" data-a="${esc(i.aid)}">Open</button>`;
   const exB=i=>i.k==="exold"?"":`<button class="g mini" data-do="flgex" data-u="${i.u}" data-g="${i.gid}" data-ls="${esc(i.ls)}">Open</button>`;
   const anyB=i=>i.k==="cp"?cpB(i):i.k==="ex"||i.k==="exold"?exB(i):open(i);
+  const keepB=i=>`<button class="g mini" data-do="flgkeep" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" title="Takes the redo back: the step counts as done again and the student gets a message">↩ No need to redo</button>`+open(i);
   const sec=(id,h,n,intro,body,empty)=>`<div class="box flsec" id="${id}"><div class="chead"><h2 style="margin:0">${h}</h2><span class="flcnt">${n||""}</span></div><p class="muted">${intro}</p>${n?body:`<p class="flnone">${empty}</p>`}</div>`;
   const exHead=!X?`<div class="flex"><button class="mini" data-do="flgexload" ${FLG.busy?"disabled":""}>${FLG.busy?"⏳ Checking…":"🔍 Check the exam tries"}</button> <span class="muted">Reads every student's web exam once (the same as opening an exam's 🖥 Web exam box).</span>${FLG.err?` <span class="late">Could not read them: ${esc(FLG.err)}</span>`:""}</div>`
     :!X.all?`<div class="flex"><span class="muted">Only ${lsLabel(EL_LS.find(l=>l.id===X.only))} so far (the exam box you opened).</span> <button class="g mini" data-do="flgexload" ${FLG.busy?"disabled":""}>${FLG.busy?"⏳ Checking…":"🔍 Check every exam"}</button></div>`
@@ -3030,15 +3040,17 @@ function flgPage(){const {you,back,cp,done}=flgScan(),gf=i=>S.flgG==="all"||i.gi
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.flgG===g?"on":""}" data-do="flgg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")
     +`<input id="flgfind" class="cfind" type="search" placeholder="🔍 Find a student" value="${esc(S.flgQ||"")}" autocomplete="off"></div>`;
   const jump=(id,ic,n,t,hot)=>`<a class="flsum${hot&&n?" hot":""}" href="#${id}" data-do="flgjump" data-id="${id}"><b>${ic} ${n==null?"?":n}</b><span>${t}</span></a>`;
-  const sum=`<div class="flsums">${jump("flyou","👉",Y.length,"waiting for you",true)}${jump("flback","↺",B.length,"sent back, not redone yet")}${jump("flcp","🎯",C.length,"checkpoints to look at")}${jump("flex","📝",X?EX.length:null,X?"exam tries to look at":"exams not checked yet")}${jump("fldone","✅",Dn.length,"dealt with")}</div>`;
+  const sum=`<div class="flsums one">${jump("flyou","👉",Y.length,"for you to check",true)}</div><p class="flinfo"><b>📖 For your information</b> · nothing to do: read them when you like and change anything</p>`
+    +`<div class="flsums">${jump("flback","↺",B.length,"sent back, not redone yet")}${jump("flcp","🎯",C.length,"checkpoints that look odd")}${jump("flex","📝",X?EX.length:null,X?"exam tries that look odd":"exams not checked yet")}${jump("fldone","✅",Dn.length,"dealt with")}</div>`;
   setTimeout(flgFind);
-  return `<div class="ph"><h1>🚩 Possible problems</h1><div class="sub">Possible copies, work sent back to redo, and checkpoints or exams that look odd · everything to keep an eye on, in one place</div></div>`
+  return `<div class="ph"><h1>🚩 Possible problems</h1><div class="sub">Only 👉 Check these needs you · the rest is for your information, and you can change anything</div></div>`
     +gchips+sum
-    +sec("flyou","👉 Waiting for you: possible copies",Y.length,"Beltran does not correct these. Open each one to see why (the writing log: how long it took, keys pressed, text pasted) and press <b>✓ Accept</b> if it is their own work or <b>↺ Redo</b> to send it back.",Y.map(i=>row(i,open)).join(""),"Nothing waiting for you. 🎉")
-    +sec("flback","↺ Sent back to redo: waiting for the student",B.length,"Nothing to do: each step counts as not done until the student hands it in again, and then Beltran corrects the new version. Work done from 30 Nov gets one week from the day it is sent back; after that it is NA. ⏰ = sent back more than a week ago.",B.map(i=>row(i,open)).join(""),"Nothing sent back is waiting.")
+    +sec("flyou","👉 Check these",Y.length,"Beltran leaves these to you when he can't be sure (a possible copy) or finds a kind of problem he hasn't seen before. Only these count in the red number. Nothing goes to the student until you decide: open each one to see why (the writing log: how long it took, keys pressed, text pasted) and press <b>✓ Accept</b> if it is fine or <b>↺ Redo</b> to send it back.",Y.map(i=>row(i,open)).join(""),"Nothing for you to check. 🎉")
+    +`<h2 class="flinfoh">📖 For your information</h2><p class="muted" style="margin-top:0">Nothing to do here: Beltran has already dealt with these, or they are only hints. Read them when you like; if you don't agree, change it: <b>↩ No need to redo</b> takes a redo back and sends the student a message, and <b>Open</b> shows the work with every button.</p>`
+    +sec("flback","↺ Sent back to redo: waiting for the student",B.length,"Each step counts as not done until the student hands it in again, and then Beltran corrects the new version. Work done from 30 Nov gets one week from the day it is sent back; after that it is NA. ⏰ = sent back more than a week ago. If it didn't need redoing, press <b>↩ No need to redo</b>.",B.map(i=>row(i,keepB)).join(""),"Nothing sent back is waiting.")
     +sec("flcp","🎯 Recall checkpoints that look odd",C.length,"A hint to look at, never proof: a checkpoint "+CP_GAP+" points or more above the student's usual level (exam marks and recall warm-ups), sent by itself because they left the page, or 3 or more quick glances away. Open it to see every answer and the time on each question; ↺ Let them do it again is there.",C.map(i=>row(i,cpB)).join(""),"No checkpoint looks odd.")
     +`<div class="box flsec" id="flex"><div class="chead"><h2 style="margin:0">📝 Web exam tries that look odd</h2></div><p class="muted">The same ⚠️ check as the exam's 🖥 Web exam box (a different internet connection from the class, started outside class time, not on a Chromebook, finished in under half the usual time) and every time a student left the exam. A hint to look at, never proof. Open shows the try, with ↺ Redo it another day.</p>${exHead}${X?(EX.length?EX.map(i=>row(i,exB)).join(""):`<p class="flnone">No exam try looks odd.</p>`):""}</div>`
-    +`<div class="box flsec" id="fldone">${fold("fldone",`<b>✅ Dealt with</b> <span class="muted">· ${Dn.length}</span>`,`<p class="muted">Handed in again after a redo (Beltran corrects the new version), possible copies you accepted, and exam tries set aside for a make-up.</p>${Dn.length?Dn.map(i=>row(i,anyB)).join(""):`<p class="flnone">Nothing yet.</p>`}`)}</div>`}
+    +`<div class="box flsec" id="fldone">${fold("fldone",`<b>✅ Dealt with</b> <span class="muted">· ${Dn.length}</span>`,`<p class="muted">Handed in again after a redo (Beltran corrects the new version), possible copies you accepted, redos you took back (↩ No need to redo), and exam tries set aside for a make-up.</p>${Dn.length?Dn.map(i=>row(i,anyB)).join(""):`<p class="flnone">Nothing yet.</p>`}`)}</div>`}
 function flgFind(){const q=corrFold(S.flgQ).trim();document.querySelectorAll("#main .flr[data-cn]").forEach(b=>{b.hidden=!!q&&!b.dataset.cn.includes(q)})}
 document.addEventListener("input",e=>{if(e.target.id==="flgfind"){S.flgQ=e.target.value;flgFind()}});
 function flgOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;if(k.k==="copy")return cpOpen(k.u,k.a,k.s);if(k.r)return cellPanel(k.u,k.a);wrOpen(k.u,k.a,k.s)}
@@ -3046,6 +3058,28 @@ function flgOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;if(k.k==="copy")ret
 function flgExOpen(k){const X=flgExDocs(),c=wxCfg(k.ls);if(!c)return;S.g=k.g;S.ls=k.ls;S.tutor="all";S.year=S.reps=false;
   if(X&&!DEMO&&X.by[c.key]){WX.docs=X.by[c.key];WX.old=(X.old||{})[c.key]||{};WX.ls=k.ls;WX.at=Date.now()}
   goPlace("exams");setTimeout(()=>wxDlg(k.u,k.ls),50)}
+// ↩ No need to redo (Roger, 28 Nov 2026: "Like sending a message saying they dont need to redo if I want"): on any step sent back to redo
+// (by Beltran or by Roger). flags[step].done "kept" (keptAt, keptNote; why and back stay for the record), so the step counts as done again
+// (elReopenedSteps only reopens "redo"), the note goes on top of the step (replies; the redo note taken off), shown at once (fbGo, or 🌙
+// held until 7:30). A correction Beltran had already written (flag fb, v, lv: a writing sent back as mostly pasted, a possible copy) goes
+// with it, as ✓ Accept does; otherwise fbSig "kept" lets the next run correct it as it is, and marks.mjs never sends a "kept" step back.
+const FLGKEEP={ca:"No cal que tornis a fer aquest pas: el deixo tal com l’has entregat. 👍",en:"No need to redo this step: I'm keeping it as you handed it in. 👍"};
+function flgKeepDlg(u,aid,step){const a=byId(aid),s=S.P[u],f=(res(u,aid).flags||{})[step];if(!a||!f)return;
+  const r0=level(u,a.ls),L=!r0||r0==="beginners"?"ca":"en",lv=Object.entries((res(u,aid).levels||{})[step]||{}),w=flgWhy(f),hasFb=!!(f.fb&&String(f.fb).trim());
+  const then=hasFb?"It gets the correction Beltran had already written"+(f.lv&&Object.keys(f.lv).length?" and its level":"")+", as ✓ Accept does."
+    :lv.length?`Its level stays ${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]||"inherit"}">${esc(l)}</b>`).join(" ")}: to change it, press Open and use ✏️ Correct it.`
+    :"Beltran corrects it as it is in the next weekday run, and never sends it back again.";
+  dlg(`<h3>↩ No need to redo · ${name(s)}</h3><p class="muted">${esc(flgStep(a,step))} · ${esc(actTitle(aid))} · ${w.who?esc(w.who)+": ":""}${esc(w.t)}${w.d?` · ${esc(String(w.d).slice(0,200))}`:""}</p>
+    <p>The step counts as done again, as it was handed in, and the redo message goes away. ${then}</p>
+    <label style="font-weight:400">The student gets this message on top of the step <small class="muted">(in ${L==="ca"?"Catalan":"English"}, their route's language; you can change it)</small></label>
+    <textarea id="flgkeepnote" style="min-height:60px">${esc(FLGKEEP[L])}</textarea>
+    <div class="row" style="justify-content:flex-start"><button data-do="flgkeepgo" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}">↩ No need to redo: send it</button></div>`)}
+function flgKeep(u,aid,step){const a=byId(aid),ta=$("#flgkeepnote"),msg=ta&&ta.value.trim(),x=res(u,aid),f=(x.flags||{})[step];if(!a||!f||!msg)return;
+  const at=new Date().toISOString(),go=S.hold?new Date(S.hold).toISOString():at,fb=String(f.fb||"").trim();
+  let old=String((x.replies||{})[step]||"").trim();const bk=String(f.back||"").trim();if(bk&&old.startsWith(bk))old=old.slice(bk.length).trim();
+  const was=fb||(f.auto&&!f.reopen?"":old),lv=f.lv&&Object.keys(f.lv).length&&fb?{levels:{[step]:f.lv},marked:{[step]:at}}:{};
+  $("#dlg").close();
+  act(patch(u,aid,Object.assign({flags:{[step]:{done:"kept",keptAt:at,keptNote:msg}},replies:{[step]:msg+(was?"\n\n"+was:"")},fbSig:{[step]:fb&&f.v||"kept"},fbBy:{[step]:null},fbGo:{[step]:go},seen:{[step]:true}},lv)))}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
 // LS1 (only: true) saves no answers per question, so it is not offered.
@@ -3427,7 +3461,7 @@ const mkStuds=grp=>Object.values(S.P).filter(s=>s.group===grp.id&&!s.away&&!s.te
 // teacher accepts it (the levels and the feedback are saved) or asks for it again in class (the student gets a note; their next hand-in
 // goes back to the marking sheet).
 const flagOf=(u,aid,step)=>((res(u,aid).flags||{})[step])||null;
-const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];return !!f&&!(f.done==="redo"&&h&&h.date>f.at)};
+const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];return !!f&&(!f.done||f.done==="redo"&&!(h&&h.date>f.at))};   // accepted, or ↩ No need to redo (kept): not waiting
 // hand-ins of one step still without a level for every criterion of it, or handed in again after the sheet marked them (Roger, 31 Oct
 // 2026: resubmissions are marked again; results/{activity}.marked[step] = when the sheet saved the levels; a level set with the buttons
 // stays). A possible copy waiting for the teacher is left out.
@@ -3482,17 +3516,19 @@ function cpItems(grp){return cpList(grp).map(({s,a,step,f})=>
 const REDO=ELMark.REDO;
 function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
   const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
-  dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <div class="need"><b>👉 What's left for you:</b> decide if it is their own work. Press <b>✔ Accept</b> if it is, or <b>↺ Redo</b> to send it back (at the bottom).</div>
+  const lvn=m&&m.c.every(c=>lv[c]),kd=f.kind;   // kd: a kind of problem Beltran hasn't seen before (marks.mjs ask)
+  dlg(`<h3>${kd?"🔎 "+esc(kd):"⚠️ Possible copy"} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+    <div class="need"><b>👉 What's left for you:</b> ${kd?"Beltran wasn't sure about this one: decide if it is fine":"decide if it is their own work"}. Press <b>✔ Accept</b> if it is, or <b>↺ Redo</b> to send it back (at the bottom).</div>
     <p><b>Why:</b> ${esc(f.why)}${f.at?` <small class="muted">(flagged on ${ELWeek.date(ymd(f.at))})</small>`:""}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
-    <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
+    <p>If it ${kd?"is fine":"is their own work"}, ${m&&!lvn||!m&&!f.fb?"Beltran corrects it as it is in the next weekday run.":m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
     <label style="font-weight:400">↺ Redo sends the student this message <small class="muted">(in ${CA_RT.includes(level(u,S.ls))?"Catalan":"English"}, their route's language; you can change it). Their writing opens again and their next hand-in goes back to ${m?"the marking sheet":"Beltran's correction"}.</small></label>
     <textarea id="cpnote" style="min-height:70px">${esc(cpNote(u,f,h.ty))}</textarea>
-    <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpback">↺ Redo</button></div>`,true);if(!m&&$("#cpfix"))writing($("#cpfix"),f.fb||"",EN,"")}
+    <div class="row" style="justify-content:flex-start"><button data-do="cpok">${kd?"✔ Accept: it's fine":"✔ Accept: it's their work"}</button><button class="g" data-do="cpback">↺ Redo</button></div>`,true);if(!m&&f.fb&&$("#cpfix"))writing($("#cpfix"),f.fb||"",EN,"")}
 const cpNote=(u,f,ty)=>ELMark.redoNote(ty,f.why,CA_RT.includes(level(u,S.ls)));   // the reason from the writing log (el-marking.js)
+// ✔ Accept with no level yet (a new kind of problem, marks.mjs ask): no levels are written, so the next run marks it
 function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accepted":"redo",nb=$("#cpnote"),note=(nb&&nb.value.trim())||cpNote(k.u,k.f,k.f.ty);
-  const ps=k.m?(ok?[patch(k.u,k.aid,{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()},flags:{[k.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
+  const ps=k.m?(ok?[patch(k.u,k.aid,Object.assign({flags:{[k.step]:{done}}},k.f.lv&&Object.keys(k.f.lv).length?{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()}}:{})),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
       :[patch(k.u,k.aid,{flags:{[k.step]:{done}}}),api.reply(k.u,a,k.step,note)])
     // a writing correction: Accept sends it as the version corrected (fbSig), so a new version is corrected again; Redo sends the note
     // (and its 5.1 level, Roger 21 Nov 2026: corrected writings count in Writing and criterion 5.1)
@@ -5544,7 +5580,7 @@ function needBox(u,a){const x=res(u,a.id),H=handedIn(u,a),nm=id=>{const st=(a.st
     if(ELMark.asked(h,x,id))todo.push(`💬 <b>${esc(nm(id))}</b>: answer the comment “${esc(h.comment)}” in the step below, or press ${nr(id)} if there is nothing to say.`
       +(/redo/i.test(x.ask[id].why||"")?` If the work itself is not a real try, open <b>↺ Redo</b> in that step instead: it answers the comment too.`:""));
     else info.push(`✉️ <b>${esc(nm(id))}</b>: Beltran answers the comment “${esc(h.comment)}” himself. ${nr(id)}`)});
-  Object.entries(x.flags||{}).forEach(([id,f])=>{if(f&&f.why&&!f.done)todo.push(`⚠️ <b>${esc(nm(id))}</b>: possible copy. Decide if it is their own work. <button class="mini" data-do="cpopen" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}">Check it</button>`)});
+  Object.entries(x.flags||{}).forEach(([id,f])=>{if(f&&f.why&&!f.done)todo.push(`${f.kind?"🔎":"⚠️"} <b>${esc(nm(id))}</b>: ${f.kind?esc(f.kind)+". Beltran wasn't sure: decide if it is fine.":"possible copy. Decide if it is their own work."} <button class="mini" data-do="cpopen" data-u="${u}" data-a="${a.id}" data-s="${esc(id)}">Check it</button>`)});
   if(a.manual&&a.graded&&x.max==null&&Object.keys(H).length)todo.push(`🎬 Give the final product its mark below and press <b>Save</b>.`);
   const g=G();if(g&&a.ls===S.ls&&!a.manual)(g.moments||[]).filter(m=>m.a===a.id&&!m.group).forEach(m=>{if(!H[m.step]||redoOf(u,a,m.step)||(x.flags||{})[m.step]&&!(x.flags||{})[m.step].done)return;
     if(!m.c.every(c=>lvOf(u,a.id,m.step,c)))info.push(`📐 <b>${esc(m.name)}</b>: Beltran gives the level in the weekday run.`)});
@@ -7115,7 +7151,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       try{await spkOne(r,s.group)}catch(err){alert("Roig could not analyse it: "+String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v34"))}
       if(redraw&&$("#dlg").open)redraw();else render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
-    corrg:()=>{S.corrG=k.g;render()},flgg:()=>{S.flgG=k.g;render()},flgopen:()=>flgOpen(k),flgcp:()=>{const a=byId(k.a);if(a){S.ls=a.ls;cpDlg(k.u,a)}},flgex:()=>flgExOpen(k),flgexload:()=>flgExLoad(),
+    corrg:()=>{S.corrG=k.g;render()},flgkeep:()=>flgKeepDlg(k.u,k.a,k.s),flgkeepgo:()=>lateAsk(()=>flgKeep(k.u,k.a,k.s)),flgg:()=>{S.flgG=k.g;render()},flgopen:()=>flgOpen(k),flgcp:()=>{const a=byId(k.a);if(a){S.ls=a.ls;cpDlg(k.u,a)}},flgex:()=>flgExOpen(k),flgexload:()=>flgExLoad(),
     flgjump:()=>{e.preventDefault();const x=document.getElementById(k.id);if(x){if(k.id==="fldone"){const d=x.querySelector("details");if(d)d.open=true}x.scrollIntoView({behavior:"smooth",block:"start"})}},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
     corrsort:()=>{S.corrSort=k.v==="stu"?"stu":"date";try{localStorage.setItem("el_t_corrsort",S.corrSort)}catch(e){}render()},

@@ -178,6 +178,11 @@ D.fpg = {};
   if (B[12]) { W(B[12], c4, at(12, 17, 0), { p: 120, k: 400, s: 900 }); flag(B[12], c4, 'write', { why: 'a long sentence pasted in the middle', done: 'accepted', at: at(13, 16, 43) }); }
   if (A2[8]) { step(A2[8], d2, 'write', { title: 'Writing', w: 1, date: at(19, 12, 30), f: [{ l: 'My text', v: 'In the photo they are play football.' }] });
     flag(A2[8], d2, 'write', { done: 'redo', back: 'Please write it again in your own words: two or three sentences about the photo.', at: at(20, 18, 5) }); }
+  // a kind of problem Beltran hadn't seen before (marks.mjs ask; Roger, 28 Nov 2026: only these and possible copies need him), and a redo
+  // Roger took back with ↩ No need to redo (done "kept")
+  if (B[14]) { W(B[14], t4, at(26, 18, 20), { p: 0, k: 610, s: 1400 }); flag(B[14], t4, 'write', { why: 'the same text as last week’s writing, word for word (typed, not pasted): reused or a mistake?', kind: 'The same text handed in twice', lv: {}, at: at(27, 16, 50) }); }
+  if (A2[9]) { step(A2[9], d2, 'write', { title: 'Writing', w: 1, date: at(19, 12, 40), f: [{ l: 'My text', v: 'They are dancing in the street. They are wearing masks.' }] });
+    flag(A2[9], d2, 'write', { done: 'kept', back: 'Please write it again in your own words.', at: at(20, 18, 5), keptAt: at(21, 9, 10), keptNote: 'No cal que tornis a fer aquest pas: el deixo tal com l’has entregat. 👍' }); }
   // a recall checkpoint sent by itself (left the page) after three quick glances
   const cp = CAT.find((a) => a.id === '4eso/ls2-recall-checkpoint-1');
   if (cp && B[13]) { const key = cp.keys[0];
