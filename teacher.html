@@ -402,11 +402,11 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
   else if(TAB_BACK&&(gOf(LAST.g)||TABS.includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
-  if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
+  if(ls){S.ls=ls.id;S.lsHand=true}else if(LAST.t&&Date.now()-LAST.t<3*3600e3){S.year=!!LAST.year;if(LAST.ls&&LAST.hand){S.ls=LAST.ls;S.lsHand=true}}   // render() swaps an LS of another course for the group's current one; an LS only kept if Roger picked it (S.lsHand), else the group's current one
   CLS.link=["course","ls","g","p","do","more"].some(k=>q.has(k));
   CLS.todo=["annnew","mtdlg"].includes(q.get("do"))?q.get("do"):q.has("more")?"more":null;   // done once the dashboard is drawn (firstDraw)
   if(CLS.link)history.replaceState(null,"",location.pathname+location.hash)})();
-const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
+const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,hand:!!S.lsHand,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
@@ -1494,7 +1494,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
 function classNow(at){const c=ELWeek.classAt(at);if(!c)return null;const x=ELWeek.now(c.gid);
   if(x&&ELWeek.tasks(x.p,x.gi).some(t=>t.kind==="self"&&t.date===ELWeek.today()))return null;return c}
 const classDone=c=>{CLS.done=c.key;try{sessionStorage.setItem("el_t_class",c.key)}catch(e){}};
-function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=S.reps=false;S.ls=null;S.place="home";   // render() picks the group's current LS by the time plan
+function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=S.reps=false;S.ls=null;S.lsHand=false;S.place="home";   // render() picks the group's current LS by the time plan
   render();scrollTo(0,0)}
 function classCheck(){const el=$("#classnow");if(!el||!S.D)return;const c=classNow(),g=c&&GR.find(x=>x.id===c.gid);
   if(!c||!g){el.innerHTML="";return}
@@ -1644,7 +1644,11 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
 const PLACES={fd:["🧠","Flashcards"],att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Assessment details"],students:["👥","Students' progress"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],exams:["📝","Exams"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"],voyage:["⛵","Class voyage"],prog:["🌱","Progress"],spk:["🗣","Speaking"],reports:["📄","Term reports"]};
-const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=S.reps=false;render();scrollTo(0,0)};
+// A group's tiles (the class voyage, the four cards) open on the LS the group is doing now (ELWeek.now), unless Roger picked another LS
+// himself in the page heading (S.lsHand; Roger, 28 Nov 2026: "this must be a mistake", every group's voyage on LS1 at 2 %): an LS that a
+// correction, a 🚩 possible problem, 👥 Students' progress (Term 1) or another page set for its own use never stays on the tiles.
+const lsNow=()=>{if(GR.some(g=>g.id===S.g)&&!S.lsHand)S.ls=null};
+const goPlace=p=>{S.place=p||"home";if(S.place==="home"){S.year=S.reps=false;lsNow()}render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
 // 📈 Learning paths, a group, an LS, the whole year) adds a step to the browser's history: Back returns to the screen before it, e.g. from
@@ -2348,7 +2352,9 @@ function vyHome(grp,ls,studs){if(!VOY_COURSES.includes(grp.course)||!window.elVo
   const fa=fpAct(ls),rows=studs.filter(s=>s.uid).map(s=>({s,...vySteps(s,ls,grp.id,fa)})),first=s=>(shortName(s).short||"").split(" ")[0];
   const map=vyMap(grp,ls,rows,fa,first);if(!map)return "";
   // ⛶ Full screen (Roger, 21 Nov 2026: "I also want a full-screen button for the [class map]"): the map and 🧭 Class steps on the whole screen
-  return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a> <button class="chip vyfsb" data-do="hfs" title="${S.hfs?"Back to the dashboard (Esc)":"The class map on the whole screen"}">${S.hfs?"✕ Exit full screen":"⛶ Full screen"}</button></h2><div class="vymap">${map}</div></div>`}
+  // another LS than the one the group is doing now (picked in the heading): say so, with a button back to it (Roger, 28 Nov 2026)
+  const cur=(ELWeek.now(grp.id)||{}).ls,cl=cur&&cur!==ls&&EL_LS.find(l=>l.id===cur),back=cl?` <button class="chip vynow" data-do="yls" data-ls="${cl.id}" title="This map is ${esc(window.elLsNum&&elLsNum(EL_LS.find(l=>l.id===ls))||ls)}, not the LS the group is doing now: show ${esc(lsLabel(cl))}">↩ ${esc(window.elLsNum&&elLsNum(cl)||cl.title)} (now)</button>`:"";
+  return `<div class="box vyrank vyhome"><h2>⛵ Class voyage <a href="#" class="chip" data-do="place" data-p="voyage">who needs a push →</a>${back} <button class="chip vyfsb" data-do="hfs" title="${S.hfs?"Back to the dashboard (Esc)":"The class map on the whole screen"}">${S.hfs?"✕ Exit full screen":"⛶ Full screen"}</button></h2><div class="vymap">${map}</div></div>`}
 function vyBox(rows,srt,cnt,sea,body){
   // the title, Order by and the counts stay at the top while the table scrolls, and ⛶ Full screen shows the whole box on the screen with
   // them (Roger, 21 Nov 2026: "I want this frozen so that when I scroll down I can see the table. And I want a full screen with the above menu")
@@ -7195,16 +7201,16 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     // another group in the side menu keeps the page (Roger, 7 Nov 2026: "when I select the groups on the left should go to same page i am"):
     // the same place (📅 Time plan, 📈 Learning paths…) or the whole-year view, and the same LS (for a group of the other course, its LS
     // with the same number). Clicking the group you are on still goes back to its tiles; Home and the other menu items open their own page.
-    const from=GR.find(g=>g.id===S.g),to=GR.find(g=>g.id===k.g);
+    const from=GR.find(g=>g.id===S.g),to=GR.find(g=>g.id===k.g);if(!from)S.lsHand=false;   // from 🏠 Home, ✏️ Corrections, 🚩 Possible problems…: the group's current LS
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=S.reps=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=S.reps=false;S.place="todo";render();
+    S.g=k.g;S.tutor="all";if(k.ls){S.ls=k.ls;S.lsHand=true}else if(S.place==="home")lsNow();render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=S.reps=false;S.place="todo";render();
     const li=[...document.querySelectorAll("li")].find(l=>l.textContent.trim().startsWith("🎯"));
     if(li){li.scrollIntoView({block:"center"});li.classList.add("askhi");setTimeout(()=>li.classList.remove("askhi"),2500)}else scrollTo(0,0)},
     place:()=>{e.preventDefault();if(k.p==="msgs"){S.msgTab=k.t||null;S.pbOpen=S.sgOpen=null}if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=S.reps=false;S.stuBoth=false;
       if(k.p==="qa"){S.qa.ls=k.ls;S.qa.g=k.g;S.g="qa";S.place="home";render();scrollTo(0,0);return}
-      S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
+      S.g=k.g;S.ls=k.ls||null;S.lsHand=!!k.ls;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
       if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
       goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
         if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},lsone:()=>{e.preventDefault();S.g="lss";S.ls=k.ls;goPlace("one")},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=S.reps=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}else S.tp2one=k.one?S.g:"";S.tp2back=k.one?k.back||"week":"";if(k.one){if(tp2Phone())S.tp2foc=true;else tp2Full(true)}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),allacts:()=>{S.allActs=!S.allActs;try{localStorage.setItem("el_t_allacts",S.allActs?"1":"0")}catch(e){}render()},shortnm:()=>shortnm(),showt:()=>{S.showT=!S.showT;try{localStorage.setItem("el_t_showtester",S.showT?"1":"0")}catch(e){}render()},tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>tp2Full(),tp2x:()=>{const bk=S.tp2back||"plan";S.tp2foc=false;S.tp2prog=false;S.tp2one="";S.tp2back="";tp2Full(false);if(bk==="week"){S.g="plan";S.tutor="all"}goPlace(bk)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
@@ -7383,7 +7389,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     vopen:()=>{if(e.target.closest("a[href]:not([data-do])"))return;S.on.open=S.on.open===k.id?null:k.id;render()},vstu:()=>{e.preventDefault();S.on.stu=k.u||null;S.on.open=null;if(k.u)S.on.v="hist";render();scrollTo(0,0)},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
-    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=S.reps=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=S.reps=false;S.ls=k.ls;S.lsHand=true;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
     glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
       quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
@@ -7444,7 +7450,7 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
     render();return}
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
   if(k.do==="tcday"&&/^\d{4}-\d\d-\d\d$/.test(t.value))tclosePanel(k.g,+k.n,t.value);
-  if(k.do==="ls"){S.year=t.value===YEAR;if(!S.year)S.ls=t.value;render()}
+  if(k.do==="ls"){S.year=t.value===YEAR;if(!S.year){S.ls=t.value;S.lsHand=true}render()}
   if(k.do==="qals"){S.qa.ls=t.value;S.qa.g="all";S.qa.f.act="all";render()}
   if(k.do==="qaf"){S.qa.f[k.f]=t.value;S.qa.f.all=false;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));

@@ -142,6 +142,20 @@ for (const size of SIZES) {
     seen.set(key, g);
     await report(label('Dashboard', size, t), size, c, extra);
   }
+  // A group's tiles open on the LS the group is doing now (Roger, 28 Nov 2026: every group's ⛵ voyage was on LS1): LS1 picked on 4ESO B,
+  // then 🏠 Home, then 2ESO A and 4ESO B again: both on LS2, as the Time plan says
+  if (!size.phone) {
+    const pick = (g) => c.page.locator(`#tabs button[data-g="${g}"]`).first().click().then(() => settle(c.page, 700));
+    const lsOn = () => c.page.evaluate(() => document.querySelector('#main .ph select')?.selectedOptions[0]?.textContent || '');
+    await pick('4ESOB'); await c.page.selectOption('#main .ph select', { index: 0 }); await settle(c.page, 600);
+    const was = await lsOn(), chip = await c.page.locator('.vyhome .vynow').count();
+    await pick('plan'); await pick('2ESOA'); const a2 = await lsOn(); await pick('plan'); await pick('4ESOB'); const b4 = await lsOn();
+    const extra = [];
+    if (!/^LS1\b/.test(was)) extra.push(`picking LS1 in the heading shows "${was}"`);
+    if (!chip) extra.push('the class voyage on LS1 has no ↩ LS2 (now) button');
+    if (!/^LS2\b/.test(a2) || !/^LS2\b/.test(b4)) extra.push(`after 🏠 Home a group's page stays on another LS (2ESO A: "${a2}", 4ESO B: "${b4}"), not the one the group is doing now`);
+    await report(label('Dashboard', size, "a group's page opens on its current LS"), size, c, extra);
+  }
   await c.ctx.close();
 }
 
