@@ -774,8 +774,8 @@ window.elStudentMenu=function(o){
   const bq=board.split("#")[0];
   // The order (Roger, 26 Nov 2026, doc "New student's organization menu"): 🏠 My dashboard · 🗂 My course · N ESO and its LSs (an LS
   // appears when the teacher opens it) · 🎓 My progress with 📊 My marks under it ("Details -> My marks") · 📚 Study (a heading, not a
-  // link) with 🎯 General practice (lab/practice.html), 🧠 Flashcards (lab/practice.html#deck), 📝 Mock exams (the board's
-  // #exam-practice) and 🔁 Learn from your mistakes (the board's #mistakes, 28 Nov 2026) · 📖 Books · 🔤 Print your grammar and vocab (the board's #language) · 🎲 Games · ❓ Help. 📱 Study on your phone
+  // link) with 🔁 Learn from your mistakes first (the board's #mistakes; Roger, 28 Nov 2026: "I want learn from my mistakes at the top"),
+  // 🎯 General practice (lab/practice.html), 🧠 Flashcards (lab/practice.html#deck) and 📝 Mock exams (the board's #exam-practice) · 📖 Books · 🔤 Print your grammar and vocab (the board's #language) · 🎲 Games · ❓ Help. 📱 Study on your phone
   // is no longer in the menu: it is a link inside ❓ Help.
   // Sub-items open with a click and stay open (Roger, 26 Nov 2026: "When I open the subtopics, they must stay open so that the menu
   // doesn't move when I go down"; it replaces the hover opening of the same day): each item with sub-items is a .nvg group, its sub-items
@@ -792,7 +792,7 @@ window.elStudentMenu=function(o){
       lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join(""))).join("")
     +grp("progress",b("progress","",bq+"#progress","🎓",t("El meu progrés","My progress")),b("marks"," sub",bq+"#marks","📊",t("Les meves notes","My marks")))
     +grp("study",`<span class="nv grp" role="button" tabindex="0"><span class="ic" aria-hidden="true">📚</span><span class="lb">${t("Estudia","Study")}</span><span class="nvc" aria-hidden="true">▾</span></span>`,
-      b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams"))+b("mistakes"," sub",bq+"#mistakes","🔁",t("Aprèn dels teus errors","Learn from your mistakes")))
+      b("mistakes"," sub",bq+"#mistakes","🔁",t("Aprèn dels teus errors","Learn from your mistakes"))+b("practise"," sub",R+"lab/practice.html","🎯",t("Pràctica general","General practice"))+b("flashcards"," sub",fl+"#deck","🧠",t("Targetes","Flashcards"))+b("examprep"," sub",bq+"#exam-practice","📝",t("Exàmens de prova","Mock exams")))
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Imprimeix la gramàtica i el vocabulari","Print your grammar and vocab")):"")
     +b("games","",R+"lab/","🎲",t("Jocs","Games"))
     +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
