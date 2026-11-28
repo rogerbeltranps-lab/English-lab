@@ -480,6 +480,21 @@
     document.addEventListener("keydown", e => { if (e.key === "Escape" && !fsMine && document.body.classList.contains("elslpfs") && !e.defaultPrevented) slpFs(false); });
     // a step chosen any other way (the engine's Next step button, the teacher's class tab): the bar follows
     document.addEventListener("click", e => { if (e.target.closest(".tab[data-panel],.section-next button") && document.body.classList.contains("elslpfs")) setTimeout(() => { slpDraw(); scrollTo(0, 0); }, 0); });
+    // the same ⛶ button stays at the top right while the student scrolls down the step (Roger, 27 Nov 2026: "the full screen button
+    // could be always at the top right even if the students scrolls down"): a fixed copy shows once the heading's own button has
+    // scrolled out of sight, under the class mode bars (slpTop). Not in the full screen view itself, not on a phone (CSS).
+    const fl = document.createElement("button"); fl.type = "button"; fl.className = "elslpgo elslpfl"; fl.hidden = true;
+    fl.addEventListener("click", () => slpFs(true)); document.body.append(fl);
+    const flUpd = () => {
+      const a = $(".lp-panels>.panel.active>.panel-head>.elslpgo"), top = slpTop();
+      const show = !document.body.classList.contains("elslpfs") && !!a && a.getBoundingClientRect().bottom < top + 4;
+      if (fl.hidden === show) fl.hidden = !show;
+      if (!show) return;
+      const lab = t("⛶ Pantalla completa", "⛶ Full screen"); if (fl.textContent !== lab) { fl.textContent = lab; fl.title = a.title; }
+      fl.style.top = (top + 12) + "px";
+    };
+    addEventListener("scroll", flUpd, { passive: true }); addEventListener("resize", flUpd);
+    document.addEventListener("click", () => setTimeout(flUpd, 0));
   }
   // ---- ⛵ 🧭 Your steps of the voyage on a 4 ESO learning path (Roger, 19 Nov 2026, mockup v14: "on the left they see 'your steps'"):
   // for a student, the left column lists every open step of the LS as on the board's voyage map (ports as headings, ✓ when done, ▶ on

@@ -146,7 +146,7 @@ for (const size of SIZES) {
 }
 
 // ---- 2. the students' pages, in English (4 ESO Core) and Catalan (2 ESO Base) ----
-const BOARD = ['', '#todo', '#homework', '#marks', '#progress', '#exam-practice', '#books', '#help'];
+const BOARD = ['', '#todo', '#homework', '#marks', '#progress', '#exam-practice', '#mistakes', '#books', '#help'];
 const SKIP = /^(.*-model|exam)\.html$/;   // the real exam page needs Roger's exam mode; the models are only videos
 for (const S of STUDENTS) {
   const lsPages = fs.readdirSync(path.join(ROOT, S.C.dir)).filter((f) => f.endsWith('.html') && !SKIP.test(f)).sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
