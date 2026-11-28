@@ -61,5 +61,8 @@ ok(RX.time.weeks.length&&RX.time.weeks.every(w=>typeof w.d==="string"&&typeof w.
 {const old={time:{weeks:[["2026-10-26",5],["2026-11-02",0]]},pts:[{pct:50}]},sf=W.elTrepSafe(old);
  ok(!nested(sf,false)&&sf.time.weeks[0].d==="2026-10-26"&&sf.time.weeks[0].n===5,"elTrepSafe turns an old saved report's [monday, n] weeks into {d, n}: "+JSON.stringify(sf));
  ok(JSON.stringify(W.elTrepWeeks(old))===JSON.stringify(W.elTrepWeeks(sf)),"elTrepWeeks reads old and new weeks the same");}
+// 📋 How I'm working (Roger, 28 Nov 2026): the students' table has the report's numbers and one row per tab taught, never a locked one
+{const T=W.elTrepTabs([LS],ctx);ok(T.due===R.time.due&&T.done===R.time.done&&T.inWeek===R.time.inWeek&&T.profile===R.time.profile,"the table's numbers must be the report's");
+ ok(T.rows.length===1&&T.rows[0].a.id==="4eso/ls2-celebrations-around-the-world"&&T.rows[0].tab==="read"&&T.rows[0].day==="2026-11-04"&&T.rows[0].done&&T.rows[0].at==="2026-11-05","one row: the Reading taught on 4 Nov, done on 5 Nov ("+JSON.stringify(T.rows.map(r=>[r.a.id,r.tab,r.day,r.at]))+")");}
 if(bad.length){console.error("✗ Term report:\n  "+bad.join("\n  "));process.exit(1)}
 console.log("✓ Term report: built live, locked steps never count, saved lines kept while unchanged");
