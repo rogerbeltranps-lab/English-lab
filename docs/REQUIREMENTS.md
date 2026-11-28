@@ -96,7 +96,7 @@ Duplicates are merged into one line. Each rule says where it comes from and when
 - **The repo is public.** Never commit personal data (names, emails, marks, the student list), real exam content, answer keys, exam audio or checkpoint keys (AGENTS; Exams doc; Drive rules).
 - Personal data lives only in `/mnt/project-files/alumnes/` and Drive › Teacher Studio › **04_Students (private)**.
 - No student names or emails in PRs, commits, code or comments: write "problem report, 2ESOA, 8 Nov".
-- In demos, previews and screenshots use the invented students of the demo files (Alex Sample, Pau Exemple), never real ones.
+- In demos, previews and screenshots use the invented students of the demo files (Alex Sample, Pau Exemple), never real ones. **Never call an invented student Ona or Martí** (Roger, 28 Nov 2026: "when showing me examples I don't want to see the name Ona or Martí"): real students have those names.
 - **Keep Firestore reads low** (the free plan's 50,000 reads a day ran out on 1 Nov 2026). No new reads without a reason; cloud scripts must check for quota errors (a silent 429 returns empty data).
 - The service-account key `bf3c16b4…` was partly exposed in a screenshot and should be replaced (open item).
 

@@ -119,7 +119,7 @@ window.ELCheckpoint = (function () {
       inp.onkeydown = e => { if (e.key === 'Enter' && (!sureB || sureB.hidden)) next(); };
       document.getElementById(p.id + 'Next').onclick = () => next();
       // Turn in (Roger, 1 Nov 2026: "don't allow them to exit with Esc, only with a button that says turn in"): asks first, then sends.
-      // The question (Roger, 9 Nov 2026: Víctor and Martí, 4ESOA, sent theirs by mistake: the old "Sure? Yes, turn it in" was the same button
+      // The question (Roger, 9 Nov 2026: two 4ESOA students sent theirs by mistake: the old "Sure? Yes, turn it in" was the same button
       // turning blue like Next, so a second click sent it): Turn in sits on the far right, away from Next; it opens an orange box that says
       // how many questions are left; "No, go on" is where Next was and has the focus (a double click or Enter keeps them in the checkpoint);
       // "Yes, turn it in" is red and only works after 2 seconds.

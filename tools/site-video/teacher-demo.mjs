@@ -16,8 +16,8 @@ const OUT = path.resolve(process.argv[2] && !process.argv[2].startsWith('--') ? 
 // ---- sample data ----
 let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const pick = (a) => a[Math.floor(rnd() * a.length)];
-const FIRST = ['Aina', 'Pol', 'Martina', 'Marc', 'Júlia', 'Jan', 'Laia', 'Biel', 'Ona', 'Nil', 'Carla', 'Arnau', 'Abril', 'Èric', 'Clàudia', 'Oriol',
-  'Mireia', 'Adrià', 'Berta', 'Gerard', 'Txell', 'Roger', 'Queralt', 'Bernat', 'Neus', 'Quim', 'Elna', 'Martí', 'Duna', 'Ferran'];
+const FIRST = ['Aina', 'Pol', 'Martina', 'Marc', 'Júlia', 'Jan', 'Laia', 'Biel', 'Iris', 'Nil', 'Carla', 'Arnau', 'Abril', 'Èric', 'Clàudia', 'Oriol',
+  'Mireia', 'Adrià', 'Berta', 'Gerard', 'Txell', 'Roger', 'Queralt', 'Bernat', 'Neus', 'Quim', 'Elna', 'Teo', 'Duna', 'Ferran'];
 const SUR = ['Puigdollers', 'Serrallonga', 'Vilalta', 'Ferrerons', 'Solanes', 'Rocamora', 'Ponsatí', 'Masdéu', 'Rierola', 'Fontcuberta', 'Costabella',
   'Boschmonar', 'Vilaplana', 'Campdepadrós', 'Salavedra', 'Pratdesaba', 'Collbató', 'Mirambell', 'Torrebadella', 'Garcies', 'Martorellas', 'Sentmenat'];
 global.window = global;
