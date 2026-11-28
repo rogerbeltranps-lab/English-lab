@@ -38,5 +38,13 @@ ok(W.elTrepPct(sh,{pg:pgS,due:()=>new Set()}).pct===null,"nothing taught yet: no
 // a term with no text: the points come from the class games played that term
 const auto=W.elTrepWorked("t2","4eso",[{title:"Grammar · Something new",ls:LS,of:10,r:7,day:"2026-12-03"},{title:"Vocabulary · Old",ls:LS,of:10,r:7,day:"2026-11-03"}]);
 ok(auto&&auto.auto&&auto.lss[0].pts.length===1&&/Something new/.test(auto.lss[0].pts[0].en),"term 2 points from that term's class games only");
+// the comment names exams by their level, never their numbers or questions, and every English sentence has its Catalan (Roger, 28 Nov 2026)
+const rsX={"4eso-my-real-routine/assessment":{sections:{a:{score:58,max:100}}},[LS+"/assessment"]:{sections:{a:{score:84,max:100}},report:{questions:[{ok:false,part:"Reading",text:"SECRET QUESTION",mine:"x",right:"y"}]}}};
+const RX=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX}));
+ok(/Satisfactory \(Assoliment satisfactori\)/.test(RX.comment)&&/Very good \(Assoliment notable\)/.test(RX.comment),"the comment must name the exams' levels: "+RX.comment);
+ok(!/\d+[.,]\d|\d+ ?%|SECRET/.test(RX.comment),"the comment must have no exam numbers, %, or exam questions: "+RX.comment);
+ok(typeof RX.commentCa==="string"&&/Assoliment satisfactori/.test(RX.commentCa)&&/Assoliment notable/.test(RX.commentCa)&&!/ exam /.test(RX.commentCa),"an English report must carry its comment in Catalan: "+RX.commentCa);
+ok(RX.pts.every(p=>typeof p.ca==="string"&&p.ca.length>3),"every point line must have its Catalan");
+const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
 if(bad.length){console.error("✗ Term report:\n  "+bad.join("\n  "));process.exit(1)}
 console.log("✓ Term report: built live, locked steps never count, saved lines kept while unchanged");
