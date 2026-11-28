@@ -143,7 +143,7 @@
                                          that was never unlocked never counts, in a point's % or in the daily work.
      elTrepWorked(term, course, games) → the term's "What we worked on": Roger's own text (EL_TREP) when he wrote one, otherwise one point per
                                          grammar and vocabulary class game the group played that term (its % = the student's latest play).
-     elTrepBuild(C, ctx)               → {pts: [{pct, line}], strong, work, time, comment}: what termReports/{email} holds, now live.
+     elTrepBuild(C, ctx)               → {pts: [{pct, line, ca}], strong, work, time, comment, commentCa}: what termReports/{email} holds, now live.
    ctx = {course, group, lang ("ca" | "en"), pg, rs, games, taught, infoOf (ls id → ls doc), term: {from, to, deadline}, lp (store key → the
    learning path's data, or null: the page does not load it), prev (the saved draft: a point keeps its written line while its % is the same)}. */
 (function () {
@@ -255,34 +255,79 @@
     const p = due ? Math.round(inWeek / due * 100) : 0, lm = dn ? Math.round(lastMin / dn * 100) : 0, prof = !due ? null : !dn ? "none" : p >= 70 ? "steady" : lm >= 40 ? "last" : "behind";
     return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam }; }
 
-  // the comment, in Roger's voice (never a name)
+  // the comment, in Roger's voice (never a name), from a fixed bank of objective sentences: each one says only what the activities, the
+  // Time plan dates or the exams show (Roger, 28 Nov 2026: "a bank of sentences… that are objective and that can be observed in the
+  // activities"), each with its Catalan for the butlletí de notes ("per every sentence that we build in English we need the catalan version").
+  // Exams by their level, never their numbers or questions ("avoid exam numbers, you can say your exam and task showed a Very Good mark results").
+  // {x} = filled in; the bank is printed for Roger by tools/term-report/bank.mjs.
+  const BANK = window.EL_TREP_BANK = {
+    work:     { when: "Everyday work, first (Roger, 28 Nov 2026: the exam is not what matters most): the average % of the points of “What we worked on” (activities, class games, hand-ins) as a level", en: "Your everyday work this term (activities, class games and the work you handed in) showed {d} results.", ca: "La teva feina de cada dia aquest trimestre (activitats, jocs de classe i les feines que has entregat) ha mostrat un {d}." },
+    progUp:   { when: "Progress: the activities' latest answers are 10 points or more above the first tries (the student went back and corrected them)", en: "You make progress when you correct your work: your answers now are much better than your first tries.", ca: "Progresses quan corregeixes la feina: les teves respostes d'ara són molt millors que els primers intents." },
+    progNone: { when: "Progress: first tries had many mistakes (under 70 %) and the student hardly corrected them", en: "You can still correct many of your answers: going back to your mistakes is how you make progress.", ca: "Encara pots corregir moltes de les teves respostes: tornar als errors és com es progressa." },
+    onTime:   { when: "Daily work: 70 % or more of the activities due were done in the week of their class", en: "You did your activities on time: most of them in the same week as the class. Keep it up.", ca: "Has fet les activitats a temps: la majoria, la mateixa setmana de la classe. Continua així." },
+    notOnTime:{ when: "Daily work: under 70 % done in the week of the class (and not mostly at the last minute)", en: "You didn't do all your activities on time: you did {done} of the {due} activities we did in class.", ca: "No has fet totes les activitats a temps: n'has fet {done} de les {due} que vam fer a classe." },
+    late:     { when: "…and 3 or more were done after the week of their class", en: "{late} of them were done after the week of the class.", ca: "{late} les vas fer després de la setmana de la classe." },
+    lastMin:  { when: "Daily work: 40 % or more of what was done was done in the last week of term or the 3 days before the exam", en: "You left many activities until the end of the term or just before the exam, so there was less time to practise.", ca: "Vas deixar moltes activitats per al final del trimestre o just abans de l'examen, i així vas tenir menys temps per practicar." },
+    none:     { when: "Daily work: none of the activities due is done", en: "You haven't done the activities we did in class yet: they are the basis of your mark.", ca: "Encara no has fet les activitats que vam fer a classe: són la base de la nota." },
+    best:     { when: "Points of “What we worked on”: the one or two with the best % (70 % or more)", en: "Your work shows your strongest points: {x}.", ca: "La teva feina mostra els teus punts forts: {x}." },
+    focus:    { when: "Points: the one with the lowest % (under 70 %)", en: "Your work shows the point you need to work on most: {x}.", ca: "La teva feina mostra el punt que has de treballar més: {x}." },
+    tipWrite: { when: "…and that point's mistakes are in a corrected writing", en: "Read the corrections of your writings and write those sentences again.", ca: "Llegeix les correccions dels teus writings i torna a escriure aquelles frases." },
+    tipGame:  { when: "…and that point's mistakes are in the class games", en: "You missed some questions on it in the class games: play them again in 🎲 Games.", ca: "Als jocs de classe vas fallar preguntes d'aquest punt: torna-hi a jugar a 🎲 Jocs." },
+    tipLp:    { when: "…and some answers in its activities are still wrong now", en: "Some of your answers in these activities are still wrong: correct them.", ca: "Algunes respostes d'aquestes activitats encara estan malament: corregeix-les." },
+    tipSpeak: { when: "…and it is a speaking point with recordings or shadowing not done", en: "Some recordings or shadowing are still to do: do them, it is the best way to become fluent.", ca: "Et falten gravacions o shadowing: fes-los, és la millor manera de guanyar fluïdesa." },
+    tipRedo:  { when: "…otherwise (or its mistakes are in the exam)", en: "Do these activities again and read the explanation of each mistake.", ca: "Torna a fer aquestes activitats i fixa't en l'explicació de cada error." },
+    examUp:   { when: "Exams, after the everyday work: the last LS exam reached a higher level than the one before", en: "In the exams, you went up from {d1} in {N1} to {d2} in {N2}.", ca: "Als exàmens has pujat d'un {d1} a la {N1} a un {d2} a la {N2}." },
+    examDown: { when: "Exams: the last LS exam reached a lower level than the one before", en: "In the exams, you went down from {d1} in {N1} to {d2} in {N2}.", ca: "Als exàmens has baixat d'un {d1} a la {N1} a un {d2} a la {N2}." },
+    examSame: { when: "Exams: both LS exams reached the same level", en: "In the exams of {N1} and {N2}, you showed {d2} results both times.", ca: "Als exàmens de la {N1} i de la {N2} has tret un {d2} totes dues vegades." },
+    examOne:  { when: "Exams: only the last LS exam has a mark", en: "In the {N2} exam, you showed {d2} results.", ca: "A l'examen de la {N2} has tret un {d2}." },
+    left1:    { when: "Before the activities deadline: 1 activity due is still not done", en: "You still have 1 activity to do: finish it before Friday.", ca: "Et falta 1 activitat: fes-la abans de divendres." },
+    left:     { when: "Before the activities deadline: 2 or more activities due are still not done", en: "You still have {n} activities to do: finish them before Friday.", ca: "Et falten {n} activitats: fes-les abans de divendres." },
+    next:     { when: "Always, at the end", en: "Next term, do each activity in the week we do it in class.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe." },
+    nextPr:   { when: "At the end, when there is a point to work on (in place of the one above)", en: "Next term, do each activity in the week we do it in class and practise “{x}” in 🎯 Practise.", ca: "Al proper trimestre, fes cada activitat la setmana que la fem a classe i practica «{x}» a 🎯 Practica." },
+    // a closing sentence, one of these, from what the work shows (Roger, 28 Nov 2026: "Add nice personal sentences at the end"; "too personal, I'm a teacher not a friend" for the others; he kept endProud, endEffort and endFresh)
+    endProud: { when: "Close: everyday work Very good or Excellent and the activities on time", en: "I'm really proud of the way you worked this term. Keep enjoying English!", ca: "Estic molt orgullós de com has treballat aquest trimestre. Continua gaudint de l'anglès!" },
+    endEffort:{ when: "Close: the student corrected their work (progress sentence above), when the one above doesn't apply", en: "I can see the effort you put into correcting your work, and I'm sure next term will be even better.", ca: "Es nota l'esforç que has fet per corregir la feina, i segur que el proper trimestre anirà encara millor." },
+    endFresh: { when: "Close: none of the activities due is done", en: "Next term is a fresh start, and I'm here to help you every step of the way.", ca: "El proper trimestre és un nou començament, i sóc aquí per ajudar-te en cada pas." },
+    endBelieve:{ when: "Close: the activities were late or at the last minute, or everyday work Not satisfactory or Satisfactory", en: "With regular work every week, your results can improve.", ca: "Amb una feina regular cada setmana, els teus resultats poden millorar." },
+    endThanks:{ when: "Close: any other case", en: "Keep working steadily next term.", ca: "Continua treballant amb constància el proper trimestre." } };
+  const DEG = { en: ["Not satisfactory (No assoliment)", "Satisfactory (Assoliment satisfactori)", "Very good (Assoliment notable)", "Excellent (Assoliment excel·lent)"],
+    ca: ["No assoliment", "Assoliment satisfactori", "Assoliment notable", "Assoliment excel·lent"] };
+  const degOf = m => m < 5 ? 0 : m < 7 ? 1 : m < 9 ? 2 : 3;
   function comment(L, pts, tm, ctx, C) { const ca = L === "ca", today = (window.ELWeek && ELWeek.today()) || new Date().toISOString().slice(0, 10), open = !ctx.term || !ctx.term.deadline || today <= ctx.term.deadline;
+    const out = [], say = (id, v) => out.push(BANK[id][ca ? "ca" : "en"].replace(/\{(\w+)\}/g, (m, k) => v && v[k] != null ? v[k] : m));
     const ex = id => { const sc = ((ctx.rs || {})[id + "/assessment"] || {}).sections || {}; let a = 0, b = 0; Object.values(sc).forEach(y => { if (y && y.score != null && y.max) { a += +y.score; b += +y.max; } }); return b ? Math.round(a / b * 100) / 10 : null; };
-    const xs = C.lss.map(x => ex(x.ls)), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs[xs.length - 1], f = n => ca ? String(n).replace(".", ",") : String(n), out = [];
+    const xs = C.lss.map(x => ex(x.ls)), e1 = xs.length > 1 ? xs[xs.length - 2] : null, e2 = xs[xs.length - 1];
     const n1 = C.lss.length > 1 ? C.lss[C.lss.length - 2] : null, N1 = n1 && window.elLsNum ? elLsNum((window.EL_LS || []).find(l => l.id === n1.ls) || {}) || "LS1" : "LS1", N2 = (window.elLsNum && elLsNum((window.EL_LS || []).find(l => l.id === (C.lss[C.lss.length - 1] || {}).ls) || {})) || "LS2";
-    if (e1 != null && e2 != null) out.push(e2 > e1 + 0.4 ? (ca ? `Has millorat des de l'examen de la ${N1}: de ${f(e1)} a ${f(e2)}. Això vol dir que, quan treballes, aprens.` : `You have improved since the ${N1} exam: from ${f(e1)} to ${f(e2)}. That shows that when you work, you learn.`)
-      : e2 < e1 - 0.4 ? (ca ? `A l'examen de la ${N2} has baixat respecte a la ${N1} (de ${f(e1)} a ${f(e2)}): mirem junts què ha passat.` : `Your ${N2} exam went down compared with ${N1} (from ${f(e1)} to ${f(e2)}), so let's look at what happened.`)
-      : (ca ? `Els teus dos exàmens han anat semblant (${f(e1)} i ${f(e2)}).` : `Your two exams were similar (${f(e1)} and ${f(e2)}).`));
-    const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse();
-    if (best.length) out.push(ca ? `El que domines més: ${best.map(p => lc(short(p.t))).join(" i ")}.` : `What you know best: ${best.map(p => lc(short(p.t))).join(" and ")}.`);
-    if (worst.length) { const w = worst[0]; out.push(ca ? `On has de posar més atenció és en ${lc(short(w.t))} (${w.pct} %). ${w.line.replace(/^[^.]*\.\s*/, "")}` : `Where you need to focus most is ${lc(short(w.t))} (${w.pct}%). ${w.line.replace(/^[^.]*\.\s*/, "")}`); }
+    const D = DEG[ca ? "ca" : "en"], d1 = e1 != null ? degOf(e1) : null, d2 = e2 != null ? degOf(e2) : null, V = { N1, N2, d1: D[d1], d2: D[d2] };
+    // everyday work and progress first, the exam after (Roger, 28 Nov 2026: "it seem that we focus more on the exam that on the rest and it isn't true")
+    const has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), best = has.slice(0, 2).filter(p => p.pct >= 70), worst = has.filter(p => p.pct < 70).slice(-2).reverse(), w = worst[0];
+    let lv = null; if (has.length) { const avg = has.reduce((a, p) => a + p.pct, 0) / has.length; lv = avg >= 90 ? 3 : avg >= 70 ? 2 : avg >= 50 ? 1 : 0; say("work", { d: D[lv] }); }
+    const pr = ctx.prog, up = !!(pr && pr.m >= 10 && pr.l - pr.f >= 10); if (pr && pr.m >= 10) { if (up) say("progUp"); else if (pr.f < 70 && pr.l - pr.f < 3) say("progNone"); }
+    if (tm.profile === "steady") say("onTime"); else if (tm.profile === "behind") { say("notOnTime", tm); if (tm.late >= 3) say("late", tm); }
+    else if (tm.profile === "last") say("lastMin"); else if (tm.profile === "none") say("none");
+    if (best.length) say("best", { x: best.map(p => lc(short(p.t))).join(ca ? " i " : " and ") });
+    if (w) { say("focus", { x: lc(short(w.t)) }); say({ write: "tipWrite", game: "tipGame", lp: "tipLp" }[w.ek] || (w.speak ? "tipSpeak" : "tipRedo")); }
+    if (d1 != null && d2 != null) say(d2 > d1 ? "examUp" : d2 < d1 ? "examDown" : "examSame", V); else if (d2 != null) say("examOne", V);
     const left = tm.due - tm.done, todo = open && left > 0;
-    const T = { steady: ca ? `Has treballat de manera constant, setmana a setmana: continua així.` : `You worked steadily, week by week: keep it up.`,
-      behind: (ca ? `De les activitats que vam fer a classe, n'has fet ${tm.done} de ${tm.due}` : `Of the activities we did in class, you did ${tm.done} of ${tm.due}`)
-        + (tm.late >= 3 ? (ca ? `, i ${tm.late} les vas fer més tard de la setmana que tocava.` : `, and ${tm.late} of them later than the week we did them.`) : ".")
-        + (todo ? (ca ? ` ${left === 1 ? "Et falta 1: fes-la" : `Et falten ${left}: fes-les`} abans de divendres.` : ` ${left === 1 ? "1 is" : left + " are"} still to do: finish ${left === 1 ? "it" : "them"} before Friday.`) : ""),
-      last: ca ? `Vas deixar moltes activitats per al final (${tm.lastMin} % l'última setmana o just abans de l'examen), i així no tens temps de practicar abans dels exàmens.` : `You left many activities until the end (${tm.lastMin}% in the last week or just before the exam), so there was no time to practise before the exams.`,
-      none: ca ? `Encara no has fet les activitats dels learning paths: són la base de la nota.` : `You haven't done the learning path activities yet: they are the basis of your mark.` }[tm.profile]; if (T) out.push(T);
-    if (todo && tm.profile !== "behind" && tm.profile !== "none") out.push(ca ? (left === 1 ? `Et falta 1 activitat: fes-la abans de divendres.` : `Et falten ${left} activitats: fes-les abans de divendres.`) : (left === 1 ? `You still have 1 activity to do: finish it before Friday.` : `You still have ${left} activities to do: finish them before Friday.`));
-    const w = worst[0]; out.push(ca ? `Al proper trimestre, fes cada activitat la setmana que la fem a classe${w ? ` i practica ${lc(short(w.t))} a 🎯 Practica` : ""}.` : `Next term, do each activity in the week we do it in class${w ? ` and practise ${lc(short(w.t))} in 🎯 Practise` : ""}.`);
+    if (todo && tm.profile !== "none") say(left === 1 ? "left1" : "left", { n: left });
+    w ? say("nextPr", { x: lc(short(w.t)) }) : say("next");
+    const P = tm.profile; say(P === "none" ? "endFresh" : P === "steady" && lv >= 2 ? "endProud" : up ? "endEffort" : P === "behind" || P === "last" || (lv != null && lv <= 1) ? "endBelieve" : "endThanks");
     return out.join(" "); }
 
-  window.elTrepBuild = function (C, ctx) { const L = ctx.lang === "ca" ? "ca" : "en", prev = (ctx.prev && ctx.prev.pts) || [], pts = [];
-    C.lss.forEach((l, li) => l.pts.forEach(pt => { const i = pts.length, { pct } = elTrepPct(pt, ctx), was = prev[i];
+  window.elTrepBuild = function (C, ctx) { const L = ctx.lang === "ca" ? "ca" : "en", prev = (ctx.prev && ctx.prev.pts) || [], pts = [], ptsCa = [];
+    C.lss.forEach((l, li) => l.pts.forEach(pt => { const i = pts.length, { pct } = elTrepPct(pt, ctx), was = prev[i], ev = evidence(ctx, pt);
+      const e0 = ev.find(x => x.k !== "fpok" && x.k !== "fpgo" && strip(x.fix).trim()), ek = e0 ? e0.k : null, speak = !e0 && pct != null && pct < 60 && pt.src.some(s => s.d);
       // a line written by the drafts (they read the learning paths' answers, the page does not) stays while its % is the same
-      const line = was && was.line && was.pct === pct && !ctx.lp ? was.line : lineOf(pct, evidence(ctx, pt), L, pt);
-      pts.push({ i, ls: li, t: pt[L] || pt.en, pct, line }); }));
-    const tm = timing(C, ctx), has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct);
-    return { lang: L, live: true, pts: pts.map(p => ({ pct: p.pct, line: p.line })), strong: has.filter(p => p.pct >= 70).slice(0, 3).map(p => p.i), work: has.filter(p => p.pct < 70).slice(-2).map(p => p.i),
-      time: { due: tm.due, done: tm.done, inWeek: tm.inWeek, lastMin: tm.lastMin, profile: tm.profile, weeks: tm.weeks, exam: tm.exam }, comment: comment(L, pts, tm, ctx, C) }; };
+      const keep = was && was.line && was.pct === pct && !ctx.lp, line = keep ? was.line : lineOf(pct, ev, L, pt);
+      // every English sentence has its Catalan, for the butlletí de notes (Roger, 28 Nov 2026: "per every sentence that we build in English we need the catalan version")
+      const lineCa = L === "ca" ? line : keep && was.ca ? was.ca : lineOf(pct, ev, "ca", pt);
+      pts.push({ i, ls: li, t: pt[L] || pt.en, pct, line, ek, speak }); ptsCa.push({ i, ls: li, t: pt.ca || pt.en, pct, line: lineCa, ek, speak }); }));
+    // progress (formative): first tries against the latest answers of every auto-checked step taught (the learning paths' stores)
+    let f = 0, l = 0, m = 0; Object.values(ctx.pg || {}).forEach(ls => Object.entries(ls || {}).forEach(([key, v]) => { let s; try { s = typeof v === "string" ? JSON.parse(v) : v; } catch (e) { return; }
+      if (!s || !s.tries) return; Object.entries(s.tries).forEach(([pid, t]) => { if (!t || !t.max || (ctx.taught && !ctx.taught(key, pid))) return; const z = (s.last || {})[pid] || t;
+        f += +t.score || 0; l += +(z.score ?? t.score) || 0; m += +t.max; }); }));
+    ctx = Object.assign({}, ctx, { prog: m ? { f: Math.round(f / m * 100), l: Math.round(l / m * 100), m } : null });
+    const tm = timing(C, ctx), has = pts.filter(p => p.pct != null).sort((a, b) => b.pct - a.pct), cm = comment(L, pts, tm, ctx, C);
+    return { lang: L, live: true, pts: pts.map((p, i) => ({ pct: p.pct, line: p.line, ca: ptsCa[i].line })), strong: has.filter(p => p.pct >= 70).slice(0, 3).map(p => p.i), work: has.filter(p => p.pct < 70).slice(-2).map(p => p.i),
+      time: { due: tm.due, done: tm.done, inWeek: tm.inWeek, lastMin: tm.lastMin, profile: tm.profile, weeks: tm.weeks, exam: tm.exam }, comment: cm, commentCa: L === "ca" ? cm : comment("ca", ptsCa, tm, ctx, C) }; };
 })();

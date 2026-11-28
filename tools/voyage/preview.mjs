@@ -20,7 +20,7 @@ const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/ja
 const { today, demo: D } = demo(LANG, 'mid');
 const C = EN ? { group: '4ESOA', ls: '4eso-seasons-and-celebrations' } : { group: '2ESOA', ls: '2eso-free-time-live' };
 // invented classmates on the group's road document (road/{ls}__{group}): first name + steps done
-const NAMES = ['Marta', 'Oriol', 'Sara', 'Hugo', 'Carla', 'Èric', 'Paula', 'Martí', 'Lucía', 'Iker', 'Noa', 'Dani', 'Emma', 'Pol', 'Júlia', 'Biel', 'Aina', 'Joel', 'Laia', 'Nil'];
+const NAMES = ['Marta', 'Oriol', 'Sara', 'Hugo', 'Carla', 'Èric', 'Paula', 'Teo', 'Lucía', 'Iker', 'Noa', 'Dani', 'Emma', 'Pol', 'Júlia', 'Biel', 'Aina', 'Joel', 'Laia', 'Nil'];
 const SPREAD = [38, 31, 44, 26, 36, 12, 40, 33, 36, 9, 35, 29, 47, 36, 30, 22, 37, 34, 41, 18];
 D.road = { me: 'demo', mates: Object.fromEntries(NAMES.map((n, i) => ['u' + i, { n, s: EN ? Math.round(SPREAD[i] / 2.2) : SPREAD[i] }])) };
 // a Time plan agenda like the teacher's (only these tabs are stops; class games and notes are not): ls/{id}.planEdits[group].agenda

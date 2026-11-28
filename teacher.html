@@ -332,6 +332,7 @@ window.EL_LS=(window.EL_LS||[]).filter(l=>!l.personal);window.EL_CATALOG=(window
 <script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-coverage.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
+<script src="shared/js/el-term-report.js?v=20261128b"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="shared/js/el-exam-seal.js?v=20261123b" defer></script><!-- 📥 Open an emailed exam (wxMailDlg) -->
 <script src="lab/game/decks/index.js"></script>
@@ -4563,27 +4564,86 @@ function repLoad(){if(REPS.busy||REPS.d)return;if(DEMO){REPS.d=DEMO.trep||{};ret
 // Can you make a publish draft button?"): teams/{group}.repPub.t1 = when; the Firestore rules then let the group's students read their own
 // termReports/{email} at any time, and their board shows 📄 My Term 1 report (draft). 🔒 Hide sets it back to null.
 function repPublish(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
-  if(!confirm(on?`Publish the Term 1 draft reports of ${g.name} now?\n\nEach student can open their own report on their board (📄 My Term 1 report · draft) until you hide them again. They never see anyone else's.`
-    :`Hide the draft reports of ${g.name} again?\n\nStudents will see theirs only while you press 📄 Show draft reports in class mode.`))return;
+  if(!confirm(on?`Show the draft Term 1 reports to ${g.name}?\n\nEach student can open their own report on their board (📄 My Term 1 report · draft), check it, finish what is missing and tell you about any mistake with ⚠️ Report a problem. They never see anyone else's.`
+    :`Hide the reports of ${g.name}?\n\nStudents can't open them any more (only while you press 📄 Show draft reports in class mode), and they are a draft again.`))return;
   const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{};t.repPub=Object.assign({},t.repPub,{t1:v});
-  const p=put(["teams",gid],{repPub:{t1:v}});render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
-function repView(grp,studs,place){repLoad();
+  const o={repPub:{t1:v}};if(!on){t.repFinal=Object.assign({},t.repFinal,{t1:null});o.repFinal={t1:null}}const p=put(["teams",gid],o);render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
+// ✅ Final version (Roger, 28 Nov 2026: "the button to say that the current reports are the last version (even though I must be able to do any
+// changes I want)"): teams/{group}.repFinal.t1 = when. Students then see the saved report as it is, labelled final (no "draft", no live
+// build). Nothing is locked: 🔄 Rebuild still rewrites any report, and ✏️ Back to draft sets it back to null.
+function repFinal(gid,on){const g=GR.find(x=>x.id===gid);if(!g)return;
+  if(!confirm(on?`Publish the final version of the Term 1 reports of ${g.name}?\n\nEvery student sees their report as it is now, as the final version (no "draft"), on their board, and it no longer changes with their work. You can still 🔄 rebuild any report or go back to draft.`
+    :`Take the reports of ${g.name} back to draft?\n\nStudents still see them, labelled draft again, and they change with their work.`))return;
+  // the final version is published too; back to draft keeps the draft shown
+  const v=on?new Date().toISOString():null,t=S.D.tm[gid]=S.D.tm[gid]||{},pv=((t.repPub||{}).t1)||v;t.repFinal=Object.assign({},t.repFinal,{t1:v});
+  const o={repFinal:{t1:v}};if(on){t.repPub=Object.assign({},t.repPub,{t1:pv});o.repPub={t1:pv}}const p=put(["teams",gid],o);render();if(p)p.catch(e=>alert("Could not save it: "+e.message))}
+// 🔄 Rebuild the reports (Roger, 28 Nov 2026: "I could press a button to generate a term report and everthing and even the comments get
+// generated out of fixed sentences"; "yes"): the same build as tools/term-report/draft.mjs, in Roger's browser, no Claude or AI. For every
+// student of the group (not the tester, not away): their work already on the dashboard (S.D.pg, S.D.rs, S.D.lv, S.D.ls), their class games
+// (myGames/{email}: one read each) and the learning paths' own data (fetched once, so a point's line can quote the student's own mistakes),
+// through elTrepBuild (el-term-report.js) with only the tabs taught by the term's last day; then termReports/{email}.t1 (what the student
+// sees) and termReportsT/{email}.t1 (first tries vs latest, teacher only), as the saved run writes them.
+const TREP_LPS={};
+async function trepLps(course){if(TREP_LPS[course])return TREP_LPS[course];const dir={"2eso":"2eso/free-time-live","4eso":"4eso/seasons-and-celebrations"}[course],o={};
+  if(!dir)return TREP_LPS[course]=o;
+  await Promise.all(EL_CATALOG.filter(a=>a.course===course&&/^[24]eso\/ls2-/.test(a.id)).map(async a=>{const f=a.id.replace(/^[24]eso\/ls2-/,"");
+    try{const r=await fetch(`${dir}/data/${f}.js`,{cache:"no-store"});if(!r.ok)return;const w={};new Function("window","console",await r.text())(w,console);
+      if(w.LP&&w.LP.key&&w.LP.panels)o[w.LP.key]=w.LP}catch(e){}}));
+  return TREP_LPS[course]=o}
+const TREP_SK={read:"reading",listen:"listening",again:"listening",grammar:"grammar",mixed:"grammar",grammarPrep:"grammar",grammarRel:"grammar",grammarComp:"grammar",grammarFeel:"grammar",vocabEx:"vocabulary",words:"vocabulary"};
+function trepFirstLatest(pg,lps){const o={},st=key=>{for(const l of Object.values(pg||{})){const v=l&&l[key];if(v){try{return typeof v==="string"?JSON.parse(v):v}catch(e){return null}}}return null};
+  Object.keys(lps).forEach(k=>{const s=st(k);if(!s)return;Object.entries(TREP_SK).forEach(([pid,sk])=>{const f=(s.tries||{})[pid],l=(s.last||{})[pid]||f;if(!f||!f.max)return;
+    const y=o[sk]=o[sk]||{f:0,l:0,m:0};y.f+=+f.score||0;y.l+=+(l.score??f.score)||0;y.m+=+f.max})});
+  Object.values(o).forEach(y=>{y.first=Math.round(y.f/y.m*100);y.latest=Math.round(y.l/y.m*100)});return o}
+async function repRebuild(gid,one){const g=GR.find(x=>x.id===gid);if(!g||REPS.rb)return;
+  const course=g.course,C=((window.EL_TREP||{}).t1||{})[course];if(!window.elTrepBuild||!C){alert("The report builder did not load. Reload the page (Ctrl+Shift+R) and try again.");return}
+  // one student or the whole group (Roger, 28 Nov 2026: "redo the report, individually or all the reports at once")
+  const studs=((REPS.studs||{})[gid]||[]).filter(s=>s.uid&&s.email&&!s.tester&&!s.away&&(!one||String(s.email).toLowerCase()===one));if(!studs.length)return;
+  if(!one&&!confirm(`Rebuild the Term 1 reports of ${g.name} from their work now?\n\n${studs.length} students. It reads each student's class games once (${studs.length} reads) and saves their report again: what they see, if the drafts are published, changes at once.`))return;
+  REPS.rb=gid;REPS.rb1=one||null;render();
+  try{const lps=await trepLps(course),LS1={"2eso":"2eso-my-real-routine","4eso":"4eso-my-real-routine"}[course],LS2={"2eso":"2eso-free-time-live","4eso":"4eso-seasons-and-celebrations"}[course];
+    const [from,to]=elTermSpan("t1"),upTo=ELWeek.add(to,1),inf=id=>S.D.ls[id]||{},taught=elTrepTaught(gid,inf,upTo),at=new Date().toISOString();let n=0;
+    for(const s of studs){const email=String(s.email).toLowerCase(),u=s.uid;
+      const mg=DEMO?{}:await F.getDoc(F.doc(db(),"myGames",email)).then(x=>x.exists()&&x.data().games||{}).catch(()=>({}));
+      const lv=((S.D.lv[u]||{})[LS2]||{}).level||((S.D.lv[u]||{})[LS1]||{}).level||"",L=!lv||lv==="beginners"?"ca":"en",pg=S.D.pg[u]||{};
+      const P=elTrepBuild(C,{course,group:gid,lang:L,pg,rs:S.D.rs[u]||{},games:Object.values(mg).filter(x=>x&&x.title&&x.of),infoOf:inf,
+        term:{from,to,deadline:(window.EL_TREP_DEADLINE||{}).t1},taught,lp:key=>lps[key]||null});delete P.live;
+      const pub=Object.assign({term:"t1"},P,{at});
+      if(!DEMO)await Promise.all([F.setDoc(F.doc(db(),"termReports",email),{t1:pub}),F.setDoc(F.doc(db(),"termReportsT",email),{t1:{firstLatest:trepFirstLatest(pg,lps)}})]);
+      if(REPS.d)REPS.d[email]=pub;n++}
+    REPS.done={g:gid,n,at,one:one||null}}
+  catch(e){console.warn("rebuild reports",e);alert("Could not rebuild the reports: "+(e.message||e))}
+  REPS.rb=null;REPS.rb1=null;render()}
+function repView(grp,studs,place){repLoad();(REPS.studs=REPS.studs||{})[grp.id]=studs;
   const back=place?"":`<div class="bar"><button class="chip" data-do="repclose">‹ Back to ${esc(grp.name)}</button></div>`;
   if(REPS.err)return back+`<div class="box"><p class="muted">Couldn't read the reports: ${esc(REPS.err)}</p></div>`;
   if(!REPS.d)return back+`<div class="box"><p class="muted">Loading the reports…</p></div>`;
   const PF={steady:["🟢","Steady"],behind:["🟡","Behind"],last:["🟠","Last minute"],none:["🔴","Nothing done"]};
+  // every English sentence has its Catalan, to copy into the butlletí de notes (Roger, 28 Nov 2026); older saved reports have only their own language
+  const tx=h=>String(h||"").replace(/<[^>]+>/g,""),CP=[];((((window.EL_TREP||{}).t1||{})[grp.course]||{}).lss||[]).forEach(l=>l.pts.forEach(p=>CP.push(p.ca||p.en)));
+  const ptsCa=R=>(R.pts||[]).map((p,i)=>{const l=R.lang==="ca"?p.line:p.ca;return l&&CP[i]?`${tx(CP[i])}: ${tx(l)}`:""}).filter(Boolean).join("\n");
+  const rb1=s=>{const e=String(s.email||"").toLowerCase(),on=REPS.rb1===e;return `<button class="chip" data-do="reprb1" data-g="${grp.id}" data-v="${esc(e)}" ${REPS.rb?"disabled":""} title="Rebuild this report from their work now">${on?"⏳":"🔄"} Rebuild</button>`};
   const rows=studs.filter(s=>!s.tester&&s.uid).map(s=>{const R=REPS.d[String(s.email||"").toLowerCase()],T=(R&&R.time)||{},pf=PF[T.profile]||["",""];
     return `<tr><td style="text-align:left"><a href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener"><b>${name(s)}</b></a></td>`
       +(R?`<td>${pf[0]} ${pf[1]}</td><td class="n">${T.done??"–"} / ${T.due??"–"}</td><td class="n" style="color:${elPctCol(T.inWeek||0)};font-weight:700">${T.inWeek??"–"}%</td><td class="n">${T.lastMin??"–"}%</td>`
-        +`<td style="text-align:left;font-size:13px;max-width:460px"><details><summary style="font:400 13px system-ui,sans-serif;cursor:pointer;text-align:left">${esc(String(R.comment||"").replace(/<[^>]+>/g,"").slice(0,90))}…</summary><p style="margin:6px 0;font-size:13.5px;line-height:1.45">${esc(String(R.comment||"").replace(/<[^>]+>/g,""))}</p></details></td>`
-        +`<td style="white-space:nowrap"><a class="chip" href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener">📄 Open ↗</a></td>`
-      :`<td colspan="6" class="muted">No report yet</td>`)+`</tr>`}).join("");
+        +`<td style="text-align:left;font-size:13px;max-width:460px"><details><summary style="font:400 13px system-ui,sans-serif;cursor:pointer;text-align:left">${esc(String(R.comment||"").replace(/<[^>]+>/g,"").slice(0,90))}…</summary><p style="margin:6px 0;font-size:13.5px;line-height:1.45">${esc(tx(R.comment))}</p>${R.lang==="en"&&R.commentCa?`<p style="margin:6px 0;font-size:13.5px;line-height:1.45;color:#475569"><b>Català:</b> ${esc(tx(R.commentCa))}</p>`:""}`
+        +`<div class="bar" style="gap:6px"><button class="chip" data-do="hwcopy" data-msg="${esc(tx(R.commentCa||R.comment))}">📋 Copy the comment in Catalan</button>${ptsCa(R)?`<button class="chip" data-do="hwcopy" data-msg="${esc(ptsCa(R))}">📋 Copy each point in Catalan</button>`:""}</div></details></td>`
+        +`<td style="white-space:nowrap"><a class="chip" href="today.html?student=${encodeURIComponent(s.uid)}#report" target="_blank" rel="noopener">📄 Open ↗</a> ${rb1(s)}</td>`
+      :`<td colspan="5" class="muted">No report yet</td><td style="white-space:nowrap">${rb1(s)}</td>`)+`</tr>`}).join("");
   const n=k=>studs.filter(s=>{const R=REPS.d[String(s.email||"").toLowerCase()];return R&&R.time&&R.time.profile===k}).length;
   const pub=((S.D.tm[grp.id]||{}).repPub||{}).t1;
-  const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${pub
-      ?`<span style="background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-weight:700">📣 Draft published ${esc(new Date(pub).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(pub).toTimeString().slice(0,5))}: every student of ${esc(grp.name)} can open theirs on their board</span><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide the drafts again</button>`
-      :`<span style="background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;font-weight:700">🔒 Not published: students see theirs only while you press 📄 Show draft reports in class mode</span><button data-do="reppub" data-g="${grp.id}" data-v="1" style="background:#166534;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">📣 Publish the draft</button>`}</div>`;
-  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
+  const fin=((S.D.tm[grp.id]||{}).repFinal||{}).t1,when=v=>esc(new Date(v).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+new Date(v).toTimeString().slice(0,5));
+  // one path (Roger, 28 Nov 2026: "show them a draft some days before in case they still have tasks to do… they revise it and tell me
+  // anything in case they see a mistake, when all agree I publish the final version"): 1 hidden → 2 📣 draft for students to check → 3 ✅ final
+  const pill=(bg,fg,h)=>`<span style="background:${bg};color:${fg};border-radius:999px;padding:3px 10px;font-weight:700">${h}</span>`,btn=(d,v,bg,h)=>`<button data-do="${d}" data-g="${grp.id}" data-v="${v}" style="background:${bg};color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${h}</button>`;
+  const pubBar=`<div class="bar" style="margin:4px 0 10px;gap:8px;align-items:center">${fin&&pub
+      ?pill("#dcfce7","#166534",`✅ Final version published ${when(fin)}: every student of ${esc(grp.name)} sees their final report on their board. A 🔄 Rebuild still changes it.`)+`<button class="chip" data-do="repfin" data-g="${grp.id}" data-v="0">✏️ Back to draft</button><button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide</button>`
+      :pub?pill("#fef3c7","#92400e",`📣 Draft shown to students since ${when(pub)}: they check it, finish what is missing and tell you about any mistake (⚠️ Report a problem). It changes with their work.`)+btn("repfin",1,"#166534","✅ Publish the final version")+`<button class="chip" data-do="reppub" data-g="${grp.id}" data-v="0">🔒 Hide</button>`
+      :pill("#f1f5f9","#334155","🔒 Students can't see their report yet.")+btn("reppub",1,"#b45309","📣 Show them the draft")+btn("repfin",1,"#166534","✅ Publish the final version")}</div>`;
+  const rb=REPS.rb===grp.id,dn=REPS.done&&REPS.done.g===grp.id?REPS.done:null;
+  const rbBar=`<div class="bar" style="margin:0 0 10px;gap:8px;align-items:center"><button data-do="reprb" data-g="${grp.id}" ${REPS.rb?"disabled":""} style="background:#1d4ed8;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer">${rb?"⏳ Rebuilding…":"🔄 Rebuild the reports"}</button>`
+    +`<span class="muted" style="font-size:13px">${dn?`✅ ${dn.one?"1 report":dn.n+" reports"} rebuilt ${esc(new Date(dn.at).toTimeString().slice(0,5))}.`:"Works out every report again from the students' work, with fixed sentences in your voice (no AI): the lines that quote their mistakes and this list too."}</span></div>`;
+  return back+`<div class="box"><h2>📄 Term 1 reports · ${esc(grp.name)}</h2>${pubBar}${rbBar}<p class="muted">🟢 ${n("steady")} steady · 🟡 ${n("behind")} behind · 🟠 ${n("last")} last minute · 🔴 ${n("none")} nothing done.</p>`
     +`<div style="overflow-x:auto"><table class="t"><thead><tr><th>Student</th><th>How they worked</th><th>Done</th><th>In the class week</th><th>Last minute</th><th>Comment</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
@@ -7349,7 +7409,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=S.reps=false;S.stuBoth=false;if(S.place==="students"&&!termLss([l],S.term,S.g).length)S.term="t"+lsTerm(l);render()},
     lsboth:()=>{S.stuBoth=true;render()},
     tclose:()=>tclosePanel(k.g,+k.n),tcsave:()=>tcloseSet(k.g,+k.n,k.d),tcopen:()=>{if(confirm("Reopen this term? Everything ticked goes back into its own term."))tcloseSet(k.g,+k.n,null)},
-    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reppub:()=>repPublish(k.g,k.v==="1"),
+    tform:()=>tformSet(+k.n,k.v),yearview:()=>{S.year=true;render();scrollTo(0,0)},repview:()=>{S.reps=true;render();scrollTo(0,0)},repclose:()=>{S.reps=false;render();scrollTo(0,0)},reprb:()=>repRebuild(k.g),reprb1:()=>repRebuild(k.g,k.v),repfin:()=>repFinal(k.g,k.v==="1"),reppub:()=>repPublish(k.g,k.v==="1"),
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?termLss(EL_LS.filter(l=>l.course===g.course),k.t,g.id):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},

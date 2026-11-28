@@ -333,6 +333,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 .rph{background:var(--rk);color:#fff;border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin:12px 0 8px}
 .rph h2{color:#fff;margin:2px 0 0;font-size:1.35rem}.rph small{color:#fff;opacity:.92;font-size:13px}.rph .route{background:#fff;color:#0f172a}
 .rpdraft{background:#fffbeb;border:1px dashed #f59e0b;border-radius:10px;padding:8px 12px;margin:0 0 4px;color:#78350f;font-size:14px}
+.rpdraft.fin{background:#f0fdf4;border:1px solid #16a34a;color:#14532d}
 .rpls{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rpl{border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px}
 .rpl h3{margin:2px 0 6px;font-size:16px;color:#0f172a}.rpl ul{margin:0;padding-left:18px}.rpl li{margin:0 0 10px;color:#0f172a}.rphow{margin-top:12px;background:#f8fafc}.rphow li{margin-bottom:4px}
 .rpt{display:block}.rpf{display:block;font-size:13.5px;color:#475569;margin-top:3px}
@@ -357,7 +358,7 @@ data it already has (parent.elExamEmbed: no Firestore read, no sign-in, no stude
 <script src="shared/js/el-fp-rubrics.js?v=20261127b"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-flashdeck.js?v=20261127w"></script><script src="shared/js/el-mascot.js?v=20261126b"></script>
-<script src="shared/js/el-term-report.js?v=20261127"></script>
+<script src="shared/js/el-term-report.js?v=20261128b"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js?v=20261125"></script>
@@ -2062,8 +2063,12 @@ function mxDo(d){const M=S.mx;
 // skills chart are worked out here, live, as on 📊 My marks and 🎓 My progress; when the work was done and the comment come from the draft.
 // or at any time once the teacher publishes the group's drafts (📣 Publish the draft on the dashboard: teams/{group}.repPub.t1; Roger, 24 Nov 2026)
 const repPub=()=>!!(((D&&D.tm)||{}).repPub||{}).t1;
+// ✅ the final version (Roger, 28 Nov 2026: "the button to say that the current reports are the last version (even though I must be able to do
+// any changes I want)"): teams/{group}.repFinal.t1 = when. The page then shows the saved report as it is (no live build, so it no longer
+// changes with the student's work), without "draft"; Roger can still rebuild any report or go back to draft from the dashboard.
+const repFin=()=>!!(((D&&D.tm)||{}).repFinal||{}).t1,repDr=()=>repFin()?"":t(" (esborrany)"," (draft)");
 const repOk=()=>!!(DEMO||AS||all()||window.EL_REP_ON||repPub());
-const repChip=cls=>repPub()&&!all()?`<a class="${cls}" href="#report">📄 ${t("El meu informe del 1r trimestre (esborrany)","My Term 1 report (draft)")}</a>`:"";
+const repChip=cls=>repPub()&&!all()?`<a class="${cls}" href="#report">📄 ${t("El meu informe del 1r trimestre","My Term 1 report")}${repDr()}</a>`:"";
 const repTxt=s=>esc(s).replace(/&lt;(\/?)i&gt;/g,"<$1i>");   // the draft's lines: plain text with <i> only
 // the level names: English with the official Catalan in brackets (Roger, 23 Nov 2026: "students must see the translation though")
 const REP_DEG=[["No assoliment","Not satisfactory"],["Assoliment satisfactori","Satisfactory"],["Assoliment notable","Very good"],["Assoliment excel·lent","Excellent"]];
@@ -2099,7 +2104,7 @@ function reportPlace(lss,ls){
   // built live from the student's own work each time the page opens (Roger, 27 Nov 2026: "reports must be done as we do activities, meaning
   // they pull the information automatically on their own"; el-term-report.js elTrepBuild): only the tabs taught by the term's last day
   // count, so a step that was never unlocked never counts; the saved draft (S.rep) only lends its written lines while a % is the same
-  const R=repLive(C,course)||S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
+  const R=(repFin()?null:repLive(C,course))||S.rep,pts=R.pts||[],mine=C.lss.map(x=>EL_LS.find(l=>l.id===x.ls)).filter(Boolean),g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lv=(elRouteOf(D.lv,(mine[mine.length-1]||{}).id)||{}).level;
   const P=[];C.lss.forEach(x=>x.pts.forEach(p=>P.push(p)));
   const pill=v=>v==null?`<span class="rpp none">–</span>`:`<span class="rpp" style="background:${col(v)}">${v} %</span>`;
@@ -2123,7 +2128,7 @@ function reportPlace(lss,ls){
   const next=`<div class="rpv next">📅 <b>${t("A partir del 2n trimestre, també comptarà <u>quan</u> fas les activitats.","From term 2, <u>when</u> you do your activities will count too.")}</b> ${t("Fes cada activitat la setmana que la fem a classe. Les activitats que no facis, o que facis totes al final del trimestre o just abans de l'examen, et baixaran la nota.","Do each activity in the week we do it in class. Activities left undone, or all done at the end of the term or just before the exam, will lower your mark.")}</div>`;
   const box=(i,h,sub,body)=>`<div class="box fv rpb">${fvHead(i,h,sub)}${body}</div>`;
   return `<div class="trep" data-c="${esc(course)}"><div class="rph"><div><small>${esc(g?g.name:"")} · English</small><h2>${esc(repName())}</h2></div>${lv?levelTag(course,lv):""}</div>`
-    +`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Pot canviar: les activitats que acabis abans de divendres encara compten.","<b>Draft.</b> It can still change: the activities you finish before Friday still count.")}</p>`
+    +(repFin()?`<p class="rpdraft fin">✅ ${t("<b>Versió final</b> del teu informe del 1r trimestre.","<b>Final version</b> of your Term 1 report.")}</p>`:`<p class="rpdraft">✏️ ${t("<b>Esborrany.</b> Revisa'l: encara pot canviar amb les activitats que acabis. Si hi veus cap error, digues-m'ho amb ⚠️ Avisa d'un problema.","<b>Draft.</b> Check it: it can still change with the activities you finish. If you see a mistake, tell me with ⚠️ Report a problem.")}</p>`)
     +box("🎓",t("Les teves notes","Your marks"),"",glance)   // first, right under the Draft line (Roger, 25 Nov 2026: "this should be at the top under draft")
     +box("🧭",t("Aquest primer trimestre hem treballat","What we worked on this term"),t("i com t'ha anat cada punt","and how each point went for you"),worked)
     +compBox(mine,1)
@@ -2162,7 +2167,7 @@ function progressPlace(lss,ls){
   const tp=rows.filter(r=>r.l).map(r=>lsDone(r.l,tm)).filter(Boolean).flatMap(x=>x.parts),tw=tp.reduce((n,x)=>n+x.w,0),TP=tw?tp.reduce((n,x)=>n+x.w*x.f,0)/tw*100:null;
   // 📄 The term reports at the top of My progress, right under its title (Roger, 25 Nov 2026: "the reports will apear here on top"): one
   // card per report the student can open (Term 1 now), whatever term is chosen below
-  const reps=repOk()?`<a class="pgrep" href="#report"><span aria-hidden="true">📄</span><span><b>${t("El meu informe del 1r trimestre (esborrany)","My Term 1 report (draft)")}</b><small>${t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`:"";
+  const reps=repOk()?`<a class="pgrep" href="#report"><span aria-hidden="true">📄</span><span><b>${t("El meu informe del 1r trimestre","My Term 1 report")}${repDr()}</b><small>${t("criteris, gramàtica i vocabulari, la teva feina de cada dia i el comentari del professor","criteria, grammar and vocabulary, your daily work and your teacher's comment")}</small></span><span aria-hidden="true">→</span></a>`:"";
   // 🏆 my points and the term bonus at the top of My progress, under the term report card (Roger, 26 Nov 2026: "This should go on top
   // of My progress, not in my marks")
   return reps+`<div id="ptbox">${pointsLine()}</div>`+`<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(tmName(tm)),these.map(r=>"LS"+r.n).join(" · "))}`
