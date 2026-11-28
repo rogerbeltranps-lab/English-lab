@@ -152,7 +152,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv.on.off{background:none;color:inherit}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cbar2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:14px}.cbar2 .cbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.cbar2 button{margin:0}
-.ctw{max-height:62vh}table.ctab{width:100%}table.ctab td,table.ctab th{text-align:left;vertical-align:top;font-size:13.5px}table.ctab td.ctn{min-width:150px}table.ctab td.ctg{white-space:nowrap;font-weight:600}table.ctab td.ctd{min-width:150px;width:1%}table.ctab td.ctd .cchip{display:block;margin:0 0 3px;white-space:nowrap}table.ctab tbody+tbody tr:first-child td{border-top:2px solid #cbd5e1}.cfind{flex:1 1 200px;max-width:280px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;font:inherit;font-size:14px}
+.ctw{max-height:62vh}table.ctab{width:100%}table.ctab td,table.ctab th{text-align:left;vertical-align:top;font-size:13.5px}table.ctab td.ctn{min-width:150px}table.ctab td.ctg{white-space:nowrap;font-weight:600}table.ctab td.ctd{min-width:150px;width:1%}table.ctab td.ctd .cchip{display:block;margin:0 0 3px;white-space:nowrap}table.ctab tbody+tbody tr:first-child td{border-top:2px solid #cbd5e1}table.ctab tr.cdh th{background:#f1f5f9;font-size:13.5px;padding:6px 8px;border-top:2px solid #cbd5e1}table.cbd td.ctd .cchip{display:inline-block}.csort{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 6px}.cfind{flex:1 1 200px;max-width:280px;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;font:inherit;font-size:14px}
 .cline{padding:7px 0;border-top:1px solid #eef2f7}.cwho{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}details.cgrp details.cgrp,details.cday details.cgrp{margin-left:14px}
 .chip.cchip{font-size:13px;padding:2px 10px;cursor:pointer}.chip.cchip:hover{border-color:#3157d5;color:#2443ad}.chip.cchip.late{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
 .cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
@@ -283,7 +283,7 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 @media(max-width:900px){.tp2s .tp2col{position:static;height:auto;display:block}.tp2s .agw{display:grid}.tp2s .agr{overflow:visible}.tp2s{grid-template-columns:1fr}.tp2sr{position:static;max-height:none}.tp2sr .lpall .wrap{max-height:75vh}}
 @media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
 </style>
-<link rel="stylesheet" href="shared/css/el-phone.css?v=20261125n"></head><body>
+<link rel="stylesheet" href="shared/css/el-phone.css?v=20261128c"></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
@@ -2768,7 +2768,7 @@ const corrOld=()=>{const t=corrRanAt();return DEMO||!t||!RAW||(AT.corr||0)>=t?[]
 async function corrFresh(){const old=corrOld();if(!old.length||CORR.busy||Date.now()-CORR.failT<5*60e3)return;CORR.busy=true;CORR.failT=0;const t=corrRanAt();
   try{if(old.length===GR.length)S.D=await load("all");else{await Promise.all(old.map(g=>loadGroup(g.id)));S.D=build(S.D)}AT.corr=t;saveCache();LIVE.since={}}
   catch(e){console.warn("corrections fetch",e);CORR.failT=Date.now()}
-  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();   // S.corrShut = the groups opened in Waiting (closed at first since 14 Nov 2026: the two tables come first)
+  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrSort=(()=>{try{return localStorage.getItem("el_t_corrsort")==="stu"?"stu":"date"}catch(e){return "date"}})();S.corrShut=new Set();   // S.corrShut = the groups opened in Waiting (closed at first since 14 Nov 2026: the two tables come first)
 document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.add(g):S.corrShut.delete(g)},true);
 function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
   const wait=[],done=[],gem=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
@@ -2822,9 +2822,22 @@ function corrEur(kind,x){x=x||{};if(typeof x.eur==="number")return {eur:x.eur};
   const t=Number((x.draft||{}).secs);if(!t)return {};const p=corrEurP[x.model]||corrEurP["gemini-pro-latest"];return {eur:(t*300*p[1]+3000*p[0]+2500*p[2])/1e6*0.87*Math.max(1,(x.changes||[]).length+1),est:true}}
 const eurTx=(v,est)=>(est?"≈ ":"")+"€"+(v<0.01?v.toFixed(3):v.toFixed(2));
 const corrFold=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-function corrFind(){const q=corrFold(S.corrQ).trim();document.querySelectorAll("table.ctab tbody[data-cn]").forEach(b=>{b.hidden=!!q&&!b.dataset.cn.includes(q)})}
+function corrFind(){const q=corrFold(S.corrQ).trim(),hit=b=>!q||b.dataset.cn.includes(q);document.querySelectorAll("table.ctab tbody[data-cn]").forEach(b=>{b.hidden=!hit(b)});
+  // 📅 by date: one row per correction under its day; a day with no row left hides too
+  document.querySelectorAll("table.ctab tbody.cdy").forEach(b=>{let n=0;b.querySelectorAll("tr[data-cn]").forEach(r=>{r.hidden=!hit(r);if(!r.hidden)n++});b.hidden=!n})}
 document.addEventListener("input",e=>{if(e.target.id==="corrfind"){S.corrQ=e.target.value;corrFind()}});
-function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;
+// 📅 Newest first (Roger, 28 Nov 2026: "I need the corrections to be order by dates, not by students (but I could have a button to switch from
+// dates to students"): the default; one row per correction under its day (newest day first, newest time first), the time button opens it.
+// 👤 By student is the table above (14 Nov 2026). The choice stays on this computer (el_t_corrsort).
+function corrByDate(L){const hm=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),days={};
+  L.slice().sort((p,q)=>(q.at||0)-(p.at||0)).forEach(i=>{const d=i.at?ymd(i.at):"";(days[d]=days[d]||[]).push(i)});
+  const body=Object.entries(days).map(([d,is])=>`<tbody class="cdy"><tr class="cdh"><th colspan="4">${d?esc(corrDay(is[0].at)):"No date"} <span class="muted">· ${plural(is.length,"correction")}</span></th></tr>`
+    +is.map(x=>{const s=S.P[x.u],g=GR.find(z=>z.id===x.gid),ic=ckI(x.k);
+      return `<tr data-cn="${esc(corrFold(s?fullName(s)+" "+name(s):""))}"><td class="ctd"><button class="chip mini cchip" data-do="corropen" data-u="${x.u}" data-a="${esc(x.aid)}" data-s="${esc(x.step)}" data-k="${x.k}" title="Open what the student got${x.est?" (💶 an estimate: this was before the cost was saved)":""}">${x.at&&!x.approx?esc(hm(x.at)):"Open"}${x.eur!=null?` · 💶 ${eurTx(x.eur,x.est)}`:""}</button></td>`
+        +`<td class="ctn"><b>${s?name(s):"?"}</b></td><td class="ctg">${esc(g?g.name:"")}</td>`
+        +`<td>${ic[0]} <b>${esc(x.k==="answer"?"Comment on "+(x.name||""):x.name||ic[1])}</b><br><small class="muted">${esc(ic[1])}${x.note?" · "+esc(x.note):""} · ${esc(actTitle(x.aid))}</small></td></tr>`}).join("")+`</tbody>`).join("");
+  return `<div class="wrap ctw"><table class="ctab cbd"><thead><tr><th>Time</th><th>Student</th><th>Course</th><th>Task</th></tr></thead>${body}</table></div>`}
+function corrTable(L,empty){if(!L.length)return `<p class="muted">${empty}</p>`;if(S.corrSort!=="stu")return corrByDate(L);
   const by={},ord=id=>{const n=cat.findIndex(x=>x.id===id);return n<0?1e4:n},hm=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
   L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});
   const body=Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],g=GR.find(x=>x.id===is[0].gid),tk={};
@@ -2880,6 +2893,7 @@ function corrPage(){
   const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO||chk?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
     stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> The page could not fetch the latest work by itself. Beltran corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")
+    +`<span class="csort"><span class="muted">Order:</span> ${[["date","📅 Newest first"],["stu","👤 By student"]].map(([v,l])=>`<button class="chip ${S.corrSort===v?"on":""}" data-do="corrsort" data-v="${v}">${l}</button>`).join("")}</span>`
     +`<input id="corrfind" class="cfind" type="search" placeholder="🔍 Find a student" value="${esc(S.corrQ||"")}" autocomplete="off"></div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
   // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
@@ -2913,7 +2927,7 @@ function corrPage(){
       <li><b>When you press ✏️ Correct everything waiting now</b> · the same as the afternoon run, at once (it starts within a few minutes; students still see it from 17:00 on a weekday).</li>
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Beltran stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
-  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">What Roig and Beltran corrected, by student · Beltran corrects every weekday · students see it at 17:00</div></div>`
+  return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">What Roig and Beltran corrected, ${S.corrSort==="stu"?"by student":"newest first"} · Beltran corrects every weekday · students see it at 17:00</div></div>`
     +`${stale}${card}${gchips}<div class="hl">${gemB}${claB}</div><div class="hgrid" style="margin-top:12px"><div class="hl">${waitB}</div><div class="hl">${infoB}</div></div>`}
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
   if(k.k==="answer"||k.k==="gfp")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
@@ -6992,7 +7006,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       try{await spkOne(r,s.group)}catch(err){alert("Roig could not analyse it: "+String(err.message||err).replace(/paste tools\/notify\/school-mail.gs/,"paste the school script v34"))}
       if(redraw&&$("#dlg").open)redraw();else render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
-    corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
+    corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrsort:()=>{S.corrSort=k.v==="stu"?"stu":"date";try{localStorage.setItem("el_t_corrsort",S.corrSort)}catch(e){}render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
     corrcheck:()=>{const r=api.mkRead();(r&&r.then?r:Promise.resolve()).then(render,e=>alert("Could not check: "+e.message))},   // one read, never a full load
     sethw:()=>{e.preventDefault();const x=planX(k.ls,k.gid),r=x.p.rows[+k.i];hwOpen(x,noCp(x,k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,"")),lineDate(r,k.line)||ELWeek.today(),origOf(x,k.line));
