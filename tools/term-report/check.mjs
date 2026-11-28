@@ -50,5 +50,8 @@ ok(/^Your everyday work/.test(RX.comment)&&RX.comment.indexOf("exam")>RX.comment
 {const E=["endProud","endEffort","endFresh","endBelieve","endThanks"].map(k=>W.EL_TREP_BANK[k]);ok(E.some(b=>RX.comment.endsWith(b.en)),"the comment ends with a closing sentence: "+RX.comment);
  ok(E.some(b=>RX.commentCa.endsWith(b.ca)),"the Catalan comment ends the same way: "+RX.commentCa);}
 const RC=W.elTrepBuild(C,Object.assign({},ctx,{rs:rsX,lang:"ca"}));ok(RC.commentCa===RC.comment,"a Catalan report's Catalan comment is the comment itself");
+// 📋 How I'm working (Roger, 28 Nov 2026): the students' table has the report's numbers and one row per tab taught, never a locked one
+{const T=W.elTrepTabs([LS],ctx);ok(T.due===R.time.due&&T.done===R.time.done&&T.inWeek===R.time.inWeek&&T.profile===R.time.profile,"the table's numbers must be the report's");
+ ok(T.rows.length===1&&T.rows[0].a.id==="4eso/ls2-celebrations-around-the-world"&&T.rows[0].tab==="read"&&T.rows[0].day==="2026-11-04"&&T.rows[0].done&&T.rows[0].at==="2026-11-05","one row: the Reading taught on 4 Nov, done on 5 Nov ("+JSON.stringify(T.rows.map(r=>[r.a.id,r.tab,r.day,r.at]))+")");}
 if(bad.length){console.error("✗ Term report:\n  "+bad.join("\n  "));process.exit(1)}
 console.log("✓ Term report: built live, locked steps never count, saved lines kept while unchanged");

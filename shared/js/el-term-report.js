@@ -233,9 +233,14 @@
     return `${b} ${L === "ca" ? "Vigila" : "Watch out"}: “${eq}” → ${fx}.${rule ? " " + rule : ""}`; }
 
   // when the work was done: every tab taught in the term (its class day), done in the week of its class, later, or at the last minute
-  function timing(C, ctx) {
-    const T = ctx.term || {}, to = T.to || "9999-12-31", from = T.from || "", G = window.EL_GRADING || {}, W = window.ELWeek;
-    const lss = C.lss.map(x => x.ls).filter(id => G[id] && !G[id].only);   // LS1 (exam and final product only): its paths were practice
+  // The same measures, tab by tab, are what the student sees all term in 🎓 My progress › 📋 How I'm working (Roger, 28 Nov 2026: "it's a
+  // good idea that the students see that during the term… a table with their progress easy to understand"; today.html howCard):
+  // elTrepTabs(LS ids, ctx) gives the summary below plus rows = [{ls, a (activity), tab, day (its class day), at (the day it was finished, or "")}]
+  function timing(C, ctx) { return tabs(C.lss.map(x => x.ls), ctx); }
+  window.elTrepTabs = (ids, ctx) => tabs(ids, ctx);
+  function tabs(ids, ctx) {
+    const T = ctx.term || {}, to = T.to || "9999-12-31", from = T.from || "", G = window.EL_GRADING || {}, W = window.ELWeek, rows = [];
+    const lss = ids.filter(id => G[id] && !G[id].only);   // LS1 (exam and final product only): its paths were practice
     let due = 0, dn = 0, inWeek = 0, lastMin = 0, lateN = 0, exam = null, start = null; const wk = {};
     lss.forEach(ls => { const p = (window.EL_PLAN || {})[ls], gi = p && W ? W.col(p, ctx.group) : -1;
       if (p && gi >= 0 && p.exam && p.exam[gi]) exam = p.exam[gi];
@@ -248,12 +253,12 @@
         const S = (a.keys || []).map(k => st(ctx, k)).filter(Boolean), D = Object.assign({}, ...S.map(s => s.done || {})), A = Object.assign({}, ...S.map(s => s.doneAt || {}));
         Object.entries(D).forEach(([pid, v]) => { const at = v && day(A[pid]); if (at) wk[monday(at)] = (wk[monday(at)] || 0) + 1; });   // the weekly bars: every step finished
         Object.entries(days).forEach(([k, d]) => { if (!k.startsWith(a.id + "#") || d <= from) return; const tab = k.slice(a.id.length + 1);
-          const steps = window.elSecSteps ? elSecSteps(a, tab) : [tab]; if (!steps.length) return; due++;
-          if (!steps.every(s => D[s])) return; dn++; const at = day(steps.map(s => A[s]).filter(Boolean).sort().pop()); if (!at) return;
+          const steps = window.elSecSteps ? elSecSteps(a, tab) : [tab]; if (!steps.length) return; due++; const row = { ls, a, tab, day: d, done: false, at: "" }; rows.push(row);
+          if (!steps.every(s => D[s])) return; dn++; row.done = true; const at = day(steps.map(s => A[s]).filter(Boolean).sort().pop()); if (!at) return; row.at = at;
           if (at <= addD(d, 7)) inWeek++; else { lateN++; if (at >= addD(to, -6) || (exam && at >= addD(exam, -3) && at <= exam)) lastMin++; } }); }); });
     const weeks = []; if (start) for (let w = monday(start); w <= monday(exam && exam > to ? exam : to); w = addD(w, 7)) { weeks.push([w, wk[w] || 0]); if (weeks.length > 30) break; }
     const p = due ? Math.round(inWeek / due * 100) : 0, lm = dn ? Math.round(lastMin / dn * 100) : 0, prof = !due ? null : !dn ? "none" : p >= 70 ? "steady" : lm >= 40 ? "last" : "behind";
-    return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam }; }
+    return { due, done: dn, late: lateN, inWeek: p, lastMin: lm, profile: prof, weeks, exam, rows }; }
 
   // the comment, in Roger's voice (never a name), from a fixed bank of objective sentences: each one says only what the activities, the
   // Time plan dates or the exams show (Roger, 28 Nov 2026: "a bank of sentences… that are objective and that can be observed in the
