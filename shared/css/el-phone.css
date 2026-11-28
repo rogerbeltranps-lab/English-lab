@@ -367,4 +367,7 @@
   table.ctab.cbd tr[data-cn] td{border:0;padding:0}
   table.ctab.cbd tr[data-cn] td:last-child{grid-column:1/-1}
   table.ctab.cbd [hidden]{display:none}
+  /* 📄 the report chips (Term 1, 2, 3, the year: today.html repSwitch) two by two, not four full-width rows */
+  .rpsw{display:grid!important;grid-template-columns:1fr 1fr;gap:6px}
+  .rpsw .pgt{min-width:0;width:auto;padding:6px 10px}
 }

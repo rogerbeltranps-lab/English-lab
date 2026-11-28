@@ -181,9 +181,20 @@ service cloud.firestore {
     // termReportsT/{email}: the teacher's extra numbers (first tries vs latest), teacher only.
     // or once Roger publishes the group's drafts (Roger, 24 Nov 2026: "Can you make a publish draft button?"): teams/{group}.repPub.t1 = when (teacher.html repPublish)
     function reportPublished() { return exists(/databases/$(database)/documents/teams/$(rosterGroup())) && get(/databases/$(database)/documents/teams/$(rosterGroup())).data.get('repPub', {}).get('t1', null) != null; }
-    function reportShown() { return reportPublished() || request.time.toMillis() - get(/databases/$(database)/documents/live/$(rosterGroup())).data.get('go', {}).get('report', {}).get('at', 0) < 5400000; }
+    function reportShown() { return reportPublished() || (request.time.toMillis() - get(/databases/$(database)/documents/live/$(rosterGroup())).data.get('go', {}).get('report', {}).get('at', 0) < 5400000
+      && get(/databases/$(database)/documents/live/$(rosterGroup())).data.get('go', {}).get('report', {}).get('term', 't1') == 't1'); }
     match /termReports/{email} {
       allow get: if isTeacher() || (school() && email == myEmail() && exists(roster()) && reportShown());
+      allow read, write: if isTeacher();
+    }
+    // Term 2, Term 3 and the final report of the year (Roger, 28 Nov 2026: "a 1st term, 2n term, 3rd term and final mark report option"):
+    // termReportsN/{term}_{email}, term = t2 | t3 | y, written by the dashboard (🔄 Rebuild). A student gets only their own, and only while
+    // that report is published for their group (teams/{group}.repPub.{term}) or the class tab shows it (live/{group}.go.report.term).
+    function termPublished(t) { return exists(/databases/$(database)/documents/teams/$(rosterGroup())) && get(/databases/$(database)/documents/teams/$(rosterGroup())).data.get('repPub', {}).get(t, null) != null; }
+    function termShown(t) { return termPublished(t) || (get(/databases/$(database)/documents/live/$(rosterGroup())).data.get('go', {}).get('report', {}).get('term', '') == t
+      && request.time.toMillis() - get(/databases/$(database)/documents/live/$(rosterGroup())).data.get('go', {}).get('report', {}).get('at', 0) < 5400000); }
+    match /termReportsN/{id} {
+      allow get: if isTeacher() || (school() && exists(roster()) && id.split('_')[0] in ['t2', 't3', 'y'] && id == id.split('_')[0] + '_' + myEmail() && termShown(id.split('_')[0]));
       allow read, write: if isTeacher();
     }
     match /termReportsT/{email} {

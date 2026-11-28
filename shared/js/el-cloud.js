@@ -1982,11 +1982,13 @@ function selfTodo(){if(document.getElementById("el-rem"))return Promise.resolve(
 // termReports/{email} only while go.report is under 90 minutes old. When it goes, class mode takes them back to the class as usual.
 const REP_MS=90*60e3;let REP_ON=false;
 function cmReport(g){const r=g&&g.cm&&g.report,on=!!(r&&r.s===g.s&&Date.now()-r.at<REP_MS&&!onDash&&user&&isStudent(user)&&!AS&&!window.EL_EXAM_LOCK);
-  const was=REP_ON;REP_ON=on;window.EL_REP_ON=on;if(was!==on)dispatchEvent(new Event("el-report"));
+  // which report: go.report.term ("t1", "t2", "t3" or "y" for the final report of the year; Term 1 when the class tab didn't say)
+  const k=on&&/^(t[123]|y)$/.test(r.term||"")?r.term:"t1",h=k==="t1"?"report":"report-"+k,wasK=window.EL_REP_TERM;
+  const was=REP_ON;REP_ON=on;window.EL_REP_ON=on;window.EL_REP_TERM=k;if(was!==on||(on&&wasK!==k))dispatchEvent(new Event("el-report"));
   if(!on)return false;
   const board=/\/today\.html$/.test(location.pathname);
-  if(board){if(location.hash!=="#report")location.hash="report"}
-  else goMove(new URL("today.html#report",ROOT),lockCa()?"📄 El teu informe del trimestre":"📄 Your term report",false,3,"📄");
+  if(board){if(location.hash!=="#"+h)location.hash=h}
+  else goMove(new URL("today.html#"+h,ROOT),lockCa()?"📄 El teu informe del trimestre":"📄 Your term report",false,3,"📄");
   return true}
 const CHEER_MS=4*60e3;let cheerT=0;
 function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();cmTopSpace()}
