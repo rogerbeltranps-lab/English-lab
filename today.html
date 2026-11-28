@@ -2122,7 +2122,7 @@ function repWeeks(T){const w=(window.elTrepWeeks?elTrepWeeks(T):[]).map(x=>[x.d,
   w.forEach(([d,v],i)=>{v=+v||0;const x=L+i*bw+bw*.18,ww=bw*.64,hot=v>2*avg&&v>=5;g+=`<rect x="${x}" y="${ys(v)}" width="${ww}" height="${ys(0)-ys(v)}" rx="3" fill="${hot?"#ea580c":"var(--rk,#2563eb)"}"/>`
     +(v?`<text class="lb" x="${x+ww/2}" y="${ys(v)-4}" text-anchor="middle">${v}</text>`:"")
     +`<text x="${x+ww/2}" y="${H-10}" text-anchor="middle">${d===ex?"▲ ":""}${new Date(d+"T12:00:00").toLocaleDateString(EN?"en-GB":"ca",{day:"numeric",month:"short"})}</text>`});
-  return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
+  return `<div class="rpw"><svg viewBox="0 0 ${Wd} ${H}" width="100%" style="max-width:720px;display:block" role="img" aria-label="${t("Activitats acabades cada setmana","Activities finished each week")}">${g}</svg></div>`}
 const repName=()=>{const n=String(D.me.name||"").trim();return n.includes(",")?n.split(",")[1].trim()+" "+n.split(",")[0].trim():n};
 const repGames=()=>Object.values(D.mg||{}).filter(g=>g&&g.title&&g.of);
 function repLive(C,course,Z){if(!window.elTrepBuild||!D.me.group)return null;
